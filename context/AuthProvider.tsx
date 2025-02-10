@@ -9,16 +9,15 @@ SplashScreen.preventAutoHideAsync();
 type AuthContextProps = {
 	session: Session | null | undefined;
 	user: User | null | undefined;
+	login: (credentials: { email: string; password: string }) => Promise<void>;
+	logout: () => Promise<void>;
 };
 
 type AuthProviderProps = {
 	children: React.ReactNode;
 };
 
-const AuthContext = createContext<AuthContextProps | undefined>({
-	session: undefined,
-	user: undefined,
-});
+const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 const AuthProvider = ({children }: AuthProviderProps) => {
 	const [session, setSession] = useState<Session | null | undefined>(undefined);
@@ -26,17 +25,33 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 	useEffect(() => {
 		supabase.auth.getSession().then(({data: { session }}) => {
 			setSession(session);
+			SplashScreen.hide();
 		});
 
 		supabase.auth.onAuthStateChange((_event, session) => {
 			setSession(session);
 		});
 	}, []);
+
+	const login = async ({ email, password }: { email: string; password: string }) => {
+		const { error } = await supabase.auth.signInWithPassword({
+			email: email,
+			password: password,
+		});
+		if (error) throw error;
+	};
+
+	const logout = async () => {
+		await supabase.auth.signOut();
+	};
+
 	return (
 		<AuthContext.Provider
 		value={{
 			session: session,
-			user: null
+			user: null,
+			login: login,
+			logout: logout,
 		}}
 		>
 			{children}
