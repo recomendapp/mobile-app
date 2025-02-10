@@ -1,5 +1,6 @@
 import { AuthProvider } from "./AuthProvider";
 import { ReactQueryProvider } from "./ReactQueryProvider";
+import { SupabaseProvider } from "./SupabaseProvider";
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -7,11 +8,13 @@ type ProvidersProps = {
 
 const Providers = ({ children } : ProvidersProps) => {
 	return (
-		<ReactQueryProvider>
-			<AuthProvider>
-				{children}
-			</AuthProvider>
-		</ReactQueryProvider>
+		<SupabaseProvider locale='en-US'>
+			<ReactQueryProvider>
+				<AuthProvider>
+					{children}
+				</AuthProvider>
+			</ReactQueryProvider>
+		</SupabaseProvider>
 	)
 };
 

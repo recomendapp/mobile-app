@@ -8,7 +8,12 @@ const AuthLayout = () => {
     return <Redirect href="/" />; // Redirige les utilisateurs connectés
   }
 
-  return <Stack screenOptions={{headerShown: false}}/>;
+  return (
+    <Stack>
+      <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen name="signup" options={{ headerShown: false }} />
+    </Stack>
+  );
 };
 
 export default AuthLayout;

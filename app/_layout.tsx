@@ -1,4 +1,5 @@
 import '~/global.css';
+import '~/lib/i18n';
 
 import { DarkTheme, DefaultTheme, Theme, ThemeProvider } from '@react-navigation/native';
 import { SplashScreen, Stack } from 'expo-router';
@@ -57,10 +58,7 @@ export default function RootLayout() {
     <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
       <Providers>
         <StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <Stack screenOptions={{ headerShown: false }}/>
         <PortalHost />
       </Providers>
     </ThemeProvider>

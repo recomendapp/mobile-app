@@ -1,8 +1,8 @@
-import { supabase } from "@/lib/supabase/client";
 import { User } from "@/types/type.db";
 import { Session } from "@supabase/supabase-js";
 import { SplashScreen } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useSupabaseClient } from "./SupabaseProvider";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -20,6 +20,7 @@ type AuthProviderProps = {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 const AuthProvider = ({children }: AuthProviderProps) => {
+	const supabase = useSupabaseClient();
 	const [session, setSession] = useState<Session | null | undefined>(undefined);
 
 	useEffect(() => {
