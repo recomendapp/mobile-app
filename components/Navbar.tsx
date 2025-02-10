@@ -18,11 +18,13 @@ export const Navbar = () => {
 		  icon: Icons.home,
 		  screen: 'index',
 		  label: t('routes.home'),
+		  href: undefined,
 		},
 		{
 		  icon: Icons.search,
 		  screen: 'search',
 		  label: t('routes.search'),
+		  href: undefined,
 		},
 		// {
 		//   icon: Icons.explore,
@@ -43,13 +45,13 @@ export const Navbar = () => {
 			icon: Icons.library,
 			screen: 'collection',
 			label: t('routes.library'),
-			href: session ? 'collection' : null,
+			href: session ? undefined : null,
 		},
 		{
 			icon: Icons.user,
 			screen: 'auth',
 			label: t('common.word.login'),
-			href: session ? null : 'auth',
+			href: session ? null : undefined,
 		}
 	], [session]);
 
