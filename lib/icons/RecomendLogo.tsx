@@ -1,16 +1,14 @@
 import Svg, { Ellipse, Path, Polygon } from "react-native-svg";
-
-const RecomendLogo = (props: React.SVGProps<SVGSVGElement>) => {
-	return (
+import { iconWithClassName } from './iconWithClassName';
+import { LucideProps } from "lucide-react-native";
+import { forwardRef } from "react";
+const RecomendLogo = forwardRef<Svg, LucideProps>((props, ref) =>
 	<Svg
-	version="1.1"
+	ref={ref}
 	id="Calque_1"
-	xmlns="http://www.w3.org/2000/svg"
-	xmlnsXlink="http://www.w3.org/1999/xlink"
 	x="0px"
 	y="0px"
 	viewBox="0 0 2000 317.6"
-	xmlSpace="preserve"
 	{...props}
 	>
 		<Ellipse transform="matrix(0.7071 -0.7071 0.7071 0.7071 -104.3122 255.5879)" cx="256.4" cy="253.7" rx="63.3" ry="63.3"/>
@@ -64,8 +62,7 @@ const RecomendLogo = (props: React.SVGProps<SVGSVGElement>) => {
 		  c8.1,9.6,12.2,24.6,12.2,44.3S1892.1,223.4,1884.2,233.9z"/>
 		<Path d="M1981.4,235.2c-8.5,0-15.4,6.9-15.4,15.4v1.3c0,8.5,6.9,15.4,15.4,15.4c8.5,0,15.4-6.9,15.4-15.4v-1.3
 		  C1996.7,242.1,1989.8,235.2,1981.4,235.2z"/>
-	  </Svg>
-	);
-};
-
-export default RecomendLogo;
+	</Svg>
+)
+iconWithClassName(RecomendLogo);
+export { RecomendLogo };

@@ -1,10 +1,12 @@
-import RecomendLogo from "@/lib/icons/RecomendLogo";
-import { CompassIcon, HomeIcon, LibraryIcon, SearchIcon, StoreIcon, UserIcon, ZapIcon } from "lucide-react-native";
+import { RecomendLogo } from "@/lib/icons/RecomendLogo";
+import { cn } from "@/lib/utils";
+import { CompassIcon, HomeIcon, LibraryIcon, Loader2Icon, LucideProps, SearchIcon, StoreIcon, UserIcon, ZapIcon } from "lucide-react-native";
 
 export const Icons = {
 	site: {
 		logo: RecomendLogo,
 	},
+	spinner: Loader2Icon,
 	home: HomeIcon,
 	search: SearchIcon,
 	explore: CompassIcon,
