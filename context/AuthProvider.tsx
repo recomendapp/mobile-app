@@ -11,6 +11,14 @@ type AuthContextProps = {
 	user: User | null | undefined;
 	login: (credentials: { email: string; password: string }) => Promise<void>;
 	logout: () => Promise<void>;
+	signup: (credentials: {
+		email: string;
+		name: string;
+		username: string;
+		password: string;
+		language: string;
+		redirectTo?: string;
+	}) => Promise<void>;
 };
 
 type AuthProviderProps = {
@@ -46,6 +54,33 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		await supabase.auth.signOut();
 	};
 
+	const signup = async (
+		credentials: {
+			email: string;
+			name: string;
+			username: string;
+			password: string;
+			language: string;
+			redirectTo?: string;
+		}
+	) => {
+		const { error } = await supabase.auth.signUp({
+			email: credentials.email,
+			password: credentials.password,
+			options: {
+				// TOOD: handle deep linking
+				emailRedirectTo: undefined,
+				data: {
+					full_name: credentials.name,
+					username: credentials.username,
+					language: credentials.language,
+				}
+			}
+		})
+		if (error) throw error;
+	};
+
+
 	return (
 		<AuthContext.Provider
 		value={{
@@ -53,6 +88,7 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			user: null,
 			login: login,
 			logout: logout,
+			signup: signup,
 		}}
 		>
 			{children}

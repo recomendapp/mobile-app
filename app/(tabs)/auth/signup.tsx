@@ -1,6 +1,6 @@
 import { Alert, ImageBackground, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View} from 'react-native';
 import { useAuth } from '@/context/AuthProvider';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button, buttonTextVariants } from '@/components/ui/button';
@@ -8,9 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Link } from 'expo-router';
 import * as z from 'zod';
-import { useForm } from 'react-hook-form';
+import { Controller, Form, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import useDebounce from '@/hooks/useDebounce';
+import { useUsernameAvailability } from '@/hooks/useUsernameAvailability';
+import { useTranslation } from 'react-i18next';
+import { Icons } from '@/constants/Icons';
+import { InputPassword } from '@/components/ui/input-password';
 
 const backgroundImages = [
 	require('@/assets/images/auth/signup/background/1.gif'),
@@ -23,7 +27,9 @@ const FULL_NAME_MAX_LENGTH = 50;
 const PASSWORD_MIN_LENGTH = 8;
 
 const SignupScreen = () => {
-	const { login } = useAuth();
+	const { login, signup } = useAuth();
+	const [ isLoading, setIsLoading ] = useState(false);
+	const { t, i18n } = useTranslation();
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
 	const signupSchema = z.object({
@@ -101,27 +107,60 @@ const SignupScreen = () => {
 		defaultValues: defaultValues,
 		mode: 'onChange',
 	});
+	const usernameAvailability = useUsernameAvailability();
 	const usernameToCheck = useDebounce(form.watch('username'), 500);
 	// OTP
 	const numberOfDigits = 6;
 	const [showOtp, setShowOtp] = useState<boolean>(false);
 
+	useEffect(() => {
+		if (!form.formState.errors.username?.message && usernameToCheck) {
+			usernameAvailability.check(usernameToCheck);
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [usernameToCheck]);
 
+	useEffect(() => {
+		if (usernameAvailability.isAvailable === false) {
+			form.setError('username', {
+				message: t('common.form.username.schema.unavailable'),
+			});
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [usernameAvailability.isAvailable, t]);
 
-	// const handleSubmit = async () => {
-	// 	try {
-	// 		setIsLoading(true);
-	// 		await login({ email: email, password: password });
-	// 	} catch (error) {
-	// 		if (error instanceof AuthError) {
-	// 			Alert.alert(error.message);
-	// 		} else {
-	// 			Alert.alert('An unexpected error occurred. Please try again later.');
-	// 		}
-	// 	} finally {
-	// 		setIsLoading(false);
-	// 	}
-	// }
+	const handleSubmit = async (data: SignupFormValues) => {
+		try {
+			setIsLoading(true);
+			await signup({
+				email: data.email,
+				name: data.full_name,
+				username: data.username,
+				password: data.password,
+				language: i18n.language,
+			});
+			// toast.success(t('form.success', { email: data.email }));
+			setShowOtp(true);
+		} catch (error) {
+			if (error instanceof AuthError) {
+				switch (error.status) {
+					case 422:
+						Alert.alert(t('common.form.email.error.unavailable'));
+						break;
+					case 500:
+						Alert.alert(t('common.form.username.schema.unavailable'));
+						break;
+					default:
+						Alert.alert(error.message);
+				}
+			} else {
+				Alert.alert(t('common.error'));
+			}
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	return (
 		<ImageBackground source={backgroundImages[0]} style={{ flex: 1 }}>
 			<LinearGradient
@@ -132,7 +171,7 @@ const SignupScreen = () => {
 			}}
 			end={{
 				x: 0,
-				y: 0.7,
+				y: 0.4,
 			}}
 			style={{
 				flex: 1,
@@ -144,51 +183,108 @@ const SignupScreen = () => {
 				paddingBottom: 114
 			}}
 			>
-				{/* <ThemedText className='text-4xl font-bold'>
-					Welcome Back
-				</ThemedText> */}
 				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className='w-full gap-4'>
 					{/* EMAIL */}
-					<View className='w-full'>
-						<Label nativeID='email'>Email</Label>
-						<Input
-						nativeID="email"
-						placeholder="Email"
-						value={email}
-						onChangeText={setEmail}
-						aria-labelledby="email"
-						aria-errormessage="email"
-						aria-disabled={isLoading}
-						className='border-foreground/80 rounded-full'
+					<View>
+						<Label nativeID='email'>{t('common.form.email.label')}</Label>
+						<Controller
+							control={form.control}
+							render={({field: { onChange, onBlur, value }}) => (
+							<Input
+								onBlur={onBlur}
+								onChangeText={value => onChange(value)}
+								value={value}
+								autoComplete="email"
+								placeholder={t('common.form.email.placeholder')}
+							/>
+							)}
+							name="email"
+							rules={{ required: true }}
 						/>
 					</View>
-					{/* PASSWORD */}
-					<View className='w-full'>
-						<Label nativeID='password'>Password</Label>
-						<Input
-						nativeID="password"
-						placeholder="Password"
-						value={password}
-						onChangeText={setPassword}
-						secureTextEntry
-						aria-labelledby="password"
-						aria-errormessage="password"
-						aria-disabled={isLoading}
-						className='border-foreground/80 rounded-full'
+					<View>
+						<Label nativeID='username'>{t('common.form.username.label')}</Label>
+						<Controller
+							control={form.control}
+							render={({field: { onChange, onBlur, value }}) => (
+							<View className='relative'>
+								<Input
+									onBlur={onBlur}
+									onChangeText={value => onChange(value)}
+									value={value}
+									autoComplete="username"
+									placeholder={t('common.form.username.placeholder')}
+									className={usernameAvailability.isLoading ? 'pr-8' : ''}
+								/>
+								{usernameAvailability.isLoading ? (
+									<View className='absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full flex justify-center items-center h-6 w-6'>
+										<Icons.loader className='w-4' />
+									</View>
+								) : null}
+							</View>
+							)}
+							name="username"
+							rules={{ required: true }}
 						/>
 					</View>
-				</KeyboardAvoidingView>
-				{/* FORGOT PASSWORD */}
-				<TouchableOpacity className='w-full'>
-					<Text className="text-right text-muted-foreground">Forgot Password?</Text>
-				</TouchableOpacity>
+					<View>
+						<Label nativeID='full_name'>{t('common.form.full_name.label')}</Label>
+						<Controller
+							control={form.control}
+							render={({field: { onChange, onBlur, value }}) => (
+							<Input
+								onBlur={onBlur}
+								onChangeText={value => onChange(value)}
+								value={value}
+								autoComplete="given-name"
+								placeholder={t('common.form.full_name.placeholder')}
+							/>
+							)}
+							name="full_name"
+							rules={{ required: true }}
+						/>
+					</View>
+					<View>
+						<Label nativeID='password'>{t('common.form.password.label')}</Label>
+						<Controller
+							control={form.control}
+							render={({field: { onChange, onBlur, value }}) => (
+							<InputPassword
+								onBlur={onBlur}
+								onChangeText={value => onChange(value)}
+								value={value}
+								autoComplete="new-password"
+								placeholder={t('common.form.password.placeholder')}
+							/>
+							)}
+							name="password"
+							rules={{ required: true }}
+						/>
+					</View>
+					<View>
+						<Label nativeID='password'>{t('common.form.password.confirm.label')}</Label>
+						<Controller
+							control={form.control}
+							render={({field: { onChange, onBlur, value }}) => (
+							<InputPassword
+								onBlur={onBlur}
+								onChangeText={value => onChange(value)}
+								value={value}
+								placeholder={t('common.form.password.confirm.placeholder')}
+							/>
+							)}
+							name="confirm_password"
+							rules={{ required: true }}
+						/>
+					</View>
 				{/* SUBMIT BUTTON */}
-				<Button onPress={handleSubmit} disabled={isLoading} className='w-full !py-4 rounded-full' size={'fit'}>
+				<Button onPress={form.handleSubmit(handleSubmit)} disabled={isLoading} className='w-full !py-4 rounded-full' size={'fit'}>
 					{/* {isLoading ? <Icons.loading /> : null} */}
-					<Text className='font-bold text-xl'>Log In</Text>
+					<Text className='font-bold text-xl'>{t('common.word.signup')}</Text>
 				</Button>
+				</KeyboardAvoidingView>
 				{/* SIGNUP */}
-				<Text className="text-right text-muted-foreground">Don't have an account? <Link href={'/auth/signup'} className={buttonTextVariants({ variant: 'link' })}>Sign Up</Link></Text>
+				<Text className="text-right text-muted-foreground">Already have an account? <Link href={'/auth/login'} className={buttonTextVariants({ variant: 'link' })}>{t('common.word.login')}</Link></Text>
 			</LinearGradient>
 		</ImageBackground>
 	)

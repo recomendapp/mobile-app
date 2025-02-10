@@ -7,6 +7,7 @@ export const Icons = {
 		logo: RecomendLogo,
 	},
 	spinner: Loader2Icon,
+	loader: Loader2Icon,
 	home: HomeIcon,
 	search: SearchIcon,
 	explore: CompassIcon,
