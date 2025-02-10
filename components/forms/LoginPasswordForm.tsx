@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
-import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/context/AuthProvider";
 import { AuthError } from "@supabase/supabase-js";
 import { useState } from "react";
@@ -32,7 +31,7 @@ const LoginPasswordForm = () => {
 	return (
 		<ThemedView className="gap-2">
 			<View>
-				<Label nativeID="email">Email</Label>
+				<Label nativeID="email" className="sr-only">Email</Label>
 				<Input
 				nativeID="email"
 				placeholder="Email"
@@ -44,7 +43,7 @@ const LoginPasswordForm = () => {
 				/>
 			</View>
 			<View>
-				<Label nativeID="password">Password</Label>
+				<Label nativeID="password" className="sr-only">Password</Label>
 				<Input
 				nativeID="password"
 				placeholder="Password"

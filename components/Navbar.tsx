@@ -7,20 +7,22 @@ import { useAuth } from '@/context/AuthProvider';
 import { useMemo } from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { HapticTab } from './HapticTab';
+import { useTranslation } from 'react-i18next';
 
 export const Navbar = () => {
 	const { session } = useAuth();
 	const { colorScheme } = useColorScheme();
+	const { t } = useTranslation();
 	const routes = useMemo(() => [
 		{
 		  icon: Icons.home,
 		  screen: 'index',
-		  label: 'Home',
+		  label: t('routes.home'),
 		},
 		{
 		  icon: Icons.search,
 		  screen: 'search',
-		  label: 'Search',
+		  label: t('routes.search'),
 		},
 		// {
 		//   icon: Icons.explore,
@@ -40,18 +42,16 @@ export const Navbar = () => {
 		{
 			icon: Icons.library,
 			screen: 'collection',
-			label: 'Library',
+			label: t('routes.library'),
 			href: session ? 'collection' : null,
 		},
 		{
 			icon: Icons.user,
 			screen: 'auth',
-			label: 'Login',
+			label: t('common.word.login'),
 			href: session ? null : 'auth',
 		}
 	], [session]);
-
-	console.log('isLogged', !!session);
 
 	return (
 		<Tabs
@@ -67,6 +67,9 @@ export const Navbar = () => {
 			},
 			default: {},
 			}),
+			// sceneStyle: {
+			// 	paddingBottom: 83,
+			// }
 		}}>
 		{routes.map((route) => (
 			<Tabs.Screen
