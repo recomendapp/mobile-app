@@ -39,7 +39,7 @@ const SignupScreen = () => {
 		username: z
 		.string()
 		.min(USERNAME_MIN_LENGTH, {
-			// message: common('form.length.char_min', { count: USERNAME_MIN_LENGTH }),
+			// message: t('common.form.length.char_min', { count: USERNAME_MIN_LENGTH }),
 		})
 		.max(USERNAME_MAX_LENGTH, {
 			// message: common('form.length.char_max', { count: USERNAME_MAX_LENGTH }),
@@ -190,6 +190,7 @@ const SignupScreen = () => {
 						<Controller
 							control={form.control}
 							render={({field: { onChange, onBlur, value }}) => (
+							<>
 							<Input
 								onBlur={onBlur}
 								onChangeText={value => onChange(value)}
@@ -197,6 +198,10 @@ const SignupScreen = () => {
 								autoComplete="email"
 								placeholder={t('common.form.email.placeholder')}
 							/>
+							{form.formState.errors.email?.message ? (
+								<Text className='text-destructive'>{form.formState.errors.email.message}</Text>
+							) : null}
+							</>
 							)}
 							name="email"
 							rules={{ required: true }}
@@ -221,6 +226,9 @@ const SignupScreen = () => {
 										<Icons.loader className='w-4' />
 									</View>
 								) : null}
+								{form.formState.errors.username?.message ? (
+									<Text className='text-destructive'>{form.formState.errors.username.message}</Text>
+								) : null}
 							</View>
 							)}
 							name="username"
@@ -232,6 +240,7 @@ const SignupScreen = () => {
 						<Controller
 							control={form.control}
 							render={({field: { onChange, onBlur, value }}) => (
+							<>
 							<Input
 								onBlur={onBlur}
 								onChangeText={value => onChange(value)}
@@ -239,6 +248,10 @@ const SignupScreen = () => {
 								autoComplete="given-name"
 								placeholder={t('common.form.full_name.placeholder')}
 							/>
+							{form.formState.errors.full_name?.message ? (
+								<Text className='text-destructive'>{form.formState.errors.full_name.message}</Text>
+							) : null}
+							</>
 							)}
 							name="full_name"
 							rules={{ required: true }}
@@ -249,6 +262,7 @@ const SignupScreen = () => {
 						<Controller
 							control={form.control}
 							render={({field: { onChange, onBlur, value }}) => (
+							<>
 							<InputPassword
 								onBlur={onBlur}
 								onChangeText={value => onChange(value)}
@@ -256,6 +270,10 @@ const SignupScreen = () => {
 								autoComplete="new-password"
 								placeholder={t('common.form.password.placeholder')}
 							/>
+							{form.formState.errors.password?.message ? (
+								<Text className='text-destructive'>{form.formState.errors.password.message}</Text>
+							) : null}
+							</>
 							)}
 							name="password"
 							rules={{ required: true }}
@@ -266,12 +284,17 @@ const SignupScreen = () => {
 						<Controller
 							control={form.control}
 							render={({field: { onChange, onBlur, value }}) => (
+							<>
 							<InputPassword
 								onBlur={onBlur}
 								onChangeText={value => onChange(value)}
 								value={value}
 								placeholder={t('common.form.password.confirm.placeholder')}
 							/>
+							{form.formState.errors.confirm_password?.message ? (
+								<Text className='text-destructive'>{form.formState.errors.confirm_password.message}</Text>
+							) : null}
+							</>
 							)}
 							name="confirm_password"
 							rules={{ required: true }}
