@@ -12,6 +12,9 @@ import { ThemeToggle } from '~/components/ThemeToggle';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { Colors } from '@/constants/Colors';
 import { Providers } from '@/context/Providers';
+import Drawer from 'expo-router/drawer';
+import CustomDrawerContent from '@/components/drawer/CustomDrawerContent';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -58,7 +61,13 @@ export default function RootLayout() {
     <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
       <Providers>
         <StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
-        <Stack screenOptions={{ headerShown: false }}/>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <Drawer
+            screenOptions={{ drawerPosition: 'right', headerShown: false }}
+            drawerContent={CustomDrawerContent}
+          />
+        </GestureHandlerRootView>
+        {/* <Stack screenOptions={{ headerShown: false }}/> */}
         <PortalHost />
       </Providers>
     </ThemeProvider>

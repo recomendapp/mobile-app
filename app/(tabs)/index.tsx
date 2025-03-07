@@ -1,25 +1,54 @@
 import * as React from 'react';
 import Animated from 'react-native-reanimated';
-import { Button } from '~/components/ui/button';
+import { Button, buttonTextVariants } from '~/components/ui/button';
 import { Text } from '~/components/ui/text';
 import { useAuth } from '@/context/AuthProvider';
 import { ThemedView } from '@/components/ui/ThemedView';
+import { SafeAreaView, View } from 'react-native';
+import { UserNav } from '@/components/user/UserNav';
+import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
+import { ThemedText } from '@/components/ui/ThemedText';
+import { Link } from 'expo-router';
+import { useTranslation } from 'react-i18next';
+import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 
-const GITHUB_AVATAR_URI =
-  'https://i.pinimg.com/originals/ef/a2/8d/efa28d18a04e7fa40ed49eeb0ab660db.jpg';
-
-export default function HomScreen() {
-  const { session, logout } = useAuth();
+const HomeScreen = () => {
+  const { session } = useAuth();
   return (
-    <ThemedView className='flex-1 justify-center items-center gap-5 p-6 bg-secondary/30'>
-      <Animated.ScrollView>
-        {/* <ThemedText>
-          {JSON.stringify(session)}
-        </ThemedText> */}
-        {session ? <Button onPress={() => logout()}>
-          <Text>Logout</Text>
-        </Button> : null}
-      </Animated.ScrollView>
-    </ThemedView>
+      <ThemedSafeAreaView className='flex-1'>
+        <View className='flex-1 p-2 gap-2 '>
+          <HomeHeader />
+          <Animated.ScrollView>
+            <WidgetMostRecommended />
+            {/* {session ? <Button onPress={() => logout()}>
+              <Text>Logout</Text>
+            </Button> : null} */}
+          </Animated.ScrollView>
+        </View>
+      </ThemedSafeAreaView>
   );
 }
+
+const HomeHeader = () => {
+  const { session, user } = useAuth();
+  const { t } = useTranslation();
+  return (
+    <View className='flex-row justify-between items-center'>
+      <ThemedText className='text-2xl font-bold line-clamp-1'>
+        {session
+          ? `Welcome, ${user?.full_name}`
+          : `Welcome on Recomend.`}
+      </ThemedText>
+      {session ? (
+        <View className='flex-row items-center gap-2'>
+          <UserNav />
+        </View>
+      ) : (
+        <Button><Link href={'/auth/login'}>{t('common.word.login')}</Link></Button>
+      )}
+    </View>
+  );
+}
+
+
+export default HomeScreen;

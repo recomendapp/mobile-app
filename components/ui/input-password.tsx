@@ -4,14 +4,15 @@ import { Input } from "./input"
 import { cn } from "@/lib/utils"
 import { EyeOff } from "@/lib/icons/EyeOff"
 import { Eye } from "@/lib/icons/Eye"
-import { Pressable, TextInput, TextInputProps, View } from "react-native"
+import { TextInput, TextInputProps, View } from "react-native"
+import { Pressable } from "react-native-gesture-handler"
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 const InputPassword = React.forwardRef<React.ElementRef<typeof TextInput>, TextInputProps>(
   ({ className, ...props }, ref) => {
-  const [show, setShow] = React.useState(false)
+  const [show, setShow] = React.useState(false);
   return (
     <View className="relative">
       <Input
@@ -24,8 +25,8 @@ const InputPassword = React.forwardRef<React.ElementRef<typeof TextInput>, TextI
         {...props}
       />
       <Pressable
-      className="absolute top-1/2 right-2 transform -translate-y-1/2 text-muted-foreground hover:text-primary"
-      onPress={() => setShow(!show)}
+      style={{ position: "absolute", top: "50%", right: 8, transform: [{ translateY: "-50%" }] }}
+      onPress={() => setShow((prev) => !prev)}
       >
         {show ? <EyeOff size={20} className="text-muted-foreground hover:text-foreground" /> : <Eye size={20} className="text-muted-foreground hover:text-foreground" />}
       </Pressable>

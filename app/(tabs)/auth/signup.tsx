@@ -192,10 +192,13 @@ const SignupScreen = () => {
 							render={({field: { onChange, onBlur, value }}) => (
 							<>
 							<Input
+								nativeID='email'
 								onBlur={onBlur}
 								onChangeText={value => onChange(value)}
 								value={value}
+								inputMode='email'
 								autoComplete="email"
+								autoCapitalize='none'
 								placeholder={t('common.form.email.placeholder')}
 							/>
 							{form.formState.errors.email?.message ? (
@@ -214,10 +217,12 @@ const SignupScreen = () => {
 							render={({field: { onChange, onBlur, value }}) => (
 							<View className='relative'>
 								<Input
+									nativeID='username'
 									onBlur={onBlur}
 									onChangeText={value => onChange(value)}
 									value={value}
 									autoComplete="username"
+									autoCapitalize='none'
 									placeholder={t('common.form.username.placeholder')}
 									className={usernameAvailability.isLoading ? 'pr-8' : ''}
 								/>
@@ -242,10 +247,12 @@ const SignupScreen = () => {
 							render={({field: { onChange, onBlur, value }}) => (
 							<>
 							<Input
+								nativeID='full_name'
 								onBlur={onBlur}
 								onChangeText={value => onChange(value)}
 								value={value}
 								autoComplete="given-name"
+								autoCapitalize='words'
 								placeholder={t('common.form.full_name.placeholder')}
 							/>
 							{form.formState.errors.full_name?.message ? (
@@ -268,6 +275,7 @@ const SignupScreen = () => {
 								onChangeText={value => onChange(value)}
 								value={value}
 								autoComplete="new-password"
+								autoCapitalize='none'
 								placeholder={t('common.form.password.placeholder')}
 							/>
 							{form.formState.errors.password?.message ? (
