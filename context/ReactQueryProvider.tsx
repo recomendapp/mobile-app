@@ -40,7 +40,7 @@ const ReactQueryProvider = ({ children } : ReactQueryProviderProps) => {
 				return `${obj.id}`
 			}
 			},
-			devLogging: true,
+			// devLogging: true,
 		}}
 		>
 			<QueryClientProvider client={queryClient}>

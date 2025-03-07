@@ -67,7 +67,6 @@ export default function RootLayout() {
             drawerContent={CustomDrawerContent}
           />
         </GestureHandlerRootView>
-        {/* <Stack screenOptions={{ headerShown: false }}/> */}
         <PortalHost />
       </Providers>
     </ThemeProvider>

@@ -11,6 +11,12 @@ export const userKeys = {
 	 */
 	detail: (userId: string) => [...userKeys.all, userId] as const,
 	/**
+	 * Fetches the user's profile
+	 * @param userId The user id
+	 * @returns The user's profile 
+	 */
+	profile: (username: string) => [...userKeys.all, 'profile', username] as const,
+	/**
 	 * Fetches friends of a user
 	 * @param userId The user id
 	 * @param filters The filters (optional)
