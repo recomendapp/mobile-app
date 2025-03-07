@@ -1,11 +1,11 @@
 import { useAuth } from "@/context/AuthProvider";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { Link, useRouter } from "expo-router";
-import { Linking, Pressable, SafeAreaView, View, Text } from "react-native";
-import { ThemedText } from "../ui/ThemedText";
-import { Button } from "../ui/button";
+import { Pressable, SafeAreaView, View, Text } from "react-native";
 import { Icons } from "@/constants/Icons";
 import { useMemo } from "react";
+import UserAvatar from "@/components/user/UserAvatar";
+import { ThemedText } from "@/components/ui/ThemedText";
 
 const CustomDrawerContent = (props: any) => {
     const router = useRouter();
@@ -14,17 +14,17 @@ const CustomDrawerContent = (props: any) => {
     const routes = useMemo(() => {
         return [
             {
-                name: 'Profile',
-                icon: Icons.user,
-                onPress: () => {
-                    router.push('/collection');
-                }
-            },
-            {
                 name: 'Settings',
                 icon: Icons.settings,
                 onPress: async () => {
-                    router.push('/collection');
+                    router.push('/settings/profile');
+                }
+            },
+            {
+                name: 'About',
+                icon: Icons.info,
+                onPress: () => {
+                    router.push('/about');
                 }
             }
         ];
@@ -34,11 +34,23 @@ const CustomDrawerContent = (props: any) => {
         props.navigation.closeDrawer();
     }
 
+    if (!user) return null;
+
     return (
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }} className="bg-muted">
             {/* MAIN ROUTES */}
             <DrawerContentScrollView {...props}>
                 {/* <DrawerItemList {...props} /> */}
+                {/* PROFILE */}
+                <Link href={`/user/Amesky`} asChild>
+                    <Pressable className="flex-row items-center p-4 gap-2">
+                        <UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} className="w-16 h-16"/>
+                        <View>
+                            <ThemedText className="text-xl font-semibold">{user.full_name}</ThemedText>
+                            <ThemedText className="text-md text-muted-foreground">@{user.username}</ThemedText>
+                        </View>
+                    </Pressable>
+                </Link>
                 {routes.map((route, index) => (
                     <DrawerItem
                     key={index}
@@ -65,7 +77,7 @@ const CustomDrawerContent = (props: any) => {
                     <Text className="text-destructive">Logout</Text>
                 </Pressable>
             </SafeAreaView>
-        </View>
+        </SafeAreaView>
     );
 }
 

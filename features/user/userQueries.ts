@@ -34,6 +34,28 @@ export const useUserQuery = ({
 	});
 };
 
+export const useUserProfileQuery = ({
+	username,
+} : {
+	username?: string;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: userKeys.profile(username as string),
+		queryFn: async () => {
+			if (!username) return null;
+			const { data, error } = await supabase
+				.from('profile')
+				.select('*')
+				.eq('username', username)
+				.single();
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!username,
+	});
+};
+
 /**
  * Fetches the user friends
  * @param userId The user id
@@ -1091,7 +1113,7 @@ export const useUserFollowProfile = ({
 	followeeId,
 } : {
 	userId?: string;
-	followeeId?: string;
+	followeeId?: string | null;
 }) => {
 	const supabase = useSupabaseClient();
 	return useQuery({

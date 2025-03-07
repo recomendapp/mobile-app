@@ -1,10 +1,9 @@
 import { useAuth } from "@/context/AuthProvider";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
+import UserAvatar from "./UserAvatar";
 
 export const UserNav = () => {
 	const navigation = useNavigation();
@@ -15,12 +14,7 @@ export const UserNav = () => {
 	}
 	return (
 		<TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
-			<Avatar alt={user?.full_name}>
-				<AvatarImage source={{ uri: user?.avatar_url ?? '' }}/>
-				<AvatarFallback>
-					<ThemedText>{user?.full_name}</ThemedText>
-				</AvatarFallback>
-			</Avatar>
+			<UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} />
 		</TouchableOpacity>
 	)
 };
