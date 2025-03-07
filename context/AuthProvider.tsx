@@ -3,6 +3,7 @@ import { Session } from "@supabase/supabase-js";
 import { SplashScreen } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
+import { useUserQuery } from "@/features/user/userQueries";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,6 +31,12 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 const AuthProvider = ({children }: AuthProviderProps) => {
 	const supabase = useSupabaseClient();
 	const [session, setSession] = useState<Session | null | undefined>(undefined);
+	const {
+		data: user,
+	} = useUserQuery({
+		userId: session?.user.id,
+		enabled: !!session,
+	})
 
 	useEffect(() => {
 		supabase.auth.getSession().then(({data: { session }}) => {
@@ -85,7 +92,7 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		<AuthContext.Provider
 		value={{
 			session: session,
-			user: null,
+			user: user,
 			login: login,
 			logout: logout,
 			signup: signup,

@@ -3054,7 +3054,7 @@ export type Database = {
           is_liked: boolean
           media_id: number
           rating: number | null
-          updated_at: string | null
+          updated_at: string
           user_id: string
           watched_date: string
         }
@@ -3064,7 +3064,7 @@ export type Database = {
           is_liked?: boolean
           media_id: number
           rating?: number | null
-          updated_at?: string | null
+          updated_at?: string
           user_id: string
           watched_date?: string
         }
@@ -3074,7 +3074,7 @@ export type Database = {
           is_liked?: boolean
           media_id?: number
           rating?: number | null
-          updated_at?: string | null
+          updated_at?: string
           user_id?: string
           watched_date?: string
         }
@@ -4299,7 +4299,6 @@ export type Database = {
       }
       user_feed_cast_crew: {
         Row: {
-          date: string | null
           jobs: string[] | null
           movie_id: number | null
           person_id: number | null

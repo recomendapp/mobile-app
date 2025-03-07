@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { InputPassword } from '@/components/ui/input-password';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
@@ -64,6 +65,9 @@ const LoginScreen = () => {
 						<Input
 						nativeID="email"
 						placeholder="Email"
+						inputMode='email'
+						autoComplete='email'
+						autoCapitalize='none'
 						value={email}
 						onChangeText={setEmail}
 						aria-labelledby="email"
@@ -74,9 +78,11 @@ const LoginScreen = () => {
 					{/* PASSWORD */}
 					<View className='w-full'>
 						<Label nativeID='password'>Password</Label>
-						<Input
+						<InputPassword
 						nativeID="password"
 						placeholder="Password"
+						autoComplete='password'
+						autoCapitalize='none'
 						value={password}
 						onChangeText={setPassword}
 						secureTextEntry
