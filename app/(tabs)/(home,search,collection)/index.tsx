@@ -1,10 +1,8 @@
 import * as React from 'react';
 import Animated from 'react-native-reanimated';
 import { Button, buttonTextVariants } from '~/components/ui/button';
-import { Text } from '~/components/ui/text';
 import { useAuth } from '@/context/AuthProvider';
-import { ThemedView } from '@/components/ui/ThemedView';
-import { SafeAreaView, View } from 'react-native';
+import { View } from 'react-native';
 import { UserNav } from '@/components/user/UserNav';
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
 import { ThemedText } from '@/components/ui/ThemedText';

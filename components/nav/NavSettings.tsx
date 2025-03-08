@@ -4,11 +4,11 @@ import { FlatList, Text, View } from "react-native";
 import { Button, buttonTextVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
 
-const SettingsNav = () => {
+const NavSettings = () => {
 	const { t } = useTranslation();
 	const pathname = usePathname();
 
-	const settingsNavItems: { title: string; href: LinkProps['href'] }[] = [
+	const NavSettingsItems: { title: string; href: LinkProps['href'] }[] = [
 		{
 		title: t('profile.label'),
 		href: '/settings/profile',
@@ -41,10 +41,10 @@ const SettingsNav = () => {
 	return (
 		<View>
 			<FlatList
-			data={settingsNavItems}
+			data={NavSettingsItems}
 			contentContainerClassName="gap-2"
 			renderItem={({ item }) => (
-				<SettingsNavItem title={item.title} href={item.href} active={pathname === item.href} />
+				<NavSettingsItem title={item.title} href={item.href} active={pathname === item.href} />
 			)}
 			horizontal
 			showsHorizontalScrollIndicator={false}
@@ -53,7 +53,7 @@ const SettingsNav = () => {
 	)
 };
 
-const SettingsNavItem = ({
+const NavSettingsItem = ({
 	title,
 	href,
 	active,
@@ -74,4 +74,4 @@ const SettingsNavItem = ({
 	)
 };
 
-export { SettingsNav };
+export { NavSettings };

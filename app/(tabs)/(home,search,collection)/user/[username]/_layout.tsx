@@ -1,24 +1,28 @@
+import { ThemedText } from "@/components/ui/ThemedText"
+import { useUserProfileQuery } from "@/features/user/userQueries"
+import { ExternalPathString, Link, Slot, useLocalSearchParams } from "expo-router"
 import ButtonUserFollow from "@/components/buttons/ButtonUserFollow";
 import { Button, buttonTextVariants } from "@/components/ui/button";
-import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
-import { ThemedText } from "@/components/ui/ThemedText";
 import UserAvatar from "@/components/user/UserAvatar";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/context/AuthProvider";
-import { useUserProfileQuery } from "@/features/user/userQueries";
-import { ExternalPathString, Link, Slot, useLocalSearchParams } from "expo-router";
 import { Pressable, View, Text } from "react-native";
+import NavProfile from "@/components/nav/NavProfile";
+import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 
 const ProfileLayout = () => {
+	const { username } = useLocalSearchParams();
 	return (
 		<ThemedSafeAreaView className="flex-1">
 			<View className="flex-1 gap-4 p-2">
 				<ProfileHeader />
+				<NavProfile username={username as string} />
 				<Slot />
 			</View>
 		</ThemedSafeAreaView>
 	)
 };
+
 
 const ProfileHeader = () => {
 	const { user } = useAuth();
@@ -73,5 +77,6 @@ const ProfileHeader = () => {
 		</View>
 	)
 };
+
 
 export default ProfileLayout;
