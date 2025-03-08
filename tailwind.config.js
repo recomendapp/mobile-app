@@ -41,6 +41,12 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        // CUSTOM
+        "accent-yellow": {
+          DEFAULT: 'hsl(var(--accent-yellow))',
+          foreground: 'hsl(var(--accent-yellow-foreground))',
+          hover: 'hsl(var(--accent-yellow-hover))',
+        }
       },
       borderWidth: {
         hairline: hairlineWidth(),

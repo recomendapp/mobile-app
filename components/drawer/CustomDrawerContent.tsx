@@ -1,11 +1,12 @@
 import { useAuth } from "@/context/AuthProvider";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { Link, useRouter } from "expo-router";
-import { Pressable, SafeAreaView, View, Text } from "react-native";
+import { Pressable, View, Text } from "react-native";
 import { Icons } from "@/constants/Icons";
 import { useMemo } from "react";
 import UserAvatar from "@/components/user/UserAvatar";
 import { ThemedText } from "@/components/ui/ThemedText";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const CustomDrawerContent = (props: any) => {
     const router = useRouter();
@@ -28,7 +29,7 @@ const CustomDrawerContent = (props: any) => {
                 }
             }
         ];
-    }, [user]);
+    }, []);
 
     const closeDrawer = () => {
         props.navigation.closeDrawer();
@@ -42,7 +43,7 @@ const CustomDrawerContent = (props: any) => {
             <DrawerContentScrollView {...props}>
                 {/* <DrawerItemList {...props} /> */}
                 {/* PROFILE */}
-                <Link href={`/user/Amesky`} asChild>
+                <Link href={`/user/${user.username}`} asChild>
                     <Pressable className="flex-row items-center p-4 gap-2">
                         <UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} className="w-16 h-16"/>
                         <View>

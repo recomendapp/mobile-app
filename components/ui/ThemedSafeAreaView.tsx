@@ -1,14 +1,20 @@
 import { cn } from '@/lib/utils';
-import { SafeAreaView } from 'react-native';
-import { SafeAreaViewProps } from 'react-native-safe-area-context';
-import { ThemedView } from './ThemedView';
+import { forwardRef } from 'react';
+import { SafeAreaView, SafeAreaViewProps } from 'react-native-safe-area-context';
 
-
-export type ThemedSafeAreaViewProps = SafeAreaViewProps & {
+interface ThemedSafeAreaViewProps extends SafeAreaViewProps {
   lightColor?: string;
   darkColor?: string;
 };
 
-export function ThemedSafeAreaView({ className, ...props }: ThemedSafeAreaViewProps) {
-  return <SafeAreaView className={cn('bg-background', className)} {...props} />;
+const ThemedSafeAreaView = forwardRef<
+  React.ComponentRef<typeof SafeAreaView>,
+  ThemedSafeAreaViewProps
+>(({ className, ...props }, ref) => {
+  return <SafeAreaView ref={ref} className={cn('bg-background', className)} {...props} />
+});
+
+export {
+  ThemedSafeAreaViewProps,
+  ThemedSafeAreaView,
 }
