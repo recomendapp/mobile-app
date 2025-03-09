@@ -70,7 +70,7 @@ const TabsLayout = () => {
 			default: {},
 			}),
 			// sceneStyle: {
-			// 	paddingBottom: 83,
+				// paddingBottom: 50,
 			// }
 		}}>
 		{routes.map((route) => (

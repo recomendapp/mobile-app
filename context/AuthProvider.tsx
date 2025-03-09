@@ -4,6 +4,8 @@ import { SplashScreen } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
 import { useUserQuery } from "@/features/user/userQueries";
+import { useTranslation } from "react-i18next";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,6 +31,7 @@ type AuthProviderProps = {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 const AuthProvider = ({children }: AuthProviderProps) => {
+	const { i18n } = useTranslation();
 	const supabase = useSupabaseClient();
 	const [session, setSession] = useState<Session | null | undefined>(undefined);
 	const {
@@ -48,6 +51,18 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			setSession(session);
 		});
 	}, []);
+
+	useEffect(() => {
+		const syncLanguage = async () => {
+			if (user?.language && user.language !== i18n.language) {
+				await i18n.changeLanguage(user.language);
+				await AsyncStorage.setItem("language", user.language);
+			}
+		};
+		if (user) {
+			syncLanguage();
+		}
+	}, [user, i18n]);
 
 	const login = async ({ email, password }: { email: string; password: string }) => {
 		const { error } = await supabase.auth.signInWithPassword({

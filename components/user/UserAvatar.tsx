@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { Skeleton } from '../ui/skeleton';
+import { cn } from '@/lib/utils';
 
 interface UserAvatarProps extends Omit<React.ComponentPropsWithRef<typeof Avatar>, 'alt'> {
 	full_name?: string | null;
@@ -15,7 +16,7 @@ const UserAvatar = React.forwardRef<
 >(({ full_name, avatar_url, skeleton, ...props }, ref) => {
 	if (!full_name || skeleton) {
 		return (
-			<Skeleton className='h-12 w-12 rounded-full' />
+			<Skeleton className={cn('h-12 w-12 rounded-full', props.className)} />
 		)
 	}
 	return (

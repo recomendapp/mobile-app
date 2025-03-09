@@ -11,10 +11,12 @@ import { useUserFollowProfileInsert, useUserUnfollowProfileDelete } from '@/feat
 
 interface ButtonUserFollowProps {
   profileId?: string | null;
+  skeleton?: boolean;
 }
 
 const ButtonUserFollow = ({
   profileId,
+  skeleton,
 }: ButtonUserFollowProps) => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -56,9 +58,9 @@ const ButtonUserFollow = ({
 
   if (!user || user.id == profileId) return null;
 
-  if (!profileId || isLoading || isFollow === undefined) {
+  if (skeleton || !profileId || isLoading || isFollow === undefined) {
     return (
-      <Skeleton className="h-10 w-16 rounded-full" />
+      <Skeleton className="h-10 w-32 rounded-full" />
     );
   }
 

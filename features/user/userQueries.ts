@@ -100,7 +100,7 @@ export const useUserActivitiesInfiniteQuery = ({
 	userId,
 	filters,
 } : {
-	userId?: string
+	userId?: string | null;
 	filters?: {
 		sortBy?: 'watched_date' | 'rating';
 		sortOrder?: 'asc' | 'desc';
@@ -639,15 +639,17 @@ export const useUserPlaylistsInfiniteQuery = ({
 	userId,
 	filters,
 } : {
-	userId?: string;
+	userId?: string | null;
 	filters?: {
-		resultsPerPage?: number;
-		order?: 'updated_at-desc' | 'updated_at-asc';
+		sortBy?: 'created_at' | 'updated_at' | 'likes_count';
+		sortOrder?: 'asc' | 'desc';
+		perPage?: number;
 	};
 }) => {
 	const mergedFilters = {
-		resultsPerPage: 20,
-		order: 'updated_at-desc',
+		sortBy: 'updated_at',
+		sortOrder: 'desc',
+		perPage: 20,
 		...filters,
 	};
 	const supabase = useSupabaseClient();
@@ -658,27 +660,38 @@ export const useUserPlaylistsInfiniteQuery = ({
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!userId) throw Error('Missing user id');
-			let from = (pageParam - 1) * mergedFilters.resultsPerPage;
-	  		let to = from - 1 + mergedFilters.resultsPerPage;
+			let from = (pageParam - 1) * mergedFilters.perPage;
+	  		let to = from - 1 + mergedFilters.perPage;
 			let request = supabase
 				.from('playlists')
 				.select(`*`)
 				.eq('user_id', userId)
 				.range(from, to)
 
-			if (mergedFilters) {
-				if (mergedFilters.order) {
-					const [ column, direction ] = mergedFilters.order.split('-');
-					request = request.order(column, { ascending: direction === 'asc', nullsFirst: false });
+				if (mergedFilters) {
+					if (mergedFilters.sortBy && mergedFilters?.sortOrder) {
+						switch (mergedFilters.sortBy) {
+							case 'created_at':
+								request = request.order('created_at', { ascending: mergedFilters.sortOrder === 'asc' });
+								break;
+							case 'updated_at':
+								request = request.order('updated_at', { ascending: mergedFilters.sortOrder === 'asc' });
+								break;
+							case 'likes_count':
+								request = request.order('likes_count', { ascending: mergedFilters.sortOrder === 'asc' });
+								break;
+							default:
+								break;
+						}
+					}
 				}
-			}
 			const { data, error } = await request;
 			if (error) throw error;
 			return data;
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});

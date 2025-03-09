@@ -15,6 +15,7 @@ const initI18n = async () => {
 
   if (!savedLanguage) {
     savedLanguage = Localization.getLocales()[0].languageTag ?? "en-US";
+    await AsyncStorage.setItem("language", savedLanguage);
   }
 
   i18n.use(initReactI18next).init({
