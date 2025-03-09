@@ -4,6 +4,7 @@ import { useUserProfileQuery } from "@/features/user/userQueries"
 import { getIdFromSlug } from "@/hooks/getIdFromSlug";
 import { useLocalSearchParams } from "expo-router"
 import { useTranslation } from "react-i18next";
+import { ActivityIndicator, View } from "react-native";
 
 const ProfileScreen = () => {
 	const { i18n, t } = useTranslation();
@@ -20,11 +21,16 @@ const ProfileScreen = () => {
 		locale: i18n.language,
 	});
 
-	if (!movie) return null;
+	if (!movie) {
+		return (
+			<ActivityIndicator />
+		)
+	}
 
 	return (
 	<>
-		<ThemedText>Film page : {movie.title}</ThemedText>	
+		<ThemedText>Film page : {movie.title}</ThemedText>
+		<View className="h-[1000px]"/>
 	</>
 	)
 };
