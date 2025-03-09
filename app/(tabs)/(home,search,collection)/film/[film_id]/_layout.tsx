@@ -22,7 +22,7 @@ import {
 } from 'react-native-safe-area-context';
 import tailwind from 'twrnc';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Link, Slot, useLocalSearchParams } from 'expo-router';
+import { Slot, useLocalSearchParams } from 'expo-router';
 import { Icons } from '@/constants/Icons';
 import { useTranslation } from 'react-i18next';
 import { getIdFromSlug } from '@/hooks/getIdFromSlug';
@@ -34,18 +34,24 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
 import { upperFirst } from 'lodash';
 import { MediaMovie } from '@/types/type.db';
-import { cn } from '@/lib/utils';
+import { useThemeColor } from '@/hooks/useThemeColor';
+import { Colors } from '@/constants/Colors';
+import useColorConverter from '@/hooks/useColorConverter';
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
-const headerTop = 44 - 16;
+// const headerHeight = 44 - 16;
 
 interface ScreenHeaderProps {
 	filmHeaderHeight: SharedValue<number>;
+	headerHeight: SharedValue<number>;
+	onHeaderHeight: (height: number) => void;
 	sv: SharedValue<number>;
 	title: string;
 }
 const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 	filmHeaderHeight,
+	headerHeight,
+	onHeaderHeight,
 	sv,
 	title,
 }) => {
@@ -56,8 +62,8 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 			opacity: interpolate(
 			sv.get(),
 			[
-				((filmHeaderHeight.get() - (headerTop + inset.top)) / 4) * 3,
-				filmHeaderHeight.get() - (headerTop + inset.top) + 1,
+				((filmHeaderHeight.get() - (headerHeight.get() + inset.top)) / 4) * 3,
+				filmHeaderHeight.get() - (headerHeight.get() + inset.top) + 1,
 			],
 			[0, 1],
 			),
@@ -66,8 +72,8 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 				scale: interpolate(
 				sv.get(),
 				[
-					((filmHeaderHeight.get() - (headerTop + inset.top)) / 4) * 3,
-					filmHeaderHeight.get() - (headerTop + inset.top) + 1,
+					((filmHeaderHeight.get() - (headerHeight.get() + inset.top)) / 4) * 3,
+					filmHeaderHeight.get() - (headerHeight.get() + inset.top) + 1,
 				],
 				[0.98, 1],
 				Extrapolation.CLAMP,
@@ -77,8 +83,8 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 				translateY: interpolate(
 				sv.get(),
 				[
-					((filmHeaderHeight.get() - (headerTop + inset.top)) / 4) * 3,
-					filmHeaderHeight.get() - (headerTop + inset.top) + 1,
+					((filmHeaderHeight.get() - (headerHeight.get() + inset.top)) / 4) * 3,
+					filmHeaderHeight.get() - (headerHeight.get() + inset.top) + 1,
 				],
 				[-10, 0],
 				Extrapolation.CLAMP,
@@ -90,12 +96,13 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 	});
   return (
     <Animated.View
-	style={[
-	tailwind.style(
-		'absolute w-full px-4 pb-2 flex flex-row items-center justify-between z-10 bg-black',
-	),
-	opacityAnim,
-	]}>
+	className="absolute w-full px-4 pb-4 flex flex-row items-center justify-between z-10 bg-background"
+	style={[opacityAnim,]}
+	onLayout={(event: LayoutChangeEvent) => {
+		'worklet';
+		onHeaderHeight((event.nativeEvent.layout.height / 2) - 10);
+	}}
+	>
 		{navigation.canGoBack() ? <Pressable onPress={() => navigation.goBack()}>
 			<Icons.ChevronLeft className="text-foreground" />
 		</Pressable> : null}
@@ -112,23 +119,31 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 interface FilmHeaderProps {
 	filmHeaderHeight: SharedValue<number>;
 	onHeaderHeight: (height: number) => void;
+	headerHeight: SharedValue<number>;
 	sv: SharedValue<number>;
 	movie: MediaMovie;
 }
 const FilmHeader: React.FC<FilmHeaderProps> = ({
 	filmHeaderHeight,
 	onHeaderHeight,
+	headerHeight,
 	sv,
 	movie,
 }) => {
 	const { t } = useTranslation();
+	const { hslToRgb } = useColorConverter();
+	const colorsRef = useThemeColor({
+		dark: Colors.dark.background,
+		light: Colors.light.background,
+	}, 'background');
+	const colors = hslToRgb(colorsRef);
 	const inset = useSafeAreaInsets();
 	const layoutY = useSharedValue(0);
 	const opacityAnim = useAnimatedStyle(() => {
 		return {
 			opacity: interpolate(
 			sv.get(),
-			[0, filmHeaderHeight.get() - (headerTop + inset.top) / 0.9],
+			[0, filmHeaderHeight.get() - (headerHeight.get() + inset.top) / 0.9],
 			[1, 0],
 			Extrapolation.CLAMP,
 			),
@@ -137,7 +152,7 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 	const posterAnim = useAnimatedStyle(() => ({
 		opacity: interpolate(
 			sv.get(),
-			[0, filmHeaderHeight.get() - (headerTop + inset.top) / 0.8],
+			[0, filmHeaderHeight.get() - (headerHeight.get() + inset.top) / 0.8],
 			[1, 0],
 			Extrapolation.CLAMP,
 		),
@@ -145,7 +160,7 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 			{
 				scale: interpolate(
 					sv.get(),
-					[-filmHeaderHeight.get() / 2, 0, (filmHeaderHeight.get() - (headerTop + inset.top))],
+					[-filmHeaderHeight.get() / 2, 0, (filmHeaderHeight.get() - (headerHeight.get() + inset.top))],
 					[1.8, 1, 0.95],
 					'clamp',
 				),
@@ -163,7 +178,7 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 		return {
 			opacity: interpolate(
 				sv.get(),
-				[0, filmHeaderHeight.get() - (headerTop + inset.top) / 0.8],
+				[0, filmHeaderHeight.get() - (headerHeight.get() + inset.top) / 0.8],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -171,7 +186,7 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 				{
 					scale: interpolate(
 					sv.get(),
-					[0, (filmHeaderHeight.get() - (headerTop + inset.top)) / 2],
+					[0, (filmHeaderHeight.get() - (headerHeight.get() + inset.top)) / 2],
 					[1, 0.95],
 					'clamp',
 					),
@@ -215,17 +230,17 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 	>
 		<AnimatedImageWithFallback
 		alt={movie.title ?? ''}
-		style={[tailwind.style('absolute h-full w-full resize-cover'), scaleAnim]}
+		style={[tailwind.style('absolute h-full w-full'), scaleAnim]}
 		source={{ uri: movie.backdrop_url ?? '' }}
 		/>
 		<AnimatedLinearGradient
 		style={[tailwind.style('absolute inset-0'), scaleAnim]}
 		colors={[
-			`rgba(0,0,0,${0.5})`,
-			`rgba(0,0,0,${0.6})`,
-			`rgba(0,0,0,${0.6})`,
-			`rgba(0,0,0,${0.8})`,
-			`rgba(0,0,0,${1})`,
+			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.5)`,
+			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.6)`,
+			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.6)`,
+			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.8)`,
+			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 1)`,
 		]}
 		/>
 		<Animated.View
@@ -234,7 +249,6 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 			{
 				paddingTop: inset.top === 0 ? 8 : inset.top,
 			},
-			// scaleAnim,
 		]}
 		>
 			<AnimatedImageWithFallback
@@ -333,15 +347,14 @@ const FilmLayout = () => {
 	});
 	const stickyElement = useAnimatedStyle(() => {
 		return {
-		backgroundColor: 'black',
 		transform: [
 			{
 			translateY: interpolate(
 				sv.get(),
 				[
-				filmHeaderHeight.value - (headerTop + inset.top) - 1,
-				filmHeaderHeight.value - (headerTop + inset.top),
-				filmHeaderHeight.value - (headerTop + inset.top) + 1,
+				filmHeaderHeight.value - (headerHeight.get() + inset.top) - 1,
+				filmHeaderHeight.value - (headerHeight.get() + inset.top),
+				filmHeaderHeight.value - (headerHeight.get() + inset.top) + 1,
 				],
 				[0, 0, 1],
 			),
@@ -363,14 +376,24 @@ const FilmLayout = () => {
 	}
 
 	return (
-    <Animated.View style={[tailwind.style('flex-1 bg-black')]}>
-		<ScreenHeader filmHeaderHeight={filmHeaderHeight} sv={sv} title={movie?.title ?? ''} />
+    <Animated.View className="flex-1 bg-background">
+		<ScreenHeader
+		filmHeaderHeight={filmHeaderHeight}
+		headerHeight={headerHeight}
+		onHeaderHeight={(height) => {
+			'worklet';
+			headerHeight.value = height;
+		}}
+		sv={sv}
+		title={movie?.title ?? ''}
+		/>
 		<FilmHeader
 		filmHeaderHeight={filmHeaderHeight}
 		onHeaderHeight={(height) => {
 			'worklet';
 			filmHeaderHeight.value = height;
 		}}
+		headerHeight={headerHeight}
 		sv={sv}
 		movie={movie}
 		/>
@@ -387,15 +410,11 @@ const FilmLayout = () => {
 				/>
 			}
 			>
-				<Animated.View style={[animatedScrollStyle, tailwind.style('pb-10')]}>
+				<Animated.View style={[animatedScrollStyle]}>
 					{/* Fixed Section */}
 					<Animated.View
-					style={[
-						tailwind.style(
-						'flex items-center justify-center z-10 py-4',
-						),
-						stickyElement,
-					]}
+					className="flex items-center justify-center z-10 p-2 bg-background"
+					style={[stickyElement,]}
 					>
 						<FilmNav slug={String(film_id)} />
 					</Animated.View>

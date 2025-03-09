@@ -1,4 +1,3 @@
-import { useThemeColor } from '@/hooks/useThemeColor';
 import { cn } from '@/lib/utils';
 import { forwardRef } from 'react';
 import { View, type ViewProps } from 'react-native';
