@@ -18,9 +18,11 @@ const ProfileScreen = () => {
 		username: username as string,
 	});
 
+	if (!data) return null;
+
 	return (
 	<>
-		<ProfileLastActivities profile={data!} />	
+		<ProfileLastActivities profile={data} />	
 		{/* <ThemedText>User {data?.full_name}</ThemedText> */}
 	</>
 	)

@@ -27,9 +27,9 @@ const NavProfile = ({
 	]
 
 	return (
-		<View className={`flex-row flex-wrap bg-muted p-2 rounded-md`}>
+		<View className={`flex-row flex-wrap bg-muted p-1 rounded-md`}>
 			{routes.map((route, index) => (
-				<Link key={index} href={route.href} className={cn("flex-1 p-2 rounded-md", pathname === route.href ? 'bg-background' : '')} replace>
+				<Link key={index} href={route.href} className={cn("flex-1 p-2 rounded-md", pathname === route.href ? 'bg-background' : '')}>
 					<Text className={cn("text-center font-medium", pathname === route.href ? 'text-accent-yellow' : 'text-muted-foreground')}>{route.title}</Text>
 				</Link>
 			))}
