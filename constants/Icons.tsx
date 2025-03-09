@@ -13,6 +13,8 @@ import { ChevronUp } from "@/lib/icons/ChevronUp";
 import { ChevronDown } from "@/lib/icons/ChevronDown";
 import { ChevronLeft } from "@/lib/icons/ChevronLeft";
 import { ChevronRight } from "@/lib/icons/ChevronRight";
+import { EllipsisHorizontal } from "@/lib/icons/EllipsisHorizontal";
+import { EllipsisVertical } from "@/lib/icons/EllipsisVertical";
 
 export const Icons = {
 	site: {
@@ -41,4 +43,6 @@ export const Icons = {
 	ChevronDown: ChevronDown,
 	ChevronLeft: ChevronLeft,
 	ChevronRight: ChevronRight,
+	EllipsisHorizontal: EllipsisHorizontal,
+	EllipsisVertical: EllipsisVertical,
 };

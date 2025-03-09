@@ -17,7 +17,6 @@ import { RefreshControl } from "react-native-gesture-handler";
 import { useQueryClient } from "@tanstack/react-query";
 import { userKeys } from "@/features/user/userKeys";
 import { useBottomTabOverflow } from "@/components/TabBarBackground";
-import { cn } from "@/lib/utils";
 
 const ProfileLayout = () => {
 	const tabBarHeight = useBottomTabOverflow();
@@ -47,10 +46,7 @@ const ProfileLayout = () => {
 		<ThemedSafeAreaView className="flex-1">
 			{(loading || profile) ? (
 				<ScrollView
-				contentContainerClassName={cn(
-					"flex-1 gap-4 p-2",
-					tabBarHeight ? `pb-[${tabBarHeight}px]` : ''
-				)}
+				contentContainerClassName={`flex-1 gap-4 p-2 pb-[${tabBarHeight}px]`}
 				refreshControl={
 					<RefreshControl
 					  refreshing={isRefetching}
