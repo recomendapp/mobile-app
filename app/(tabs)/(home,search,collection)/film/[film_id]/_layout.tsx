@@ -401,7 +401,7 @@ const FilmLayout = () => {
 			<Animated.ScrollView
 			onScroll={scrollHandler}
 			scrollEventThrottle={16}
-			style={tailwind.style('flex-1')}
+			className="flex-1"
 			showsVerticalScrollIndicator={false}
 			refreshControl={
 				<RefreshControl
