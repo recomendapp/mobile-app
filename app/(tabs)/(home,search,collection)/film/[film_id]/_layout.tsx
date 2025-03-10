@@ -1,12 +1,7 @@
 import * as React from 'react';
 import {
-	ActivityIndicator,
-  Button,
-  Dimensions,
   LayoutChangeEvent,
   Pressable,
-  StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import Animated, {
@@ -37,9 +32,11 @@ import { MediaMovie } from '@/types/type.db';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { Colors } from '@/constants/Colors';
 import useColorConverter from '@/hooks/useColorConverter';
+import { useBottomTabOverflow } from '@/components/TabBarBackground';
+import { ThemedView } from '@/components/ui/ThemedView';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
-// const headerHeight = 44 - 16;
 
 interface ScreenHeaderProps {
 	filmHeaderHeight: SharedValue<number>;
@@ -94,26 +91,38 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 			paddingTop: inset.top === 0 ? 8 : inset.top,
 		};
 	});
-  return (
-    <Animated.View
-	className="absolute w-full px-4 pb-4 flex flex-row items-center justify-between z-10 bg-background"
-	style={[opacityAnim,]}
-	onLayout={(event: LayoutChangeEvent) => {
-		'worklet';
-		onHeaderHeight((event.nativeEvent.layout.height / 2) - 10);
-	}}
-	>
-		{navigation.canGoBack() ? <Pressable onPress={() => navigation.goBack()}>
-			<Icons.ChevronLeft className="text-foreground" />
-		</Pressable> : null}
-		<ThemedText className='text-xl font-medium'>
-		{title}
-		</ThemedText>
-		<Pressable onPress={() => console.log('pressed')}>
-			<Icons.EllipsisVertical className="text-foreground"/>
-		</Pressable>
-    </Animated.View>
-  );
+	return (
+	<>
+		<Animated.View
+		className="absolute w-full px-4 pb-4 flex flex-row items-center justify-between gap-2 z-10 bg-background"
+		style={[opacityAnim,]}
+		onLayout={(event: LayoutChangeEvent) => {
+			'worklet';
+			onHeaderHeight((event.nativeEvent.layout.height / 2) - 10);
+		}}
+		>
+			<Icons.ChevronLeft className="text-foreground opacity-0" />
+			<ThemedText numberOfLines={1} className='text-xl font-medium shrink'>
+			{title}
+			</ThemedText>
+			<Pressable onPress={() => console.log('pressed')}>
+				<Icons.EllipsisVertical className="text-foreground"/>
+			</Pressable>
+		</Animated.View>
+		{navigation.canGoBack() ? (
+			<Pressable
+			onPress={() => navigation.goBack()}
+			className='absolute z-10'
+			style={{
+				top: inset.top,
+				left: 14,
+			}}
+			>
+				<Icons.ChevronLeft className="text-foreground" />
+			</Pressable>
+		) : null}
+	</>
+	);
 };
 
 interface FilmHeaderProps {
@@ -121,7 +130,8 @@ interface FilmHeaderProps {
 	onHeaderHeight: (height: number) => void;
 	headerHeight: SharedValue<number>;
 	sv: SharedValue<number>;
-	movie: MediaMovie;
+	movie?: MediaMovie | null;
+	loading: boolean;
 }
 const FilmHeader: React.FC<FilmHeaderProps> = ({
 	filmHeaderHeight,
@@ -129,6 +139,7 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 	headerHeight,
 	sv,
 	movie,
+	loading,
 }) => {
 	const { t } = useTranslation();
 	const { hslToRgb } = useColorConverter();
@@ -202,16 +213,16 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 		};
 	});
 	const scaleAnim = useAnimatedStyle(() => {
-	return {
-		transform: [
-		{
-			scale: interpolate(sv.get(), [-50, 0], [1.3, 1], {
-			extrapolateLeft: 'extend',
-			extrapolateRight: 'clamp',
-			}),
-		},
-		],
-	};
+		return {
+			transform: [
+			{
+				scale: interpolate(sv.get(), [-50, 0], [1.3, 1], {
+				extrapolateLeft: 'extend',
+				extrapolateRight: 'clamp',
+				}),
+			},
+			],
+		};
 	});
 	return (
     <Animated.View
@@ -228,14 +239,15 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 		layoutY.value = event.nativeEvent.layout.y;
 	  }}
 	>
-		<AnimatedImageWithFallback
-		alt={movie.title ?? ''}
+		{movie ? <Animated.Image
 		style={[tailwind.style('absolute h-full w-full'), scaleAnim]}
 		source={{ uri: movie.backdrop_url ?? '' }}
-		/>
+		/> : null}
 		<AnimatedLinearGradient
 		style={[tailwind.style('absolute inset-0'), scaleAnim]}
 		colors={[
+			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.3)`,
+			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.4)`,
 			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.5)`,
 			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.6)`,
 			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.6)`,
@@ -245,36 +257,39 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 		/>
 		<Animated.View
 		style={[
-			tailwind.style('flex items-center gap-4 p-4'),
+			tailwind.style('flex items-center gap-4 p-2'),
 			{
 				paddingTop: inset.top === 0 ? 8 : inset.top,
 			},
 		]}
 		>
-			<AnimatedImageWithFallback
-			alt={movie.title ?? ''}
-			source={{ uri: movie.avatar_url ?? '' }}
-			style={[
-				tailwind.style('w-32 h-48 rounded-md'),
-				posterAnim,
-			]}
-			/>
+			{!loading ? (
+				<AnimatedImageWithFallback
+				alt={movie?.title ?? ''}
+				source={{ uri: movie?.avatar_url ?? '' }}
+				className={'w-48 aspect-[2/3] rounded-md h-fit'}
+				style={[ posterAnim ]}
+				/>
+			) : <Skeleton className="w-48 aspect-[2/3]" style={posterAnim}/>}
 			<Animated.View
 			style={[
 				tailwind.style('gap-2 w-full'),
 				textAnim,
 			]}
 			>
-				<View>
+				{movie ? <View>
 					<ThemedText className='text-accent-yellow'>{upperFirst('film')}</ThemedText>
-					{movie.genres ? <Genres genres={movie.genres} /> : null}
-				</View>
-				<ThemedText
+					{movie?.genres ? <Genres genres={movie.genres} /> : null}
+				</View> : loading ? <Skeleton className="w-32 h-8" /> : null}
+				{!loading ? <ThemedText
 				numberOfLines={2}
-				className='text-4xl font-bold'
+				className={`
+					text-4xl font-bold
+					${(!movie && !loading) ? 'text-center text-muted-foreground' : ''}
+				`}
 				>
-				{movie.title}
-				</ThemedText>
+				{movie?.title ?? upperFirst(t('common.errors.film_not_found'))}
+				</ThemedText> : <Skeleton className="w-64 h-12" />}
 			</Animated.View>
 		</Animated.View>
     </Animated.View>
@@ -329,6 +344,7 @@ const FilmLayout = () => {
 		refetch();
 	};
 
+	const tabBarHeight = useBottomTabOverflow();
 	const inset = useSafeAreaInsets();
 	const headerHeight = useSharedValue<number>(0);
 	const filmHeaderHeight = useSharedValue<number>(0);
@@ -343,6 +359,7 @@ const FilmLayout = () => {
 	const animatedScrollStyle = useAnimatedStyle(() => {
 		return {
 		paddingTop: filmHeaderHeight.get(),
+		paddingBottom: tabBarHeight + inset.bottom,
 		};
 	});
 	const stickyElement = useAnimatedStyle(() => {
@@ -362,18 +379,6 @@ const FilmLayout = () => {
 		],
 		};
 	});
-
-	if (loading) {
-		return (
-			<ActivityIndicator />
-		)
-	}
-
-	if (!movie) {
-		return (
-			<ThemedText>{t('common.errors.film_not_found')}</ThemedText>
-		)
-	}
 
 	return (
     <Animated.View className="flex-1 bg-background">
@@ -396,6 +401,7 @@ const FilmLayout = () => {
 		headerHeight={headerHeight}
 		sv={sv}
 		movie={movie}
+		loading={loading}
 		/>
 		<Animated.View style={tailwind.style('flex-1')}>
 			<Animated.ScrollView
@@ -403,23 +409,29 @@ const FilmLayout = () => {
 			scrollEventThrottle={16}
 			className="flex-1"
 			showsVerticalScrollIndicator={false}
-			refreshControl={
-				<RefreshControl
-					refreshing={isRefetching}
-					onRefresh={refresh}
-				/>
-			}
+			// refreshControl={
+			// 	<RefreshControl
+			// 	refreshing={isRefetching}
+			// 	onRefresh={refresh}
+			// 	/>
+			// }
 			>
 				<Animated.View style={[animatedScrollStyle]}>
-					{/* Fixed Section */}
-					<Animated.View
-					className="flex items-center justify-center z-10 p-2 bg-background"
-					style={[stickyElement,]}
-					>
-						<FilmNav slug={String(film_id)} />
-					</Animated.View>
-					{/* SCREEN */}
-					<Slot />
+					{movie ? (
+					<>
+						{/* Fixed Section */}
+						<Animated.View
+						className="flex items-center justify-center z-10 p-2 bg-background"
+						style={[stickyElement]}
+						>
+							<FilmNav slug={String(film_id)} />
+						</Animated.View>
+						{/* SCREEN */}
+						<ThemedView className='gap-2 px-2 pb-2'>
+							<Slot />
+						</ThemedView>
+					</>
+					) : null}
 				</Animated.View>
 			</Animated.ScrollView>
 		</Animated.View>

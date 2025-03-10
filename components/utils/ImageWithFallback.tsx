@@ -8,8 +8,9 @@ import { Icons } from '@/constants/Icons';
 import { Image, ImageProps, ImageSource } from 'expo-image';
 import deepmerge from 'deepmerge';
 import tailwind from 'twrnc';
+import Animated from 'react-native-reanimated';
 
-interface ImageWithFallbackProps extends ComponentProps<typeof View> {
+interface ImageWithFallbackProps extends ComponentProps<typeof Animated.View> {
   source: ImageSource;
   contentFit?: ImageProps['contentFit'];
   transition?: ImageProps['transition'];
@@ -43,7 +44,7 @@ export const ImageWithFallback = React.forwardRef<
   }, [source]);
 
   return (
-    <View
+    <Animated.View
     ref={ref}
     className={cn('overflow-hidden items-center justify-center w-full h-full bg-muted rounded-md', className)}
     style={[
@@ -84,7 +85,7 @@ export const ImageWithFallback = React.forwardRef<
       ) : (
         <Fallback className={cn('', className)} type={type} from="#363636" to="#363636" alt={alt} />
       )} */}
-    </View>
+    </Animated.View>
   );
 });
 
