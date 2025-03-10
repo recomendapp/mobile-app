@@ -9,6 +9,8 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
+// import tw from '@/lib/tw';
+import tw from 'twrnc';
 
 const HomeScreen = () => {
   const { session } = useAuth();
@@ -31,14 +33,14 @@ const HomeHeader = () => {
   const { session, user } = useAuth();
   const { t } = useTranslation();
   return (
-    <View className='flex-row justify-between items-center'>
-      <ThemedText className='text-2xl font-bold line-clamp-1'>
+    <View style={[tw.style('flex-row justify-between items-center')]}>
+      <ThemedText numberOfLines={1} style={[tw.style('text-2xl font-bold')]}>
         {session
           ? `Welcome, ${user?.full_name}`
           : `Welcome on Recomend.`}
       </ThemedText>
       {session ? (
-        <View className='flex-row items-center gap-2'>
+        <View style={[tw.style('flex-row items-center gap-2')]}>
           <UserNav />
         </View>
       ) : (

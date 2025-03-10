@@ -4,11 +4,10 @@ import { getIdFromSlug } from "@/hooks/getIdFromSlug";
 import { Link, useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 import { Media, MediaMoviePerson } from "@/types/type.db";
 import { FlashList } from "@shopify/flash-list";
 import { CardMedia } from "@/components/cards/CardMedia";
-import { Skeleton } from "@/components/ui/skeleton";
 
 const FilmScreen = () => {
 	const { i18n, t } = useTranslation();
@@ -16,10 +15,6 @@ const FilmScreen = () => {
 	const { id: movieId} = getIdFromSlug(film_id as string);
 	const {
 		data: movie,
-		isLoading,
-		isError,
-		isRefetching,
-		refetch,
 	} = useMediaMovieDetailsQuery({
 		id: movieId,
 		locale: i18n.language,

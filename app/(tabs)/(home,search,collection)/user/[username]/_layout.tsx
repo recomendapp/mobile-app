@@ -68,9 +68,7 @@ const ProfileLayout = () => {
 							<ProfilePrivateAccountCard />
 							</>
 						)
-					) : (
-						<ActivityIndicator />
-					)}
+					) : null}
 				</ScrollView>
 			) : (
 				<ScrollView
