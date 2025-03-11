@@ -9,7 +9,7 @@ import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 import tw from '@/lib/tw';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/buttonNEWNAME';
 
 const HomeScreen = () => {
   const { session } = useAuth();

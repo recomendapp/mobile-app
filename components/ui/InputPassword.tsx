@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Input } from "./Input"
+import { Input } from "./inputNEWNAME"
 import { EyeOff } from "@/lib/icons/EyeOff"
 import { Eye } from "@/lib/icons/Eye"
 import { TextInput, TextInputProps, View } from "react-native"

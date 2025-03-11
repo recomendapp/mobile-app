@@ -2,7 +2,7 @@ import { View, Text, Dimensions, ImageBackground } from "react-native";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useWidgetMostRecommended } from "@/features/widget/widgetQueries";
-import { Skeleton } from "../ui/Skeleton";
+import { Skeleton } from "../ui/skeletonNEWNAME";
 import { useRef } from "react";
 import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
 import { useSharedValue } from "react-native-reanimated";

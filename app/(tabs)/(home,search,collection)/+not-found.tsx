@@ -1,5 +1,5 @@
 import { useBottomTabOverflow } from '@/components/TabBarBackground';
-import { Button, buttonTextVariants } from '@/components/ui/Button';
+import { Button, buttonTextVariants } from '@/components/ui/buttonNEWNAME';
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
 import { ThemedText } from '@/components/ui/ThemedText';
 import tw from '@/lib/tw';
