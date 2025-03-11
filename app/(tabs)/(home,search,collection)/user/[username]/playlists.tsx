@@ -1,6 +1,6 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
-import { Button, buttonTextVariants } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button, buttonTextVariants } from "@/components/ui/Button";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText"
 import { Icons } from "@/constants/Icons";
 import {  useUserPlaylistsInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries"

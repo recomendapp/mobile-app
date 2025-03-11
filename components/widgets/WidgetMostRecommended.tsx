@@ -2,7 +2,7 @@ import { View, Text, Dimensions, ImageBackground } from "react-native";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useWidgetMostRecommended } from "@/features/widget/widgetQueries";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "../ui/Skeleton";
 import { useRef } from "react";
 import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
 import { useSharedValue } from "react-native-reanimated";
@@ -49,7 +49,7 @@ const WidgetMostRecommended = ({
 				renderItem={({ index, item }) => (
 					<ImageBackground
 					source={{ uri: item.media?.backdrop_url ?? ''}}
-					style={[tw.style('h-80 rounded-md overflow-hidden')]}
+					style={tw.style('h-80 rounded-md overflow-hidden')}
 					>
 						<ThemedText style={{ textAlign: "center", fontSize: 30 }}>{item.media?.title}</ThemedText>
 					</ImageBackground>

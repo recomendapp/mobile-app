@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { Skeleton } from '../ui/skeleton';
-import { cn } from '@/lib/utils';
+import { Skeleton } from '../ui/Skeleton';
 import { View } from 'react-native';
+import Avatar from '../ui/Avatar';
+import { ThemedText } from '../ui/ThemedText';
+import tw from '@/lib/tw';
 
 interface UserAvatarProps extends Omit<React.ComponentPropsWithRef<typeof View>, 'alt'> {
 	full_name?: string | null;
@@ -15,24 +17,26 @@ const UserAvatar = React.forwardRef<
 >(({ full_name, avatar_url, skeleton, style, ...props }, ref) => {
 	if (!full_name || skeleton) {
 		return (
-			<Skeleton className={cn('h-12 w-12 rounded-full', props.className)} />
+			<Skeleton
+			style={[
+				tw.style('h-12 w-12 rounded-full'),
+				style,
+			]}
+			/>
 		)
 	}
 	return (
-		<View
+		<Avatar.Root
 		ref={ref}
-		style={[
-			{ width: 48, height: 48, borderRadius: 24 },
-			style,
-		]}
+		alt={full_name}
+		style={[style]}
 		{...props}
-		/>
-		// <Avatar ref={ref} alt={full_name} {...props}>
-		// 	<AvatarImage source={{ uri: avatar_url ?? '' }}/>
-		// 	<AvatarFallback>
-		// 		<ThemedText>{full_name}</ThemedText>
-		// 	</AvatarFallback>
-		// </Avatar>
+		>
+			<Avatar.Image source={{ uri: avatar_url ?? '' }}/>
+			<Avatar.Fallback>
+				<ThemedText>{full_name}</ThemedText>
+			</Avatar.Fallback>
+		</Avatar.Root>
 	)
 });
 UserAvatar.displayName = 'UserAvatar';

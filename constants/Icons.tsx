@@ -15,14 +15,15 @@ import { ChevronLeft } from "@/lib/icons/ChevronLeft";
 import { ChevronRight } from "@/lib/icons/ChevronRight";
 import { EllipsisHorizontal } from "@/lib/icons/EllipsisHorizontal";
 import { EllipsisVertical } from "@/lib/icons/EllipsisVertical";
+import tw from "@/lib/tw";
 
 export const Icons = {
 	site: {
 		logo: RecomendLogo,
 	},
 	spinner: Loader2Icon,
-	loader: ({ className, ...props }: LucideProps) => (
-		<Icons.spinner className={cn('animate-spin', className)} {...props} />
+	loader: ({ style, ...props }: LucideProps) => (
+		<Icons.spinner style={[tw.style('animate-spin'), style]} {...props} />
 	),
 	premium: Premium,
 	home: HomeIcon,

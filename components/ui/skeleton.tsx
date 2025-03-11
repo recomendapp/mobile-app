@@ -34,8 +34,8 @@ function Skeleton({
   return (
     <Animated.View
       style={[
-        style,
         styleDefault,
+        style,
       ]}
       {...props}
     />

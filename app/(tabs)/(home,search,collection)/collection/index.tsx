@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Animated from 'react-native-reanimated';
-import { Button } from '~/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthProvider';
 import { View } from 'react-native';
 import { UserNav } from '@/components/user/UserNav';
@@ -13,7 +13,7 @@ import tw from '@/lib/tw';
 const CollectionScreen = () => {
   const { session } = useAuth();
   return (
-      <ThemedSafeAreaView style={[tw.style("flex-1")]}>
+      <ThemedSafeAreaView style={tw.style("flex-1")}>
         <View className='flex-1 p-2 gap-2 '>
           <CollectionHeader />
           <Animated.ScrollView>

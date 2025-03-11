@@ -6,11 +6,15 @@ export type ColorTheme = {
   destructive: string;
   destructiveForeground: string;
   tint: string;
+  // Accent colors
+  accentYellow: string;
+  accentYellowForeground: string;
+  accentHover: string;
 };
 
 const sharedColors = {
-  black: '#000000',
-  white: '#FFFFFF',
+  black: 'hsl(0 0% 0%)',
+  white: 'hsl(0 0% 100%)',
 };
 
 type SharedColors = typeof sharedColors;
@@ -31,6 +35,10 @@ const Colors: ColorPalettes = {
     destructive: 'hsl(0 72% 51%)',
     destructiveForeground: 'hsl(0 0% 98%)',
     tint: 'hsl(0 0% 100%)',
+    // Accent colors
+    accentYellow: 'hsl(51 100% 73%)',
+    accentYellowForeground: sharedColors.black,
+    accentHover: 'hsl(44 97% 40%)',
     ...sharedColors,
   },
   light: {
@@ -41,6 +49,10 @@ const Colors: ColorPalettes = {
     destructive: 'hsl(0 84.2% 60.2%)',
     destructiveForeground: 'hsl(0 0% 98%)',
     tint: 'hsl(240 5.9% 10%)',
+    // Accent colors
+    accentYellow: 'hsl(51 100% 73%)',
+    accentYellowForeground: sharedColors.black,
+    accentHover: 'hsl(44 97% 40%)',
     ...sharedColors,
   },
 };

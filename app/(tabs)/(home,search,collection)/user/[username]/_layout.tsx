@@ -2,7 +2,7 @@ import { ThemedText } from "@/components/ui/ThemedText"
 import { useUserProfileQuery } from "@/features/user/userQueries"
 import { ExternalPathString, Link, Slot, useLocalSearchParams } from "expo-router"
 import ButtonUserFollow from "@/components/buttons/ButtonUserFollow";
-import { Button, buttonTextVariants } from "@/components/ui/button";
+import { Button, buttonTextVariants } from "@/components/ui/Button";
 import UserAvatar from "@/components/user/UserAvatar";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/context/AuthProvider";
@@ -12,13 +12,16 @@ import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import { useTranslation } from "react-i18next";
 import { upperFirst } from "lodash";
 // import * as SeparatorPrimitive from '@rn-primitives/separator';
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useQueryClient } from "@tanstack/react-query";
 import { userKeys } from "@/features/user/userKeys";
 import { useBottomTabOverflow } from "@/components/TabBarBackground";
+import tw from "@/lib/tw";
+import { useTheme } from "@/context/ThemeProvider";
 
 const ProfileLayout = () => {
+	const { colors } = useTheme();
 	const tabBarHeight = useBottomTabOverflow();
 	const { t } = useTranslation();
 	const { username } = useLocalSearchParams();
@@ -43,10 +46,10 @@ const ProfileLayout = () => {
 	};
 
 	return (
-		<ThemedSafeAreaView className="flex-1">
+		<ThemedSafeAreaView style={tw.style("flex-1")}>
 			{(loading || profile) ? (
 				<ScrollView
-				contentContainerClassName={`flex-1 gap-4 p-2 pb-[${tabBarHeight}px]`}
+				contentContainerStyle={tw.style(`flex-1 gap-4 p-2 pb-[${tabBarHeight}px]`)}
 				refreshControl={
 					<RefreshControl
 					  refreshing={isRefetching}
@@ -72,7 +75,7 @@ const ProfileLayout = () => {
 				</ScrollView>
 			) : (
 				<ScrollView
-				contentContainerClassName="flex-1 justify-center items-center"
+				contentContainerStyle={tw.style("flex-1 justify-center items-center")}
 				refreshControl={
 					<RefreshControl
 					  refreshing={isRefetching}
@@ -80,7 +83,7 @@ const ProfileLayout = () => {
 					/>
 				}
 				>
-					<Icons.user className="text-foreground" size={50} />
+					<Icons.user color={colors.foreground} size={50} />
 					<ThemedText>{upperFirst(t('common.errors.user_not_found'))}</ThemedText>
 				</ScrollView>
 			)}
@@ -90,6 +93,7 @@ const ProfileLayout = () => {
 
 
 const ProfileHeader = () => {
+	const { colors } = useTheme();
 	const { user } = useAuth();
 	const { username } = useLocalSearchParams();
 	const {
@@ -103,17 +107,17 @@ const ProfileHeader = () => {
 	const loading = isLoading || profile === undefined;
 
 	return (
-		<View className="gap-2">
-			<View className="flex-row  gap-4 shrink-0 items-start justify-between">
-				<UserAvatar className="w-32 h-32" full_name={profile?.full_name} avatar_url={profile?.avatar_url} skeleton={loading} />
-				<View className="flex gap-4 items-end">
-					<View className="flex-row items-center gap-2 ">
-						{!loading ? <Button variant={'action'}><Text className={buttonTextVariants({variant: 'action'})}>followers</Text></Button> : <Skeleton className={'w-20 h-8'}/>}
-						{!loading ? <Button variant={'action'}><Text className={buttonTextVariants({variant: 'action'})}>following</Text></Button> : <Skeleton className={'w-20 h-8'}/>}
+		<View style={tw.style('gap-2')}>
+			<View style={tw.style('flex-row gap-4 shrink-0 items-start justify-between')}>
+				<UserAvatar style={tw.style('w-32 h-32')} full_name={profile?.full_name} avatar_url={profile?.avatar_url} skeleton={loading} />
+				<View style={tw.style('flex gap-4 items-end')}>
+					<View style={tw.style('flex-row items-center gap-2')}>
+						{!loading ? <Button variant={'action'}><Text className={buttonTextVariants({variant: 'action'})}>followers</Text></Button> : <Skeleton style={tw.style('w-20 h-8')}/>}
+						{!loading ? <Button variant={'action'}><Text className={buttonTextVariants({variant: 'action'})}>following</Text></Button> : <Skeleton style={tw.style('w-20 h-8')}/>}
 						{user?.id == profile?.id && (
 							<Link href="/settings/profile" asChild>
 								<Button variant={'action'}>
-									<Icons.settings className="text-foreground"/>
+									<Icons.settings color={colors.foreground}/>
 								</Button>
 							</Link>
 						)}
@@ -121,21 +125,21 @@ const ProfileHeader = () => {
 					<ButtonUserFollow profileId={profile?.id} skeleton={loading} />
 				</View>
 			</View>
-			<View className="gap-2">
-				{!loading ?<View className="flex-row items-center gap-2">
-					 <ThemedText className="text-xl font-semibold">
+			<View style={tw.style('gap-2')}>
+				{!loading ?<View style={tw.style('flex-row items-center gap-2')}>
+					 <ThemedText style={tw.style('text-xl font-semibold')}>
 						{profile?.full_name}
 						{/* {profile?.premium && (
-							<Icons.premium className='ml-1 '/>
+							<Icons.premium style={tw.style('ml-1')}/>
 						)} */}
 					</ThemedText>
-					<ThemedText className="text-xl text-muted-foreground">@{profile?.username}</ThemedText>
-				</View> : <Skeleton className={'w-32 h-8'}/>}
+					<ThemedText style={[{ color: colors.mutedForeground }, tw.style('text-xl')]}>@{profile?.username}</ThemedText>
+				</View> : <Skeleton style={tw.style('w-32 h-8')}/>}
 				{profile?.bio ? <ThemedText>{profile.bio}</ThemedText> : null}
 				{profile?.website ?
 					<Link href={profile.website as ExternalPathString} target="_blank" asChild>
-						<Pressable className="flex-row gap-2 items-center">
-							<Icons.link width={15} className="text-foreground"/>
+						<Pressable style={tw.style('flex-row gap-2 items-center')}>
+							<Icons.link color={colors.foreground} width={15}/>
 							<ThemedText>{profile.website.replace(/(^\w+:|^)\/\//, '')}</ThemedText>
 						</Pressable>
 					</Link>
@@ -146,13 +150,14 @@ const ProfileHeader = () => {
 };
 
 const ProfilePrivateAccountCard = () => {
+	const { colors } = useTheme();
 	const { t } = useTranslation();
 	return (
-	<View className='flex gap-4 justify-center items-center px-4 py-8 border-y-2'>
-		<Icons.lock className="text-foreground" />
+	<View style={tw.style('flex gap-4 justify-center items-center px-4 py-8 border-y-2')}>
+		<Icons.lock color={colors.foreground} />
 		<View>
-			<ThemedText className="text-center">{upperFirst(t('common.messages.this_account_is_private'))}</ThemedText>
-			<ThemedText className='text-center text-muted-foreground'>{upperFirst(t('common.messages.follow_to_see_activities'))}</ThemedText>
+			<ThemedText >{upperFirst(t('common.messages.this_account_is_private'))}</ThemedText>
+			<ThemedText style={[{ color: colors.mutedForeground }]}>{upperFirst(t('common.messages.follow_to_see_activities'))}</ThemedText>
 		</View>
 	</View>
 	);
