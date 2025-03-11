@@ -1,7 +1,6 @@
 import { LucideProps } from "lucide-react-native";
 import { forwardRef } from "react";
 import Svg, { Path } from "react-native-svg";
-import { iconWithClassName } from "./iconWithClassName";
 
 const Premium = forwardRef<Svg, LucideProps>((props, ref) =>
 	<Svg
@@ -23,6 +22,4 @@ const Premium = forwardRef<Svg, LucideProps>((props, ref) =>
 	</Svg>
 );
 
-export {
-	Premium
-}
+export { Premium }

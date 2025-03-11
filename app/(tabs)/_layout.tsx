@@ -1,12 +1,12 @@
 import { Tabs } from 'expo-router';
 import { Icons } from "@/constants/Icons";
-import TabBarBackground from '@/components/TabBarBackground';
 import { Platform } from 'react-native';
 import { useAuth } from '@/context/AuthProvider';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HapticTab } from '@/components/HapticTab';
 import { useTheme } from '@/context/ThemeProvider';
+import TabBarBackground from '@/components/TabBar/TabBarBackground';
 
 const TabsLayout = () => {
 	const { colors } = useTheme();
@@ -62,11 +62,14 @@ const TabsLayout = () => {
 			tabBarButton: HapticTab,
 			tabBarBackground: TabBarBackground,
 			tabBarStyle: Platform.select({
-			ios: {
-				// Use a transparent background on iOS to show the blur effect
-				position: 'absolute',
-			},
-			default: {},
+				ios: {
+					// Use a transparent background on iOS to show the blur effect
+					position: 'absolute',
+				},
+				android: {
+					backgroundColor: colors.background,
+				},
+				default: {},
 			}),
 			// sceneStyle: {
 				// paddingBottom: 50,

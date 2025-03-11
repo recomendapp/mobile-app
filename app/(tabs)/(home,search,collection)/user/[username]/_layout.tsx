@@ -2,7 +2,6 @@ import { ThemedText } from "@/components/ui/ThemedText"
 import { useUserProfileQuery } from "@/features/user/userQueries"
 import { ExternalPathString, Link, Slot, useLocalSearchParams } from "expo-router"
 import ButtonUserFollow from "@/components/buttons/ButtonUserFollow";
-import { Button, buttonTextVariants } from "@/components/ui/Button";
 import UserAvatar from "@/components/user/UserAvatar";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/context/AuthProvider";
@@ -16,9 +15,9 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useQueryClient } from "@tanstack/react-query";
 import { userKeys } from "@/features/user/userKeys";
-import { useBottomTabOverflow } from "@/components/TabBarBackground";
 import tw from "@/lib/tw";
 import { useTheme } from "@/context/ThemeProvider";
+import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 
 const ProfileLayout = () => {
 	const { colors } = useTheme();
@@ -111,14 +110,12 @@ const ProfileHeader = () => {
 			<View style={tw.style('flex-row gap-4 shrink-0 items-start justify-between')}>
 				<UserAvatar style={tw.style('w-32 h-32')} full_name={profile?.full_name} avatar_url={profile?.avatar_url} skeleton={loading} />
 				<View style={tw.style('flex gap-4 items-end')}>
-					<View style={tw.style('flex-row items-center gap-2')}>
-						{!loading ? <Button variant={'action'}><Text className={buttonTextVariants({variant: 'action'})}>followers</Text></Button> : <Skeleton style={tw.style('w-20 h-8')}/>}
-						{!loading ? <Button variant={'action'}><Text className={buttonTextVariants({variant: 'action'})}>following</Text></Button> : <Skeleton style={tw.style('w-20 h-8')}/>}
+					<View style={tw.style('flex-row items-center gap-8')}>
+						{!loading ? <Pressable><ThemedText style={tw.style('font-semibold')}>followers</ThemedText></Pressable> : <Skeleton style={tw.style('w-20 h-8')}/>}
+						{!loading ? <Pressable><ThemedText style={tw.style('font-semibold')}>following</ThemedText></Pressable> : <Skeleton style={tw.style('w-20 h-8')}/>}
 						{user?.id == profile?.id && (
-							<Link href="/settings/profile" asChild>
-								<Button variant={'action'}>
-									<Icons.settings color={colors.foreground}/>
-								</Button>
+							<Link href="/settings/profile">
+								<Icons.settings color={colors.foreground}/>
 							</Link>
 						)}
 					</View>

@@ -4,11 +4,14 @@ import { Label } from "@/components/ui/Label";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { useAuth } from "@/context/AuthProvider";
+import { useTheme } from "@/context/ThemeProvider";
+import tw from "@/lib/tw";
 import { AuthError } from "@supabase/supabase-js";
 import { useState } from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 
 const LoginPasswordForm = () => {
+	const { colors } = useTheme();
 	const { login } = useAuth();
 	const [ email, setEmail ] = useState('');
 	const [ password, setPassword ] = useState('');
@@ -29,9 +32,9 @@ const LoginPasswordForm = () => {
 		}
 	}
 	return (
-		<ThemedView className="gap-2">
+		<ThemedView style={tw.style('gap-2')}>
 			<View>
-				<Label nativeID="email" className="sr-only">Email</Label>
+				<Label nativeID="email" style={tw.style('sr-only')}>Email</Label>
 				<Input
 				nativeID="email"
 				placeholder="Email"
@@ -43,7 +46,7 @@ const LoginPasswordForm = () => {
 				/>
 			</View>
 			<View>
-				<Label nativeID="password" className="sr-only">Password</Label>
+				<Label nativeID="password" style={tw.style('sr-only')}>Password</Label>
 				<Input
 				nativeID="password"
 				placeholder="Password"
@@ -61,7 +64,7 @@ const LoginPasswordForm = () => {
 			</Button>
 			<View>
 				<TouchableOpacity>
-					<Text className="text-right text-muted-foreground">Forgot Password?</Text>
+					<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Forgot Password?</Text>
 				</TouchableOpacity>
 			</View>
 		</ThemedView>

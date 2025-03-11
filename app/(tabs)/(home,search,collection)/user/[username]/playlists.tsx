@@ -12,7 +12,7 @@ import { useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 
 const GRID_COLUMNS = 3;
 
@@ -64,13 +64,13 @@ const ProfilePlaylistsScreen = () => {
 		<>
 			<View>
 				<View style={tw.style('flex flex-row justify-end items-center gap-2')}>
-					<Button variant={'ghost'} size={'sm'} onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}>
+					<Pressable onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}>
 					{sortOrder === 'desc' ? <Icons.ArrowDownNarrowWide color={colors.foreground} size={20} /> : <Icons.ArrowUpNarrowWide color={colors.foreground} size={20} />}
-					</Button>
-					<Button variant={'secondary'} size={'fit'} onPress={handleSortBy} style={tw.style('flex-row items-center gap-1')}>
-						<Text className={buttonTextVariants({variant: 'secondary'})}>{upperFirst(t(`common.messages.${sortBy}`))}</Text>
+					</Pressable>
+					<Pressable onPress={handleSortBy} style={tw.style('flex-row items-center gap-1')}>
+						<ThemedText>{upperFirst(t(`common.messages.${sortBy}`))}</ThemedText>
 						<Icons.ChevronDown color={colors.foreground} size={20} />
-					</Button>
+					</Pressable>
 				</View>
 			</View>
 			{activities?.pages[0].length ?

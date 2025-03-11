@@ -1,3 +1,4 @@
+import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
 import React from 'react';
 import {
@@ -126,6 +127,7 @@ Image.displayName = 'ImageAvatar';
 
 // Fallback Component
 const Fallback = React.forwardRef<View, FallbackProps>(({ style, children }, ref) => {
+  const { colors } = useTheme();
   const { alt, status } = useRootContext();
 
   if (status !== 'error') {
@@ -134,13 +136,15 @@ const Fallback = React.forwardRef<View, FallbackProps>(({ style, children }, ref
 
   return (
     <View
-	ref={ref}
-	style={[
-		tw.style('flex h-full w-full items-center justify-center rounded-full bg-muted'),
-		style,
-	]}
-	accessibilityRole="image"
-	accessibilityLabel={alt}>
+    ref={ref}
+    style={[
+      { backgroundColor: colors.muted },
+      tw.style('flex h-full w-full items-center justify-center rounded-full'),
+      style,
+    ]}
+    accessibilityRole="image"
+    accessibilityLabel={alt}
+    >
       {children}
     </View>
   );

@@ -1,11 +1,8 @@
-// import '~/styles/global.css';
 import '~/lib/i18n';
 
-import { DarkTheme, DefaultTheme, Theme, ThemeProvider } from '@react-navigation/native';
 import { SplashScreen } from 'expo-router';
 import * as React from 'react';
 import { Platform } from 'react-native';
-import { useColorScheme } from '~/hooks/useColorScheme';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 // import { Colors } from '@/constants/Colors';
 import { Providers } from '@/context/Providers';
@@ -34,7 +31,7 @@ export {
 
 export default function RootLayout() {
   const hasMounted = React.useRef(false);
-  const { colorScheme, isDarkColorScheme } = useColorScheme();
+  // const { colorScheme, isDarkColorScheme } = useColorScheme();
   const [isColorSchemeLoaded, setIsColorSchemeLoaded] = React.useState(false);
 
   useIsomorphicLayoutEffect(() => {
@@ -46,7 +43,7 @@ export default function RootLayout() {
     //   // Adds the background color to the html element to prevent white background on overscroll.
     //   document.documentElement.classList.add('bg-background');
     // }
-    setAndroidNavigationBar(colorScheme);
+    setAndroidNavigationBar('dark');
     setIsColorSchemeLoaded(true);
     hasMounted.current = true;
     // SplashScreen.hide();

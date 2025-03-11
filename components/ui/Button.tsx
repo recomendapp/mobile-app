@@ -1,3 +1,4 @@
+import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
@@ -65,13 +66,15 @@ type ButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
 
 const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>(
   ({ variant, size, role = 'button', ...props }, ref) => {
+    const { colors } = useTheme();
     return (
       <Pressable
         ref={ref}
         role={role}
         style={[
-          props.disabled && tw.style('opacity-50 web:pointer-events-none'),
-          tw.style(buttonVariants({ variant, size })),
+          { color: colors.foreground },
+          props.disabled && tw.style('opacity-50'),
+          // tw.style(buttonVariants({ variant, size })),
         ]}
         {...props}
       />
