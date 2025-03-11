@@ -14,7 +14,7 @@ const CollectionScreen = () => {
   const { session } = useAuth();
   return (
       <ThemedSafeAreaView style={tw.style("flex-1")}>
-        <View className='flex-1 p-2 gap-2 '>
+        <View style={tw.style("flex-1 p-2 gap-2")}>
           <CollectionHeader />
           <Animated.ScrollView>
 			      <ThemedText>Collection here</ThemedText>
@@ -28,14 +28,14 @@ const CollectionHeader = () => {
   const { session, user } = useAuth();
   const { t } = useTranslation();
   return (
-    <View className='flex-row justify-between items-center'>
-      <ThemedText className='text-2xl font-bold line-clamp-1'>
+    <View style={tw.style("flex-row justify-between items-center")}>
+      <ThemedText numberOfLines={1} style={tw.style("text-2xl font-bold")}>
         {session
           ? `Welcome, ${user?.full_name}`
           : `Welcome on Recomend.`}
       </ThemedText>
       {session ? (
-        <View className='flex-row items-center gap-2'>
+        <View style={tw.style("flex-row items-center gap-2")}>
           <UserNav />
         </View>
       ) : (

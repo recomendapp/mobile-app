@@ -3,6 +3,7 @@ import { Link, LinkProps, usePathname } from "expo-router";
 import Animated from "react-native-reanimated";
 import tw from "@/lib/tw";
 import { useTheme } from "@/context/ThemeProvider";
+import { View, Text } from "react-native";
 
 interface FilmNavProps extends React.ComponentPropsWithRef<Animated.View> {
 	slug: string;
@@ -45,12 +46,18 @@ const FilmNav = React.forwardRef<
 				key={index}
 				href={route.href}
 				style={[
-					tw.style('flex-1 p-2 rounded-md text-center font-medium'),
-					{ color: pathname === route.href ? colors.accentYellow : colors.mutedForeground },
+					tw.style('flex-1 p-2 rounded-md'),
 					pathname === route.href && { backgroundColor: colors.background },
 				]}
 				>
-				{route.title}
+					<Animated.Text
+					style={[
+						tw.style('text-center font-medium'),
+						{ color: pathname === route.href ? colors.accentYellow : colors.mutedForeground },
+					]}
+					>
+						{route.title}
+					</Animated.Text>
 				</Link>
 			))}
 		</Animated.View>

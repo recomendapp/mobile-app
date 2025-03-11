@@ -56,7 +56,7 @@ const CustomDrawerContent = (props: any) => {
                         <UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} style={tw.style("w-16 h-16")} />
                         <View>
                             <ThemedText style={tw.style("text-xl font-semibold")}>{user.full_name}</ThemedText>
-                            <ThemedText style={[{ color: colors.mutedForeground }, tw.style("text-md")]}>@{user.username}</ThemedText>
+                            <ThemedText style={{ color: colors.mutedForeground }}>@{user.username}</ThemedText>
                         </View>
                     </Pressable>
                 </Link>
