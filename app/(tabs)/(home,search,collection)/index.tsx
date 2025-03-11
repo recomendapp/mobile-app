@@ -40,13 +40,13 @@ const HomeHeader = () => {
       </ThemedText>
       {session ? (
         <View style={[tw.style('flex-row items-center gap-2')]}>
-          {/* <UserNav /> */}
+          <UserNav />
         </View>
       ) : (
-        <Link href={'/auth/login'} asChild><Button>{t('common.word.login')}</Button></Link>
+        <Button><Link href={'/auth/login'}>{t('common.word.login')}</Link></Button>
       )}
     </View>
   );
-}
+};
 
 export default HomeScreen;

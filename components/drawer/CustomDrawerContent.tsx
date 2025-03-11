@@ -8,6 +8,7 @@ import UserAvatar from "@/components/user/UserAvatar";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/context/ThemeProvider";
+import tw from "@/lib/tw";
 
 const CustomDrawerContent = (props: any) => {
     const router = useRouter();
@@ -51,11 +52,11 @@ const CustomDrawerContent = (props: any) => {
                 {/* <DrawerItemList {...props} /> */}
                 {/* PROFILE */}
                 <Link href={`/user/${user.username}`} asChild>
-                    <Pressable className="flex-row items-center p-4 gap-2">
-                        <UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} className="w-16 h-16"/>
+                    <Pressable style={[tw.style("flex-row items-center p-4 gap-2")]}>
+                        <UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} style={[tw.style("w-16 h-16")]} />
                         <View>
-                            <ThemedText className="text-xl font-semibold">{user.full_name}</ThemedText>
-                            <ThemedText className="text-md text-muted-foreground">@{user.username}</ThemedText>
+                            <ThemedText style={[tw.style("text-xl font-semibold")]}>{user.full_name}</ThemedText>
+                            <ThemedText style={[{ color: colors.mutedForeground }, tw.style("text-md")]}>@{user.username}</ThemedText>
                         </View>
                     </Pressable>
                 </Link>
@@ -63,8 +64,9 @@ const CustomDrawerContent = (props: any) => {
                     <DrawerItem
                     key={index}
                     label={route.name}
+                    labelStyle={{ color: colors.foreground }}
                     icon={({ color, size }) => (
-                        <route.icon color={color} size={size} />
+                        <route.icon color={colors.foreground} size={size} />
                     )}
                     onPress={() => {
                         route.onPress();
@@ -80,9 +82,9 @@ const CustomDrawerContent = (props: any) => {
                     await logout();
                     closeDrawer();
                 }}
-                className="px-4"
+                style={[tw.style("px-4")]}
                 >
-                    <Text className="text-destructive">Logout</Text>
+                    <Text style={{ color: colors.destructive }}>Logout</Text>
                 </Pressable>
             </SafeAreaView>
         </SafeAreaView>

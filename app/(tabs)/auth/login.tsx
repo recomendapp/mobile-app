@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { InputPassword } from '@/components/ui/input-password';
+import tw from '@/lib/tw';
+import { useTheme } from '@/context/ThemeProvider';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
@@ -16,6 +18,7 @@ const backgroundImages = [
 
 const LoginScreen = () => {
 	const { login } = useAuth();
+	const { colors } = useTheme();
 	const { t } = useTranslation();
 	const [ email, setEmail ] = useState('');
 	const [ password, setPassword ] = useState('');
@@ -57,9 +60,9 @@ const LoginScreen = () => {
 				paddingBottom: 114
 			}}
 			>
-				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className='w-full gap-4'>
+				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[tw.style('w-full gap-4')]}>
 					{/* EMAIL */}
-					<View className='w-full'>
+					<View style={[tw.style('w-full')]}>
 						<ThemedText nativeID='email'>Email</ThemedText>
 						<Input
 						nativeID="email"
@@ -75,7 +78,7 @@ const LoginScreen = () => {
 						/>
 					</View>
 					{/* PASSWORD */}
-					<View className='w-full'>
+					<View style={[tw.style('w-full')]}>
 						<ThemedText nativeID='password'>Password</ThemedText>
 						<InputPassword
 						nativeID="password"
@@ -91,17 +94,17 @@ const LoginScreen = () => {
 						/>
 					</View>
 					{/* FORGOT PASSWORD */}
-					<TouchableOpacity className='w-full'>
-						<Text className="text-right text-muted-foreground">Forgot Password?</Text>
+					<TouchableOpacity style={[tw.style('w-full')]}>
+						<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Forgot Password?</Text>
 					</TouchableOpacity>
 					{/* SUBMIT BUTTON */}
-					<Button onPress={handleSubmit} disabled={isLoading} className='w-full !py-4 rounded-xl' size={'fit'}>
+					<Button onPress={handleSubmit} disabled={isLoading} style={[tw.style('w-full py-4 rounded-xl')]} size={'fit'}>
 						{/* {isLoading ? <Icons.loading /> : null} */}
-						<Text className='font-bold text-xl'>{t('common.word.login')}</Text>
+						<Text style={[tw.style('font-bold text-xl')]}>{t('common.word.login')}</Text>
 					</Button>
 				</KeyboardAvoidingView>
 				{/* SIGNUP */}
-				<Text className="text-right text-muted-foreground">Don't have an account? <Link href={'/auth/signup'} className={buttonTextVariants({ variant: 'link' })}>Sign Up</Link></Text>
+				<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Don't have an account? <Link href={'/auth/signup'} className={buttonTextVariants({ variant: 'link' })}>Sign Up</Link></Text>
 			</LinearGradient>
 		</ImageBackground>
 	)
