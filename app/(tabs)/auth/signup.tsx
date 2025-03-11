@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button, buttonTextVariants } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Link } from 'expo-router';
 import * as z from 'zod';
@@ -15,6 +14,7 @@ import { useUsernameAvailability } from '@/hooks/useUsernameAvailability';
 import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
 import { InputPassword } from '@/components/ui/input-password';
+import { ThemedText } from '@/components/ui/ThemedText';
 
 const backgroundImages = [
 	require('@/assets/images/auth/signup/background/1.gif'),
@@ -186,7 +186,7 @@ const SignupScreen = () => {
 				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className='w-full gap-4'>
 					{/* EMAIL */}
 					<View>
-						<Label nativeID='email'>{t('common.form.email.label')}</Label>
+						<ThemedText nativeID='email'>{t('common.form.email.label')}</ThemedText>
 						<Controller
 							control={form.control}
 							render={({field: { onChange, onBlur, value }}) => (
@@ -211,7 +211,7 @@ const SignupScreen = () => {
 						/>
 					</View>
 					<View>
-						<Label nativeID='username'>{t('common.form.username.label')}</Label>
+						<ThemedText nativeID='username'>{t('common.form.username.label')}</ThemedText>
 						<Controller
 							control={form.control}
 							render={({field: { onChange, onBlur, value }}) => (
@@ -241,7 +241,7 @@ const SignupScreen = () => {
 						/>
 					</View>
 					<View>
-						<Label nativeID='full_name'>{t('common.form.full_name.label')}</Label>
+						<ThemedText nativeID='full_name'>{t('common.form.full_name.label')}</ThemedText>
 						<Controller
 							control={form.control}
 							render={({field: { onChange, onBlur, value }}) => (
@@ -265,7 +265,7 @@ const SignupScreen = () => {
 						/>
 					</View>
 					<View>
-						<Label nativeID='password'>{t('common.form.password.label')}</Label>
+						<ThemedText nativeID='password'>{t('common.form.password.label')}</ThemedText>
 						<Controller
 							control={form.control}
 							render={({field: { onChange, onBlur, value }}) => (
@@ -288,7 +288,7 @@ const SignupScreen = () => {
 						/>
 					</View>
 					<View>
-						<Label nativeID='password'>{t('common.form.password.confirm.label')}</Label>
+						<ThemedText nativeID='password'>{t('common.form.password.confirm.label')}</ThemedText>
 						<Controller
 							control={form.control}
 							render={({field: { onChange, onBlur, value }}) => (

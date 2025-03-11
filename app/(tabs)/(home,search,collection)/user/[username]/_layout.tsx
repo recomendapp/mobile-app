@@ -11,7 +11,7 @@ import ProfileNav from "@/components/screens/user/ProfileNav";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import { useTranslation } from "react-i18next";
 import { upperFirst } from "lodash";
-import * as SeparatorPrimitive from '@rn-primitives/separator';
+// import * as SeparatorPrimitive from '@rn-primitives/separator';
 import { Skeleton } from "@/components/ui/skeleton";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useQueryClient } from "@tanstack/react-query";
@@ -64,7 +64,7 @@ const ProfileLayout = () => {
 							</>
 						) : (
 							<>
-							<SeparatorPrimitive.Root className="bg-muted h-0.5 rounded-full"/>
+							{/* <SeparatorPrimitive.Root className="bg-muted h-0.5 rounded-full"/> */}
 							<ProfilePrivateAccountCard />
 							</>
 						)

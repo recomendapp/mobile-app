@@ -5,7 +5,6 @@ import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button, buttonTextVariants } from '@/components/ui/button';
 import { ThemedText } from '@/components/ui/ThemedText';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -61,7 +60,7 @@ const LoginScreen = () => {
 				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className='w-full gap-4'>
 					{/* EMAIL */}
 					<View className='w-full'>
-						<Label nativeID='email'>Email</Label>
+						<ThemedText nativeID='email'>Email</ThemedText>
 						<Input
 						nativeID="email"
 						placeholder="Email"
@@ -77,7 +76,7 @@ const LoginScreen = () => {
 					</View>
 					{/* PASSWORD */}
 					<View className='w-full'>
-						<Label nativeID='password'>Password</Label>
+						<ThemedText nativeID='password'>Password</ThemedText>
 						<InputPassword
 						nativeID="password"
 						placeholder="Password"
