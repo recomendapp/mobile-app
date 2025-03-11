@@ -1,5 +1,4 @@
-import { View, Text, Dimensions, ImageBackground } from "react-native";
-import { cn } from "@/lib/utils";
+import { View, Dimensions, ImageBackground, ViewProps } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useWidgetMostRecommended } from "@/features/widget/widgetQueries";
 import { Skeleton } from "../ui/Skeleton";
@@ -11,13 +10,9 @@ import tw from "@/lib/tw";
 
 const width = Dimensions.get("window").width;
 
-interface WidgetMostRecommendedProps {
-	className?: string;
-}
-
 const WidgetMostRecommended = ({
-	className,
-} : WidgetMostRecommendedProps) => {
+	style,
+} : ViewProps) => {
 	const t = useTranslation();
 	const {
 		data,
@@ -35,11 +30,11 @@ const WidgetMostRecommended = ({
 	};
 
 	if (data === undefined || isLoading) {
-		return <Skeleton className={cn("w-full h-80", className)} />
+		return <Skeleton style={[tw.style('w-full h-80'), style]} />
 	}
 	if (!data.length || isError) return null;
 	return (
-		<View className={cn('', className)}>
+		<View style={style}>
 			<Carousel
 				ref={ref}
 				width={width}

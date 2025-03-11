@@ -2,7 +2,6 @@ import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
 import * as React from 'react';
 import { TextInput, type TextInputProps } from 'react-native';
-import { cn } from '~/lib/utils';
 
 const Input = React.forwardRef<React.ElementRef<typeof TextInput>, TextInputProps>(
   ({ style, placeholderTextColor, ...props }, ref) => {

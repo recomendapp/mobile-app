@@ -1,12 +1,10 @@
 import * as React from 'react';
 import { ComponentProps, useEffect, useState } from 'react';
-import { cn } from '@/lib/utils';
 import { MediaType } from '@/types/type.db';
-import { DimensionValue, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { ImageIcon, ListVideoIcon } from 'lucide-react-native';
 import { Icons } from '@/constants/Icons';
 import { Image, ImageProps, ImageSource } from 'expo-image';
-import deepmerge from 'deepmerge';
 import tailwind from 'twrnc';
 import Animated from 'react-native-reanimated';
 import tw from '@/lib/tw';
