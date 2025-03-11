@@ -1,5 +1,4 @@
 import * as React from "react"
-import { cn } from "@/lib/utils";
 import { Media, UserActivity } from "@/types/type.db";
 import { ThemedText } from "../ui/ThemedText";
 import Animated from "react-native-reanimated";
@@ -206,7 +205,7 @@ CardMediaPoster.displayName = "CardMediaPoster";
 const CardMedia = React.forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	CardMediaProps
->(({ className, hideMediaType = true, showRating = true, linked = true, variant = "default", ...props }, ref) => {
+>(({ hideMediaType = true, showRating = true, linked = true, variant = "default", ...props }, ref) => {
 	const router = useRouter();
 	const onPress = () => {
 		if (linked && props.media.url) {
@@ -217,9 +216,9 @@ const CardMedia = React.forwardRef<
 	// <ContextMenuMedia media={media}>
 	<Pressable onPress={onPress}>
 		{variant === "default" ? (
-			<CardMediaDefault ref={ref} className={cn(linked ? 'cursor-pointer' : '', className)} linked={linked} showRating={showRating} {...props} />
+			<CardMediaDefault ref={ref} linked={linked} showRating={showRating} {...props} />
 		) : variant == "poster" ? (
-			<CardMediaPoster ref={ref} className={cn(linked ? 'cursor-pointer' : '', className)} linked={linked} showRating={showRating} {...props} />
+			<CardMediaPoster ref={ref} linked={linked} showRating={showRating} {...props} />
 		// ) : variant == "row" ? (
 			// <CardMediaRow ref={ref} className={cn(linked ? 'cursor-pointer' : '', className)} media={media} linked={linked} onClick={customOnClick} showRating={showRating} hideMediaType={hideMediaType} {...props} />
 		) : null}

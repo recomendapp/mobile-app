@@ -1,7 +1,5 @@
 import { RecomendLogo } from "@/lib/icons/RecomendLogo";
 import { CompassIcon, HomeIcon, InfoIcon, LibraryIcon, Loader2Icon, LogOutIcon, LucideProps, SearchIcon, SettingsIcon, StoreIcon, UserIcon, ZapIcon } from "lucide-react-native";
-import { cn } from "@/lib/utils";
-
 import { Link } from "@/lib/icons/Link";
 import { Settings } from "@/lib/icons/Settings";
 import { Premium } from "@/lib/icons/Premium";

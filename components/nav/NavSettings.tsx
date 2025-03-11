@@ -2,7 +2,6 @@ import { Link, LinkProps, usePathname } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { FlatList, Text, View } from "react-native";
 import { Button, buttonTextVariants } from "../ui/Button";
-import { cn } from "@/lib/utils";
 import tw from "@/lib/tw";
 import { useTheme } from "@/context/ThemeProvider";
 
@@ -70,7 +69,7 @@ const NavSettingsItem = ({
 		href={href}
 		asChild
 		>
-			<Button variant={'outline'} className={cn("rounded-full", active ? 'bg-muted' : '')}>
+			<Button variant={'outline'} style={[tw.style('rounded-full'), active && { backgroundColor: colors.muted }]}>
 				<Text className={buttonTextVariants({ variant: active ? 'secondary' : 'outline'})}>{title}</Text>
 			</Button>
 		</Link>
