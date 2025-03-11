@@ -15,6 +15,9 @@ export type ColorTheme = {
   accentBlue: string;
   accentBlueForeground: string;
   accentBlueHover: string;
+  accentPink: string;
+  accentPinkForeground: string;
+  accentPinkHover: string;
 };
 
 const sharedColors = {
@@ -49,6 +52,9 @@ const Colors: ColorPalettes = {
     accentBlue: 'hsl(216, 100%, 58%)',
     accentBlueForeground: sharedColors.white,
     accentBlueHover: 'hsl(212 100% 30%)',
+    accentPink: 'hsl(320 87% 75%)',
+    accentPinkForeground: sharedColors.black,
+    accentPinkHover: 'hsl(320 89% 57%)',
     ...sharedColors,
   },
   light: {
@@ -68,6 +74,9 @@ const Colors: ColorPalettes = {
     accentBlue: 'hsl(216, 100%, 58%)',
     accentBlueForeground: sharedColors.white,
     accentBlueHover: 'hsl(212 100% 30%)',
+    accentPink: 'hsl(320 87% 75%)',
+    accentPinkForeground: sharedColors.black,
+    accentPinkHover: 'hsl(320 89% 57%)',
     ...sharedColors,
   },
 };
