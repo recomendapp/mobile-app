@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/buttonNEWNAME";
-import { Input } from "@/components/ui/inputNEWNAME";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";

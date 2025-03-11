@@ -2,7 +2,7 @@ import { ThemedText } from "@/components/ui/ThemedText"
 import { useUserProfileQuery } from "@/features/user/userQueries"
 import { ExternalPathString, Link, Slot, useLocalSearchParams } from "expo-router"
 import ButtonUserFollow from "@/components/buttons/ButtonUserFollow";
-import { Button, buttonTextVariants } from "@/components/ui/buttonNEWNAME";
+import { Button, buttonTextVariants } from "@/components/ui/Button";
 import UserAvatar from "@/components/user/UserAvatar";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/context/AuthProvider";
@@ -12,7 +12,7 @@ import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import { useTranslation } from "react-i18next";
 import { upperFirst } from "lodash";
 // import * as SeparatorPrimitive from '@rn-primitives/separator';
-import { Skeleton } from "@/components/ui/skeletonNEWNAME";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useQueryClient } from "@tanstack/react-query";
 import { userKeys } from "@/features/user/userKeys";

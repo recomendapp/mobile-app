@@ -1,6 +1,6 @@
 import { PER_PAGE } from "@/app/(tabs)/(home,search,collection)/user/[username]/collection";
 import { CardMedia } from "@/components/cards/CardMedia";
-import { Skeleton } from "@/components/ui/skeletonNEWNAME";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useUserActivitiesInfiniteQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Skeleton } from '../ui/skeletonNEWNAME';
+import { Skeleton } from '../ui/Skeleton';
 import { View } from 'react-native';
 import Avatar from '../ui/Avatar';
 import { ThemedText } from '../ui/ThemedText';

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Animated from 'react-native-reanimated';
-import { Button } from '@/components/ui/buttonNEWNAME';
+import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthProvider';
 import { View } from 'react-native';
 import { UserNav } from '@/components/user/UserNav';
