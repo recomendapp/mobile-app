@@ -1,6 +1,6 @@
 import { CardMedia } from "@/components/cards/CardMedia";
-import { Button, buttonTextVariants } from "@/components/ui/buttonNEWNAME";
-import { Skeleton } from "@/components/ui/skeletonNEWNAME";
+import { Button, buttonTextVariants } from "@/components/ui/Button";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText"
 import { Icons } from "@/constants/Icons";
 import { useUserActivitiesInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries"
