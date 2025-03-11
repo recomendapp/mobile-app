@@ -1,7 +1,6 @@
-import { cn } from '@/lib/utils';
+import { useTheme } from '@/context/ThemeProvider';
 import { forwardRef } from 'react';
 import { View, type ViewProps } from 'react-native';
-
 
 interface ThemedViewProps extends ViewProps {
   lightColor?: string;
@@ -11,8 +10,18 @@ interface ThemedViewProps extends ViewProps {
 const ThemedView = forwardRef<
   React.ComponentRef<typeof View>,
   ThemedViewProps
->(({ className, ...props }, ref) => {
-  return <View ref={ref} className={cn('bg-background', className)} {...props} />
+>(({ style, ...props }, ref) => {
+  const { colors } = useTheme();
+  return (
+  <View
+  ref={ref}
+  style={[
+    { backgroundColor: colors.background },
+    style,
+  ]}
+  {...props}
+  />
+  )
 });
 
 export {

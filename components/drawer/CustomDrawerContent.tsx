@@ -7,9 +7,11 @@ import { useMemo } from "react";
 import UserAvatar from "@/components/user/UserAvatar";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "@/context/ThemeProvider";
 
 const CustomDrawerContent = (props: any) => {
     const router = useRouter();
+    const { colors } = useTheme();
     const { user, logout } = useAuth();
 
     const routes = useMemo(() => {
@@ -38,7 +40,12 @@ const CustomDrawerContent = (props: any) => {
     if (!user) return null;
 
     return (
-        <SafeAreaView style={{ flex: 1 }} className="bg-muted">
+        <SafeAreaView
+        style={{
+            flex: 1,
+            backgroundColor: colors.muted,
+        }}
+        >
             {/* MAIN ROUTES */}
             <DrawerContentScrollView {...props}>
                 {/* <DrawerItemList {...props} /> */}

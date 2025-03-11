@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Animated from 'react-native-reanimated';
-import { Button, buttonTextVariants } from '~/components/ui/button';
 import { useAuth } from '@/context/AuthProvider';
 import { View } from 'react-native';
 import { UserNav } from '@/components/user/UserNav';
@@ -9,14 +8,14 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
-// import tw from '@/lib/tw';
-import tw from 'twrnc';
+import tw from '@/lib/tw';
+import { Button } from '@/components/ui/button';
 
 const HomeScreen = () => {
   const { session } = useAuth();
   return (
-      <ThemedSafeAreaView className='flex-1'>
-        <View className='flex-1 p-2 gap-2 '>
+      <ThemedSafeAreaView style={[tw.style("flex-1")]}>
+        <View style={[tw.style("flex-1 p-2 gap-2")]}>
           <HomeHeader />
           <Animated.ScrollView>
             <WidgetMostRecommended />
@@ -41,14 +40,13 @@ const HomeHeader = () => {
       </ThemedText>
       {session ? (
         <View style={[tw.style('flex-row items-center gap-2')]}>
-          <UserNav />
+          {/* <UserNav /> */}
         </View>
       ) : (
-        <Button><Link href={'/auth/login'}>{t('common.word.login')}</Link></Button>
+        <Link href={'/auth/login'} asChild><Button>{t('common.word.login')}</Button></Link>
       )}
     </View>
   );
 }
-
 
 export default HomeScreen;

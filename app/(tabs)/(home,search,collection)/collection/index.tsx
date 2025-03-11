@@ -8,11 +8,12 @@ import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import tw from '@/lib/tw';
 
 const CollectionScreen = () => {
   const { session } = useAuth();
   return (
-      <ThemedSafeAreaView className='flex-1'>
+      <ThemedSafeAreaView style={[tw.style("flex-1")]}>
         <View className='flex-1 p-2 gap-2 '>
           <CollectionHeader />
           <Animated.ScrollView>

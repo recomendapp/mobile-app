@@ -7,6 +7,7 @@ import { useRef } from "react";
 import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
 import { useSharedValue } from "react-native-reanimated";
 import { ThemedText } from "../ui/ThemedText";
+import tw from "@/lib/tw";
 
 const width = Dimensions.get("window").width;
 
@@ -48,7 +49,7 @@ const WidgetMostRecommended = ({
 				renderItem={({ index, item }) => (
 					<ImageBackground
 					source={{ uri: item.media?.backdrop_url ?? ''}}
-					className="h-80 rounded-md overflow-hidden"
+					style={[tw.style('h-80 rounded-md overflow-hidden')]}
 					>
 						<ThemedText style={{ textAlign: "center", fontSize: 30 }}>{item.media?.title}</ThemedText>
 					</ImageBackground>

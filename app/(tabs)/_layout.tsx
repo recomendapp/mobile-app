@@ -1,17 +1,16 @@
 import { Tabs } from 'expo-router';
 import { Icons } from "@/constants/Icons";
-import { Colors } from '@/constants/Colors';
 import TabBarBackground from '@/components/TabBarBackground';
 import { Platform } from 'react-native';
 import { useAuth } from '@/context/AuthProvider';
 import { useMemo } from 'react';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { useTranslation } from 'react-i18next';
 import { HapticTab } from '@/components/HapticTab';
+import { useTheme } from '@/context/ThemeProvider';
 
 const TabsLayout = () => {
+	const { colors } = useTheme();
 	const { session } = useAuth();
-	const { colorScheme } = useColorScheme();
 	const { t } = useTranslation();
 	const routes = useMemo(() => [
 		{
@@ -54,11 +53,11 @@ const TabsLayout = () => {
 			href: session ? null : undefined,
 		}
 	], [session]);
-
+	
 	return (
 		<Tabs
 		screenOptions={{
-			tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+			tabBarActiveTintColor: colors.tint,
 			headerShown: false,
 			tabBarButton: HapticTab,
 			tabBarBackground: TabBarBackground,

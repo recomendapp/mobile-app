@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { useTheme } from '@/context/ThemeProvider';
 import { forwardRef } from 'react';
 import { SafeAreaView, SafeAreaViewProps } from 'react-native-safe-area-context';
 
@@ -10,8 +10,18 @@ interface ThemedSafeAreaViewProps extends SafeAreaViewProps {
 const ThemedSafeAreaView = forwardRef<
   React.ComponentRef<typeof SafeAreaView>,
   ThemedSafeAreaViewProps
->(({ className, ...props }, ref) => {
-  return <SafeAreaView ref={ref} className={cn('bg-background', className)} {...props} />
+>(({ style, ...props }, ref) => {
+  const { colors } = useTheme();
+  return (
+  <SafeAreaView
+  ref={ref}
+  style={[
+    { backgroundColor: colors.background },
+    style,
+  ]}
+  {...props}
+  />
+  )
 });
 
 export {
