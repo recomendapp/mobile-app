@@ -13,6 +13,7 @@ import useNow from "@/hooks/useNow";
 import { ThemedText } from "../ui/ThemedText";
 import { IconMediaRating } from "../medias/IconMediaRating";
 import { CardUser } from "./CardUser";
+import ActionReviewLike from "../reviews/actions/ActionReviewLike";
 
 interface CardReviewProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -47,11 +48,11 @@ const CardReviewDefault = React.forwardRef<
 			]}
 			{...props}
 		>
-			<View style={tw.style("items-center gap-1")}>
+			<View style={tw.style("items-center gap-1 shrink")}>
 				<IconMediaRating rating={activity?.rating!} />
 				{/* <View style={[{ backgroundColor: colors.mutedForeground }, tw.style("h-full w-0.5 rounded-full")]} /> */}
 			</View>
-			<View style={tw.style("w-full flex-col gap-1")}>
+			<View style={tw.style("w-full flex-col gap-1 shrink")}>
 				<View style={tw.style("w-full flex-row justify-between items-center gap-2")}>
 					<CardUser variant="inline" user={author} />
 					<View style={[{ color: colors.mutedForeground }, tw.style('text-sm')]}>
@@ -64,8 +65,8 @@ const CardReviewDefault = React.forwardRef<
 					</ThemedText>
 				) : null}
 				<Overview data={review?.body} />
-				<View style={tw.style("flex items-center justify-end m-1")}>
-					{/* <ActionReviewLike reviewId={review?.id} reviewLikesCount={review.likes_count} /> */}
+				<View style={tw.style("flex-row items-center justify-end m-1")}>
+					<ActionReviewLike reviewId={review?.id} reviewLikesCount={review.likes_count} />
 				</View>
 			</View>
 		</Animated.View>
