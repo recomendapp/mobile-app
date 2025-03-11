@@ -3,14 +3,15 @@ import { useAuth } from '@/context/AuthProvider';
 import { useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Button, buttonTextVariants } from '@/components/ui/button';
+import { Button, buttonTextVariants } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/Input';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { InputPassword } from '@/components/ui/input-password';
+import { InputPassword } from '@/components/ui/InputPassword';
 import tw from '@/lib/tw';
 import { useTheme } from '@/context/ThemeProvider';
+import { Label } from '@/components/ui/Label';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
@@ -60,10 +61,10 @@ const LoginScreen = () => {
 				paddingBottom: 114
 			}}
 			>
-				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[tw.style('w-full gap-4')]}>
+				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={tw.style('w-full gap-4')}>
 					{/* EMAIL */}
-					<View style={[tw.style('w-full')]}>
-						<ThemedText nativeID='email'>Email</ThemedText>
+					<View style={tw.style('w-full gap-1')}>
+						<Label nativeID='email'>Email</Label>
 						<Input
 						nativeID="email"
 						placeholder="Email"
@@ -78,8 +79,8 @@ const LoginScreen = () => {
 						/>
 					</View>
 					{/* PASSWORD */}
-					<View style={[tw.style('w-full')]}>
-						<ThemedText nativeID='password'>Password</ThemedText>
+					<View style={tw.style('w-full gap-1')}>
+						<Label nativeID='password'>Password</Label>
 						<InputPassword
 						nativeID="password"
 						placeholder="Password"
@@ -94,13 +95,13 @@ const LoginScreen = () => {
 						/>
 					</View>
 					{/* FORGOT PASSWORD */}
-					<TouchableOpacity style={[tw.style('w-full')]}>
+					<TouchableOpacity style={tw.style('w-full')}>
 						<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Forgot Password?</Text>
 					</TouchableOpacity>
 					{/* SUBMIT BUTTON */}
-					<Button onPress={handleSubmit} disabled={isLoading} style={[tw.style('w-full py-4 rounded-xl')]} size={'fit'}>
+					<Button onPress={handleSubmit} disabled={isLoading} style={tw.style('w-full py-4 rounded-xl')}>
 						{/* {isLoading ? <Icons.loading /> : null} */}
-						<Text style={[tw.style('font-bold text-xl')]}>{t('common.word.login')}</Text>
+						<Text style={tw.style('font-bold text-xl')}>{t('common.word.login')}</Text>
 					</Button>
 				</KeyboardAvoidingView>
 				{/* SIGNUP */}

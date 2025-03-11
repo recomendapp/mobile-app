@@ -52,10 +52,10 @@ const CustomDrawerContent = (props: any) => {
                 {/* <DrawerItemList {...props} /> */}
                 {/* PROFILE */}
                 <Link href={`/user/${user.username}`} asChild>
-                    <Pressable style={[tw.style("flex-row items-center p-4 gap-2")]}>
-                        <UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} style={[tw.style("w-16 h-16")]} />
+                    <Pressable style={tw.style("flex-row items-center p-4 gap-2")}>
+                        <UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} style={tw.style("w-16 h-16")} />
                         <View>
-                            <ThemedText style={[tw.style("text-xl font-semibold")]}>{user.full_name}</ThemedText>
+                            <ThemedText style={tw.style("text-xl font-semibold")}>{user.full_name}</ThemedText>
                             <ThemedText style={[{ color: colors.mutedForeground }, tw.style("text-md")]}>@{user.username}</ThemedText>
                         </View>
                     </Pressable>
@@ -82,7 +82,7 @@ const CustomDrawerContent = (props: any) => {
                     await logout();
                     closeDrawer();
                 }}
-                style={[tw.style("px-4")]}
+                style={tw.style("px-4")}
                 >
                     <Text style={{ color: colors.destructive }}>Logout</Text>
                 </Pressable>

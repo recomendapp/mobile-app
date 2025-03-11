@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, buttonTextVariants } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button, buttonTextVariants } from '@/components/ui/Button';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuth } from '@/context/AuthProvider';
 import { useTranslation } from 'react-i18next';
 import upperFirst from 'lodash/upperFirst';

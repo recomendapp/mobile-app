@@ -1,6 +1,7 @@
 import { Link, LinkProps, usePathname } from "expo-router";
-import { View, Text } from "react-native";
-import { cn } from "@/lib/utils";
+import { View } from "react-native";
+import tw from "@/lib/tw";
+import { useTheme } from "@/context/ThemeProvider";
 
 interface NavProfileProps {
 	username: string;
@@ -9,6 +10,7 @@ interface NavProfileProps {
 const NavProfile = ({
 	username
 } : NavProfileProps) => {
+	const { colors } = useTheme();
 	const pathname = usePathname();
 
 	const routes: { title: string; href: LinkProps['href'] }[] = [
@@ -27,10 +29,18 @@ const NavProfile = ({
 	]
 
 	return (
-		<View className={`flex-row flex-wrap bg-muted p-1 rounded-md`}>
+		<View style={[{ backgroundColor: colors.muted }, tw.style('flex-row flex-wrap p-1 rounded-md')]}>
 			{routes.map((route, index) => (
-				<Link key={index} href={route.href} className={cn("flex-1 p-2 rounded-md", pathname === route.href ? 'bg-background' : '')}>
-					<Text className={cn("text-center font-medium", pathname === route.href ? 'text-accent-yellow' : 'text-muted-foreground')}>{route.title}</Text>
+				<Link
+				key={index}
+				href={route.href}
+				style={[
+					tw.style('flex-1 p-2 rounded-md text-center font-medium'),
+					{ color: pathname === route.href ? colors.accentYellow : colors.mutedForeground },
+					pathname === route.href && { backgroundColor: colors.background },
+				]}
+				>
+				{route.title}
 				</Link>
 			))}
 		</View>

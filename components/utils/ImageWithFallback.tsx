@@ -9,6 +9,8 @@ import { Image, ImageProps, ImageSource } from 'expo-image';
 import deepmerge from 'deepmerge';
 import tailwind from 'twrnc';
 import Animated from 'react-native-reanimated';
+import tw from '@/lib/tw';
+import { useTheme } from '@/context/ThemeProvider';
 
 interface ImageWithFallbackProps extends ComponentProps<typeof Animated.View> {
   source: ImageSource;
@@ -30,13 +32,13 @@ export const ImageWithFallback = React.forwardRef<
   source,
   alt,
   type = 'default',
-  className,
   contentFit = 'cover',
   transition = 250,
   cachePolicy = 'disk',
-  style = {},
+  style,
   ...rest
 }, ref) => {
+  const { colors } = useTheme();
   const [imgSrc, setImgSrc] = useState<ImageSource | undefined | null>(source);
 
   useEffect(() => {
@@ -46,8 +48,9 @@ export const ImageWithFallback = React.forwardRef<
   return (
     <Animated.View
     ref={ref}
-    className={cn('overflow-hidden items-center justify-center w-full h-full bg-muted rounded-md', className)}
     style={[
+      { backgroundColor: colors.muted },
+      tw.style('overflow-hidden items-center justify-center w-full h-full rounded-md'),
       style,
     ]}
     {...rest}
@@ -68,23 +71,6 @@ export const ImageWithFallback = React.forwardRef<
       ) : (
         <Fallback type={type} alt={alt} />
       )}
-      {/* {imgSrc ? (
-        <Image
-          ref={ref}
-          source={imgSrc}
-          onError={() => {
-            setImgSrc(null);
-          }}
-          style={deepmerge(defaultStyle, style)}
-          transition={transition}
-          contentFit={contentFit}
-          // placeholder={{ blurhash }}
-          cachePolicy={cachePolicy}
-          {...rest}
-        />
-      ) : (
-        <Fallback className={cn('', className)} type={type} from="#363636" to="#363636" alt={alt} />
-      )} */}
     </Animated.View>
   );
 });
@@ -96,18 +82,19 @@ const Fallback = ({
   type?: string | null;
   alt?: string;
 }) => {
+  const { colors } = useTheme();
   switch (type) {
     case 'playlist':
-      return <ListVideoIcon color="#fff" className="w-2/5 h-2/5" />;
+      return <ListVideoIcon color={colors.foreground} style={tw.style('w-2/5 h-2/5')} />;
     case 'person':
-      return <Icons.user color="#fff" className="w-2/5 h-2/5" />;
+      return <Icons.user color={colors.foreground} style={tw.style('w-2/5 h-2/5')} />;
     case 'movie':
-      return <Text className="text-muted-foreground text-clamp-2 text-center">{alt}</Text>;
+      return <Text numberOfLines={2} style={[{ color: colors.mutedForeground }, tw.style('text-center')]}>{alt}</Text>;
     case 'tv_series':
-      return <Text className="text-muted-foreground text-clamp-2 text-center">{alt}</Text>;
+      return <Text numberOfLines={2} style={[{ color: colors.mutedForeground }, tw.style('text-center')]}>{alt}</Text>;
     case 'service':
-      return <Text className="text-muted-foreground text-clamp-2 text-center">{alt}</Text>;
+      return <Text numberOfLines={2} style={[{ color: colors.mutedForeground }, tw.style('text-center')]}>{alt}</Text>;
     default:
-      return <ImageIcon color="#fff" className="w-2/5 h-2/5" />;
+      return <ImageIcon color={colors.foreground} style={tw.style('w-2/5 h-2/5')} />;
   }
 };

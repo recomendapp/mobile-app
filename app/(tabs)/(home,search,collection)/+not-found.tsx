@@ -1,5 +1,5 @@
 import { useBottomTabOverflow } from '@/components/TabBarBackground';
-import { Button, buttonTextVariants } from '@/components/ui/button';
+import { Button, buttonTextVariants } from '@/components/ui/Button';
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
 import { ThemedText } from '@/components/ui/ThemedText';
 import tw from '@/lib/tw';
@@ -16,7 +16,7 @@ export default function NotFoundScreen() {
         { paddingBottom: tabBarHeight },
       ]}
       >
-        <ThemedText style={[tw.style("text-3xl font-bold")]}>This screen doesn't exist.</ThemedText>
+        <ThemedText style={tw.style("text-3xl font-bold")}>This screen doesn't exist.</ThemedText>
 
         <Button onPress={() => navigation.goBack()}>
           <Text className={buttonTextVariants({ variant: 'default' })}>Go back !</Text>

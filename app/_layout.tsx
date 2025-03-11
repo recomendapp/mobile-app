@@ -13,6 +13,7 @@ import Drawer from 'expo-router/drawer';
 import CustomDrawerContent from '@/components/drawer/CustomDrawerContent';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import StatusBar from '@/components/StatusBar';
+import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect';
 
 // const LIGHT_THEME: Theme = {
 //   ...DefaultTheme,
@@ -70,6 +71,3 @@ export default function RootLayout() {
     </Providers>
   );
 }
-
-const useIsomorphicLayoutEffect =
-  Platform.OS === 'web' && typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;

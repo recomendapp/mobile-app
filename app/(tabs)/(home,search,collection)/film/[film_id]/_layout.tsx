@@ -25,7 +25,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { useBottomTabOverflow } from '@/components/TabBarBackground';
 import { ThemedView } from '@/components/ui/ThemedView';
-import FilmHeader from '@/components/screens/user/ProfileHeader';
+import FilmHeader from '@/components/screens/film/FilmHeader';
 
 interface ScreenHeaderProps {
 	filmHeaderHeight: SharedValue<number>;
