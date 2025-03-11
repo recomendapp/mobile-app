@@ -21,7 +21,7 @@ import { MediaMovie, MediaPerson } from '@/types/type.db';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { Colors } from '@/constants/Colors';
 import useColorConverter from '@/hooks/useColorConverter';
-import { Skeleton } from '@/components/ui/Skeleton';
+import { Skeleton } from '@/components/ui/skeletonNEWNAME';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { Pressable } from 'react-native-gesture-handler';

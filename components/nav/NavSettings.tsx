@@ -1,7 +1,7 @@
 import { Link, LinkProps, usePathname } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { FlatList, Text, View } from "react-native";
-import { Button, buttonTextVariants } from "../ui/Button";
+import { Button, buttonTextVariants } from "../ui/buttonNEWNAME";
 import { cn } from "@/lib/utils";
 
 const NavSettings = () => {

@@ -1,5 +1,5 @@
 import { useAuth } from "@/context/AuthProvider";
-import { Skeleton } from "@/components/ui/Skeleton";
+import { Skeleton } from "@/components/ui/skeletonNEWNAME";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
