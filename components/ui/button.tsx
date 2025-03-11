@@ -1,3 +1,4 @@
+import tw from '@/lib/tw';
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 import { Pressable } from 'react-native';
@@ -23,7 +24,7 @@ const buttonVariants = cva(
         sm: 'h-9 rounded-md px-3',
         lg: 'h-11 rounded-md px-8 native:h-14',
         icon: 'h-10 w-10',
-        fit: 'h-fit px-4 py-2',
+        // fit: 'h-fit px-4 py-2',
       },
     },
     defaultVariants: {
@@ -65,24 +66,33 @@ type ButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
   VariantProps<typeof buttonVariants>;
 
 const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => {
+  ({ variant, size, role = 'button', ...props }, ref) => {
     return (
-      <TextClassContext.Provider
-        value={cn(
-          props.disabled && 'web:pointer-events-none',
-          buttonTextVariants({ variant, size })
-        )}
-      >
-        <Pressable
-          className={cn(
-            props.disabled && 'opacity-50 web:pointer-events-none',
-            buttonVariants({ variant, size, className })
-          )}
-          ref={ref}
-          role='button'
-          {...props}
-        />
-      </TextClassContext.Provider>
+      <Pressable
+        ref={ref}
+        role={role}
+        style={[
+          props.disabled && tw.style('opacity-50 web:pointer-events-none'),
+          tw.style(buttonVariants({ variant, size })),
+        ]}
+        {...props}
+      />
+      // <TextClassContext.Provider
+      //   value={cn(
+      //     props.disabled && 'web:pointer-events-none',
+      //     buttonTextVariants({ variant, size })
+      //   )}
+      // >
+      //   <Pressable
+      //     className={cn(
+      //       props.disabled && 'opacity-50 web:pointer-events-none',
+      //       buttonVariants({ variant, size, className })
+      //     )}
+      //     ref={ref}
+      //     role='button'
+      //     {...props}
+      //   />
+      // </TextClassContext.Provider>
     );
   }
 );

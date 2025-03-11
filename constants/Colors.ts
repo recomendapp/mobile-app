@@ -2,6 +2,9 @@ export type ColorTheme = {
   foreground: string;
   background: string;
   muted: string;
+  mutedForeground: string;
+  destructive: string;
+  destructiveForeground: string;
   tint: string;
 };
 
@@ -24,6 +27,9 @@ const Colors: ColorPalettes = {
     foreground: 'hsl(0 0% 98%)',
     background: 'hsl(240 10% 3.9%)',
     muted: 'hsl(0 0% 12%)',
+    mutedForeground: 'hsl(0 0% 57%)',
+    destructive: 'hsl(0 72% 51%)',
+    destructiveForeground: 'hsl(0 0% 98%)',
     tint: 'hsl(0 0% 100%)',
     ...sharedColors,
   },
@@ -31,6 +37,9 @@ const Colors: ColorPalettes = {
     foreground: 'hsl(240 10% 3.9%)',
     background: 'hsl(0 0% 100%)',
     muted: 'hsl(0 0% 8%)',
+    mutedForeground: 'hsl(0 0% 57%)',
+    destructive: 'hsl(0 84.2% 60.2%)',
+    destructiveForeground: 'hsl(0 0% 98%)',
     tint: 'hsl(240 5.9% 10%)',
     ...sharedColors,
   },
