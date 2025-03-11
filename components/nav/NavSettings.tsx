@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { FlatList, Text, View } from "react-native";
 import { Button, buttonTextVariants } from "../ui/Button";
 import { cn } from "@/lib/utils";
+import tw from "@/lib/tw";
+import { useTheme } from "@/context/ThemeProvider";
 
 const NavSettings = () => {
 	const { t } = useTranslation();
@@ -42,7 +44,7 @@ const NavSettings = () => {
 		<View>
 			<FlatList
 			data={NavSettingsItems}
-			contentContainerClassName="gap-2"
+			contentContainerStyle={tw.style('gap-2')}
 			renderItem={({ item }) => (
 				<NavSettingsItem title={item.title} href={item.href} active={pathname === item.href} />
 			)}
@@ -62,6 +64,7 @@ const NavSettingsItem = ({
 	href: LinkProps['href'];
 	active?: boolean;
 }) => {
+	const { colors } = useTheme();
 	return (
 		<Link
 		href={href}

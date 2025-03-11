@@ -18,13 +18,12 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
 import { upperFirst } from 'lodash';
 import { MediaMovie, MediaPerson } from '@/types/type.db';
-import { useThemeColor } from '@/hooks/useThemeColor';
-import { Colors } from '@/constants/Colors';
 import useColorConverter from '@/hooks/useColorConverter';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
-import { Pressable } from 'react-native-gesture-handler';
+import { useTheme } from '@/context/ThemeProvider';
+import tw from '@/lib/tw';
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
@@ -46,11 +45,8 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const { hslToRgb } = useColorConverter();
-	const colorsRef = useThemeColor({
-		dark: Colors.dark.background,
-		light: Colors.light.background,
-	}, 'background');
-	const colors = hslToRgb(colorsRef);
+	const { colors } = useTheme();
+	const bgColor = hslToRgb(colors.background);
 	const inset = useSafeAreaInsets();
 	const layoutY = useSharedValue(0);
 	const opacityAnim = useAnimatedStyle(() => {
@@ -129,8 +125,10 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 	});
 	return (
     <Animated.View
-	className="w-full absolute"
-	style={[opacityAnim]}
+	style={[
+		tw.style('w-full absolute'),
+		opacityAnim
+	]}
 	onLayout={(event: LayoutChangeEvent) => {
 		'worklet';
 		onHeaderHeight(event.nativeEvent.layout.height);
@@ -144,50 +142,57 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 		<AnimatedLinearGradient
 		style={[tailwind.style('absolute inset-0'), scaleAnim]}
 		colors={[
-			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.3)`,
-			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.4)`,
-			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.5)`,
-			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.6)`,
-			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.6)`,
-			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 0.8)`,
-			`rgba(${colors.r}, ${colors.g}, ${colors.b}, 1)`,
+			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
+			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
+			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.5)`,
+			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
+			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
+			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.8)`,
+			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 1)`,
 		]}
 		/>
 		<Animated.View
-		className="flex items-center gap-4 p-2"
-		style={{ paddingTop: inset.top === 0 ? 8 : inset.top }}
+		style={[
+			tailwind.style('items-center gap-4 p-2'),
+			{ paddingTop: inset.top === 0 ? 8 : inset.top }
+		]}
 		>
 			{!loading ? (
 				<AnimatedImageWithFallback
 				alt={movie?.title ?? ''}
 				source={{ uri: movie?.avatar_url ?? '' }}
-				className={'w-48 aspect-[2/3] rounded-md h-fit'}
-				style={[ posterAnim ]}
+				style={[
+					{ aspectRatio: 2 / 3, height: 'fit-content' },
+					tw.style('rounded-md w-48'),
+					posterAnim
+				]}
 				/>
-			) : <Skeleton className="w-48 aspect-[2/3]" style={posterAnim}/>}
+			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw.style('w-48'), posterAnim]}/>}
 			<Animated.View
-			className="gap-2 w-full"
-			style={[textAnim]}
+			style={[
+				tw.style('gap-2 w-full'),
+				textAnim
+			]}
 			>
 				{/* GENRES */}
 				{movie ? <ThemedText>
-					<ThemedText className='text-accent-yellow'>{upperFirst('film')}</ThemedText>
+					<ThemedText style={{ color: colors.accentYellow }}>{upperFirst('film')}</ThemedText>
 					{movie?.genres ? <Genres genres={movie.genres} /> : null}
-				</ThemedText> : loading ? <Skeleton className="w-32 h-8" /> : null}
+				</ThemedText> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
 				{/* TITLE */}
 				{!loading ? (
 					<ThemedText
 					numberOfLines={2}
-					className={`
-						text-4xl font-bold
-						${(!movie && !loading) ? 'text-center text-muted-foreground' : ''}
-					`}
+					style={[
+						tw.style('text-4xl font-bold'),
+						(!movie && !loading) && { textAlign: 'center', color: colors.mutedForeground }
+					]}
 					>
 						{movie?.title ?? upperFirst(t('common.errors.film_not_found'))}
 					</ThemedText>
-				) : <Skeleton className="w-64 h-12" />}
+				) : <Skeleton style={tw.style('w-64 h-12')} />}
 				{(movie?.extra_data.original_title && movie.extra_data.original_title !== movie.title) ? (
-					<ThemedText numberOfLines={1} className="text-lg font-semibold text-muted-foreground">
+					<ThemedText numberOfLines={1} style={[ { color: colors.mutedForeground }, tw.style('text-lg font-semibold')]}>
 						{movie.extra_data.original_title}
 					</ThemedText>
 				) : null}
@@ -195,7 +200,6 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 				{movie?.main_credit || movie?.extra_data.runtime ? (
 					<ThemedText>
 						{movie.main_credit ? <Directors directors={movie.main_credit} /> : null}
-
 					</ThemedText>
 				) : null}
 
