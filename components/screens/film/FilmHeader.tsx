@@ -12,7 +12,6 @@ import Animated, {
 import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import tailwind from 'twrnc';
 import { useTranslation } from 'react-i18next';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
@@ -136,11 +135,11 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 	  }}
 	>
 		{movie ? <Animated.Image
-		style={[tailwind.style('absolute h-full w-full'), scaleAnim]}
+		style={[tw.style('absolute h-full w-full'), scaleAnim]}
 		source={{ uri: movie.backdrop_url ?? '' }}
 		/> : null}
 		<AnimatedLinearGradient
-		style={[tailwind.style('absolute inset-0'), scaleAnim]}
+		style={[tw.style('absolute inset-0'), scaleAnim]}
 		colors={[
 			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
 			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
@@ -153,7 +152,7 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 		/>
 		<Animated.View
 		style={[
-			tailwind.style('items-center gap-4 p-2'),
+			tw.style('items-center gap-4 p-2'),
 			{ paddingTop: inset.top === 0 ? 8 : inset.top }
 		]}
 		>

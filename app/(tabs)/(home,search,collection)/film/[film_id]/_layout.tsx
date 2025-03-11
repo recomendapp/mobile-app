@@ -22,12 +22,12 @@ import { useMediaMovieDetailsQuery } from '@/features/media/mediaQueries';
 import FilmNav from '@/components/screens/film/FilmNav';
 import { useNavigation } from '@react-navigation/native';
 import { ThemedText } from '@/components/ui/ThemedText';
-import { useBottomTabOverflow } from '@/components/TabBarBackground';
 import { ThemedView } from '@/components/ui/ThemedView';
 import FilmHeader from '@/components/screens/film/FilmHeader';
 import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
 import { ThemedAnimatedView } from '@/components/ui/ThemedAnimatedView';
+import { useBottomTabOverflow } from '@/components/TabBar/TabBarBackground';
 
 interface ScreenHeaderProps {
 	filmHeaderHeight: SharedValue<number>;
@@ -201,7 +201,12 @@ const FilmLayout = () => {
 				movie={movie}
 				loading={loading}
 				/>
-				<Animated.View style={[animatedScrollStyle]}>
+				<Animated.View
+				style={[
+					tw.style('gap-2'),
+					animatedScrollStyle
+				]}
+				>
 					{movie ? (
 					<>
 						{/* Fixed Section */}

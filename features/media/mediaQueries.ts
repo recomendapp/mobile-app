@@ -46,10 +46,10 @@ export const useMediaMovieDetailsQuery = ({
 
 /* --------------------------------- REVIEWS -------------------------------- */
 export const useMediaReviewsInfiniteQuery = ({
-	mediaId,
+	id,
 	filters,
 } : {
-	mediaId: number;
+	id?: number | null;
 	filters: {
 		perPage: number;
 		sortBy: 'updated_at';
@@ -59,10 +59,11 @@ export const useMediaReviewsInfiniteQuery = ({
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
 		queryKey: mediaKeys.reviews({
-			mediaId,
+			id: id!,
 			filters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
+			if (!id) throw Error('No id provided');
 			let from = (pageParam - 1) * filters.perPage;
 	  		let to = from - 1 + filters.perPage;
 			let request = supabase
@@ -71,14 +72,14 @@ export const useMediaReviewsInfiniteQuery = ({
 					*,
 					activity:user_activity!inner(*, user(*))
 				`)
-				.eq('activity.media_id', mediaId)
+				.eq('activity.media_id', id)
 				.range(from, to)
 			
 			if (filters) {
 				if (filters.sortBy && filters.sortOrder) {
 					switch (filters.sortBy) {
 						case 'updated_at':
-							request = request.order('updated_at', { ascending: filters.sortOrder === 'asc', nullsFirst: false });
+							request = request.order('updated_at', { ascending: filters.sortOrder === 'asc' });
 							break;
 						default:
 							break;
@@ -93,43 +94,55 @@ export const useMediaReviewsInfiniteQuery = ({
 		getNextPageParam: (lastPage, pages) => {
 			return lastPage?.length == filters.perPage ? pages.length + 1 : undefined;
 		},
-		enabled: !!mediaId,
+		enabled: !!id,
 	});
 
 };
 /* -------------------------------------------------------------------------- */
 export const useMediaPlaylistsInfiniteQuery = ({
-	mediaId,
+	id,
 	filters,
 } : {
-	mediaId: number;
+	id?: number | null;
 	filters: {
 		perPage: number;
 		sortBy: 'created_at' | 'updated_at' | 'likes_count';
 		sortOrder: 'asc' | 'desc';
 	};
 }) => {
-	console.log('mediaId', mediaId);
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
 		queryKey: mediaKeys.playlists({
-			mediaId,
+			id: id!,
 			filters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
+			if (!id) throw Error('No id provided');
 			let from = (pageParam - 1) * filters.perPage;
 	  		let to = from - 1 + filters.perPage;
 			let request = supabase
 				.from('playlists')
 				.select('*, playlist_items!inner(*)')
 				.match({
-					'playlist_items.media_id': mediaId,
+					'playlist_items.media_id': id,
 				})
 				.range(from, to);
 			
 			if (filters) {
 				if (filters.sortBy && filters.sortOrder) {
-					request = request.order(filters.sortBy, { ascending: filters.sortOrder === 'asc', nullsFirst: false });
+					switch (filters.sortBy) {
+						case 'updated_at':
+							request = request.order('updated_at', { ascending: filters.sortOrder === 'asc' });
+							break;
+						case 'created_at':
+							request = request.order('created_at', { ascending: filters.sortOrder === 'asc' });
+							break;
+						case 'likes_count':
+							request = request.order('likes_count', { ascending: filters.sortOrder === 'asc' });
+							break;
+						default:
+							break;
+					}
 				}
 			}
 			const { data, error } = await request;
@@ -140,7 +153,7 @@ export const useMediaPlaylistsInfiniteQuery = ({
 		getNextPageParam: (lastPage, pages) => {
 			return lastPage?.length == filters.perPage ? pages.length + 1 : undefined;
 		},
-		enabled: !!mediaId,
+		enabled: !!id,
 	});
 };
 /* -------------------------------- PLAYLISTS ------------------------------- */
