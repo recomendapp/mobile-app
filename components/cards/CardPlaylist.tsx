@@ -1,12 +1,12 @@
-import { cn } from '@/lib/utils';
 import { ImageWithFallback } from '../utils/ImageWithFallback';
 import { Playlist } from '@/types/type.db';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import React from 'react';
 import Animated from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { ThemedText } from '../ui/ThemedText';
+import { useRouter } from 'expo-router';
+import tw from '@/lib/tw';
 
 interface CardPlaylistProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -18,18 +18,18 @@ interface CardPlaylistProps
 const CardPlaylistDefault = React.forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	Omit<CardPlaylistProps, "variant">
->(({ className, playlist, hideItemCount, children, ...props }, ref) => {
+>(({ style, playlist, hideItemCount, children, ...props }, ref) => {
 	const { t } = useTranslation();
 	return (
 		<Animated.View
 			ref={ref}
-			className={cn(
-				"gap-2",
-				className
-			)}
+			style={[
+				tw.style("gap-2"),
+				style,
+			]}
 			{...props}
 		>
-			<View className='relative aspect-square rounded-sm overflow-hidden w-full'>
+			<View style={tw.style("relative aspect-square rounded-sm overflow-hidden w-full")}>
 				<ImageWithFallback
 					source={{uri: playlist.poster_url ?? ''}}
 					alt={playlist?.title ?? ''}
@@ -38,7 +38,7 @@ const CardPlaylistDefault = React.forwardRef<
 				/>
 			</View>
 			<View>
-				<ThemedText className='text-center font-medium line-clamp-2'>{playlist?.title}</ThemedText>
+				<ThemedText numberOfLines={2} style={tw.style("text-center font-medium")}>{playlist?.title}</ThemedText>
 			</View>
 			{/* <CardContent className='p-0'>
 				<p className="line-clamp-2 break-words group-hover:text-primary/80">{playlist?.title}</p>
@@ -56,15 +56,19 @@ CardPlaylistDefault.displayName = "CardPlaylistDefault";
 const CardPlaylist = React.forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	CardPlaylistProps
->(({ className, playlist, variant = "default", ...props }, ref) => {
+>(({ playlist, variant = "default", ...props }, ref) => {
+	const router = useRouter();
+	const onPress = () => {
+		router.push(`/playlist/${playlist?.id}`);
+	};
 	return (
 	// <ContextMenuMovie movie={movie}>
 		// <Link href={`/playlist/${playlist?.id}`}>
-		<>
+		<Pressable onPress={onPress}>
 			{variant === "default" ? (
-				<CardPlaylistDefault ref={ref} className={className} playlist={playlist} {...props} />
+				<CardPlaylistDefault ref={ref}  playlist={playlist} {...props} />
 			) : null}
-		</>
+		</Pressable>
 		// </Link>
 	// </ContextMenuMovie>
 	);

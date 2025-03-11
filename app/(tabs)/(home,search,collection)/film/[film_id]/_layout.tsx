@@ -14,7 +14,6 @@ import Animated, {
 import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import tailwind from 'twrnc';
 import { Slot, useLocalSearchParams } from 'expo-router';
 import { Icons } from '@/constants/Icons';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +25,9 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { useBottomTabOverflow } from '@/components/TabBarBackground';
 import { ThemedView } from '@/components/ui/ThemedView';
 import FilmHeader from '@/components/screens/film/FilmHeader';
+import { useTheme } from '@/context/ThemeProvider';
+import tw from '@/lib/tw';
+import { ThemedAnimatedView } from '@/components/ui/ThemedAnimatedView';
 
 interface ScreenHeaderProps {
 	filmHeaderHeight: SharedValue<number>;
@@ -41,6 +43,7 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 	sv,
 	title,
 }) => {
+	const { colors } = useTheme();
 	const navigation = useNavigation();
 	const inset = useSafeAreaInsets();
 	const opacityAnim = useAnimatedStyle(() => {
@@ -83,31 +86,36 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 	return (
 	<>
 		<Animated.View
-		className="absolute w-full px-4 pb-4 flex flex-row items-center justify-between gap-2 z-10 bg-background"
-		style={[opacityAnim,]}
+		style={[
+			{ backgroundColor: colors.background },
+			tw.style('absolute w-full px-4 pb-4 flex flex-row items-center justify-between gap-2 z-10'),
+			opacityAnim
+		]}
 		onLayout={(event: LayoutChangeEvent) => {
 			'worklet';
 			onHeaderHeight((event.nativeEvent.layout.height / 2) - 10);
 		}}
 		>
-			<Icons.ChevronLeft className="text-foreground opacity-0" />
-			<ThemedText numberOfLines={1} className='text-xl font-medium shrink'>
+			<Icons.ChevronLeft style={tw.style('opacity-0')} />
+			<ThemedText numberOfLines={1} style={tw.style('text-xl font-medium shrink')}>
 			{title}
 			</ThemedText>
 			<Pressable onPress={() => console.log('pressed')}>
-				<Icons.EllipsisVertical className="text-foreground"/>
+				<Icons.EllipsisVertical color={colors.foreground} />
 			</Pressable>
 		</Animated.View>
 		{navigation.canGoBack() ? (
 			<Pressable
 			onPress={() => navigation.goBack()}
-			className='absolute z-10'
-			style={{
-				top: inset.top,
-				left: 14,
-			}}
+			style={[
+				tw.style('absolute z-10'),
+				{
+					top: inset.top,
+					left: 14,
+				}
+			]}
 			>
-				<Icons.ChevronLeft className="text-foreground" />
+				<Icons.ChevronLeft color={colors.foreground} />
 			</Pressable>
 		) : null}
 	</>
@@ -164,7 +172,7 @@ const FilmLayout = () => {
 	});
 
 	return (
-    <Animated.View className="flex-1 bg-background">
+    <ThemedAnimatedView style={tw.style('flex-1')}>
 		<ScreenHeader
 		filmHeaderHeight={filmHeaderHeight}
 		headerHeight={headerHeight}
@@ -175,11 +183,11 @@ const FilmLayout = () => {
 		sv={sv}
 		title={movie?.title ?? ''}
 		/>
-		<Animated.View className="flex-1">
+		<Animated.View style={tw.style('flex-1')}>
 			<Animated.ScrollView
 			onScroll={scrollHandler}
 			scrollEventThrottle={16}
-			className="flex-1"
+			style={tw.style('flex-1')}
 			showsVerticalScrollIndicator={false}
 			>
 				<FilmHeader
@@ -197,14 +205,16 @@ const FilmLayout = () => {
 					{movie ? (
 					<>
 						{/* Fixed Section */}
-						<Animated.View
-						className="flex items-center justify-center z-10 p-2 bg-background"
-						style={[stickyElement]}
+						<ThemedAnimatedView
+						style={[
+							tw.style('items-center justify-center z-10 p-2'),
+							stickyElement
+						]}
 						>
 							<FilmNav slug={String(film_id)} />
-						</Animated.View>
+						</ThemedAnimatedView>
 						{/* SCREEN */}
-						<ThemedView className='gap-2 px-2 pb-2'>
+						<ThemedView style={tw.style('gap-2 px-2 pb-2')}>
 							<Slot />
 						</ThemedView>
 					</>
@@ -212,7 +222,7 @@ const FilmLayout = () => {
 				</Animated.View>
 			</Animated.ScrollView>
 		</Animated.View>
-    </Animated.View>
+    </ThemedAnimatedView>
 	);
 };
 
