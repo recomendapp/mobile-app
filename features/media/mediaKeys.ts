@@ -21,22 +21,22 @@ export const mediaKeys = {
 
 	/* --------------------------------- REVIEWS -------------------------------- */
 	reviews: ({
-		mediaId,
+		id,
 		filters,
 	} : {
-		mediaId: number;
+		id: number;
 		filters?: any;
-	}) => filters ? [...mediaKeys.detail({ id: mediaId }), 'reviews', filters] as const : [...mediaKeys.detail({ id: mediaId }), 'reviews'] as const,
+	}) => filters ? [...mediaKeys.detail({ id }), 'reviews', filters] as const : [...mediaKeys.detail({ id }), 'reviews'] as const,
 	/* -------------------------------------------------------------------------- */
 
 	/* -------------------------------- PLAYLISTS ------------------------------- */
 	playlists: ({
-		mediaId,
+		id,
 		filters,
 	} : {
-		mediaId: number;
+		id: number;
 		filters?: any;
-	}) => filters ? [...mediaKeys.detail({ id: mediaId }), 'playlists', filters] as const : [...mediaKeys.detail({ id: mediaId }), 'playlists'] as const,
+	}) => filters ? [...mediaKeys.detail({ id }), 'playlists', filters] as const : [...mediaKeys.detail({ id }), 'playlists'] as const,
 	/* -------------------------------------------------------------------------- */
 
 	/* -------------------------------------------------------------------------- */

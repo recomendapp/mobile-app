@@ -1,8 +1,9 @@
 import { PER_PAGE } from "@/app/(tabs)/(home,search,collection)/user/[username]/collection";
 import { CardMedia } from "@/components/cards/CardMedia";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useUserActivitiesInfiniteQuery } from "@/features/user/userQueries"
+import tw from "@/lib/tw";
 import { Profile } from "@/types/type.db";
 import { FlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
@@ -31,10 +32,10 @@ const ProfileLastActivities = ({ profile }: { profile: Profile }) => {
 	if (!loading && !activities?.pages[0].length) return null;
   
 	return (
-	  <View className="flex flex-col gap-1">
+	  <View style={tw.style('gap-1')}>
 		{!loading ? <Link href={`/user/${profile.username}/collection`} asChild>
-			<ThemedText className="font-semibold text-xl">{upperFirst(t('common.messages.last_activities'))}</ThemedText>
-		</Link> : <Skeleton className={`h-8 w-32 rounded-full`} />}
+			<ThemedText style={tw.style('text-xl font-semibold')}>{upperFirst(t('common.messages.last_activities'))}</ThemedText>
+		</Link> : <Skeleton style={tw.style('h-8 w-32 rounded-full')} />}
 		{!loading ? <FlashList
 		data={activities.pages.flat()}
 		renderItem={({ item, index }) => (
@@ -53,8 +54,8 @@ const ProfileLastActivities = ({ profile }: { profile: Profile }) => {
 		onEndReachedThreshold={0.25}
 		horizontal
 		showsHorizontalScrollIndicator={false}
-		ItemSeparatorComponent={() => <View className="w-2" />}
-		/> : <Skeleton className="h-48 w-full" />}
+		ItemSeparatorComponent={() => <View style={tw.style('w-2')} />}
+		/> : <Skeleton style={tw.style('h-48 w-full')} />}
 	  </View>
 	);
 };

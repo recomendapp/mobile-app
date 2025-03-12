@@ -1,4 +1,4 @@
-import { Colors } from '@/constants/Colors';
+import Colors from '@/constants/Colors';
 import * as NavigationBar from 'expo-navigation-bar';
 import { Platform } from 'react-native';
 

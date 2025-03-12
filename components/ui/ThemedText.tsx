@@ -1,6 +1,6 @@
 import { Text, type TextProps } from 'react-native';
-import { cn } from '@/lib/utils';
 import { forwardRef } from 'react';
+import { useTheme } from '@/context/ThemeProvider';
 
 interface ThemedTextProps extends TextProps {
   lightColor?: string;
@@ -11,8 +11,18 @@ interface ThemedTextProps extends TextProps {
 const ThemedText = forwardRef<
   React.ComponentRef<typeof Text>,
   ThemedTextProps
->(({ className, ...props }, ref) => {
-  return <Text ref={ref} className={cn('text-foreground', className)} {...props} />
+>(({ style, ...props }, ref) => {
+  const { colors } = useTheme();
+  return (
+  <Text
+  ref={ref}
+  style={[
+    { color: colors.foreground },
+    style,
+  ]}
+  {...props}
+  />
+  );
 });
 
 export {

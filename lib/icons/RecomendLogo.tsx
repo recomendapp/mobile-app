@@ -1,5 +1,4 @@
 import Svg, { Ellipse, Path, Polygon } from "react-native-svg";
-import { iconWithClassName } from './iconWithClassName';
 import { LucideProps } from "lucide-react-native";
 import { forwardRef } from "react";
 const RecomendLogo = forwardRef<Svg, LucideProps>((props, ref) =>
@@ -64,5 +63,4 @@ const RecomendLogo = forwardRef<Svg, LucideProps>((props, ref) =>
 		  C1996.7,242.1,1989.8,235.2,1981.4,235.2z"/>
 	</Svg>
 )
-iconWithClassName(RecomendLogo);
 export { RecomendLogo };

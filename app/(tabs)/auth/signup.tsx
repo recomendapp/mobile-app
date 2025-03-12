@@ -3,9 +3,8 @@ import { useAuth } from '@/context/AuthProvider';
 import { useEffect, useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Button, buttonTextVariants } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { Button, ButtonText } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { Link } from 'expo-router';
 import * as z from 'zod';
 import { Controller, Form, useForm } from 'react-hook-form';
@@ -14,7 +13,10 @@ import useDebounce from '@/hooks/useDebounce';
 import { useUsernameAvailability } from '@/hooks/useUsernameAvailability';
 import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
-import { InputPassword } from '@/components/ui/input-password';
+import { InputPassword } from '@/components/ui/InputPassword';
+import { Label } from '@/components/ui/Label';
+import tw from '@/lib/tw';
+import { useTheme } from '@/context/ThemeProvider';
 
 const backgroundImages = [
 	require('@/assets/images/auth/signup/background/1.gif'),
@@ -27,6 +29,7 @@ const FULL_NAME_MAX_LENGTH = 50;
 const PASSWORD_MIN_LENGTH = 8;
 
 const SignupScreen = () => {
+	const { colors } = useTheme();
 	const { login, signup } = useAuth();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const { t, i18n } = useTranslation();
@@ -183,9 +186,9 @@ const SignupScreen = () => {
 				paddingBottom: 114
 			}}
 			>
-				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className='w-full gap-4'>
+				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={tw.style('w-full gap-4')}>
 					{/* EMAIL */}
-					<View>
+					<View style={tw.style('w-full gap-1')}>
 						<Label nativeID='email'>{t('common.form.email.label')}</Label>
 						<Controller
 							control={form.control}
@@ -210,12 +213,12 @@ const SignupScreen = () => {
 							rules={{ required: true }}
 						/>
 					</View>
-					<View>
+					<View style={tw.style('w-full gap-1')}>
 						<Label nativeID='username'>{t('common.form.username.label')}</Label>
 						<Controller
 							control={form.control}
 							render={({field: { onChange, onBlur, value }}) => (
-							<View className='relative'>
+							<View style={tw.style('relative')}>
 								<Input
 									nativeID='username'
 									onBlur={onBlur}
@@ -224,15 +227,15 @@ const SignupScreen = () => {
 									autoComplete="username"
 									autoCapitalize='none'
 									placeholder={t('common.form.username.placeholder')}
-									className={usernameAvailability.isLoading ? 'pr-8' : ''}
+									style={[usernameAvailability.isLoading && tw.style('pr-8')]}
 								/>
 								{usernameAvailability.isLoading ? (
-									<View className='absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full flex justify-center items-center h-6 w-6'>
-										<Icons.loader className='w-4' />
+									<View style={tw.style('absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full flex justify-center items-center h-6 w-6')}>
+										<Icons.loader size={16} />
 									</View>
 								) : null}
 								{form.formState.errors.username?.message ? (
-									<Text className='text-destructive'>{form.formState.errors.username.message}</Text>
+									<Text style={[{ color: colors.destructive }]}>{form.formState.errors.username.message}</Text>
 								) : null}
 							</View>
 							)}
@@ -240,7 +243,7 @@ const SignupScreen = () => {
 							rules={{ required: true }}
 						/>
 					</View>
-					<View>
+					<View style={tw.style('w-full gap-1')}>
 						<Label nativeID='full_name'>{t('common.form.full_name.label')}</Label>
 						<Controller
 							control={form.control}
@@ -256,7 +259,7 @@ const SignupScreen = () => {
 								placeholder={t('common.form.full_name.placeholder')}
 							/>
 							{form.formState.errors.full_name?.message ? (
-								<Text className='text-destructive'>{form.formState.errors.full_name.message}</Text>
+								<Text style={[{ color: colors.destructive }]}>{form.formState.errors.full_name.message}</Text>
 							) : null}
 							</>
 							)}
@@ -264,7 +267,7 @@ const SignupScreen = () => {
 							rules={{ required: true }}
 						/>
 					</View>
-					<View>
+					<View style={tw.style('w-full gap-1')}>
 						<Label nativeID='password'>{t('common.form.password.label')}</Label>
 						<Controller
 							control={form.control}
@@ -279,7 +282,7 @@ const SignupScreen = () => {
 								placeholder={t('common.form.password.placeholder')}
 							/>
 							{form.formState.errors.password?.message ? (
-								<Text className='text-destructive'>{form.formState.errors.password.message}</Text>
+								<Text style={[{ color: colors.destructive }]}>{form.formState.errors.password.message}</Text>
 							) : null}
 							</>
 							)}
@@ -287,7 +290,7 @@ const SignupScreen = () => {
 							rules={{ required: true }}
 						/>
 					</View>
-					<View>
+					<View style={tw.style('w-full gap-1')}>
 						<Label nativeID='password'>{t('common.form.password.confirm.label')}</Label>
 						<Controller
 							control={form.control}
@@ -300,7 +303,7 @@ const SignupScreen = () => {
 								placeholder={t('common.form.password.confirm.placeholder')}
 							/>
 							{form.formState.errors.confirm_password?.message ? (
-								<Text className='text-destructive'>{form.formState.errors.confirm_password.message}</Text>
+								<Text style={[{ color: colors.destructive }]}>{form.formState.errors.confirm_password.message}</Text>
 							) : null}
 							</>
 							)}
@@ -309,13 +312,13 @@ const SignupScreen = () => {
 						/>
 					</View>
 				{/* SUBMIT BUTTON */}
-				<Button onPress={form.handleSubmit(handleSubmit)} disabled={isLoading} className='w-full !py-4 rounded-full' size={'fit'}>
+				<Button onPress={form.handleSubmit(handleSubmit)} disabled={isLoading} style={tw.style('w-full rounded-xl')}>
 					{/* {isLoading ? <Icons.loading /> : null} */}
-					<Text className='font-bold text-xl'>{t('common.word.signup')}</Text>
+					<ButtonText style={tw.style('font-bold text-xl')}>{t('common.word.signup')}</ButtonText>
 				</Button>
 				</KeyboardAvoidingView>
 				{/* SIGNUP */}
-				<Text className="text-right text-muted-foreground">Already have an account? <Link href={'/auth/login'} className={buttonTextVariants({ variant: 'link' })}>{t('common.word.login')}</Link></Text>
+				<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Already have an account? <Link href={'/auth/login'} style={{ color: colors.accentYellow }}>{t('common.word.login')}</Link></Text>
 			</LinearGradient>
 		</ImageBackground>
 	)
