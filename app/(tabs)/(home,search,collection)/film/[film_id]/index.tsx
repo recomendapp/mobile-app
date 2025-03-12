@@ -30,10 +30,8 @@ import { ThemedAnimatedView } from '@/components/ui/ThemedAnimatedView';
 import { useBottomTabOverflow } from '@/components/TabBar/TabBarBackground';
 import { FlashList } from '@shopify/flash-list';
 import { useFilmStore } from '@/stores/filmStore';
-import { LegendList } from '@legendapp/list';
 
 const AnimatedFlashList = Animated.createAnimatedComponent(FlashList)
-const AnimatedLegendList = Animated.createAnimatedComponent(LegendList)
 
 const DATA = [
 	{
@@ -56,7 +54,7 @@ const DATA = [
 const PersonScreen = () => {
 	const { i18n, t } = useTranslation();
 	const { film_id  } = useLocalSearchParams();
-	const { sv, filmHeaderHeight, stickyHeight } = useFilmStore();
+	const { sv, headerHeight, filmHeaderHeight } = useFilmStore();
 	const { id: movieId } = getIdFromSlug(film_id as string);
 	const {
 		data: movie,
@@ -84,10 +82,36 @@ const PersonScreen = () => {
 		};
 	});
 
+	const stickyElement = useAnimatedStyle(() => {
+		return {
+		transform: [
+			{
+			translateY: interpolate(
+				sv.get(),
+				[
+				filmHeaderHeight.get() - (headerHeight.get() + inset.top) - 1,
+				filmHeaderHeight.get() - (headerHeight.get() + inset.top),
+				filmHeaderHeight.get() - (headerHeight.get() + inset.top) + 1,
+				],
+				[0, 0, 1],
+			),
+			},
+		],
+		};
+	});
+
 	return (
 		<AnimatedFlashList
-		// ListHeaderComponent={() => (
-		// )}
+		ListHeaderComponent={() => (
+			<ThemedAnimatedView
+			style={[
+				tw.style('w-full items-center justify-center z-10 p-2'),
+				stickyElement
+			]}
+			>
+				<FilmNav slug={String(film_id)} />
+			</ThemedAnimatedView>
+		)}
 		data={DATA} style={{ flex: 1 }}
 		renderItem={({ item } : { item: any }) => (
 			<Animated.View style={[tw`p-4 h-96`, { backgroundColor: getRandomDarkColor() }]}>
@@ -95,7 +119,7 @@ const PersonScreen = () => {
 			</Animated.View>
 		)}
 		contentContainerStyle={{
-			paddingTop: filmHeaderHeight.get() + stickyHeight.get(),
+			paddingTop: filmHeaderHeight.get(),
 			// top: filmHeaderHeight.get(),
 		}}
 		keyExtractor={(item, index) => index.toString()}

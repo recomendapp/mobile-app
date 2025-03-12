@@ -94,7 +94,7 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 		]}
 		onLayout={(event: LayoutChangeEvent) => {
 			'worklet';
-			onHeaderHeight((event.nativeEvent.layout.height / 2) - 10);
+			onHeaderHeight((event.nativeEvent.layout.height / 2) - 8);
 		}}
 		>
 			<Icons.ChevronLeft style={tw.style('opacity-0')} />
@@ -126,7 +126,7 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 const FilmScreen = () => {
 	const { i18n, t } = useTranslation();
 	const { film_id } = useLocalSearchParams();
-	const { sv, headerHeight, filmHeaderHeight, setStickyHeight } = useFilmStore();
+	const { sv, headerHeight, filmHeaderHeight } = useFilmStore();
 	const { id: movieId } = getIdFromSlug(film_id as string);
 	const {
 		data: movie,
@@ -176,7 +176,7 @@ const FilmScreen = () => {
 			/>
 			{movie ? (
 				<>
-					<ThemedAnimatedView
+					{/* <ThemedAnimatedView
 					style={[
 						tw.style('absolute w-full items-center justify-center z-10 p-2'),
 						{ top: filmHeaderHeight.get(), },
@@ -188,7 +188,7 @@ const FilmScreen = () => {
 					}}
 					>
 						<FilmNav slug={String(film_id)} />
-					</ThemedAnimatedView>
+					</ThemedAnimatedView> */}
 					<Slot />
 				</>
 			) : null}
