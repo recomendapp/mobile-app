@@ -2,13 +2,20 @@ import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
 import React from 'react';
 import {
-  Image as RNImage,
   View,
-  type ImageSourcePropType,
-  type NativeSyntheticEvent,
-  type ImageLoadEventData,
-  type ImageErrorEventData,
+  // type ImageSourcePropType,
+  // type NativeSyntheticEvent,
+  // type ImageLoadEventData,
+  // type ImageErrorEventData,
 } from 'react-native';
+import {
+  Image as EImage,
+  type ImageErrorEventData,
+  type ImageLoadEventData,
+  type ImageSource
+} from 'expo-image';
+import { ThemedText } from './ThemedText';
+import Animated from 'react-native-reanimated';
 
 // Types
 type AvatarState = 'loading' | 'error' | 'loaded';
@@ -20,10 +27,10 @@ interface RootProps {
 }
 
 interface ImageProps {
-  source: ImageSourcePropType;
+  source: ImageSource;
   style?: any;
-  onLoad?: (e: NativeSyntheticEvent<ImageLoadEventData>) => void;
-  onError?: (e: NativeSyntheticEvent<ImageErrorEventData>) => void;
+  onLoad?: (e: ImageLoadEventData) => void;
+  onError?: (e: ImageErrorEventData) => void;
   onLoadingStatusChange?: (status: 'error' | 'loaded') => void;
 }
 
@@ -37,25 +44,36 @@ interface RootContext {
   alt: string;
   status: AvatarState;
   setStatus: (status: AvatarState) => void;
+  containerSize: { width: number; height: number };
 }
 
 const RootContext = React.createContext<RootContext | null>(null);
 
 // Root Component
-const Root = React.forwardRef<View, RootProps>(({ alt, style, children }, ref) => {
+const Root = React.forwardRef<Animated.View, RootProps>(({ alt, style, children }, ref) => {
   const [status, setStatus] = React.useState<AvatarState>('error');
+  const [containerSize, setContainerSize] = React.useState<{ width: number; height: number }>({
+    width: 40,
+    height: 40,
+  });
 
   return (
-    <RootContext.Provider value={{ alt, status, setStatus }}>
-      <View
+    <RootContext.Provider value={{ alt, status, setStatus, containerSize }}>
+    <Animated.View
 	  ref={ref}
 	  style={[
-		tw.style('relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full'),
-		style,
+      tw.style('relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full'),
+      style,
 	  ]}
+    onLayout={(e) => {
+      setContainerSize({
+        width: e.nativeEvent.layout.width,
+        height: e.nativeEvent.layout.height,
+      });
+    }}
 	  >
         {children}
-      </View>
+      </Animated.View>
     </RootContext.Provider>
   );
 });
@@ -72,7 +90,7 @@ function useRootContext() {
 }
 
 // Image Component
-const Image = React.forwardRef<RNImage, ImageProps>(
+const Image = React.forwardRef<EImage, ImageProps>(
   ({ source, style, onLoad: onLoadProp, onError: onErrorProp, onLoadingStatusChange }, ref) => {
     const { alt, setStatus, status } = useRootContext();
 
@@ -86,7 +104,7 @@ const Image = React.forwardRef<RNImage, ImageProps>(
     }, [source, setStatus]);
 
     const onLoad = React.useCallback(
-      (e: NativeSyntheticEvent<ImageLoadEventData>) => {
+      (e: ImageLoadEventData) => {
         setStatus('loaded');
         onLoadingStatusChange?.('loaded');
         onLoadProp?.(e);
@@ -95,7 +113,7 @@ const Image = React.forwardRef<RNImage, ImageProps>(
     );
 
     const onError = React.useCallback(
-      (e: NativeSyntheticEvent<ImageErrorEventData>) => {
+      (e: ImageErrorEventData) => {
         setStatus('error');
         onLoadingStatusChange?.('error');
         onErrorProp?.(e);
@@ -108,13 +126,13 @@ const Image = React.forwardRef<RNImage, ImageProps>(
     }
 
     return (
-      <RNImage
+      <EImage
         ref={ref}
         source={source}
         style={[
-			tw.style('aspect-square h-full w-full'),
-			style,
-		]}
+          tw.style('aspect-square h-full w-full'),
+          style,
+        ]}
         accessibilityLabel={alt}
         onLoad={onLoad}
         onError={onError}
@@ -126,16 +144,19 @@ const Image = React.forwardRef<RNImage, ImageProps>(
 Image.displayName = 'ImageAvatar';
 
 // Fallback Component
-const Fallback = React.forwardRef<View, FallbackProps>(({ style, children }, ref) => {
+const Fallback = React.forwardRef<Animated.View, FallbackProps>(({ style }, ref) => {
   const { colors } = useTheme();
-  const { alt, status } = useRootContext();
+  const { alt, status, containerSize } = useRootContext();
 
   if (status !== 'error') {
     return null;
   }
 
+  const initials = getInitials(alt);
+  const fontSize = Math.min(containerSize.width, containerSize.height) / 4;
+
   return (
-    <View
+    <Animated.View
     ref={ref}
     style={[
       { backgroundColor: colors.muted },
@@ -145,15 +166,30 @@ const Fallback = React.forwardRef<View, FallbackProps>(({ style, children }, ref
     accessibilityRole="image"
     accessibilityLabel={alt}
     >
-      {children}
-    </View>
+      <Animated.Text
+      style={{ color: colors.foreground, fontSize: fontSize, fontWeight: 'semibold' }}
+      >
+        {initials}
+      </Animated.Text>
+    </Animated.View>
   );
 });
 
 Fallback.displayName = 'FallbackAvatar';
 
+const getInitials = (name: string, type: 'first-and-last' | 'all' | 'international' = 'first-and-last') => {
+  switch (type) {
+    case 'all': 
+      return name.match(/(\b\S)?/g)?.join("").toUpperCase();
+    case 'international':
+      return name.match(/(^\S\S?|\s\S)?/g)?.map(v=>v.trim()).join("").match(/(^\S|\S$)?/g)?.join("").toLocaleUpperCase();
+    default:
+      return name.match(/(^\S\S?|\b\S)?/g)?.join("").match(/(^\S|\S$)?/g)?.join("").toUpperCase();
+  }
+};
+
 // Utilitaire
-function isValidSource(source?: ImageSourcePropType): boolean {
+function isValidSource(source?: ImageSource): boolean {
   if (!source) return false;
   if (typeof source === 'number') return true;
   if (Array.isArray(source)) return source.some((s) => !!s.uri);

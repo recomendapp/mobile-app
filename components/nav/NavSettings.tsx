@@ -1,7 +1,6 @@
 import { Link, LinkProps, usePathname } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { FlatList, Pressable, Text, View } from "react-native";
-import { buttonTextVariants } from "../ui/Button";
 import tw from "@/lib/tw";
 import { useTheme } from "@/context/ThemeProvider";
 
@@ -70,7 +69,7 @@ const NavSettingsItem = ({
 		asChild
 		>
 			<Pressable style={[tw.style('rounded-full'), active && { backgroundColor: colors.muted }]}>
-				<Text className={buttonTextVariants({ variant: active ? 'secondary' : 'outline'})}>{title}</Text>
+				<Text>{title}</Text>
 			</Pressable>
 		</Link>
 	)

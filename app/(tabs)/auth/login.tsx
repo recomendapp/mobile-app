@@ -3,8 +3,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Button, buttonTextVariants } from '@/components/ui/Button';
-import { ThemedText } from '@/components/ui/ThemedText';
+import { Button, ButtonText } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -99,13 +98,13 @@ const LoginScreen = () => {
 						<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Forgot Password?</Text>
 					</TouchableOpacity>
 					{/* SUBMIT BUTTON */}
-					<Button onPress={handleSubmit} disabled={isLoading} style={tw.style('w-full py-4 rounded-xl')}>
+					<Button onPress={handleSubmit} disabled={isLoading} style={tw.style('w-full rounded-xl')}>
 						{/* {isLoading ? <Icons.loading /> : null} */}
-						<Text style={tw.style('font-bold text-xl')}>{t('common.word.login')}</Text>
+						<ButtonText style={tw.style('font-bold text-xl')}>{t('common.word.login')}</ButtonText>
 					</Button>
 				</KeyboardAvoidingView>
 				{/* SIGNUP */}
-				<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Don't have an account? <Link href={'/auth/signup'} className={buttonTextVariants({ variant: 'link' })}>Sign Up</Link></Text>
+				<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Don't have an account? <Link href={'/auth/signup'} style={{ color: colors.accentYellow }}>Sign Up</Link></Text>
 			</LinearGradient>
 		</ImageBackground>
 	)

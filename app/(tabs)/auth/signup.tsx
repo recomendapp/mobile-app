@@ -3,7 +3,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { useEffect, useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Button, buttonTextVariants } from '@/components/ui/Button';
+import { Button, ButtonText } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Link } from 'expo-router';
 import * as z from 'zod';
@@ -14,7 +14,6 @@ import { useUsernameAvailability } from '@/hooks/useUsernameAvailability';
 import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
 import { InputPassword } from '@/components/ui/InputPassword';
-import { ThemedText } from '@/components/ui/ThemedText';
 import { Label } from '@/components/ui/Label';
 import tw from '@/lib/tw';
 import { useTheme } from '@/context/ThemeProvider';
@@ -313,13 +312,13 @@ const SignupScreen = () => {
 						/>
 					</View>
 				{/* SUBMIT BUTTON */}
-				<Button onPress={form.handleSubmit(handleSubmit)} disabled={isLoading} style={tw.style('w-full py-4 rounded-xl')}>
+				<Button onPress={form.handleSubmit(handleSubmit)} disabled={isLoading} style={tw.style('w-full rounded-xl')}>
 					{/* {isLoading ? <Icons.loading /> : null} */}
-					<Text style={tw.style('font-bold text-xl')}>{t('common.word.signup')}</Text>
+					<ButtonText style={tw.style('font-bold text-xl')}>{t('common.word.signup')}</ButtonText>
 				</Button>
 				</KeyboardAvoidingView>
 				{/* SIGNUP */}
-				<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Already have an account? <Link href={'/auth/login'} className={buttonTextVariants({ variant: 'link' })}>{t('common.word.login')}</Link></Text>
+				<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Already have an account? <Link href={'/auth/login'} style={{ color: colors.accentYellow }}>{t('common.word.login')}</Link></Text>
 			</LinearGradient>
 		</ImageBackground>
 	)
