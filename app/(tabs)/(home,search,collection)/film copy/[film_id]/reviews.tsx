@@ -1,9 +1,10 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
+import { CardReview } from "@/components/cards/CardReview";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/context/ThemeProvider";
-import { useMediaMovieDetailsQuery, useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
+import { useMediaMovieDetailsQuery, useMediaReviewsInfiniteQuery } from "@/features/media/mediaQueries";
 import { getIdFromSlug } from "@/hooks/getIdFromSlug";
 import tw from "@/lib/tw";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -13,10 +14,11 @@ import { upperFirst } from "lodash";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
+import Animated from "react-native-reanimated";
 
-const GRID_COLUMNS = 3;
+const GRID_COLUMNS = 1;
 
-const FilmPlaylistsScreen = () => {
+const FilmReviewsScreen = () => {
 	const { colors } = useTheme();
 	const { i18n, t } = useTranslation();
 	const { film_id } = useLocalSearchParams();
@@ -25,11 +27,9 @@ const FilmPlaylistsScreen = () => {
 	const [display, setDisplay] = useState<'grid' | 'row'>('grid');
 	const sortByOptions = [
 		{ label: t('common.messages.updated_at'), value: 'updated_at' },
-		{ label: t('common.messages.created_at'), value: 'created_at' },
-		{ label: t('common.messages.likes_count'), value: 'likes_count' },
 		{ label: t('common.word.cancel'), value: 'cancel' },
 	];
-	const [sortBy, setSortBy] = useState<'updated_at' | 'created_at' | 'likes_count'>('updated_at');
+	const [sortBy, setSortBy] = useState<'updated_at'>('updated_at');
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
 	const {
@@ -39,21 +39,21 @@ const FilmPlaylistsScreen = () => {
 		locale: i18n.language,
 	});
 	const {
-		data: playlists,
+		data: reviews,
 		isLoading,
 		isFetching,
 		fetchNextPage,
 		hasNextPage,
-	} = useMediaPlaylistsInfiniteQuery({
+	} = useMediaReviewsInfiniteQuery({
 		id: movie?.media_id,
 		filters: {
 			sortBy: sortBy,
 			sortOrder: sortOrder,
-			perPage: 1,
+			perPage: 10,
 		}
 	});
 
-	const loading = isLoading || playlists === undefined;
+	const loading = isLoading || reviews === undefined;
 	
 	const handleSortBy = () => {
 		const cancelIndex = sortByOptions.length - 1;
@@ -62,7 +62,7 @@ const FilmPlaylistsScreen = () => {
 			cancelButtonIndex: cancelIndex,
 		}, (selectedIndex) => {
 			if (selectedIndex === undefined || selectedIndex === cancelIndex) return;
-			setSortBy(sortByOptions[selectedIndex].value as 'updated_at' | 'created_at' | 'likes_count');
+			setSortBy(sortByOptions[selectedIndex].value as 'updated_at');
 		});
 	};
 
@@ -79,17 +79,16 @@ const FilmPlaylistsScreen = () => {
 					</Pressable>
 				</View>
 			</View>
-			{playlists?.pages[0].length ?
+			{reviews?.pages[0].length ?
 				<FlashList
-				data={playlists.pages.flat()}
+				data={reviews.pages.flat()}
 				renderItem={({ item, index }) => (
-					<View key={index} style={tw.style('p-1')}>
-						<CardPlaylist
-						key={item.id}
-						playlist={item}
-						style={tw.style('w-full')}
-						/>
-					</View>
+					<CardReview
+					key={index}
+					review={item}
+					activity={item.activity}
+					author={item.activity?.user}
+					/>
 				)}
 				keyExtractor={(_, index) => index.toString()}
 				estimatedItemSize={190 * 15}
@@ -98,7 +97,7 @@ const FilmPlaylistsScreen = () => {
 				onEndReached={() => hasNextPage && fetchNextPage()}
 				onEndReachedThreshold={0.3}
 				nestedScrollEnabled
-				// ItemSeparatorComponent={() => <View className="w-2" />}
+				ItemSeparatorComponent={() => <View className="w-2" />}
 				/>
 			: loading ? <Skeleton style={tw.style('h-48 w-full')} />
 			: <ThemedText style={tw.style('text-center')}>{upperFirst(t('common.messages.no_results'))}</ThemedText>}
@@ -106,4 +105,4 @@ const FilmPlaylistsScreen = () => {
 	)
 };
 
-export default FilmPlaylistsScreen;
+export default FilmReviewsScreen;

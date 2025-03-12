@@ -30,6 +30,9 @@ import { ThemedAnimatedView } from '@/components/ui/ThemedAnimatedView';
 import { useBottomTabOverflow } from '@/components/TabBar/TabBarBackground';
 import { FlashList } from '@shopify/flash-list';
 import { useFilmStore } from '@/stores/filmStore';
+
+const AnimatedFlashList = Animated.createAnimatedComponent(FlashList)
+
 interface ScreenHeaderProps {
 	filmHeaderHeight: SharedValue<number>;
 	headerHeight: SharedValue<number>;
@@ -123,33 +126,56 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 	);
 };
 
-const FilmScreen = () => {
+const DATA = [
+	{
+	  title: "First Item",
+	},
+	{
+	  title: "Second Item",
+	},
+	{
+		title: "Third Item",
+	},
+	{
+		title: "Fourth Item",
+	},
+	{
+		title: "Fifth Item",
+	}
+];
+
+const PersonScreen = () => {
 	const { i18n, t } = useTranslation();
-	const { film_id } = useLocalSearchParams();
-	const { sv, headerHeight, filmHeaderHeight, setStickyHeight } = useFilmStore();
-	const { id: movieId } = getIdFromSlug(film_id as string);
+	const { person_id } = useLocalSearchParams();
+	const { sv, headerHeight, filmHeaderHeight } = useFilmStore();
+	const { id: personId} = getIdFromSlug(person_id as string);
 	const {
 		data: movie,
 		isLoading,
 	} = useMediaMovieDetailsQuery({
-		id: movieId,
+		id: 1100099, // personId,
 		locale: i18n.language,
 	});
 	const loading = isLoading || movie === undefined;
 
 	const inset = useSafeAreaInsets();
-	const layoutY = useSharedValue<number>(0);
-	const stickyElement = useAnimatedStyle(() => ({
+	const stickyElement = useAnimatedStyle(() => {
+		return {
 		transform: [
 			{
-				translateY: interpolate(
-					sv.get(),
-					[layoutY.value - 1, layoutY.value, layoutY.value + 1],
-					[1, 0, -1],
-				),
-			}
-		]
-	}));
+			translateY: interpolate(
+				sv.get(),
+				[
+				filmHeaderHeight.get() - (headerHeight.get() + inset.top) - 1,
+				filmHeaderHeight.get() - (headerHeight.get() + inset.top),
+				filmHeaderHeight.get() - (headerHeight.get() + inset.top) + 1,
+				],
+				[0, 0, 1],
+			),
+			},
+		],
+		};
+	});
 
 	return (
 		<ThemedAnimatedView style={tw.style('flex-1')}>
@@ -174,26 +200,29 @@ const FilmScreen = () => {
 			movie={movie}
 			loading={loading}
 			/>
+			<Animated.View style={tw.style('h-48 bg-red-500')} />
 			{movie ? (
-				<>
-					<ThemedAnimatedView
-					style={[
-						tw.style('absolute w-full items-center justify-center z-10 p-2'),
-						{ top: filmHeaderHeight.get(), },
-						stickyElement
-					]}
-					onLayout={(event: LayoutChangeEvent) => {
-						'worklet';
-						setStickyHeight(event.nativeEvent.layout.height);
-					}}
-					>
-						<FilmNav slug={String(film_id)} />
-					</ThemedAnimatedView>
-					<Slot />
-				</>
+				<ThemedAnimatedView
+				style={[
+					tw.style('items-center justify-center z-10 p-2'),
+					// stickyElement
+				]}
+				>
+					<FilmNav slug={String(person_id)} />
+				</ThemedAnimatedView>
 			) : null}
+			<Slot />
 		</ThemedAnimatedView>
 	);
 };
 
-export default FilmScreen;
+const getRandomDarkColor = () => {
+	const min = 20; // Valeur minimale pour rester sombre
+	const max = 100; // Valeur maximale pour éviter d'être trop clair
+	const r = Math.floor(Math.random() * (max - min + 1)) + min;
+	const g = Math.floor(Math.random() * (max - min + 1)) + min;
+	const b = Math.floor(Math.random() * (max - min + 1)) + min;
+	return `rgba(${r}, ${g}, ${b}, 0.8)`;
+};
+
+export default PersonScreen;
