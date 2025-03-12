@@ -1,9 +1,10 @@
 import { CardMedia } from "@/components/cards/CardMedia";
-import { Button, buttonTextVariants } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText"
 import { Icons } from "@/constants/Icons";
+import { useTheme } from "@/context/ThemeProvider";
 import { useUserActivitiesInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries"
+import tw from "@/lib/tw";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { Picker } from "@react-native-picker/picker";
 import { FlashList } from "@shopify/flash-list";
@@ -11,12 +12,13 @@ import { useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 
 const GRID_COLUMNS = 3;
 export const PER_PAGE = GRID_COLUMNS * 5;
 
 const ProfileCollectionScreen = () => {
+	const { colors } = useTheme();
 	const { username } = useLocalSearchParams();
 	const { t } = useTranslation();
 	const { showActionSheetWithOptions } = useActionSheet();
@@ -61,31 +63,30 @@ const ProfileCollectionScreen = () => {
 	return (
 		<>
 			<View>
-				<View className="flex flex-row justify-end items-center gap-2">
-					<Button variant={'ghost'} size={'sm'} onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}>
-					{sortOrder === 'desc' ? <Icons.ArrowDownNarrowWide size={20} className="text-foreground"/> : <Icons.ArrowUpNarrowWide size={20} className="text-foreground" />}
-					</Button>
-					<Button variant={'secondary'} size={'fit'} onPress={handleSortBy} className="flex-row items-center gap-1">
-						<Text className={buttonTextVariants({variant: 'secondary'})}>{upperFirst(t(`common.messages.${sortBy}`))}</Text>
-						<Icons.ChevronDown size={20} className="text-foreground"/>
-					</Button>
+				<View style={tw.style('flex flex-row justify-end items-center gap-2')}>
+					<Pressable onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}>
+					{sortOrder === 'desc' ? <Icons.ArrowDownNarrowWide color={colors.foreground} size={20} /> : <Icons.ArrowUpNarrowWide color={colors.foreground} size={20} />}
+					</Pressable>
+					<Pressable onPress={handleSortBy} style={tw.style('flex-row items-center gap-1')}>
+						<ThemedText>{upperFirst(t(`common.messages.${sortBy}`))}</ThemedText>
+						<Icons.ChevronDown color={colors.foreground} size={20} />
+					</Pressable>
 				</View>
 			</View>
 			{activities?.pages[0].length ?
 				<FlashList
 				data={activities.pages.flat()}
 				renderItem={({ item, index }) => (
-					<View key={index} className="p-0.5">
+					<View key={index} style={tw.style('p-0.5')}>
 						<CardMedia
 						key={item.id}
 						variant='poster'
 						media={item.media!}
 						index={index}
-						className="w-full"
+						style={tw.style('w-full')}
 						/>
 					</View>
 				)}
-				className="h-full"
 				keyExtractor={(_, index) => index.toString()}
 				estimatedItemSize={190 * 15}
 				refreshing={isFetching}
@@ -95,8 +96,8 @@ const ProfileCollectionScreen = () => {
 				nestedScrollEnabled
 				// ItemSeparatorComponent={() => <View className="w-2" />}
 				/>
-			: loading ? <Skeleton className="h-48 w-full" />
-			: <ThemedText className="text-center">{upperFirst(t('common.messages.no_results'))}</ThemedText>}
+			: loading ? <Skeleton style={tw.style('h-48 w-full')} />
+			: <ThemedText style={tw.style('text-center')}>{upperFirst(t('common.messages.no_results'))}</ThemedText>}
 		</>
 	);
 };

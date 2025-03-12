@@ -1,8 +1,8 @@
 import { Link, LinkProps, usePathname } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { FlatList, Text, View } from "react-native";
-import { Button, buttonTextVariants } from "../ui/button";
-import { cn } from "@/lib/utils";
+import { FlatList, Pressable, Text, View } from "react-native";
+import tw from "@/lib/tw";
+import { useTheme } from "@/context/ThemeProvider";
 
 const NavSettings = () => {
 	const { t } = useTranslation();
@@ -42,7 +42,7 @@ const NavSettings = () => {
 		<View>
 			<FlatList
 			data={NavSettingsItems}
-			contentContainerClassName="gap-2"
+			contentContainerStyle={tw.style('gap-2')}
 			renderItem={({ item }) => (
 				<NavSettingsItem title={item.title} href={item.href} active={pathname === item.href} />
 			)}
@@ -62,14 +62,15 @@ const NavSettingsItem = ({
 	href: LinkProps['href'];
 	active?: boolean;
 }) => {
+	const { colors } = useTheme();
 	return (
 		<Link
 		href={href}
 		asChild
 		>
-			<Button variant={'outline'} className={cn("rounded-full", active ? 'bg-muted' : '')}>
-				<Text className={buttonTextVariants({ variant: active ? 'secondary' : 'outline'})}>{title}</Text>
-			</Button>
+			<Pressable style={[tw.style('rounded-full'), active && { backgroundColor: colors.muted }]}>
+				<Text>{title}</Text>
+			</Pressable>
 		</Link>
 	)
 };

@@ -1,11 +1,12 @@
 import * as React from "react"
-import { cn } from "@/lib/utils";
 import { Media, UserActivity } from "@/types/type.db";
 import { ThemedText } from "../ui/ThemedText";
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "../utils/ImageWithFallback";
 import { Image } from "expo-image";
-import { Link, RelativePathString } from "expo-router";
+import { Href, Link, RelativePathString, useRouter } from "expo-router";
+import tw from "@/lib/tw";
+import { Pressable } from "react-native";
 
 interface CardMediaProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -69,16 +70,15 @@ CardMediaDefault.displayName = "CardMediaDefault";
 const CardMediaPoster = React.forwardRef<
 React.ElementRef<typeof Animated.View>,
 	Omit<CardMediaProps, "variant">
->(({ className, media, activity, profileActivity, linked, disableActions, showRating, children, ...props }, ref) => {
+>(({ style, media, activity, profileActivity, linked, disableActions, showRating, children, ...props }, ref) => {
 	return (
 		<Animated.View
 			ref={ref}
-			className={cn(
-				"group relative transition flex gap-4 items-center w-32 shrink-0 rounded-sm",
-				"border-transparent hover:border-accent-1",
-				"aspect-[2/3] overflow-hidden",
-				className
-			)}
+			style={[
+				{ aspectRatio: 2 / 3 },
+				tw.style('relative flex gap-4 items-center w-32 shrink-0 rounded-sm border-transparent overflow-hidden'),
+				style,
+			]}
 			{...props}
 		>
 			<ImageWithFallback
@@ -205,18 +205,24 @@ CardMediaPoster.displayName = "CardMediaPoster";
 const CardMedia = React.forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	CardMediaProps
->(({ className, hideMediaType = true, showRating = true, linked = true, variant = "default", ...props }, ref) => {
+>(({ hideMediaType = true, showRating = true, linked = true, variant = "default", ...props }, ref) => {
+	const router = useRouter();
+	const onPress = () => {
+		if (linked && props.media.url) {
+			router.push(props.media.url as Href);
+		}
+	};
 	return (
 	// <ContextMenuMedia media={media}>
-	<Link href={props.media.url as RelativePathString ?? ''} asChild>
+	<Pressable onPress={onPress}>
 		{variant === "default" ? (
-			<CardMediaDefault ref={ref} className={cn(linked ? 'cursor-pointer' : '', className)} linked={linked} showRating={showRating} {...props} />
+			<CardMediaDefault ref={ref} linked={linked} showRating={showRating} {...props} />
 		) : variant == "poster" ? (
-			<CardMediaPoster ref={ref} className={cn(linked ? 'cursor-pointer' : '', className)} linked={linked} showRating={showRating} {...props} />
+			<CardMediaPoster ref={ref} linked={linked} showRating={showRating} {...props} />
 		// ) : variant == "row" ? (
 			// <CardMediaRow ref={ref} className={cn(linked ? 'cursor-pointer' : '', className)} media={media} linked={linked} onClick={customOnClick} showRating={showRating} hideMediaType={hideMediaType} {...props} />
 		) : null}
-	</Link>
+	</Pressable>
 	// </ContextMenuMedia>
 	);
 });
