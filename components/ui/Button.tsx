@@ -1,83 +1,127 @@
 import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
-import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 import { Pressable } from 'react-native';
+import Animated from 'react-native-reanimated';
 
-const buttonVariants = cva(
-  'flex items-center justify-center rounded-md web:ring-offset-background web:transition-colors web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2',
-  {
-    variants: {
-      variant: {
-        default: 'bg-primary web:hover:opacity-90 active:opacity-90',
-        destructive: 'bg-destructive web:hover:opacity-90 active:opacity-90',
-        outline:
-          'border border-input bg-background web:hover:bg-accent web:hover:text-accent-foreground active:bg-accent',
-        secondary: 'bg-secondary web:hover:opacity-80 active:opacity-80',
-        ghost: 'web:hover:bg-accent web:hover:text-accent-foreground active:bg-accent',
-        link: 'web:underline-offset-4 web:hover:underline web:focus:underline ',
-        action: 'text-foreground hover:text-foreground/60'
-      },
-      size: {
-        default: 'h-10 px-4 py-2 native:h-12 native:px-5 native:py-3',
-        sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md px-8 native:h-14',
-        icon: 'h-10 w-10',
-        // fit: 'h-fit px-4 py-2',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
+type Variant =
+  'default'
+  | 'destructive'
+  | 'outline'
+  | 'accent-yellow';
+
+interface ButtonTextProps
+  extends React.ComponentPropsWithoutRef<typeof Animated.Text> {
+    variant?: Variant;
   }
-);
 
-const buttonTextVariants = cva(
-  'web:whitespace-nowrap text-sm native:text-base font-medium text-foreground web:transition-colors',
-  {
-    variants: {
-      variant: {
-        default: 'text-primary-foreground',
-        destructive: 'text-destructive-foreground',
-        outline: 'group-active:text-accent-foreground',
-        secondary: 'text-secondary-foreground group-active:text-secondary-foreground',
-        ghost: 'group-active:text-accent-foreground',
-        link: 'text-primary group-active:underline',
-        action: 'group-active:text-accent-foreground',
-      },
-      size: {
-        default: '',
-        sm: '',
-        lg: 'native:text-lg',
-        icon: '',
-        fit: '',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
-  }
-);
-
-type ButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
-  VariantProps<typeof buttonVariants>;
-
-const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>(
-  ({ variant, size, role = 'button', ...props }, ref) => {
+const ButtonText = React.forwardRef<
+  React.ElementRef<typeof Animated.Text>,
+  ButtonTextProps
+>(({ variant, style, ...props }, ref) => {
     const { colors } = useTheme();
+    const variantStyles = React.useMemo(() => {
+      const shared = "text-sm font-medium";
+      let style = {};
+      switch (variant) {
+        case 'destructive':
+          style = {
+            color: colors.destructiveForeground,
+          }
+          break;
+        case 'outline':
+          style = {
+            color: colors.foreground,
+          }
+          break;
+        case 'accent-yellow':
+          style = {
+            color: colors.accentYellowForeground,
+          }
+          break;
+        default:
+          style = {
+            color: colors.primaryForeground,
+          }
+      }
+      return {
+        shared,
+        variant: style,
+      }
+    }, [variant, colors]);
     return (
-      <Pressable
+      <Animated.Text
         ref={ref}
-        role={role}
         style={[
-          { color: colors.foreground },
-          props.disabled && tw.style('opacity-50'),
-          // tw.style(buttonVariants({ variant, size })),
+          tw.style(variantStyles.shared),
+          variantStyles.variant,
+          style,
         ]}
         {...props}
       />
+    );
+  }
+);
+
+
+
+interface ButtonProps
+  extends React.ComponentPropsWithoutRef<typeof Animated.View> {
+    variant?: Variant;
+    disabled?: boolean;
+    onPress?: () => void;
+  }
+
+const Button = React.forwardRef<React.ElementRef<typeof Animated.View>, ButtonProps>(
+  ({ variant, disabled, role = 'button', style, ...props }, ref) => {
+    const { colors } = useTheme();
+    const variantStyles = React.useMemo(() => {
+      const shared = "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium px-4 py-2";
+      let style = {};
+      switch (variant) {
+        case 'destructive':
+          style = {
+            backgroundColor: colors.destructive,
+          }
+          break;
+        case 'outline':
+          style = {
+            backgroundColor: colors.background,
+            borderColor: colors.muted,
+            borderWidth: 1,
+          }
+          break;
+        case 'accent-yellow':
+          style = {
+            backgroundColor: colors.accentYellow,
+          }
+          break;
+        default:
+          style = {
+            backgroundColor: colors.primary,
+          }
+      }
+      return {
+        shared,
+        variant: style,
+      }
+    }, [variant, colors]);
+    return (
+      <Pressable disabled={disabled} onPress={props.onPress} style={{ opacity: disabled ? 0.5 : 1 }}>
+        <Animated.View
+        ref={ref}
+        role={role}
+        style={[
+          tw.style(variantStyles.shared),
+          variantStyles.variant,
+          style,
+          // tw.style(buttonVariants({ variant, size })),
+        ]}
+        {...props}
+        >
+          {props.children}
+        </Animated.View>
+      </Pressable>
       // <TextClassContext.Provider
       //   value={cn(
       //     props.disabled && 'web:pointer-events-none',
@@ -99,5 +143,11 @@ const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>
 );
 Button.displayName = 'Button';
 
-export { Button, buttonTextVariants, buttonVariants };
-export type { ButtonProps };
+export {
+  Button,
+  ButtonText,
+};
+export type {
+  ButtonProps,
+  ButtonTextProps,
+};

@@ -10,11 +10,15 @@ import Animated, {
 
 const duration = 1000;
 
-function Skeleton({
-  className,
-  style,
-  ...props
-}: React.ComponentPropsWithoutRef<typeof Animated.View>) {
+interface SkeletonProps
+  extends React.ComponentPropsWithoutRef<typeof Animated.View> {
+    borderRadius?: number;
+  }
+
+const Skeleton = React.forwardRef<
+  React.ElementRef<typeof Animated.View>,
+  SkeletonProps
+>(({ style, borderRadius = 6, ...props }, ref) => {
   const { colors } = useTheme();
   const sv = useSharedValue(1);
 
@@ -27,19 +31,21 @@ function Skeleton({
 
   const styleDefault = useAnimatedStyle(() => ({
     opacity: sv.value,
-    borderRadius: 6,
+    borderRadius: borderRadius,
     backgroundColor: colors.muted,
+    
   }));
 
   return (
     <Animated.View
-      style={[
-        styleDefault,
-        style,
-      ]}
-      {...props}
+    ref={ref}
+    style={[
+      styleDefault,
+      style,
+    ]}
+    {...props}
     />
   );
-}
+});
 
 export { Skeleton };

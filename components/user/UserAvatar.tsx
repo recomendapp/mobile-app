@@ -1,18 +1,16 @@
 import * as React from 'react';
 import { Skeleton } from '../ui/Skeleton';
-import { View } from 'react-native';
 import Avatar from '../ui/Avatar';
-import { ThemedText } from '../ui/ThemedText';
 import tw from '@/lib/tw';
 
-interface UserAvatarProps extends Omit<React.ComponentPropsWithRef<typeof View>, 'alt'> {
+interface UserAvatarProps extends Omit<React.ComponentPropsWithRef<typeof Avatar.Root>, 'alt'> {
 	full_name?: string | null;
 	avatar_url?: string | null;
 	skeleton?: boolean;
 }
 
 const UserAvatar = React.forwardRef<
-	React.ElementRef<typeof View>,
+	React.ElementRef<typeof Avatar.Root>,
 	UserAvatarProps
 >(({ full_name, avatar_url, skeleton, style, ...props }, ref) => {
 	if (!full_name || skeleton) {
@@ -33,9 +31,7 @@ const UserAvatar = React.forwardRef<
 		{...props}
 		>
 			<Avatar.Image source={{ uri: avatar_url ?? '' }}/>
-			<Avatar.Fallback>
-				<ThemedText>{full_name}</ThemedText>
-			</Avatar.Fallback>
+			<Avatar.Fallback />
 		</Avatar.Root>
 	)
 });

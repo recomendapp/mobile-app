@@ -1,6 +1,9 @@
 export type ColorTheme = {
   foreground: string;
   background: string;
+  primary: string;
+  primarySubued: string;
+  primaryForeground: string;
   muted: string;
   mutedForeground: string;
   card: string;
@@ -38,6 +41,9 @@ const Colors: ColorPalettes = {
   dark: {
     foreground: 'hsl(0 0% 98%)',
     background: 'hsl(0 10% 3.9%)',
+    primary: 'hsl(0 100% 100%)',
+    primarySubued: 'hsl(0 0% 65%)',
+    primaryForeground: 'hsl(0 0% 6%)',
     muted: 'hsl(0 0% 12%)',
     mutedForeground: 'hsl(0 0% 57%)',
     card: 'hsl(0 0% 8%)',
@@ -60,6 +66,9 @@ const Colors: ColorPalettes = {
   light: {
     foreground: 'hsl(240 10% 3.9%)',
     background: 'hsl(0 0% 100%)',
+    primary: 'hsl(0 100% 100%)',
+    primarySubued: 'hsl(0 0% 65%)',
+    primaryForeground: 'hsl(240 5.9% 10%;)',
     muted: 'hsl(0 0% 8%)',
     mutedForeground: 'hsl(0 0% 57%)',
     card: 'hsl(240 10% 3.9%)',

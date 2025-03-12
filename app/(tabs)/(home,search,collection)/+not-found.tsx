@@ -1,12 +1,11 @@
 import { useBottomTabOverflow } from '@/components/TabBar/TabBarBackground';
-import { Button, buttonTextVariants } from '@/components/ui/Button';
+import { Button, ButtonText } from '@/components/ui/Button';
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
 import { ThemedText } from '@/components/ui/ThemedText';
 import tw from '@/lib/tw';
 import { useNavigation } from '@react-navigation/native';
-import { Text } from 'react-native';
 
-export default function NotFoundScreen() {
+const NotFoundScreen = () => {
   const tabBarHeight = useBottomTabOverflow();
   const navigation = useNavigation();
   return (
@@ -19,8 +18,10 @@ export default function NotFoundScreen() {
         <ThemedText style={tw.style("text-3xl font-bold")}>This screen doesn't exist.</ThemedText>
 
         <Button onPress={() => navigation.goBack()}>
-          <Text className={buttonTextVariants({ variant: 'default' })}>Go back !</Text>
+          <ButtonText>Go back !</ButtonText>
         </Button>
       </ThemedSafeAreaView>
   );
-}
+};
+
+export default NotFoundScreen;

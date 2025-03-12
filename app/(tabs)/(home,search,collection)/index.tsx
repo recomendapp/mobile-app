@@ -9,7 +9,7 @@ import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 import tw from '@/lib/tw';
-import { Button } from '@/components/ui/Button';
+import { Button, ButtonText } from '@/components/ui/Button';
 
 const HomeScreen = () => {
   const { session } = useAuth();
@@ -43,7 +43,7 @@ const HomeHeader = () => {
           <UserNav />
         </View>
       ) : (
-        <Button><Link href={'/auth/login'}>{t('common.word.login')}</Link></Button>
+        <Link href={'/auth/login'} asChild><Button><ButtonText>{t('common.word.login')}</ButtonText></Button></Link>
       )}
     </View>
   );
