@@ -14,22 +14,18 @@ import Animated, {
 import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { Slot, useLocalSearchParams } from 'expo-router';
-import { Icons } from '@/constants/Icons';
+import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { getIdFromSlug } from '@/hooks/getIdFromSlug';
 import { useMediaMovieDetailsQuery } from '@/features/media/mediaQueries';
 import FilmNav from '@/components/screens/film/FilmNav';
-import { useNavigation } from '@react-navigation/native';
 import { ThemedText } from '@/components/ui/ThemedText';
-import { ThemedView } from '@/components/ui/ThemedView';
-import FilmHeaderTwo from '@/components/screens/film/FilmHeaderTwo';
-import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
 import { ThemedAnimatedView } from '@/components/ui/ThemedAnimatedView';
 import { useBottomTabOverflow } from '@/components/TabBar/TabBarBackground';
 import { FlashList } from '@shopify/flash-list';
-import { useFilmStore } from '@/stores/filmStore';
+import FilmHeader from '@/components/screens/film/FilmHeaderTwo';
+import FilmHeaderTop from '@/components/screens/film/FilmHeaderTop';
 
 const AnimatedFlashList = Animated.createAnimatedComponent(FlashList)
 
@@ -51,10 +47,12 @@ const DATA = [
 	}
 ];
 
-const PersonScreen = () => {
+const FilmScreen = () => {
 	const { i18n, t } = useTranslation();
 	const { film_id  } = useLocalSearchParams();
-	const { sv, headerHeight, filmHeaderHeight } = useFilmStore();
+	const sv = useSharedValue<number>(0);
+	const headerHeight = useSharedValue<number>(0);
+	const filmHeaderHeight = useSharedValue<number>(0);
 	const { id: movieId } = getIdFromSlug(film_id as string);
 	const {
 		data: movie,
@@ -67,7 +65,6 @@ const PersonScreen = () => {
 
 	const tabBarHeight = useBottomTabOverflow();
 	const inset = useSafeAreaInsets();
-
 	const scrollHandler = useAnimatedScrollHandler({
 		onScroll: event => {
 			'worklet';
@@ -81,7 +78,6 @@ const PersonScreen = () => {
 		paddingBottom: tabBarHeight + inset.bottom,
 		};
 	});
-
 	const stickyElement = useAnimatedStyle(() => {
 		return {
 		transform: [
@@ -101,34 +97,57 @@ const PersonScreen = () => {
 	});
 
 	return (
-		<AnimatedFlashList
-		ListHeaderComponent={() => (
-			<ThemedAnimatedView
-			style={[
-				tw.style('w-full items-center justify-center z-10 p-2'),
-				stickyElement
-			]}
-			>
-				<FilmNav slug={String(film_id)} />
-			</ThemedAnimatedView>
-		)}
-		data={DATA} style={{ flex: 1 }}
-		renderItem={({ item } : { item: any }) => (
-			<Animated.View style={[tw`p-4 h-96`, { backgroundColor: getRandomDarkColor() }]}>
-				<ThemedText>{item.title}</ThemedText>
-			</Animated.View>
-		)}
-		contentContainerStyle={{
-			paddingTop: filmHeaderHeight.get(),
-			// top: filmHeaderHeight.get(),
-		}}
-		keyExtractor={(item, index) => index.toString()}
-		estimatedItemSize={100}
-		onScroll={scrollHandler}
-		scrollEventThrottle={16}
-		showsVerticalScrollIndicator={false}
-		nestedScrollEnabled
-		/>
+		<>
+			<FilmHeaderTop
+			filmHeaderHeight={filmHeaderHeight}
+			headerHeight={headerHeight}
+			onHeaderHeight={(height) => {
+				'worklet';
+				headerHeight.value = height;
+			}}
+			sv={sv}
+			title={movie?.title ?? ''}
+			/>
+			<AnimatedFlashList
+			ListHeaderComponent={() => (
+				<>
+					<FilmHeader
+					filmHeaderHeight={filmHeaderHeight}
+					onHeaderHeight={(height) => {
+						'worklet';
+						filmHeaderHeight.value = height;
+					}}
+					headerHeight={headerHeight}
+					sv={sv}
+					movie={movie}
+					loading={loading}
+					/>
+					{movie ? <>
+						<ThemedAnimatedView
+						style={[
+							tw.style('w-full items-center justify-center z-10 p-2'),
+							stickyElement
+						]}
+						>
+							<FilmNav slug={String(film_id)} />
+						</ThemedAnimatedView>
+					</> : null}
+				</>
+			)}
+			data={DATA}
+			renderItem={({ item } : { item: any }) => (
+				<Animated.View style={[tw`p-4 h-96`, { backgroundColor: getRandomDarkColor() }]}>
+					<ThemedText>{item.title}</ThemedText>
+				</Animated.View>
+			)}
+			keyExtractor={(item, index) => index.toString()}
+			estimatedItemSize={100}
+			onScroll={scrollHandler}
+			scrollEventThrottle={16}
+			showsVerticalScrollIndicator={false}
+			nestedScrollEnabled
+			/>
+		</>
 	);
 };
 
@@ -141,4 +160,4 @@ const getRandomDarkColor = () => {
 	return `rgba(${r}, ${g}, ${b}, 0.8)`;
 };
 
-export default PersonScreen;
+export default FilmScreen;

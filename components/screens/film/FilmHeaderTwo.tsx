@@ -135,8 +135,8 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 	return (
     <Animated.View
 	style={[
-		tw.style('w-full absolute'),
-		opacityAnim
+		tw.style('w-full'), // absolute'),
+		// opacityAnim
 	]}
 	onLayout={(event: LayoutChangeEvent) => {
 		'worklet';

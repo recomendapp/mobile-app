@@ -16,6 +16,7 @@ export const useMediaMovieDetailsQuery = ({
 		queryKey: mediaKeys.detail({ id: id as number, type: 'movie' }),
 		queryFn: async () => {
 			if (!id) throw Error('No id or type provided');
+			await new Promise((resolve) => setTimeout(resolve, 10000));
 			const { data, error } = await supabase
 				.from('media_movie')
 				.select(`
