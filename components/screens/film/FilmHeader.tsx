@@ -33,6 +33,7 @@ interface FilmHeaderProps {
 	sv: SharedValue<number>;
 	movie?: MediaMovie | null;
 	loading: boolean;
+	pullToRefreshDist: number;
 }
 const FilmHeader: React.FC<FilmHeaderProps> = ({
 	filmHeaderHeight,
@@ -41,6 +42,7 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 	sv,
 	movie,
 	loading,
+	pullToRefreshDist,
 }) => {
 	const { t } = useTranslation();
 	const { hslToRgb } = useColorConverter();
@@ -48,14 +50,31 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 	const bgColor = hslToRgb(colors.background);
 	const inset = useSafeAreaInsets();
 	const layoutY = useSharedValue(0);
-	const opacityAnim = useAnimatedStyle(() => {
+	const headerAnimStyle = useAnimatedStyle(() => {
 		return {
 			opacity: interpolate(
-			sv.get(),
-			[0, filmHeaderHeight.get() - (headerHeight.get() + inset.top) / 0.9],
-			[1, 0],
-			Extrapolation.CLAMP,
+				sv.get(),
+				[0, filmHeaderHeight.get() - (headerHeight.get() + inset.top) / 0.9],
+				[1, 0],
+				Extrapolation.CLAMP,
 			),
+			transform: [
+				// {
+				// 	scale: interpolate(
+				// 		sv.get(),
+				// 		[-filmHeaderHeight.get() / 2, 0, (filmHeaderHeight.get() - (headerHeight.get() + inset.top))],
+				// 		[1.8, 1, 0.95],
+				// 		'clamp',
+				// 	),
+				// },
+				{
+					translateY: interpolate(
+						sv.get(),
+						[layoutY.value - 1, layoutY.value, layoutY.value + 1],
+						[1, 0, -1],
+					),
+				},
+			],
 		};
 	});
 	const posterAnim = useAnimatedStyle(() => ({
@@ -76,9 +95,9 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 			},
 			{
 				translateY: interpolate(
-				sv.get(),
-				[layoutY.get() - 1, layoutY.get(), layoutY.get()],
-				[-0.3, 0, -1],
+					sv.get(),
+					[layoutY.value - 1, layoutY.value, layoutY.value],
+					[-0.3, 0, -1],
 				),
 			},
 		],
@@ -111,22 +130,33 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 		};
 	});
 	const scaleAnim = useAnimatedStyle(() => {
+		// code isnt good, we have to to move the image up proportionally to the scale (only when pull to refresh so fron -pullToRefreshDist to 0)
 		return {
 			transform: [
-			{
-				scale: interpolate(sv.get(), [-50, 0], [1.3, 1], {
-				extrapolateLeft: 'extend',
-				extrapolateRight: 'clamp',
-				}),
-			},
+				// {
+				// 	scale: interpolate(
+				// 		sv.get(),
+				// 		[-pullToRefreshDist, 0],
+				// 		[scaleFactor, 1],
+				// 		Extrapolation.CLAMP,
+				// 	),
+				// },
+				// {
+				// 	translateY: interpolate(
+				// 		sv.get(),
+				// 		[-pullToRefreshDist, 0],
+				// 		[-pullToRefreshDist * (scaleFactor - 1), 0],
+				// 		Extrapolation.CLAMP,
+				// 	),
+				// },
 			],
-		};
+	  	}
 	});
 	return (
     <Animated.View
 	style={[
-		tw.style('w-full absolute'),
-		opacityAnim
+		tw.style('w-full absolute bg-red-500'),
+		headerAnimStyle,
 	]}
 	onLayout={(event: LayoutChangeEvent) => {
 		'worklet';
@@ -141,13 +171,15 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 		<AnimatedLinearGradient
 		style={[tw.style('absolute inset-0'), scaleAnim]}
 		colors={[
-			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
-			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
-			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.5)`,
-			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
-			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
-			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.8)`,
-			`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 1)`,
+			`rgba(255, 0, 0, 1)`,
+			`rgba(255, 0, 0, 1)`,
+			// `rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
+			// `rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
+			// `rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.5)`,
+			// `rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
+			// `rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
+			// `rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.8)`,
+			// `rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 1)`,
 		]}
 		/>
 		<Animated.View
