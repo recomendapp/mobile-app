@@ -1,7 +1,5 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { CardReview } from "@/components/cards/CardReview";
-import { useFilmContext } from "@/components/screens/film/FilmContext";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
@@ -16,19 +14,15 @@ import { upperFirst } from "lodash";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
-import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const AnimatedFlashList = Animated.createAnimatedComponent(FlashList);
+import Animated from "react-native-reanimated";
 
 const GRID_COLUMNS = 1;
 
 const FilmReviewsScreen = () => {
 	const { colors } = useTheme();
 	const { i18n, t } = useTranslation();
-	const { tabState, movieId, scrollY, headerHeight, addScrollRef } = useFilmContext();
-	const tabBarHeight = useBottomTabOverflow();
-	const inset = useSafeAreaInsets();
+	// const { film_id } = useLocalSearchParams();
+	// const { id: movieId} = getIdFromSlug(film_id as string);
 	const { showActionSheetWithOptions } = useActionSheet();
 	const [display, setDisplay] = useState<'grid' | 'row'>('grid');
 	const sortByOptions = [
@@ -41,7 +35,7 @@ const FilmReviewsScreen = () => {
 	const {
 		data: movie,
 	} = useMediaMovieDetailsQuery({
-		id: movieId, // movieId
+		id: 512, // movieId
 		locale: i18n.language,
 	});
 	const {
@@ -71,60 +65,6 @@ const FilmReviewsScreen = () => {
 			setSortBy(sortByOptions[selectedIndex].value as 'updated_at');
 		});
 	};
-
-	const scrollHandler = useAnimatedScrollHandler({
-		onScroll: event => {
-			'worklet';
-			scrollY.value = event.contentOffset.y;
-		},
-	});
-
-	return (
-		<AnimatedFlashList
-		ref={(ref) => {
-			if (ref) {
-			  addScrollRef('reviews', ref); // ref est déjà une AnimatedRef avec Reanimated
-			}
-		}}
-		ListHeaderComponent={() => (
-			<View>
-				<View style={tw.style('flex flex-row justify-end items-center gap-2')}>
-					<Pressable onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}>
-					{sortOrder === 'desc' ? <Icons.ArrowDownNarrowWide color={colors.foreground} size={20} /> : <Icons.ArrowUpNarrowWide color={colors.foreground} size={20} />}
-					</Pressable>
-					<Pressable onPress={handleSortBy} style={tw.style('flex-row items-center gap-1')}>
-						<ThemedText>{upperFirst(t(`common.messages.${sortBy}`))}</ThemedText>
-						<Icons.ChevronDown color={colors.foreground} size={20} />
-					</Pressable>
-				</View>
-			</View>
-		)}
-		ListEmptyComponent={() => !loading ? <ThemedText style={tw.style('text-center')}>{upperFirst(t('common.messages.no_results'))}</ThemedText> : null}
-		onScroll={scrollHandler}
-		contentContainerStyle={{
-			paddingTop: headerHeight.get(),
-			paddingBottom: tabBarHeight + inset.bottom,
-		}}
-		data={reviews?.pages.flat()}
-		renderItem={({ item, index }) => (
-			<CardReview
-			key={index}
-			review={item}
-			activity={item.activity}
-			author={item.activity?.user}
-			/>
-		)}
-		keyExtractor={(_, index) => index.toString()}
-		estimatedItemSize={190 * 15}
-		refreshing={isFetching}
-		numColumns={display === 'grid' ? GRID_COLUMNS : 1}
-		onEndReached={() => hasNextPage && fetchNextPage()}
-		onEndReachedThreshold={0.3}
-		nestedScrollEnabled
-		ItemSeparatorComponent={() => <View className="w-2" />}
-		// ItemSeparatorComponent={() => <View className="w-2" />}
-		/>
-	)
 
 	return (
 		<>
