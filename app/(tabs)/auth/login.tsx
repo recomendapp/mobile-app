@@ -60,7 +60,10 @@ const LoginScreen = () => {
 				paddingBottom: 114
 			}}
 			>
-				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={tw.style('w-full gap-4')}>
+				<KeyboardAvoidingView
+				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+				style={tw.style('w-full gap-4')}
+				>
 					{/* EMAIL */}
 					<View style={tw.style('w-full gap-1')}>
 						<Label nativeID='email'>Email</Label>

@@ -141,10 +141,11 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 				});
 			  });
 		} else {
+			console.log('bleeeh', -gestureState.velocityY);
 			if (Math.abs(gestureState.velocityY) < 200) return;
 			headerScrollY.value = withDecay({
 				velocity: -gestureState.velocityY,
-				deceleration: 0.998,
+				// deceleration: 0.998,
 			})
 		}
 	};

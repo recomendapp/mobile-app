@@ -87,8 +87,8 @@ const FilmProvider: React.FC<FilmProviderProps> = ({
 								offset: headerHeight.get(),
 								animated: false,
 							});
+							listOffsets.set(refKey, headerHeight.get());
 						}
-						listOffsets.set(refKey, headerHeight.get());
 					}
 				}
 			} // else {
@@ -116,7 +116,7 @@ const FilmProvider: React.FC<FilmProviderProps> = ({
 		() => scrollY.value,
 		(value) => {
 			console.log('scrollY', value);
-			// runOnJS(syncScrollOffset)();
+			runOnJS(syncScrollOffset)();
 		}
 	);
 

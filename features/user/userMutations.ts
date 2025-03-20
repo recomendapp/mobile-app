@@ -4,6 +4,48 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { userKeys } from './userKeys';
 import { useSupabaseClient } from '@/context/SupabaseProvider';
 
+export const useUserUpdateMutation = ({
+	userId,
+} : {
+	userId?: string;
+}) => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			fullName,
+			username,
+			avatar,
+			bio,
+			avatarUrl,
+		} : {
+			fullName?: string;
+			username?: string;
+			avatar?: string | null;
+			bio?: string | null;
+			avatarUrl?: string | null;
+		}) => {
+			if (!userId) throw Error('Missing user id');
+			const { data, error } = await supabase
+				.from('user')
+				.update({
+					full_name: fullName,
+					username: username,
+					avatar: avatar,
+					bio: bio,
+					avatar_url: avatarUrl,
+				})
+				.eq('id', userId)
+				.select('*')
+				.single();
+			if (error) throw error;
+			return data;
+		},
+		onSuccess: (data) => {
+			queryClient.setQueryData(userKeys.detail(data.id), data);
+		}
+	});
+};
 
 /**
  * Accepts a follower request

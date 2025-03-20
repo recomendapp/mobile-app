@@ -15,7 +15,7 @@ import { useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, View } from "react-native";
+import { Dimensions, Pressable, View } from "react-native";
 import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -80,7 +80,7 @@ const FilmReviewsScreen = () => {
 	});
 
 	return (
-		<AnimatedFlashList
+		<Animated.FlatList
 		ref={(ref) => {
 			if (ref) {
 			  addScrollRef('reviews', ref); // ref est déjà une AnimatedRef avec Reanimated
@@ -104,6 +104,7 @@ const FilmReviewsScreen = () => {
 		contentContainerStyle={{
 			paddingTop: headerHeight.get(),
 			paddingBottom: tabBarHeight + inset.bottom,
+			minHeight: Dimensions.get('window').height + headerHeight.get(),
 		}}
 		data={reviews?.pages.flat()}
 		renderItem={({ item, index }) => (
@@ -115,7 +116,7 @@ const FilmReviewsScreen = () => {
 			/>
 		)}
 		keyExtractor={(_, index) => index.toString()}
-		estimatedItemSize={190 * 15}
+		// estimatedItemSize={190 * 15}
 		refreshing={isFetching}
 		numColumns={display === 'grid' ? GRID_COLUMNS : 1}
 		onEndReached={() => hasNextPage && fetchNextPage()}
