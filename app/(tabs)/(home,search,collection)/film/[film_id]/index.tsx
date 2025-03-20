@@ -3,7 +3,7 @@ import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
 import { Link } from "expo-router"
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
+import { Dimensions, View } from "react-native";
 import { Media, MediaMoviePerson } from "@/types/type.db";
 import { FlashList } from "@shopify/flash-list";
 import { CardMedia } from "@/components/cards/CardMedia";
@@ -53,6 +53,7 @@ const FilmScreen = () => {
 	contentContainerStyle={{
 		paddingTop: headerHeight.get(),
 		paddingBottom: tabBarHeight + inset.bottom,
+		minHeight: Dimensions.get('window').height + headerHeight.get(),
 	}}
 	ListHeaderComponent={() => (
 		<>

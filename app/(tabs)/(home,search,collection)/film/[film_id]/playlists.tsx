@@ -14,7 +14,7 @@ import { useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, View } from "react-native";
+import { Dimensions, Pressable, View } from "react-native";
 import Animated, { useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -108,6 +108,7 @@ const FilmPlaylistsScreen = () => {
 		contentContainerStyle={{
 			paddingTop: headerHeight.get(),
 			paddingBottom: tabBarHeight + inset.bottom,
+			minHeight: Dimensions.get('window').height + headerHeight.get(),
 		}}
 		data={playlists?.pages.flat()}
 		renderItem={({ item, index }) => (
