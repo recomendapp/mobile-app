@@ -17,13 +17,17 @@ export const useUserUpdateMutation = ({
 			username,
 			avatar,
 			bio,
+			website,
 			avatarUrl,
+			privateAccount,
 		} : {
 			fullName?: string;
 			username?: string;
 			avatar?: string | null;
 			bio?: string | null;
+			website?: string | null;
 			avatarUrl?: string | null;
+			privateAccount?: boolean;
 		}) => {
 			if (!userId) throw Error('Missing user id');
 			const { data, error } = await supabase
@@ -33,16 +37,28 @@ export const useUserUpdateMutation = ({
 					username: username,
 					avatar: avatar,
 					bio: bio,
+					website: website,
 					avatar_url: avatarUrl,
+					private: privateAccount,
 				})
 				.eq('id', userId)
 				.select('*')
 				.single();
-			if (error) throw error;
-			return data;
-		},
+				if (error) throw error;
+				return data;
+			},
 		onSuccess: (data) => {
+			console.log('new key', userKeys.detail(data.id));
+			console.log('[REACT-QUERY] User before', queryClient.getQueryData(userKeys.detail(data.id)));
 			queryClient.setQueryData(userKeys.detail(data.id), data);
+			queryClient.setQueryData(userKeys.profile(data.username), (oldData: User | undefined) => {
+				if (!oldData) return oldData;
+				return {
+					...oldData,
+					...data,
+				}
+			});
+			console.log('[REACT-QUERY] User after', queryClient.getQueryData(userKeys.detail(data.id)));
 		}
 	});
 };

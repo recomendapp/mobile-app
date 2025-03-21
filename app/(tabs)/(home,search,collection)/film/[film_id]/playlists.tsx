@@ -6,19 +6,15 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/context/ThemeProvider";
 import { useMediaMovieDetailsQuery, useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
-import { getIdFromSlug } from "@/hooks/getIdFromSlug";
 import tw from "@/lib/tw";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { FlashList } from "@shopify/flash-list";
-import { useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Dimensions, Pressable, View } from "react-native";
 import Animated, { useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const AnimatedFlashList = Animated.createAnimatedComponent(FlashList);
 
 const GRID_COLUMNS = 3;
 

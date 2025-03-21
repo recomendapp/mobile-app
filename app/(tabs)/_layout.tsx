@@ -30,11 +30,11 @@ const TabsLayout = () => {
 		//   screen: 'explore',
 		//   label: 'Explore',
 		// },
-		// {
-		// 	icon: Icons.feed,
-		// 	screen: 'feed',
-		// 	label: 'Feed',
-		// },
+		{
+			icon: Icons.feed,
+			screen: 'feed',
+			label: t('routes.feed'),
+		},
 		// {
 		// 	icon: session ? Icons.library : Icons.user,
 		// 	screen: session ? 'collection' : 'auth/login',
