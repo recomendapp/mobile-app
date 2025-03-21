@@ -4,14 +4,15 @@ import { useTheme } from "@/context/ThemeProvider";
 import { useUserUpdateMutation } from "@/features/user/userMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, Form, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
+import { Button, ButtonText } from "@/components/ui/Button";
 
 const ProfileSettings = () => {
 	const { user } = useAuth();
@@ -49,21 +50,19 @@ const ProfileSettings = () => {
 		  .nullable(),
 	});
 	type ProfileFormValues = z.infer<typeof profileFormSchema>;
-	const defaultValues = useMemo(() => ({
+	const defaultValues = {
 		full_name: user?.full_name ?? '',
 		bio: user?.bio,
 		website: user?.website,
-	}), [user]);
+	};
 	const form = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues,
 		mode: 'onChange',
 	});
-
 	const onSubmit = async (values: ProfileFormValues) => {
 		try {
 			if (!user) return;
-			// throw new Error('Not implemented');
 			setIsLoading(true);
 			if (
 				newAvatar 
@@ -72,30 +71,41 @@ const ProfileSettings = () => {
 				|| values.website !== user.website
 			) {
 				const userPayload  = {
-					full_name: values.full_name,
+					fullName: values.full_name,
 					bio: values.bio?.trim() ?? null,
 					website: values.website?.trim() ?? null,
 					avatarUrl: user.avatar_url,
 				};
-				if (newAvatar) {
-					const newAvatarUrl = ''
-					userPayload.avatarUrl = newAvatarUrl;
-				}
+				// if (newAvatar) {
+					// 	const newAvatarUrl = ''
+					// 	userPayload.avatarUrl = newAvatarUrl;
+					// }
 				await updateProfileMutation.mutateAsync(userPayload);
 			}
-			// Burnt.toast({
-			// 	title: t('common.word.saved'),
-			// 	preset: 'done',
-			// })
+			Burnt.toast({
+				title: t('common.word.saved'),
+				preset: 'done',
+			})
 		} catch (error: any) {
-			// Burnt.toast({
-			// 	title: error.message,
-			// 	preset: 'error',
-			// });
+			Burnt.toast({
+				title: error.message,
+				preset: 'error',
+			});
 		} finally {
 			setIsLoading(false);
 		}
 	};
+
+	useEffect(() => {
+		if (user) {
+			form.reset({
+				full_name: user.full_name,
+				bio: user.bio,
+				website: user.website,
+			});
+		}
+	}, [user]);
+
 	return (
 		<>
 			<Controller
@@ -110,6 +120,7 @@ const ProfileSettings = () => {
 					<Input
 					placeholder={t('pages.settings.profile.full_name.placeholder')}
 					value={value}
+					autoCorrect={false}
 					onBlur={onBlur}
 					onChangeText={onChange}
 					/>
@@ -148,12 +159,21 @@ const ProfileSettings = () => {
 					<Input
 					placeholder={'https://example.com'}
 					value={value ?? ''}
+					autoCapitalize='none'
+					autoCorrect={false}
 					onBlur={onBlur}
 					onChangeText={onChange}
 					/>
 				</View>
 			)}
 			/>
+			<Button
+			onPress={form.handleSubmit(onSubmit)}
+			disabled={isLoading}
+			>
+				<ActivityIndicator animating={isLoading} color={colors.background} />
+				<ButtonText>{t('common.word.save')}</ButtonText>
+			</Button>
 		</>
 	)
 };

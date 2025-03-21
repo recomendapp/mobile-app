@@ -38,8 +38,7 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		data: user,
 	} = useUserQuery({
 		userId: session?.user.id,
-		enabled: !!session,
-	})
+	});
 
 	useEffect(() => {
 		supabase.auth.getSession().then(({data: { session }}) => {

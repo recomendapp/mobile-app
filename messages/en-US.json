@@ -74,7 +74,8 @@
       "updated_at": "updated at",
       "search_media": "search a media",
       "watched_date": "watched date",
-      "rating": "rating"
+      "rating": "rating",
+      "library": "library"
     },
     "errors": {
       "not_logged_in": "you are not logged in",

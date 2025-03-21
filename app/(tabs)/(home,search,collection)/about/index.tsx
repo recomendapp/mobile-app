@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 
 const AboutScreen = () => {
-	const t = useTranslation();
+	const { t } = useTranslation();
 
 	const resources = [
 		{
@@ -75,7 +75,7 @@ const AboutScreen = () => {
 
   return (
     <ThemedSafeAreaView className="flex-1">
-		<ThemedText>ABOUT PAGE</ThemedText>
+		  <ThemedText>made by @loup</ThemedText>
     </ThemedSafeAreaView>
   );
 };
