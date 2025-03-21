@@ -16,7 +16,7 @@ export const mediaKeys = {
 		id: number;
 		type?: MediaType;
 	}) => type
-		? [mediaKeys.specify({ type }), String(id)] as const
+		? [...mediaKeys.specify({ type }), String(id)] as const
 		: [...mediaKeys.all, id] as const,
 
 	/* --------------------------------- REVIEWS -------------------------------- */

@@ -21,7 +21,6 @@ const ButtonUserFollow = React.forwardRef<
   React.ElementRef<typeof Button>,
   ButtonUserFollowProps
 >(({ profileId, skeleton, style, ...props }, ref) => {
-  const { colors } = useTheme();
   const { t } = useTranslation();
   const { user } = useAuth();
 

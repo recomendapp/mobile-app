@@ -1,21 +1,27 @@
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
-import { getIdFromSlug } from "@/hooks/getIdFromSlug";
-import { Link, useLocalSearchParams } from "expo-router"
+import { Link } from "expo-router"
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
+import { Dimensions, View } from "react-native";
 import { Media, MediaMoviePerson } from "@/types/type.db";
 import { FlashList } from "@shopify/flash-list";
 import { CardMedia } from "@/components/cards/CardMedia";
 import tw from "@/lib/tw";
 import { useTheme } from "@/context/ThemeProvider";
+import Animated, { useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
+import { useFilmContext } from "@/components/screens/film/FilmContext";
+import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useEffect } from "react";
 
 const FilmScreen = () => {
 	const { colors } = useTheme();
 	const { i18n, t } = useTranslation();
-	const { film_id } = useLocalSearchParams();
-	const { id: movieId} = getIdFromSlug(film_id as string);
+	const { tabState, movieId, scrollY, headerHeight, addScrollRef } = useFilmContext();
+	const tabBarHeight = useBottomTabOverflow();
+	const inset = useSafeAreaInsets();
+	const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
 	const {
 		data: movie,
 	} = useMediaMovieDetailsQuery({
@@ -23,23 +29,66 @@ const FilmScreen = () => {
 		locale: i18n.language,
 	});
 
+	const scrollHandler = useAnimatedScrollHandler({
+		onScroll: event => {
+			'worklet';
+			scrollY.value = event.contentOffset.y;
+		},
+	});
+
+	useEffect(() => {
+		if (scrollRef.current && tabState) {
+			addScrollRef('index', scrollRef);
+		}
+	}, [scrollRef, tabState]);
+
 	if (!movie) return null;
+	if (!tabState) return null;
 
 	return (
-	<>
-		{/* SYNOPSIS */}
-		<View style={tw.style('gap-1')}>
-			<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.word.overview'))}</ThemedText>
-			<ThemedText style={[{ color: colors.mutedForeground }, tw.style('text-justify')]}>
-				{movie.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
-			</ThemedText>
-		</View>
-		{/* CASTING */}
-		<View style={tw.style('gap-1')}> 
-			<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
-			{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
-		</View>
-	</>
+	<Animated.FlatList
+	scrollToOverflowEnabled
+	ref={scrollRef}
+	onScroll={scrollHandler}
+	contentContainerStyle={{
+		paddingTop: headerHeight.get(),
+		paddingBottom: tabBarHeight + inset.bottom,
+		minHeight: Dimensions.get('window').height + headerHeight.get(),
+	}}
+	ListHeaderComponent={() => (
+		<>
+			{/* <View style={tw.style('h-96 bg-red-500')} /> */}
+			{/* SYNOPSIS */}
+			<View style={tw.style('gap-1')}>
+				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.word.overview'))}</ThemedText>
+				<ThemedText style={[{ color: colors.mutedForeground }, tw.style('text-justify')]}>
+					{movie.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
+				</ThemedText>
+			</View>
+			{/* CASTING */}
+			<View style={tw.style('gap-1')}> 
+				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
+				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
+			</View>
+
+			<View style={tw.style('gap-1')}> 
+				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
+				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
+			</View>
+			<View style={tw.style('gap-1')}> 
+				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
+				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
+			</View>
+			<View style={tw.style('gap-1')}> 
+				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
+				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
+			</View>
+		</>
+	)}
+	showsVerticalScrollIndicator={false}
+	data={[null]}
+	renderItem={() => null}
+	/>
 	)
 };
 

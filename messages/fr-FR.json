@@ -74,7 +74,8 @@
       "updated_at": "mis à jour",
       "search_media": "rechercher un média",
       "watched_date": "date de visionnage",
-      "rating": "note"
+      "rating": "note",
+      "library": "bibliothèque",
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",
