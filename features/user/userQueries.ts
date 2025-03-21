@@ -1142,6 +1142,6 @@ export const useUserFollowProfile = ({
 			if (error) throw error;
 			return data;
 		},
-		enabled: !!userId && !!followeeId,
+		enabled: !!userId && !!followeeId && userId !== followeeId,
 	});
 }

@@ -76,7 +76,7 @@ const Button = React.forwardRef<React.ElementRef<typeof Animated.View>, ButtonPr
   ({ variant, disabled, role = 'button', style, ...props }, ref) => {
     const { colors } = useTheme();
     const variantStyles = React.useMemo(() => {
-      const shared = "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium px-4 py-2";
+      const shared = "flex-row items-center justify-center gap-2 rounded-md text-sm font-medium px-4 py-2";
       let style = {};
       switch (variant) {
         case 'destructive':

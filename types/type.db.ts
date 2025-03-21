@@ -95,14 +95,6 @@ export type UserReview =
 /* -------------------------------------------------------------------------- */
 
 
-
-
-
-
-
-
-
-
 /* -------------------------------- PLAYLIST -------------------------------- */
 export type Playlist = Database['public']['Tables']['playlists']['Row'] & {
 	user?: User;
