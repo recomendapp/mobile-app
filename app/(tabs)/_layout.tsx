@@ -63,7 +63,6 @@ const TabsLayout = () => {
 			tabBarBackground: TabBarBackground,
 			tabBarStyle: Platform.select({
 				ios: {
-					// Use a transparent background on iOS to show the blur effect
 					position: 'absolute',
 				},
 				android: {
@@ -71,9 +70,6 @@ const TabsLayout = () => {
 				},
 				default: {},
 			}),
-			// sceneStyle: {
-				// paddingBottom: 50,
-			// }
 		}}>
 		{routes.map((route) => (
 			<Tabs.Screen

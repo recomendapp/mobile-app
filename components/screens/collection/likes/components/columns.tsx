@@ -1,16 +1,61 @@
 'use client';
 import { ColumnDef } from '@tanstack/react-table';
 import { UserActivity } from '@/types/type.db';
-import { capitalize } from 'lodash';
-import { ThemedText } from '@/components/ui/ThemedText';
-import { View } from 'react-native';
+import { capitalize, upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { DataTableColumnHeader } from './data-table-column-header';
 import { DataTableItem } from './data-table-item';
 import React from 'react';
+import { DataTableRowActions } from './data-table-row-actions';
+import useBottomSheetStore from '@/stores/useBottomSheetStore';
+import { useUserActivityUpdateMutation } from '@/features/user/userMutations';
+import BottomSheetMedia from '@/components/bottom-sheets/sheets/BottomSheetMedia';
+import { Icons } from '@/constants/Icons';
+import * as Burnt from 'burnt';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useTheme } from '@/context/ThemeProvider';
 
 export const Columns = () => {
+	const { colors } = useTheme();
 	const { t } = useTranslation();
+	const { openSheet, createConfirmSheet } = useBottomSheetStore();
+	const updateActivity = useUserActivityUpdateMutation();
+
+	const handleUnlike = React.useCallback(async (id: number) => {
+		await updateActivity.mutateAsync({
+			activityId: id,
+			isLiked: false,
+		}, {
+			onSuccess: () => {
+				Burnt.toast({
+					title: capitalize(t('common.word.deleted')),
+					preset: 'done',
+				});
+			},
+			onError: () => {
+				Burnt.toast({
+					title: capitalize(t('common.errors.an_error_occurred')),
+					preset: 'error',
+				});
+			}
+		});
+	}, []);
+	const handleOpenSheet = React.useCallback((data: UserActivity) => {
+		openSheet(BottomSheetMedia, {
+			media: data.media,
+			additionalItemsBottom: [
+				{
+					icon: Icons.Delete,
+					label: upperFirst(t('common.word.delete')),
+					onPress: () => createConfirmSheet({
+						title: capitalize(t('common.library.collection.likes.modal.delete_confirm.title')),
+						onConfirm: () => handleUnlike(data.id),
+					})
+				}
+			]
+		});
+	}, []);
+
 	return React.useMemo<ColumnDef<UserActivity>[]>(() => [
 		{
 			id: 'item',
@@ -21,21 +66,17 @@ export const Columns = () => {
 			header: ({ column }) => (
 			<DataTableColumnHeader column={column} title={capitalize(t('common.messages.item', { count: 1 }))} />
 			),
-			cell: ({ row }) => <DataTableItem key={row.index} item={row} />,
+			cell: ({ row }) => <DataTableItem key={row.index} item={row} openSheet={handleOpenSheet} />,
 			enableHiding: false,
 		},
 		{
 			id: 'actions',
-			cell: ({ row, table, column }) => (
-				<View>
-					<ThemedText>actions</ThemedText>
-				</View>
-			// <DataTableRowActions
-			//   data={row.original}
-			//   table={table}
-			//   row={row}
-			//   column={column}
-			// />
+			cell: ({ row }) => (
+				<TouchableOpacity
+				onPress={() => handleOpenSheet(row.original)}
+				>
+					<Icons.EllipsisHorizontal color={colors.foreground}/>
+				</TouchableOpacity>
 			),
 		},
 	], []);

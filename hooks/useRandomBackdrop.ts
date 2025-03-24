@@ -1,8 +1,13 @@
+import { useMemo } from 'react';
+
 const useRandomBackdrop = (backdrops: (string | null | undefined)[]) => {
-	const images = backdrops.filter((backdrop) => backdrop !== undefined) as string[];
+  const randomBackdrop = useMemo(() => {
+    const images = backdrops.filter((backdrop) => backdrop !== undefined) as string[];
 	if (!images.length) return undefined;
-	const randomBackdrop = images[Math.floor(Math.random() * images.length)];
-	return randomBackdrop;
+	return images[Math.floor(Math.random() * images.length)];
+  }, [backdrops]);
+
+  return randomBackdrop;
 };
 
 export default useRandomBackdrop;

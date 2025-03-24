@@ -5,7 +5,6 @@ import Animated, { SharedValue, useAnimatedScrollHandler } from "react-native-re
 import CollectionHeader from "../CollectionHeader";
 import { capitalize } from "lodash";
 import { RefreshControl } from "react-native-gesture-handler";
-import { useRouter } from "expo-router";
 import { View } from "react-native";
 import tw from "@/lib/tw";
 import { useTheme } from "@/context/ThemeProvider";
@@ -35,6 +34,9 @@ const TableLikes = ({
 } : TableLikesProps) => {
 	const { inset } = useTheme();
 	const { t } = useTranslation();
+	const backdrops = React.useMemo(() => {
+		return likes.map((like) => like.media?.backdrop_url);
+	}, [likes]);
 	const bottomTabHeight = useBottomTabOverflow();
 	const scrollHandler = useAnimatedScrollHandler({
 		onScroll: event => {
@@ -85,7 +87,7 @@ const TableLikes = ({
 		scrollY={scrollY}
 		title={capitalize(t('common.library.collection.likes.label'))}
 		numberOfItems={likes.length}
-		backdrops={likes.map((like) => like.media?.backdrop_url)}
+		backdrops={backdrops}
 		/>
 		<DataTableToolbar table={table} />
 		{/* <View>
@@ -111,23 +113,24 @@ const TableLikes = ({
 			))}
 		</View> */}
 	</>
-	),[]);
+	), [likes]);
 
 	return (
 		<Animated.FlatList
 		onScroll={scrollHandler}
 		ListHeaderComponent={renderHeader}
+		ListHeaderComponentStyle={tw`mb-2`}
 		data={table.getRowModel().rows}
 		renderItem={({ item }) => (
-			<View key={item.id} style={tw`p-1 flex-row items-center justify-between`}>
+			<View key={item.id} style={tw`flex-row items-center justify-between p-1 gap-2`}>
 				{item.getVisibleCells().map((cell) => (
-					<Fragment key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-					</Fragment>
-                  ))}
+				<Fragment key={cell.id}>
+					{flexRender(
+					cell.column.columnDef.cell,
+					cell.getContext()
+					)}
+				</Fragment>
+                ))}
 			</View>
 		)}
 		// estimatedItemSize={likes.length}
