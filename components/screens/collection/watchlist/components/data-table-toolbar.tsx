@@ -25,7 +25,7 @@ export function DataTableToolbar<TData>({
     <View style={tw`gap-2 px-2`}>
       <View style={tw`flex-row flex-1 items-center gap-2`}>
         <Input
-        placeholder={capitalize(t('common.library.collection.likes.search.placeholder'))}
+        placeholder={capitalize(t('common.library.collection.watchlist.search.placeholder'))}
         value={
           (table.getColumn('item')?.getFilterValue() as string) ??
           ''

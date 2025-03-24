@@ -36,7 +36,7 @@ const WatchlistScreen = () => {
 					headerOverlayHeight.value = height;
 				}}
 				scrollY={scrollY}
-				title={capitalize(t('common.library.collection.likes.label'))}
+				title={capitalize(t('common.library.collection.watchlist.label'))}
 				/>
 				<TableWatchlist
 				watchlist={watchlist}
