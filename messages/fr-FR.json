@@ -8,7 +8,6 @@
       "go_to_serie": "accéder à la série",
       "go_to_user": "accéder à l'utilisateur",
       "go_to_person": "accéder à la personne",
-      "view_recommendations": "voir {count, plural, one {la reco} other {les recos}}",
       "view_directors": "voir {count, plural, one {le réalisateur} other {les réalisateurs}}",
       "no_director": "aucun réalisateur",
       "view_comment": "voir {count, plural, one {le commentaire} other {les commentaires}}",
@@ -57,7 +56,6 @@
       "person": "{count, plural, one {personne} other {personnes}}",
       "top_result": "meilleur resultat",
       "user": "{count, plural, one {utilisateur} other {utilisateurs}}",
-      "reco": "{count, plural, one {reco} other {recos}}",
       "my_recos": "mes recos",
       "item_one": "item",
       "item_other": "items",
@@ -84,7 +82,11 @@
       "comment_one": "commentaire",
       "comment_other": "commentaires",
       "view_comment_one": "voir le commentaire",
-      "view_comment_other": "voir les commentaires"
+      "view_comment_other": "voir les commentaires",
+      "view_recommendation_one": "voir la reco",
+      "view_recommendation_other": "voir les recos",
+      "reco_one": "reco",
+      "reco_other": "recos"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",

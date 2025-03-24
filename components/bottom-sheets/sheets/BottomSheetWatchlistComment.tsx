@@ -4,7 +4,6 @@ import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { UserWatchlist } from '@/types/type.db';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
@@ -19,13 +18,6 @@ interface BottomSheetWatchlistCommentProps extends Omit<React.ComponentPropsWith
   id: string;
   watchlistItem: UserWatchlist
 };
-
-interface Item {
-	icon: LucideIcon;
-	label: string;
-	onPress: () => void;
-	submenu?: Item[];
-}
 
 const BottomSheetWatchlistComment = forwardRef<
   React.ElementRef<typeof BottomSheetModal>,
@@ -51,12 +43,22 @@ const BottomSheetWatchlistComment = forwardRef<
 		return;
 	}
 	await updateWatchlist.mutateAsync({
-	  watchlistId: watchlistItem.id,
-	  comment: comment.replace(/\s+/g, ' ').trimStart(),
+		watchlistId: watchlistItem.id,
+		comment: comment.replace(/\s+/g, ' ').trimStart(),
 	}, {
-	  onSuccess: () => {
-		closeSheet(id);
-	  },
+		onSuccess: () => {
+			Burnt.toast({
+				title: upperFirst(t('common.word.saved')),
+				preset: 'done',
+			});
+			closeSheet(id);
+		},
+		onError: () => {
+			Burnt.toast({
+				title: upperFirst(t('common.errors.an_error_occurred')),
+				preset: 'error',
+			});
+		}
 	});
   };
   return (

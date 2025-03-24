@@ -8,7 +8,6 @@
       "go_to_serie": "go to serie",
       "go_to_user": "go to user",
       "go_to_person": "go to person",
-      "view_recommendations": "view {count, plural, one {reco} other {recos}}",
       "view_directors": "view {count, plural, one {director} other {directors}}",
       "no_director": "no director",
       "view_comment": "view {count, plural, one {comment} other {comments}}",
@@ -57,7 +56,6 @@
       "person": "{count, plural, one {person} other {persons}}",
       "top_result": "top result",
       "user": "{count, plural, one {user} other {users}}",
-      "reco": "{count, plural, one {reco} other {recos}}",
       "my_recos": "my recos",
       "item_one": "item",
       "item_other": "items",
@@ -84,7 +82,11 @@
       "comment_one": "comment",
       "comment_other": "comments",
       "view_comment_one": "view comment",
-      "view_comment_other": "view comments"
+      "view_comment_other": "view comments",
+      "view_recommendation_one": "view reco",
+      "view_recommendation_other": "view recos",
+      "reco_one": "reco",
+      "reco_other": "recos"
     },
     "errors": {
       "not_logged_in": "you are not logged in",
