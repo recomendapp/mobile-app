@@ -67,7 +67,7 @@ const BottomSheetConfirm = React.forwardRef<
         {description ? <ThemedText style={tw`text-center mb-4`}>
           {typeof description === 'string' ? description : description}
         </ThemedText> : null}
-        <View style={tw`gap-4`}>
+        <View style={tw`gap-4 px-4`}>
           <Button onPress={handleConfirm}>
             <ButtonText>{confirmText}</ButtonText>
           </Button>
