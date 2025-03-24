@@ -1,14 +1,14 @@
 import AnimatedImage from "@/components/ui/AnimatedImage";
 import AnimatedLinearGradient from "@/components/ui/AnimatedLinearGradient";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { useTheme } from "@/context/ThemeProvider";
 import useColorConverter from "@/hooks/useColorConverter";
 import tw from "@/lib/tw";
-import { forwardRef } from "react";
+import React, { forwardRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Text, View } from "react-native";
+import { Text } from "react-native";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import useRandomBackdrop from "@/hooks/useRandomBackdrop";
 
 interface CollectionHeaderProps
 	extends React.ComponentPropsWithoutRef<typeof Animated.View> {
@@ -17,15 +17,17 @@ interface CollectionHeaderProps
 		scrollY: SharedValue<number>;
 		title: string;
 		numberOfItems: number;
+		backdrops: (string | null | undefined)[];
 	}
 
 const CollectionHeader = forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	CollectionHeaderProps
->(({ headerHeight, headerOverlayHeight, scrollY, title, numberOfItems, ...props }, ref) => {
+>(({ headerHeight, headerOverlayHeight, scrollY, title, numberOfItems, backdrops, ...props }, ref) => {
 	const { t } = useTranslation();
 	const { colors } = useTheme();
 	const { hslToRgb } = useColorConverter();
+	const bgBackdrop = useRandomBackdrop(backdrops);
 	const bgColor = hslToRgb(colors.background);
 
 	const layoutY = useSharedValue(0);
@@ -66,6 +68,7 @@ const CollectionHeader = forwardRef<
 			],
 		};
 	});
+
 	return (
 		<Animated.View
 		ref={ref}
@@ -84,12 +87,12 @@ const CollectionHeader = forwardRef<
 				tw`absolute inset-0`,
 				scaleAnim,
 			]}
-			source={{ uri: 'https://media.giphy.com/media/Ic0IOSkS23UAw/giphy.gif' }}
+			source={{ uri: bgBackdrop ?? 'https://media.giphy.com/media/Ic0IOSkS23UAw/giphy.gif' }}
 			/>
 			<AnimatedLinearGradient
 			style={[
 				tw`absolute inset-0`,
-				// scaleAnim,
+				scaleAnim,
 			]}
 			colors={[
 				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
