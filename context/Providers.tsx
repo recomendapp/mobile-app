@@ -3,6 +3,8 @@ import { AuthProvider } from "./AuthProvider";
 import { ReactQueryProvider } from "./ReactQueryProvider";
 import { SupabaseProvider } from "./SupabaseProvider";
 import { ThemeProvider } from "./ThemeProvider";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetManager } from "@/components/bottom-sheets/BottomSheetManager";
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -10,17 +12,20 @@ type ProvidersProps = {
 
 const Providers = ({ children } : ProvidersProps) => {
 	return (
-	<ActionSheetProvider>
-		<ThemeProvider>
-			<SupabaseProvider locale='en-US'>
-				<ReactQueryProvider>
-					<AuthProvider>
-						{children}
-					</AuthProvider>
-				</ReactQueryProvider>
-			</SupabaseProvider>
-		</ThemeProvider>
-	</ActionSheetProvider>
+	<GestureHandlerRootView style={{ flex: 1 }}>
+		<ActionSheetProvider>
+			<ThemeProvider>
+				<SupabaseProvider locale='en-US'>
+					<ReactQueryProvider>
+						<AuthProvider>
+							{children}
+							<BottomSheetManager />
+						</AuthProvider>
+					</ReactQueryProvider>
+				</SupabaseProvider>
+			</ThemeProvider>
+		</ActionSheetProvider>
+	</GestureHandlerRootView>
 	)
 };
 

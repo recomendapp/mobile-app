@@ -59,8 +59,10 @@
       "user": "{count, plural, one {user} other {users}}",
       "reco": "{count, plural, one {reco} other {recos}}",
       "my_recos": "my recos",
-      "item": "{count, plural, one {item} other {items}}",
-      "item_count": "{count, plural, one {# item} other {# items}}",
+      "item_one": "item",
+      "item_other": "items",
+      "item_count_one": "{count} item",
+      "item_count_other": "{count} items",
       "type": "type",
       "complete": "complete",
       "completed": "completed",
@@ -75,7 +77,8 @@
       "search_media": "search a media",
       "watched_date": "watched date",
       "rating": "rating",
-      "library": "library"
+      "library": "library",
+      "confirm": "confirm"
     },
     "errors": {
       "not_logged_in": "you are not logged in",

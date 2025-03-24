@@ -1,15 +1,18 @@
 import Colors, { TColors } from "@/constants/Colors";
 import { DefaultTheme } from "@react-navigation/native";
 import { createContext, useContext, useState } from "react";
+import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type ThemeContextType = {
 	colors: TColors;
 	applyColors: (colors: TColors) => void;
+	inset: EdgeInsets;
 };
   
 const ThemeContext = createContext<ThemeContextType>({
 	colors: Colors.dark,
 	applyColors: () => {},
+	inset: { top: 0, right: 0, bottom: 0, left: 0 },
 });
 
 
@@ -19,7 +22,7 @@ type ThemeProviderProps = {
   
 const ThemeProvider = ({children}: ThemeProviderProps) => {
 	const [colors, setColors] = useState(Colors.dark);
-
+	const inset = useSafeAreaInsets();
 	const applyColors = (colorTheme: TColors) => {
 		setColors(colorTheme);
 	};
@@ -30,7 +33,8 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 		<ThemeContext.Provider
 		value={{
 			applyColors,
-			colors
+			colors,
+			inset,
 		}}
 		>
 			{children}

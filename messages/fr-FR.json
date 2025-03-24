@@ -59,8 +59,10 @@
       "user": "{count, plural, one {utilisateur} other {utilisateurs}}",
       "reco": "{count, plural, one {reco} other {recos}}",
       "my_recos": "mes recos",
-      "item": "{count, plural, one {élément} other {éléments}}",
-      "item_count": "{count, plural, one {# élément} other {# éléments}}",
+      "item_one": "item",
+      "item_other": "items",
+      "item_count_one": "{count} item",
+      "item_count_other": "{count} items",
       "type": "type",
       "complete": "compléter",
       "completed": "complété",
@@ -76,6 +78,7 @@
       "watched_date": "date de visionnage",
       "rating": "note",
       "library": "bibliothèque",
+      "confirm": "confirmer"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",

@@ -1,5 +1,5 @@
 
-import { MediaType, User, UserFollower, UserRecosAggregated, UserReview, UserWatchlist } from '@/types/type.db';
+import { User, UserActivity, UserFollower, UserRecosAggregated, UserWatchlist } from '@/types/type.db';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { userKeys } from './userKeys';
 import { useSupabaseClient } from '@/context/SupabaseProvider';
@@ -48,8 +48,6 @@ export const useUserUpdateMutation = ({
 				return data;
 			},
 		onSuccess: (data) => {
-			console.log('new key', userKeys.detail(data.id));
-			console.log('[REACT-QUERY] User before', queryClient.getQueryData(userKeys.detail(data.id)));
 			queryClient.setQueryData(userKeys.detail(data.id), data);
 			queryClient.setQueryData(userKeys.profile(data.username), (oldData: User | undefined) => {
 				if (!oldData) return oldData;
@@ -58,7 +56,6 @@ export const useUserUpdateMutation = ({
 					...data,
 				}
 			});
-			console.log('[REACT-QUERY] User after', queryClient.getQueryData(userKeys.detail(data.id)));
 		}
 	});
 };
@@ -331,11 +328,21 @@ export const useUserActivityUpdateMutation = () => {
 				mediaId: data.media_id,
 			}), data);
 
-			isLikedChange && queryClient.invalidateQueries({
-				queryKey: userKeys.likes({
-					userId: data.user_id,
-				})
+			isLikedChange && queryClient.setQueryData(userKeys.likes({
+				userId: data.user_id,
+				filters: {
+					order: 'created_at-asc'
+				}
+			}), (oldData: UserActivity[] | undefined) => {
+				if (!oldData) return oldData;
+				return oldData.filter((item) => item.id !== data.id);
 			});
+
+			// isLikedChange && queryClient.invalidateQueries({
+			// 	queryKey: userKeys.likes({
+			// 		userId: data.user_id,
+			// 	})
+			// });
 
 			queryClient.invalidateQueries({
 				queryKey: userKeys.feed({ userId: data.user_id })

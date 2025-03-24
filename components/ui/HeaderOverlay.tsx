@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
+import React from 'react';
 
 interface HeaderOverlayProps {
 	triggerHeight: SharedValue<number>;
@@ -71,6 +72,7 @@ const HeaderOverlay: React.FC<HeaderOverlayProps> = ({
 			paddingTop: inset.top === 0 ? 8 : inset.top,
 		};
 	});
+
 	return (
 	<>
 		<Animated.View
