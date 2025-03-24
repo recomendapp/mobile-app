@@ -1,13 +1,11 @@
-'use client';
 import { Table } from '@tanstack/react-table';
-
 import { capitalize } from 'lodash';
 import { View } from 'react-native';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { DataTableSortOptions } from './data-table-sort-options';
 import { Input } from '@/components/ui/Input';
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import { Icons } from '@/constants/Icons';
 import { useTheme } from '@/context/ThemeProvider';
 interface DataTableToolbarProps<TData> {

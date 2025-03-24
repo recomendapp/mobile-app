@@ -44,7 +44,7 @@ const Colors: ColorPalettes = {
     primary: 'hsl(0 100% 100%)',
     primarySubued: 'hsl(0 0% 65%)',
     primaryForeground: 'hsl(0 0% 6%)',
-    muted: 'hsl(0 0% 12%)',
+    muted: 'hsl(0 0% 8%)',
     mutedForeground: 'hsl(0 0% 57%)',
     card: 'hsl(0 0% 8%)',
     cardForeground: 'hsl(0 0% 100%)',
