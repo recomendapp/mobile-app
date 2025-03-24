@@ -11,6 +11,8 @@ import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
+import { Text, View } from 'react-native';
+import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 
 interface BottomSheetMediaProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   id: string;
@@ -73,7 +75,27 @@ const BottomSheetMedia = forwardRef<
         tw`flex-1`,
       ]}
       >
-        <ThemedText style={tw`text-center text-xl font-bold`}>{media?.title}</ThemedText>
+        <View
+        style={[
+          { borderColor: colors.muted },
+          tw`flex-row items-center gap-2 border-b p-4`,
+        ]}
+        >
+          <ImageWithFallback
+          alt={media?.title ?? ''}
+          source={{ uri: media?.avatar_url ?? '' }}
+          style={[
+            { aspectRatio: 2 / 3, height: 'fit-content' },
+            tw.style('rounded-md w-12'),
+          ]}
+          />
+          <View style={tw`shrink`}>
+            <ThemedText numberOfLines={2} style={tw`shrink font-bold`}>{media?.title}</ThemedText>
+            <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
+              {media?.main_credit?.map((director) => director.title).join(', ')}
+            </Text>
+          </View>
+        </View>
         {items.map((group, i) => (
           <Fragment key={i}>
             {group.map((item, j) => (
@@ -81,12 +103,11 @@ const BottomSheetMedia = forwardRef<
               key={j}
               onPress={() => {
                 item.onPress();
-                console.log('closeSheet', id);
                 closeSheet(id);
               }}
               style={tw`flex-row items-center gap-2 p-4`}
               >
-                <item.icon color={colors.foreground} size={24} />
+                <item.icon color={colors.mutedForeground} size={20} />
                 <ThemedText>{item.label}</ThemedText>
               </TouchableOpacity>
             ))}
