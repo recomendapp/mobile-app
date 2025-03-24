@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { UserActivity } from "@/types/type.db";
+import { UserWatchlist } from "@/types/type.db";
 import { useTranslation } from "react-i18next";
 import Animated, { SharedValue, useAnimatedScrollHandler } from "react-native-reanimated";
 import CollectionHeader from "../CollectionHeader";
@@ -11,11 +11,11 @@ import { useTheme } from "@/context/ThemeProvider";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { ColumnFiltersState, flexRender, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, Row, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { Columns } from "./components/columns";
-import { DataTableToolbar } from "./components/data-table-toolbar";
 import { ThemedText } from "@/components/ui/ThemedText";
+import { DataTableToolbar } from "./components/data-table-toolbar";
 
-interface TableLikesProps {
-	likes: UserActivity[];
+interface TableWatchlistProps {
+	watchlist: UserWatchlist[];
 	scrollY: SharedValue<number>;
 	headerHeight: SharedValue<number>;
 	headerOverlayHeight: SharedValue<number>;
@@ -24,20 +24,20 @@ interface TableLikesProps {
 	refetch: () => void;
 }
 
-const TableLikes = ({
-	likes,
+const TableWatchlist = ({
+	watchlist,
 	scrollY,
 	headerHeight,
 	headerOverlayHeight,
 	isFetching,
 	isRefetching,
 	refetch,
-} : TableLikesProps) => {
+} : TableWatchlistProps) => {
 	const { inset } = useTheme();
 	const { t } = useTranslation();
 	const backdrops = React.useMemo(() => {
-		return likes.map((like) => like.media?.backdrop_url);
-	}, [likes]);
+		return watchlist.map((watchlist) => watchlist.media?.backdrop_url);
+	}, [watchlist]);
 	const bottomTabHeight = useBottomTabOverflow();
 	const scrollHandler = useAnimatedScrollHandler({
 		onScroll: event => {
@@ -54,8 +54,8 @@ const TableLikes = ({
 		{ id: 'created_at', desc: false },
 	]);
 
-	const table = useReactTable<UserActivity>({
-		data: likes,
+	const table = useReactTable<UserWatchlist>({
+		data: watchlist,
 		columns: Columns(),
 		initialState: {
 			pagination: {
@@ -87,35 +87,13 @@ const TableLikes = ({
 		headerHeight={headerHeight}
 		headerOverlayHeight={headerOverlayHeight}
 		scrollY={scrollY}
-		title={capitalize(t('common.library.collection.likes.label'))}
-		numberOfItems={likes.length}
+		title={capitalize(t('common.library.collection.watchlist.label'))}
+		numberOfItems={watchlist.length}
 		backdrops={backdrops}
 		/>
 		<DataTableToolbar table={table} />
-		{/* <View>
-			{table.getHeaderGroups().map((headerGroup) => (
-				<View
-				key={headerGroup.id}
-				style={tw`flex-row items-center justify-between p-1`}
-				>
-					{headerGroup.headers.map((header) => (
-						<View
-						key={header.id}
-						style={tw`flex-1 flex-row items-center gap-2`}
-						>
-							{header.isPlaceholder
-								? null
-								: flexRender(
-									header.column.columnDef.header,
-									header.getContext()
-								)}
-						</View>
-					))}
-				</View>
-			))}
-		</View> */}
 	</>
-	), [likes]);
+	), [watchlist]);
 
 	const renderEmpty = React.useCallback(() => (
 		<View style={tw`flex-1 items-center justify-center`}>
@@ -142,7 +120,7 @@ const TableLikes = ({
 			</View>
 		)}
 		ListEmptyComponent={renderEmpty}
-		// estimatedItemSize={likes.length}
+		// estimatedItemSize={watchlist.length}
 		contentContainerStyle={{
 			paddingBottom: bottomTabHeight + inset.bottom,
 		}}
@@ -159,4 +137,4 @@ const TableLikes = ({
 	)
 };
 
-export default TableLikes;
+export default TableWatchlist;

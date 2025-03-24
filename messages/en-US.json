@@ -78,7 +78,13 @@
       "watched_date": "watched date",
       "rating": "rating",
       "library": "library",
-      "confirm": "confirm"
+      "confirm": "confirm",
+      "title": "title",
+      "added_date": "added date",
+      "comment_one": "comment",
+      "comment_other": "comments",
+      "view_comment_one": "view comment",
+      "view_comment_other": "view comments"
     },
     "errors": {
       "not_logged_in": "you are not logged in",

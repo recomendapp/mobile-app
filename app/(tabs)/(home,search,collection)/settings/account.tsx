@@ -138,7 +138,7 @@ const AccountSettings = () => {
 			onPress={form.handleSubmit(onSubmit)}
 			disabled={isLoading}
 			>
-				<ActivityIndicator animating={isLoading} color={colors.background} />
+				{isLoading ? <ActivityIndicator color={colors.background} /> : null}
 				<ButtonText>{t('common.word.save')}</ButtonText>
 			</Button>
 		</>

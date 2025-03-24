@@ -37,7 +37,7 @@ type BottomSheetStore = {
   openSheet: <T>(
     content: BottomSheetContentComponent<T>,
     props: Omit<T, 'id' | 'open' | 'onOpenChange'>,
-    snapPoints?: string[],
+    snapPoints?: string[] | null,
     persistent?: boolean // Optionnel, défaut à false
   ) => string;
   closeSheet: (id: string) => void;
@@ -57,7 +57,7 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
   openSheet: <T>(
     content: BottomSheetContentComponent<T>,
     props: Omit<T, 'id' | 'open' | 'onOpenChange'>,
-    snapPoints = ['40%', '60%'],
+    snapPoints: string[] | null | undefined = ['40%', '60%'],
     persistent = false // Défaut à false
   ) => {
     const id = Math.random().toString(36).substring(7);
@@ -70,7 +70,7 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
           isClosing: false,
           content,
           props,
-          snapPoints,
+          snapPoints: snapPoints === null ? [] : snapPoints,
           persistent,
         },
       ],

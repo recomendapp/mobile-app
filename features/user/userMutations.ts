@@ -328,21 +328,26 @@ export const useUserActivityUpdateMutation = () => {
 				mediaId: data.media_id,
 			}), data);
 
-			isLikedChange && queryClient.setQueryData(userKeys.likes({
-				userId: data.user_id,
-				filters: {
-					order: 'created_at-asc'
-				}
-			}), (oldData: UserActivity[] | undefined) => {
-				if (!oldData) return oldData;
-				return oldData.filter((item) => item.id !== data.id);
-			});
-
-			// isLikedChange && queryClient.invalidateQueries({
-			// 	queryKey: userKeys.likes({
-			// 		userId: data.user_id,
-			// 	})
-			// });
+			/* ---------------- Delete the like in all the likes queries ---------------- */
+			if (isLikedChange) {
+				const baseKey = userKeys.likes({ userId: data.user_id });
+				const likesQueries = queryClient.getQueriesData<UserActivity[]>({
+					predicate: (query) => {
+						const key = query.queryKey
+						return Array.isArray(key) && baseKey.every((v, i) => v === key[i]);
+					}
+				});
+				likesQueries.forEach(([key, oldData]) => {
+					if (!oldData) return;
+					queryClient.setQueryData(key, (currentData: UserActivity[] | undefined) => {
+						if (!currentData) return currentData;
+						return currentData.filter(
+							(like) => like.id !== data.id
+						);
+					});
+				});
+			}
+			/* -------------------------------------------------------------------------- */
 
 			queryClient.invalidateQueries({
 				queryKey: userKeys.feed({ userId: data.user_id })

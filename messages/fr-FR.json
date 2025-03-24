@@ -78,7 +78,13 @@
       "watched_date": "date de visionnage",
       "rating": "note",
       "library": "bibliothèque",
-      "confirm": "confirmer"
+      "confirm": "confirmer",
+      "title": "titre",
+      "added_date": "date d'ajout",
+      "comment_one": "commentaire",
+      "comment_other": "commentaires",
+      "view_comment_one": "voir le commentaire",
+      "view_comment_other": "voir les commentaires"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",

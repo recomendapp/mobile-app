@@ -92,16 +92,16 @@ export const BottomSheetManager = () => {
   return (
     <BottomSheetModalProvider>
       {sheets.map(({ id, isOpen, isClosing, content, props, snapPoints }) => (
-        <BottomSheetItem
-        key={id}
-        id={id}
-        isOpen={isOpen}
-        isClosing={isClosing}
-        content={content}
-        props={props}
-        snapPoints={snapPoints}
-        closeSheet={closeSheet}
-        removeSheet={removeSheet}
+      <BottomSheetItem
+      key={id}
+      id={id}
+      isOpen={isOpen}
+      isClosing={isClosing}
+      content={content}
+      props={props}
+      snapPoints={snapPoints}
+      closeSheet={closeSheet}
+      removeSheet={removeSheet}
       />
       ))}
     </BottomSheetModalProvider>
