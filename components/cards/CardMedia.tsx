@@ -3,10 +3,12 @@ import { Media, UserActivity } from "@/types/type.db";
 import { ThemedText } from "../ui/ThemedText";
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "../utils/ImageWithFallback";
-import { Image } from "expo-image";
-import { Href, Link, RelativePathString, useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import tw from "@/lib/tw";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
+import { useTheme } from "@/context/ThemeProvider";
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
+import BottomSheetMedia from "../bottom-sheets/sheets/BottomSheetMedia";
 
 interface CardMediaProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -20,49 +22,38 @@ interface CardMediaProps
 		showRating?: boolean;
 		hideMediaType?: boolean;
 		index?: number;
+		children?: React.ReactNode;
 	}
 
 const CardMediaDefault = React.forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	Omit<CardMediaProps, "variant">
->(({ className, media, activity, profileActivity, children, linked, showRating, posterClassName, ...props }, ref) => {
-	// const mediaDetails = getMediaDetails(media);
+>(({ style, media, activity, profileActivity, children, linked, showRating, posterClassName, ...props }, ref) => {
+	const { colors } = useTheme();
 	return (
 		<Animated.View
 		ref={ref}
+		style={[
+			{ backgroundColor: colors.card, borderColor: colors.border },
+			tw`flex-row items-center rounded-xl h-20 p-1 gap-2 border`,
+			style,
+		]}
 		{...props}
 		>
-			<ThemedText>Default card</ThemedText>
+			<ImageWithFallback
+				source={{uri: media.avatar_url ?? ''}}
+				alt={media.title ?? ''}
+				type={media.media_type}
+				style={{
+					aspectRatio: 2 / 3,
+					width: 'auto',
+				}}
+			/>
+			<View style={tw`shrink px-2 py-1 gap-1`}>
+				<ThemedText numberOfLines={2}>{media.title}</ThemedText>
+				{children}
+			</View>
 		</Animated.View>
-		// <Card
-		// 	ref={ref}
-		// 	className={cn(
-		// 		"flex items-center rounded-xl h-20 bg-muted hover:bg-muted-hover p-1",
-		// 		className
-		// 	)}
-		// 	{...props}
-		// >
-		// 	<div
-		// 	className={cn('relative h-full shrink-0 rounded-md overflow-hidden', mediaDetails.poster_className, posterClassName)}
-		// 	>
-		// 		<ImageWithFallback
-		// 			src={media.avatar_url ?? ''}
-		// 			alt={media.title ?? ''}
-		// 			fill
-		// 			className="object-cover"
-		// 			type="playlist"
-		// 			sizes={`
-		// 			(max-width: 640px) 96px,
-		// 			(max-width: 1024px) 120px,
-		// 			150px
-		// 			`}
-		// 		/>
-		// 	</div>
-		// 	<div className='px-2 py-1 space-y-1'>
-		// 		<p className='line-clamp-2 break-words'>{media.title}</p>
-		// 		{children}
-		// 	</div>
-		// </Card>
 	);
 });
 CardMediaDefault.displayName = "CardMediaDefault";
@@ -207,14 +198,22 @@ const CardMedia = React.forwardRef<
 	CardMediaProps
 >(({ hideMediaType = true, showRating = true, linked = true, variant = "default", ...props }, ref) => {
 	const router = useRouter();
+	const { openSheet } = useBottomSheetStore();
 	const onPress = () => {
 		if (linked && props.media.url) {
 			router.push(props.media.url as Href);
 		}
 	};
+	const onLongPress = () => {
+		openSheet(BottomSheetMedia, {
+			media: props.media,
+		})
+	};
 	return (
-	// <ContextMenuMedia media={media}>
-	<Pressable onPress={onPress}>
+	<Pressable
+	onPress={onPress}
+	onLongPress={onLongPress}
+	>
 		{variant === "default" ? (
 			<CardMediaDefault ref={ref} linked={linked} showRating={showRating} {...props} />
 		) : variant == "poster" ? (
@@ -223,7 +222,6 @@ const CardMedia = React.forwardRef<
 			// <CardMediaRow ref={ref} className={cn(linked ? 'cursor-pointer' : '', className)} media={media} linked={linked} onClick={customOnClick} showRating={showRating} hideMediaType={hideMediaType} {...props} />
 		) : null}
 	</Pressable>
-	// </ContextMenuMedia>
 	);
 });
 CardMedia.displayName = "CardMedia";
