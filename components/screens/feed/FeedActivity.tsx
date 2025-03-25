@@ -23,7 +23,7 @@ const FeedActivity = forwardRef<
 	  <View
 	  ref={ref}
 	  style={[
-		tw`space-x-2`,
+		tw`flex-row items-center gap-2`,
 		style,
 	  ]}
 	  {...props}

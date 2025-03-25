@@ -32,7 +32,7 @@ export const WidgetUserDiscovery = ({
 
   return (
   <View style={[tw`gap-2`, style]}>
-	<ThemedText style={tw`p-0 w-fit font-semibold text-xl`}>{t('widgets.user_discovery.label')}</ThemedText>
+	  <ThemedText style={tw`p-0 w-fit font-semibold text-xl`}>{t('widgets.user_discovery.label')}</ThemedText>
     <FlatList
     data={users.pages.flat()}
     renderItem={({ item }) => (
