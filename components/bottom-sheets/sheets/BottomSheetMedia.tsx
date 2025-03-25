@@ -45,7 +45,13 @@ const BottomSheetMedia = forwardRef<
 			{
 				icon: Icons.Movie,
 				onPress: () => router.push(media?.url as LinkProps['href']),
-				label: upperFirst(t('common.messages.go_to_film')),
+        label: media?.media_type === 'movie'
+          ? upperFirst(t('common.messages.go_to_film'))
+          : media?.media_type === 'tv_series'
+          ? upperFirst(t('common.messages.go_to_serie'))
+          : media?.media_type === 'person'
+          ? upperFirst(t('common.messages.go_to_person'))
+          : upperFirst(t('common.messages.go_to_media')),
 			},
       {
 				icon: Icons.AddPlaylist,

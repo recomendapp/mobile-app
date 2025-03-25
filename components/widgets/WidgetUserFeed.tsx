@@ -6,8 +6,7 @@ import { useTranslation } from "react-i18next";
 import { FlatList, View } from "react-native";
 import { useTheme } from "@/context/ThemeProvider";
 import { ThemedText } from "@/components/ui/ThemedText";
-
-const WIDGET_USER_FEED_LIMIT = 4;
+import { CardUserActivity } from "../cards/CardUserActivity";
 
 export const WidgetUserFeed = ({
   style,
@@ -16,7 +15,11 @@ export const WidgetUserFeed = ({
   const { t } = useTranslation();
   const { user } = useAuth();
 
-  const { data: feed } = useUserFeedInfiniteQuery({
+  const {
+    data: feed,
+    fetchNextPage,
+    hasNextPage,
+  } = useUserFeedInfiniteQuery({
     userId: user?.id,
   })
 
@@ -28,15 +31,15 @@ export const WidgetUserFeed = ({
       <ThemedText style={tw`p-0 w-fit font-semibold text-xl`}>{t('widgets.user_feed.label')}</ThemedText>
     </Link>
     <FlatList
-    data={feed.pages.flat().slice(0, WIDGET_USER_FEED_LIMIT)}
+    data={feed.pages.flat()}
     renderItem={({ item }) => (
-      <View key={item.media_id} style={tw`flex-0.5`}>
-        {/* <CardUserActivity key={index} activity={item} /> */}
-      </View>
+      <CardUserActivity key={item.media_id} activity={item} style={tw`max-h-36 w-86`}/>
     )}
-    numColumns={2}
-    columnWrapperStyle={tw`gap-1`}
-    ItemSeparatorComponent={() => <View style={tw`h-1`} />}
+    horizontal
+    onEndReached={() => hasNextPage && fetchNextPage()}
+    onEndReachedThreshold={0.2}
+    showsHorizontalScrollIndicator={false}
+    ItemSeparatorComponent={() => <View style={tw`w-1`} />}
     nestedScrollEnabled
     />
   </View>

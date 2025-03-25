@@ -34,6 +34,7 @@ const TabsLayout = () => {
 			icon: Icons.feed,
 			screen: 'feed',
 			label: t('routes.feed'),
+			href: session ? undefined : null,
 		},
 		// {
 		// 	icon: session ? Icons.library : Icons.user,

@@ -8,6 +8,7 @@
       "go_to_serie": "accéder à la série",
       "go_to_user": "accéder à l'utilisateur",
       "go_to_person": "accéder à la personne",
+      "go_to_media": "accéder au média",
       "view_directors": "voir {count, plural, one {le réalisateur} other {les réalisateurs}}",
       "no_director": "aucun réalisateur",
       "view_comment": "voir {count, plural, one {le commentaire} other {les commentaires}}",
