@@ -28,16 +28,16 @@ const CardUserDefault = React.forwardRef<
 		<Animated.View
 		ref={ref}
 		style={[
-			{ backgroundColor: colors.muted },
-			tw.style('items-center rounded-xl h-20 p-1'),
+			{ backgroundColor: colors.card, borderColor: colors.border },
+			tw.style('flex-row items-center rounded-xl h-20 p-1 border'),
 			style,
 		]}
 		{...props}
 		>
 			<UserAvatar full_name={user?.full_name} avatar_url={user?.avatar_url} />
-			<View style={tw.style('px-2 py-1 space-y-1')}>
-				<ThemedText numberOfLines={2} style={tw.style('break-words')}>{user?.full_name}</ThemedText>
-				<Text style={{ color: colors.mutedForeground }}>@{user?.username}</Text>
+			<View style={tw.style('shrink px-2 py-1 gap-1')}>
+				<ThemedText numberOfLines={2}>{user?.full_name}</ThemedText>
+				<Text numberOfLines={2} style={{ color: colors.mutedForeground }}>@{user?.username}</Text>
 				{/* {children} */}
 			</View>
 		</Animated.View>
@@ -102,7 +102,7 @@ CardUserInline.displayName = "CardUserInline";
 const CardUser = React.forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	CardUserProps
->(({ variant = "default", linked, ...props }, ref) => {
+>(({ variant = "default", linked = true, ...props }, ref) => {
 	const router = useRouter();
 	const onPress = () => {
 		if (linked) {
