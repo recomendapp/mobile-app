@@ -7,7 +7,6 @@ import React, { forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Text } from "react-native";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useRandomBackdrop from "@/hooks/useRandomBackdrop";
 
 interface CollectionHeaderProps
@@ -25,13 +24,12 @@ const CollectionHeader = forwardRef<
 	CollectionHeaderProps
 >(({ headerHeight, headerOverlayHeight, scrollY, title, numberOfItems, backdrops, ...props }, ref) => {
 	const { t } = useTranslation();
-	const { colors } = useTheme();
+	const { colors, inset } = useTheme();
 	const { hslToRgb } = useColorConverter();
 	const bgBackdrop = useRandomBackdrop(backdrops);
 	const bgColor = hslToRgb(colors.background);
 
 	const layoutY = useSharedValue(0);
-	const inset = useSafeAreaInsets();
 	const opacityAnim = useAnimatedStyle(() => {
 		return {
 			opacity: interpolate(

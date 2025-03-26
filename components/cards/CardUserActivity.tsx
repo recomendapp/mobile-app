@@ -49,7 +49,7 @@ const CardUserActivityDefault = React.forwardRef<
 					</View>
 				</View>
 				<View style={tw`gap-2`}>
-					<ThemedText numberOfLines={2} style={tw`text-md font-bold`}>
+					<ThemedText numberOfLines={2} style={tw`font-bold`}>
 						{activity?.media?.title}
 					</ThemedText>
 					<ThemedText

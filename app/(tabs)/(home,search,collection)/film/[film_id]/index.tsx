@@ -12,15 +12,13 @@ import { useTheme } from "@/context/ThemeProvider";
 import Animated, { useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
 import { useFilmContext } from "@/components/screens/film/FilmContext";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useEffect } from "react";
 
 const FilmScreen = () => {
-	const { colors } = useTheme();
+	const { colors, inset } = useTheme();
 	const { i18n, t } = useTranslation();
 	const { tabState, movieId, scrollY, headerHeight, addScrollRef } = useFilmContext();
 	const tabBarHeight = useBottomTabOverflow();
-	const inset = useSafeAreaInsets();
 	const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
 	const {
 		data: movie,

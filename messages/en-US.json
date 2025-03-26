@@ -87,7 +87,10 @@
       "view_recommendation_one": "view reco",
       "view_recommendation_other": "view recos",
       "reco_one": "reco",
-      "reco_other": "recos"
+      "reco_other": "recos",
+      "send": "send",
+      "sent": "sent",
+      "search_friend": "search a friend"
     },
     "errors": {
       "not_logged_in": "you are not logged in",

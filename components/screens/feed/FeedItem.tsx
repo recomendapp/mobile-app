@@ -1,5 +1,3 @@
-"use client";
-
 import { UserActivity } from "@/types/type.db";
 import { Skeleton } from "@/components/ui/Skeleton";
 import tw from "@/lib/tw";

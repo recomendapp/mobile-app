@@ -28,7 +28,7 @@ export const WidgetUserFeed = ({
   return (
   <View style={[tw`gap-2`, style]}>
     <Link href={'/feed'} asChild>
-      <ThemedText style={tw`p-0 w-fit font-semibold text-xl`}>{t('widgets.user_feed.label')}</ThemedText>
+      <ThemedText style={tw`p-0 font-semibold text-xl`}>{t('widgets.user_feed.label')}</ThemedText>
     </Link>
     <FlatList
     data={feed.pages.flat()}

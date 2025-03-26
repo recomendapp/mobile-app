@@ -1,23 +1,19 @@
-"use client";
-
 import { createClient } from "@/lib/supabase/client";
-// import { routing } from "@/lib/i18n/routing";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { createContext, useContext, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 const SupabaseContext = createContext<SupabaseClient<Database> | undefined>(undefined);
 
 export const SupabaseProvider = ({
-	locale,
 	children,
 } : {
-	locale: string;
 	children: React.ReactNode;
 }) => {
+	const { i18n } = useTranslation();
 	const supabase = useMemo(() => {
-		return createClient(locale);
-	}, [locale]);
-
+		return createClient(i18n.language);
+	}, [i18n.language]);
 	return (
 		<SupabaseContext.Provider value={supabase}>
 			{children}

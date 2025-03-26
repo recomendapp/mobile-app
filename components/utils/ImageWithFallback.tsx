@@ -37,10 +37,10 @@ export const ImageWithFallback = React.forwardRef<
   ...rest
 }, ref) => {
   const { colors } = useTheme();
-  const [imgSrc, setImgSrc] = useState<ImageSource | undefined | null>(source);
+  const [imgSrc, setImgSrc] = useState<ImageSource | undefined | null>((source.uri && source.uri.length! > 0) ? source : null);
 
   useEffect(() => {
-    setImgSrc(source);
+    setImgSrc((source.uri && source.uri.length! > 0) ? source : null);
   }, [source]);
 
   return (

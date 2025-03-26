@@ -20,7 +20,7 @@ const TabsLayout = () => {
 		  href: undefined,
 		},
 		{
-		  icon: Icons.search,
+		  icon: Icons.Search,
 		  screen: '(search)',
 		  label: t('routes.search'),
 		  href: undefined,

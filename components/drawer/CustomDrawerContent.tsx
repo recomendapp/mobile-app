@@ -48,7 +48,7 @@ const CustomDrawerContent = (props: any) => {
         }}
         >
             {/* MAIN ROUTES */}
-            <DrawerContentScrollView {...props}>
+            <DrawerContentScrollView>
                 {/* <DrawerItemList {...props} /> */}
                 {/* PROFILE */}
                 <Link href={`/user/${user.username}`} asChild>

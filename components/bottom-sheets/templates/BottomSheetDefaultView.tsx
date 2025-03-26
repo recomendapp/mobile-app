@@ -1,7 +1,7 @@
 import React from 'react';
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import tw from '@/lib/tw';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '@/context/ThemeProvider';
 
 interface BottomSheetDefaultViewProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   content: React.ReactNode;
@@ -11,8 +11,7 @@ const BottomSheetDefaultView = React.forwardRef<
 	React.ElementRef<typeof BottomSheetModal>,
 	BottomSheetDefaultViewProps
 >(({ content, ...props }, ref) => {
-  const inset = useSafeAreaInsets();
-	
+  const { inset } = useTheme();
   return (
     <BottomSheetModal
     ref={ref}

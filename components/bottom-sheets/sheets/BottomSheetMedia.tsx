@@ -4,7 +4,6 @@ import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
 import { Media } from '@/types/type.db';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinkProps, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/context/ThemeProvider';
@@ -13,6 +12,7 @@ import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { Text, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
+import BottomSheetSendReco from './BottomSheetSendReco';
 
 interface BottomSheetMediaProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   id: string;
@@ -32,11 +32,10 @@ const BottomSheetMedia = forwardRef<
   React.ElementRef<typeof BottomSheetModal>,
   BottomSheetMediaProps
 >(({ id, media, additionalItemsTop = [], additionalItemsBottom = [], snapPoints, ...props }, ref) => {
-  const { closeSheet } = useBottomSheetStore();
-  const { colors } = useTheme();
+  const { closeSheet, openSheet } = useBottomSheetStore();
+  const { colors, inset } = useTheme();
   const router = useRouter();
   const { t } = useTranslation();
-  const inset = useSafeAreaInsets();
   const items: Item[][] = useMemo(() => ([
     [
       ...additionalItemsTop,
@@ -61,7 +60,9 @@ const BottomSheetMedia = forwardRef<
 			},
 			{
 				icon: Icons.Reco,
-        onPress: () => {},
+        onPress: () => openSheet(BottomSheetSendReco, {
+          media: media!,
+        }),
 				// onClick: () => openModal(ModalRecoSend, { mediaId: media.media_id!, mediaTitle: mediaDetails.title }),
 				label: upperFirst(t('common.messages.send_to_friend')),
 			}

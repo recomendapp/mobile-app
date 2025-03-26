@@ -87,7 +87,10 @@
       "view_recommendation_one": "voir la reco",
       "view_recommendation_other": "voir les recos",
       "reco_one": "reco",
-      "reco_other": "recos"
+      "reco_other": "recos",
+      "send": "envoyer",
+      "sent": "envoyé",
+      "search_friend": "rechercher un ami"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",

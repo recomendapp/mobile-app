@@ -252,7 +252,7 @@ export {
 // 			<Button
 // 			  variant={'link'}
 // 			  className={`
-// 				w-fit p-0 h-full italic text-muted-foreground transition
+// 				p-0 h-full italic text-muted-foreground transition
 // 				${linked ? 'hover:text-accent-1' : 'hover:text-muted-foreground hover:no-underline'}
 // 			`}
 // 			  asChild

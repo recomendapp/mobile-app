@@ -7,9 +7,8 @@ import {
   BottomSheetFlatList,
   BottomSheetSectionList,
 } from '@gorhom/bottom-sheet';
-import { useRouter, useNavigation } from 'expo-router';
-import { useEffect } from 'react';
 import BottomSheetConfirm from '@/components/bottom-sheets/templates/BottomSheetConfirm';
+import * as Haptics from 'expo-haptics';
 
 type BottomSheetContentElement =
   | React.ReactElement<typeof BottomSheetView>
@@ -61,6 +60,9 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
     persistent = false // Défaut à false
   ) => {
     const id = Math.random().toString(36).substring(7);
+    if (process.env.EXPO_OS === 'ios') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     set((state) => ({
       sheets: [
         ...state.sheets,

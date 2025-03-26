@@ -5,9 +5,9 @@ import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from 'lodash';
 import { View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, ButtonText } from '@/components/ui/Button';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
+import { useTheme } from '@/context/ThemeProvider';
 
 interface BottomSheetConfirmProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   id: string;
@@ -22,9 +22,9 @@ const BottomSheetConfirm = React.forwardRef<
 	React.ElementRef<typeof BottomSheetModal>,
 	BottomSheetConfirmProps
 >(({ id, title, description, onConfirm, cancelLabel, confirmLabel, backdropComponent, ...props }, ref) => {
+  const { inset } = useTheme();
   const { closeSheet } = useBottomSheetStore();
   const { t } = useTranslation();
-  const inset = useSafeAreaInsets();
 
   const cancelText = cancelLabel || capitalize(t('common.word.cancel'));
   const confirmText = confirmLabel || capitalize(t('common.messages.confirm'));

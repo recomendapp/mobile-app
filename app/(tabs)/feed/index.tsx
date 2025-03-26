@@ -9,7 +9,6 @@ import { FlashList } from "@shopify/flash-list";
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const FeedScreen = () => {
 	const { user } = useAuth();
