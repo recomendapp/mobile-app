@@ -778,8 +778,8 @@ export const useUserPlaylistsFeaturedInfiniteQuery = ({
 			filter: mergedFilters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
-			let from = (pageParam - 1) * 20;
-	  		let to = from - 1 + 20;
+			let from = (pageParam - 1) * mergedFilters.resultsPerPage;
+			let to = from - 1 + mergedFilters.resultsPerPage;
 			let request = supabase
 				.from('playlists_featured')
 				.select(`*, playlist:playlists(*, user(*))`)
@@ -804,7 +804,7 @@ export const useUserPlaylistsFeaturedInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == 20 ? pages.length + 1 : undefined;
+			return lastPage?.length == mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
 		},
 	});
 };

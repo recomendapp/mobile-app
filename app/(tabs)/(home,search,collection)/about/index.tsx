@@ -1,5 +1,6 @@
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
 import { ThemedText } from '@/components/ui/ThemedText';
+import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 
 
@@ -74,8 +75,8 @@ const AboutScreen = () => {
 	];
 
   return (
-    <ThemedSafeAreaView className="flex-1">
-		  <ThemedText>made by @loup</ThemedText>
+    <ThemedSafeAreaView style={tw`flex-1 items-center justify-center`}>
+		  <ThemedText>made by @lxup</ThemedText>
     </ThemedSafeAreaView>
   );
 };
