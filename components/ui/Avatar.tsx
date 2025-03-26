@@ -2,19 +2,11 @@ import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
 import React from 'react';
 import {
-  View,
-  // type ImageSourcePropType,
-  // type NativeSyntheticEvent,
-  // type ImageLoadEventData,
-  // type ImageErrorEventData,
-} from 'react-native';
-import {
   Image as EImage,
   type ImageErrorEventData,
   type ImageLoadEventData,
   type ImageSource
 } from 'expo-image';
-import { ThemedText } from './ThemedText';
 import Animated from 'react-native-reanimated';
 
 // Types

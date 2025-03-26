@@ -20,7 +20,7 @@ const FeaturedPlaylists = () => {
 
 	return (
 		<FlatList
-		data={playlists?.pages.flat().slice(0, 4)}
+		data={playlists?.pages.flat()}
 		renderItem={({ item: { playlist } }) => (
 			<View key={playlist.id} style={{ flex: 1 / GRID_COLUMNS }}>
 				<CardPlaylist playlist={playlist} />
