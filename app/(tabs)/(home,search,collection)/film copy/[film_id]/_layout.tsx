@@ -11,16 +11,13 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
-import {
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
-import { Slot, useLocalSearchParams, withLayoutContext } from 'expo-router';
+import { Slot, useLocalSearchParams } from 'expo-router';
 import { Icons } from '@/constants/Icons';
 import { useTranslation } from 'react-i18next';
 import { getIdFromSlug } from '@/hooks/getIdFromSlug';
 import { useMediaMovieDetailsQuery } from '@/features/media/mediaQueries';
 import FilmNav from '@/components/screens/film/FilmNav';
-import { ParamListBase, TabNavigationState, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { ThemedView } from '@/components/ui/ThemedView';
 import FilmHeader from '@/components/screens/film/FilmHeader';
@@ -43,9 +40,8 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 	sv,
 	title,
 }) => {
-	const { colors } = useTheme();
+	const { colors, inset } = useTheme();
 	const navigation = useNavigation();
-	const inset = useSafeAreaInsets();
 	const opacityAnim = useAnimatedStyle(() => {
 		return {
 			opacity: interpolate(
@@ -124,6 +120,7 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 
 const FilmLayout = () => {
 	const { i18n, t } = useTranslation();
+	const { inset } = useTheme();
 	const { film_id } = useLocalSearchParams();
 	const { id: movieId} = getIdFromSlug(film_id as string);
 	const {
@@ -136,7 +133,6 @@ const FilmLayout = () => {
 	const loading = isLoading || movie === undefined;
 
 	const tabBarHeight = useBottomTabOverflow();
-	const inset = useSafeAreaInsets();
 	const headerHeight = useSharedValue<number>(0);
 	const filmHeaderHeight = useSharedValue<number>(0);
 	const sv = useSharedValue<number>(0);

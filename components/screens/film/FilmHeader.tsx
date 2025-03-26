@@ -13,9 +13,6 @@ import Animated, {
   withDecay,
   withTiming,
 } from 'react-native-reanimated';
-import {
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
@@ -42,10 +39,9 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const { hslToRgb } = useColorConverter();
-	const { colors } = useTheme();
+	const { colors, inset } = useTheme();
 	const { scrollY, headerOverlayHeight, headerHeight, headerScrollY, scrollRefs, tabState } = useFilmContext();
 	const bgColor = hslToRgb(colors.background);
-	const inset = useSafeAreaInsets();
 	const layoutY = useSharedValue(0);
 	const headerScrollStart = useSharedValue(0);
 	const opacityAnim = useAnimatedStyle(() => {

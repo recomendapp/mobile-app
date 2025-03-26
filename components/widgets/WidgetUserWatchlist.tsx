@@ -28,7 +28,7 @@ export const WidgetUserWatchlist = ({
   return (
   <View style={[tw`gap-2`, style]}>
     <Link href={'/collection/watchlist'} asChild>
-      <ThemedText style={tw`p-0 w-fit font-semibold text-xl`}>{t('widgets.user_watchlist.label')}</ThemedText>
+      <ThemedText style={tw`p-0 font-semibold text-xl`}>{t('widgets.user_watchlist.label')}</ThemedText>
     </Link>
     <FlatList
     data={watchlist}

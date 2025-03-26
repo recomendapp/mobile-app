@@ -9,9 +9,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
-import {
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
 import { useLocalSearchParams, withLayoutContext } from 'expo-router';
 import { Icons } from '@/constants/Icons';
 import { useTranslation } from 'react-i18next';
@@ -41,9 +38,8 @@ interface ScreenHeaderProps {
 const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 	title,
 }) => {
-	const { colors } = useTheme();
+	const { colors, inset } = useTheme();
 	const navigation = useNavigation();
-	const inset = useSafeAreaInsets();
 	const { scrollY, headerHeight, headerOverlayHeight } = useFilmContext();
 	const opacityAnim = useAnimatedStyle(() => {
 		return {

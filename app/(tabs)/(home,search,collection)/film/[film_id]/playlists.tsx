@@ -13,18 +13,16 @@ import { upperFirst } from "lodash";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Dimensions, Pressable, View } from "react-native";
-import Animated, { useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, { useAnimatedRef, useAnimatedScrollHandler } from "react-native-reanimated";
 
 const GRID_COLUMNS = 3;
 
 const FilmPlaylistsScreen = () => {
-	const { colors } = useTheme();
+	const { colors, inset } = useTheme();
 	const { i18n, t } = useTranslation();
 	const { movieId, scrollY, headerHeight, addScrollRef, tabState } = useFilmContext();
 	const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
 	const tabBarHeight = useBottomTabOverflow();
-	const inset = useSafeAreaInsets();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const [display, setDisplay] = useState<'grid' | 'row'>('grid');
 	const sortByOptions = [

@@ -3,7 +3,6 @@ import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { UserWatchlist } from '@/types/type.db';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
@@ -24,9 +23,8 @@ const BottomSheetWatchlistComment = forwardRef<
   BottomSheetWatchlistCommentProps
 >(({ id, watchlistItem, snapPoints, ...props }, ref) => {
   const { closeSheet } = useBottomSheetStore();
-  const { colors } = useTheme();
+  const { colors, inset } = useTheme();
   const { t } = useTranslation();
-  const inset = useSafeAreaInsets();
   const [comment, setComment] = React.useState(watchlistItem.comment || '');
   const updateWatchlist = useUserWatchlistUpdateMutation();
 

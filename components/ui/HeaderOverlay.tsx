@@ -8,9 +8,6 @@ import Animated, {
   SharedValue,
   useAnimatedStyle,
 } from 'react-native-reanimated';
-import {
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
 import { Icons } from '@/constants/Icons';
 import { useNavigation } from '@react-navigation/native';
 import { ThemedText } from '@/components/ui/ThemedText';
@@ -32,9 +29,8 @@ const HeaderOverlay: React.FC<HeaderOverlayProps> = ({
 	scrollY,
 	title,
 }) => {
-	const { colors } = useTheme();
+	const { colors, inset } = useTheme();
 	const navigation = useNavigation();
-	const inset = useSafeAreaInsets();
 	const opacityAnim = useAnimatedStyle(() => {
 		return {
 			opacity: interpolate(

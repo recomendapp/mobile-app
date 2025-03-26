@@ -2,6 +2,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { userKeys } from "./userKeys"
 import { UserFeedCastCrew, Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserReview, UserWatchlist } from "@/types/type.db";
 import { useSupabaseClient } from "@/context/SupabaseProvider";
+import { playlistKeys } from "../playlist/playlistKeys";
 
 /* ---------------------------------- USER ---------------------------------- */
 
@@ -753,6 +754,58 @@ export const useUserPlaylistsSavedInfiniteQuery = ({
 			return lastPage?.length == mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
+	});
+};
+
+export const useUserPlaylistsFeaturedInfiniteQuery = ({
+	filter,
+} : {
+	filter?: {
+		resultsPerPage?: number;
+		sortBy?: 'created_at' | 'updated_at';
+		sortOrder?: 'asc' | 'desc';
+	}
+} = {}) => {
+	const mergedFilters = {
+		resultsPerPage: 20,
+		sortBy: 'updated_at',
+		sortOrder: 'desc',
+		...filter,
+	};
+	const supabase = useSupabaseClient();
+	return useInfiniteQuery({
+		queryKey: playlistKeys.featured({
+			filter: mergedFilters,
+		}),
+		queryFn: async ({ pageParam = 1 }) => {
+			let from = (pageParam - 1) * 20;
+	  		let to = from - 1 + 20;
+			let request = supabase
+				.from('playlists_featured')
+				.select(`*, playlist:playlists(*, user(*))`)
+				.range(from, to);
+			if (mergedFilters) {
+				if (mergedFilters.sortBy) {
+					switch (mergedFilters.sortBy) {
+						case 'created_at':
+							request = request.order('created_at', { referencedTable: 'playlist', ascending: mergedFilters.sortOrder === 'asc' });
+							break;
+						case 'updated_at':
+							request = request.order('updated_at', { referencedTable: 'playlist', ascending: mergedFilters.sortOrder === 'asc' });
+							break;
+						default:
+							break;
+					}
+				}
+			}
+			const { data, error } = await request;
+			if (error) throw error;
+			return data;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage?.length == 20 ? pages.length + 1 : undefined;
+		},
 	});
 };
 

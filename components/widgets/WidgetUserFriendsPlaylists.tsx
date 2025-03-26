@@ -29,15 +29,16 @@ export const WidgetUserFriendsPlaylists = ({
 
   return (
   <View style={[tw`flex-1 gap-2`, style]}>
-    <ThemedText style={tw`p-0 w-fit font-semibold text-xl`}>{t('widgets.user_friends_playlists.label')}</ThemedText>
+    <ThemedText style={tw`p-0 font-semibold text-xl`}>{t('widgets.user_friends_playlists.label')}</ThemedText>
     <FlatList
     data={playlists.pages.flat()}
     renderItem={({ item }) => (
-      <View key={item.id} style={tw`w-24`}>
+      <View key={item.id} style={tw`w-36`}>
         <CardPlaylist playlist={item} />
       </View>
     )}
     horizontal
+    showsHorizontalScrollIndicator={false}
     ItemSeparatorComponent={() => <View style={tw`w-1`} />}
     nestedScrollEnabled
     />

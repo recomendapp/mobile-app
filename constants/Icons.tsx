@@ -13,7 +13,7 @@ export const Icons = {
 	),
 	premium: Premium,
 	home: HomeIcon,
-	search: SearchIcon,
+	Search: SearchIcon,
 	explore: CompassIcon,
 	feed: ZapIcon,
 	shop: StoreIcon,

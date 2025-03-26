@@ -12,7 +12,12 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType>({
 	colors: Colors.dark,
 	applyColors: () => {},
-	inset: { top: 0, right: 0, bottom: 0, left: 0 },
+	inset: {
+		top: 0,
+		right: 0,
+		bottom: 0,
+		left: 0,
+	},
 });
 
 
@@ -22,10 +27,10 @@ type ThemeProviderProps = {
   
 const ThemeProvider = ({children}: ThemeProviderProps) => {
 	const [colors, setColors] = useState(Colors.dark);
-	const inset = useSafeAreaInsets();
 	const applyColors = (colorTheme: TColors) => {
 		setColors(colorTheme);
 	};
+	const inset = useSafeAreaInsets();
 
 	DefaultTheme.colors.background = colors.background;
 

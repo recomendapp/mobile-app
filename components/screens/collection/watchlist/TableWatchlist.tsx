@@ -7,12 +7,12 @@ import { capitalize } from "lodash";
 import { RefreshControl } from "react-native-gesture-handler";
 import { View } from "react-native";
 import tw from "@/lib/tw";
-import { useTheme } from "@/context/ThemeProvider";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { ColumnFiltersState, flexRender, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, Row, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { Columns } from "./components/columns";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { DataTableToolbar } from "./components/data-table-toolbar";
+import { useTheme } from "@/context/ThemeProvider";
 
 interface TableWatchlistProps {
 	watchlist: UserWatchlist[];

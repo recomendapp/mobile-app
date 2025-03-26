@@ -3,7 +3,6 @@ import { BottomSheetFlashList, BottomSheetModal } from '@gorhom/bottom-sheet';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { UserRecosAggregated } from '@/types/type.db';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
@@ -19,9 +18,8 @@ const BottomSheetMyRecosSenders = forwardRef<
   React.ElementRef<typeof BottomSheetModal>,
   BottomSheetMyRecosSendersProps
 >(({ id, comments, ...props }, ref) => {
-  const { colors } = useTheme();
+  const { colors, inset } = useTheme();
   const { t } = useTranslation();
-  const inset = useSafeAreaInsets();
   return (
     <BottomSheetModal
     ref={ref}

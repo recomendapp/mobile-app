@@ -34,7 +34,7 @@ export const WidgetUserRecos = ({
   return (
   <View style={[tw`gap-2`, style]}>
     <Link href={'/collection/my-recos'} asChild>
-      <ThemedText style={tw`p-0 w-fit font-semibold text-xl`}>{t('widgets.user_recos.label')}</ThemedText>
+      <ThemedText style={tw`p-0 font-semibold text-xl`}>{t('widgets.user_recos.label')}</ThemedText>
     </Link>
     <FlatList
     data={recos}
