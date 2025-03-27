@@ -9,7 +9,7 @@ export const Icons = {
 	},
 	spinner: Loader2Icon,
 	loader: ({ style, ...props }: LucideProps) => (
-		<Icons.spinner style={[tw.style('animate-spin'), style]} {...props} />
+		<Icons.spinner style={[tw.style(''), style]} {...props} />
 	),
 	premium: Premium,
 	home: HomeIcon,

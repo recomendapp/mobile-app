@@ -29,7 +29,6 @@ const FeedScreen = () => {
 		<FlashList
 		data={feed?.pages.flat()}
 		renderItem={({ item, index }) => (
-			// <FeedItem key={index} activity={item} />
 			<View key={index} style={tw`p-1`}>
 				<CardUserActivity activity={item} showReview />
 			</View>

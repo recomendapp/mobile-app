@@ -123,33 +123,31 @@ const TableLikes = ({
 	), []);
 
 	return (
-		<Animated.FlatList
-		onScroll={scrollHandler}
-		ListHeaderComponent={renderHeader}
-		ListHeaderComponentStyle={tw`mb-2`}
-		data={table.getRowModel().rows}
-		renderItem={({ item }) => (
-			<View key={item.id} style={tw`flex-row items-center justify-between p-1 gap-2`}>
-				{item.getVisibleCells().map((cell) => (
-				<Fragment key={cell.id}>
-					{flexRender(
-					cell.column.columnDef.cell,
-					cell.getContext()
-					)}
-				</Fragment>
-                ))}
-			</View>
-		)}
-		ListEmptyComponent={renderEmpty}
-		// estimatedItemSize={likes.length}
-		contentContainerStyle={{
-			paddingBottom: bottomTabHeight + inset.bottom,
-		}}
-		keyExtractor={(item) => item.original.id.toString()}
-		showsVerticalScrollIndicator={false}
-		refreshing={isRefetching}
-		onRefresh={refetch}
-		/>
+		<>
+			<Animated.FlatList
+			onScroll={scrollHandler}
+			ListHeaderComponent={renderHeader}
+			ListHeaderComponentStyle={tw`mb-2`}
+			data={table.getRowModel().rows}
+			renderItem={({ item }) => (
+				<View key={item.id} style={tw`flex-row items-center justify-between p-1 gap-2`}>
+					{item.getVisibleCells().map((cell) => (
+					<Fragment key={cell.id}>
+						{flexRender(
+						cell.column.columnDef.cell,
+						cell.getContext()
+						)}
+					</Fragment>
+					))}
+				</View>
+			)}
+			ListEmptyComponent={renderEmpty}
+			keyExtractor={(item) => item.original.id.toString()}
+			showsVerticalScrollIndicator={false}
+			refreshing={isRefetching}
+			onRefresh={refetch}
+			/>
+		</>
 	)
 };
 
