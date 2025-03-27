@@ -14,6 +14,8 @@ const FeaturedPlaylists = () => {
 		data: playlists,
 		fetchNextPage,
 		hasNextPage,
+		isRefetching,
+		refetch,
 	} = useUserPlaylistsFeaturedInfiniteQuery();
 
 	if (!playlists) return null;
@@ -35,6 +37,8 @@ const FeaturedPlaylists = () => {
 		showsVerticalScrollIndicator={false}
 		columnWrapperStyle={tw`gap-2`}
 		ItemSeparatorComponent={() => <View style={tw`h-2`} />}
+		refreshing={isRefetching}
+		onRefresh={refetch}
 		/>
 	)
 };

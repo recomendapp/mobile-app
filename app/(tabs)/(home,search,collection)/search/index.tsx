@@ -36,6 +36,8 @@ const SearchScreen = () => {
 				style={[
 					{ color: colors.foreground },
 				]}
+				textAlignVertical="center"
+
 				value={search}
 				onChangeText={setSearch}
 				/>

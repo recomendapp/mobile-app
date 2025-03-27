@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import Animated, { SharedValue, useAnimatedScrollHandler } from "react-native-reanimated";
 import CollectionHeader from "../CollectionHeader";
 import { capitalize } from "lodash";
-import { RefreshControl } from "react-native-gesture-handler";
 import { View } from "react-native";
 import tw from "@/lib/tw";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
@@ -127,13 +126,8 @@ const TableMyRecos = ({
 		}}
 		keyExtractor={(item) => item.original.media_id!.toString()}
 		showsVerticalScrollIndicator={false}
-		refreshing={isFetching}
-		refreshControl={
-			<RefreshControl
-				refreshing={isRefetching}
-				onRefresh={refetch}
-			/>
-		}
+		refreshing={isRefetching}
+		onRefresh={refetch}
 		/>
 	)
 };

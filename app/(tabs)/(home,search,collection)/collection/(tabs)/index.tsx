@@ -7,7 +7,7 @@ import { useUserPlaylistsInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { FlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
-import { RefreshControl, View } from "react-native";
+import { View } from "react-native";
 
 const CollectionScreen = () => {
 	const { user } = useAuth();
@@ -54,12 +54,8 @@ const CollectionScreen = () => {
 			  );
 			}
 		}}
-		refreshControl={
-			<RefreshControl
-				refreshing={isRefetching}
-				onRefresh={refetch}
-			/>
-		}
+		refreshing={isRefetching}
+		onRefresh={refetch}
 		numColumns={3}
 		contentContainerStyle={{
 			paddingBottom: tabBarHeight,
@@ -67,7 +63,6 @@ const CollectionScreen = () => {
 		keyExtractor={(_, index) => index.toString()}
 		estimatedItemSize={150}
 		showsVerticalScrollIndicator={false}
-		refreshing={isFetching}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.3}
 		nestedScrollEnabled

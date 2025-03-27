@@ -648,6 +648,13 @@
           "description": "Share your opinion on {title}."
         }
       }
+    },
+    "feed": {
+      "watched": "{{name}} watched",
+      "rated": "{{name}} rated",
+      "liked": "{{name}} liked",
+      "rated_liked": "{{name}} liked and rated",
+      "reviewed": "{{name}} reviewed"
     }
   },
   "routes": {
@@ -662,15 +669,6 @@
     "settings": "Settings",
     "library": "Library",
     "logout": "Logout"
-  },
-  "feed": {
-    "user_movie_activity": {
-      "watched": "<name></name> watched",
-      "rated": "<name></name> rated",
-      "liked": "<name></name> liked",
-      "rated_liked": "<name></name> liked and rated",
-      "reviewed": "<name></name> reviewed"
-    }
   },
   "features": {
     "tracking": {

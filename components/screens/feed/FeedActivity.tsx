@@ -1,4 +1,5 @@
 import { IconMediaRating } from "@/components/medias/IconMediaRating";
+import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/context/ThemeProvider";
 import tw from "@/lib/tw";
@@ -30,63 +31,39 @@ const FeedActivity = forwardRef<
 	  >
 		{activity?.review ? (
 		  <>
-			{/* <span>
-			  {t('feed.user_movie_activity.reviewed', {
-				name: () => (
-				  <Link href={`/@${activity.user?.username}`} className="text-foreground hover:underline">
-					{activity.user?.username}
-				  </Link>
-				),
-				movie: () => (
-					<></>
-				//   <MovieHoverCard movie={activity.movie} />
-				),
+			<ThemedText>
+			  {t('pages.feed.reviewed', {
+				name: activity.user?.username,
 			  })}
-			</span> */}
+			</ThemedText>
 		  </>
 		) : (
 		  <>
-			{/* {activity?.is_liked && activity?.rating ? (
-			  <span>
-				{t.rich('user_movie_activity.rated_liked', {
-				  name: () => (
-					<Link href={`/@${activity.user?.username}`} className="text-foreground hover:underline">
-					  {activity.user?.username}
-					</Link>
-				  ),
+			{activity?.is_liked && activity?.rating ? (
+			  <ThemedText>
+				{t('pages.feed.rated_liked', {
+				  name: activity.user?.username,
 				})}
-			  </span>
+			  </ThemedText>
 			) : activity?.is_liked && !activity?.rating ? (
-			  <span>
-				{t.rich('user_movie_activity.liked', {
-				  name: () => (
-					<Link href={`/@${activity.user?.username}`} className="text-foreground hover:underline">
-					  {activity.user?.username}
-					</Link>
-				  ),
+			  <ThemedText>
+				{t('pages.feed.liked', {
+					name: activity.user?.username,
 				})}
-			  </span>
+			  </ThemedText>
 			) : !activity?.is_liked && activity?.rating ? (
-			  <span>
-				{t.rich('user_movie_activity.rated', {
-				  name: () => (
-					<Link href={`/@${activity.user?.username}`} className="text-foreground hover:underline">
-					  {activity.user?.username}
-					</Link>
-				  ),
+			  <ThemedText>
+				{t('pages.feed.rated', {
+				  name: activity.user?.username,
 				})}
-			  </span>
+			  </ThemedText>
 			) : (
-			  <span>
-				{t.rich('user_movie_activity.watched', {
-				  name: () => (
-					<Link href={`/@${activity?.user?.username}`} className="text-foreground hover:underline">
-					  {activity?.user?.username}
-					</Link>
-				  ),
+			  <ThemedText>
+				{t('pages.feed.watched', {
+				  name: activity?.user?.username,
 				})}
-			  </span>
-			)} */}
+			  </ThemedText>
+			)}
 		  	{activity?.rating && (
 				<IconMediaRating
 				rating={activity.rating}
