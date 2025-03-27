@@ -15,7 +15,6 @@ const SearchScreen = () => {
 	const { colors, inset } = useTheme();
 	const [search, setSearch] = useState('');
 	const debouncedSearch = useDebounce(search, 500);
-	console.log('debouncedSearch', !!debouncedSearch);
 	return (
 		<ThemedView
 		style={[
@@ -26,15 +25,16 @@ const SearchScreen = () => {
 			<View
 			style={[
 				{ backgroundColor: colors.muted },
-				tw`flex-row items-center gap-2 p-2 rounded-md`,
+				tw`flex-row items-center gap-2 rounded-md`,
 			]}
 			>
-				<Icons.Search color={colors.foreground} size={20} style={tw``} />
+				<Icons.Search color={colors.foreground} size={20} style={tw`my-2 ml-2`} />
 				<TextInput
 				placeholder="Search for movies, tv shows, and people"
 				placeholderTextColor={colors.mutedForeground}
 				style={[
 					{ color: colors.foreground },
+					tw`flex-1 py-2 pr-2`,
 				]}
 				textAlignVertical="center"
 
