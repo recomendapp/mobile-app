@@ -44,6 +44,7 @@ const ProfileLastActivities = ({ profile }: { profile: Profile }) => {
 			variant='poster'
 			media={item.media!}
 			index={index}
+			profileActivity={item}
 			/>
 		)}
 		keyExtractor={(_, index) => index.toString()}

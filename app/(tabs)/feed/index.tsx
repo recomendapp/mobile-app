@@ -1,3 +1,4 @@
+import { CardUserActivity } from "@/components/cards/CardUserActivity";
 import FeedItem from "@/components/screens/feed/FeedItem";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { ThemedText } from "@/components/ui/ThemedText"
@@ -26,9 +27,12 @@ const FeedScreen = () => {
 	const loading = isLoading || feed === undefined;
 	return (
 		<FlashList
-		data={feed?.pages.flatMap((page) => page)}
+		data={feed?.pages.flat()}
 		renderItem={({ item, index }) => (
-			<FeedItem key={index} activity={item} />
+			// <FeedItem key={index} activity={item} />
+			<View key={index} style={tw`p-1`}>
+				<CardUserActivity activity={item} showReview />
+			</View>
 		)}
 		ListEmptyComponent={() => !loading ? (
 			<ThemedView style={tw`flex-1 items-center justify-center`}>
@@ -38,6 +42,8 @@ const FeedScreen = () => {
 		contentContainerStyle={{
 			paddingTop: 8,
 			paddingBottom: tabBarHeight,
+			paddingLeft: 8,
+			paddingRight: 8,
 		}}
 		keyExtractor={(_, index) => index.toString()}
 		estimatedItemSize={feed?.pages.flatMap((page) => page).length}
@@ -46,7 +52,6 @@ const FeedScreen = () => {
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.3}
 		nestedScrollEnabled
-		ItemSeparatorComponent={() => <View style={tw`h-2`} />}
 		/>
 	);
 };

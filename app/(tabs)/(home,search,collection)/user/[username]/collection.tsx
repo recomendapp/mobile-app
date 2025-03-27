@@ -82,6 +82,7 @@ const ProfileCollectionScreen = () => {
 						key={item.id}
 						variant='poster'
 						media={item.media!}
+						profileActivity={item}
 						index={index}
 						style={tw.style('w-full')}
 						/>

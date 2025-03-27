@@ -42,7 +42,7 @@ export const Columns = () => {
 	const handleOpenSheet = React.useCallback((data: UserWatchlist) => {
 		openSheet(BottomSheetMedia, {
 			media: data.media,
-			additionalItemsBottom: [
+			additionalItemsTop: [
 				{
 					icon: Icons.Comment,
 					label: data?.comment ? capitalize(t('common.messages.view_comment', { count: 1 })) : capitalize(t('common.messages.add_comment')),
@@ -50,6 +50,8 @@ export const Columns = () => {
 						watchlistItem: data,
 					}),
 				},
+			],
+			additionalItemsBottom: [
 				{
 					icon: Icons.Delete,
 					label: upperFirst(t('common.word.delete')),

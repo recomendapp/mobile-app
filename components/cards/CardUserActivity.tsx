@@ -8,17 +8,19 @@ import { View } from "react-native";
 import UserAvatar from "../user/UserAvatar";
 import { ThemedText } from "../ui/ThemedText";
 import FeedActivity from "../screens/feed/FeedActivity";
+import { CardReview } from "./CardReview";
 
 interface CardUserActivityProps
 	extends React.ComponentProps<typeof Animated.View> {
 		variant?: "default";
 		activity: UserActivity;
+		showReview?: boolean;
 	}
 
 const CardUserActivityDefault = React.forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	Omit<CardUserActivityProps, "variant">
->(({ style, activity, children, ...props }, ref) => {
+>(({ style, activity, children, showReview, ...props }, ref) => {
 	const { colors } = useTheme();
 	// const format = useFormatter();
 	// const now = useNow({ updateInterval: 1000 * 10 });
@@ -52,15 +54,19 @@ const CardUserActivityDefault = React.forwardRef<
 					<ThemedText numberOfLines={2} style={tw`font-bold`}>
 						{activity?.media?.title}
 					</ThemedText>
-					<ThemedText
-					numberOfLines={2}
-					style={[
-						tw`text-xs text-justify`,
-						(!activity?.media?.extra_data.overview || !activity?.media?.extra_data.overview.length) && { color: colors.mutedForeground },
-					]}
-					>
-						{(activity?.media?.extra_data.overview && activity?.media?.extra_data.overview.length) ? activity?.media?.extra_data.overview : 'Aucune description'}
-					</ThemedText>
+					{(showReview && activity?.review) ? (
+						<CardReview activity={activity} review={activity?.review} author={activity?.user!} style={{ backgroundColor: colors.background }} />
+					) : (
+						<ThemedText
+						numberOfLines={2}
+						style={[
+							tw`text-xs text-justify`,
+							(!activity?.media?.extra_data.overview || !activity?.media?.extra_data.overview.length) && { color: colors.mutedForeground },
+						]}
+						>
+							{(activity?.media?.extra_data.overview && activity?.media?.extra_data.overview.length) ? activity?.media?.extra_data.overview : 'Aucune description'}
+						</ThemedText>
+					)}
 				</View>
 			</View>
 		</Animated.View>

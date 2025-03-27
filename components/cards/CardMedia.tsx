@@ -9,6 +9,7 @@ import { Pressable, View } from "react-native";
 import { useTheme } from "@/context/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMedia from "../bottom-sheets/sheets/BottomSheetMedia";
+import { IconMediaRating } from "../medias/IconMediaRating";
 
 interface CardMediaProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -77,28 +78,26 @@ React.ElementRef<typeof Animated.View>,
 				alt={media.title ?? ''}
 				type={media.media_type}
 			/>
-			{/* {(media.vote_average
+			{(media.vote_average
 			|| media.tmdb_vote_average
 			|| profileActivity?.rating
 			|| profileActivity?.is_liked
 			|| profileActivity?.review
 			) ? (
-				<div className='absolute top-1 right-1 flex flex-col gap-1'>
+				<View style={tw`absolute top-1 right-1 flex-col gap-1`}>
 					{(media.vote_average || media.tmdb_vote_average) ?
 					<IconMediaRating
-					disableTooltip
 					rating={media.vote_average ?? media.tmdb_vote_average}
 					/> : null}
 					{(profileActivity?.is_liked
 					|| profileActivity?.rating
 					|| profileActivity?.review) ? (
 					<IconMediaRating
-					disableTooltip
 					rating={profileActivity.rating}
 					variant="profile"
 					/>) : null}
-				</div>
-			) : null} */}
+				</View>
+			) : null}
 		</Animated.View>
 	);
 });

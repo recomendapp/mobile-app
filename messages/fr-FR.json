@@ -648,6 +648,13 @@
           "description": "Partagez votre avis sur {title}."
         }
       }
+    },
+    "feed": {
+      "watched": "{{name}} a vu",
+      "rated": "{{name}} a noté",
+      "liked": "{{name}} a liké",
+      "rated_liked": "{{name}} a liké et noté",
+      "reviewed": "{{name}} a écrit une critique"
     }
   },
   "routes": {
@@ -662,15 +669,6 @@
     "settings": "Paramètres",
     "library": "Bibliothèque",
     "logout": "Déconnexion"
-  },
-  "feed": {
-    "user_movie_activity": {
-      "watched": "<name></name> a vu",
-      "rated": "<name></name> a noté",
-      "liked": "<name></name> a liké",
-      "rated_liked": "<name></name> a liké et noté",
-      "reviewed": "<name></name> a écrit une critique"
-    }
   },
   "features": {
     "tracking": {

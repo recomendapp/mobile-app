@@ -6,7 +6,7 @@ import Animated from "react-native-reanimated";
 interface IconMediaRatingProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
 		variant?: "general" | "follower" | "user" | "profile";
-		rating: number;
+		rating?: number | null;
 }
 
 const IconMediaRating = React.forwardRef<
@@ -38,6 +38,7 @@ const IconMediaRating = React.forwardRef<
 				}
 		}
 	}, [variant, colors]);
+	if (!rating) return null;
 	return (
 	<Animated.View
 	ref={ref}

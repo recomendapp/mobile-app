@@ -50,7 +50,7 @@ const Colors: ColorPalettes = {
     border: 'hsl(240 3.7% 15.9%)',
     card: 'hsl(0 0% 8%)',
     cardForeground: 'hsl(0 0% 100%)',
-    destructive: 'hsl(0 72% 51%)',
+    destructive: 'hsl(0 62.8% 30.6%)',
     destructiveForeground: 'hsl(0 0% 98%)',
     tint: 'hsl(0 0% 100%)',
     // Accent colors

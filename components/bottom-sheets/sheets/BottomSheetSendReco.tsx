@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/Input';
 import UserAvatar from '@/components/user/UserAvatar';
 import { Button, ButtonText } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
+import { Badge } from '@/components/ui/Badge';
 
 interface BottomSheetSendRecoProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   id: string;
@@ -37,7 +38,7 @@ const BottomSheetSendReco = forwardRef<
 		data: friends,
 	} = useUserRecosSendQuery({
 		userId: user?.id,
-		mediaId: media.id,
+		mediaId: media.media_id!,
 	});
 	const sendMovie = useUserRecosInsertMutation();
 
@@ -167,7 +168,7 @@ const BottomSheetSendReco = forwardRef<
                   </View>
                 </View>
                 <View style={tw`flex-row items-center gap-2 shrink-0`}>
-                    {/* {already_sent && (
+                    {already_sent && (
                       <Badge variant="accent-yellow">
                         Déjà envoyé
                       </Badge>
@@ -176,7 +177,7 @@ const BottomSheetSendReco = forwardRef<
                       <Badge variant="destructive">
                         Déjà vu
                       </Badge>
-                    )} */}
+                    )}
                     <Icons.Check size={20} style={[{ color: colors.foreground }, tw`${!selected.some((selectedUser) => selectedUser?.id === friend?.id) ? 'opacity-0' : ''}`]} />
                   </View>
               </View>
