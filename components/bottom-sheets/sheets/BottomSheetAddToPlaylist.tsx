@@ -144,7 +144,7 @@ const BottomSheetAddToPlaylist = forwardRef<
       <BottomSheetView
       style={[
         { paddingBottom: inset.bottom },
-        tw`flex-1 gap-2`,
+        tw`flex-1 gap-2 mx-2`,
       ]}
       >
         <View style={tw`gap-2 p-2`}>
@@ -203,7 +203,7 @@ const BottomSheetAddToPlaylist = forwardRef<
               return setSelected((prev) => [...prev, playlist]);
             }}
             >
-              <View style={tw`flex-row items-center justify-between gap-2 p-2 py-2`}>
+              <View style={tw`flex-row items-center justify-between gap-2 py-2`}>
                 <View style={tw`shrink flex-row items-center gap-2`}>
                   <ImageWithFallback
                   source={{ uri: playlist.poster_url ?? '' }}
