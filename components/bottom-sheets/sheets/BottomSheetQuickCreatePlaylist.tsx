@@ -41,8 +41,6 @@ const BottomSheetQuickCreatePlaylist = React.forwardRef<
   return (
     <BottomSheetModal
     ref={ref}
-    enableDynamicSizing={false}
-    snapPoints={['60%']}
     {...props}
     >
       <BottomSheetView
