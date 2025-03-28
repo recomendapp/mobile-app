@@ -120,7 +120,7 @@ const BottomSheetSendReco = forwardRef<
       <BottomSheetView
       style={[
         { paddingBottom: inset.bottom },
-        tw`flex-1 gap-2`,
+        tw`flex-1 gap-2 mx-2`,
       ]}
       >
         <View style={tw`gap-2 p-2`}>
