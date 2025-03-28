@@ -29,18 +29,6 @@ interface BottomSheetAddToPlaylistProps extends Omit<React.ComponentPropsWithout
 
 const COMMENT_MAX_LENGTH = 180;
 
-const Test = () => {
-  return (
-    <Text>Test</Text>
-  )
-}
-
-const Test2 = () => {
-  return (
-    <Text>Test2</Text>
-  )
-}
-
 const BottomSheetAddToPlaylist = forwardRef<
   React.ElementRef<typeof BottomSheetModal>,
   BottomSheetAddToPlaylistProps
@@ -102,7 +90,6 @@ const BottomSheetAddToPlaylist = forwardRef<
   };
 
   const handleCreatePlaylist = async (playlistName: string) => {
-    console.log('playlistName', playlistName);
 		await createPlaylistMutation.mutateAsync({
 			title: playlistName,
 		}, {

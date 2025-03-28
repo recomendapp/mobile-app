@@ -46,7 +46,7 @@ const BottomSheetQuickCreatePlaylist = React.forwardRef<
       <BottomSheetView
       style={[
         { paddingBottom: inset.bottom },
-        tw`flex-1 gap-4 items-center justify-center px-2`,
+        tw`flex-1 gap-4 items-center justify-center mx-2`,
       ]}
       >
         <ThemedText style={tw`text-lg font-bold`}>Donner un nom à la playlist</ThemedText>
