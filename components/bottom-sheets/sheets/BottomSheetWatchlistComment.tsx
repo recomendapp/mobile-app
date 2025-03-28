@@ -8,7 +8,7 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useUserWatchlistUpdateMutation } from '@/features/user/userMutations';
-import { Input } from '@/components/ui/Input';
+import { InputBottomSheet } from '@/components/ui/Input';
 import { Button, ButtonText } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
 import { ActivityIndicator } from 'react-native';
@@ -71,7 +71,7 @@ const BottomSheetWatchlistComment = forwardRef<
       ]}
       >
         <ThemedText style={tw`text-center text-xl font-bold`}>{upperFirst(t('common.messages.comment', { count: 1 }))}</ThemedText>
-		<Input
+		<InputBottomSheet
 		multiline
 		defaultValue={comment}
 		onChangeText={setComment}
