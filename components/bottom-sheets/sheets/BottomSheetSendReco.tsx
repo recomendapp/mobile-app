@@ -36,6 +36,8 @@ const BottomSheetSendReco = forwardRef<
   const { closeSheet } = useBottomSheetStore();
   const {
 		data: friends,
+    isRefetching,
+    refetch,
 	} = useUserRecosSendQuery({
 		userId: user?.id,
 		mediaId: media.media_id!,
@@ -184,6 +186,8 @@ const BottomSheetSendReco = forwardRef<
             </TouchableWithoutFeedback>
           )}
           showsVerticalScrollIndicator={false}
+          refreshing={isRefetching}
+          onRefresh={refetch}
           />
         </View>
         <InputBottomSheet
