@@ -13,7 +13,7 @@ import { useUserRecosSendQuery } from '@/features/user/userQueries';
 import { useUserRecosInsertMutation } from '@/features/user/userMutations';
 import { useAuth } from '@/context/AuthProvider';
 import Fuse from "fuse.js";
-import { Input } from '@/components/ui/Input';
+import { InputBottomSheet } from '@/components/ui/Input';
 import UserAvatar from '@/components/user/UserAvatar';
 import { Button, ButtonText } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
@@ -140,7 +140,7 @@ const BottomSheetSendReco = forwardRef<
             )}
           </View>
         </View>
-        <Input
+        <InputBottomSheet
         defaultValue={search}
         onChangeText={setSearch}
         placeholder={upperFirst(t('common.messages.search_friend'))}
@@ -186,7 +186,7 @@ const BottomSheetSendReco = forwardRef<
           showsVerticalScrollIndicator={false}
           />
         </View>
-        <Input
+        <InputBottomSheet
         defaultValue={comment}
         onChangeText={setComment}
         placeholder={upperFirst(t('common.messages.add_comment'))}
