@@ -207,6 +207,16 @@ export const userKeys = {
 		userId: string;
 		filters?: any;
 	}) => filters ? [...userKeys.detail(userId), 'playlists-saved', filters] as const : [...userKeys.detail(userId), 'playlists-saved'] as const,
+
+	addMediaToPlaylist: ({
+		userId,
+		mediaId,
+		type,
+	} : {
+		userId: string;
+		mediaId: number;
+		type?: 'personal' | 'saved';
+	}) => type ? [...userKeys.detail(userId), 'add-media-to-playlist', mediaId, type] as const : [...userKeys.detail(userId), 'add-media-to-playlist', mediaId] as const,
 	/* -------------------------------------------------------------------------- */
 
 

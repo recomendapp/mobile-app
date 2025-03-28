@@ -1,5 +1,5 @@
 import { RecomendLogo } from "@/lib/icons/RecomendLogo";
-import { AlertCircleIcon, ArrowDownNarrowWideIcon, ArrowUpNarrowWideIcon, BookmarkIcon, CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, ClapperboardIcon, CompassIcon, EllipsisIcon, EllipsisVerticalIcon, EyeIcon, EyeOffIcon, FilterIcon, HeartIcon, HomeIcon, InfoIcon, LibraryIcon, LinkIcon, ListPlusIcon, Loader2Icon, LockIcon, LogOutIcon, LucideProps, SearchIcon, SendIcon, SettingsIcon, StoreIcon, TextIcon, TrashIcon, UserIcon, XIcon, ZapIcon } from "lucide-react-native";
+import { AlertCircleIcon, ArrowDownNarrowWideIcon, ArrowUpNarrowWideIcon, BookmarkIcon, CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, ClapperboardIcon, CompassIcon, EllipsisIcon, EllipsisVerticalIcon, EyeIcon, EyeOffIcon, FilterIcon, HeartIcon, HomeIcon, InfoIcon, LibraryIcon, LinkIcon, ListPlusIcon, Loader2Icon, LockIcon, LogOutIcon, LucideProps, PlusIcon, SearchIcon, SendIcon, SettingsIcon, StoreIcon, TextIcon, TrashIcon, UserIcon, XIcon, ZapIcon } from "lucide-react-native";
 import { Premium } from "@/lib/icons/Premium";
 import tw from "@/lib/tw";
 
@@ -46,4 +46,5 @@ export const Icons = {
 	Cancel: XIcon,
 	Comment: TextIcon,
 	Check: CheckIcon,
+	Add: PlusIcon,
 };
