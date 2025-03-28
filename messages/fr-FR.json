@@ -90,7 +90,11 @@
       "reco_other": "recos",
       "send": "envoyer",
       "sent": "envoyé",
-      "search_friend": "rechercher un ami"
+      "search_friend": "rechercher un ami",
+      "search_playlist": "rechercher une playlist",
+      "add": "ajouter",
+      "already_added": "déjà ajouté",
+      "create": "créer"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",

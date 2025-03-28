@@ -11,7 +11,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
 import { Label } from "@/components/ui/Label";
-import { Input } from "@/components/ui/Input";
+import { Input, InputBottomSheet } from "@/components/ui/Input";
 import { Button, ButtonText } from "@/components/ui/Button";
 import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
 import useDebounce from "@/hooks/useDebounce";
@@ -121,7 +121,7 @@ const AccountSettings = () => {
 						<Label>{t('pages.settings.account.username.label')}</Label>
 						<ThemedText>{value?.length ?? 0} / {USERNAME_MAX_LENGTH}</ThemedText>
 					</View>
-					<Input
+					<InputBottomSheet
 					placeholder={t('pages.settings.account.username.placeholder')}
 					value={value}
 					autoCorrect={false}

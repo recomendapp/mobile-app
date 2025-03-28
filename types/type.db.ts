@@ -114,7 +114,7 @@ export type PlaylistGuest = Database['public']['Tables']['playlist_guests']['Row
 	playlist?: Playlist;
 };
 
-export type PlaylistType = 'personal' | 'shared';
+export type PlaylistType = 'personal' | 'saved';
 /* -------------------------------------------------------------------------- */
 
 /* ---------------------------------- FEED ---------------------------------- */

@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { userKeys } from "./userKeys"
-import { UserFeedCastCrew, Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserReview, UserWatchlist } from "@/types/type.db";
+import { UserFeedCastCrew, Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserReview, UserWatchlist, PlaylistType } from "@/types/type.db";
 import { useSupabaseClient } from "@/context/SupabaseProvider";
 import { playlistKeys } from "../playlist/playlistKeys";
 
@@ -941,6 +941,75 @@ export const useUserPlaylistsFriendsInfinite = ({
 			return lastPage?.length == mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
+	});
+};
+
+export const useUserAddMediaToPlaylistQuery = ({
+	mediaId,
+	userId,
+	type = 'personal',
+} : {
+	mediaId: number;
+	userId?: string;
+	type: PlaylistType;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: userKeys.addMediaToPlaylist({
+			userId: userId as string	,
+			mediaId: mediaId,
+			type: type,
+		}),
+		queryFn: async () => {
+			if (!userId) throw Error('Missing user id');
+			if (!type) throw Error('Missing type');
+			if (type === 'personal') { // personal
+				const { data, error } = await supabase
+					.from('playlists')
+					.select('*, playlist_items(count)')
+					.match({
+						'user_id': userId,
+						'playlist_items.media_id': mediaId,
+					})
+					.order('updated_at', { ascending: false })
+				if (error) throw error;
+				const output = data?.map(({ playlist_items, ...playlist }) => ({
+					playlist: playlist,
+					already_added: playlist_items[0]?.count > 0,
+				}));
+				return output;
+			} else { // saved
+				const { data, error } = await supabase
+					.from('playlists_saved')
+					.select(`
+						id,
+						playlist:playlists!inner(
+							*,
+							playlist_guests!inner(*),
+							user!inner(*),
+							playlist_items(count)
+						)
+					`)
+					.match({
+						'user_id': userId,
+						'playlist.playlist_guests.user_id': userId,
+						'playlist.playlist_guests.edit': true,
+						'playlist.user.premium': true,
+						'playlist.playlist_items.media_id': mediaId,
+					})
+					.order('updated_at', {
+						referencedTable: 'playlist',
+						ascending: false 
+					})
+				if (error) throw error;
+				const output = data?.map(({ playlist: { playlist_items, playlist_guests, user, ...playlist }, ...playlists_saved }) => ({
+					playlist: playlist,
+					already_added: playlist_items[0]?.count > 0,
+				}));
+				return output;
+			}
+		},
+		enabled: !!userId && !!mediaId,
 	});
 };
 

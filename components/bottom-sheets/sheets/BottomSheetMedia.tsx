@@ -13,6 +13,7 @@ import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { Text, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import BottomSheetSendReco from './BottomSheetSendReco';
+import BottomSheetAddToPlaylist from './BottomSheetAddToPlaylist';
 
 interface BottomSheetMediaProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   id: string;
@@ -54,8 +55,9 @@ const BottomSheetMedia = forwardRef<
 			},
       {
 				icon: Icons.AddPlaylist,
-        onPress: () => {},
-				// onClick: () => openModal(ModalPlaylistAdd, { mediaId: media.media_id!, mediaTitle: mediaDetails.title }),
+        onPress: () => openSheet(BottomSheetAddToPlaylist, {
+          media: media!,
+        }),
 				label: upperFirst(t('common.messages.add_to_playlist')),
 			},
 			{
@@ -63,7 +65,6 @@ const BottomSheetMedia = forwardRef<
         onPress: () => openSheet(BottomSheetSendReco, {
           media: media!,
         }),
-				// onClick: () => openModal(ModalRecoSend, { mediaId: media.media_id!, mediaTitle: mediaDetails.title }),
 				label: upperFirst(t('common.messages.send_to_friend')),
 			}
     ],

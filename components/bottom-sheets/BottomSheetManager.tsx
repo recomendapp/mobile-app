@@ -90,20 +90,22 @@ export const BottomSheetManager = () => {
   }, [sheets, closeSheet, navigation]);
 
   return (
-    <BottomSheetModalProvider>
+    <>
       {sheets.map(({ id, isOpen, isClosing, content, props, snapPoints }) => (
-      <BottomSheetItem
-      key={id}
-      id={id}
-      isOpen={isOpen}
-      isClosing={isClosing}
-      content={content}
-      props={props}
-      snapPoints={snapPoints}
-      closeSheet={closeSheet}
-      removeSheet={removeSheet}
-      />
+      <BottomSheetModalProvider key={id}>
+        <BottomSheetItem
+        // key={id}
+        id={id}
+        isOpen={isOpen}
+        isClosing={isClosing}
+        content={content}
+        props={props}
+        snapPoints={snapPoints}
+        closeSheet={closeSheet}
+        removeSheet={removeSheet}
+        />
+      </BottomSheetModalProvider>
       ))}
-    </BottomSheetModalProvider>
+    </>
   );
 };
