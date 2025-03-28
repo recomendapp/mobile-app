@@ -52,6 +52,8 @@ const BottomSheetAddToPlaylist = forwardRef<
   const { closeSheet, openSheet } = useBottomSheetStore();
   const {
 		data: playlists,
+    isRefetching,
+    refetch,
 	} = useUserAddMediaToPlaylistQuery({
 		userId: user?.id,
 		mediaId: media.media_id!,
@@ -225,6 +227,8 @@ const BottomSheetAddToPlaylist = forwardRef<
             </TouchableWithoutFeedback>
           )}
           showsVerticalScrollIndicator={false}
+          refreshing={isRefetching}
+          onRefresh={refetch}
           />
         </View>
         <InputBottomSheet
