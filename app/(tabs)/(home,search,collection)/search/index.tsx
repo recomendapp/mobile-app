@@ -1,5 +1,7 @@
 
 import FeaturedPlaylists from "@/components/screens/search/FeaturedPlaylists";
+import Filters from "@/components/screens/search/Filters";
+import ResultPlaylists from "@/components/screens/search/results/ResultPlaylists";
 import { Input } from "@/components/ui/Input";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import { ThemedText } from "@/components/ui/ThemedText";
@@ -8,13 +10,35 @@ import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/context/ThemeProvider";
 import useDebounce from "@/hooks/useDebounce";
 import tw from "@/lib/tw";
-import { useState } from "react";
+import useSearchStore from "@/stores/useSearchStore";
+import { useCallback } from "react";
 import { TextInput, View } from "react-native";
 
 const SearchScreen = () => {
 	const { colors, inset } = useTheme();
-	const [search, setSearch] = useState('');
+	const { search, setSearch, filter } = useSearchStore(state => state);
 	const debouncedSearch = useDebounce(search, 500);
+	const renderSearch = useCallback(() => {
+		if (debouncedSearch) {
+			switch (filter) {
+				case "movies":
+					return <ThemedText>Search for movies: {debouncedSearch}</ThemedText>
+				case "tv_series":
+					return <ThemedText>Search for tv series: {debouncedSearch}</ThemedText>
+				case "persons":
+					return <ThemedText>Search for persons: {debouncedSearch}</ThemedText>
+				case "playlists":
+					return <ResultPlaylists search={debouncedSearch} />
+				case "users":
+					return <ThemedText>Search for users: {debouncedSearch}</ThemedText>
+				default:
+					return <ThemedText>Search for: {debouncedSearch}</ThemedText>
+			}
+		} else {
+			return <FeaturedPlaylists />
+		}
+	}, [debouncedSearch, filter]);
+
 	return (
 		<ThemedView
 		style={[
@@ -25,7 +49,7 @@ const SearchScreen = () => {
 			<View
 			style={[
 				{ backgroundColor: colors.muted },
-				tw`flex-row items-center gap-2 rounded-md`,
+				tw`flex-row items-center gap-2 rounded-md mx-2`,
 			]}
 			>
 				<Icons.Search color={colors.foreground} size={20} style={tw`my-2 ml-2`} />
@@ -43,13 +67,9 @@ const SearchScreen = () => {
 				/>
 			</View>
 			{debouncedSearch ? (
-				<>
-				</>
-			) : (
-				<>
-				<FeaturedPlaylists />
-				</>
-			)}
+				<Filters />
+			) : null}
+			{renderSearch()}
 		</ThemedView>
 	)
 };

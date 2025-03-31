@@ -149,7 +149,7 @@ const BottomSheetAddToPlaylist = forwardRef<
                 <ImageWithFallback
                 source={{ uri: playlist.poster_url ?? '' }}
                 alt={playlist.title}
-                style={tw`rounded-md object-cover w-10 h-10`}
+                style={tw`rounded-md w-10 h-10`}
                 type="playlist"
                 />
               </TouchableOpacity>
@@ -165,21 +165,23 @@ const BottomSheetAddToPlaylist = forwardRef<
         onChangeText={setSearch}
         placeholder={upperFirst(t('common.messages.search_playlist'))}
         />
-        <Button
-        variant={'outline'}
-        style={tw`w-full`}
-        onPress={() => {
-          openSheet(BottomSheetQuickCreatePlaylist, {
-            onConfirm: handleCreatePlaylist,
-            placeholder: media.title,
-          })
-        }}
-        >
-          <Icons.Add size={20} color={colors.foreground} style={tw`mr-2`} />
-          <ButtonText variant='outline'>{t('common.playlist.actions.create')}</ButtonText>
-        </Button>
         <View style={tw`h-64`}>
           <FlatList
+          ListHeaderComponent={() => (
+            <Button
+            variant={'outline'}
+            style={tw`w-full`}
+            onPress={() => {
+              openSheet(BottomSheetQuickCreatePlaylist, {
+                onConfirm: handleCreatePlaylist,
+                placeholder: media.title,
+              })
+            }}
+            >
+              <Icons.Add size={20} color={colors.foreground} style={tw`mr-2`} />
+              <ButtonText variant='outline'>{t('common.playlist.actions.create')}</ButtonText>
+            </Button>
+          )}
           data={results}
           renderItem={({ item: { playlist, already_added } }) => (
             <TouchableWithoutFeedback

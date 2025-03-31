@@ -76,29 +76,31 @@ const Button = React.forwardRef<React.ElementRef<typeof Animated.View>, ButtonPr
   ({ variant, disabled, role = 'button', style, ...props }, ref) => {
     const { colors } = useTheme();
     const variantStyles = React.useMemo(() => {
-      const shared = "flex-row items-center justify-center gap-2 rounded-md text-sm font-medium px-4 py-2";
+      const shared = "flex-row items-center justify-center gap-2 rounded-md text-sm font-medium px-4 py-2 border";
       let style = {};
       switch (variant) {
         case 'destructive':
           style = {
             backgroundColor: colors.destructive,
+            borderColor: colors.destructive,
           }
           break;
         case 'outline':
           style = {
             backgroundColor: colors.background,
             borderColor: colors.muted,
-            borderWidth: 1,
           }
           break;
         case 'accent-yellow':
           style = {
             backgroundColor: colors.accentYellow,
+            borderColor: colors.accentYellow,
           }
           break;
         default:
           style = {
             backgroundColor: colors.primary,
+            borderColor: colors.primary,
           }
       }
       return {

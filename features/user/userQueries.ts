@@ -775,7 +775,7 @@ export const useUserPlaylistsFeaturedInfiniteQuery = ({
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
 		queryKey: playlistKeys.featured({
-			filter: mergedFilters,
+			filters: mergedFilters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
 			let from = (pageParam - 1) * mergedFilters.resultsPerPage;

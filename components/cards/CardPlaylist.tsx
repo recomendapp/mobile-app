@@ -7,6 +7,8 @@ import { Pressable, View } from 'react-native';
 import { ThemedText } from '../ui/ThemedText';
 import { useRouter } from 'expo-router';
 import tw from '@/lib/tw';
+import { Text } from 'react-native';
+import { useTheme } from '@/context/ThemeProvider';
 
 interface CardPlaylistProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -20,6 +22,7 @@ const CardPlaylistDefault = React.forwardRef<
 	Omit<CardPlaylistProps, "variant">
 >(({ style, playlist, hideItemCount, children, ...props }, ref) => {
 	const { t } = useTranslation();
+	const { colors } = useTheme();
 	return (
 		<Animated.View
 			ref={ref}
@@ -38,7 +41,10 @@ const CardPlaylistDefault = React.forwardRef<
 				/>
 			</View>
 			<View>
-				<ThemedText numberOfLines={2} style={tw.style("text-center font-medium")}>{playlist?.title}</ThemedText>
+				<ThemedText numberOfLines={2} style={tw.style("font-medium")}>{playlist?.title}</ThemedText>
+				<Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
+					{t('common.messages.by_name', { name: playlist.user?.username })}
+				</Text>
 			</View>
 			{/* <CardContent className='p-0'>
 				<p className="line-clamp-2 break-words group-hover:text-primary/80">{playlist?.title}</p>

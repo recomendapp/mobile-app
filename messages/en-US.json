@@ -94,7 +94,8 @@
       "search_playlist": "search a playlist",
       "add": "add",
       "already_added": "already added",
-      "create": "create"
+      "create": "create",
+      "by_name": "by {{name}}"
     },
     "errors": {
       "not_logged_in": "you are not logged in",
