@@ -94,7 +94,8 @@
       "search_playlist": "rechercher une playlist",
       "add": "ajouter",
       "already_added": "déjà ajouté",
-      "create": "créer"
+      "create": "créer",
+      "by_name": "par {name}"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",
