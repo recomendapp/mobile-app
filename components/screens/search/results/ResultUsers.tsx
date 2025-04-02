@@ -1,22 +1,20 @@
-import { CardPlaylist } from "@/components/cards/CardPlaylist";
+import { CardUser } from "@/components/cards/CardUser";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useTheme } from "@/context/ThemeProvider";
-import { useSearchPlaylistsInfiniteQuery } from "@/features/search/searchQueries";
+import { useSearchUsersInfiniteQuery } from "@/features/search/searchQueries";
 import tw from "@/lib/tw";
 import { FlashList } from "@shopify/flash-list";
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Text, View } from "react-native";
 
-const GRID_COLS = 3;
-
-interface ResultPlaylistsProps {
+interface ResultUsersProps {
 	search: string;
 }
 
-const ResultPlaylists = ({
+const ResultUsers = ({
 	search,
-} : ResultPlaylistsProps) => {
+} : ResultUsersProps) => {
 	const { t } = useTranslation();
 	const { inset, colors } = useTheme();
 	const tabBarHeight = useBottomTabOverflow();
@@ -27,17 +25,17 @@ const ResultPlaylists = ({
 		fetchNextPage,
 		isRefetching,
 		refetch,
-	} = useSearchPlaylistsInfiniteQuery({
+	} = useSearchUsersInfiniteQuery({
 		query: search,
 	});
-	const loading = isLoading || results === undefined;
+	const loading = isLoading || results === undefined
 
 	return (
 		<FlashList
 		data={results?.pages.flat()}
 		renderItem={({ item }) => (
 			<View key={item.id} style={tw`p-1`}>
-				<CardPlaylist playlist={item} />
+				<CardUser user={item} />
 			</View>
 		)}
 		ListEmptyComponent={() => (
@@ -50,7 +48,6 @@ const ResultPlaylists = ({
 			)
 		)}
 		keyExtractor={(item) => String(item.id)}
-		numColumns={GRID_COLS}
 		showsVerticalScrollIndicator={false}
 		contentContainerStyle={{
 			paddingLeft: 4,
@@ -66,4 +63,4 @@ const ResultPlaylists = ({
 	)
 };
 
-export default ResultPlaylists;
+export default ResultUsers;

@@ -49,7 +49,7 @@ const CollectionScreen = () => {
 			} else {
 			  return (
 				<View key={index} style={tw`p-1`}>
-				  <CardPlaylist playlist={item} style={tw`w-full`} />
+				  <CardPlaylist playlist={item} style={tw`w-full`} showPlaylistAuthor={false} showItemsCount />
 				</View>
 			  );
 			}

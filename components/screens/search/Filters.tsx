@@ -1,5 +1,4 @@
 import { Button, ButtonText } from "@/components/ui/Button";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { useTheme } from "@/context/ThemeProvider";
 import tw from "@/lib/tw";
 import useSearchStore from "@/stores/useSearchStore";
@@ -7,7 +6,7 @@ import { upperFirst } from "lodash";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
-import { FlatList, Pressable } from "react-native-gesture-handler";
+import { FlatList } from "react-native-gesture-handler";
 
 interface FiltersProps {
 	
