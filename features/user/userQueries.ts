@@ -665,7 +665,7 @@ export const useUserPlaylistsInfiniteQuery = ({
 	  		let to = from - 1 + mergedFilters.perPage;
 			let request = supabase
 				.from('playlists')
-				.select(`*`)
+				.select(`*, user(*)`)
 				.eq('user_id', userId)
 				.range(from, to)
 

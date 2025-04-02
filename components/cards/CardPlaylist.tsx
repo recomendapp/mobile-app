@@ -14,13 +14,14 @@ interface CardPlaylistProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
 		variant?: "default";
 		playlist: Playlist;
-		hideItemCount?: boolean;
+		showPlaylistAuthor?: boolean;
+		showItemsCount?: boolean;
 	}
 
 const CardPlaylistDefault = React.forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	Omit<CardPlaylistProps, "variant">
->(({ style, playlist, hideItemCount, children, ...props }, ref) => {
+>(({ style, playlist, showPlaylistAuthor = true, showItemsCount = false, children, ...props }, ref) => {
 	const { t } = useTranslation();
 	const { colors } = useTheme();
 	return (
@@ -42,18 +43,13 @@ const CardPlaylistDefault = React.forwardRef<
 			</View>
 			<View>
 				<ThemedText numberOfLines={2} style={tw.style("font-medium")}>{playlist?.title}</ThemedText>
-				<Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
+				{showPlaylistAuthor ? <Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
 					{t('common.messages.by_name', { name: playlist.user?.username })}
-				</Text>
+				</Text> : null}
+				{showItemsCount ? <Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
+					{t('common.messages.item_count', { count: playlist.items_count })}
+				</Text> : null}
 			</View>
-			{/* <CardContent className='p-0'>
-				<p className="line-clamp-2 break-words group-hover:text-primary/80">{playlist?.title}</p>
-				{!hideItemCount ? (
-					<p className="line-clamp-1 text-sm italic text-muted-foreground">
-					{common('messages.item_count', { count: playlist?.items_count ?? 0 })}
-					</p>
-				) : null}
-			</CardContent> */}
 		</Animated.View>
 	);
 });

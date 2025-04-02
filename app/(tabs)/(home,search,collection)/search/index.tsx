@@ -2,6 +2,7 @@
 import FeaturedPlaylists from "@/components/screens/search/FeaturedPlaylists";
 import Filters from "@/components/screens/search/Filters";
 import ResultPlaylists from "@/components/screens/search/results/ResultPlaylists";
+import ResultUsers from "@/components/screens/search/results/ResultUsers";
 import { Input } from "@/components/ui/Input";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import { ThemedText } from "@/components/ui/ThemedText";
@@ -30,7 +31,7 @@ const SearchScreen = () => {
 				case "playlists":
 					return <ResultPlaylists search={debouncedSearch} />
 				case "users":
-					return <ThemedText>Search for users: {debouncedSearch}</ThemedText>
+					return <ResultUsers search={debouncedSearch} />
 				default:
 					return <ThemedText>Search for: {debouncedSearch}</ThemedText>
 			}

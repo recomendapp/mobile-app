@@ -58,3 +58,53 @@ export const useSearchPlaylistsInfiniteQuery = ({
 		enabled: !!query,
 	})
 };
+
+export const useSearchUsersInfiniteQuery = ({
+	query,
+	filters,
+} : {
+	query: string;
+	filters?: {
+		sortBy?: 'updated_at';
+		sortOrder?: 'asc' | 'desc';
+		perPage?: number;
+	};
+}) => {
+	const mergedFilters = {
+		sortBy: 'updated_at',
+		sortOrder: 'desc',
+		perPage: 20,
+		...filters,
+	};
+	const { i18n } = useTranslation();
+	const supabase = useSupabaseClient();
+	return useInfiniteQuery({
+		queryKey: searchKeys.users({
+			locale: i18n.language,
+			query: query,
+			filters: filters,
+		}),
+		queryFn: async ({ pageParam = 1 }) => {
+			let from  = (pageParam - 1) * mergedFilters.perPage;
+			let to = from - 1 + mergedFilters.perPage;
+			let request = supabase
+				.from('user')
+				.select('*')
+				.range(from, to)
+				.ilike('username', `${query}%`)
+			if (mergedFilters) {
+				if (mergedFilters.sortBy && mergedFilters.sortOrder) {
+					// add logic to sort
+				}
+			}
+			const { data, error } = await request;
+			if (error) throw error;
+			return data;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+		},
+		enabled: !!query,
+	})
+};

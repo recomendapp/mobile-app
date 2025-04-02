@@ -55,4 +55,14 @@ export const searchKeys = {
 		query: string;
 		filters: any;
 	}) => [locale, 'search', 'playlists', query, JSON.stringify(filters)],
+
+	users: ({
+		locale,
+		query,
+		filters,
+	} : {
+		locale: string;
+		query: string;
+		filters: any;
+	}) => [locale, 'search', 'users', query, JSON.stringify(filters)],
 };
