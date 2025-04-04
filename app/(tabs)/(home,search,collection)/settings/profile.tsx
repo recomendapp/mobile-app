@@ -4,8 +4,8 @@ import { useTheme } from "@/context/ThemeProvider";
 import { useUserUpdateMutation } from "@/features/user/userMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useMemo, useState } from "react";
-import { Controller, Form, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Text, View } from "react-native";
 import * as z from 'zod';
@@ -17,7 +17,7 @@ import { Button, ButtonText } from "@/components/ui/Button";
 const ProfileSettings = () => {
 	const { user } = useAuth();
 	const { t } = useTranslation();
-	const { colors } = useTheme();
+	const { colors, inset } = useTheme();
 	const updateProfileMutation = useUserUpdateMutation({
 		userId: user?.id,
 	});
@@ -171,7 +171,7 @@ const ProfileSettings = () => {
 			onPress={form.handleSubmit(onSubmit)}
 			disabled={isLoading}
 			>
-				<ActivityIndicator animating={isLoading} color={colors.background} />
+				{isLoading ? <ActivityIndicator color={colors.background} /> : null}
 				<ButtonText>{t('common.word.save')}</ButtonText>
 			</Button>
 		</>

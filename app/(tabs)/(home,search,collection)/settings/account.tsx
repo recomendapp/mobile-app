@@ -4,14 +4,14 @@ import { useTheme } from "@/context/ThemeProvider";
 import { useUserUpdateMutation } from "@/features/user/userMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useMemo, useState } from "react";
-import { Controller, Form, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Text, View } from "react-native";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
 import { Label } from "@/components/ui/Label";
-import { Input, InputBottomSheet } from "@/components/ui/Input";
+import { Input } from "@/components/ui/Input";
 import { Button, ButtonText } from "@/components/ui/Button";
 import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
 import useDebounce from "@/hooks/useDebounce";
@@ -121,7 +121,7 @@ const AccountSettings = () => {
 						<Label>{t('pages.settings.account.username.label')}</Label>
 						<ThemedText>{value?.length ?? 0} / {USERNAME_MAX_LENGTH}</ThemedText>
 					</View>
-					<InputBottomSheet
+					<Input
 					placeholder={t('pages.settings.account.username.placeholder')}
 					value={value}
 					autoCorrect={false}

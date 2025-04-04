@@ -9,6 +9,8 @@ import { useRouter } from 'expo-router';
 import tw from '@/lib/tw';
 import { Text } from 'react-native';
 import { useTheme } from '@/context/ThemeProvider';
+import useBottomSheetStore from '@/stores/useBottomSheetStore';
+import BottomSheetPlaylist from '../bottom-sheets/sheets/BottomSheetPlaylist';
 
 interface CardPlaylistProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -60,19 +62,24 @@ const CardPlaylist = React.forwardRef<
 	CardPlaylistProps
 >(({ playlist, variant = "default", ...props }, ref) => {
 	const router = useRouter();
+	const { openSheet } = useBottomSheetStore();
 	const onPress = () => {
 		router.push(`/playlist/${playlist?.id}`);
 	};
+	const onLongPress = () => {
+		openSheet(BottomSheetPlaylist, {
+			playlist: playlist,
+		})
+	}
 	return (
-	// <ContextMenuMovie movie={movie}>
-		// <Link href={`/playlist/${playlist?.id}`}>
-		<Pressable onPress={onPress}>
+		<Pressable
+		onPress={onPress}
+		onLongPress={onLongPress}
+		>
 			{variant === "default" ? (
 				<CardPlaylistDefault ref={ref}  playlist={playlist} {...props} />
 			) : null}
 		</Pressable>
-		// </Link>
-	// </ContextMenuMovie>
 	);
 });
 CardPlaylist.displayName = "CardPlaylist";

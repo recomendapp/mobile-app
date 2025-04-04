@@ -10,7 +10,7 @@ export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 const InputPassword = React.forwardRef<React.ElementRef<typeof TextInput>, TextInputProps>(
-  ({ style, ...props }, ref) => {
+  ({ style, secureTextEntry, ...props }, ref) => {
   const { colors } = useTheme()
   const [show, setShow] = React.useState(false);
   return (
