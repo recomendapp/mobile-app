@@ -107,7 +107,7 @@ const BottomSheetAddToPlaylist = forwardRef<
 				});
 				setSelected((prev) => [...prev, playlist]);
 			},
-			onError: (error: any) => {
+			onError: () => {
 				Burnt.toast({
           title: upperFirst(t('common.errors.an_error_occurred')),
           preset: 'error',

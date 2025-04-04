@@ -9,6 +9,7 @@
       "go_to_user": "go to user",
       "go_to_person": "go to person",
       "go_to_media": "go to media",
+      "go_to_playlist": "go to playlist",
       "view_directors": "view {count, plural, one {director} other {directors}}",
       "no_director": "no director",
       "view_comment": "view {count, plural, one {comment} other {comments}}",

@@ -13,14 +13,14 @@ import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 
-const Tab = createMaterialTopTabNavigator();
+const { Navigator } = createMaterialTopTabNavigator();
 
 const MaterialTopTabs = withLayoutContext<
 	MaterialTopTabNavigationOptions,
-	typeof Tab.Navigator,
+	typeof Navigator,
 	TabNavigationState<ParamListBase>,
 	MaterialTopTabNavigationEventMap
->(Tab.Navigator);
+>(Navigator);
 
 const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBarProps) => {
 	return (

@@ -46,7 +46,7 @@ export const usePlaylistInsertMutation = ({
 		onSuccess: (data) => {
 			queryClient.invalidateQueries({
 				queryKey: userKeys.playlists({
-					userId: userId as string,
+					userId: data.user_id
 				}),
 			});
 		}

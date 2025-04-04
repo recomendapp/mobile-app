@@ -1,4 +1,5 @@
 
+import ButtonCreatePlaylist from "@/components/buttons/ButtonCreatePlaylist";
 import { Button, ButtonText } from "@/components/ui/Button";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import { ThemedText } from "@/components/ui/ThemedText";
@@ -74,7 +75,10 @@ const CollectionLayout = () => {
 	return (
 		<ThemedSafeAreaView style={tw.style('flex-1')}>
 			<View style={tw.style('flex-row justify-between items-center gap-2 p-2')}>
-				<ThemedText style={tw`text-4xl font-bold`}>{upperFirst(t('common.messages.library'))}</ThemedText>
+				<View style={tw`flex-row items-center gap-2`}>
+					<ThemedText style={tw`text-2xl font-bold`}>{upperFirst(t('common.messages.library'))}</ThemedText>
+					<ButtonCreatePlaylist redirectAfterCreate={false} />
+				</View>
 				<UserNav />
 			</View>
 			<MaterialTopTabs
