@@ -16,11 +16,11 @@ import { InputBottomSheet } from '@/components/ui/Input';
 import { Button, ButtonText } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
-import { useAddMediaToPlaylists, usePlaylistInsertMutation } from '@/features/playlist/playlistMutations';
+import { useAddMediaToPlaylists } from '@/features/playlist/playlistMutations';
 import * as Burnt from 'burnt';
 import { useQueryClient } from '@tanstack/react-query';
 import { userKeys } from '@/features/user/userKeys';
-import BottomSheetQuickCreatePlaylist from './BottomSheetQuickCreatePlaylist';
+import BottomSheetPlaylistCreate from './BottomSheetPlaylistCreate';
 
 interface BottomSheetAddToPlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   id: string;
@@ -51,9 +51,6 @@ const BottomSheetAddToPlaylist = forwardRef<
     userId: user?.id,
     mediaId: media.media_id!,
   });
-  const createPlaylistMutation = usePlaylistInsertMutation({
-    userId: user?.id,
-  })
 
   const [search, setSearch] = useState('');
   const fuse = useMemo(() => {
@@ -88,33 +85,6 @@ const BottomSheetAddToPlaylist = forwardRef<
 			}
 		});
   };
-
-  const handleCreatePlaylist = async (playlistName: string) => {
-		await createPlaylistMutation.mutateAsync({
-			title: playlistName,
-		}, {
-			onSuccess: (playlist) => {
-				queryClient.setQueryData(userKeys.addMediaToPlaylist({
-          userId: user?.id!,
-					mediaId: media.media_id!,
-					type: 'personal',
-				}), (prev: { playlist: Playlist; already_added: boolean }[] | undefined) => {
-					if (!prev) return [{ playlist, already_added: false }];
-					return [
-						{ playlist, already_added: false },
-						...prev,
-					];
-				});
-				setSelected((prev) => [...prev, playlist]);
-			},
-			onError: () => {
-				Burnt.toast({
-          title: upperFirst(t('common.errors.an_error_occurred')),
-          preset: 'error',
-        })
-			}
-		});
-	};
 
   useEffect(() => {
     if (!playlists?.length) return;
@@ -172,8 +142,21 @@ const BottomSheetAddToPlaylist = forwardRef<
             variant={'outline'}
             style={tw`w-full`}
             onPress={() => {
-              openSheet(BottomSheetQuickCreatePlaylist, {
-                onConfirm: handleCreatePlaylist,
+              openSheet(BottomSheetPlaylistCreate, {
+                onCreate: (playlist) => {
+                  queryClient.setQueryData(userKeys.addMediaToPlaylist({
+                    userId: user?.id!,
+                    mediaId: media.media_id!,
+                    type: 'personal',
+                  }), (prev: { playlist: Playlist; already_added: boolean }[] | undefined) => {
+                    if (!prev) return [{ playlist, already_added: false }];
+                    return [
+                      { playlist, already_added: false },
+                      ...prev,
+                    ];
+                  });
+                  setSelected((prev) => [...prev, playlist]);
+                },
                 placeholder: media.title,
               })
             }}

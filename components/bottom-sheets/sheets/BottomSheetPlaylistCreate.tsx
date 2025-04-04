@@ -9,35 +9,49 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonText } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
+import { usePlaylistInsertMutation } from '@/features/playlist/playlistMutations';
+import { useAuth } from '@/context/AuthProvider';
+import { Playlist } from '@/types/type.db';
 
-interface BottomSheetQuickCreatePlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetPlaylistCreateProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   id: string;
-  onConfirm: (playlistName: string) => void;
+  onCreate?: (playlist: Playlist) => void;
   placeholder?: string | null;
 }
 
-const BottomSheetQuickCreatePlaylist = React.forwardRef<
+const BottomSheetPlaylistCreate = React.forwardRef<
 	React.ElementRef<typeof BottomSheetModal>,
-	BottomSheetQuickCreatePlaylistProps
->(({ id, onConfirm, placeholder, snapPoints, ...props }, ref) => {
+	BottomSheetPlaylistCreateProps
+>(({ id, onCreate, placeholder, snapPoints, ...props }, ref) => {
+  const { user } = useAuth();
   const { closeSheet } = useBottomSheetStore();
   const { inset } = useTheme();
   const { t } = useTranslation();
   const [playlistName, setPlaylistName] = React.useState('');
-
-  const handleConfirm = () => {
-    try {
-      if (placeholder || playlistName.length > 0) {
-        onConfirm(playlistName.length > 0 ? playlistName : placeholder!);
-        closeSheet(id);
-      }
-    } catch (error) {
-      Burnt.toast({
-        title: upperFirst(t('common.errors.an_error_occurred')),
-        preset: 'error',
+  const createPlaylistMutation = usePlaylistInsertMutation({
+    userId: user?.id,
+  });
+  const handleCreatePlaylist = async (name: string) => {
+      await createPlaylistMutation.mutateAsync({
+        title: name,
+      }, {
+        onSuccess: (playlist) => {
+          Burnt.toast({
+            title: upperFirst(t('common.messages.added')),
+            preset: 'done',
+          });
+          onCreate && onCreate(playlist);
+          closeSheet(id);
+        },
+        onError: () => {
+          Burnt.toast({
+            title: upperFirst(t('common.errors.an_error_occurred')),
+            preset: 'error',
+          })
+        }
       });
-    }
-  }
+    };
+
   return (
     <BottomSheetModal
     ref={ref}
@@ -57,7 +71,7 @@ const BottomSheetQuickCreatePlaylist = React.forwardRef<
         style={tw`w-full`}
         />
         <Button
-        onPress={handleConfirm}
+        onPress={() => handleCreatePlaylist(playlistName.length > 0 ? playlistName : placeholder!)}
         >
           <ButtonText>{upperFirst(t('common.messages.create'))}</ButtonText>
         </Button>
@@ -65,6 +79,6 @@ const BottomSheetQuickCreatePlaylist = React.forwardRef<
     </BottomSheetModal>
   );
 });
-BottomSheetQuickCreatePlaylist.displayName = 'BottomSheetQuickCreatePlaylist';
+BottomSheetPlaylistCreate.displayName = 'BottomSheetPlaylistCreate';
 
-export default BottomSheetQuickCreatePlaylist;
+export default BottomSheetPlaylistCreate;
