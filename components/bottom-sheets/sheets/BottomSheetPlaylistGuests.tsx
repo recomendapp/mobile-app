@@ -7,6 +7,7 @@ import { Playlist } from '@/types/type.db';
 import { View } from 'react-native';
 import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
+import { usePlaylistGuests } from '@/features/playlist/playlistQueries';
 
 interface BottomSheetPlaylistGuestsProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   id: string;
@@ -20,6 +21,13 @@ const BottomSheetPlaylistGuests = React.forwardRef<
 >(({ id, playlist, onEdit, snapPoints, ...props }, ref) => {
   const { colors, inset } = useTheme();
   const { t } = useTranslation();
+  const {
+    data: guests,
+    isLoading,
+    isError,
+    refetch,
+  } = usePlaylistGuests(playlist.id);
+
   return (
     <BottomSheetModal
     ref={ref}

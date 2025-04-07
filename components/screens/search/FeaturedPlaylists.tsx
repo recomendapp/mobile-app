@@ -1,7 +1,7 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useTheme } from "@/context/ThemeProvider";
-import { useUserPlaylistsFeaturedInfiniteQuery } from "@/features/user/userQueries";
+import { usePlaylistFeaturedInfiniteQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { FlatList, View } from "react-native";
 
@@ -16,7 +16,7 @@ const FeaturedPlaylists = () => {
 		hasNextPage,
 		isRefetching,
 		refetch,
-	} = useUserPlaylistsFeaturedInfiniteQuery();
+	} = usePlaylistFeaturedInfiniteQuery();
 
 	if (!playlists) return null;
 

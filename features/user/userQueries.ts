@@ -757,58 +757,6 @@ export const useUserPlaylistsSavedInfiniteQuery = ({
 	});
 };
 
-export const useUserPlaylistsFeaturedInfiniteQuery = ({
-	filter,
-} : {
-	filter?: {
-		resultsPerPage?: number;
-		sortBy?: 'created_at' | 'updated_at';
-		sortOrder?: 'asc' | 'desc';
-	}
-} = {}) => {
-	const mergedFilters = {
-		resultsPerPage: 20,
-		sortBy: 'updated_at',
-		sortOrder: 'desc',
-		...filter,
-	};
-	const supabase = useSupabaseClient();
-	return useInfiniteQuery({
-		queryKey: playlistKeys.featured({
-			filters: mergedFilters,
-		}),
-		queryFn: async ({ pageParam = 1 }) => {
-			let from = (pageParam - 1) * mergedFilters.resultsPerPage;
-			let to = from - 1 + mergedFilters.resultsPerPage;
-			let request = supabase
-				.from('playlists_featured')
-				.select(`*, playlist:playlists(*, user(*))`)
-				.range(from, to);
-			if (mergedFilters) {
-				if (mergedFilters.sortBy) {
-					switch (mergedFilters.sortBy) {
-						case 'created_at':
-							request = request.order('created_at', { referencedTable: 'playlist', ascending: mergedFilters.sortOrder === 'asc' });
-							break;
-						case 'updated_at':
-							request = request.order('updated_at', { referencedTable: 'playlist', ascending: mergedFilters.sortOrder === 'asc' });
-							break;
-						default:
-							break;
-					}
-				}
-			}
-			const { data, error } = await request;
-			if (error) throw error;
-			return data;
-		},
-		initialPageParam: 1,
-		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
-		},
-	});
-};
-
 export const useUserPlaylistSavedQuery = ({
 	userId,
 	playlistId,
