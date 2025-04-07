@@ -1,6 +1,7 @@
 {
   "common": {
     "messages": {
+      "error": "error",
       "no_results": "no results",
       "added_by": "added by",
       "sort_by": "sort by",
@@ -96,7 +97,12 @@
       "add": "add",
       "already_added": "already added",
       "create": "create",
-      "by_name": "by {{name}}"
+      "by_name": "by {{name}}",
+      "are_u_sure": "are you sure?",
+      "edit": "edit",
+      "edited": "edited",
+      "save_to_library": "save to my library",
+      "remove_from_library": "remove from my library"
     },
     "errors": {
       "not_logged_in": "you are not logged in",
@@ -198,8 +204,10 @@
         }
       },
       "length": {
-        "char_min": "{count, plural, one {# character} other {# characters}} minimum",
-        "char_max": "{count, plural, one {# character} other {# characters}} maximum"
+        "char_min_one": "{{count}} character minimum",
+        "char_min_other": "{{count}} characters minimum",
+        "char_max_one": "{{count}} character maximum",
+        "char_max_other": "{{count}} characters maximum"
       },
       "error": {
         "too_many_attempts": "Too many attempts, please try again later",
@@ -272,7 +280,14 @@
       "actions": {
         "create": "Create a playlist",
         "edit": "Edit the playlist",
-        "delete": "Delete the playlist"
+        "delete": {
+          "description": "This will permanently delete {{title}} from your library."
+        }
+      },
+      "form": {
+        "title": {
+          "placeholder": "Name of the playlist"
+        }
       },
       "search": {
         "placeholder": "search in the playlist..."

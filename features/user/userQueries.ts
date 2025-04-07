@@ -49,7 +49,7 @@ export const useUserProfileQuery = ({
 				.from('profile')
 				.select('*')
 				.eq('username', username)
-				.single();
+				.maybeSingle();
 			if (error) throw error;
 			return data;
 		},

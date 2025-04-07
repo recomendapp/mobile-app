@@ -34,7 +34,8 @@ export const Columns = () => {
 			},
 			onError: () => {
 				Burnt.toast({
-					title: capitalize(t('common.errors.an_error_occurred')),
+					title: upperFirst(t('common.messages.error')),
+					message: upperFirst(t('common.errors.an_error_occurred')),
 					preset: 'error',
 				});
 			}
@@ -54,7 +55,8 @@ export const Columns = () => {
 			},
 			onError: () => {
 				Burnt.toast({
-					title: capitalize(t('common.errors.an_error_occurred')),
+					title: upperFirst(t('common.messages.error')),
+					message: upperFirst(t('common.errors.an_error_occurred')),
 					preset: 'error',
 				});
 			}

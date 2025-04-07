@@ -35,7 +35,8 @@ const BottomSheetWatchlistComment = forwardRef<
 	}
 	if (!watchlistItem?.id) {
 		Burnt.toast({
-			title: upperFirst(t('common.errors.an_error_occurred')),
+			title: upperFirst(t('common.messages.error')),
+			message: upperFirst(t('common.errors.an_error_occurred')),
 			preset: 'error',
 		});
 		return;
@@ -53,7 +54,8 @@ const BottomSheetWatchlistComment = forwardRef<
 		},
 		onError: () => {
 			Burnt.toast({
-				title: upperFirst(t('common.errors.an_error_occurred')),
+				title: upperFirst(t('common.messages.error')),
+				message: upperFirst(t('common.errors.an_error_occurred')),
 				preset: 'error',
 			});
 		}

@@ -45,7 +45,7 @@ type BottomSheetStore = {
   createConfirmSheet: (options: {
     title: string;
     description?: string | React.ReactNode;
-    onConfirm: () => void;
+    onConfirm: () => void | Promise<void>;
     cancelLabel?: string;
     confirmLabel?: string;
   }) => string;

@@ -13,7 +13,7 @@ interface BottomSheetConfirmProps extends Omit<React.ComponentPropsWithoutRef<ty
   id: string;
   title: string;
   description?: string | React.ReactNode;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   cancelLabel?: string;
   confirmLabel?: string;
 }
@@ -29,8 +29,8 @@ const BottomSheetConfirm = React.forwardRef<
   const cancelText = cancelLabel || capitalize(t('common.word.cancel'));
   const confirmText = confirmLabel || capitalize(t('common.messages.confirm'));
 
-  const handleConfirm = () => {
-    onConfirm();
+  const handleConfirm = async () => {
+    await onConfirm();
     closeSheet(id);
   };
 
