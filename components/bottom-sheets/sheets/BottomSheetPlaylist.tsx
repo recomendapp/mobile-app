@@ -119,9 +119,6 @@ const BottomSheetPlaylist = forwardRef<
             onPress: () => {
               openSheet(BottomSheetPlaylistEdit, {
                 playlist: playlist,
-                onEdit: async (playlist) => {
-                  console.log('onEdit', playlist);
-                },
               })
             },
             label: upperFirst(t('common.messages.edit')),
