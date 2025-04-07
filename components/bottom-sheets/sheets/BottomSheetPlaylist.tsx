@@ -18,6 +18,7 @@ import * as Burnt from 'burnt';
 import BottomSheetPlaylistEdit from './BottomSheetPlaylistEdit';
 import { useUserPlaylistSavedQuery } from '@/features/user/userQueries';
 import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation } from '@/features/user/userMutations';
+import BottomSheetPlaylistGuests from './BottomSheetPlaylistGuests';
 
 interface BottomSheetPlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   id: string;
@@ -124,6 +125,13 @@ const BottomSheetPlaylist = forwardRef<
               })
             },
             label: upperFirst(t('common.messages.edit')),
+          },
+          {
+            icon: Icons.Users,
+            onPress: () => openSheet(BottomSheetPlaylistGuests, {
+              playlist: playlist,
+            }),
+            label: upperFirst(t('common.messages.guest', { context: 'male', count: 2 })),
           },
           {
             icon: Icons.Delete,
