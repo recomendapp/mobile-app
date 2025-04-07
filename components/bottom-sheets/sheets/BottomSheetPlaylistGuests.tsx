@@ -31,6 +31,8 @@ const BottomSheetPlaylistGuests = React.forwardRef<
   return (
     <BottomSheetModal
     ref={ref}
+    snapPoints={['90%']}
+    enableDynamicSizing={false}
     {...props}
     >
       <BottomSheetView
@@ -42,6 +44,9 @@ const BottomSheetPlaylistGuests = React.forwardRef<
         <ThemedText style={tw`font-bold`}>
           {upperFirst(t('common.playlist.actions.edit_guests'))}
         </ThemedText>
+        <View style={tw`flex-1 w-full`}>
+
+        </View>
       </BottomSheetView>
     </BottomSheetModal>
   );
