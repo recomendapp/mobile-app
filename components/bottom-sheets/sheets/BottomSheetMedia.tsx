@@ -98,7 +98,7 @@ const BottomSheetMedia = forwardRef<
           ]}
           />
           <View style={tw`shrink`}>
-            <ThemedText numberOfLines={2} style={tw`shrink font-bold`}>{media?.title}</ThemedText>
+            <ThemedText numberOfLines={2} style={tw`shrink`}>{media?.title}</ThemedText>
             <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
               {media?.main_credit?.map((director) => director.title).join(', ')}
             </Text>
