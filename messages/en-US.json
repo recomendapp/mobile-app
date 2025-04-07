@@ -102,7 +102,10 @@
       "edit": "edit",
       "edited": "edited",
       "save_to_library": "save to my library",
-      "remove_from_library": "remove from my library"
+      "remove_from_library": "remove from my library",
+      "private": "private",
+      "guest_one": "guest",
+      "guest_other": "guests"
     },
     "errors": {
       "not_logged_in": "you are not logged in",
@@ -283,7 +286,8 @@
         "edit": "Edit the playlist",
         "delete": {
           "description": "This will permanently delete {{title}} from your library."
-        }
+        },
+        "edit_guests": "Edit guests"
       },
       "form": {
         "title": {

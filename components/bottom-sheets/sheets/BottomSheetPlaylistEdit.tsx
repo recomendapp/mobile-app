@@ -5,9 +5,7 @@ import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonText } from '@/components/ui/Button';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { useAuth } from '@/context/AuthProvider';
 import { Playlist } from '@/types/type.db';
 import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
@@ -21,6 +19,7 @@ import { useActionSheet } from '@expo/react-native-action-sheet';
 import * as ImagePicker from 'expo-image-picker';
 import { useSupabaseClient } from '@/context/SupabaseProvider';
 import { decode } from 'base64-arraybuffer';
+import Switch from '@/components/ui/Switch';
 
 interface BottomSheetPlaylistEditProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   id: string;
@@ -73,6 +72,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
     { label: "Supprimer l'image actuelle", value: "delete", disable: !playlist.poster_url && !newPoster },
 		{ label: t("common.word.cancel"), value: "cancel" },
 	], [t, playlist.poster_url, newPoster]);
+
   const handlePosterOptions = () => {
     const cancelIndex = posterOptions.length - 1;
     showActionSheetWithOptions({
@@ -124,7 +124,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
   };
 
   const submit = async (values: PlaylistFormValues) => {
-      try {
+    try {
       let poster_url: string | null | undefined = undefined;
       if (newPoster) {
         const fileExt = newPoster.uri.split('.').pop();
@@ -207,12 +207,11 @@ const BottomSheetPlaylistEdit = React.forwardRef<
             <ThemedText>{upperFirst(t('common.word.save'))}</ThemedText>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={handlePosterOptions} style={tw.style('relative aspect-square rounded-sm overflow-hidden w-1/3')}>
+        <TouchableOpacity onPress={handlePosterOptions} style={tw.style('relative aspect-square rounded-sm overflow-hidden w-2/4')}>
           <ImageWithFallback
             source={{uri: newPoster !== undefined ? (newPoster?.uri ?? '') : playlist.poster_url ?? ''}}
             alt={playlist?.title ?? ''}
             type="playlist"
-            
           />
         </TouchableOpacity>
         <Controller
@@ -257,6 +256,21 @@ const BottomSheetPlaylistEdit = React.forwardRef<
           </View>
         )}
         />
+        <View style={tw`w-full flex-row items-center justify-between gap-1`}>
+          <Controller
+          name='private'
+          control={form.control}
+          render={({ field: { onChange, onBlur, value} }) => (
+            <View style={tw`flex-row items-center gap-2`}>
+              <ThemedText>{upperFirst(t('common.messages.private', { context: 'female' }))}</ThemedText>
+              <Switch
+              value={value}
+              onValueChange={onChange}
+              />
+            </View>
+          )}
+          />
+        </View>
       </BottomSheetView>
     </BottomSheetModal>
   );

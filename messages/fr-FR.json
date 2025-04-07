@@ -103,7 +103,15 @@
       "edited_male": "modifié",
       "edited_female": "modifiée",
       "save_to_library": "enregistrer dans ma bibliothèque",
-      "remove_from_library": "supprimer de ma bibliothèque"
+      "remove_from_library": "supprimer de ma bibliothèque",
+      "private_female_one": "privée",
+      "private_female_other": "privées",
+      "private_male_one": "privé",
+      "private_male_other": "privés",
+      "guest_female_one": "invitée",
+      "guest_female_other": "invitées",
+      "guest_male_one": "invité",
+      "guest_male_other": "invités"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",
@@ -284,7 +292,8 @@
         "edit": "Modifier la playlist",
         "delete": {
           "description": "Cela supprimera {{title}} définitivement de votre bibliothèque."
-        }
+        },
+        "edit_guests": "Modifier les invités"
       },
       "form": {
         "title": {

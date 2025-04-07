@@ -31,6 +31,18 @@ type SheetState<T = any> = {
   persistent: boolean; // Nouvelle propriété
 };
 
+const generateSheetId = <T>(
+  content: BottomSheetContentComponent<T>,
+  props: Omit<T, 'id' | 'open' | 'onOpenChange'>
+): string => {
+  const contentName = content.displayName || content.name || 'unknown';
+  const propsString = JSON.stringify(props, (key, value) => {
+    if (typeof value === 'function') return undefined;
+    return value;
+  });
+  return `${contentName}-${propsString}`;
+};
+
 type BottomSheetStore = {
   sheets: SheetState[];
   openSheet: <T>(
@@ -57,9 +69,12 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
     content: BottomSheetContentComponent<T>,
     props: Omit<T, 'id' | 'open' | 'onOpenChange'>,
     snapPoints: string[] | null | undefined = ['40%', '60%'],
-    persistent = false // Défaut à false
+    persistent = false
   ) => {
-    const id = Math.random().toString(36).substring(7);
+    // const id = Math.random().toString(36).substring(7);
+    const id = generateSheetId(content, props);
+    const existingSheet = get().sheets.find((s) => s.id === id);
+    if (existingSheet) return id;
     if (process.env.EXPO_OS === 'ios') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
@@ -87,7 +102,7 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
         s.id === id ? { ...s, isOpen: false, isClosing: true } : s
       ),
     }));
-    // Délai pour laisser l’animation se terminer avant suppression
+    // Delayed removal to allow closing animation
     setTimeout(() => get().removeSheet(id), 300);
   },
   removeSheet: (id: string) => {
