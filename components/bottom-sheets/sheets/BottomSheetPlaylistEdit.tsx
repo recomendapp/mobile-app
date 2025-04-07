@@ -19,6 +19,8 @@ import { InputBottomSheet } from '@/components/ui/Input';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import * as ImagePicker from 'expo-image-picker';
+import { useSupabaseClient } from '@/context/SupabaseProvider';
+import { decode } from 'base64-arraybuffer';
 
 interface BottomSheetPlaylistEditProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   id: string;
@@ -34,12 +36,13 @@ const BottomSheetPlaylistEdit = React.forwardRef<
 	React.ElementRef<typeof BottomSheetModal>,
 	BottomSheetPlaylistEditProps
 >(({ id, playlist, onEdit, snapPoints, ...props }, ref) => {
+  const supabase = useSupabaseClient();
   const { closeSheet } = useBottomSheetStore();
   const { colors, inset } = useTheme();
   const { t } = useTranslation();
   const { showActionSheetWithOptions } = useActionSheet();
   const updatePlaylistMutation = usePlaylistUpdateMutation();
-  const [newPoster, setNewPoster] = useState<string | null | undefined>(undefined);
+  const [newPoster, setNewPoster] = useState<ImagePicker.ImagePickerAsset | null | undefined>(undefined);
 
   /* ---------------------------------- FORM ---------------------------------- */
   const playlistSchema = z.object({
@@ -50,14 +53,12 @@ const BottomSheetPlaylistEdit = React.forwardRef<
       .max(DESCRIPTION_MAX_LENGTH, { message: upperFirst(t('common.form.length.char_max', { count: DESCRIPTION_MAX_LENGTH }))})
       .optional().nullable(),
     private: z.boolean().default(false),
-    poster_url: z.string().url().optional().nullable(),
   });
   type PlaylistFormValues = z.infer<typeof playlistSchema>;
   const defaultValues: Partial<PlaylistFormValues> = {
     title: playlist.title,
     description: playlist.description,
     private: playlist.private,
-    poster_url: playlist.poster_url,
   };
   const form = useForm<PlaylistFormValues>({
     resolver: zodResolver(playlistSchema),
@@ -69,14 +70,14 @@ const BottomSheetPlaylistEdit = React.forwardRef<
   const posterOptions = useMemo(() => [
 		{ label: "Choisir dans la bibliothèque", value: "library" },
 		{ label: "Prendre une photo", value: "camera" },
-    { label: "Supprimer l'image actuelle", value: "delete", enable: playlist.poster_url !== null },
+    { label: "Supprimer l'image actuelle", value: "delete", disable: !playlist.poster_url && !newPoster },
 		{ label: t("common.word.cancel"), value: "cancel" },
-	], [t, playlist]);
+	], [t, playlist.poster_url, newPoster]);
   const handlePosterOptions = () => {
     const cancelIndex = posterOptions.length - 1;
     showActionSheetWithOptions({
       options: posterOptions.map((option) => upperFirst(option.label)),
-      disabledButtonIndices: posterOptions.map((option, index) => option.enable === false ? index : -1).filter((index) => index !== -1),
+      disabledButtonIndices: posterOptions.map((option, index) => option.disable ? index : -1).filter((index) => index !== -1),
       cancelButtonIndex: cancelIndex,
     }, async (selectedIndex) => {
       if (selectedIndex === undefined || selectedIndex === cancelIndex) return;
@@ -87,52 +88,96 @@ const BottomSheetPlaylistEdit = React.forwardRef<
             mediaTypes: ['images'],
             allowsEditing: true,
             aspect: [1, 1],
-            quality: 1,
+            quality: 0,
+            base64: true,
           })
-          console.log('results', results);
           if (!results.canceled) {
-            setNewPoster(results.assets[0].uri);
+            setNewPoster(results.assets[0]);
           }
           break;
         case 'camera':
+          const hasPermission = await ImagePicker.requestCameraPermissionsAsync();
+          if (!hasPermission.granted) {
+            Burnt.toast({
+              title: upperFirst(t('common.messages.error')),
+              message: upperFirst(t('common.errors.camera_permission_denied')),
+              preset: 'error',
+            });
+            return;
+          }
           const cameraResults = await ImagePicker.launchCameraAsync({
             mediaTypes: ['images'],
             allowsEditing: true,
             aspect: [1, 1],
-            quality: 1,
+            quality: 0,
+            base64: true,
           })
           if (!cameraResults.canceled) {
-            setNewPoster(cameraResults.assets[0].uri);
+            setNewPoster(cameraResults.assets[0]);
           }
           break;
         case 'delete':
-          setNewPoster(null);
+          setNewPoster(playlist.poster_url ? null : undefined);
           break;
       };
     });
   };
 
   const submit = async (values: PlaylistFormValues) => {
-    await updatePlaylistMutation.mutateAsync({
-      playlistId: playlist.id,
-      payload: values,
-    }, {
-      onSuccess: (playlist) => {
+      try {
+      let poster_url: string | null | undefined = undefined;
+      if (newPoster) {
+        const fileExt = newPoster.uri.split('.').pop();
+        const fileName = `${playlist.id}-${Math.random()}.${fileExt}`;
+        const { data, error } = await supabase.storage
+          .from('playlist_posters')
+          .upload(fileName, decode(newPoster.base64!), {
+            contentType: newPoster.mimeType,
+            upsert: true,
+          });
+        if (error) throw error;
+        poster_url =  `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${data?.fullPath}`;
+      } else if (newPoster === null) {
+        poster_url = null;
+      }
+      await updatePlaylistMutation.mutateAsync({
+        playlistId: playlist.id,
+        payload: {
+          ...values,
+          poster_url: poster_url,
+        },
+      }, {
+        onSuccess: (playlist) => {
+          Burnt.toast({
+            title: upperFirst(t('common.word.saved')),
+            preset: 'done',
+          });
+          onEdit && onEdit(playlist);
+          closeSheet(id);
+        },
+        onError: (error) => {
+          Burnt.toast({
+            title: upperFirst(t('common.messages.error')),
+            message: upperFirst(t('common.errors.an_error_occurred')),
+            preset: 'error',
+          });
+        }
+      });
+    } catch (error: any) {
+      if (error?.message) {
         Burnt.toast({
-          title: upperFirst(t('common.word.saved')),
-          preset: 'done',
+          title: upperFirst(t('common.messages.error')),
+          message: upperFirst(error.message),
+          preset: 'error',
         });
-        onEdit && onEdit(playlist);
-        closeSheet(id);
-      },
-      onError: (error) => {
+      } else {
         Burnt.toast({
           title: upperFirst(t('common.messages.error')),
           message: upperFirst(t('common.errors.an_error_occurred')),
           preset: 'error',
         });
       }
-    });
+    }
   };
 
   return (
@@ -164,7 +209,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
         </View>
         <TouchableOpacity onPress={handlePosterOptions} style={tw.style('relative aspect-square rounded-sm overflow-hidden w-1/3')}>
           <ImageWithFallback
-            source={{uri: newPoster !== undefined ? (newPoster ?? '') : playlist.poster_url ?? ''}}
+            source={{uri: newPoster !== undefined ? (newPoster?.uri ?? '') : playlist.poster_url ?? ''}}
             alt={playlist?.title ?? ''}
             type="playlist"
             

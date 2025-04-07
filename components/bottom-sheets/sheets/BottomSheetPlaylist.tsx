@@ -189,7 +189,7 @@ const BottomSheetPlaylist = forwardRef<
           ]}
           />
           <View style={tw`shrink`}>
-            <ThemedText numberOfLines={2} style={tw`shrink font-bold`}>{playlist.title}</ThemedText>
+            <ThemedText numberOfLines={2} style={tw`shrink`}>{playlist.title}</ThemedText>
             <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
               {t('common.messages.by_name', { name: playlist.user?.username })}
             </Text>

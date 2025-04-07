@@ -116,7 +116,8 @@
       "review_not_found": "review not found",
       "person_not_found": "person not found",
       "wrong_arguments": "wrong arguments",
-      "no_media_found": "no media found"
+      "no_media_found": "no media found",
+      "camera_permission_denied": "camera permission denied"
     },
     "word": {
       "hello": "Hello",

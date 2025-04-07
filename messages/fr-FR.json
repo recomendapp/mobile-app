@@ -117,7 +117,8 @@
       "review_not_found": "critique introuvable",
       "person_not_found": "personne introuvable",
       "wrong_arguments": "arguments incorrects",
-      "no_media_found": "aucun média trouvé"
+      "no_media_found": "aucun média trouvé",
+      "camera_permission_denied": "permission d'accès à la caméra refusée"
     },
     "word": {
       "hello": "Bonjour",
