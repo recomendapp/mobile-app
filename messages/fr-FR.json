@@ -1,6 +1,7 @@
 {
   "common": {
     "messages": {
+      "error": "erreur",
       "no_results": "aucun résultat",
       "added_by": "ajouté par",
       "sort_by": "trier par",
@@ -96,7 +97,13 @@
       "add": "ajouter",
       "already_added": "déjà ajouté",
       "create": "créer",
-      "by_name": "par {name}"
+      "by_name": "par {name}",
+      "are_u_sure": "êtes-vous sûr ?",
+      "edit": "modifier",
+      "edited_male": "modifié",
+      "edited_female": "modifiée",
+      "save_to_library": "enregistrer dans ma bibliothèque",
+      "remove_from_library": "supprimer de ma bibliothèque"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",
@@ -198,8 +205,10 @@
         }
       },
       "length": {
-        "char_min": "{count, plural, one {# caractère} other {# caractères}} minimum",
-        "char_max": "{count, plural, one {# caractère} other {# caractères}} maximum"
+        "char_min_one": "{{count}} caractère minimum",
+        "char_min_other": "{{count}} caractères minimum",
+        "char_max_one": "{{count}} caractère maximum",
+        "char_max_other": "{{count}} caractères maximum"
       },
       "error": {
         "too_many_attempts": "Trop de tentatives, veuillez réessayer plus tard",
@@ -272,7 +281,14 @@
       "actions": {
         "create": "Créer une playlist",
         "edit": "Modifier la playlist",
-        "delete": "Supprimer la playlist"
+        "delete": {
+          "description": "Cela supprimera {{title}} définitivement de votre bibliothèque."
+        }
+      },
+      "form": {
+        "title": {
+          "placeholder": "Nom de la playlist"
+        }
       },
       "search": {
         "placeholder": "rechercher dans la playlist..."

@@ -3,6 +3,7 @@ import { User, UserActivity, UserFollower, UserRecosAggregated, UserWatchlist } 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { userKeys } from './userKeys';
 import { useSupabaseClient } from '@/context/SupabaseProvider';
+import { useAuth } from '@/context/AuthProvider';
 
 export const useUserUpdateMutation = ({
 	userId,
@@ -786,18 +787,18 @@ export const useUserWatchlistUpdateMutation = () => {
 export const useUserPlaylistSavedInsertMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
+	const { user } = useAuth();
 	return useMutation({
 		mutationFn: async ({
-			userId,
 			playlistId,
 		} : {
-			userId: string;
 			playlistId: number;
 		}) => {
+			if (!user) throw Error('Missing user');
 			const { data, error } = await supabase
 				.from('playlists_saved')
 				.insert({
-					user_id: userId,
+					user_id: user.id,
 					playlist_id: playlistId,
 				})
 				.select()

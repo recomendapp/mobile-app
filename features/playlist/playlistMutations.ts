@@ -89,6 +89,36 @@ export const usePlaylistDeleteMutation = ({
 	});
 };
 
+/**
+ * Updates a playlist
+ * @returns The mutation
+ */
+export const usePlaylistUpdateMutation = () => {
+	const supabase = useSupabaseClient();
+	return useMutation({
+		mutationFn: async ({
+			playlistId,
+			payload,
+		} : {
+			playlistId: number;
+			payload: {
+				title: string;
+				description?: string | null;
+				private?: boolean;
+				poster_url?: string | null;
+			}
+		}) => {
+			const { data, error } = await supabase
+				.from('playlists')
+				.update(payload)
+				.eq('id', playlistId)
+				.select(`*`)
+				.single();
+			if (error) throw error;
+			return data;
+		},
+	})
+};
 
 export const useAddMediaToPlaylists = ({
 	mediaId,

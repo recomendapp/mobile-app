@@ -70,13 +70,13 @@ const SecuritySettings = () => {
 		} catch (error) {
 			if (error instanceof AuthError) {
 				Burnt.toast({
-					title: t('common.errors.an_error_occurred'),
+					title: t('common.messages.error'),
 					message: error.message,
 					preset: 'error',
 				});
 			} else {
 				Burnt.toast({
-					title: t('common.errors.an_error_occurred'),
+					title: t('common.messages.error'),
 					preset: 'error',
 				})
 			}
