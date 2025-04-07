@@ -183,12 +183,14 @@ const BottomSheetPlaylistEdit = React.forwardRef<
   return (
     <BottomSheetModal
     ref={ref}
+    enableDynamicSizing={false}
+    snapPoints={['90%']}
     {...props}
     >
       <BottomSheetView
       style={[
         { paddingBottom: inset.bottom },
-        tw`flex-1 gap-4 items-center justify-center mx-2`,
+        tw`flex-1 gap-4 items-center mx-2`,
       ]}
       >
         <View style={tw`flex-row items-center justify-between w-full`}>
