@@ -92,7 +92,7 @@ const ActionReviewLike = React.forwardRef<
 		>
 			<Animated.View ref={ref} style={[tw.style('flex-row items-center'), style]} {...props}>
 				{(isLoading || like === undefined) ? (
-				<Icons.loader color={colors.mutedForeground} size={20} />
+				<Icons.Loader color={colors.mutedForeground} size={20} />
 				) : isError ? (
 				<Icons.AlertCircle color={colors.mutedForeground} size={20}/>
 				) : (

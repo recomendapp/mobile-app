@@ -57,7 +57,8 @@ type BottomSheetStore = {
   createConfirmSheet: (options: {
     title: string;
     description?: string | React.ReactNode;
-    onConfirm: () => void | Promise<void>;
+    onConfirm?: () => void | Promise<void>;
+    onCancel?: () => void | Promise<void>;
     cancelLabel?: string;
     confirmLabel?: string;
   }) => string;
@@ -116,11 +117,12 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
     }));
     setTimeout(() => set({ sheets: [] }), 300);
   },
-  createConfirmSheet: ({ title, description, onConfirm, cancelLabel, confirmLabel }) => {
+  createConfirmSheet: ({ title, description, onConfirm, onCancel, cancelLabel, confirmLabel }) => {
     return get().openSheet(BottomSheetConfirm, {
       title,
       description,
       onConfirm,
+      onCancel,
       cancelLabel,
       confirmLabel,
     }, ['30%'], true);

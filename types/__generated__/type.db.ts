@@ -3480,7 +3480,7 @@ export type Database = {
           id: number
           likes_count: number
           title: string | null
-          updated_at: string | null
+          updated_at: string
           views_count: number
         }
         Insert: {
@@ -3490,7 +3490,7 @@ export type Database = {
           id?: number
           likes_count?: number
           title?: string | null
-          updated_at?: string | null
+          updated_at?: string
           views_count?: number
         }
         Update: {
@@ -3500,7 +3500,7 @@ export type Database = {
           id?: number
           likes_count?: number
           title?: string | null
-          updated_at?: string | null
+          updated_at?: string
           views_count?: number
         }
         Relationships: [
@@ -4747,6 +4747,13 @@ export type Database = {
           popularity: number
           directors: Json
         }[]
+      }
+      playlist_guests_update: {
+        Args: {
+          p_playlist_id: number
+          p_guests: Json
+        }
+        Returns: undefined
       }
       search_movies: {
         Args: {
