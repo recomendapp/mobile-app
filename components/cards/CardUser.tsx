@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useRouter } from "expo-router";
-import { Pressable, View, Text } from "react-native";
+import { Pressable, View, Text, StyleProp, ViewStyle } from "react-native";
 import Animated from "react-native-reanimated";
 import { User } from "@/types/type.db";
 import UserAvatar from "../user/UserAvatar";
@@ -12,6 +12,8 @@ import { ThemedView } from "../ui/ThemedView";
 
 interface CardUserProps
 	extends React.ComponentPropsWithoutRef<typeof Animated.View> {
+		onPress?: () => void;
+		containerStyle?: StyleProp<ViewStyle>;
 		variant?: "default" | "icon" | "username" | "inline";
 		user: User;
 		linked?: boolean;
@@ -102,15 +104,13 @@ CardUserInline.displayName = "CardUserInline";
 const CardUser = React.forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	CardUserProps
->(({ variant = "default", linked = true, ...props }, ref) => {
+>(({ variant = "default", linked = true, onPress, containerStyle, ...props }, ref) => {
 	const router = useRouter();
-	const onPress = () => {
-		if (linked) {
-			router.push(`/user/${props.user?.username}`);
-		}
+	const onPressDefault = () => {
+		router.push(`/user/${props.user?.username}`);
 	};
 	return (
-		<Pressable onPress={onPress}>
+		<Pressable onPress={onPress ?? (linked ? onPressDefault : undefined)} style={containerStyle}>
 			{variant === "default" ? (
 				<CardUserDefault ref={ref} {...props} />
 			) : variant === "icon" ? (

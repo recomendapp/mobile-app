@@ -2,15 +2,17 @@ import { RecomendLogo } from "@/lib/icons/RecomendLogo";
 import { AlertCircleIcon, ArrowDownNarrowWideIcon, ArrowUpNarrowWideIcon, BookmarkIcon, CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, ClapperboardIcon, CompassIcon, EditIcon, EllipsisIcon, EllipsisVerticalIcon, EyeIcon, EyeOffIcon, FilterIcon, HeartIcon, HomeIcon, InfoIcon, LibraryIcon, LinkIcon, ListPlusIcon, ListVideoIcon, Loader2Icon, LockIcon, LogOutIcon, LucideProps, PlusIcon, SearchIcon, SendIcon, SettingsIcon, StoreIcon, TextIcon, TrashIcon, UserIcon, UsersIcon, XIcon, ZapIcon } from "lucide-react-native";
 import { Premium } from "@/lib/icons/Premium";
 import tw from "@/lib/tw";
+import { ActivityIndicator } from "react-native";
 
 export const Icons = {
 	site: {
 		logo: RecomendLogo,
 	},
 	spinner: Loader2Icon,
-	loader: ({ style, ...props }: LucideProps) => (
-		<Icons.spinner style={[tw.style(''), style]} {...props} />
-	),
+	// loader: ({ style, ...props }: LucideProps) => (
+	// 	<Icons.spinner style={[tw.style(''), style]} {...props} />
+	// ),
+	Loader: ActivityIndicator,
 	premium: Premium,
 	home: HomeIcon,
 	Search: SearchIcon,

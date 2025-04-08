@@ -169,6 +169,7 @@ const BottomSheetAddToPlaylist = forwardRef<
           data={results}
           renderItem={({ item: { playlist, already_added } }) => (
             <TouchableWithoutFeedback
+            key={playlist.id}
             onPress={() => {
               if (selected.some((selectedPlaylist) => selectedPlaylist?.id === playlist?.id)) {
                 return setSelected((prev) => prev.filter(

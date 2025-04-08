@@ -234,7 +234,7 @@ const SignupScreen = () => {
 								/>
 								{usernameAvailability.isLoading ? (
 									<View style={tw.style('absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full flex justify-center items-center h-6 w-6')}>
-										<Icons.loader size={16} />
+										<Icons.Loader size={16} />
 									</View>
 								) : null}
 								{form.formState.errors.username?.message ? (

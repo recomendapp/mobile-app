@@ -13,7 +13,8 @@ interface BottomSheetConfirmProps extends Omit<React.ComponentPropsWithoutRef<ty
   id: string;
   title: string;
   description?: string | React.ReactNode;
-  onConfirm: () => void | Promise<void>;
+  onConfirm?: () => void | Promise<void>;
+  onCancel?: () => void | Promise<void>;
   cancelLabel?: string;
   confirmLabel?: string;
 }
@@ -21,7 +22,7 @@ interface BottomSheetConfirmProps extends Omit<React.ComponentPropsWithoutRef<ty
 const BottomSheetConfirm = React.forwardRef<
 	React.ElementRef<typeof BottomSheetModal>,
 	BottomSheetConfirmProps
->(({ id, title, description, onConfirm, cancelLabel, confirmLabel, backdropComponent, ...props }, ref) => {
+>(({ id, title, description, onConfirm, onCancel, cancelLabel, confirmLabel, backdropComponent, ...props }, ref) => {
   const { inset } = useTheme();
   const { closeSheet } = useBottomSheetStore();
   const { t } = useTranslation();
@@ -30,11 +31,12 @@ const BottomSheetConfirm = React.forwardRef<
   const confirmText = confirmLabel || capitalize(t('common.messages.confirm'));
 
   const handleConfirm = async () => {
-    await onConfirm();
+    onConfirm && await onConfirm();
     closeSheet(id);
   };
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
+    onCancel && await onCancel();
     closeSheet(id);
   };
 
