@@ -109,8 +109,10 @@ const CardUser = React.forwardRef<
 	const onPressDefault = () => {
 		router.push(`/user/${props.user?.username}`);
 	};
+	const Container = linked ? Pressable : Animated.View;
+
 	return (
-		<Pressable onPress={onPress ?? (linked ? onPressDefault : undefined)} style={containerStyle}>
+		<Container onPress={onPress ?? (linked ? onPressDefault : undefined)} style={containerStyle}>
 			{variant === "default" ? (
 				<CardUserDefault ref={ref} {...props} />
 			) : variant === "icon" ? (
@@ -120,7 +122,7 @@ const CardUser = React.forwardRef<
 			) : variant === "inline" ? (
 				<CardUserInline ref={ref} {...props} />
 			) : null}
-		</Pressable>
+		</Container>
 	);
 });
 CardUser.displayName = "CardUser";
