@@ -9,6 +9,9 @@ import { Text, View } from "react-native";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useTheme } from "@/context/ThemeProvider";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { useTranslation } from "react-i18next";
+import { upperFirst } from "lodash";
+import { title } from "@/hooks/custom-lodash";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -22,13 +25,12 @@ const MaterialTopTabs = withLayoutContext<
 const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBarProps) => {
 	const { colors } = useTheme();
   return (
-		<View style={[{ backgroundColor: colors.muted}, tw`flex-row items-center gap-2 p-2 rounded-md`]}>
+		<View style={[{ backgroundColor: colors.muted}, tw`flex-row items-center p-1 rounded-md`]}>
       {state.routes.map((item, index) => {
         const { options } = descriptors[item.key];
         const label =
-          options.tabBarLabel !== undefined
-            ? options.title
-            : item.name;
+          options.title
+            || item.name;
         const isFocused = state.index === index;
         const onPress = () => {
 					const event = navigation.emit({
@@ -41,21 +43,26 @@ const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBar
 					}
 				};
         return (
-          <TouchableOpacity
+          <View
           key={item.key}
-          onPress={onPress}
+          style={[
+            { backgroundColor: isFocused ? colors.background : undefined },
+            tw`flex-1 p-1 rounded-md`,
+          ]}
           >
-            <ThemedText
-            style={[
-              {
-                color: isFocused ? colors.accentYellow : colors.mutedForeground,
-              },
-              tw`text-lg`
-            ]}
-            >
-              {label}
-            </ThemedText>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={onPress}>
+              <ThemedText
+              style={[
+                {
+                  color: isFocused ? colors.accentYellow : colors.mutedForeground,
+                },
+                tw`text-center`
+              ]}
+              >
+                {label}
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
         );
       })}
 		</View>
@@ -63,7 +70,7 @@ const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBar
 };
 
 const FeedLayout = () => {
-  const { colors } = useTheme();
+  const { t } = useTranslation();
   const { session } = useAuth();
 
   if (session === null) {
@@ -75,8 +82,8 @@ const FeedLayout = () => {
       <MaterialTopTabs
       tabBar={(props) => <TabBar {...props} />}
       >
-        <MaterialTopTabs.Screen name="index" options={{ title: 'feed' }} />
-        <MaterialTopTabs.Screen name="cast-crew" options={{ title: 'cast-crew' }} />
+        <MaterialTopTabs.Screen name="index" options={{ title: upperFirst(t('common.word.community')) }} />
+        <MaterialTopTabs.Screen name="cast-crew" options={{ title: title(t('common.word.cast_and_crew')) }} />
       </MaterialTopTabs>
     </ThemedSafeAreaView>
   );

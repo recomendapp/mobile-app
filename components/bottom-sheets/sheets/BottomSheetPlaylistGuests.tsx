@@ -21,6 +21,7 @@ import { PostgrestError } from '@supabase/supabase-js';
 import { useAuth } from '@/context/AuthProvider';
 import { useQueryClient } from '@tanstack/react-query';
 import { playlistKeys } from '@/features/playlist/playlistKeys';
+import BottomSheetPlaylistGuestsAdd from './BottomSheetPlaylistGuestsAdd';
 
 interface BottomSheetPlaylistGuestsProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
   id: string;
@@ -33,7 +34,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
 >(({ id, playlist, snapPoints, ...props }, ref) => {
   const supabase = useSupabaseClient();
   const { colors, inset } = useTheme();
-  const { closeSheet, createConfirmSheet } = useBottomSheetStore();
+  const { closeSheet, createConfirmSheet, openSheet } = useBottomSheetStore();
   const { t } = useTranslation();
   const { user: loggedUser } = useAuth();
   const queryClient = useQueryClient();
@@ -118,7 +119,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
         });
       }
     }
-  }
+  };
 
   const handleRemoveGuest = async (userId: string) => {
     setGuests((prev) => {
@@ -126,7 +127,15 @@ const BottomSheetPlaylistGuests = React.forwardRef<
       const newGuests = prev.filter((guest) => guest.user.id !== userId);
       return newGuests;
     });
-  }
+  };
+
+  const handleAddGuest = async (user: User) => {
+    setGuests((prev) => {
+      if (!prev) return [];
+      const newGuests = [...prev, { user, edit: false }];
+      return newGuests;
+    });
+  };
 
   return (
     <BottomSheetModal
@@ -158,18 +167,19 @@ const BottomSheetPlaylistGuests = React.forwardRef<
               closeSheet(id)
             }
           }}
+          style={tw`flex-1`}
           >
             <ThemedText>{upperFirst(t('common.word.cancel'))}</ThemedText>
           </TouchableOpacity>
-          <ThemedText style={tw`font-bold`}>
+          <ThemedText style={tw`flex-1 text-center font-bold`}>
            {upperFirst(t('common.playlist.actions.edit_guests'))}
           </ThemedText>
           <TouchableOpacity
           onPress={handleSave}
           disabled={!hasChanges}
-          style={{ opacity: hasChanges ? 1 : 0.5}}
+          style={[{ opacity: hasChanges ? 1 : 0.5}, tw`flex-1`]}
           >
-            <ThemedText>{upperFirst(t('common.word.save'))}</ThemedText>
+            <ThemedText style={tw`text-right`}>{upperFirst(t('common.word.save'))}</ThemedText>
           </TouchableOpacity>
         </View>
         <View style={tw`flex-1 w-full gap-2`}>
@@ -181,7 +191,12 @@ const BottomSheetPlaylistGuests = React.forwardRef<
             style={tw`flex-1`}
             />
             <TouchableOpacity
-            onPress={() => console.log('add')}
+            onPress={() => openSheet(BottomSheetPlaylistGuestsAdd, {
+              playlistId: playlist.id,
+              guests: guests,
+              onAdd: handleAddGuest,
+              onRemove: handleRemoveGuest,
+            })}
             >
               <Icons.Add color={colors.foreground} />
             </TouchableOpacity>
@@ -201,9 +216,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
                   user={user}
                   style={tw`border-0 bg-transparent h-auto`}
                   containerStyle={tw`flex-1`}
-                  onPress={() => {
-                    console.log('user', user);
-                  }}
+                  linked={false}
                   />
                   <Button
                   disabled={!loggedUser?.premium}

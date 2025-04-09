@@ -95,6 +95,7 @@
       "search_friend": "search a friend",
       "search_playlist": "search a playlist",
       "search_guest": "search a guest",
+      "search_user": "search a user",
       "add": "add",
       "already_added": "already added",
       "create": "create",
@@ -106,7 +107,8 @@
       "remove_from_library": "remove from my library",
       "private": "private",
       "guest_one": "guest",
-      "guest_other": "guests"
+      "guest_other": "guests",
+      "ok": "ok"
     },
     "errors": {
       "not_logged_in": "you are not logged in",
@@ -288,7 +290,8 @@
         "delete": {
           "description": "This will permanently delete {{title}} from your library."
         },
-        "edit_guests": "Edit guests"
+        "edit_guests": "Edit guests",
+        "add_guests": "Add guests"
       },
       "form": {
         "title": {

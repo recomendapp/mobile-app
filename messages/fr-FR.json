@@ -95,6 +95,7 @@
       "search_friend": "rechercher un ami",
       "search_playlist": "rechercher une playlist",
       "search_guest": "rechercher un(e) invité(e)",
+      "search_user": "rechercher un(e) utilisateur(trice)",
       "add": "ajouter",
       "already_added": "déjà ajouté",
       "create": "créer",
@@ -112,7 +113,8 @@
       "guest_female_one": "invitée",
       "guest_female_other": "invitées",
       "guest_male_one": "invité",
-      "guest_male_other": "invités"
+      "guest_male_other": "invités",
+      "ok": "ok"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",
@@ -294,7 +296,8 @@
         "delete": {
           "description": "Cela supprimera {{title}} définitivement de votre bibliothèque."
         },
-        "edit_guests": "Modifier les invités"
+        "edit_guests": "Modifier les invité(e)s",
+        "add_guests": "Ajouter des invité(e)s"
       },
       "form": {
         "title": {
