@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect } from 'react';
-import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
+import React from 'react';
+// import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
 import { useTheme } from '@/context/ThemeProvider';
 import { useNavigation } from 'expo-router';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
+import { SheetSize, TrueSheet } from "@lodev09/react-native-true-sheet"
 
 type BottomSheetItemProps = {
   id: string;
@@ -10,7 +11,7 @@ type BottomSheetItemProps = {
   isClosing: boolean;
   content: React.ComponentType<any>;
   props?: any;
-  snapPoints?: string[];
+  sizes?: SheetSize[];
   closeSheet: (id: string) => void;
   removeSheet: (id: string) => void;
 };
@@ -19,14 +20,14 @@ export const BottomSheetItem = ({
   id,
   isOpen,
   isClosing,
-  content: Component,
+  content: Content,
   props,
-  snapPoints = ['40%', '60%'],
+  sizes,
   closeSheet,
   removeSheet,
 }: BottomSheetItemProps) => {
   const { colors } = useTheme();
-  const bottomSheetRef = React.useRef<BottomSheetModal>(null);
+  const bottomSheetRef = React.useRef<TrueSheet>(null);
 
   const handleSheetChanges = (index: number) => {
     if (index === -1) {
@@ -34,50 +35,77 @@ export const BottomSheetItem = ({
     }
   };
 
-  const renderBackdrop = useCallback(
-		(props: BottomSheetBackdropProps) => (
-			<BottomSheetBackdrop
-			{...props}
-			disappearsOnIndex={-1}
-			appearsOnIndex={0}
-			/>
-		),
-		[]
-	);
+  // const renderBackdrop = useCallback(
+	// 	(props: BottomSheetBackdropProps) => (
+	// 		<BottomSheetBackdrop
+	// 		{...props}
+	// 		disappearsOnIndex={-1}
+	// 		appearsOnIndex={0}
+	// 		/>
+	// 	),
+	// 	[]
+	// );
 
-  useEffect(() => {
-    if (bottomSheetRef.current) {
+  React.useEffect(() => {
+    const manageSheet = async () => {
       if (isOpen && !isClosing) {
-        bottomSheetRef.current?.present();
+        console.log('open');
+        await bottomSheetRef.current?.present();
+        console.log('present');
       } else {
-        bottomSheetRef.current?.close();
+        console.log('close');
+        await bottomSheetRef.current?.dismiss();
+        console.log('dismiss');
       }
     }
-  }, [isOpen, isClosing]);
+    if (bottomSheetRef.current) {
+      manageSheet();
+    }
+  }, [isOpen, isClosing, bottomSheetRef]);
 
   return (
-    <Component
+    <TrueSheet
       ref={bottomSheetRef}
-      snapPoints={snapPoints}
-      onChange={handleSheetChanges}
-      backdropComponent={renderBackdrop}
-      backgroundStyle={{
-        backgroundColor: colors.background
+      sizes={sizes}
+      style={{
+        backgroundColor: colors.muted
       }}
-      handleIndicatorStyle={{
-        backgroundColor: colors.mutedForeground
-      }}
-      id={id}
-      {...props}
-    />
+      // onChange={handleSheetChanges}
+      cornerRadius={24} // Optionnel, selon ton design
+      // backgroundStyle={{
+      //   backgroundColor: colors.background,
+      // }}
+      // handleIndicatorStyle={{
+      //   backgroundColor: colors.mutedForeground,
+      // }}
+    >
+      <Content id={id} {...props} />
+    </TrueSheet>
   );
+
+  // return (
+  //   <Component
+  //     ref={bottomSheetRef}
+  //     snapPoints={snapPoints}
+  //     onChange={handleSheetChanges}
+  //     // backdropComponent={renderBackdrop}
+  //     backgroundStyle={{
+  //       backgroundColor: colors.background
+  //     }}
+  //     handleIndicatorStyle={{
+  //       backgroundColor: colors.mutedForeground
+  //     }}
+  //     id={id}
+  //     {...props}
+  //   />
+  // );
 };
 
 export const BottomSheetManager = () => {
   const navigation = useNavigation();
   const { sheets, closeSheet, removeSheet } = useBottomSheetStore();
 
-  useEffect(() => {
+  React.useEffect(() => {
     const unsubscribe = navigation.addListener('state', () => {
       sheets.forEach((sheet) => {
         if (!sheet.persistent && sheet.isOpen) {
@@ -91,20 +119,18 @@ export const BottomSheetManager = () => {
 
   return (
     <>
-      {sheets.map(({ id, isOpen, isClosing, content, props, snapPoints }) => (
-      <BottomSheetModalProvider key={id}>
+      {sheets.map(({ id, isOpen, isClosing, content, props, sizes }) => (
         <BottomSheetItem
-        // key={id}
+        key={id}
         id={id}
         isOpen={isOpen}
         isClosing={isClosing}
         content={content}
         props={props}
-        snapPoints={snapPoints}
+        sizes={sizes}
         closeSheet={closeSheet}
         removeSheet={removeSheet}
         />
-      </BottomSheetModalProvider>
       ))}
     </>
   );

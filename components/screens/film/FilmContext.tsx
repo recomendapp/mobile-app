@@ -18,6 +18,7 @@ interface FilmContextType {
 	tabState: TabNavigationState<ParamListBase> | undefined;
 	headerHeight: SharedValue<number>;
 	headerOverlayHeight: SharedValue<number>;
+	tabBarHeight: SharedValue<number>;
 	scrollY: SharedValue<number>;
 	headerScrollY: SharedValue<number>;
   	headerMoveScrollY: SharedValue<number>;
@@ -36,6 +37,7 @@ interface FilmProviderProps {
 	tabState: TabNavigationState<ParamListBase> | undefined;
 	headerHeight: SharedValue<number>;
 	headerOverlayHeight: SharedValue<number>;
+	tabBarHeight: SharedValue<number>;
 	scrollY: SharedValue<number>;
 	movieId: number;
 }
@@ -45,6 +47,7 @@ const FilmProvider: React.FC<FilmProviderProps> = ({
 	tabState,
 	headerHeight,
 	headerOverlayHeight,
+	tabBarHeight,
 	scrollY,
 	movieId,
 }) => {
@@ -134,6 +137,7 @@ const FilmProvider: React.FC<FilmProviderProps> = ({
 			tabState,
 			headerHeight,
 			headerOverlayHeight,
+			tabBarHeight,
 			scrollY,
 			headerScrollY,
 			headerMoveScrollY,

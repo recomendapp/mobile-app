@@ -6,12 +6,10 @@ import CollectionHeader from "../CollectionHeader";
 import { capitalize } from "lodash";
 import { View } from "react-native";
 import tw from "@/lib/tw";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { ColumnFiltersState, flexRender, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, Row, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { Columns } from "./components/columns";
 import { DataTableToolbar } from "./components/data-table-toolbar";
 import { ThemedText } from "@/components/ui/ThemedText";
-import { useTheme } from "@/context/ThemeProvider";
 
 interface TableLikesProps {
 	likes: UserActivity[];
@@ -28,16 +26,13 @@ const TableLikes = ({
 	scrollY,
 	headerHeight,
 	headerOverlayHeight,
-	isFetching,
 	isRefetching,
 	refetch,
 } : TableLikesProps) => {
-	const { inset } = useTheme();
 	const { t } = useTranslation();
 	const backdrops = React.useMemo(() => {
 		return likes.map((like) => like.media?.backdrop_url);
 	}, [likes]);
-	const bottomTabHeight = useBottomTabOverflow();
 	const scrollHandler = useAnimatedScrollHandler({
 		onScroll: event => {
 			'worklet';
