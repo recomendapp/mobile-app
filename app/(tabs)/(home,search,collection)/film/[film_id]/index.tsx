@@ -17,8 +17,8 @@ import { useEffect } from "react";
 const FilmScreen = () => {
 	const { colors, inset } = useTheme();
 	const { i18n, t } = useTranslation();
-	const { tabState, movieId, scrollY, headerHeight, addScrollRef } = useFilmContext();
-	const tabBarHeight = useBottomTabOverflow();
+	const { tabState, movieId, scrollY, headerHeight, tabBarHeight, addScrollRef } = useFilmContext();
+	const bottomTabBarHeight = useBottomTabOverflow();
 	const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
 	const {
 		data: movie,
@@ -48,16 +48,18 @@ const FilmScreen = () => {
 	scrollToOverflowEnabled
 	ref={scrollRef}
 	onScroll={scrollHandler}
-	contentContainerStyle={{
-		paddingTop: headerHeight.get(),
-		paddingBottom: tabBarHeight + inset.bottom,
-		minHeight: Dimensions.get('window').height + headerHeight.get(),
-	}}
+	contentContainerStyle={[
+		{
+			paddingTop: headerHeight.get() + tabBarHeight.get(),
+			paddingBottom: bottomTabBarHeight + inset.bottom,
+			minHeight: Dimensions.get('window').height + headerHeight.get(),
+		},
+	]}
 	ListHeaderComponent={() => (
 		<>
 			{/* <View style={tw.style('h-96 bg-red-500')} /> */}
 			{/* SYNOPSIS */}
-			<View style={tw.style('gap-1')}>
+			<View style={tw.style('gap-1 px-2')}>
 				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.word.overview'))}</ThemedText>
 				<ThemedText style={[{ color: colors.mutedForeground }, tw.style('text-justify')]}>
 					{movie.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
@@ -65,7 +67,7 @@ const FilmScreen = () => {
 			</View>
 			{/* CASTING */}
 			<View style={tw.style('gap-1')}> 
-				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
+				<ThemedText style={tw.style('px-2 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
 				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
 			</View>
 
@@ -120,6 +122,7 @@ const FilmCast = ({
 			</Link>
 			)
 		}}
+		contentContainerStyle={tw`px-2`}
 		keyExtractor={(_, index) => index.toString()}
 		estimatedItemSize={cast.length}
 		showsHorizontalScrollIndicator={false}

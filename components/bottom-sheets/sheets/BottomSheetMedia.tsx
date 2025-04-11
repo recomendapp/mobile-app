@@ -73,11 +73,11 @@ const BottomSheetMedia = forwardRef<
     ],
   ]), [media]);
   return (
-    <BottomSheetModal
-    ref={ref}
-    {...props}
-    >
-      <BottomSheetView
+    // <BottomSheetModal
+    // ref={ref}
+    // {...props}
+    // >
+      <View
       style={[
         { paddingBottom: inset.bottom },
         tw`flex-1`,
@@ -121,8 +121,8 @@ const BottomSheetMedia = forwardRef<
             ))}
           </Fragment>
         ))}
-      </BottomSheetView>
-    </BottomSheetModal>
+      </View>
+    // </BottomSheetModal>
   );
 });
 BottomSheetMedia.displayName = 'BottomSheetMedia';

@@ -1,24 +1,29 @@
 import { create } from 'zustand';
 import React, { ForwardRefExoticComponent, RefAttributes } from 'react';
-import {
-  BottomSheetView,
-  BottomSheetScrollView,
-  BottomSheetFlashList,
-  BottomSheetFlatList,
-  BottomSheetSectionList,
-} from '@gorhom/bottom-sheet';
+// import {
+//   BottomSheetView,
+//   BottomSheetScrollView,
+//   BottomSheetFlashList,
+//   BottomSheetFlatList,
+//   BottomSheetSectionList,
+// } from '@gorhom/bottom-sheet';
 import BottomSheetConfirm from '@/components/bottom-sheets/templates/BottomSheetConfirm';
 import * as Haptics from 'expo-haptics';
+import { SheetSize } from '@lodev09/react-native-true-sheet';
 
-type BottomSheetContentElement =
-  | React.ReactElement<typeof BottomSheetView>
-  | React.ReactElement<typeof BottomSheetScrollView>
-  | React.ReactElement<typeof BottomSheetFlashList>
-  | React.ReactElement<typeof BottomSheetFlatList>
-  | React.ReactElement<typeof BottomSheetSectionList>;
+// type BottomSheetContentElement =
+//   | React.ReactElement<typeof BottomSheetView>
+//   | React.ReactElement<typeof BottomSheetScrollView>
+//   | React.ReactElement<typeof BottomSheetFlashList>
+//   | React.ReactElement<typeof BottomSheetFlatList>
+//   | React.ReactElement<typeof BottomSheetSectionList>;
 
-  type BottomSheetContentComponent<T> =
-  | (React.ComponentType<T> & { (props: T): BottomSheetContentElement })
+//   type BottomSheetContentComponent<T> =
+//   | (React.ComponentType<T> & { (props: T): BottomSheetContentElement })
+//   | ForwardRefExoticComponent<T & RefAttributes<any>>;
+
+type BottomSheetContentComponent<T> =
+  | React.ComponentType<T>
   | ForwardRefExoticComponent<T & RefAttributes<any>>;
 
 type SheetState<T = any> = {
@@ -27,7 +32,7 @@ type SheetState<T = any> = {
   isClosing: boolean;
   content: BottomSheetContentComponent<T>;
   props?: Omit<T, 'id' | 'open' | 'onOpenChange'>;
-  snapPoints?: string[];
+  sizes?: SheetSize[];
   persistent: boolean; // Nouvelle propriété
 };
 
@@ -48,7 +53,7 @@ type BottomSheetStore = {
   openSheet: <T>(
     content: BottomSheetContentComponent<T>,
     props: Omit<T, 'id' | 'open' | 'onOpenChange'>,
-    snapPoints?: string[] | null,
+    sizes?: SheetSize[] | null,
     persistent?: boolean // Optionnel, défaut à false
   ) => string;
   closeSheet: (id: string) => void;
@@ -69,7 +74,7 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
   openSheet: <T>(
     content: BottomSheetContentComponent<T>,
     props: Omit<T, 'id' | 'open' | 'onOpenChange'>,
-    snapPoints: string[] | null | undefined = ['40%', '60%'],
+    sizes: SheetSize[] | null | undefined = ['auto'],
     persistent = false
   ) => {
     const id = Math.random().toString(36).substring(7);
@@ -88,7 +93,7 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
           isClosing: false,
           content,
           props,
-          snapPoints: snapPoints === null ? [] : snapPoints,
+          sizes: sizes === null ? [] : sizes,
           persistent,
         },
       ],
@@ -125,7 +130,7 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
       onCancel,
       cancelLabel,
       confirmLabel,
-    }, ['30%'], true);
+    }, ['auto'], true);
   },
 }));
 
