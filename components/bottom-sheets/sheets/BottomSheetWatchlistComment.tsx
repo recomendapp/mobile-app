@@ -1,5 +1,4 @@
-import React, { forwardRef } from 'react';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import React from 'react';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { UserWatchlist } from '@/types/type.db';
@@ -8,20 +7,21 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useUserWatchlistUpdateMutation } from '@/features/user/userMutations';
-import { InputBottomSheet } from '@/components/ui/Input';
+import { Input } from '@/components/ui/Input';
 import { Button, ButtonText } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
 
-interface BottomSheetWatchlistCommentProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetWatchlistCommentProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
   watchlistItem: UserWatchlist
 };
 
-const BottomSheetWatchlistComment = forwardRef<
-  React.ElementRef<typeof BottomSheetModal>,
+const BottomSheetWatchlistComment = React.forwardRef<
+  React.ElementRef<typeof TrueSheet>,
   BottomSheetWatchlistCommentProps
->(({ id, watchlistItem, snapPoints, ...props }, ref) => {
+>(({ id, watchlistItem, ...props }, ref) => {
   const { closeSheet } = useBottomSheetStore();
   const { colors, inset } = useTheme();
   const { t } = useTranslation();
@@ -30,7 +30,7 @@ const BottomSheetWatchlistComment = forwardRef<
 
   const handleUpdateComment = async () => {
 	if (comment == watchlistItem?.comment) {
-		closeSheet(id);
+		await closeSheet(id);
 		return;
 	}
 	if (!watchlistItem?.id) {
@@ -45,12 +45,12 @@ const BottomSheetWatchlistComment = forwardRef<
 		watchlistId: watchlistItem.id,
 		comment: comment.replace(/\s+/g, ' ').trimStart(),
 	}, {
-		onSuccess: () => {
+		onSuccess: async () => {
 			Burnt.toast({
 				title: upperFirst(t('common.word.saved')),
 				preset: 'done',
 			});
-			closeSheet(id);
+			await closeSheet(id);
 		},
 		onError: () => {
 			Burnt.toast({
@@ -62,18 +62,18 @@ const BottomSheetWatchlistComment = forwardRef<
 	});
   };
   return (
-    <BottomSheetModal
+    <TrueSheet
     ref={ref}
     {...props}
     >
-      <BottomSheetView
+      <View
       style={[
         { paddingBottom: inset.bottom },
         tw`flex-1 gap-2 px-4`,
       ]}
       >
         <ThemedText style={tw`text-center text-xl font-bold`}>{upperFirst(t('common.messages.comment', { count: 1 }))}</ThemedText>
-		<InputBottomSheet
+		<Input
 		multiline
 		defaultValue={comment}
 		onChangeText={setComment}
@@ -84,8 +84,8 @@ const BottomSheetWatchlistComment = forwardRef<
 			{updateWatchlist.isPending ? <ActivityIndicator color={colors.background} /> : null}
 			<ButtonText>{upperFirst(t('common.word.save'))}</ButtonText>
 		</Button>
-      </BottomSheetView>
-    </BottomSheetModal>
+      </View>
+    </TrueSheet>
   );
 });
 BottomSheetWatchlistComment.displayName = 'BottomSheetWatchlistComment';

@@ -1,31 +1,32 @@
 import React from 'react';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import tw from '@/lib/tw';
 import { useTheme } from '@/context/ThemeProvider';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import { View } from 'react-native';
 
-interface BottomSheetDefaultViewProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetDefaultViewProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   content: React.ReactNode;
 }
 
 const BottomSheetDefaultView = React.forwardRef<
-	React.ElementRef<typeof BottomSheetModal>,
+	React.ElementRef<typeof TrueSheet>,
 	BottomSheetDefaultViewProps
 >(({ content, ...props }, ref) => {
   const { inset } = useTheme();
   return (
-    <BottomSheetModal
+    <TrueSheet
     ref={ref}
     {...props}
     >
-      <BottomSheetView
+      <View
       style={[
         { paddingBottom: inset.bottom },
         tw`flex-1`,
       ]}
       >
         {content}
-      </BottomSheetView>
-    </BottomSheetModal>
+      </View>
+    </TrueSheet>
   );
 });
 BottomSheetDefaultView.displayName = 'BottomSheetDefaultView';

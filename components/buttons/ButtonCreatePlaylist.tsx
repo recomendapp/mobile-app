@@ -19,8 +19,8 @@ const ButtonCreatePlaylist = forwardRef<
 	const { colors } = useTheme();
 	const { openSheet } = useBottomSheetStore();
 	const router = useRouter();
-	const handlePress = (event: GestureResponderEvent) => {
-		openSheet(BottomSheetPlaylistCreate, {
+	const handlePress = async (event: GestureResponderEvent) => {
+		await openSheet(BottomSheetPlaylistCreate, {
 			onCreate: (playlist) => {
 				redirectAfterCreate && router.push(`/playlist/${playlist.id}`);
 			}

@@ -1,5 +1,4 @@
-import React, { useCallback } from 'react';
-import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import React from 'react';
 import { ThemedText } from '@/components/ui/ThemedText';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
@@ -8,8 +7,9 @@ import { View } from 'react-native';
 import { Button, ButtonText } from '@/components/ui/Button';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useTheme } from '@/context/ThemeProvider';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
 
-interface BottomSheetConfirmProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetConfirmProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
   title: string;
   description?: string | React.ReactNode;
@@ -20,9 +20,9 @@ interface BottomSheetConfirmProps extends Omit<React.ComponentPropsWithoutRef<ty
 }
 
 const BottomSheetConfirm = React.forwardRef<
-	React.ElementRef<typeof BottomSheetModal>,
+	React.ElementRef<typeof TrueSheet>,
 	BottomSheetConfirmProps
->(({ id, title, description, onConfirm, onCancel, cancelLabel, confirmLabel, backdropComponent, ...props }, ref) => {
+>(({ id, title, description, onConfirm, onCancel, cancelLabel, confirmLabel, ...props }, ref) => {
   const { inset } = useTheme();
   const { closeSheet } = useBottomSheetStore();
   const { t } = useTranslation();
@@ -32,34 +32,20 @@ const BottomSheetConfirm = React.forwardRef<
 
   const handleConfirm = async () => {
     onConfirm && await onConfirm();
-    closeSheet(id);
+    await closeSheet(id);
   };
 
   const handleCancel = async () => {
     onCancel && await onCancel();
-    closeSheet(id);
+    await closeSheet(id);
   };
-
-	const renderBackdrop = useCallback(
-		(props: BottomSheetBackdropProps) => (
-			<BottomSheetBackdrop
-			{...props}
-			disappearsOnIndex={-1}
-			appearsOnIndex={0}
-			pressBehavior={'none'}
-			/>
-		),
-		[]
-	);
 	
   return (
-    <BottomSheetModal
+    <TrueSheet
     ref={ref}
-    enablePanDownToClose={false}
-    backdropComponent={renderBackdrop}
     {...props}
     >
-      <BottomSheetView
+      <View
       style={[
         { paddingBottom: inset.bottom },
         tw`flex-1`,
@@ -80,8 +66,8 @@ const BottomSheetConfirm = React.forwardRef<
             <ButtonText variant='outline'>{cancelText}</ButtonText>
           </Button>
         </View>
-      </BottomSheetView>
-    </BottomSheetModal>
+      </View>
+    </TrueSheet>
   );
 });
 BottomSheetConfirm.displayName = 'BottomSheetConfirm';

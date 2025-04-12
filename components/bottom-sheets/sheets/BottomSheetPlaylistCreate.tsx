@@ -1,9 +1,7 @@
 import React from 'react';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import tw from '@/lib/tw';
 import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
-import { InputBottomSheet } from '@/components/ui/Input';
 import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonText } from '@/components/ui/Button';
@@ -16,8 +14,10 @@ import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Text, View } from 'react-native';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import { Input } from '@/components/ui/Input';
 
-interface BottomSheetPlaylistCreateProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetPlaylistCreateProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
   onCreate?: (playlist: Playlist) => void;
   placeholder?: string | null;
@@ -27,9 +27,9 @@ const TITLE_MIN_LENGTH = 1;
 const TITLE_MAX_LENGTH = 100;
 
 const BottomSheetPlaylistCreate = React.forwardRef<
-	React.ElementRef<typeof BottomSheetModal>,
+	React.ElementRef<typeof TrueSheet>,
 	BottomSheetPlaylistCreateProps
->(({ id, onCreate, placeholder, snapPoints, ...props }, ref) => {
+>(({ id, onCreate, placeholder, ...props }, ref) => {
   const { user } = useAuth();
   const { closeSheet } = useBottomSheetStore();
   const { colors, inset } = useTheme();
@@ -59,13 +59,13 @@ const BottomSheetPlaylistCreate = React.forwardRef<
     await createPlaylistMutation.mutateAsync({
       title: values.title,
     }, {
-      onSuccess: (playlist) => {
+      onSuccess: async (playlist) => {
         Burnt.toast({
           title: upperFirst(t('common.messages.added')),
           preset: 'done',
         });
         onCreate && onCreate(playlist);
-        closeSheet(id);
+        await closeSheet(id);
       },
       onError: () => {
         Burnt.toast({
@@ -78,11 +78,11 @@ const BottomSheetPlaylistCreate = React.forwardRef<
   };
 
   return (
-    <BottomSheetModal
+    <TrueSheet
     ref={ref}
     {...props}
     >
-      <BottomSheetView
+      <View
       style={[
         { paddingBottom: inset.bottom },
         tw`flex-1 gap-4 items-center justify-center mx-2`,
@@ -94,7 +94,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
         control={form.control}
         render={({ field: { onChange, onBlur, value} }) => (
           <View style={tw`gap-2 w-full`}>
-            <InputBottomSheet
+            <Input
             placeholder={placeholder ?? upperFirst(t('common.playlist.form.title.placeholder'))}
             value={value}
             autoCorrect={false}
@@ -121,8 +121,8 @@ const BottomSheetPlaylistCreate = React.forwardRef<
         >
           <ButtonText>{upperFirst(t('common.messages.create'))}</ButtonText>
         </Button>
-      </BottomSheetView>
-    </BottomSheetModal>
+      </View>
+    </TrueSheet>
   );
 });
 BottomSheetPlaylistCreate.displayName = 'BottomSheetPlaylistCreate';

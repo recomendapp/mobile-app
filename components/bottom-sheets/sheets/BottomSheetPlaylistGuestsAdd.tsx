@@ -1,5 +1,4 @@
 import React from 'react';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import tw from '@/lib/tw';
 import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
@@ -14,8 +13,9 @@ import { CardUser } from '@/components/cards/CardUser';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import useDebounce from '@/hooks/useDebounce';
 import { FlashList } from '@shopify/flash-list';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
 
-interface BottomSheetPlaylistGuestsAddProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetPlaylistGuestsAddProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
   playlistId: number;
   guests: { user: User, edit: boolean }[] | undefined;
@@ -24,9 +24,9 @@ interface BottomSheetPlaylistGuestsAddProps extends Omit<React.ComponentPropsWit
 }
 
 const BottomSheetPlaylistGuestsAdd = React.forwardRef<
-  React.ElementRef<typeof BottomSheetModal>,
+  React.ElementRef<typeof TrueSheet>,
   BottomSheetPlaylistGuestsAddProps
->(({ id, playlistId, guests: guestsParent, onAdd, onRemove, snapPoints, ...props }, ref) => {
+>(({ id, playlistId, guests: guestsParent, onAdd, onRemove, sizes, ...props }, ref) => {
   const { colors, inset } = useTheme();
   const { closeSheet, createConfirmSheet } = useBottomSheetStore();
   const { t } = useTranslation();
@@ -53,13 +53,12 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
   const loading = isLoading || users === undefined;
 
   return (
-    <BottomSheetModal
+    <TrueSheet
     ref={ref}
-    snapPoints={['90%']}
-    enableDynamicSizing={false}
+    sizes={['large']}
     {...props}
     >
-      <BottomSheetView
+      <View
       style={[
         { paddingBottom: inset.bottom },
         tw`flex-1 gap-4 items-center justify-center mx-2`,
@@ -72,7 +71,7 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
           </ThemedText>
           <TouchableOpacity
           style={tw`flex-1`}
-          onPress={() => closeSheet(id)}
+          onPress={async () => await closeSheet(id)}
           >
             <ThemedText style={tw`text-right`}>{upperCase(t('common.messages.ok'))}</ThemedText>
           </TouchableOpacity>
@@ -133,14 +132,14 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
             estimatedItemSize={100}
             showsVerticalScrollIndicator={false}
             refreshing={isRefetching}
-            onRefresh={refetch}
+            // onRefresh={refetch}
             onEndReached={hasNextPage ? fetchNextPage : undefined}
             onEndReachedThreshold={0.3}
             />
           </View>
         </View>
-      </BottomSheetView>
-    </BottomSheetModal>
+      </View>
+    </TrueSheet>
   );
 });
 BottomSheetPlaylistGuestsAdd.displayName = 'BottomSheetPlaylistGuestsAdd';

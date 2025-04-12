@@ -203,8 +203,8 @@ const CardMedia = React.forwardRef<
 			router.push(props.media.url as Href);
 		}
 	};
-	const onLongPress = () => {
-		openSheet(BottomSheetMedia, {
+	const onLongPress = async () => {
+		await openSheet(BottomSheetMedia, {
 			media: props.media,
 		})
 	};
