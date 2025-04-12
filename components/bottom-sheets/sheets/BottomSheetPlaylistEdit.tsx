@@ -1,5 +1,4 @@
-import React, { useMemo, useState } from 'react';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import React from 'react';
 import tw from '@/lib/tw';
 import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
@@ -13,15 +12,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { usePlaylistUpdateMutation } from '@/features/playlist/playlistMutations';
 import * as Burnt from 'burnt';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { InputBottomSheet } from '@/components/ui/Input';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import * as ImagePicker from 'expo-image-picker';
 import { useSupabaseClient } from '@/context/SupabaseProvider';
 import { decode } from 'base64-arraybuffer';
 import Switch from '@/components/ui/Switch';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import { Input } from '@/components/ui/Input';
 
-interface BottomSheetPlaylistEditProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetPlaylistEditProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
   playlist: Playlist;
   onEdit?: (playlist: Playlist) => void | Promise<void>;
@@ -32,16 +32,16 @@ const TITLE_MAX_LENGTH = 100;
 const DESCRIPTION_MAX_LENGTH = 300;
 
 const BottomSheetPlaylistEdit = React.forwardRef<
-	React.ElementRef<typeof BottomSheetModal>,
+	React.ElementRef<typeof TrueSheet>,
 	BottomSheetPlaylistEditProps
->(({ id, playlist, onEdit, snapPoints, ...props }, ref) => {
+>(({ id, playlist, onEdit, sizes, ...props }, ref) => {
   const supabase = useSupabaseClient();
   const { closeSheet } = useBottomSheetStore();
   const { colors, inset } = useTheme();
   const { t } = useTranslation();
   const { showActionSheetWithOptions } = useActionSheet();
   const updatePlaylistMutation = usePlaylistUpdateMutation();
-  const [newPoster, setNewPoster] = useState<ImagePicker.ImagePickerAsset | null | undefined>(undefined);
+  const [newPoster, setNewPoster] = React.useState<ImagePicker.ImagePickerAsset | null | undefined>(undefined);
 
   /* ---------------------------------- FORM ---------------------------------- */
   const playlistSchema = z.object({
@@ -66,7 +66,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
   });
   /* -------------------------------------------------------------------------- */
 
-  const posterOptions = useMemo(() => [
+  const posterOptions = React.useMemo(() => [
 		{ label: "Choisir dans la bibliothèque", value: "library" },
 		{ label: "Prendre une photo", value: "camera" },
     { label: "Supprimer l'image actuelle", value: "delete", disable: !playlist.poster_url && !newPoster },
@@ -147,13 +147,13 @@ const BottomSheetPlaylistEdit = React.forwardRef<
           poster_url: poster_url,
         },
       }, {
-        onSuccess: (playlist) => {
+        onSuccess: async (playlist) => {
           Burnt.toast({
             title: upperFirst(t('common.word.saved')),
             preset: 'done',
           });
           onEdit && onEdit(playlist);
-          closeSheet(id);
+          await closeSheet(id);
         },
         onError: (error) => {
           Burnt.toast({
@@ -181,13 +181,12 @@ const BottomSheetPlaylistEdit = React.forwardRef<
   };
 
   return (
-    <BottomSheetModal
+    <TrueSheet
     ref={ref}
-    enableDynamicSizing={false}
-    snapPoints={['90%']}
+    sizes={['large']}
     {...props}
     >
-      <BottomSheetView
+      <View
       style={[
         { paddingBottom: inset.bottom },
         tw`flex-1 gap-4 items-center mx-2`,
@@ -195,7 +194,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
       >
         <View style={tw`flex-row items-center justify-between w-full`}>
           <TouchableOpacity
-          onPress={() => closeSheet(id)}
+          onPress={async () => await closeSheet(id)}
           >
             <ThemedText>{upperFirst(t('common.word.cancel'))}</ThemedText>
           </TouchableOpacity>
@@ -221,7 +220,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
         control={form.control}
         render={({ field: { onChange, onBlur, value} }) => (
           <View style={tw`gap-2 w-full`}>
-            <InputBottomSheet
+            <Input
             placeholder={upperFirst(t('common.playlist.form.title.placeholder'))}
             value={value}
             autoCorrect={false}
@@ -241,7 +240,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
         control={form.control}
         render={({ field: { onChange, onBlur, value} }) => (
           <View style={tw`gap-2 w-full`}>
-            <InputBottomSheet
+            <Input
             placeholder={upperFirst(t('common.word.description'))}
             style={tw`h-24`}
             multiline
@@ -273,8 +272,8 @@ const BottomSheetPlaylistEdit = React.forwardRef<
           )}
           />
         </View>
-      </BottomSheetView>
-    </BottomSheetModal>
+      </View>
+    </TrueSheet>
   );
 });
 BottomSheetPlaylistEdit.displayName = 'BottomSheetPlaylistEdit';

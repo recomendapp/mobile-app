@@ -1,5 +1,4 @@
-import React, { forwardRef } from 'react';
-import { BottomSheetFlashList, BottomSheetModal } from '@gorhom/bottom-sheet';
+import React from 'react';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { UserRecosAggregated } from '@/types/type.db';
@@ -8,31 +7,35 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import { View } from 'react-native';
 import { CardUser } from '@/components/cards/CardUser';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import { FlashList } from '@shopify/flash-list';
 
-interface BottomSheetMyRecosSendersProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetMyRecosSendersProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
   comments: UserRecosAggregated['senders'];
 };
 
-const BottomSheetMyRecosSenders = forwardRef<
-  React.ElementRef<typeof BottomSheetModal>,
+const BottomSheetMyRecosSenders = React.forwardRef<
+  React.ElementRef<typeof TrueSheet>,
   BottomSheetMyRecosSendersProps
->(({ id, comments, ...props }, ref) => {
+>(({ id, comments, sizes, ...props }, ref) => {
   const { colors, inset } = useTheme();
   const { t } = useTranslation();
+  const flashlistRef = React.useRef<FlashList<any>>(null);
   return (
-    <BottomSheetModal
+    <TrueSheet
     ref={ref}
-	enableDynamicSizing={false}
+	sizes={['large']}
+	scrollRef={flashlistRef}
     {...props}
     >
-		<BottomSheetFlashList
+		<FlashList
+		ref={flashlistRef}
 		data={comments}
 		renderItem={({ item }) => (
 			<View key={item.user.id} style={[{ backgroundColor: colors.muted }, tw`rounded-xl p-2 gap-2`]}>
 				<View style={tw`flex-row items-center justify-between gap-2`}>
 					<CardUser user={item.user} variant='inline' />
-					{/* <ThemedText>{item.created_at}</ThemedText> */}
 				</View>
 				{item.comment ? (
 					<View style={[{ backgroundColor: colors.background }, tw`ml-6 p-2 rounded-md`]}>
@@ -47,13 +50,14 @@ const BottomSheetMyRecosSenders = forwardRef<
 		estimatedItemSize={100}
 		keyExtractor={(item) => item.user.id}
 		contentContainerStyle={{
+			paddingTop: 16,
 			paddingLeft: 16,
 			paddingRight: 16,
 			paddingBottom: inset.bottom,
 		}}
 		ItemSeparatorComponent={() => <View style={tw`h-2`} />}
 		/>
-    </BottomSheetModal>
+    </TrueSheet>
   );
 });
 BottomSheetMyRecosSenders.displayName = 'BottomSheetMyRecosSenders';

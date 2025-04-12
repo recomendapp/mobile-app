@@ -63,14 +63,14 @@ export const Columns = () => {
 		});
 	}, []);
 
-	const handleOpenSheet = React.useCallback((data: UserRecosAggregated) => {
-		openSheet(BottomSheetMedia, {
+	const handleOpenSheet = React.useCallback(async (data: UserRecosAggregated) => {
+		await openSheet(BottomSheetMedia, {
 			media: data.media,
 			additionalItemsTop: [
 				{
 					icon: Icons.Check,
 					label: upperFirst(t('common.messages.complete')),
-					onPress: () => createConfirmSheet({
+					onPress: async () => await createConfirmSheet({
 						title: capitalize(t('common.library.collection.my_recos.modal.complete_confirm.title')),
 						onConfirm: () => handleCompleteReco(data.user_id!, data.media_id!),
 					})
@@ -78,7 +78,7 @@ export const Columns = () => {
 				{
 					icon: Icons.Comment,
 					label: upperFirst(t('common.messages.view_recommendation', { count: 1})),
-					onPress: () => openSheet(BottomSheetMyRecosSenders, {
+					onPress: async () => await openSheet(BottomSheetMyRecosSenders, {
 						comments: data.senders,
 					}),
 				}
@@ -87,7 +87,7 @@ export const Columns = () => {
 				{
 					icon: Icons.Delete,
 					label: upperFirst(t('common.word.delete')),
-					onPress: () => createConfirmSheet({
+					onPress: async () => await createConfirmSheet({
 						title: capitalize(t('common.library.collection.my_recos.modal.delete_confirm.title')),
 						onConfirm: () => handleDeleteReco(data.user_id!, data.media_id!),
 					})

@@ -1,5 +1,4 @@
 import React from 'react';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import tw from '@/lib/tw';
 import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
@@ -22,16 +21,17 @@ import { useAuth } from '@/context/AuthProvider';
 import { useQueryClient } from '@tanstack/react-query';
 import { playlistKeys } from '@/features/playlist/playlistKeys';
 import BottomSheetPlaylistGuestsAdd from './BottomSheetPlaylistGuestsAdd';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
 
-interface BottomSheetPlaylistGuestsProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetPlaylistGuestsProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
   playlist: Playlist;
 }
 
 const BottomSheetPlaylistGuests = React.forwardRef<
-  React.ElementRef<typeof BottomSheetModal>,
+  React.ElementRef<typeof TrueSheet>,
   BottomSheetPlaylistGuestsProps
->(({ id, playlist, snapPoints, ...props }, ref) => {
+>(({ id, playlist, sizes, ...props }, ref) => {
   const supabase = useSupabaseClient();
   const { colors, inset } = useTheme();
   const { closeSheet, createConfirmSheet, openSheet } = useBottomSheetStore();
@@ -103,7 +103,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
         title: upperFirst(t('common.word.saved')),
         preset: 'done',
       });
-      closeSheet(id);
+      await closeSheet(id);
     } catch (error) {
       if (error instanceof PostgrestError) {
         Burnt.toast({
@@ -138,13 +138,12 @@ const BottomSheetPlaylistGuests = React.forwardRef<
   };
 
   return (
-    <BottomSheetModal
+    <TrueSheet
     ref={ref}
-    snapPoints={['90%']}
-    enableDynamicSizing={false}
+    sizes={['large']}
     {...props}
     >
-      <BottomSheetView
+      <View
       style={[
         { paddingBottom: inset.bottom },
         tw`flex-1 gap-4 items-center justify-center mx-2`,
@@ -152,19 +151,19 @@ const BottomSheetPlaylistGuests = React.forwardRef<
       >
         <View style={tw`flex-row items-center justify-between w-full`}>
           <TouchableOpacity
-          onPress={() => {
+          onPress={async () => {
             if (hasChanges) {
-              createConfirmSheet({
+              await createConfirmSheet({
                 title: 'Abandonner les modifications ?',
                 description: 'Si vous revenez en arrière maintenant, vous perdrez vos modifications.',
                 cancelLabel: 'Ignorer',
                 confirmLabel: 'Poursuivre la modification',
-                onCancel: () => {
-                  closeSheet(id);
+                onCancel: async () => {
+                  await closeSheet(id);
                 }
               })
             } else {
-              closeSheet(id)
+              await closeSheet(id)
             }
           }}
           style={tw`flex-1`}
@@ -191,7 +190,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
             style={tw`flex-1`}
             />
             <TouchableOpacity
-            onPress={() => openSheet(BottomSheetPlaylistGuestsAdd, {
+            onPress={async () => await openSheet(BottomSheetPlaylistGuestsAdd, {
               playlistId: playlist.id,
               guests: guests,
               onAdd: handleAddGuest,
@@ -252,12 +251,12 @@ const BottomSheetPlaylistGuests = React.forwardRef<
             keyExtractor={(item) => item.user.id.toString()}
             showsVerticalScrollIndicator={false}
             refreshing={isRefetching}
-            onRefresh={refetch}
+            // onRefresh={refetch}
             />
           </View>
         </View>
-      </BottomSheetView>
-    </BottomSheetModal>
+      </View>
+    </TrueSheet>
   );
 });
 BottomSheetPlaylistGuests.displayName = 'BottomSheetPlaylistGuests';

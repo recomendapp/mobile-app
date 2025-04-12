@@ -1,5 +1,4 @@
-import React, { forwardRef, Fragment, useMemo } from 'react';
-import { BottomSheetModal, BottomSheetView, TouchableOpacity } from '@gorhom/bottom-sheet';
+import React from 'react';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
@@ -10,12 +9,13 @@ import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Text, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import BottomSheetSendReco from './BottomSheetSendReco';
 import BottomSheetAddToPlaylist from './BottomSheetAddToPlaylist';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
 
-interface BottomSheetMediaProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetMediaProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
   media?: Media,
   additionalItemsTop?: Item[];
@@ -29,15 +29,15 @@ interface Item {
 	submenu?: Item[];
 }
 
-const BottomSheetMedia = forwardRef<
-  React.ElementRef<typeof BottomSheetModal>,
+const BottomSheetMedia = React.forwardRef<
+  React.ElementRef<typeof TrueSheet>,
   BottomSheetMediaProps
->(({ id, media, additionalItemsTop = [], additionalItemsBottom = [], snapPoints, ...props }, ref) => {
+>(({ id, media, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const { closeSheet, openSheet } = useBottomSheetStore();
   const { colors, inset } = useTheme();
   const router = useRouter();
   const { t } = useTranslation();
-  const items: Item[][] = useMemo(() => ([
+  const items: Item[][] = React.useMemo(() => ([
     [
       ...additionalItemsTop,
     ],
@@ -55,14 +55,14 @@ const BottomSheetMedia = forwardRef<
 			},
       {
 				icon: Icons.AddPlaylist,
-        onPress: () => openSheet(BottomSheetAddToPlaylist, {
+        onPress: async () => await openSheet(BottomSheetAddToPlaylist, {
           media: media!,
         }),
 				label: upperFirst(t('common.messages.add_to_playlist')),
 			},
 			{
 				icon: Icons.Reco,
-        onPress: () => openSheet(BottomSheetSendReco, {
+        onPress: async () => await openSheet(BottomSheetSendReco, {
           media: media!,
         }),
 				label: upperFirst(t('common.messages.send_to_friend')),
@@ -72,11 +72,12 @@ const BottomSheetMedia = forwardRef<
       ...additionalItemsBottom,
     ],
   ]), [media]);
+
   return (
-    // <BottomSheetModal
-    // ref={ref}
-    // {...props}
-    // >
+    <TrueSheet
+    ref={ref}
+    {...props}
+    >
       <View
       style={[
         { paddingBottom: inset.bottom },
@@ -105,13 +106,13 @@ const BottomSheetMedia = forwardRef<
           </View>
         </View>
         {items.map((group, i) => (
-          <Fragment key={i}>
+          <React.Fragment key={i}>
             {group.map((item, j) => (
               <TouchableOpacity
               key={j}
-              onPress={() => {
-                item.onPress();
-                closeSheet(id);
+              onPress={async () => {
+                await closeSheet(id);
+                await item.onPress();
               }}
               style={tw`flex-row items-center gap-2 p-4`}
               >
@@ -119,10 +120,10 @@ const BottomSheetMedia = forwardRef<
                 <ThemedText>{item.label}</ThemedText>
               </TouchableOpacity>
             ))}
-          </Fragment>
+          </React.Fragment>
         ))}
       </View>
-    // </BottomSheetModal>
+    </TrueSheet>
   );
 });
 BottomSheetMedia.displayName = 'BottomSheetMedia';
