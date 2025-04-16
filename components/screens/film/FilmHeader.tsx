@@ -1,17 +1,14 @@
-import * as React from 'react';
+import React from 'react';
 import {
   LayoutChangeEvent,
-  Platform,
 } from 'react-native';
 import Animated, {
   Extrapolation,
   interpolate,
   runOnJS,
-  useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withDecay,
-  withTiming,
 } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import { ThemedText } from '@/components/ui/ThemedText';
@@ -24,8 +21,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
-import { Gesture, GestureDetector, GestureStateChangeEvent, PanGestureHandlerEventPayload } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useFilmContext } from './FilmContext';
+import { useFilmStore } from '@/stores/useFilmStore';
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
@@ -40,7 +38,14 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 	const { t } = useTranslation();
 	const { hslToRgb } = useColorConverter();
 	const { colors, inset } = useTheme();
-	const { scrollY, headerOverlayHeight, headerHeight, headerScrollY, scrollRefs, tabState } = useFilmContext();
+	const {
+		scrollY,
+		headerOverlayHeight,
+		headerHeight,
+		headerScrollY,
+		scrollRefs,
+		tabState,
+	} = useFilmStore();
 	const bgColor = hslToRgb(colors.background);
 	const layoutY = useSharedValue(0);
 	const headerScrollStart = useSharedValue(0);
@@ -127,35 +132,32 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 			// ],
 		};
 	});
-
-	const handleHeaderGestureEnd = (gestureState: GestureStateChangeEvent<PanGestureHandlerEventPayload>) => {
-		if (scrollY.get() < 0) {
-			scrollRefs.forEach((listRef) => {
-				listRef.current?.scrollToOffset({
-				  offset: 0,
-				  animated: true,
-				});
-			  });
-		} else {
-			console.log('bleeeh', -gestureState.velocityY);
-			if (Math.abs(gestureState.velocityY) < 200) return;
-			headerScrollY.value = withDecay({
-				velocity: -gestureState.velocityY,
-				// deceleration: 0.998,
-			})
-		}
+	const handleHeaderGestureEnd = () => {
+		scrollRefs.forEach((listRef) => {
+			listRef.current?.scrollToOffset({
+				offset: 0,
+				animated: true,
+			});
+		});
 	};
 
 	const headerGesture = Gesture.Pan()
 		.onBegin(() => {
-			headerScrollStart.value = scrollY.get(); // Sauvegarde la position initiale du scroll
-	  	})
-		.onUpdate((event) => {
-			const newScrollValue = headerScrollStart.get() - event.translationY;
-			headerScrollY.value = newScrollValue;
+			headerScrollStart.value = scrollY.get();
 		})
-		.onEnd((e) => {
-			runOnJS(handleHeaderGestureEnd)(e);
+		.onChange((event) => {
+			headerScrollY.value = headerScrollStart.get() - event.translationY;
+		})
+		.onFinalize((e) => {
+			console.log('headerScrollY', e.velocityY);
+			if (headerScrollY.get() < 0) {
+				runOnJS(handleHeaderGestureEnd)()
+			} else {
+				if (Math.abs(e.velocityY) < 200) return;
+				headerScrollY.value = withDecay({
+					velocity: e.velocityY,
+				})
+			}
 		});
 
 	return (

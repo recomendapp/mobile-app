@@ -122,7 +122,7 @@ export const useMediaPlaylistsInfiniteQuery = ({
 	  		let to = from - 1 + filters.perPage;
 			let request = supabase
 				.from('playlists')
-				.select('*, playlist_items!inner(*)')
+				.select('*, user(*), playlist_items!inner(*)')
 				.match({
 					'playlist_items.media_id': id,
 				})

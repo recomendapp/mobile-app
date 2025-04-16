@@ -9,15 +9,28 @@ import { FlashList } from "@shopify/flash-list";
 import { CardMedia } from "@/components/cards/CardMedia";
 import tw from "@/lib/tw";
 import { useTheme } from "@/context/ThemeProvider";
-import Animated, { useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
-import { useFilmContext } from "@/components/screens/film/FilmContext";
+import Animated, { runOnJS, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useEffect } from "react";
+import { useFilmStore } from "@/stores/useFilmStore";
+import { useRoute } from "@react-navigation/native";
+
+const WINDOW_HEIGHT = Dimensions.get('window').height;
 
 const FilmScreen = () => {
 	const { colors, inset } = useTheme();
 	const { i18n, t } = useTranslation();
-	const { tabState, movieId, scrollY, headerHeight, tabBarHeight, addScrollRef } = useFilmContext();
+	const route = useRoute();
+	const {
+		tabState,
+		syncScrollOffset,
+		movieId,
+		scrollY,
+		headerHeight,
+		tabBarHeight,
+		headerOverlayHeight,
+		addScrollRef 
+	} = useFilmStore();
 	const bottomTabBarHeight = useBottomTabOverflow();
 	const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
 	const {
@@ -32,13 +45,27 @@ const FilmScreen = () => {
 			'worklet';
 			scrollY.value = event.contentOffset.y;
 		},
+		onMomentumEnd: event => {
+			'worklet';
+			runOnJS(syncScrollOffset)();
+		},
+		onEndDrag: event => {
+			'worklet';
+			runOnJS(syncScrollOffset)();
+		}
 	});
+
+	const flatlistStyle = useAnimatedStyle(() => ({
+		paddingTop: headerHeight.get() + tabBarHeight.get(),
+	}));
 
 	useEffect(() => {
 		if (scrollRef.current && tabState) {
-			addScrollRef('index', scrollRef);
+			addScrollRef(route.key, scrollRef);
 		}
 	}, [scrollRef, tabState]);
+
+	console.log('route', route);
 
 	if (!movie) return null;
 	if (!tabState) return null;
@@ -48,11 +75,11 @@ const FilmScreen = () => {
 	scrollToOverflowEnabled
 	ref={scrollRef}
 	onScroll={scrollHandler}
+	style={flatlistStyle}
 	contentContainerStyle={[
 		{
-			paddingTop: headerHeight.get() + tabBarHeight.get(),
 			paddingBottom: bottomTabBarHeight + inset.bottom,
-			minHeight: Dimensions.get('window').height + headerHeight.get(),
+			minHeight: WINDOW_HEIGHT - (headerOverlayHeight.get() + tabBarHeight.get() + inset.top),
 		},
 	]}
 	ListHeaderComponent={() => (

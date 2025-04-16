@@ -1,28 +1,38 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
-import { useFilmContext } from "@/components/screens/film/FilmContext";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/context/ThemeProvider";
 import { useMediaMovieDetailsQuery, useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
+import { useFilmStore } from "@/stores/useFilmStore";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import { FlashList } from "@shopify/flash-list";
+import { useRoute } from "@react-navigation/native";
 import { upperFirst } from "lodash";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Dimensions, Pressable, View } from "react-native";
-import Animated, { useAnimatedRef, useAnimatedScrollHandler } from "react-native-reanimated";
+import Animated, { runOnJS, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
 
 const GRID_COLUMNS = 3;
+const WINDOW_HEIGHT = Dimensions.get('window').height;
 
 const FilmPlaylistsScreen = () => {
 	const { colors, inset } = useTheme();
 	const { i18n, t } = useTranslation();
-	const { movieId, scrollY, headerHeight, addScrollRef, tabState } = useFilmContext();
+	const route = useRoute();
+	const {
+		tabState,
+		movieId,
+		syncScrollOffset,
+		scrollY,
+		headerHeight,
+		tabBarHeight,
+		headerOverlayHeight,
+		addScrollRef 
+	} = useFilmStore();
 	const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
-	const tabBarHeight = useBottomTabOverflow();
+	const bottomTabBarHeight = useBottomTabOverflow();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const [display, setDisplay] = useState<'grid' | 'row'>('grid');
 	const sortByOptions = [
@@ -73,17 +83,37 @@ const FilmPlaylistsScreen = () => {
 			'worklet';
 			scrollY.value = event.contentOffset.y;
 		},
+		onMomentumEnd: event => {
+			'worklet';
+			runOnJS(syncScrollOffset)();
+		},
+		onEndDrag: event => {
+			'worklet';
+			runOnJS(syncScrollOffset)();
+		}
 	});
+
+	const flatlistStyle = useAnimatedStyle(() => ({
+		paddingTop: headerHeight.get() + tabBarHeight.get(),
+	}));
 
 	useEffect(() => {
 		if (scrollRef.current && tabState) {
-			addScrollRef('playlists', scrollRef);
+			addScrollRef(route.key, scrollRef);
 		}
 	}, [scrollRef, tabState]);
 
 	return (
 		<Animated.FlatList
 		ref={scrollRef}
+		style={flatlistStyle}
+		contentContainerStyle={[
+			tw`pt-2 px-2`,
+			{
+				paddingBottom: bottomTabBarHeight + inset.bottom,
+				minHeight: WINDOW_HEIGHT - (headerOverlayHeight.get() + tabBarHeight.get() + inset.top),
+			},
+		]}
 		ListHeaderComponent={() => (
 			<View>
 				<View style={tw.style('flex flex-row justify-end items-center gap-2')}>
@@ -99,14 +129,9 @@ const FilmPlaylistsScreen = () => {
 		)}
 		ListEmptyComponent={() => !loading ? <ThemedText style={tw.style('text-center')}>{upperFirst(t('common.messages.no_results'))}</ThemedText> : null}
 		onScroll={scrollHandler}
-		contentContainerStyle={{
-			paddingTop: headerHeight.get(),
-			paddingBottom: tabBarHeight + inset.bottom,
-			minHeight: Dimensions.get('window').height + headerHeight.get(),
-		}}
 		data={playlists?.pages.flat()}
 		renderItem={({ item, index }) => (
-			<View key={index} style={tw.style('p-1')}>
+			<View key={index} style={[tw`p-1`, { flex: 1 / GRID_COLUMNS }]}>
 				<CardPlaylist
 				key={item.id}
 				playlist={item}
@@ -115,53 +140,13 @@ const FilmPlaylistsScreen = () => {
 			</View>
 		)}
 		keyExtractor={(_, index) => index.toString()}
-		// estimatedItemSize={190 * 15}
 		refreshing={isFetching}
 		numColumns={display === 'grid' ? GRID_COLUMNS : 1}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.1}
 		nestedScrollEnabled
-		// ItemSeparatorComponent={() => <View className="w-2" />}
+		showsVerticalScrollIndicator={false}
 		/>
-	)
-
-	return (
-		<>
-			<View>
-				<View style={tw.style('flex flex-row justify-end items-center gap-2')}>
-					<Pressable onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}>
-					{sortOrder === 'desc' ? <Icons.ArrowDownNarrowWide color={colors.foreground} size={20} /> : <Icons.ArrowUpNarrowWide color={colors.foreground} size={20} />}
-					</Pressable>
-					<Pressable onPress={handleSortBy} style={tw.style('flex-row items-center gap-1')}>
-						<ThemedText>{upperFirst(t(`common.messages.${sortBy}`))}</ThemedText>
-						<Icons.ChevronDown color={colors.foreground} size={20} />
-					</Pressable>
-				</View>
-			</View>
-			{playlists?.pages[0].length ?
-				<FlashList
-				data={playlists.pages.flat()}
-				renderItem={({ item, index }) => (
-					<View key={index} style={tw.style('p-1')}>
-						<CardPlaylist
-						key={item.id}
-						playlist={item}
-						style={tw.style('w-full')}
-						/>
-					</View>
-				)}
-				keyExtractor={(_, index) => index.toString()}
-				estimatedItemSize={190 * 15}
-				refreshing={isFetching}
-				numColumns={display === 'grid' ? GRID_COLUMNS : 1}
-				onEndReached={() => hasNextPage && fetchNextPage()}
-				onEndReachedThreshold={0.3}
-				nestedScrollEnabled
-				// ItemSeparatorComponent={() => <View className="w-2" />}
-				/>
-			: loading ? <Skeleton style={tw.style('h-48 w-full')} />
-			: <ThemedText style={tw.style('text-center')}>{upperFirst(t('common.messages.no_results'))}</ThemedText>}
-		</>
 	)
 };
 
