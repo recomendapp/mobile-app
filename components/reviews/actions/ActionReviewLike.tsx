@@ -50,7 +50,8 @@ const ActionReviewLike = React.forwardRef<
 			onSuccess: () => {
 				setLikeCount((prev) => (prev ?? 0) + 1);
 			},
-			onError: () => {
+			onError: (error) => {
+				console.error(error);
 				// toast.error(upperFirst(common('errors.an_error_occurred')));
 			}
 		});

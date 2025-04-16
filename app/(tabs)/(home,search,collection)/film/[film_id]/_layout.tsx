@@ -8,6 +8,7 @@ import {
 import Animated, {
   Extrapolation,
   interpolate,
+  runOnJS,
   SharedValue,
   useAnimatedReaction,
   useAnimatedStyle,
@@ -27,6 +28,8 @@ import { ThemedAnimatedView } from '@/components/ui/ThemedAnimatedView';
 import { createMaterialTopTabNavigator, MaterialTopTabBarProps, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions } from '@react-navigation/material-top-tabs';
 import FilmProvider, { useFilmContext } from '@/components/screens/film/FilmContext';
 import HeaderOverlay from '@/components/ui/HeaderOverlay';
+import { EdgeInsets } from 'react-native-safe-area-context';
+import { useFilmStore } from '@/stores/useFilmStore';
 
 const { Navigator } = createMaterialTopTabNavigator();
 
@@ -43,30 +46,28 @@ interface TabBarProps extends MaterialTopTabBarProps {
 	tabBarHeight: SharedValue<number>;
 	scrollY: SharedValue<number>;
 	onHeight: (height: number) => void;
+	inset: EdgeInsets;
 }
 
-const TabBar = ({ state, descriptors, navigation, headerOverlayHeight, headerHeight, scrollY, tabBarHeight, onHeight } : TabBarProps) => {
-	const { inset, colors } = useTheme();
-	const anim = useAnimatedStyle(() => ({
-		transform: [
-			{
-				translateY: interpolate(
-					scrollY.get(),
-					[
-						headerHeight.get() + (headerOverlayHeight.get() + inset.top) - 1,
-						headerHeight.get() + (headerOverlayHeight.get() + inset.top),
-						headerHeight.get() + (headerOverlayHeight.get() + inset.top) + 1,
-					],
-					[0, 0, 1]
-				),
-			}
-		]
-	}));
+const TabBar = ({ state, descriptors, navigation, headerOverlayHeight, headerHeight, scrollY, tabBarHeight, inset, onHeight } : TabBarProps) => {
+	const { colors } = useTheme();
+	const anim = useAnimatedStyle(() => {
+		return {
+			transform: [
+				{
+					translateY: Math.max(
+						headerOverlayHeight.get() + inset.top,
+						headerHeight.get() - scrollY.get()
+					  )
+				},
+			],
+		};
+	});
   	return (
 		<Animated.View
 		style={[
 			{ backgroundColor: colors.muted },
-			tw`absolute flex-row items-center p-1 rounded-md z-10`,
+			tw`absolute flex-row items-center p-1 z-10`,
 			anim,
 		]}
 		onLayout={(event) => {
@@ -81,21 +82,21 @@ const TabBar = ({ state, descriptors, navigation, headerOverlayHeight, headerHei
 					|| item.name;
 				const isFocused = state.index === index;
 				const onPress = () => {
-							const event = navigation.emit({
-								type: 'tabPress',
-								target: item.key,
-								canPreventDefault: true,
-							});
-							if (!isFocused && !event.defaultPrevented) {
-								navigation.navigate(item.name);
-							}
-						};
+					const event = navigation.emit({
+						type: 'tabPress',
+						target: item.key,
+						canPreventDefault: true,
+					});
+					if (!isFocused && !event.defaultPrevented) {
+						navigation.navigate(item.name);
+					}
+				};
 				return (
 					<View
 					key={item.key}
 					style={[
 					{ backgroundColor: isFocused ? colors.background : undefined },
-					tw`flex-1 p-1 rounded-md`,
+					tw`flex-1 py-2 px-1 rounded-md`,
 					]}
 					>
 						<TouchableOpacity onPress={onPress}>
@@ -120,7 +121,19 @@ const TabBar = ({ state, descriptors, navigation, headerOverlayHeight, headerHei
 const FilmLayout = () => {
 	const { i18n, t } = useTranslation();
 	const { film_id } = useLocalSearchParams();
+	const { inset } = useTheme();
 	const { id: movieId} = getIdFromSlug(film_id as string);
+	const {
+		init,
+		setTabState,
+		syncScrollOffset,
+		handleHeaderScroll,
+		headerHeight,
+		headerOverlayHeight,
+		tabBarHeight,
+		scrollY,
+		headerScrollY,
+	} = useFilmStore();
 	const {
 		data: movie,
 		isLoading,
@@ -129,20 +142,20 @@ const FilmLayout = () => {
 		locale: i18n.language,
 	});
 	const loading = isLoading || movie === undefined;
-	const [tabState, setTabState] = React.useState<TabNavigationState<ParamListBase>>();
-	const headerOverlayHeight = useSharedValue<number>(0);
-	const headerHeight = useSharedValue<number>(0);
-	const tabBarHeight = useSharedValue<number>(0);
-	const scrollY = useSharedValue<number>(0);
+
+	React.useEffect(() => {
+		init(movieId);
+	}, [movieId]);
+
+	// useAnimatedReaction(
+	// 	() => headerScrollY.value,
+	// 	(value) => {
+	// 		'worklet';
+	// 		runOnJS(handleHeaderScroll)(value);
+	// 	}
+	// )
+
 	return (
-	<FilmProvider
-	tabState={tabState}
-	headerHeight={headerHeight}
-	headerOverlayHeight={headerOverlayHeight}
-	tabBarHeight={tabBarHeight}
-	scrollY={scrollY}
-	movieId={movieId}
-	>
     	<ThemedAnimatedView style={tw.style('flex-1')}>
 			<HeaderOverlay
 			triggerHeight={headerHeight}
@@ -154,32 +167,38 @@ const FilmLayout = () => {
 			scrollY={scrollY}
 			title={movie?.title ?? ''}
 			/>
-			{movie ? <MaterialTopTabs
-			tabBar={(props) => (
-				<TabBar
-				headerOverlayHeight={headerOverlayHeight}
-				headerHeight={headerHeight}
-				scrollY={scrollY}
-				tabBarHeight={tabBarHeight}
-				onHeight={(height) => {
-					'worklet';
-					tabBarHeight.value = height;
+			{movie ? (
+				<MaterialTopTabs
+				tabBar={(props) => (
+					<TabBar
+					inset={inset}
+					headerOverlayHeight={headerOverlayHeight}
+					headerHeight={headerHeight}
+					scrollY={scrollY}
+					tabBarHeight={tabBarHeight}
+					onHeight={(height) => {
+						'worklet';
+						tabBarHeight.value = height;
+					}}
+					{...props}
+					/>
+				)}
+				screenListeners={{
+					state: (e) => {
+						setTabState(e.data.state);
+					}
 				}}
-				{...props}
-				/>
-			)}
-			screenListeners={{
-				state: (e) => {
-					setTabState(e.data.state);
-				}
-			}}
-			/> : null}
+				>
+					<MaterialTopTabs.Screen name="index" options={{ title: 'Description' }} />
+					<MaterialTopTabs.Screen name="reviews" options={{ title: 'Reviews' }} />
+					<MaterialTopTabs.Screen name="playlists" options={{ title: 'Playlists' }} />
+				</MaterialTopTabs>
+			) : null}
 			<FilmHeader
 			movie={movie}
 			loading={loading}
 			/>
     	</ThemedAnimatedView>
-	</FilmProvider>
 	);
 };
 

@@ -1,27 +1,40 @@
+import React from "react";
 import { CardReview } from "@/components/cards/CardReview";
-import { useFilmContext } from "@/components/screens/film/FilmContext";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/context/ThemeProvider";
 import { useMediaMovieDetailsQuery, useMediaReviewsInfiniteQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import { FlashList } from "@shopify/flash-list";
 import { upperFirst } from "lodash";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Dimensions, Pressable, View } from "react-native";
-import Animated, { useAnimatedScrollHandler } from "react-native-reanimated";
+import Animated, { runOnJS, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
+import { useFilmStore } from "@/stores/useFilmStore";
+import ButtonMyReview from "@/components/buttons/ButtonMyReview";
+import { useRoute } from "@react-navigation/native";
 
 const GRID_COLUMNS = 1;
+const WINDOW_HEIGHT = Dimensions.get('window').height;
 
 const FilmReviewsScreen = () => {
 	const { colors, inset } = useTheme();
 	const { i18n, t } = useTranslation();
-	const { tabState, movieId, scrollY, headerHeight, addScrollRef } = useFilmContext();
-	const tabBarHeight = useBottomTabOverflow();
+	const route = useRoute();
+	const {
+		tabState,
+		movieId,
+		syncScrollOffset,
+		scrollY,
+		headerHeight,
+		tabBarHeight,
+		headerOverlayHeight,
+		addScrollRef 
+	} = useFilmStore();
+	const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
+	const bottomTabBarHeight = useBottomTabOverflow();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const [display, setDisplay] = useState<'grid' | 'row'>('grid');
 	const sortByOptions = [
@@ -70,20 +83,43 @@ const FilmReviewsScreen = () => {
 			'worklet';
 			scrollY.value = event.contentOffset.y;
 		},
+		onMomentumEnd: event => {
+			'worklet';
+			runOnJS(syncScrollOffset)();
+		},
+		onEndDrag: event => {
+			'worklet';
+			runOnJS(syncScrollOffset)();
+		}
 	});
+
+	const flatlistStyle = useAnimatedStyle(() => ({
+		paddingTop: headerHeight.get() + tabBarHeight.get(),
+	}));
+
+	React.useEffect(() => {
+		if (scrollRef.current && tabState) {
+			addScrollRef(route.key, scrollRef);
+		}
+	}, [scrollRef, tabState]);
 
 	return (
 		<Animated.FlatList
-		ref={(ref) => {
-			if (ref) {
-			  addScrollRef('reviews', ref); // ref est déjà une AnimatedRef avec Reanimated
-			}
-		}}
+		ref={scrollRef}
+		style={flatlistStyle}
+		contentContainerStyle={[
+			tw`pt-2 px-2`,
+			{
+				paddingBottom: bottomTabBarHeight + inset.bottom,
+				minHeight: WINDOW_HEIGHT - (headerOverlayHeight.get() + tabBarHeight.get() + inset.top)
+			},
+		]}
 		ListHeaderComponent={() => (
-			<View>
+			<View style={tw`flex-row justify-between items-center gap-2`}>
+				<ButtonMyReview mediaId={movie?.media_id!} />
 				<View style={tw.style('flex flex-row justify-end items-center gap-2')}>
 					<Pressable onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}>
-					{sortOrder === 'desc' ? <Icons.ArrowDownNarrowWide color={colors.foreground} size={20} /> : <Icons.ArrowUpNarrowWide color={colors.foreground} size={20} />}
+						{sortOrder === 'desc' ? <Icons.ArrowDownNarrowWide color={colors.foreground} size={20} /> : <Icons.ArrowUpNarrowWide color={colors.foreground} size={20} />}
 					</Pressable>
 					<Pressable onPress={handleSortBy} style={tw.style('flex-row items-center gap-1')}>
 						<ThemedText>{upperFirst(t(`common.messages.${sortBy}`))}</ThemedText>
@@ -94,11 +130,6 @@ const FilmReviewsScreen = () => {
 		)}
 		ListEmptyComponent={() => !loading ? <ThemedText style={tw.style('text-center')}>{upperFirst(t('common.messages.no_results'))}</ThemedText> : null}
 		onScroll={scrollHandler}
-		contentContainerStyle={{
-			paddingTop: headerHeight.get(),
-			paddingBottom: tabBarHeight + inset.bottom,
-			minHeight: Dimensions.get('window').height + headerHeight.get(),
-		}}
 		data={reviews?.pages.flat()}
 		renderItem={({ item, index }) => (
 			<CardReview
@@ -109,54 +140,15 @@ const FilmReviewsScreen = () => {
 			/>
 		)}
 		keyExtractor={(_, index) => index.toString()}
-		// estimatedItemSize={190 * 15}
 		refreshing={isFetching}
 		numColumns={display === 'grid' ? GRID_COLUMNS : 1}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.3}
 		nestedScrollEnabled
+		showsVerticalScrollIndicator={false}
 		ItemSeparatorComponent={() => <View className="w-2" />}
-		// ItemSeparatorComponent={() => <View className="w-2" />}
 		/>
-	)
-
-	return (
-		<>
-			<View>
-				<View style={tw.style('flex flex-row justify-end items-center gap-2')}>
-					<Pressable onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}>
-					{sortOrder === 'desc' ? <Icons.ArrowDownNarrowWide color={colors.foreground} size={20} /> : <Icons.ArrowUpNarrowWide color={colors.foreground} size={20} />}
-					</Pressable>
-					<Pressable onPress={handleSortBy} style={tw.style('flex-row items-center gap-1')}>
-						<ThemedText>{upperFirst(t(`common.messages.${sortBy}`))}</ThemedText>
-						<Icons.ChevronDown color={colors.foreground} size={20} />
-					</Pressable>
-				</View>
-			</View>
-			{reviews?.pages[0].length ?
-				<FlashList
-				data={reviews.pages.flat()}
-				renderItem={({ item, index }) => (
-					<CardReview
-					key={index}
-					review={item}
-					activity={item.activity}
-					author={item.activity?.user}
-					/>
-				)}
-				keyExtractor={(_, index) => index.toString()}
-				estimatedItemSize={190 * 15}
-				refreshing={isFetching}
-				numColumns={display === 'grid' ? GRID_COLUMNS : 1}
-				onEndReached={() => hasNextPage && fetchNextPage()}
-				onEndReachedThreshold={0.3}
-				nestedScrollEnabled
-				ItemSeparatorComponent={() => <View className="w-2" />}
-				/>
-			: loading ? <Skeleton style={tw.style('h-48 w-full')} />
-			: <ThemedText style={tw.style('text-center')}>{upperFirst(t('common.messages.no_results'))}</ThemedText>}
-		</>
-	)
+	);
 };
 
 export default FilmReviewsScreen;
