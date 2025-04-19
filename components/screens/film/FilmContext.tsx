@@ -1,3 +1,4 @@
+import { useTheme } from '@/context/ThemeProvider';
 import { ParamListBase, TabNavigationState } from '@react-navigation/native';
 import React from 'react';
 import Animated, { AnimatedRef, runOnJS, SharedValue, useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
@@ -7,8 +8,6 @@ type ScrollableRef = AnimatedRef<
 	// | Animated.FlatList<any>
 	// | FlashList<any>
 >;
-
-type Screen = 'index' | 'reviews' | 'playlists';
 
 interface FilmContextType {
 	tabState: TabNavigationState<ParamListBase> | undefined;
@@ -21,53 +20,55 @@ interface FilmContextType {
 	movieId: number;
 	scrollRefs: Map<string, ScrollableRef>;
 	listOffsets: Map<string, number>;
-	addScrollRef: (key: Screen, ref: ScrollableRef) => void;
-	removeScrollRef: (key: Screen) => void;
-	syncScrollOffset: (offset: number, key: string) => void;
+	addScrollRef: (key: string, ref: ScrollableRef) => void;
+	removeScrollRef: (key: string) => void;
+	syncScrollOffset: () => void;
 }
 
 const FilmContext = React.createContext<FilmContextType | undefined>(undefined);
 
 interface FilmProviderProps {
 	children: React.ReactNode;
+	movieId: number;
 	tabState: TabNavigationState<ParamListBase> | undefined;
 	headerHeight: SharedValue<number>;
 	headerOverlayHeight: SharedValue<number>;
 	tabBarHeight: SharedValue<number>;
 	scrollY: SharedValue<number>;
-	movieId: number;
 }
   
 const FilmProvider: React.FC<FilmProviderProps> = ({
 	children,
+	movieId,
 	tabState,
 	headerHeight,
 	headerOverlayHeight,
 	tabBarHeight,
 	scrollY,
-	movieId,
 }) => {
+	const { inset } = useTheme();
 	const scrollRefs = React.useRef<Map<string, ScrollableRef>>(new Map()).current;
 	const listOffsets = React.useRef<Map<string, number>>(new Map()).current;
 	const headerScrollY = useSharedValue(0);
   	const headerMoveScrollY = useSharedValue(0);
 
-	const addScrollRef = (key: Screen, ref: ScrollableRef) => {
-		const route = tabState?.routes.find((r) => r.name.startsWith(key));
+	const addScrollRef = (key: string, ref: ScrollableRef) => {
+		const route = tabState?.routes.find((r) => r.key === key);
 		if (!route) return;
 		scrollRefs.set(route.key, ref);
 	};
-	const removeScrollRef = (key: Screen) => {
-		const route = tabState?.routes.find((r) => r.name.startsWith(key));
+	const removeScrollRef = (key: string) => {
+		const route = tabState?.routes.find((r) => r.key === key);
 		if (!route) return;
 		scrollRefs.delete(route.key);
 	};
 	const syncScrollOffset = () => {
 		if (!tabState) return;
 		const currentKey = tabState?.routes[tabState.index].key;
+		const limitScrolll = headerHeight.get() - headerOverlayHeight.get() - inset.top;
 		scrollRefs.forEach((ref, refKey) => {
 			if (refKey !== currentKey) {
-				if (scrollY.get() < headerHeight.get() && scrollY.get() >= 0) {
+				if (scrollY.get() < limitScrolll && scrollY.get() >= 0) {
 					if (ref.current) {
 						ref.current.scrollToOffset({
 							offset: scrollY.get(),
@@ -75,7 +76,7 @@ const FilmProvider: React.FC<FilmProviderProps> = ({
 						});
 						listOffsets.set(refKey, scrollY.get());
 					}
-				} else if (scrollY.get() >= headerHeight.get()) {
+				} else if (scrollY.get() >= limitScrolll) {
 					if (!listOffsets.get(refKey) || listOffsets.get(refKey)! < headerHeight.get()) {
 						if (ref.current) {
 							ref.current.scrollToOffset({
@@ -105,19 +106,12 @@ const FilmProvider: React.FC<FilmProviderProps> = ({
 		}
 	};
 
-	useAnimatedReaction(
-		() => scrollY.value,
-		() => {
-			runOnJS(syncScrollOffset)();
-		}
-	);
-
-	useAnimatedReaction(
-		() => headerScrollY.value,
-		(value) => {
-			runOnJS(handleHeaderScroll)(value);
-		}
-	);
+	// useAnimatedReaction(
+	// 	() => headerScrollY.value,
+	// 	(value) => {
+	// 		runOnJS(handleHeaderScroll)(value);
+	// 	}
+	// );
   
 	return (
 		<FilmContext.Provider

@@ -23,7 +23,6 @@ import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useFilmContext } from './FilmContext';
-import { useFilmStore } from '@/stores/useFilmStore';
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
@@ -45,7 +44,7 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 		headerScrollY,
 		scrollRefs,
 		tabState,
-	} = useFilmStore();
+	} = useFilmContext();
 	const bgColor = hslToRgb(colors.background);
 	const layoutY = useSharedValue(0);
 	const headerScrollStart = useSharedValue(0);

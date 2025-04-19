@@ -1,35 +1,27 @@
 import React from 'react';
 import {
-  LayoutChangeEvent,
-  Pressable,
   TouchableOpacity,
   View,
 } from 'react-native';
 import Animated, {
-  Extrapolation,
-  interpolate,
-  runOnJS,
   SharedValue,
-  useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
 import { useLocalSearchParams, withLayoutContext } from 'expo-router';
-import { Icons } from '@/constants/Icons';
 import { useTranslation } from 'react-i18next';
 import { getIdFromSlug } from '@/hooks/getIdFromSlug';
 import { useMediaMovieDetailsQuery } from '@/features/media/mediaQueries';
-import { ParamListBase, TabNavigationState, useNavigation } from '@react-navigation/native';
+import { ParamListBase, TabNavigationState } from '@react-navigation/native';
 import { ThemedText } from '@/components/ui/ThemedText';
 import FilmHeader from '@/components/screens/film/FilmHeader';
 import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
 import { ThemedAnimatedView } from '@/components/ui/ThemedAnimatedView';
 import { createMaterialTopTabNavigator, MaterialTopTabBarProps, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions } from '@react-navigation/material-top-tabs';
-import FilmProvider, { useFilmContext } from '@/components/screens/film/FilmContext';
+import FilmProvider from '@/components/screens/film/FilmContext';
 import HeaderOverlay from '@/components/ui/HeaderOverlay';
 import { EdgeInsets } from 'react-native-safe-area-context';
-import { useFilmStore } from '@/stores/useFilmStore';
 
 const { Navigator } = createMaterialTopTabNavigator();
 
@@ -124,17 +116,6 @@ const FilmLayout = () => {
 	const { inset } = useTheme();
 	const { id: movieId} = getIdFromSlug(film_id as string);
 	const {
-		init,
-		setTabState,
-		syncScrollOffset,
-		handleHeaderScroll,
-		headerHeight,
-		headerOverlayHeight,
-		tabBarHeight,
-		scrollY,
-		headerScrollY,
-	} = useFilmStore();
-	const {
 		data: movie,
 		isLoading,
 	} = useMediaMovieDetailsQuery({
@@ -142,10 +123,11 @@ const FilmLayout = () => {
 		locale: i18n.language,
 	});
 	const loading = isLoading || movie === undefined;
-
-	React.useEffect(() => {
-		init(movieId);
-	}, [movieId]);
+	const [tabState, setTabState] = React.useState<TabNavigationState<ParamListBase>>();
+	const headerOverlayHeight = useSharedValue<number>(43);
+	const headerHeight = useSharedValue<number>(0);
+	const tabBarHeight = useSharedValue<number>(33);
+	const scrollY = useSharedValue<number>(0);
 
 	// useAnimatedReaction(
 	// 	() => headerScrollY.value,
@@ -156,6 +138,14 @@ const FilmLayout = () => {
 	// )
 
 	return (
+	<FilmProvider
+	tabState={tabState}
+	movieId={movieId}
+	headerHeight={headerHeight}
+	headerOverlayHeight={headerOverlayHeight}
+	tabBarHeight={tabBarHeight}
+	scrollY={scrollY}
+	>
     	<ThemedAnimatedView style={tw.style('flex-1')}>
 			<HeaderOverlay
 			triggerHeight={headerHeight}
@@ -198,7 +188,8 @@ const FilmLayout = () => {
 			movie={movie}
 			loading={loading}
 			/>
-    	</ThemedAnimatedView>
+    	</ThemedAnimatedView>	
+	</FilmProvider>
 	);
 };
 

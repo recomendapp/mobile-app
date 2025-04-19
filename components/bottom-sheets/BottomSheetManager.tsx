@@ -29,7 +29,7 @@ export const BottomSheetManager = () => {
         id={id}
         sizes={sizes}
         cornerRadius={24}
-        backgroundColor={colors.background}
+        backgroundColor={colors.muted}
         closeSheet={closeSheet}
         removeSheet={removeSheet}
         onDismiss={() => {

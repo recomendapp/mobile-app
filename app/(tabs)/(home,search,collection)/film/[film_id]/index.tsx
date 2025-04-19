@@ -3,17 +3,16 @@ import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
 import { Link } from "expo-router"
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
-import { Dimensions, View } from "react-native";
+import { Dimensions, FlatList, View } from "react-native";
 import { Media, MediaMoviePerson } from "@/types/type.db";
-import { FlashList } from "@shopify/flash-list";
 import { CardMedia } from "@/components/cards/CardMedia";
 import tw from "@/lib/tw";
 import { useTheme } from "@/context/ThemeProvider";
 import Animated, { runOnJS, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useEffect } from "react";
-import { useFilmStore } from "@/stores/useFilmStore";
 import { useRoute } from "@react-navigation/native";
+import { useFilmContext } from "@/components/screens/film/FilmContext";
 
 const WINDOW_HEIGHT = Dimensions.get('window').height;
 
@@ -30,7 +29,7 @@ const FilmScreen = () => {
 		tabBarHeight,
 		headerOverlayHeight,
 		addScrollRef 
-	} = useFilmStore();
+	} = useFilmContext();
 	const bottomTabBarHeight = useBottomTabOverflow();
 	const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
 	const {
@@ -65,8 +64,6 @@ const FilmScreen = () => {
 		}
 	}, [scrollRef, tabState]);
 
-	console.log('route', route);
-
 	if (!movie) return null;
 	if (!tabState) return null;
 
@@ -98,7 +95,7 @@ const FilmScreen = () => {
 				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
 			</View>
 
-			<View style={tw.style('gap-1')}> 
+			{/* <View style={tw.style('gap-1')}> 
 				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
 				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
 			</View>
@@ -109,7 +106,7 @@ const FilmScreen = () => {
 			<View style={tw.style('gap-1')}> 
 				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
 				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
-			</View>
+			</View> */}
 		</>
 	)}
 	showsVerticalScrollIndicator={false}
@@ -127,7 +124,7 @@ const FilmCast = ({
 	const { colors } = useTheme();
 	const { t } = useTranslation();
 	return (
-		<FlashList
+		<FlatList
 		data={cast}
 		renderItem={({ item, index }) => {
 			if (!item.person) return null;
@@ -151,7 +148,6 @@ const FilmCast = ({
 		}}
 		contentContainerStyle={tw`px-2`}
 		keyExtractor={(_, index) => index.toString()}
-		estimatedItemSize={cast.length}
 		showsHorizontalScrollIndicator={false}
 		horizontal
 		ItemSeparatorComponent={() => <View style={tw.style('w-2')} />}

@@ -86,7 +86,7 @@ const HeaderOverlay: React.FC<HeaderOverlayProps> = ({
 			<ThemedText numberOfLines={1} style={tw.style('text-xl font-medium shrink')}>
 			{title}
 			</ThemedText>
-			<Pressable onPress={() => console.log('pressed')}>
+			<Pressable onPress={() => console.log('options pressed')}>
 				<Icons.EllipsisVertical color={colors.foreground} />
 			</Pressable>
 		</Animated.View>
