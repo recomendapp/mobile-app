@@ -4,7 +4,6 @@ import { useTheme } from "@/context/ThemeProvider";
 import useColorConverter from "@/hooks/useColorConverter";
 import tw from "@/lib/tw";
 import React, { forwardRef } from "react";
-import { useTranslation } from "react-i18next";
 import { Text } from "react-native";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import useRandomBackdrop from "@/hooks/useRandomBackdrop";
@@ -23,7 +22,6 @@ const CollectionHeader = forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	CollectionHeaderProps
 >(({ headerHeight, headerOverlayHeight, scrollY, title, numberOfItems, backdrops, ...props }, ref) => {
-	const { t } = useTranslation();
 	const { colors, inset } = useTheme();
 	const { hslToRgb } = useColorConverter();
 	const bgBackdrop = useRandomBackdrop(backdrops);

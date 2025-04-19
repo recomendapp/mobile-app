@@ -1,14 +1,15 @@
 import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
 import * as React from 'react';
-import { Pressable } from 'react-native';
+import { Pressable, PressableProps, StyleProp } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 type Variant =
   'default'
   | 'destructive'
   | 'outline'
-  | 'accent-yellow';
+  | 'accent-yellow'
+  | 'muted';
 
 interface ButtonTextProps
   extends React.ComponentPropsWithoutRef<typeof Animated.Text> {
@@ -37,6 +38,11 @@ const ButtonText = React.forwardRef<
         case 'accent-yellow':
           style = {
             color: colors.accentYellowForeground,
+          }
+          break;
+        case 'muted':
+          style = {
+            color: colors.foreground,
           }
           break;
         default:
@@ -70,10 +76,11 @@ interface ButtonProps
     variant?: Variant;
     disabled?: boolean;
     onPress?: () => void;
+    pressableStyle?: StyleProp<PressableProps>;
   }
 
 const Button = React.forwardRef<React.ElementRef<typeof Animated.View>, ButtonProps>(
-  ({ variant, disabled, role = 'button', style, ...props }, ref) => {
+  ({ variant, disabled, role = 'button', pressableStyle, style, ...props }, ref) => {
     const { colors } = useTheme();
     const variantStyles = React.useMemo(() => {
       const shared = "flex-row items-center justify-center gap-2 rounded-md text-sm font-medium px-4 py-2 border";
@@ -97,6 +104,12 @@ const Button = React.forwardRef<React.ElementRef<typeof Animated.View>, ButtonPr
             borderColor: colors.accentYellow,
           }
           break;
+        case 'muted':
+          style = {
+            backgroundColor: colors.muted,
+            borderColor: colors.muted,
+          }
+          break;
         default:
           style = {
             backgroundColor: colors.primary,
@@ -109,7 +122,7 @@ const Button = React.forwardRef<React.ElementRef<typeof Animated.View>, ButtonPr
       }
     }, [variant, colors]);
     return (
-      <Pressable disabled={disabled} onPress={props.onPress} style={{ opacity: disabled ? 0.5 : 1 }}>
+      <Pressable disabled={disabled} onPress={props.onPress} style={[{ opacity: disabled ? 0.5 : 1, flex: 1 }, pressableStyle]}>
         <Animated.View
         ref={ref}
         role={role}

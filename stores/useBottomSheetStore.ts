@@ -1,33 +1,19 @@
 import { create } from 'zustand';
 import React, { ForwardRefExoticComponent, RefAttributes } from 'react';
-import {
-  BottomSheetView,
-  BottomSheetScrollView,
-  BottomSheetFlashList,
-  BottomSheetFlatList,
-  BottomSheetSectionList,
-} from '@gorhom/bottom-sheet';
 import BottomSheetConfirm from '@/components/bottom-sheets/templates/BottomSheetConfirm';
 import * as Haptics from 'expo-haptics';
+import { SheetSize, TrueSheet } from '@lodev09/react-native-true-sheet';
 
-type BottomSheetContentElement =
-  | React.ReactElement<typeof BottomSheetView>
-  | React.ReactElement<typeof BottomSheetScrollView>
-  | React.ReactElement<typeof BottomSheetFlashList>
-  | React.ReactElement<typeof BottomSheetFlatList>
-  | React.ReactElement<typeof BottomSheetSectionList>;
-
-  type BottomSheetContentComponent<T> =
-  | (React.ComponentType<T> & { (props: T): BottomSheetContentElement })
-  | ForwardRefExoticComponent<T & RefAttributes<any>>;
+type BottomSheetContentComponent<T> =
+  | React.ComponentType<T>
+  | ForwardRefExoticComponent<T & RefAttributes<TrueSheet>>;
 
 type SheetState<T = any> = {
   id: string;
-  isOpen: boolean;
-  isClosing: boolean;
+  ref: React.RefObject<TrueSheet> | null;
   content: BottomSheetContentComponent<T>;
   props?: Omit<T, 'id' | 'open' | 'onOpenChange'>;
-  snapPoints?: string[];
+  sizes?: SheetSize[];
   persistent: boolean; // Nouvelle propriété
 };
 
@@ -48,10 +34,10 @@ type BottomSheetStore = {
   openSheet: <T>(
     content: BottomSheetContentComponent<T>,
     props: Omit<T, 'id' | 'open' | 'onOpenChange'>,
-    snapPoints?: string[] | null,
+    sizes?: SheetSize[] | null,
     persistent?: boolean // Optionnel, défaut à false
-  ) => string;
-  closeSheet: (id: string) => void;
+  ) => Promise<string>;
+  closeSheet: (id: string) => Promise<void>;
   removeSheet: (id: string) => void;
   closeAll: () => void;
   createConfirmSheet: (options: {
@@ -61,15 +47,15 @@ type BottomSheetStore = {
     onCancel?: () => void | Promise<void>;
     cancelLabel?: string;
     confirmLabel?: string;
-  }) => string;
+  }) => Promise<string>;
 };
 
 const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
   sheets: [],
-  openSheet: <T>(
+  openSheet: async <T>(
     content: BottomSheetContentComponent<T>,
     props: Omit<T, 'id' | 'open' | 'onOpenChange'>,
-    snapPoints: string[] | null | undefined = ['40%', '60%'],
+    sizes: SheetSize[] | null | undefined = ['auto'],
     persistent = false
   ) => {
     const id = Math.random().toString(36).substring(7);
@@ -79,32 +65,30 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
     if (process.env.EXPO_OS === 'ios') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
+
+    const sheetRef = React.createRef<TrueSheet>();
     set((state) => ({
       sheets: [
         ...state.sheets,
         {
           id,
-          isOpen: true,
-          isClosing: false,
+          ref: sheetRef,
           content,
           props,
-          snapPoints: snapPoints === null ? [] : snapPoints,
+          sizes: sizes === null ? [] : sizes,
           persistent,
         },
       ],
     }));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await sheetRef.current?.present();
     return id;
   },
-  closeSheet: (id: string) => {
+  closeSheet: async (id: string) => {
     const sheet = get().sheets.find((s) => s.id === id);
-    if (!sheet) return;
-    set((state) => ({
-      sheets: state.sheets.map((s) =>
-        s.id === id ? { ...s, isOpen: false, isClosing: true } : s
-      ),
-    }));
-    // Delayed removal to allow closing animation
-    setTimeout(() => get().removeSheet(id), 300);
+    if (sheet?.ref) {
+      await sheet.ref.current?.dismiss();
+    }
   },
   removeSheet: (id: string) => {
     set((state) => ({
@@ -112,20 +96,22 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
     }));
   },
   closeAll: () => {
-    set((state) => ({
-      sheets: state.sheets.map((s) => ({ ...s, isOpen: false, isClosing: true })),
-    }));
-    setTimeout(() => set({ sheets: [] }), 300);
+    const { sheets } = get();
+    sheets.forEach((sheet) => {
+      if (sheet.ref) {
+        sheet.ref.current?.dismiss();
+      }
+    });
   },
-  createConfirmSheet: ({ title, description, onConfirm, onCancel, cancelLabel, confirmLabel }) => {
-    return get().openSheet(BottomSheetConfirm, {
+  createConfirmSheet: async ({ title, description, onConfirm, onCancel, cancelLabel, confirmLabel }) => {
+    return await get().openSheet(BottomSheetConfirm, {
       title,
       description,
       onConfirm,
       onCancel,
       cancelLabel,
       confirmLabel,
-    }, ['30%'], true);
+    }, ['auto'], true);
   },
 }));
 

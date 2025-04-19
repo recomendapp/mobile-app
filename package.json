@@ -18,6 +18,7 @@
     "@expo/react-native-action-sheet": "^4.1.1",
     "@gorhom/bottom-sheet": "^5.1.2",
     "@hookform/resolvers": "^4.0.0",
+    "@lodev09/react-native-true-sheet": "^2.0.5",
     "@normy/react-query": "^0.18.0",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-picker/picker": "2.9.0",

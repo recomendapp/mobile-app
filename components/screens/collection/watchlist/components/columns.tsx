@@ -40,14 +40,14 @@ export const Columns = () => {
 		});
 	}, []);
 
-	const handleOpenSheet = React.useCallback((data: UserWatchlist) => {
-		openSheet(BottomSheetMedia, {
+	const handleOpenSheet = React.useCallback(async (data: UserWatchlist) => {
+		await openSheet(BottomSheetMedia, {
 			media: data.media,
 			additionalItemsTop: [
 				{
 					icon: Icons.Comment,
 					label: data?.comment ? capitalize(t('common.messages.view_comment', { count: 1 })) : capitalize(t('common.messages.add_comment')),
-					onPress: () => openSheet(BottomSheetWatchlistComment, {
+					onPress: async () => await openSheet(BottomSheetWatchlistComment, {
 						watchlistItem: data,
 					}),
 				},
@@ -56,7 +56,7 @@ export const Columns = () => {
 				{
 					icon: Icons.Delete,
 					label: upperFirst(t('common.word.delete')),
-					onPress: () => createConfirmSheet({
+					onPress: async () => await createConfirmSheet({
 						title: capitalize(t('common.library.collection.watchlist.modal.delete_confirm.title')),
 						onConfirm: () => handleDeleteWatchlist(data.id),
 					})

@@ -1,5 +1,4 @@
-import React, { forwardRef, useEffect, useMemo, useState } from 'react';
-import { BottomSheetModal, BottomSheetView, TouchableOpacity } from '@gorhom/bottom-sheet';
+import React from 'react';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
@@ -8,28 +7,29 @@ import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { FlatList, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useUserRecosSendQuery } from '@/features/user/userQueries';
 import { useUserRecosInsertMutation } from '@/features/user/userMutations';
 import { useAuth } from '@/context/AuthProvider';
 import Fuse from "fuse.js";
-import { InputBottomSheet } from '@/components/ui/Input';
 import UserAvatar from '@/components/user/UserAvatar';
 import { Button, ButtonText } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
 import { Badge } from '@/components/ui/Badge';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import { Input } from '@/components/ui/Input';
 
-interface BottomSheetSendRecoProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetSendRecoProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
   media: Media,
 };
 
 const COMMENT_MAX_LENGTH = 180;
 
-const BottomSheetSendReco = forwardRef<
-  React.ElementRef<typeof BottomSheetModal>,
+const BottomSheetSendReco = React.forwardRef<
+  React.ElementRef<typeof TrueSheet>,
   BottomSheetSendRecoProps
->(({ id, media, snapPoints, ...props }, ref) => {
+>(({ id, media, ...props }, ref) => {
   const { colors, inset } = useTheme();
   const { user } = useAuth();
   const { t } = useTranslation();
@@ -44,17 +44,17 @@ const BottomSheetSendReco = forwardRef<
 	});
 	const sendMovie = useUserRecosInsertMutation();
 
-  const [search, setSearch] = useState('');
-  const fuse = useMemo(() => {
+  const [search, setSearch] = React.useState('');
+  const fuse = React.useMemo(() => {
     if (!friends) return null;
     return new Fuse(friends, {
       keys: ['friend.username', 'friend.full_name'],
       threshold: 0.3,
     });
 	}, [friends]);
-  const [results, setResults] = useState<typeof friends>([]);
-  const [selected, setSelected] = useState<User[]>([]);
-  const [comment, setComment] = useState('');
+  const [results, setResults] = React.useState<typeof friends>([]);
+  const [selected, setSelected] = React.useState<User[]>([]);
+  const [comment, setComment] = React.useState('');
 
   const submit = async () => {
     if (!user || !media.media_id) return;
@@ -64,12 +64,12 @@ const BottomSheetSendReco = forwardRef<
 			receivers: selected,
 			comment: comment,
 		}, {
-			onSuccess: () => {
+			onSuccess: async () => {
         Burnt.toast({
           title: upperFirst(t('common.messages.sent')),
           preset: 'done',
         })
-				closeSheet(id);
+				await closeSheet(id);
 			},
 			onError: (error: any) => {
 				if (error instanceof Error) {
@@ -103,7 +103,7 @@ const BottomSheetSendReco = forwardRef<
 		});
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!friends?.length) return;
     if (search === '') {
       setResults(friends);
@@ -113,11 +113,11 @@ const BottomSheetSendReco = forwardRef<
 	}, [search, friends, fuse]);
 
   return (
-    <BottomSheetModal
+    <TrueSheet
     ref={ref}
     {...props}
     >
-      <BottomSheetView
+      <View
       style={[
         { paddingBottom: inset.bottom },
         tw`flex-1 gap-2 mx-2`,
@@ -142,7 +142,7 @@ const BottomSheetSendReco = forwardRef<
             )}
           </View>
         </View>
-        <InputBottomSheet
+        <Input
         defaultValue={search}
         onChangeText={setSearch}
         placeholder={upperFirst(t('common.messages.search_friend'))}
@@ -187,10 +187,10 @@ const BottomSheetSendReco = forwardRef<
           )}
           showsVerticalScrollIndicator={false}
           refreshing={isRefetching}
-          onRefresh={refetch}
+          // onRefresh={refetch}
           />
         </View>
-        <InputBottomSheet
+        <Input
         defaultValue={comment}
         onChangeText={setComment}
         placeholder={upperFirst(t('common.messages.add_comment'))}
@@ -199,8 +199,8 @@ const BottomSheetSendReco = forwardRef<
         <Button disabled={!selected.length} onPress={submit}>
           <ButtonText>{upperFirst(t('common.messages.send'))}</ButtonText>
         </Button>
-      </BottomSheetView>
-    </BottomSheetModal>
+      </View>
+    </TrueSheet>
   );
 });
 BottomSheetSendReco.displayName = 'BottomSheetSendReco';

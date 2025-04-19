@@ -39,14 +39,14 @@ export const Columns = () => {
 			}
 		});
 	}, []);
-	const handleOpenSheet = React.useCallback((data: UserActivity) => {
-		openSheet(BottomSheetMedia, {
+	const handleOpenSheet = React.useCallback(async (data: UserActivity) => {
+		await openSheet(BottomSheetMedia, {
 			media: data.media,
 			additionalItemsBottom: [
 				{
 					icon: Icons.Delete,
 					label: upperFirst(t('common.word.delete')),
-					onPress: () => createConfirmSheet({
+					onPress: async () => await createConfirmSheet({
 						title: capitalize(t('common.library.collection.likes.modal.delete_confirm.title')),
 						onConfirm: () => handleUnlike(data.id),
 					})
