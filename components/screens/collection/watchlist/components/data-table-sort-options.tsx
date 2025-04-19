@@ -27,8 +27,8 @@ export function DataTableSortOptions<TData>({
   const { colors } = useTheme();
   const { t } = useTranslation();
   const { openSheet, closeSheet } = useBottomSheetStore();
-  const handleOnPress = () => {
-    const sheetId = openSheet(BottomSheetDefaultView, {
+  const handleOnPress = async () => {
+    const sheetId = await openSheet(BottomSheetDefaultView, {
       content: (
         <>
           {table
@@ -40,9 +40,9 @@ export function DataTableSortOptions<TData>({
             .map((column) => (
                 <TouchableOpacity
                 key={column.id}
-                onPress={() => {
+                onPress={async () => {
                   column.toggleSorting();
-                  closeSheet(sheetId);
+                  await closeSheet(sheetId);
                 }}
                 style={tw`flex-row items-center gap-2 p-4`}
                 >

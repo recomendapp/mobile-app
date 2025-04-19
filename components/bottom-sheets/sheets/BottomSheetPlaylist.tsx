@@ -1,5 +1,4 @@
-import React, { forwardRef, Fragment, useMemo } from 'react';
-import { BottomSheetModal, BottomSheetView, TouchableOpacity } from '@gorhom/bottom-sheet';
+import React from 'react';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
@@ -10,7 +9,7 @@ import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Text, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAuth } from '@/context/AuthProvider';
 import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
@@ -19,8 +18,9 @@ import BottomSheetPlaylistEdit from './BottomSheetPlaylistEdit';
 import { useUserPlaylistSavedQuery } from '@/features/user/userQueries';
 import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation } from '@/features/user/userMutations';
 import BottomSheetPlaylistGuests from './BottomSheetPlaylistGuests';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
 
-interface BottomSheetPlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetPlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
   playlist: Playlist,
   additionalItemsTop?: Item[];
@@ -35,10 +35,10 @@ interface Item {
   disabled?: boolean;
 }
 
-const BottomSheetPlaylist = forwardRef<
-  React.ElementRef<typeof BottomSheetModal>,
+const BottomSheetPlaylist = React.forwardRef<
+  React.ElementRef<typeof TrueSheet>,
   BottomSheetPlaylistProps
->(({ id, playlist, additionalItemsTop = [], snapPoints, ...props }, ref) => {
+>(({ id, playlist, additionalItemsTop = [], ...props }, ref) => {
   const { user } = useAuth();
   const { closeSheet, openSheet, createConfirmSheet } = useBottomSheetStore();
   const { colors, inset } = useTheme();
@@ -59,7 +59,7 @@ const BottomSheetPlaylist = forwardRef<
     userId: user?.id,
   });
 
-  const items: Item[][] = useMemo(() => {
+  const items: Item[][] = React.useMemo(() => {
     return [
       [
         ...additionalItemsTop,
@@ -116,8 +116,8 @@ const BottomSheetPlaylist = forwardRef<
         ...(user?.id === playlist.user?.id ? [
           {
             icon: Icons.Edit,
-            onPress: () => {
-              openSheet(BottomSheetPlaylistEdit, {
+            onPress: async () => {
+              await openSheet(BottomSheetPlaylistEdit, {
                 playlist: playlist,
               })
             },
@@ -125,22 +125,22 @@ const BottomSheetPlaylist = forwardRef<
           },
           {
             icon: Icons.Users,
-            onPress: () => openSheet(BottomSheetPlaylistGuests, {
+            onPress: async () => await openSheet(BottomSheetPlaylistGuests, {
               playlist: playlist,
             }),
             label: upperFirst(t('common.messages.guest', { context: 'male', count: 2 })),
           },
           {
             icon: Icons.Delete,
-            onPress: () => {
-              createConfirmSheet({
+            onPress: async () => {
+              await createConfirmSheet({
                 title: upperFirst(t('common.messages.are_u_sure')),
                 description: upperFirst(t('common.playlist.actions.delete.description', { title: playlist.title })),
                 onConfirm: async () => {
                   await playlistDeleteMutation.mutateAsync(
                     { playlistId: playlist.id },
                     {
-                      onSuccess: () => {
+                      onSuccess: async () => {
                         Burnt.toast({
                           title: upperFirst(t('common.word.deleted')),
                           preset: 'done',
@@ -148,7 +148,7 @@ const BottomSheetPlaylist = forwardRef<
                         if (pathname.startsWith(`/playlist/${playlist.id}`)) {
                           router.replace('/collection');
                         }
-                        closeSheet(id);
+                        await closeSheet(id);
                       },
                       onError: () => {
                         Burnt.toast({
@@ -169,11 +169,11 @@ const BottomSheetPlaylist = forwardRef<
     ]
   }, [playlist, user, saved, additionalItemsTop, colors, t, router, closeSheet, id, createConfirmSheet, playlistDeleteMutation, insertPlaylistSaved, deletePlaylistSaved]);
   return (
-    <BottomSheetModal
+    <TrueSheet
     ref={ref}
     {...props}
     >
-      <BottomSheetView
+      <View
       style={[
         { paddingBottom: inset.bottom },
         tw`flex-1`,
@@ -201,13 +201,13 @@ const BottomSheetPlaylist = forwardRef<
           </View>
         </View>
         {items.map((group, i) => (
-          <Fragment key={i}>
+          <React.Fragment key={i}>
             {group.map((item, j) => (
               <TouchableOpacity
               key={j}
               onPress={async () => {
+                (item.closeSheet === undefined || item.closeSheet === true) && await closeSheet(id);
                 await item.onPress();
-                (item.closeSheet === undefined || item.closeSheet === true) && closeSheet(id);
               }}
               style={[tw`flex-row items-center gap-2 p-4`, { opacity: item.disabled ? 0.5 : 1 }]}
               disabled={item.disabled}
@@ -216,10 +216,10 @@ const BottomSheetPlaylist = forwardRef<
                 <ThemedText>{item.label}</ThemedText>
               </TouchableOpacity>
             ))}
-          </Fragment>
+          </React.Fragment>
         ))}
-      </BottomSheetView>
-    </BottomSheetModal>
+      </View>
+    </TrueSheet>
   );
 });
 BottomSheetPlaylist.displayName = 'BottomSheetPlaylist';

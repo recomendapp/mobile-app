@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { userKeys } from './userKeys';
 import { useSupabaseClient } from '@/context/SupabaseProvider';
 import { useAuth } from '@/context/AuthProvider';
+import { mediaKeys } from '../media/mediaKeys';
 
 export const useUserUpdateMutation = ({
 	userId,
@@ -360,80 +361,80 @@ export const useUserActivityUpdateMutation = () => {
 
 /* --------------------------------- REVIEW --------------------------------- */
 
-// export const useUserReviewInsertMutation = ({
-// 	userId,
-// 	mediaId,
-// } : {
-// 	userId?: string;
-// 	mediaId: number;
-// }) => {
-// 	const supabase = useSupabaseClient();
-// 	const queryClient = useQueryClient();
-// 	return useMutation({
-// 		mutationFn: async ({
-// 			activityId,
-// 			title,
-// 			body,
-// 		} : {
-// 			activityId: number;
-// 			title?: string | null;
-// 			body: JSONContent;
-// 		}) => {
-// 			const { data, error } = await supabase
-// 				.from('user_review')
-// 				.insert({
-// 					id: activityId,
-// 					title: title,
-// 					body: body,
-// 				})
-// 				.select('*')
-// 				.single()
-// 			if (error) throw error;
-// 			return data;
-// 		},
-// 		onSuccess: (data) => {
-// 			// Invalidate reviews queries
-// 			queryClient.invalidateQueries({
-// 				queryKey: mediaKeys.reviews({ mediaId }),
-// 			});
+export const useUserReviewInsertMutation = ({
+	userId,
+	mediaId,
+} : {
+	userId?: string;
+	mediaId: number;
+}) => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			activityId,
+			title,
+			body,
+		} : {
+			activityId: number;
+			title?: string | null;
+			body: any;
+		}) => {
+			const { data, error } = await supabase
+				.from('user_review')
+				.insert({
+					id: activityId,
+					title: title,
+					body: body,
+				})
+				.select('*')
+				.single()
+			if (error) throw error;
+			return data;
+		},
+		onSuccess: (data) => {
+			// Invalidate reviews queries
+			queryClient.invalidateQueries({
+				queryKey: mediaKeys.reviews({ id: mediaId }),
+			});
 
-// 			// Invalidate the review activity
-// 			userId && queryClient.invalidateQueries({
-// 				queryKey: userKeys.activity({ userId: userId, mediaId }),
-// 			});
-// 		}
-// 	});
-// };
+			// Invalidate the review activity
+			userId && queryClient.invalidateQueries({
+				queryKey: userKeys.activity({ userId: userId, mediaId }),
+			});
+		}
+	});
+};
 
-// export const useUserReviewUpdateMutation = () => {
-// 	const supabase = useSupabaseClient();
-// 	const queryClient = useQueryClient();
-// 	return useMutation({
-// 		mutationFn: async ({
-// 			id,
-// 			title,
-// 			body,
-// 		} : {
-// 			id: number;
-// 			title?: string | null;
-// 			body: JSONContent;
-// 		}) => {
-// 			const { data, error } = await supabase
-// 				.from('user_review')
-// 				.update({
-// 					title: title,
-// 					body: body,
-// 				})
-// 				.eq('id', id)
-// 				.select('*')
-// 			if (error) throw error;
-// 			return data;
-// 		},
-// 		onSuccess: (data) => {
-// 			// queryClient.setQueryData(userKeys.review({ reviewId: data.id }), data);
-// 		},
-// 	});
-// };
+export const useUserReviewUpdateMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			id,
+			title,
+			body,
+		} : {
+			id: number;
+			title?: string | null;
+			body: any;
+		}) => {
+			const { data, error } = await supabase
+				.from('user_review')
+				.update({
+					title: title,
+					body: body,
+				})
+				.eq('id', id)
+				.select('*')
+			if (error) throw error;
+			return data;
+		},
+		onSuccess: (data) => {
+			// queryClient.setQueryData(userKeys.review({ reviewId: data.id }), data);
+		},
+	});
+};
 
 // export const useUserReviewDeleteMutation = ({
 // 	userId,

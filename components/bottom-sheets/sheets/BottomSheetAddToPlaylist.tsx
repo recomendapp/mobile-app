@@ -1,5 +1,4 @@
-import React, { forwardRef, useEffect, useMemo, useState } from 'react';
-import { BottomSheetModal, BottomSheetView, TouchableOpacity } from '@gorhom/bottom-sheet';
+import React from 'react';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
@@ -8,11 +7,10 @@ import { useTheme } from '@/context/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { FlatList, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useUserAddMediaToPlaylistQuery } from '@/features/user/userQueries';
 import { useAuth } from '@/context/AuthProvider';
 import Fuse from "fuse.js";
-import { InputBottomSheet } from '@/components/ui/Input';
 import { Button, ButtonText } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
@@ -21,18 +19,20 @@ import * as Burnt from 'burnt';
 import { useQueryClient } from '@tanstack/react-query';
 import { userKeys } from '@/features/user/userKeys';
 import BottomSheetPlaylistCreate from './BottomSheetPlaylistCreate';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import { Input } from '@/components/ui/Input';
 
-interface BottomSheetAddToPlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof BottomSheetModal>, 'children'> {
+interface BottomSheetAddToPlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
   media: Media,
 };
 
 const COMMENT_MAX_LENGTH = 180;
 
-const BottomSheetAddToPlaylist = forwardRef<
-  React.ElementRef<typeof BottomSheetModal>,
+const BottomSheetAddToPlaylist = React.forwardRef<
+  React.ElementRef<typeof TrueSheet>,
   BottomSheetAddToPlaylistProps
->(({ id, media, snapPoints, ...props }, ref) => {
+>(({ id, media, ...props }, ref) => {
   const { colors, inset } = useTheme();
   const { user } = useAuth();
   const { t } = useTranslation();
@@ -52,17 +52,17 @@ const BottomSheetAddToPlaylist = forwardRef<
     mediaId: media.media_id!,
   });
 
-  const [search, setSearch] = useState('');
-  const fuse = useMemo(() => {
+  const [search, setSearch] = React.useState('');
+  const fuse = React.useMemo(() => {
     if (!playlists) return null;
     return new Fuse(playlists, {
       keys: ['playlist.title'],
       threshold: 0.3,
     });
 	}, [playlists]);
-  const [results, setResults] = useState<typeof playlists>([]);
-  const [selected, setSelected] = useState<Playlist[]>([]);
-  const [comment, setComment] = useState('');
+  const [results, setResults] = React.useState<typeof playlists>([]);
+  const [selected, setSelected] = React.useState<Playlist[]>([]);
+  const [comment, setComment] = React.useState('');
 
   const submit = async () => {
     if (!user || !media.media_id) return;
@@ -70,12 +70,12 @@ const BottomSheetAddToPlaylist = forwardRef<
 			playlists: selected,
       comment: comment,
 		}, {
-			onSuccess: () => {
+			onSuccess: async () => {
         Burnt.toast({
           title: upperFirst(t('common.messages.added')),
           preset: 'done',
         })
-				closeSheet(id);
+				await closeSheet(id);
 			},
 			onError: () => {	
         Burnt.toast({
@@ -87,7 +87,7 @@ const BottomSheetAddToPlaylist = forwardRef<
 		});
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!playlists?.length) return;
     if (search === '') {
       setResults(playlists);
@@ -97,11 +97,11 @@ const BottomSheetAddToPlaylist = forwardRef<
 	}, [search, playlists, fuse]);
 
   return (
-    <BottomSheetModal
+    <TrueSheet
     ref={ref}
     {...props}
     >
-      <BottomSheetView
+      <View
       style={[
         { paddingBottom: inset.bottom },
         tw`flex-1 gap-2 mx-2`,
@@ -131,7 +131,7 @@ const BottomSheetAddToPlaylist = forwardRef<
             )}
           </View>
         </View>
-        <InputBottomSheet
+        <Input
         defaultValue={search}
         onChangeText={setSearch}
         placeholder={upperFirst(t('common.messages.search_playlist'))}
@@ -142,8 +142,8 @@ const BottomSheetAddToPlaylist = forwardRef<
             <Button
             variant={'outline'}
             style={tw`w-full`}
-            onPress={() => {
-              openSheet(BottomSheetPlaylistCreate, {
+            onPress={async () => {
+              await openSheet(BottomSheetPlaylistCreate, {
                 onCreate: (playlist) => {
                   queryClient.setQueryData(userKeys.addMediaToPlaylist({
                     userId: user?.id!,
@@ -200,12 +200,11 @@ const BottomSheetAddToPlaylist = forwardRef<
               </View>
             </TouchableWithoutFeedback>
           )}
-          showsVerticalScrollIndicator={false}
           refreshing={isRefetching}
-          onRefresh={refetch}
+          // onRefresh={refetch}
           />
         </View>
-        <InputBottomSheet
+        <Input
         defaultValue={comment}
         onChangeText={setComment}
         placeholder={upperFirst(t('common.messages.add_comment'))}
@@ -214,8 +213,8 @@ const BottomSheetAddToPlaylist = forwardRef<
         <Button disabled={!selected.length} onPress={submit}>
           <ButtonText>{upperFirst(t('common.messages.add'))}</ButtonText>
         </Button>
-      </BottomSheetView>
-    </BottomSheetModal>
+      </View>
+    </TrueSheet>
   );
 });
 BottomSheetAddToPlaylist.displayName = 'BottomSheetAddToPlaylist';
