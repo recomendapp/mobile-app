@@ -1,9 +1,36 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { mediaKeys } from "./mediaKeys";
 import { useSupabaseClient } from "@/context/SupabaseProvider";
-import { MediaMovie } from "@/types/type.db";
+import { Media, MediaMovie } from "@/types/type.db";
 
 /* --------------------------------- DETAILS -------------------------------- */
+export const useMediaDetailsQuery = ({
+	id,
+} : {
+	id: number;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: mediaKeys.detail({ id }),
+		queryFn: async () => {
+			if (!id) throw Error('No id provided');
+			const { data, error } = await supabase
+				.from('media')
+				.select(`
+					*
+				`)
+				.match({
+					media_id: id,
+				})
+				.maybeSingle()
+				.overrideTypes<Media, { merge: false }>();
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!id,
+	});
+};
+
 export const useMediaMovieDetailsQuery = ({
 	id,
 	locale,

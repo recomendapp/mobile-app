@@ -10,6 +10,7 @@ import { useTheme } from "@/context/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMedia from "../bottom-sheets/sheets/BottomSheetMedia";
 import { IconMediaRating } from "../medias/IconMediaRating";
+import MediaActionUserActivityRating from "../medias/actions/MediaActionUserActivityRating";
 
 interface CardMediaProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -21,6 +22,9 @@ interface CardMediaProps
 		posterClassName?: string;
 		disableActions?: boolean;
 		showRating?: boolean;
+		showAction?: {
+			rating?: boolean;
+		}
 		hideMediaType?: boolean;
 		index?: number;
 		children?: React.ReactNode;
@@ -29,31 +33,38 @@ interface CardMediaProps
 const CardMediaDefault = React.forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	Omit<CardMediaProps, "variant">
->(({ style, media, activity, profileActivity, children, linked, showRating, posterClassName, ...props }, ref) => {
+>(({ style, media, activity, showAction, profileActivity, children, linked, showRating, posterClassName, ...props }, ref) => {
 	const { colors } = useTheme();
 	return (
 		<Animated.View
 		ref={ref}
 		style={[
 			{ backgroundColor: colors.card, borderColor: colors.border },
-			tw`flex-row items-center rounded-xl h-20 p-1 gap-2 border`,
+			tw`flex-row justify-between items-center rounded-xl h-20 p-1 gap-2 border overflow-hidden`,
 			style,
 		]}
 		{...props}
 		>
-			<ImageWithFallback
-				source={{uri: media.avatar_url ?? ''}}
-				alt={media.title ?? ''}
-				type={media.media_type}
-				style={{
-					aspectRatio: 2 / 3,
-					width: 'auto',
-				}}
-			/>
-			<View style={tw`shrink px-2 py-1 gap-1`}>
-				<ThemedText numberOfLines={2}>{media.title}</ThemedText>
-				{children}
+			<View style={tw`flex-1 flex-row items-center gap-2`}>
+				<ImageWithFallback
+					source={{uri: media.avatar_url ?? ''}}
+					alt={media.title ?? ''}
+					type={media.media_type}
+					style={{
+						aspectRatio: 2 / 3,
+						width: 'auto',
+					}}
+				/>
+				<View style={tw`shrink px-2 py-1 gap-1`}>
+					<ThemedText numberOfLines={2}>{media.title}</ThemedText>
+					{children}
+				</View>
 			</View>
+			{showAction ? <View style={tw`flex-row items-center gap-2`}>
+				{showAction?.rating ? (
+					<MediaActionUserActivityRating media={media} />
+				) : null}
+			</View> : null}
 		</Animated.View>
 	);
 });

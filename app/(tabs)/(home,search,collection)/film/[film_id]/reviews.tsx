@@ -12,9 +12,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Dimensions, Pressable, View } from "react-native";
 import Animated, { runOnJS, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
-import { useFilmStore } from "@/stores/useFilmStore";
 import ButtonMyReview from "@/components/buttons/ButtonMyReview";
 import { useRoute } from "@react-navigation/native";
+import { useFilmContext } from "@/components/screens/film/FilmContext";
 
 const GRID_COLUMNS = 1;
 const WINDOW_HEIGHT = Dimensions.get('window').height;
@@ -32,7 +32,7 @@ const FilmReviewsScreen = () => {
 		tabBarHeight,
 		headerOverlayHeight,
 		addScrollRef 
-	} = useFilmStore();
+	} = useFilmContext();
 	const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
 	const bottomTabBarHeight = useBottomTabOverflow();
 	const { showActionSheetWithOptions } = useActionSheet();

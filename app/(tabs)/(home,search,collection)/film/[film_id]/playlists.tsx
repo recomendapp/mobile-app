@@ -1,11 +1,11 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
+import { useFilmContext } from "@/components/screens/film/FilmContext";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/context/ThemeProvider";
 import { useMediaMovieDetailsQuery, useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
-import { useFilmStore } from "@/stores/useFilmStore";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { useRoute } from "@react-navigation/native";
 import { upperFirst } from "lodash";
@@ -30,7 +30,7 @@ const FilmPlaylistsScreen = () => {
 		tabBarHeight,
 		headerOverlayHeight,
 		addScrollRef 
-	} = useFilmStore();
+	} = useFilmContext();
 	const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
 	const bottomTabBarHeight = useBottomTabOverflow();
 	const { showActionSheetWithOptions } = useActionSheet();
