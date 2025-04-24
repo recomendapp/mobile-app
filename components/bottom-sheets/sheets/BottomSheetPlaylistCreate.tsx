@@ -59,13 +59,13 @@ const BottomSheetPlaylistCreate = React.forwardRef<
     await createPlaylistMutation.mutateAsync({
       title: values.title,
     }, {
-      onSuccess: async (playlist) => {
+      onSuccess: (playlist) => {
         Burnt.toast({
           title: upperFirst(t('common.messages.added')),
           preset: 'done',
         });
         onCreate && onCreate(playlist);
-        await closeSheet(id);
+        closeSheet(id);
       },
       onError: () => {
         Burnt.toast({
@@ -80,6 +80,11 @@ const BottomSheetPlaylistCreate = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+    onLayout={async () => {
+      if (typeof ref === 'object' && ref?.current?.present) {
+        await ref.current.present();
+      };
+    }}
     {...props}
     >
       <View
@@ -95,6 +100,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
         render={({ field: { onChange, onBlur, value} }) => (
           <View style={tw`gap-2 w-full`}>
             <Input
+            variant='outline'
             placeholder={placeholder ?? upperFirst(t('common.playlist.form.title.placeholder'))}
             value={value}
             autoCorrect={false}

@@ -17,7 +17,7 @@ export const Icons = {
 	home: HomeIcon,
 	Search: SearchIcon,
 	explore: CompassIcon,
-	feed: ZapIcon,
+	Feed: ZapIcon,
 	shop: StoreIcon,
 	library: LibraryIcon,
 	user: UserIcon,

@@ -25,6 +25,11 @@ const BottomSheetMyRecosSenders = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+	onLayout={async () => {
+		if (typeof ref === 'object' && ref?.current?.present) {
+		  await ref.current.present();
+		};
+	}}
 	sizes={['large']}
 	scrollRef={flashlistRef}
     {...props}

@@ -102,7 +102,6 @@ const LoginScreen = () => {
 					</TouchableOpacity>
 					{/* SUBMIT BUTTON */}
 					<Button onPress={handleSubmit} disabled={isLoading} style={tw.style('w-full rounded-xl')}>
-						{/* {isLoading ? <Icons.loading /> : null} */}
 						<ButtonText style={tw.style('font-bold text-xl')}>{t('common.word.login')}</ButtonText>
 					</Button>
 				</KeyboardAvoidingView>

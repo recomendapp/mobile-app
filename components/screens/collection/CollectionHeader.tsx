@@ -36,31 +36,20 @@ const CollectionHeader = forwardRef<
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
-			// transform: [
-			// 	{
-			// 		translateY: interpolate(
-			// 			scrollY.get(),
-			// 			[layoutY.get() - 1, layoutY.get(), layoutY.get() + 1],
-			// 			[1, 0, -1],
-			// 		),
-			// 	},
-			// ],
 		};
 	});
 	const scaleAnim = useAnimatedStyle(() => {
+		const scaleValue = interpolate(
+			scrollY.get(),
+			[-headerHeight.get(), 0],
+			[2, 1],
+			Extrapolation.CLAMP,
+		);
+		const offset = (headerHeight.get() * (scaleValue - 1)) / 2;
 		return {
 			transform: [
-			{
-				scale: interpolate(
-					scrollY.get(),
-					[-50, 0],
-					[1.3, 1],
-					{
-						extrapolateLeft: 'extend',
-						extrapolateRight: 'clamp',
-					}
-				),
-			},
+				{ scale: scaleValue },
+				{ translateY: -offset },
 			],
 		};
 	});

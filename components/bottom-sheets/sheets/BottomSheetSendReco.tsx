@@ -64,12 +64,12 @@ const BottomSheetSendReco = React.forwardRef<
 			receivers: selected,
 			comment: comment,
 		}, {
-			onSuccess: async () => {
+			onSuccess: () => {
         Burnt.toast({
           title: upperFirst(t('common.messages.sent')),
           preset: 'done',
         })
-				await closeSheet(id);
+				closeSheet(id);
 			},
 			onError: (error: any) => {
 				if (error instanceof Error) {
@@ -115,6 +115,11 @@ const BottomSheetSendReco = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+    onLayout={async () => {
+      if (typeof ref === 'object' && ref?.current?.present) {
+        await ref.current.present();
+      };
+    }}
     {...props}
     >
       <View

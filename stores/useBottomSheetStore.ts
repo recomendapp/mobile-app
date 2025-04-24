@@ -65,7 +65,6 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
     if (process.env.EXPO_OS === 'ios') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-
     const sheetRef = React.createRef<TrueSheet>();
     set((state) => ({
       sheets: [
@@ -80,8 +79,6 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
         },
       ],
     }));
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    await sheetRef.current?.present();
     return id;
   },
   closeSheet: async (id: string) => {

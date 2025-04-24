@@ -21,6 +21,7 @@ interface HeaderOverlayProps {
 	onHeaderHeight: (height: number) => void;
 	scrollY: SharedValue<number>;
 	title: string;
+	onMenuPress?: () => void;
 }
 const HeaderOverlay: React.FC<HeaderOverlayProps> = ({
 	triggerHeight,
@@ -28,6 +29,7 @@ const HeaderOverlay: React.FC<HeaderOverlayProps> = ({
 	onHeaderHeight,
 	scrollY,
 	title,
+	onMenuPress,
 }) => {
 	const { colors, inset } = useTheme();
 	const navigation = useNavigation();
@@ -86,9 +88,7 @@ const HeaderOverlay: React.FC<HeaderOverlayProps> = ({
 			<ThemedText numberOfLines={1} style={tw.style('text-xl font-medium shrink')}>
 			{title}
 			</ThemedText>
-			<Pressable onPress={() => console.log('options pressed')}>
-				<Icons.EllipsisVertical color={colors.foreground} />
-			</Pressable>
+			<Icons.EllipsisVertical style={tw.style('opacity-0')} />
 		</Animated.View>
 		{navigation.canGoBack() ? (
 			<Pressable
@@ -102,6 +102,20 @@ const HeaderOverlay: React.FC<HeaderOverlayProps> = ({
 			]}
 			>
 				<Icons.ChevronLeft color={colors.foreground} />
+			</Pressable>
+		) : null}
+		{onMenuPress ? (
+			<Pressable
+			onPress={onMenuPress}
+			style={[
+				tw.style('absolute z-10'),
+				{
+					top: inset.top,
+					right: 14,
+				}
+			]}
+			>
+				<Icons.EllipsisVertical color={colors.foreground} />
 			</Pressable>
 		) : null}
 	</>

@@ -171,6 +171,11 @@ const BottomSheetPlaylist = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+    onLayout={async () => {
+      if (typeof ref === 'object' && ref?.current?.present) {
+        await ref.current.present();
+      };
+    }}
     {...props}
     >
       <View
@@ -205,9 +210,9 @@ const BottomSheetPlaylist = React.forwardRef<
             {group.map((item, j) => (
               <TouchableOpacity
               key={j}
-              onPress={async () => {
-                (item.closeSheet === undefined || item.closeSheet === true) && await closeSheet(id);
-                await item.onPress();
+              onPress={() => {
+                (item.closeSheet === undefined || item.closeSheet === true) && closeSheet(id);
+                item.onPress();
               }}
               style={[tw`flex-row items-center gap-2 p-4`, { opacity: item.disabled ? 0.5 : 1 }]}
               disabled={item.disabled}

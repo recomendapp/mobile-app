@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
 import { upperFirst } from 'lodash';
-import { MediaMovie, MediaPerson } from '@/types/type.db';
+import { Media, MediaMovie, MediaPerson } from '@/types/type.db';
 import useColorConverter from '@/hooks/useColorConverter';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -23,6 +23,7 @@ import { useTheme } from '@/context/ThemeProvider';
 import tw from '@/lib/tw';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useFilmContext } from './FilmContext';
+import MediaActionUserActivityRating from '@/components/medias/actions/MediaActionUserActivityRating';
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
@@ -48,6 +49,7 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 	const bgColor = hslToRgb(colors.background);
 	const layoutY = useSharedValue(0);
 	const headerScrollStart = useSharedValue(0);
+	const posterHeight = useSharedValue(0);
 	const opacityAnim = useAnimatedStyle(() => {
 		return {
 			opacity: interpolate(
@@ -67,31 +69,33 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 			],
 		};
 	});
-	const posterAnim = useAnimatedStyle(() => ({
-		opacity: interpolate(
+	const posterAnim = useAnimatedStyle(() => {
+		const scaleValue = interpolate(
 			scrollY.get(),
-			[0, headerHeight.get() - (headerOverlayHeight.get() + inset.top) / 0.8],
-			[1, 0],
+			[-headerHeight.get(), 0],
+			[3, 1],
 			Extrapolation.CLAMP,
-		),
-		transform: [
-			{
-				scale: interpolate(
-					scrollY.get(),
-					[-headerHeight.get() / 2, 0, (headerHeight.get() - (headerOverlayHeight.get() + inset.top))],
-					[1.8, 1, 0.95],
-					'clamp',
-				),
-			},
-			{
-				translateY: interpolate(
+		);
+		const scaleOffset = (posterHeight.get() * (scaleValue - 1)) / 2;
+		const freezeScroll = interpolate(
+			scrollY.get(),
+			[-headerHeight.get(), 0],
+			[-headerHeight.get(), 1],
+			Extrapolation.CLAMP,
+		);
+		return {
+			opacity: interpolate(
 				scrollY.get(),
-				[layoutY.get() - 1, layoutY.get(), layoutY.get()],
-				[-0.3, 0, -1],
-				),
-			},
-		],
-	}));
+				[0, headerHeight.get() - (headerOverlayHeight.get() + inset.top) / 0.8],
+				[1, 0],
+				Extrapolation.CLAMP,
+			),
+			transform: [
+				{ scale: scaleValue },
+				{ translateY: freezeScroll + scaleOffset },
+			],
+		};
+	});
 	const textAnim = useAnimatedStyle(() => {
 		return {
 			opacity: interpolate(
@@ -119,16 +123,19 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 			],
 		};
 	});
-	const scaleAnim = useAnimatedStyle(() => {
+	const bgAnim = useAnimatedStyle(() => {
+		const scaleValue = interpolate(
+			scrollY.get(),
+			[-headerHeight.get(), 0],
+			[2, 1],
+			Extrapolation.CLAMP,
+		);
+		const offset = (headerHeight.get() * (scaleValue - 1)) / 2;
 		return {
-			// transform: [
-			// {
-			// 	scale: interpolate(scrollY.get(), [-50, 0], [1.3, 1], {
-			// 	extrapolateLeft: 'extend',
-			// 	extrapolateRight: 'clamp',
-			// 	}),
-			// },
-			// ],
+			transform: [
+				{ scale: scaleValue },
+				{ translateY: -offset },
+			],
 		};
 	});
 	const handleHeaderGestureEnd = () => {
@@ -173,11 +180,11 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 		}}
 		>
 			{movie ? <Animated.Image
-			style={[tw.style('absolute h-full w-full'), scaleAnim]}
+			style={[tw.style('absolute h-full w-full'), bgAnim]}
 			source={{ uri: movie.backdrop_url ?? '' }}
 			/> : null}
 			<AnimatedLinearGradient
-			style={[tw.style('absolute inset-0'), scaleAnim]}
+			style={[tw.style('absolute inset-0'), bgAnim]}
 			colors={[
 				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
 				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
@@ -196,6 +203,10 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 			>
 				{!loading ? (
 					<AnimatedImageWithFallback
+					onLayout={(e) => {
+						'worklet';
+						posterHeight.value = e.nativeEvent.layout.height;
+					}}
 					alt={movie?.title ?? ''}
 					source={{ uri: movie?.avatar_url ?? '' }}
 					style={[
@@ -203,6 +214,7 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 						tw.style('rounded-md w-48'),
 						posterAnim
 					]}
+					type="movie"
 					/>
 				) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw.style('w-48'), posterAnim]}/>}
 				<Animated.View
@@ -242,6 +254,11 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 
 				</Animated.View>
 			</Animated.View>
+			{movie ? (
+			<Animated.View style={tw`p-2`}>
+				<MediaActionUserActivityRating media={movie as Media} />
+			</Animated.View>
+			) : null}
 		</Animated.View>
 	</GestureDetector>
 	);

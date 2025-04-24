@@ -183,6 +183,11 @@ const BottomSheetPlaylistEdit = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+    onLayout={async () => {
+      if (typeof ref === 'object' && ref?.current?.present) {
+        await ref.current.present();
+      };
+    }}
     sizes={['large']}
     {...props}
     >
@@ -194,7 +199,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
       >
         <View style={tw`flex-row items-center justify-between w-full`}>
           <TouchableOpacity
-          onPress={async () => await closeSheet(id)}
+          onPress={() => closeSheet(id)}
           >
             <ThemedText>{upperFirst(t('common.word.cancel'))}</ThemedText>
           </TouchableOpacity>
@@ -221,6 +226,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
         render={({ field: { onChange, onBlur, value} }) => (
           <View style={tw`gap-2 w-full`}>
             <Input
+            variant='outline'
             placeholder={upperFirst(t('common.playlist.form.title.placeholder'))}
             value={value}
             autoCorrect={false}
@@ -241,6 +247,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
         render={({ field: { onChange, onBlur, value} }) => (
           <View style={tw`gap-2 w-full`}>
             <Input
+            variant='outline'
             placeholder={upperFirst(t('common.word.description'))}
             style={tw`h-24`}
             multiline

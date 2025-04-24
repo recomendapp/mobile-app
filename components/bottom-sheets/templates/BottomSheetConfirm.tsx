@@ -43,6 +43,11 @@ const BottomSheetConfirm = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+    onLayout={async () => {
+      if (typeof ref === 'object' && ref?.current?.present) {
+        await ref.current.present();
+      };
+    }}
     {...props}
     >
       <View
