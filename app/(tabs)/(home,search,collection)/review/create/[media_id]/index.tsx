@@ -1,9 +1,10 @@
 import ReviewForm from "@/components/screens/review/ReviewForm";
-import { ThemedText } from "@/components/ui/ThemedText"
+import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/context/AuthProvider";
 import { useMediaDetailsQuery } from "@/features/media/mediaQueries";
 import { useUserActivityQuery } from "@/features/user/userQueries";
 import { getIdFromSlug } from "@/hooks/getIdFromSlug";
+import tw from "@/lib/tw";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native"
 
@@ -31,8 +32,8 @@ const ReviewCreateScreen = () => {
 	if (activity?.review) return router.replace(`/review/${activity?.review?.id}`);
 	if (loading) {
 		return (
-			<View>
-				<ThemedText>Loading...</ThemedText>
+			<View style={tw`flex-1 items-center justify-center`}>
+				<Icons.Loader />
 			</View>
 		);
 	};

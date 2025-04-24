@@ -6,7 +6,7 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { upperFirst } from 'lodash';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, FlatList, TextInput, View } from 'react-native';
+import { Dimensions, FlatList, View } from 'react-native';
 import Animated, { clamp, interpolate, runOnJS, SharedValue, useAnimatedProps, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Icons } from '@/constants/Icons';
@@ -14,6 +14,10 @@ import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Media } from '@/types/type.db';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
+import { useUserActivityQuery } from '@/features/user/userQueries';
+import { useAuth } from '@/context/AuthProvider';
+import { useUserActivityInsertMutation, useUserActivityUpdateMutation } from '@/features/user/userMutations';
+import * as Burnt from 'burnt';
 
 const { width } = Dimensions.get('screen');
 const ITEM_WIDTH = width * 0.2;
@@ -81,16 +85,30 @@ RatingItem.displayName = 'RatingItem';
 interface BottomSheetMediaRatingProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
 	id: string;
 	media: Media;
-	initialRating?: number | null;
+	/**
+	 * 
+	 * @param rating The rating value, or null if the rating was removed.
+	 * @returns 
+	 */
 	onRatingChange?: (rating: number | null) => void;
 };
 const BottomSheetMediaRating = React.forwardRef<
 	React.ElementRef<typeof TrueSheet>,
 	BottomSheetMediaRatingProps
->(({ id, media, initialRating, onRatingChange, sizes, ...props }, ref) => {
+>(({ id, media, onRatingChange, sizes, ...props }, ref) => {
+	const { user } = useAuth();
 	const { colors, inset } = useTheme();
 	const { t } = useTranslation();
 	const { closeSheet } = useBottomSheetStore();
+	const {
+		data: activity,
+	} = useUserActivityQuery({
+		userId: user?.id,
+		mediaId: media.media_id!,
+	});
+	const insertActivity = useUserActivityInsertMutation();
+	const updateActivity = useUserActivityUpdateMutation();
+
 	const scrollRef = React.useRef<FlatList>(null);
 	const ratings = React.useMemo(() => {
 		return Array.from({ length: 10 }, (_, i) => ({
@@ -98,14 +116,14 @@ const BottomSheetMediaRating = React.forwardRef<
 			rating: i + 1,
 		}));
 	}, []);
-	const activeRating = useSharedValue(initialRating ?? Math.floor(ratings.length / 2));
+	const activeRating = useSharedValue(activity?.rating ?? Math.floor(ratings.length / 2));
 	const scrollX = useSharedValue(0);
 
 	const vibrate = () => {
 		if (process.env.EXPO_OS === 'ios') {
 			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 		}
-	}
+	};
 	const onScroll = useAnimatedScrollHandler(e => {
 		'worklet';
 		scrollX.value = clamp(e.contentOffset.x / ITEM_TOTAL_SIZE, 0, ratings.length - 1);
@@ -114,12 +132,55 @@ const BottomSheetMediaRating = React.forwardRef<
 			activeRating.value = newActiveRating;
 			runOnJS(vibrate)();
 		}
-	})
-
-	const animatedTextProps = useAnimatedProps(() => ({
-		text: `${activeRating.value}`,
-		defaultValue: `${activeRating.value}`,
-	}));
+	});
+	const handleRate = async (rating: number) => {
+		if (!user?.id) return;
+		if (activity) {
+			await updateActivity.mutateAsync({
+				activityId: activity.id,
+				rating: rating,
+			}, {
+				onError: () => {
+					Burnt.toast({
+						title: upperFirst(t('common.errors.an_error_occurred')),
+						preset: 'error',
+					});
+				}
+			});
+		} else {
+			await insertActivity.mutateAsync({
+				userId: user?.id,
+				mediaId: media.media_id!,
+				rating: rating,
+			}, {
+				onError: () => {
+					Burnt.toast({
+						title: upperFirst(t('common.errors.an_error_occurred')),
+						preset: 'error',
+					});
+				}
+			});
+		}
+	};
+	const handleUnrate = async () => {
+		if (activity?.review) {
+			Burnt.toast({
+				title: upperFirst(t('common.errors.an_error_occurred')),
+				preset: 'error',
+			});
+		}
+		await updateActivity.mutateAsync({
+			activityId: activity!.id!,
+			rating: null,
+		}, {
+			onError: () => {
+				Burnt.toast({
+					title: upperFirst(t('common.errors.an_error_occurred')),
+					preset: 'error',
+				});
+			}
+		});
+	};
 
 	const decreaseRatingStyle = useAnimatedStyle(() => ({
 		opacity: activeRating.value === 1 ? 0.5 : 1,
@@ -135,14 +196,12 @@ const BottomSheetMediaRating = React.forwardRef<
 	}));
 
 	const handleDeleteRating = async () => {
+		handleUnrate();
 		onRatingChange?.(null);
 		closeSheet(id);
 	};
 	const handleSaveRating = async () => {
-		onRatingChange?.(activeRating.value);
-		closeSheet(id);
-	};
-	const handleAddRating = async () => {
+		await handleRate(activeRating.value);
 		onRatingChange?.(activeRating.value);
 		closeSheet(id);
 	};
@@ -150,20 +209,25 @@ const BottomSheetMediaRating = React.forwardRef<
 	return (
 		<TrueSheet
 		ref={ref}
+		onLayout={async () => {
+			if (typeof ref === 'object' && ref?.current?.present) {
+			  await ref.current.present();
+			};
+		}}
 		sizes={['auto']}
 		FooterComponent={() => (
 			<View style={[{ paddingBottom: inset.bottom }, tw`flex-1 flex-row gap-2 justify-between px-4`]}>
-				{initialRating ? (
+				{activity?.rating ? (
 					<>
-						<Button variant="outline" onPress={handleDeleteRating}>
+						<Button variant="outline" onPress={handleDeleteRating} pressableStyle={tw`flex-1`}>
 							<ButtonText variant="outline">Delete</ButtonText>
 						</Button>
-						<Button variant="accent-yellow" onPress={handleSaveRating}>
+						<Button variant="accent-yellow" onPress={handleSaveRating} pressableStyle={tw`flex-1`}>
 							<ButtonText variant="accent-yellow">{upperFirst(t('common.word.save'))}</ButtonText>
 						</Button>
 					</>
 				) : (
-					<Button variant="accent-yellow" onPress={handleAddRating}>
+					<Button variant="accent-yellow" onPress={handleSaveRating} pressableStyle={tw`flex-1`}>
 						<ButtonText variant="accent-yellow">Ajouter une note</ButtonText>
 					</Button>
 				)}

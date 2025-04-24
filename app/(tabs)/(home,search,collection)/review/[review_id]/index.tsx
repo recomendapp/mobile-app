@@ -1,8 +1,10 @@
 import { CardMedia } from "@/components/cards/CardMedia";
+import { IconMediaRating } from "@/components/medias/IconMediaRating";
 import ActionReviewLike from "@/components/reviews/actions/ActionReviewLike";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { Button, ButtonText } from "@/components/ui/Button";
 import { ThemedText } from "@/components/ui/ThemedText"
+import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/context/AuthProvider";
 import { useTheme } from "@/context/ThemeProvider";
 import { useUserReviewQuery } from "@/features/user/userQueries";
@@ -31,8 +33,8 @@ const ReviewScreen = () => {
 
 	if (loading) {
 		return (
-			<View>
-				<ThemedText>Loading...</ThemedText>
+			<View style={tw`flex-1 items-center justify-center`}>
+				<Icons.Loader />
 			</View>
 		);
 	};
@@ -52,6 +54,8 @@ const ReviewScreen = () => {
 			</Text>
 			<CardMedia
 			media={review.activity?.media!}
+			activity={review.activity!}
+			showRating
 			/>
 			<Viewer
 			content={review.body}

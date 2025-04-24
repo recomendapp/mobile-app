@@ -140,6 +140,11 @@ const BottomSheetPlaylistGuests = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+    onLayout={async () => {
+      if (typeof ref === 'object' && ref?.current?.present) {
+        await ref.current.present();
+      };
+    }}
     sizes={['large']}
     {...props}
     >
@@ -151,19 +156,19 @@ const BottomSheetPlaylistGuests = React.forwardRef<
       >
         <View style={tw`flex-row items-center justify-between w-full`}>
           <TouchableOpacity
-          onPress={async () => {
+          onPress={() => {
             if (hasChanges) {
-              await createConfirmSheet({
+              createConfirmSheet({
                 title: 'Abandonner les modifications ?',
                 description: 'Si vous revenez en arrière maintenant, vous perdrez vos modifications.',
                 cancelLabel: 'Ignorer',
                 confirmLabel: 'Poursuivre la modification',
-                onCancel: async () => {
-                  await closeSheet(id);
+                onCancel: () => {
+                  closeSheet(id);
                 }
               })
             } else {
-              await closeSheet(id)
+              closeSheet(id)
             }
           }}
           style={tw`flex-1`}
@@ -184,6 +189,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
         <View style={tw`flex-1 w-full gap-2`}>
           <View style={tw`flex-row items-center justify-between gap-2`}>
             <Input
+            variant='outline'
             defaultValue={search}
             onChangeText={setSearch}
             placeholder={upperFirst(t('common.messages.search_guest'))}

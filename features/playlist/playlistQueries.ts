@@ -25,9 +25,9 @@ export const usePlaylistFull = (playlistId: number) => {
 				`)
 				.eq('id', playlistId)
 				.order('rank', { ascending: true, referencedTable: 'playlist_items' })
-				.returns<Playlist[]>()
-				.single();
-			if (error || !data) throw error;
+				.maybeSingle();
+			if (error) throw error;
+			if (!data) return data;
 			
 			// Set the playlist items and guests in the queryClient
 			queryClient.setQueryData(playlistKeys.items(playlistId), data.items);

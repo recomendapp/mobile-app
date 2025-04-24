@@ -1,7 +1,9 @@
 import ReviewForm from "@/components/screens/review/ReviewForm";
 import { ThemedText } from "@/components/ui/ThemedText"
+import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/context/AuthProvider";
 import { useUserReviewQuery } from "@/features/user/userQueries";
+import tw from "@/lib/tw";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native"
 
@@ -19,8 +21,8 @@ const ReviewEditScreen = () => {
 
 	if (loading) {
 		return (
-			<View>
-				<ThemedText>Loading...</ThemedText>
+			<View style={tw`flex-1 items-center justify-center`}>
+				<Icons.Loader />
 			</View>
 		);
 	};

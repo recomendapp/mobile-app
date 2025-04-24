@@ -30,7 +30,7 @@ const BottomSheetWatchlistComment = React.forwardRef<
 
   const handleUpdateComment = async () => {
 	if (comment == watchlistItem?.comment) {
-		await closeSheet(id);
+		closeSheet(id);
 		return;
 	}
 	if (!watchlistItem?.id) {
@@ -45,12 +45,12 @@ const BottomSheetWatchlistComment = React.forwardRef<
 		watchlistId: watchlistItem.id,
 		comment: comment.replace(/\s+/g, ' ').trimStart(),
 	}, {
-		onSuccess: async () => {
+		onSuccess: () => {
 			Burnt.toast({
 				title: upperFirst(t('common.word.saved')),
 				preset: 'done',
 			});
-			await closeSheet(id);
+			closeSheet(id);
 		},
 		onError: () => {
 			Burnt.toast({
@@ -64,6 +64,11 @@ const BottomSheetWatchlistComment = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+	onLayout={async () => {
+		if (typeof ref === 'object' && ref?.current?.present) {
+		  await ref.current.present();
+		};
+	}}
     {...props}
     >
       <View
@@ -74,6 +79,7 @@ const BottomSheetWatchlistComment = React.forwardRef<
       >
         <ThemedText style={tw`text-center text-xl font-bold`}>{upperFirst(t('common.messages.comment', { count: 1 }))}</ThemedText>
 		<Input
+		variant='outline'
 		multiline
 		defaultValue={comment}
 		onChangeText={setComment}

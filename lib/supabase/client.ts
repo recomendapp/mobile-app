@@ -10,7 +10,7 @@ export const createClient = (locale: string) => {
 			storage: AsyncStorage,
 			autoRefreshToken: true,
 			persistSession: true,
-			detectSessionInUrl: true,
+			detectSessionInUrl: false,
 		},
 		global: {
 			headers: {

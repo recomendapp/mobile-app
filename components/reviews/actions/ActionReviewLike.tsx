@@ -10,6 +10,7 @@ import { useTheme } from "@/context/ThemeProvider";
 import { Icons } from "@/constants/Icons";
 import Animated from "react-native-reanimated";
 import tw from "@/lib/tw";
+import * as Haptics from "expo-haptics";
 
 interface ActionReviewLikeProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -89,7 +90,12 @@ const ActionReviewLike = React.forwardRef<
 	return (
 		<Pressable
 		disabled={isLoading || isError || like === undefined || insertLike.isPending || deleteLike.isPending}
-		onPress={() => like ? handleUnlike() : handleLike()}
+		onPress={() => {
+			if (process.env.EXPO_OS === 'ios') {
+				Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+			}
+			like ? handleUnlike() : handleLike()
+		}}
 		>
 			<Animated.View ref={ref} style={[tw.style('flex-row items-center'), style]} {...props}>
 				{(isLoading || like === undefined) ? (

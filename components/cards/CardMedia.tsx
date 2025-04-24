@@ -60,11 +60,16 @@ const CardMediaDefault = React.forwardRef<
 					{children}
 				</View>
 			</View>
-			{showAction ? <View style={tw`flex-row items-center gap-2`}>
+			{showAction || showRating ? (
+			<View style={tw`flex-row items-center gap-2`}>
 				{showAction?.rating ? (
 					<MediaActionUserActivityRating media={media} />
 				) : null}
-			</View> : null}
+				{showRating ? (
+					<IconMediaRating rating={activity?.rating} />
+				) : null}
+			</View>
+ 			) : null}
 		</Animated.View>
 	);
 });

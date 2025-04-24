@@ -19,7 +19,6 @@ export const BottomSheetManager = () => {
 
     return unsubscribe;
   }, [sheets, closeSheet, navigation]);
-
   return (
     <>
       {sheets.map(({ id, content: Content, props, sizes, ref }) => (

@@ -11,6 +11,7 @@
       "go_to_person": "accéder à la personne",
       "go_to_media": "accéder au média",
       "go_to_playlist": "accéder à la playlist",
+      "go_to_activity": "accéder à l'activité",
       "view_directors": "voir {count, plural, one {le réalisateur} other {les réalisateurs}}",
       "no_director": "aucun réalisateur",
       "view_comment": "voir {count, plural, one {le commentaire} other {les commentaires}}",

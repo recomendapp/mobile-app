@@ -55,6 +55,11 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+    onLayout={async () => {
+      if (typeof ref === 'object' && ref?.current?.present) {
+        await ref.current.present();
+      };
+    }}
     sizes={['large']}
     {...props}
     >
@@ -71,7 +76,7 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
           </ThemedText>
           <TouchableOpacity
           style={tw`flex-1`}
-          onPress={async () => await closeSheet(id)}
+          onPress={() => closeSheet(id)}
           >
             <ThemedText style={tw`text-right`}>{upperCase(t('common.messages.ok'))}</ThemedText>
           </TouchableOpacity>
@@ -81,6 +86,7 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
         </ThemedText> */}
         <View style={tw`flex-1 w-full gap-2`}>
           <Input
+          variant='outline'
           defaultValue={search}
           onChangeText={setSearch}
           placeholder={upperFirst(t('common.messages.search_user'))}

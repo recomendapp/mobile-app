@@ -2,7 +2,7 @@ import React from 'react';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
-import { Media } from '@/types/type.db';
+import { Media, UserActivity } from '@/types/type.db';
 import { LinkProps, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/context/ThemeProvider';
@@ -15,9 +15,9 @@ import BottomSheetSendReco from './BottomSheetSendReco';
 import BottomSheetAddToPlaylist from './BottomSheetAddToPlaylist';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 
-interface BottomSheetMediaProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
+interface BottomSheetUserActivityProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
-  media?: Media,
+  activity: UserActivity,
   additionalItemsTop?: Item[];
   additionalItemsBottom?: Item[];
 };
@@ -29,10 +29,10 @@ interface Item {
 	submenu?: Item[];
 }
 
-const BottomSheetMedia = React.forwardRef<
+const BottomSheetUserActivity = React.forwardRef<
   React.ElementRef<typeof TrueSheet>,
-  BottomSheetMediaProps
->(({ id, media, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
+  BottomSheetUserActivityProps
+>(({ id, activity: { media, ...activity}, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const { closeSheet, openSheet } = useBottomSheetStore();
   const { colors, inset } = useTheme();
   const router = useRouter();
@@ -42,6 +42,11 @@ const BottomSheetMedia = React.forwardRef<
       ...additionalItemsTop,
     ],
     [
+      {
+        icon: Icons.Feed,
+        onPress: () => router.push(`/user/${activity.user?.username}`),
+        label: upperFirst(t('common.messages.go_to_activity')),
+      },
 			{
 				icon: Icons.Movie,
 				onPress: () => router.push(media?.url as LinkProps['href']),
@@ -115,7 +120,7 @@ const BottomSheetMedia = React.forwardRef<
             {group.map((item, j) => (
               <TouchableOpacity
               key={j}
-              onPress={async () => {
+              onPress={() => {
                 closeSheet(id);
                 item.onPress();
               }}
@@ -131,6 +136,6 @@ const BottomSheetMedia = React.forwardRef<
     </TrueSheet>
   );
 });
-BottomSheetMedia.displayName = 'BottomSheetMedia';
+BottomSheetUserActivity.displayName = 'BottomSheetUserActivity';
 
-export default BottomSheetMedia;
+export default BottomSheetUserActivity;

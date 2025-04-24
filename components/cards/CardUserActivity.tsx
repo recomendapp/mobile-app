@@ -4,17 +4,21 @@ import { UserActivity } from "@/types/type.db";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "../utils/ImageWithFallback";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import UserAvatar from "../user/UserAvatar";
 import { ThemedText } from "../ui/ThemedText";
 import FeedActivity from "../screens/feed/FeedActivity";
 import { CardReview } from "./CardReview";
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
+import BottomSheetUserActivity from "../bottom-sheets/sheets/BottomSheetUserActivity";
+import { useRouter } from "expo-router";
 
 interface CardUserActivityProps
 	extends React.ComponentProps<typeof Animated.View> {
 		variant?: "default";
 		activity: UserActivity;
 		showReview?: boolean;
+		linked?: boolean;
 	}
 
 const CardUserActivityDefault = React.forwardRef<
@@ -77,13 +81,26 @@ CardUserActivityDefault.displayName = "CardUserActivityDefault";
 const CardUserActivity = React.forwardRef<
 	React.ElementRef<typeof Animated.View>,
 	CardUserActivityProps
->(({ variant = "default", ...props }, ref) => {
+>(({ variant = "default", linked = false, ...props }, ref) => {
+	const router = useRouter();
+	const { openSheet } = useBottomSheetStore();
+	const onPress = () => {
+		router.push(`/user/${props.activity.user?.username}`);
+	};
+	const onLongPress = async () => {
+		await openSheet(BottomSheetUserActivity, {
+			activity: props.activity,
+		})
+	};
 	return (
-		<>
+		<Pressable
+		onPress={linked ? onPress : undefined}
+		onLongPress={onLongPress}
+		>
 			{variant === "default" ? (
 				<CardUserActivityDefault ref={ref} {...props} />
 			) : null}
-		</>
+		</Pressable>
 	)
 });
 CardUserActivity.displayName = "CardUserActivity";

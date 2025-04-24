@@ -21,6 +21,7 @@ const FeedScreen = () => {
 		isFetching,
 		fetchNextPage,
 		hasNextPage,
+		refetch,
 	} = useUserFeedInfiniteQuery({
 		userId: user?.id,
 	});
@@ -51,6 +52,7 @@ const FeedScreen = () => {
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.3}
 		nestedScrollEnabled
+		onRefresh={refetch}
 		/>
 	);
 };

@@ -122,7 +122,7 @@ const Button = React.forwardRef<React.ElementRef<typeof Animated.View>, ButtonPr
       }
     }, [variant, colors]);
     return (
-      <Pressable disabled={disabled} onPress={props.onPress} style={[{ opacity: disabled ? 0.5 : 1, flex: 1 }, pressableStyle]}>
+      <Pressable disabled={disabled} onPress={props.onPress} style={[{ opacity: disabled ? 0.5 : 1 }, pressableStyle]}>
         <Animated.View
         ref={ref}
         role={role}
@@ -130,29 +130,12 @@ const Button = React.forwardRef<React.ElementRef<typeof Animated.View>, ButtonPr
           tw.style(variantStyles.shared),
           variantStyles.variant,
           style,
-          // tw.style(buttonVariants({ variant, size })),
         ]}
         {...props}
         >
           {props.children}
         </Animated.View>
       </Pressable>
-      // <TextClassContext.Provider
-      //   value={cn(
-      //     props.disabled && 'web:pointer-events-none',
-      //     buttonTextVariants({ variant, size })
-      //   )}
-      // >
-      //   <Pressable
-      //     className={cn(
-      //       props.disabled && 'opacity-50 web:pointer-events-none',
-      //       buttonVariants({ variant, size, className })
-      //     )}
-      //     ref={ref}
-      //     role='button'
-      //     {...props}
-      //   />
-      // </TextClassContext.Provider>
     );
   }
 );

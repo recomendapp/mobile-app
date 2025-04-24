@@ -25,22 +25,12 @@ const TabsLayout = () => {
 		  label: t('routes.search'),
 		  href: undefined,
 		},
-		// {
-		//   icon: Icons.explore,
-		//   screen: 'explore',
-		//   label: 'Explore',
-		// },
 		{
-			icon: Icons.feed,
+			icon: Icons.Feed,
 			screen: 'feed',
 			label: t('routes.feed'),
 			href: session ? undefined : null,
 		},
-		// {
-		// 	icon: session ? Icons.library : Icons.user,
-		// 	screen: session ? 'collection' : 'auth/login',
-		// 	label: session ? 'Library' : 'Login',
-		// }
 		{
 			icon: Icons.library,
 			screen: '(collection)',

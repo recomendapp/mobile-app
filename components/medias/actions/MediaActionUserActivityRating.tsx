@@ -42,67 +42,10 @@ const MediaActionUserActivityRating = React.forwardRef<
 	const insertActivity = useUserActivityInsertMutation();
 	const updateActivity = useUserActivityUpdateMutation();
 
-	const handleRate = async (rating: number) => {
-		if (!user?.id) return;
-		if (activity) {
-			await updateActivity.mutateAsync({
-				activityId: activity.id,
-				rating: rating,
-			}, {
-				onError: () => {
-					Burnt.toast({
-						title: upperFirst(t('common.errors.an_error_occurred')),
-						preset: 'error',
-					});
-				}
-			});
-		} else {
-			await insertActivity.mutateAsync({
-				userId: user?.id,
-				mediaId: media.media_id!,
-				rating: rating,
-			}, {
-				onError: () => {
-					Burnt.toast({
-						title: upperFirst(t('common.errors.an_error_occurred')),
-						preset: 'error',
-					});
-				}
-			});
-		}
-	};
-	const handleUnrate = async () => {
-		if (activity?.review) {
-			Burnt.toast({
-				title: upperFirst(t('common.errors.an_error_occurred')),
-				preset: 'error',
-			});
-		}
-		await updateActivity.mutateAsync({
-		  activityId: activity!.id!,
-		  rating: null,
-		}, {
-			onError: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.errors.an_error_occurred')),
-					preset: 'error',
-				});
-			}
-		});
-	};
-
 	return (
 		<Pressable
 		onPress={() => openSheet(BottomSheetMediaRating, {
 			media: media,
-			initialRating: activity?.rating,
-			onRatingChange: async (rating) => {
-				if (rating) {
-					await handleRate(rating);
-				} else {
-					await handleUnrate();
-				}
-			}
 		})}
 		disabled={isLoading || isError || activity === undefined || insertActivity.isPending || updateActivity.isPending}
 		// variant={activity?.rating ? 'rating-enabled' : 'rating'}

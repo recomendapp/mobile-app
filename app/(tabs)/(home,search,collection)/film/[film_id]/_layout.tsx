@@ -22,6 +22,9 @@ import { createMaterialTopTabNavigator, MaterialTopTabBarProps, MaterialTopTabNa
 import FilmProvider from '@/components/screens/film/FilmContext';
 import HeaderOverlay from '@/components/ui/HeaderOverlay';
 import { EdgeInsets } from 'react-native-safe-area-context';
+import useBottomSheetStore from '@/stores/useBottomSheetStore';
+import BottomSheetMedia from '@/components/bottom-sheets/sheets/BottomSheetMedia';
+import { Media } from '@/types/type.db';
 
 const { Navigator } = createMaterialTopTabNavigator();
 
@@ -115,6 +118,7 @@ const FilmLayout = () => {
 	const { film_id } = useLocalSearchParams();
 	const { inset } = useTheme();
 	const { id: movieId} = getIdFromSlug(film_id as string);
+	const { openSheet } = useBottomSheetStore();
 	const {
 		data: movie,
 		isLoading,
@@ -156,6 +160,11 @@ const FilmLayout = () => {
 			}}
 			scrollY={scrollY}
 			title={movie?.title ?? ''}
+			onMenuPress={() => {
+				openSheet(BottomSheetMedia, {
+					media: movie as Media,
+				})
+			}}
 			/>
 			{movie ? (
 				<MaterialTopTabs

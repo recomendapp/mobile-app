@@ -316,7 +316,6 @@ const SignupScreen = () => {
 					</View>
 				{/* SUBMIT BUTTON */}
 				<Button onPress={form.handleSubmit(handleSubmit)} disabled={isLoading} style={tw.style('w-full rounded-xl')}>
-					{/* {isLoading ? <Icons.loading /> : null} */}
 					<ButtonText style={tw.style('font-bold text-xl')}>{t('common.word.signup')}</ButtonText>
 				</Button>
 				</KeyboardAvoidingView>

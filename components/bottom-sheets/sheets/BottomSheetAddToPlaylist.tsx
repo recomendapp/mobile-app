@@ -99,6 +99,11 @@ const BottomSheetAddToPlaylist = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+    onLayout={async () => {
+      if (typeof ref === 'object' && ref?.current?.present) {
+        await ref.current.present();
+      };
+    }}
     {...props}
     >
       <View
@@ -132,6 +137,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
           </View>
         </View>
         <Input
+        variant='outline'
         defaultValue={search}
         onChangeText={setSearch}
         placeholder={upperFirst(t('common.messages.search_playlist'))}
@@ -205,6 +211,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
           />
         </View>
         <Input
+        variant='outline'
         defaultValue={comment}
         onChangeText={setComment}
         placeholder={upperFirst(t('common.messages.add_comment'))}
