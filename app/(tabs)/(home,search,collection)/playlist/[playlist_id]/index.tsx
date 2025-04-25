@@ -1,5 +1,6 @@
 import BottomSheetPlaylist from "@/components/bottom-sheets/sheets/BottomSheetPlaylist";
 import PlaylistHeader from "@/components/screens/playlist/PlaylistHeader";
+import { Button, ButtonText } from "@/components/ui/Button";
 import HeaderOverlay from "@/components/ui/HeaderOverlay";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
@@ -47,11 +48,22 @@ const PlaylistScreen = () => {
 		{/* <DataTableToolbar table={table} /> */}
 	</>
 	), [playlist]);
-	const renderEmpty = React.useCallback(() => (
-		<View style={tw`flex-1 items-center justify-center`}>
-			<ThemedText>{capitalize(t('common.messages.no_results'))}</ThemedText>
-		</View>
-	), []);
+	const renderEmpty = React.useCallback(() => {
+		if (!playlist) return null;
+		return (
+			<View style={tw`flex-1 items-center justify-center gap-2`}>
+				<ThemedText>{capitalize(t('common.messages.no_results'))}</ThemedText>
+				<Button style={tw`rounded-full`}>
+					<ButtonText>Ajouter à cette playlist</ButtonText>
+				</Button>
+			</View>
+		)
+		// return (
+		// 	<View style={tw`flex-1 items-center justify-center`}>
+		// 		<ThemedText>{capitalize(t('common.messages.no_results'))}</ThemedText>
+		// 	</View>
+		// )
+	}, [playlist]);
 	return (
 		<ThemedView style={tw`flex-1`}>
 			<HeaderOverlay
@@ -75,9 +87,9 @@ const PlaylistScreen = () => {
 			ListHeaderComponent={renderHeader}
 			ListHeaderComponentStyle={tw`mb-2`}
 			// data={table.getRowModel().rows}
-			data={[{ id: 1 }]}
+			data={[]}
 			renderItem={({ item, index }) => (
-				<View key={item.id}>
+				<View key={index}>
 					<ThemedText>{index}</ThemedText>
 				</View>
 			)}

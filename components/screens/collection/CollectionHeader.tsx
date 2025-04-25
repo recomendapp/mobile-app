@@ -1,5 +1,3 @@
-import AnimatedImage from "@/components/ui/AnimatedImage";
-import AnimatedLinearGradient from "@/components/ui/AnimatedLinearGradient";
 import { useTheme } from "@/context/ThemeProvider";
 import useColorConverter from "@/hooks/useColorConverter";
 import tw from "@/lib/tw";
@@ -7,6 +5,8 @@ import React, { forwardRef } from "react";
 import { Text } from "react-native";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import useRandomBackdrop from "@/hooks/useRandomBackdrop";
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface CollectionHeaderProps
 	extends React.ComponentPropsWithoutRef<typeof Animated.View> {
@@ -68,28 +68,29 @@ const CollectionHeader = forwardRef<
 		}}
 		{...props}
 		>
-			<AnimatedImage
+			<Animated.View
 			style={[
 				tw`absolute inset-0`,
 				scaleAnim,
 			]}
-			source={{ uri: bgBackdrop ?? 'https://media.giphy.com/media/Ic0IOSkS23UAw/giphy.gif' }}
-			/>
-			<AnimatedLinearGradient
-			style={[
-				tw`absolute inset-0`,
-				scaleAnim,
-			]}
-			colors={[
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.5)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.8)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 1)`,
-			]}
-			/>
+			>
+				<Image
+				style={tw`absolute inset-0`}
+				source={{ uri: bgBackdrop ?? 'https://media.giphy.com/media/Ic0IOSkS23UAw/giphy.gif' }}
+				/>
+				<LinearGradient
+				style={tw`absolute inset-0`}
+				colors={[
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.5)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.8)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 1)`,
+				]}
+				/>
+			</Animated.View>
 			<Animated.View
 			style={[
 				tw`items-center justify-center px-4 py-8 h-56`,

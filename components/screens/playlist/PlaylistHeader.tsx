@@ -1,5 +1,3 @@
-import AnimatedImage from "@/components/ui/AnimatedImage";
-import AnimatedLinearGradient from "@/components/ui/AnimatedLinearGradient";
 import { useTheme } from "@/context/ThemeProvider";
 import useColorConverter from "@/hooks/useColorConverter";
 import tw from "@/lib/tw";
@@ -12,6 +10,9 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
+import { CardUser } from "@/components/cards/CardUser";
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface PlaylistHeaderProps
 	extends React.ComponentPropsWithoutRef<typeof Animated.View> {
@@ -33,7 +34,6 @@ const PlaylistHeader = forwardRef<
 	const bgBackdrop = useRandomBackdrop(backdrops);
 	const bgColor = hslToRgb(colors.background);
 	const posterHeight = useSharedValue(0);
-	const layoutY = useSharedValue(0);
 	const opacityAnim = useAnimatedStyle(() => {
 		return {
 			opacity: interpolate(
@@ -111,38 +111,40 @@ const PlaylistHeader = forwardRef<
 		<Animated.View
 		ref={ref}
 		style={[
-			// tw`absolute w-full`,
 			opacityAnim,
 		]}
 		onLayout={(event) => {
 			'worklet';
 			headerHeight.value = event.nativeEvent.layout.height;
-			layoutY.value = event.nativeEvent.layout.y;
 		}}
 		{...props}
 		>
-			{playlist ? <AnimatedImage
+			<Animated.View
 			style={[
 				tw`absolute inset-0`,
 				bgAnim,
 			]}
-			source={{ uri: bgBackdrop ?? 'https://media.giphy.com/media/Ic0IOSkS23UAw/giphy.gif' }}
-			/> : null}
-			<AnimatedLinearGradient
-			style={[
-				tw`absolute inset-0`,
-				bgAnim,
-			]}
-			colors={[
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.5)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.8)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 1)`,
-			]}
-			/>
+			>
+				{playlist ? (
+					<Image
+					style={tw`absolute inset-0`}
+					source={{ uri: bgBackdrop ?? 'https://media.giphy.com/media/Ic0IOSkS23UAw/giphy.gif' }}
+					/>
+				) : null}
+				<LinearGradient
+
+				style={tw`absolute inset-0`}
+				colors={[
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.5)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.8)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 1)`,
+				]}
+				/>
+			</Animated.View>
 			<Animated.View
 			style={[
 				tw`items-center justify-center gap-2 p-2`,
@@ -189,6 +191,11 @@ const PlaylistHeader = forwardRef<
 							{playlist?.title ?? upperFirst(t('common.errors.playlist_not_found'))}
 						</ThemedText>
 					) : <Skeleton style={tw.style('w-64 h-12')} />}
+					{playlist ? (
+						<>
+							<CardUser variant="inline" user={playlist.user!} />
+						</>
+					) : null}
 				</Animated.View>
 			</Animated.View>
 		</Animated.View>

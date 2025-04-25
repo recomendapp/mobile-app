@@ -1,19 +1,13 @@
 import React from "react"
-import { upperFirst } from "lodash";
-import { Pressable, View } from "react-native";
+import { Pressable } from "react-native";
 import { useAuth } from "@/context/AuthProvider";
-import { useTranslation } from "react-i18next";
 import { useUserActivityQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import { AlertCircleIcon } from "lucide-react-native";
 import { useUserActivityInsertMutation, useUserActivityUpdateMutation } from "@/features/user/userMutations";
-import * as Burnt from "burnt";
 import { IconMediaRating } from "../IconMediaRating";
 import { useTheme } from "@/context/ThemeProvider";
-import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import tw from "@/lib/tw";
-import { Button, ButtonText } from "@/components/ui/Button";
 import BottomSheetMediaRating from "@/components/bottom-sheets/sheets/BottomSheetMediaRating";
 import { Media } from "@/types/type.db";
 
@@ -28,7 +22,6 @@ const MediaActionUserActivityRating = React.forwardRef<
 	MediaActionUserActivityRatingProps
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();
-	const { t } = useTranslation();
 	const { user } = useAuth();
 	const { openSheet } = useBottomSheetStore();
 	const {
@@ -48,11 +41,12 @@ const MediaActionUserActivityRating = React.forwardRef<
 			media: media,
 		})}
 		disabled={isLoading || isError || activity === undefined || insertActivity.isPending || updateActivity.isPending}
-		// variant={activity?.rating ? 'rating-enabled' : 'rating'}
+		style={[
+			{ opacity: isLoading || activity === undefined ? 0.5 : 1 },
+		]}
+		{...props}
 		>
-		{(isLoading || activity === undefined) ? (
-			<Icons.spinner color={colors.foreground} />
-		) : isError ? (
+		{isError ? (
 			<AlertCircleIcon />
 		) : activity?.rating ? (
 			<IconMediaRating rating={activity.rating} />

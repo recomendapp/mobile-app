@@ -148,6 +148,7 @@ const BottomSheetSendReco = React.forwardRef<
           </View>
         </View>
         <Input
+        variant='outline'
         defaultValue={search}
         onChangeText={setSearch}
         placeholder={upperFirst(t('common.messages.search_friend'))}
@@ -196,6 +197,7 @@ const BottomSheetSendReco = React.forwardRef<
           />
         </View>
         <Input
+        variant='outline'
         defaultValue={comment}
         onChangeText={setComment}
         placeholder={upperFirst(t('common.messages.add_comment'))}
