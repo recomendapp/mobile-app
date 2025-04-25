@@ -24,8 +24,7 @@ import tw from '@/lib/tw';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useFilmContext } from './FilmContext';
 import MediaActionUserActivityRating from '@/components/medias/actions/MediaActionUserActivityRating';
-
-const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
+import { Image } from 'expo-image';
 
 interface FilmHeaderProps {
 	movie?: MediaMovie | null;
@@ -179,22 +178,29 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 			layoutY.value = event.nativeEvent.layout.y;
 		}}
 		>
-			{movie ? <Animated.Image
-			style={[tw.style('absolute h-full w-full'), bgAnim]}
-			source={{ uri: movie.backdrop_url ?? '' }}
-			/> : null}
-			<AnimatedLinearGradient
-			style={[tw.style('absolute inset-0'), bgAnim]}
-			colors={[
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.5)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.8)`,
-				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 1)`,
+			<Animated.View
+			style={[
+				tw`absolute inset-0`,
+				bgAnim,
 			]}
-			/>
+			>
+				{movie ? <Image
+				style={tw`absolute inset-0`}
+				source={{ uri: movie.backdrop_url ?? '' }}
+				/> : null}
+				<LinearGradient
+				style={tw`absolute inset-0`}
+				colors={[
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.5)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.8)`,
+					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 1)`,
+				]}
+				/>
+			</Animated.View>
 			<Animated.View
 			style={[
 				tw.style('items-center gap-4 p-2'),
