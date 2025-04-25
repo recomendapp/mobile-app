@@ -49,7 +49,7 @@ const IconMediaRating = React.forwardRef<
 	]}
 	{...props}
 	>
-		<Animated.Text style={{ color: variantStyles.text }}>{rating % 1 === 0 ? rating : rating.toFixed(1)}</Animated.Text>
+		<Animated.Text style={[{ color: variantStyles.text }, tw`font-bold`]}>{rating % 1 === 0 ? rating : rating.toFixed(1)}</Animated.Text>
 	</Animated.View>
 	);
 });

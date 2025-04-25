@@ -10,11 +10,13 @@ import { useTheme } from "@/context/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMediaRating from "@/components/bottom-sheets/sheets/BottomSheetMediaRating";
 import { Media } from "@/types/type.db";
+import tw from "@/lib/tw";
+
+const ICON_SIZE = 30;
 
 interface MediaActionUserActivityRatingProps
 	extends React.ComponentProps<typeof Pressable> {
 		media: Media;
-		stopPropagation?: boolean;
 	}
 
 const MediaActionUserActivityRating = React.forwardRef<
@@ -37,6 +39,7 @@ const MediaActionUserActivityRating = React.forwardRef<
 
 	return (
 		<Pressable
+		ref={ref}
 		onPress={() => openSheet(BottomSheetMediaRating, {
 			media: media,
 		})}
@@ -47,11 +50,11 @@ const MediaActionUserActivityRating = React.forwardRef<
 		{...props}
 		>
 		{isError ? (
-			<AlertCircleIcon />
+			<AlertCircleIcon size={ICON_SIZE} />
 		) : activity?.rating ? (
-			<IconMediaRating rating={activity.rating} />
+			<IconMediaRating rating={activity.rating} style={tw`w-12`} />
 		) : (
-			<Icons.Star color={colors.accentYellow} />
+			<Icons.Star color={colors.accentYellow} size={ICON_SIZE} />
 		)}
 		</Pressable>
 	);

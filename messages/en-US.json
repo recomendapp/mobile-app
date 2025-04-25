@@ -108,6 +108,7 @@
       "save_to_library": "save to my library",
       "remove_from_library": "remove from my library",
       "private": "private",
+      "public": "public",
       "guest_one": "guest",
       "guest_other": "guests",
       "ok": "ok"
