@@ -100,7 +100,7 @@ export type Playlist = Database['public']['Tables']['playlists']['Row'] & {
 	user?: User;
 	guests?: PlaylistGuest[];
 	collaborators?: PlaylistGuest[] | any;
-	items?: PlaylistItem[] | any;
+	items?: PlaylistItem[];
 };
 
 export type PlaylistItem = Database['public']['Tables']['playlist_items']['Row'] & {

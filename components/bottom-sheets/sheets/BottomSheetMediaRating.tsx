@@ -164,10 +164,13 @@ const BottomSheetMediaRating = React.forwardRef<
 	};
 	const handleUnrate = async () => {
 		if (activity?.review) {
-			Burnt.toast({
+			return Burnt.toast({
 				title: upperFirst(t('common.errors.an_error_occurred')),
+				message: 'You cannot unrate a media with a review.',
+				duration: 3,
+				haptic: 'error',
 				preset: 'error',
-			});
+			})
 		}
 		await updateActivity.mutateAsync({
 			activityId: activity!.id!,

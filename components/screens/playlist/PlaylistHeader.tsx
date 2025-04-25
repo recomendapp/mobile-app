@@ -177,7 +177,7 @@ const PlaylistHeader = forwardRef<
 					{playlist ? <ThemedText>
 						<ThemedText style={{ color: colors.accentYellow }}>{upperFirst('playlist')}</ThemedText>
 						{" | "}
-						{upperFirst(t('common.messages.private', { context: 'female' }))}
+						{playlist.private ? upperFirst(t('common.messages.private', { context: 'female' })) : upperFirst(t('common.messages.public', { context: 'female' }))}
 					</ThemedText> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
 					{/* TITLE */}
 					{!loading ? (

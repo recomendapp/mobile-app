@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   LayoutChangeEvent,
+  View,
 } from 'react-native';
 import Animated, {
   Extrapolation,
@@ -25,6 +26,11 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useFilmContext } from './FilmContext';
 import MediaActionUserActivityRating from '@/components/medias/actions/MediaActionUserActivityRating';
 import { Image } from 'expo-image';
+import MediaActionUserActivityLike from '@/components/medias/actions/MediaActionUserActivityLike';
+import MediaActionUserActivityWatch from '@/components/medias/actions/MediaActionUserActivityWatch';
+import MediaActionUserWatchlist from '@/components/medias/actions/MediaActionUserWatchlist';
+import MediaActionPlaylistAdd from '@/components/medias/actions/MediaActionPlaylistAdd';
+import MediaActionUserRecos from '@/components/medias/actions/MediaActionUserRecos';
 
 interface FilmHeaderProps {
 	movie?: MediaMovie | null;
@@ -261,9 +267,18 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 				</Animated.View>
 			</Animated.View>
 			{movie ? (
-			<Animated.View style={tw`p-2`}>
-				<MediaActionUserActivityRating media={movie as Media} />
-			</Animated.View>
+			<View style={tw`flex-row items-center justify-between gap-4 p-2`}>
+				<View style={tw`flex-row items-center gap-4`}>
+					<MediaActionUserActivityRating media={movie as Media} />
+					<MediaActionUserActivityLike media={movie as Media} />
+					<MediaActionUserActivityWatch media={movie as Media} />
+					<MediaActionUserWatchlist media={movie as Media} />
+				</View>
+				<View style={tw`flex-row items-center gap-4`}>
+					<MediaActionPlaylistAdd media={movie as Media} />
+					<MediaActionUserRecos media={movie as Media} />
+				</View>
+			</View>
 			) : null}
 		</Animated.View>
 	</GestureDetector>
