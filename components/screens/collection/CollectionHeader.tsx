@@ -58,7 +58,6 @@ const CollectionHeader = forwardRef<
 		<Animated.View
 		ref={ref}
 		style={[
-			// tw`absolute w-full`,
 			opacityAnim,
 		]}
 		onLayout={(event) => {
