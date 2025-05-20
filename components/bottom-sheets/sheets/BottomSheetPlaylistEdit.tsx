@@ -213,11 +213,12 @@ const BottomSheetPlaylistEdit = React.forwardRef<
             <ThemedText>{upperFirst(t('common.word.save'))}</ThemedText>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={handlePosterOptions} style={tw.style('relative aspect-square rounded-sm overflow-hidden w-2/4')}>
+        <TouchableOpacity onPress={handlePosterOptions} style={tw`relative aspect-square rounded-md overflow-hidden w-2/4`}>
           <ImageWithFallback
             source={{uri: newPoster !== undefined ? (newPoster?.uri ?? '') : playlist.poster_url ?? ''}}
             alt={playlist?.title ?? ''}
             type="playlist"
+            style={{ backgroundColor: colors.background   }}
           />
         </TouchableOpacity>
         <Controller

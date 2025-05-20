@@ -32,7 +32,7 @@
     "base64-arraybuffer": "^1.0.2",
     "burnt": "^0.13.0",
     "class-variance-authority": "^0.7.0",
-    "expo": "~52.0.38",
+    "expo": "52.0.46",
     "expo-blur": "~14.0.3",
     "expo-build-properties": "~0.13.2",
     "expo-dev-client": "~5.0.14",
