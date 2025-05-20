@@ -77,16 +77,13 @@ const MediaActionUserActivityWatch = React.forwardRef<
 			activity ? handleUnwatch() : handleWatch();
 		}}
 		disabled={isLoading || isError || activity === undefined || insertActivity.isPending || deleteActivity.isPending}
-		style={[
-			{ opacity: isLoading || activity === undefined ? 0.5 : 1 },
-		]}
 		{...props}
 		>
 		{isError ? (
 			<AlertCircleIcon size={ICON_SIZE} />
 		) : (
-			<View style={[{ backgroundColor: activity ? colors.accentBlue : undefined, borderColor: colors.accentBlue, width: ICON_SIZE, height: ICON_SIZE }, tw`rounded-full border-2 items-center justify-center`]}>
-				<Icons.Check color={activity ? colors.foreground : colors.accentBlue} />
+			<View style={[{ backgroundColor: activity ? colors.accentBlue : undefined, borderColor: activity ? colors.accentBlue : colors.foreground, width: ICON_SIZE, height: ICON_SIZE }, tw`rounded-full border-2 items-center justify-center`]}>
+				<Icons.Check color={colors.foreground} />
 			</View>
 		)}
 		</Pressable>

@@ -44,9 +44,6 @@ const MediaActionUserActivityRating = React.forwardRef<
 			media: media,
 		})}
 		disabled={isLoading || isError || activity === undefined || insertActivity.isPending || updateActivity.isPending}
-		style={[
-			{ opacity: isLoading || activity === undefined ? 0.5 : 1 },
-		]}
 		{...props}
 		>
 		{isError ? (
@@ -54,7 +51,7 @@ const MediaActionUserActivityRating = React.forwardRef<
 		) : activity?.rating ? (
 			<IconMediaRating rating={activity.rating} style={tw`w-12`} />
 		) : (
-			<Icons.Star color={colors.accentYellow} size={ICON_SIZE} />
+			<Icons.Star color={colors.foreground} size={ICON_SIZE} />
 		)}
 		</Pressable>
 	);

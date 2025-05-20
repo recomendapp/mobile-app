@@ -96,9 +96,6 @@ const MediaActionUserWatchlist = React.forwardRef<
 			watchlist ? handleUnwatchlist() : handleWatchlist();
 		}}
 		disabled={isLoading || isError || watchlist === undefined || insertWatchlist.isPending || deleteWatchlist.isPending}
-		style={[
-			{ opacity: isLoading || watchlist === undefined ? 0.5 : 1 },
-		]}
 		{...props}
 		>
 		{isError ? (

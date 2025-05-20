@@ -13,8 +13,10 @@ import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
 import * as Haptics from "expo-haptics";
+import Animated, { interpolateColor, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
 
 const ICON_SIZE = 30;
+const AnimatedLikeIcon = Animated.createAnimatedComponent(Icons.like);
 
 interface MediaActionUserActivityLikeProps
 	extends React.ComponentProps<typeof Pressable> {
@@ -39,9 +41,11 @@ const MediaActionUserActivityLike = React.forwardRef<
 	});
 	const insertActivity = useUserActivityInsertMutation();
 	const updateActivity = useUserActivityUpdateMutation();
+	const isLiked = useSharedValue(activity?.is_liked ? 1 : 0);
 
 	const handleLike = async () => {
 		if (!user?.id) return;
+		isLiked.value = 1;
 		if (activity) {
 			await updateActivity.mutateAsync({
 				activityId: activity.id,
@@ -53,10 +57,11 @@ const MediaActionUserActivityLike = React.forwardRef<
 					});
 				},
 				onError: () => {
+					isLiked.value = 0;
 					Burnt.toast({
 						title: upperFirst(t('errors.an_error_occurred')),
 						preset: 'error',
-					})
+					});
 				}
 			});
 		} else {
@@ -71,16 +76,18 @@ const MediaActionUserActivityLike = React.forwardRef<
 					});
 				},
 				onError: () => {
+					isLiked.value = 0;
 					Burnt.toast({
 						title: upperFirst(t('errors.an_error_occurred')),
 						preset: 'error',
-					})
+					});
 				}
 			});
 		}
 	};
 	const handleUnlike = async () => {
 		if (!activity) return;
+		isLiked.value = 0;
 		await updateActivity.mutateAsync({
 			activityId: activity.id,
 			isLiked: false,
@@ -94,10 +101,38 @@ const MediaActionUserActivityLike = React.forwardRef<
 				Burnt.toast({
 					title: upperFirst(t('errors.an_error_occurred')),
 					preset: 'error',
-				})
+				});
+				isLiked.value = 1;
 			}
 		});
 	};
+
+	const anim = useAnimatedProps(() => {
+		const color = interpolateColor(
+			isLiked.get(),
+			[0, 1],
+			[
+				colors.foreground,
+				colors.accentPink,
+			]
+		);
+		const fill = interpolateColor(
+			isLiked.get(),
+			[0, 1],
+			[
+				'transparent',
+				colors.accentPink,
+			]
+		);
+		return {
+			color,
+			fill,
+		}
+	});
+
+	React.useEffect(() => {
+		isLiked.value = withTiming(activity?.is_liked ? 1 : 0)
+	}, [activity?.is_liked]);
 
 	return (
 		<Pressable
@@ -109,15 +144,16 @@ const MediaActionUserActivityLike = React.forwardRef<
 			activity?.is_liked ? handleUnlike() : handleLike();
 		}}
 		disabled={isLoading || isError || activity === undefined || insertActivity.isPending || updateActivity.isPending}
-		style={[
-			{ opacity: isLoading || activity === undefined ? 0.5 : 1 },
-		]}
 		{...props}
 		>
 		{isError ? (
 			<AlertCircleIcon size={ICON_SIZE} />
 		) : (
-			<Icons.like color={colors.accentPink} fill={activity?.is_liked ? colors.accentPink : undefined} size={ICON_SIZE} />
+			<Icons.like color={activity?.is_liked ? colors.accentPink : colors.foreground} fill={activity?.is_liked ? colors.accentPink : undefined} size={ICON_SIZE} />
+			// <AnimatedLikeIcon
+			// animatedProps={anim}
+			// size={ICON_SIZE}
+			// />
 		)}
 		</Pressable>
 	);
