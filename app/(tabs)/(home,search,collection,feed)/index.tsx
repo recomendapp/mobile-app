@@ -78,9 +78,7 @@ const HomeHeader = () => {
         <View style={tw.style('flex-row items-center gap-2')}>
           <UserNav />
         </View>
-      ) : (
-        <Link href={'/auth/login'} asChild><Button><ButtonText>{t('common.word.login')}</ButtonText></Button></Link>
-      )}
+      ) : null}
     </View>
   );
 };

@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "recomend",
+    "scheme": "com.recomend",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -18,17 +18,15 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lxup.recomend",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
+      "bundleIdentifier": "com.recomend"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.lxup.recomend"
+      "edgeToEdgeEnabled": true,
+      "package": "com.recomend"
     },
     "web": {
       "bundler": "metro",

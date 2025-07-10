@@ -1,17 +1,15 @@
 import { useAuth } from "@/context/AuthProvider";
 import { useUserFeedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { FlatList, View } from "react-native";
-import { useTheme } from "@/context/ThemeProvider";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { CardUserActivity } from "../cards/CardUserActivity";
+import { Link } from "expo-router";
 
 export const WidgetUserFeed = ({
   style,
 } : React.ComponentPropsWithoutRef<typeof View>) => {
-  const { colors } = useTheme();
   const { t } = useTranslation();
   const { user } = useAuth();
 
@@ -27,7 +25,7 @@ export const WidgetUserFeed = ({
 
   return (
   <View style={[tw`gap-2`, style]}>
-    <Link href={'/feed'} asChild>
+    <Link href={'/(tabs)/(feed)/feed'} asChild>
       <ThemedText style={tw`p-0 font-semibold text-xl`}>{t('widgets.user_feed.label')}</ThemedText>
     </Link>
     <FlatList

@@ -27,7 +27,7 @@ const TabsLayout = () => {
 		},
 		{
 			icon: Icons.Feed,
-			screen: 'feed',
+			screen: '(feed)',
 			label: t('routes.feed'),
 			href: session ? undefined : null,
 		},
@@ -61,6 +61,7 @@ const TabsLayout = () => {
 				},
 				default: {},
 			}),
+			lazy: true,
 		}}>
 		{routes.map((route) => (
 			<Tabs.Screen
