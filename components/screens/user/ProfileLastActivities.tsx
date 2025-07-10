@@ -1,4 +1,4 @@
-import { PER_PAGE } from "@/app/(tabs)/(home,search,collection)/user/[username]/collection";
+import { PER_PAGE } from "@/app/(tabs)/(home,search,collection,feed)/user/[username]/collection";
 import { CardMedia } from "@/components/cards/CardMedia";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText";

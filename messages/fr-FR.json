@@ -101,7 +101,7 @@
       "add": "ajouter",
       "already_added": "déjà ajouté",
       "create": "créer",
-      "by_name": "par {name}",
+      "by_name": "par {{name}}",
       "are_u_sure": "êtes-vous sûr ?",
       "edit": "modifier",
       "edited_male": "modifié",
