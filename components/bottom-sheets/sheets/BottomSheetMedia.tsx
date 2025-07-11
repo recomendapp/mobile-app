@@ -78,7 +78,7 @@ const BottomSheetMedia = React.forwardRef<
     <ThemedTrueSheet ref={ref} {...props}>
       <View
       style={[
-        { borderColor: colors.muted },
+        { borderColor: colors.mutedForeground },
         tw`flex-row items-center gap-2 border-b p-4`,
       ]}
       >
