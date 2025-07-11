@@ -4,7 +4,7 @@ import CollectionIcon from "./CollectionIcon";
 import { Icons } from "@/constants/Icons";
 import { capitalize } from "lodash";
 import { LinkProps } from "expo-router";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 
 interface CollectionStaticRoute {
 	type: 'static';

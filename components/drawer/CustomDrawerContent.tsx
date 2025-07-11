@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { Link, useRouter } from "expo-router";
 import { Pressable, View, Text } from "react-native";
@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import UserAvatar from "@/components/user/UserAvatar";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 
 const CustomDrawerContent = (props: any) => {

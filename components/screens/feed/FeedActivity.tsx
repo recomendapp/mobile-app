@@ -1,7 +1,7 @@
 import { IconMediaRating } from "@/components/medias/IconMediaRating";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { UserActivity } from "@/types/type.db";
 import { forwardRef } from "react";
@@ -14,7 +14,7 @@ interface FeedActivityProps
 }
 
 const FeedActivity = forwardRef<
-	React.ElementRef<typeof View>,
+	React.ComponentRef<typeof View>,
 	FeedActivityProps
 >(({ activity, style, ...props }, ref) => {
 	const { colors } = useTheme();

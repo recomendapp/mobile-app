@@ -1,6 +1,6 @@
 import { ThemedText } from '@/components/ui/ThemedText';
 import { Icons } from '@/constants/Icons';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import { Column } from '@tanstack/react-table';
 import { ChevronsUpDownIcon, LucideIcon } from 'lucide-react-native';

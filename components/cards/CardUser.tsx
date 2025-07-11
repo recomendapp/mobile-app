@@ -5,7 +5,7 @@ import Animated from "react-native-reanimated";
 import { User } from "@/types/type.db";
 import UserAvatar from "../user/UserAvatar";
 import tw from "@/lib/tw";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { ThemedText } from "../ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { ThemedView } from "../ui/ThemedView";
@@ -22,7 +22,7 @@ interface CardUserProps
 	}
 
 const CardUserDefault = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	Omit<CardUserProps, "variant">
 >(({ user, linked, children, style, ...props }, ref) => {
 	const { colors } = useTheme();
@@ -48,7 +48,7 @@ const CardUserDefault = React.forwardRef<
 CardUserDefault.displayName = "CardUserDefault";
 
 const CardUserIcon = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	Omit<CardUserProps, "variant">
 >(({ user, linked, width = 25, height = 25, children, style, ...props }, ref) => {
 	return (
@@ -67,7 +67,7 @@ const CardUserIcon = React.forwardRef<
 CardUserIcon.displayName = "CardUserIcon";
 
 const CardUserUsername = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	Omit<CardUserProps, "variant">
 >(({ user, linked, width, height, children, style, ...props }, ref) => {
 	return (
@@ -89,7 +89,7 @@ const CardUserUsername = React.forwardRef<
 CardUserUsername.displayName = "CardUserUsername";
 
 const CardUserInline = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	Omit<CardUserProps, "variant">
 >(({ user, children, style, ...props }, ref) => {
 	return (
@@ -102,7 +102,7 @@ const CardUserInline = React.forwardRef<
 CardUserInline.displayName = "CardUserInline";
 
 const CardUser = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	CardUserProps
 >(({ variant = "default", linked = true, onPress, containerStyle, ...props }, ref) => {
 	const router = useRouter();

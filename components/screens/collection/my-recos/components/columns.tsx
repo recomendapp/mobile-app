@@ -11,7 +11,7 @@ import BottomSheetMedia from '@/components/bottom-sheets/sheets/BottomSheetMedia
 import { Icons } from '@/constants/Icons';
 import * as Burnt from 'burnt';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import BottomSheetMyRecosSenders from '@/components/bottom-sheets/sheets/BottomSheetMyRecosSenders';
 
 export const Columns = () => {

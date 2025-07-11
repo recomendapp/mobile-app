@@ -8,7 +8,7 @@ import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { Icons } from "@/constants/Icons";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import useDebounce from "@/hooks/useDebounce";
 import tw from "@/lib/tw";
 import useSearchStore from "@/stores/useSearchStore";

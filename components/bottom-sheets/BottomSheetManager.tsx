@@ -1,7 +1,12 @@
 import React from 'react';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import { useNavigation } from 'expo-router';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
+
+export interface BottomSheetProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
+  id: string;
+};
 
 export const BottomSheetManager = () => {
   const { colors } = useTheme();
@@ -25,17 +30,18 @@ export const BottomSheetManager = () => {
         <Content
         key={id}
         ref={ref}
+        onLayout={() => {
+          if (typeof ref === 'object' && ref?.current?.present) {
+            ref.current.present();
+          };
+        }}
         id={id}
         sizes={sizes}
-        cornerRadius={24}
-        backgroundColor={colors.muted}
+        initialIndex={1}
         closeSheet={closeSheet}
         removeSheet={removeSheet}
         onDismiss={() => {
           removeSheet(id);
-        }}
-        contentContainerStyle={{
-          paddingTop: 16,
         }}
         {...props}
         />

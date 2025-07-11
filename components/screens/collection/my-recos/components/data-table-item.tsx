@@ -8,7 +8,7 @@ import { Row } from "@tanstack/react-table";
 import { LinkProps } from "expo-router";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { AnimatedImageWithFallback } from "@/components/ui/AnimatedImageWithFallback";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 
 interface DataTableItemProps {
 	item: Row<UserRecosAggregated>;

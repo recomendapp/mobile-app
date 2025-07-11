@@ -20,7 +20,7 @@ import useColorConverter from '@/hooks/useColorConverter';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useFilmContext } from './FilmContext';

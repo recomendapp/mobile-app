@@ -1,4 +1,4 @@
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import { ParamListBase, TabNavigationState } from '@react-navigation/native';
 import React from 'react';
 import Animated, { AnimatedRef, runOnJS, SharedValue, useAnimatedReaction, useSharedValue } from 'react-native-reanimated';

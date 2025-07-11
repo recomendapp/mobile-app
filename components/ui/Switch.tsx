@@ -1,8 +1,8 @@
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import * as React from 'react';
 import { SwitchProps, Switch as SwitchRN } from 'react-native';
 
-const Switch = React.forwardRef<React.ElementRef<typeof SwitchRN>, SwitchProps>(
+const Switch = React.forwardRef<React.ComponentRef<typeof SwitchRN>, SwitchProps>(
 	({ style, ...props }, ref) => {
 		const { colors } = useTheme();
 		return (

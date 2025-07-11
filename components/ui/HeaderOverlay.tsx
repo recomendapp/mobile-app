@@ -11,7 +11,7 @@ import Animated, {
 import { Icons } from '@/constants/Icons';
 import { useNavigation } from '@react-navigation/native';
 import { ThemedText } from '@/components/ui/ThemedText';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import React from 'react';
 

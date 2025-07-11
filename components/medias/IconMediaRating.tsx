@@ -1,4 +1,4 @@
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import * as React from "react";
 import Animated from "react-native-reanimated";
@@ -10,7 +10,7 @@ interface IconMediaRatingProps
 }
 
 const IconMediaRating = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	IconMediaRatingProps
 >(({ rating, variant = "general", style, ...props }, ref) => {
 	const { colors } = useTheme();

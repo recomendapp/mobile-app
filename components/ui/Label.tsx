@@ -3,7 +3,7 @@ import * as React from 'react';
 import { TextProps } from 'react-native';
 import { ThemedText } from './ThemedText';
 
-const Label = React.forwardRef<React.ElementRef<typeof ThemedText>, TextProps>(
+const Label = React.forwardRef<React.ComponentRef<typeof ThemedText>, TextProps>(
 	({ style, ...props }, ref) => {
 		return (
 			<ThemedText

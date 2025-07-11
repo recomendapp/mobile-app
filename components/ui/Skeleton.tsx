@@ -1,4 +1,4 @@
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import * as React from 'react';
 import Animated, {
   useAnimatedStyle,
@@ -16,7 +16,7 @@ interface SkeletonProps
   }
 
 const Skeleton = React.forwardRef<
-  React.ElementRef<typeof Animated.View>,
+  React.ComponentRef<typeof Animated.View>,
   SkeletonProps
 >(({ style, borderRadius = 6, ...props }, ref) => {
   const { colors } = useTheme();

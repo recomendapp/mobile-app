@@ -1,6 +1,6 @@
 import { CardUser } from "@/components/cards/CardUser";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { useSearchUsersInfiniteQuery } from "@/features/search/searchQueries";
 import tw from "@/lib/tw";
 import { FlashList } from "@shopify/flash-list";

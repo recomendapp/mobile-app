@@ -1,5 +1,5 @@
 import { Alert, ImageBackground, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View} from 'react-native';
-import { useAuth } from '@/context/AuthProvider';
+import { useAuth } from '@/providers/AuthProvider';
 import { useEffect, useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,7 +16,7 @@ import { Icons } from '@/constants/Icons';
 import { InputPassword } from '@/components/ui/InputPassword';
 import { Label } from '@/components/ui/Label';
 import tw from '@/lib/tw';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 
 const backgroundImages = [
 	require('@/assets/images/auth/signup/background/1.gif'),

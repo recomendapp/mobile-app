@@ -1,11 +1,11 @@
 import { Tabs } from 'expo-router';
 import { Icons } from "@/constants/Icons";
 import { Platform } from 'react-native';
-import { useAuth } from '@/context/AuthProvider';
+import { useAuth } from '@/providers/AuthProvider';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HapticTab } from '@/components/HapticTab';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import TabBarBackground from '@/components/TabBar/TabBarBackground';
 
 const TabsLayout = () => {

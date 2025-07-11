@@ -5,13 +5,13 @@ import { Icons } from '@/constants/Icons';
 import { Playlist } from '@/types/type.db';
 import { usePathname, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
-import { useAuth } from '@/context/AuthProvider';
+import { useAuth } from '@/providers/AuthProvider';
 import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
 import * as Burnt from 'burnt';
 import BottomSheetPlaylistEdit from './BottomSheetPlaylistEdit';
@@ -19,6 +19,7 @@ import { useUserPlaylistSavedQuery } from '@/features/user/userQueries';
 import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation } from '@/features/user/userMutations';
 import BottomSheetPlaylistGuests from './BottomSheetPlaylistGuests';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 
 interface BottomSheetPlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -36,7 +37,7 @@ interface Item {
 }
 
 const BottomSheetPlaylist = React.forwardRef<
-  React.ElementRef<typeof TrueSheet>,
+  React.ComponentRef<typeof TrueSheet>,
   BottomSheetPlaylistProps
 >(({ id, playlist, additionalItemsTop = [], ...props }, ref) => {
   const { user } = useAuth();
@@ -169,62 +170,47 @@ const BottomSheetPlaylist = React.forwardRef<
     ]
   }, [playlist, user, saved, additionalItemsTop, colors, t, router, closeSheet, id, createConfirmSheet, playlistDeleteMutation, insertPlaylistSaved, deletePlaylistSaved]);
   return (
-    <TrueSheet
-    ref={ref}
-    onLayout={async () => {
-      if (typeof ref === 'object' && ref?.current?.present) {
-        await ref.current.present();
-      };
-    }}
-    {...props}
-    >
+  <ThemedTrueSheet ref={ref} {...props}>
       <View
       style={[
-        { paddingBottom: inset.bottom },
-        tw`flex-1`,
+        { borderColor: colors.muted },
+        tw`flex-row items-center gap-2 border-b p-4`,
       ]}
       >
-        <View
+        <ImageWithFallback
+        alt={playlist.title ?? ''}
+        source={{ uri: playlist.poster_url ?? '' }}
         style={[
-          { borderColor: colors.muted },
-          tw`flex-row items-center gap-2 border-b p-4`,
+          { aspectRatio: 1 / 1, height: 'fit-content' },
+          tw.style('rounded-md w-12'),
         ]}
-        >
-          <ImageWithFallback
-          alt={playlist.title ?? ''}
-          source={{ uri: playlist.poster_url ?? '' }}
-          style={[
-            { aspectRatio: 1 / 1, height: 'fit-content' },
-            tw.style('rounded-md w-12'),
-          ]}
-          />
-          <View style={tw`shrink`}>
-            <ThemedText numberOfLines={2} style={tw`shrink`}>{playlist.title}</ThemedText>
-            <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
-              {t('common.messages.by_name', { name: playlist.user?.username })}
-            </Text>
-          </View>
+        />
+        <View style={tw`shrink`}>
+          <ThemedText numberOfLines={2} style={tw`shrink`}>{playlist.title}</ThemedText>
+          <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
+            {t('common.messages.by_name', { name: playlist.user?.username })}
+          </Text>
         </View>
-        {items.map((group, i) => (
-          <React.Fragment key={i}>
-            {group.map((item, j) => (
-              <TouchableOpacity
-              key={j}
-              onPress={() => {
-                (item.closeSheet === undefined || item.closeSheet === true) && closeSheet(id);
-                item.onPress();
-              }}
-              style={[tw`flex-row items-center gap-2 p-4`, { opacity: item.disabled ? 0.5 : 1 }]}
-              disabled={item.disabled}
-              >
-                <item.icon color={colors.mutedForeground} size={20} />
-                <ThemedText>{item.label}</ThemedText>
-              </TouchableOpacity>
-            ))}
-          </React.Fragment>
-        ))}
       </View>
-    </TrueSheet>
+      {items.map((group, i) => (
+        <React.Fragment key={i}>
+          {group.map((item, j) => (
+            <TouchableOpacity
+            key={j}
+            onPress={() => {
+              (item.closeSheet === undefined || item.closeSheet === true) && closeSheet(id);
+              item.onPress();
+            }}
+            style={[tw`flex-row items-center gap-2 p-4`, { opacity: item.disabled ? 0.5 : 1 }]}
+            disabled={item.disabled}
+            >
+              <item.icon color={colors.mutedForeground} size={20} />
+              <ThemedText>{item.label}</ThemedText>
+            </TouchableOpacity>
+          ))}
+        </React.Fragment>
+      ))}
+    </ThemedTrueSheet>
   );
 });
 BottomSheetPlaylist.displayName = 'BottomSheetPlaylist';

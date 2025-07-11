@@ -1,8 +1,6 @@
 import React from 'react';
-import tw from '@/lib/tw';
-import { useTheme } from '@/context/ThemeProvider';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import { View } from 'react-native';
+import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 
 interface BottomSheetDefaultViewProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -10,29 +8,13 @@ interface BottomSheetDefaultViewProps extends Omit<React.ComponentPropsWithoutRe
 }
 
 const BottomSheetDefaultView = React.forwardRef<
-	React.ElementRef<typeof TrueSheet>,
+	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetDefaultViewProps
 >(({ id, content, ...props }, ref) => {
-  const { inset } = useTheme();
   return (
-    <TrueSheet
-    ref={ref}
-    onLayout={async () => {
-      if (typeof ref === 'object' && ref?.current?.present) {
-        await ref.current.present();
-      };
-    }}
-    {...props}
-    >
-      <View
-      style={[
-        { paddingBottom: inset.bottom },
-        tw`flex-1`,
-      ]}
-      >
-        {content}
-      </View>
-    </TrueSheet>
+    <ThemedTrueSheet ref={ref} {...props}>
+      {content}
+    </ThemedTrueSheet>
   );
 });
 BottomSheetDefaultView.displayName = 'BottomSheetDefaultView';

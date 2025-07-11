@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Animated from 'react-native-reanimated';
-import { useAuth } from '@/context/AuthProvider';
+import { useAuth } from '@/providers/AuthProvider';
 import { FlatList, ScrollView, View } from 'react-native';
 import { UserNav } from '@/components/user/UserNav';
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
@@ -34,7 +34,7 @@ const HomeScreen = () => {
             { paddingBottom: bottomTabHeight + 8 },
           ]}
           showsVerticalScrollIndicator={false}
-          ListHeaderComponent={() => (
+          ListHeaderComponent={
             <>
               <WidgetMostRecommended />
               {session ? (
@@ -55,7 +55,7 @@ const HomeScreen = () => {
                 </>
               )}
             </>
-          )}
+          }
           ListHeaderComponentStyle={tw`gap-2`}
           nestedScrollEnabled
           />

@@ -11,7 +11,7 @@ import { ColumnFiltersState, flexRender, getCoreRowModel, getFacetedRowModel, ge
 import { Columns } from "./components/columns";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { DataTableToolbar } from "./components/data-table-toolbar";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 
 interface TableWatchlistProps {
 	watchlist: UserWatchlist[];

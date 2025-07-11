@@ -1,4 +1,4 @@
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { UserActivity } from "@/types/type.db";
 import * as React from "react"
@@ -22,7 +22,7 @@ interface CardUserActivityProps
 	}
 
 const CardUserActivityDefault = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	Omit<CardUserActivityProps, "variant">
 >(({ style, activity, children, showReview, ...props }, ref) => {
 	const { colors } = useTheme();
@@ -79,7 +79,7 @@ const CardUserActivityDefault = React.forwardRef<
 CardUserActivityDefault.displayName = "CardUserActivityDefault";
 
 const CardUserActivity = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	CardUserActivityProps
 >(({ variant = "default", linked = false, ...props }, ref) => {
 	const router = useRouter();

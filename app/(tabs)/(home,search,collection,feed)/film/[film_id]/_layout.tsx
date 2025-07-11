@@ -15,7 +15,7 @@ import { useMediaMovieDetailsQuery } from '@/features/media/mediaQueries';
 import { ParamListBase, TabNavigationState } from '@react-navigation/native';
 import { ThemedText } from '@/components/ui/ThemedText';
 import FilmHeader from '@/components/screens/film/FilmHeader';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import { ThemedAnimatedView } from '@/components/ui/ThemedAnimatedView';
 import { createMaterialTopTabNavigator, MaterialTopTabBarProps, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions } from '@react-navigation/material-top-tabs';
@@ -132,15 +132,7 @@ const FilmLayout = () => {
 	const headerHeight = useSharedValue<number>(0);
 	const tabBarHeight = useSharedValue<number>(33);
 	const scrollY = useSharedValue<number>(0);
-
-	// useAnimatedReaction(
-	// 	() => headerScrollY.value,
-	// 	(value) => {
-	// 		'worklet';
-	// 		runOnJS(handleHeaderScroll)(value);
-	// 	}
-	// )
-
+	
 	return (
 	<FilmProvider
 	tabState={tabState}

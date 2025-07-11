@@ -1,12 +1,12 @@
 import React from "react"
 import { Pressable } from "react-native";
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import { AlertCircleIcon } from "lucide-react-native";
 import { useUserActivityInsertMutation, useUserActivityUpdateMutation } from "@/features/user/userMutations";
 import { IconMediaRating } from "../IconMediaRating";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMediaRating from "@/components/bottom-sheets/sheets/BottomSheetMediaRating";
 import { Media } from "@/types/type.db";
@@ -20,7 +20,7 @@ interface MediaActionUserActivityRatingProps
 	}
 
 const MediaActionUserActivityRating = React.forwardRef<
-	React.ElementRef<typeof Pressable>,
+	React.ComponentRef<typeof Pressable>,
 	MediaActionUserActivityRatingProps
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();

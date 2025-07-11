@@ -10,8 +10,8 @@ import { useUserActivityUpdateMutation } from '@/features/user/userMutations';
 import BottomSheetMedia from '@/components/bottom-sheets/sheets/BottomSheetMedia';
 import { Icons } from '@/constants/Icons';
 import * as Burnt from 'burnt';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useTheme } from '@/context/ThemeProvider';
+import { Pressable } from 'react-native-gesture-handler';
+import { useTheme } from '@/providers/ThemeProvider';
 
 export const Columns = () => {
 	const { colors } = useTheme();
@@ -71,11 +71,11 @@ export const Columns = () => {
 		{
 			id: 'actions',
 			cell: ({ row }) => (
-				<TouchableOpacity
+				<Pressable
 				onPress={() => handleOpenSheet(row.original)}
 				>
 					<Icons.EllipsisHorizontal color={colors.foreground}/>
-				</TouchableOpacity>
+				</Pressable>
 			),
 		},
 		// Sorting columns

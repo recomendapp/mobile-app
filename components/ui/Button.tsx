@@ -1,4 +1,4 @@
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import * as React from 'react';
 import { Pressable, PressableProps, StyleProp } from 'react-native';
@@ -17,7 +17,7 @@ interface ButtonTextProps
   }
 
 const ButtonText = React.forwardRef<
-  React.ElementRef<typeof Animated.Text>,
+  React.ComponentRef<typeof Animated.Text>,
   ButtonTextProps
 >(({ variant, style, ...props }, ref) => {
     const { colors } = useTheme();
@@ -79,7 +79,7 @@ interface ButtonProps
     pressableStyle?: StyleProp<PressableProps>;
   }
 
-const Button = React.forwardRef<React.ElementRef<typeof Animated.View>, ButtonProps>(
+const Button = React.forwardRef<React.ComponentRef<typeof Animated.View>, ButtonProps>(
   ({ variant, disabled, role = 'button', pressableStyle, style, ...props }, ref) => {
     const { colors } = useTheme();
     const variantStyles = React.useMemo(() => {

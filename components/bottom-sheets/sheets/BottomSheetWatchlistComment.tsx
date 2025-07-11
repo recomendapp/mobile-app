@@ -2,7 +2,7 @@ import React from 'react';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { UserWatchlist } from '@/types/type.db';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
@@ -12,6 +12,7 @@ import { Button, ButtonText } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
 import { ActivityIndicator, View } from 'react-native';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 
 interface BottomSheetWatchlistCommentProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -19,7 +20,7 @@ interface BottomSheetWatchlistCommentProps extends Omit<React.ComponentPropsWith
 };
 
 const BottomSheetWatchlistComment = React.forwardRef<
-  React.ElementRef<typeof TrueSheet>,
+  React.ComponentRef<typeof TrueSheet>,
   BottomSheetWatchlistCommentProps
 >(({ id, watchlistItem, ...props }, ref) => {
   const { closeSheet } = useBottomSheetStore();
@@ -62,22 +63,12 @@ const BottomSheetWatchlistComment = React.forwardRef<
 	});
   };
   return (
-    <TrueSheet
-    ref={ref}
-	onLayout={async () => {
-		if (typeof ref === 'object' && ref?.current?.present) {
-		  await ref.current.present();
-		};
-	}}
-    {...props}
-    >
-      <View
-      style={[
-        { paddingBottom: inset.bottom },
-        tw`flex-1 gap-2 px-4`,
-      ]}
-      >
-        <ThemedText style={tw`text-center text-xl font-bold`}>{upperFirst(t('common.messages.comment', { count: 1 }))}</ThemedText>
+    <ThemedTrueSheet
+	ref={ref}
+	contentContainerStyle={tw`gap-2 px-4`}
+	{...props}
+	>
+		<ThemedText style={tw`text-center text-xl font-bold`}>{upperFirst(t('common.messages.comment', { count: 1 }))}</ThemedText>
 		<Input
 		variant='outline'
 		multiline
@@ -90,8 +81,7 @@ const BottomSheetWatchlistComment = React.forwardRef<
 			{updateWatchlist.isPending ? <ActivityIndicator color={colors.background} /> : null}
 			<ButtonText>{upperFirst(t('common.word.save'))}</ButtonText>
 		</Button>
-      </View>
-    </TrueSheet>
+    </ThemedTrueSheet>
   );
 });
 BottomSheetWatchlistComment.displayName = 'BottomSheetWatchlistComment';

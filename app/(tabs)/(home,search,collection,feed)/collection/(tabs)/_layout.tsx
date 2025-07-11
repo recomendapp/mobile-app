@@ -4,7 +4,7 @@ import { Button, ButtonText } from "@/components/ui/Button";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { UserNav } from "@/components/user/UserNav";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
 import { ParamListBase, TabNavigationState } from "@react-navigation/native";

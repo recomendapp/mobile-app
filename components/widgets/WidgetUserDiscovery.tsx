@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useUserDiscoveryInfinite } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Link } from "expo-router";
@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { FlatList, Text, View } from "react-native";
 import { CardMedia } from "@/components/cards/CardMedia";
 import UserAvatar from "@/components/user/UserAvatar";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { CardUser } from "../cards/CardUser";

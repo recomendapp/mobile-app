@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { Redirect, Stack, withLayoutContext } from "expo-router";
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
 import { ParamListBase, TabNavigationState } from "@react-navigation/native";
@@ -7,7 +7,7 @@ import tw from "@/lib/tw";
 import Animated from "react-native-reanimated";
 import { Text, View } from "react-native";
 import { ThemedText } from "@/components/ui/ThemedText";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useTranslation } from "react-i18next";
 import { upperFirst } from "lodash";

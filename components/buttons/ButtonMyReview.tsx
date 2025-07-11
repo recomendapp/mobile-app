@@ -1,11 +1,11 @@
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityQuery } from "@/features/user/userQueries";
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
 import { Skeleton } from "../ui/Skeleton";
 import { Link } from "expo-router";
 import { FileEditIcon } from "lucide-react-native";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { ThemedText } from "../ui/ThemedText";
 import { TouchableOpacity, View } from "react-native";

@@ -7,7 +7,7 @@ import { DataTableSortOptions } from './data-table-sort-options';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Icons } from '@/constants/Icons';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }

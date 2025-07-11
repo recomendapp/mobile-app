@@ -1,6 +1,6 @@
-import ReviewForm from "@/components/screens/review/ReviewForm";
+// import ReviewForm from "@/components/screens/review/ReviewForm";
 import { Icons } from "@/constants/Icons";
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useMediaDetailsQuery } from "@/features/media/mediaQueries";
 import { useUserActivityQuery } from "@/features/user/userQueries";
 import { getIdFromSlug } from "@/hooks/getIdFromSlug";
@@ -37,11 +37,11 @@ const ReviewCreateScreen = () => {
 			</View>
 		);
 	};
-	return (
-	<ReviewForm
-	media={media}
-	/>
-	)
+	// return (
+	// <ReviewForm
+	// media={media}
+	// />
+	// )
 };
 
 export default ReviewCreateScreen;

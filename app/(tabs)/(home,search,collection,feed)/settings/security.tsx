@@ -1,4 +1,4 @@
-import { useSupabaseClient } from "@/context/SupabaseProvider";
+import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -9,7 +9,7 @@ import tw from "@/lib/tw";
 import { Label } from "@/components/ui/Label";
 import { InputPassword } from "@/components/ui/InputPassword";
 import { Button, ButtonText } from "@/components/ui/Button";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
 

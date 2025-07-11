@@ -1,6 +1,6 @@
 import { Button, ButtonText } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { upperFirst } from 'lodash';
@@ -15,9 +15,10 @@ import { Media } from '@/types/type.db';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useUserActivityQuery } from '@/features/user/userQueries';
-import { useAuth } from '@/context/AuthProvider';
+import { useAuth } from '@/providers/AuthProvider';
 import { useUserActivityInsertMutation, useUserActivityUpdateMutation } from '@/features/user/userMutations';
 import * as Burnt from 'burnt';
+import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 
 const { width } = Dimensions.get('screen');
 const ITEM_WIDTH = width * 0.2;
@@ -35,7 +36,7 @@ interface RatingItemProps
 	}
 
 const RatingItem = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	RatingItemProps
 >(({ index, totalItems, rating, scrollX, ...props }, ref) => {
 	const anim = useAnimatedStyle(() => ({
@@ -93,7 +94,7 @@ interface BottomSheetMediaRatingProps extends Omit<React.ComponentPropsWithoutRe
 	onRatingChange?: (rating: number | null) => void;
 };
 const BottomSheetMediaRating = React.forwardRef<
-	React.ElementRef<typeof TrueSheet>,
+	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetMediaRatingProps
 >(({ id, media, onRatingChange, sizes, ...props }, ref) => {
 	const { user } = useAuth();
@@ -210,13 +211,8 @@ const BottomSheetMediaRating = React.forwardRef<
 	};
 
 	return (
-		<TrueSheet
+		<ThemedTrueSheet
 		ref={ref}
-		onLayout={async () => {
-			if (typeof ref === 'object' && ref?.current?.present) {
-			  await ref.current.present();
-			};
-		}}
 		sizes={['auto']}
 		FooterComponent={() => (
 			<View style={[{ paddingBottom: inset.bottom }, tw`flex-1 flex-row gap-2 justify-between px-4`]}>
@@ -339,7 +335,7 @@ const BottomSheetMediaRating = React.forwardRef<
 			scrollEventThrottle={1000 / 60} // ~16ms
 			snapToInterval={ITEM_TOTAL_SIZE}
 			/>
-		</TrueSheet>
+		</ThemedTrueSheet>
 	);
 });
 BottomSheetMediaRating.displayName = 'BottomSheetMediaRating';

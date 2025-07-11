@@ -43,7 +43,6 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 	useEffect(() => {
 		supabase.auth.getSession().then(({data: { session }}) => {
 			setSession(session);
-			SplashScreen.hide();
 		});
 
 		supabase.auth.onAuthStateChange((_event, session) => {
@@ -62,6 +61,15 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			syncLanguage();
 		}
 	}, [user, i18n]);
+
+	useEffect(() => {
+		if (
+			session === null ||
+			(session !== undefined && user !== undefined)
+		) {
+			SplashScreen.hide();
+		}
+	}, [session, user]);
 
 	const login = async ({ email, password }: { email: string; password: string }) => {
 		const { error } = await supabase.auth.signInWithPassword({

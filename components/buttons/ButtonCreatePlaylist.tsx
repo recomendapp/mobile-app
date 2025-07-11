@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { Icons } from "@/constants/Icons";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { useRouter } from "expo-router";
 import BottomSheetPlaylistCreate from "../bottom-sheets/sheets/BottomSheetPlaylistCreate";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
@@ -13,7 +13,7 @@ interface ButtonCreatePlaylistProps extends Omit<React.ComponentPropsWithoutRef<
 };
 
 const ButtonCreatePlaylist = forwardRef<
-  React.ElementRef<typeof TouchableOpacity>,
+  React.ComponentRef<typeof TouchableOpacity>,
   ButtonCreatePlaylistProps
 >(({ size, color, onPress, redirectAfterCreate = true, ...props }, ref) => {
 	const { colors } = useTheme();

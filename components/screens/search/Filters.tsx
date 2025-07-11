@@ -1,5 +1,5 @@
 import { Button, ButtonText } from "@/components/ui/Button";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import useSearchStore from "@/stores/useSearchStore";
 import { upperFirst } from "lodash";

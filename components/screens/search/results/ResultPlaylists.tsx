@@ -1,6 +1,6 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { useSearchPlaylistsInfiniteQuery } from "@/features/search/searchQueries";
 import tw from "@/lib/tw";
 import { FlashList } from "@shopify/flash-list";
@@ -49,7 +49,7 @@ const ResultPlaylists = ({
 				</View>
 			)
 		)}
-		keyExtractor={(item) => String(item.id)}
+		keyExtractor={(item) => String(item.id)}		
 		numColumns={GRID_COLS}
 		showsVerticalScrollIndicator={false}
 		contentContainerStyle={{

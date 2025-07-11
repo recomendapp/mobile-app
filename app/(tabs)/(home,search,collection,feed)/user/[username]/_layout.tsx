@@ -4,7 +4,7 @@ import { ExternalPathString, Link, Slot, useLocalSearchParams } from "expo-route
 import ButtonUserFollow from "@/components/buttons/ButtonUserFollow";
 import UserAvatar from "@/components/user/UserAvatar";
 import { Icons } from "@/constants/Icons";
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { Pressable, View, Text, ActivityIndicator, ScrollView } from "react-native";
 import ProfileNav from "@/components/screens/user/ProfileNav";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
@@ -16,7 +16,7 @@ import { RefreshControl } from "react-native-gesture-handler";
 import { useQueryClient } from "@tanstack/react-query";
 import { userKeys } from "@/features/user/userKeys";
 import tw from "@/lib/tw";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 
 const ProfileLayout = () => {

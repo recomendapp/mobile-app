@@ -7,7 +7,7 @@ import { Dimensions, FlatList, View } from "react-native";
 import { Media, MediaMoviePerson } from "@/types/type.db";
 import { CardMedia } from "@/components/cards/CardMedia";
 import tw from "@/lib/tw";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { runOnJS, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useEffect } from "react";
@@ -79,7 +79,7 @@ const FilmScreen = () => {
 			minHeight: WINDOW_HEIGHT - (headerOverlayHeight.get() + tabBarHeight.get() + inset.top),
 		},
 	]}
-	ListHeaderComponent={() => (
+	ListHeaderComponent={
 		<>
 			{/* <View style={tw.style('h-96 bg-red-500')} /> */}
 			{/* SYNOPSIS */}
@@ -108,7 +108,7 @@ const FilmScreen = () => {
 				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
 			</View> */}
 		</>
-	)}
+	}
 	showsVerticalScrollIndicator={false}
 	data={[null]}
 	renderItem={() => null}
