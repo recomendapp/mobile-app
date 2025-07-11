@@ -1,6 +1,6 @@
 import { Text, type TextProps } from 'react-native';
 import { forwardRef } from 'react';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 
 interface ThemedTextProps extends TextProps {
   lightColor?: string;

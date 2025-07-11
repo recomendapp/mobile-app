@@ -3,7 +3,7 @@ import { CardReview } from "@/components/cards/CardReview";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { useMediaMovieDetailsQuery, useMediaReviewsInfiniteQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -114,7 +114,7 @@ const FilmReviewsScreen = () => {
 				minHeight: WINDOW_HEIGHT - (headerOverlayHeight.get() + tabBarHeight.get() + inset.top)
 			},
 		]}
-		ListHeaderComponent={() => (
+		ListHeaderComponent={
 			<View style={tw`flex-row justify-between items-center gap-2`}>
 				<ButtonMyReview mediaId={movie?.media_id!} />
 				<View style={tw.style('flex flex-row justify-end items-center gap-2')}>
@@ -127,7 +127,7 @@ const FilmReviewsScreen = () => {
 					</Pressable>
 				</View>
 			</View>
-		)}
+		}
 		ListEmptyComponent={() => !loading ? <ThemedText style={tw.style('text-center')}>{upperFirst(t('common.messages.no_results'))}</ThemedText> : null}
 		onScroll={scrollHandler}
 		data={reviews?.pages.flat()}

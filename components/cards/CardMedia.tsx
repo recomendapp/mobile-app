@@ -6,7 +6,7 @@ import { ImageWithFallback } from "../utils/ImageWithFallback";
 import { Href, useRouter } from "expo-router";
 import tw from "@/lib/tw";
 import { Pressable, View } from "react-native";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMedia from "../bottom-sheets/sheets/BottomSheetMedia";
 import { IconMediaRating } from "../medias/IconMediaRating";
@@ -31,7 +31,7 @@ interface CardMediaProps
 	}
 
 const CardMediaDefault = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	Omit<CardMediaProps, "variant">
 >(({ style, media, activity, showAction, profileActivity, children, linked, showRating, posterClassName, ...props }, ref) => {
 	const { colors } = useTheme();
@@ -76,7 +76,7 @@ const CardMediaDefault = React.forwardRef<
 CardMediaDefault.displayName = "CardMediaDefault";
 
 const CardMediaPoster = React.forwardRef<
-React.ElementRef<typeof Animated.View>,
+React.ComponentRef<typeof Animated.View>,
 	Omit<CardMediaProps, "variant">
 >(({ style, media, activity, profileActivity, linked, disableActions, showRating, children, ...props }, ref) => {
 	return (
@@ -209,7 +209,7 @@ CardMediaPoster.displayName = "CardMediaPoster";
 // CardMediaRow.displayName = "CardMediaRow";
 
 const CardMedia = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	CardMediaProps
 >(({ hideMediaType = true, showRating = true, linked = true, variant = "default", ...props }, ref) => {
 	const router = useRouter();
@@ -219,10 +219,10 @@ const CardMedia = React.forwardRef<
 			router.push(props.media.url as Href);
 		}
 	};
-	const onLongPress = async () => {
-		await openSheet(BottomSheetMedia, {
+	const onLongPress = () => {
+		openSheet(BottomSheetMedia, {
 			media: props.media,
-		})
+		});
 	};
 	return (
 	<Pressable

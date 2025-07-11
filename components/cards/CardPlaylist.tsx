@@ -8,7 +8,7 @@ import { ThemedText } from '../ui/ThemedText';
 import { useRouter } from 'expo-router';
 import tw from '@/lib/tw';
 import { Text } from 'react-native';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import BottomSheetPlaylist from '../bottom-sheets/sheets/BottomSheetPlaylist';
 
@@ -21,7 +21,7 @@ interface CardPlaylistProps
 	}
 
 const CardPlaylistDefault = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	Omit<CardPlaylistProps, "variant">
 >(({ style, playlist, showPlaylistAuthor = true, showItemsCount = false, children, ...props }, ref) => {
 	const { t } = useTranslation();
@@ -58,7 +58,7 @@ const CardPlaylistDefault = React.forwardRef<
 CardPlaylistDefault.displayName = "CardPlaylistDefault";
 
 const CardPlaylist = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	CardPlaylistProps
 >(({ playlist, variant = "default", ...props }, ref) => {
 	const router = useRouter();

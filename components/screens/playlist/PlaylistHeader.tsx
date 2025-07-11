@@ -1,4 +1,4 @@
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import useColorConverter from "@/hooks/useColorConverter";
 import tw from "@/lib/tw";
 import React, { forwardRef } from "react";
@@ -25,7 +25,7 @@ interface PlaylistHeaderProps
 	}
 
 const PlaylistHeader = forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	PlaylistHeaderProps
 >(({ playlist, loading, headerHeight, headerOverlayHeight, scrollY, backdrops, ...props }, ref) => {
 	const { colors, inset } = useTheme();

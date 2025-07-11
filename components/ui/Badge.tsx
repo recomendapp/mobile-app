@@ -1,4 +1,4 @@
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import * as React from 'react';
 import { Pressable } from 'react-native';
@@ -16,7 +16,7 @@ interface BadgeTextProps
   }
 
 const BadgeText = React.forwardRef<
-  React.ElementRef<typeof Animated.Text>,
+  React.ComponentRef<typeof Animated.Text>,
   BadgeTextProps
 >(({ variant, style, ...props }, ref) => {
     const { colors } = useTheme();
@@ -72,7 +72,7 @@ interface BadgeProps
     onPress?: () => void;
   }
 
-const Badge = React.forwardRef<React.ElementRef<typeof Animated.View>, BadgeProps>(
+const Badge = React.forwardRef<React.ComponentRef<typeof Animated.View>, BadgeProps>(
   ({ variant, disabled, style, children, ...props }, ref) => {
     const { colors } = useTheme();
     const variantStyles = React.useMemo(() => {

@@ -2,14 +2,14 @@ import * as React from "react"
 import { Input } from "./Input"
 import { TextInput, TextInputProps, View } from "react-native"
 import { Pressable } from "react-native-gesture-handler"
-import { useTheme } from "@/context/ThemeProvider"
+import { useTheme } from "@/providers/ThemeProvider"
 import tw from "@/lib/tw"
 import { Icons } from "@/constants/Icons"
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {}
 
-const InputPassword = React.forwardRef<React.ElementRef<typeof TextInput>, TextInputProps>(
+const InputPassword = React.forwardRef<React.ComponentRef<typeof TextInput>, TextInputProps>(
   ({ style, secureTextEntry, ...props }, ref) => {
   const { colors } = useTheme()
   const [show, setShow] = React.useState(false);

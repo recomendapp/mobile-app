@@ -7,7 +7,7 @@ import Animated from "react-native-reanimated";
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import tw from "@/lib/tw";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { useTranslation } from "react-i18next";
 import useNow from "@/hooks/useNow";
 import { ThemedText } from "../ui/ThemedText";
@@ -25,7 +25,7 @@ interface CardReviewProps
 	}
 
 const CardReviewDefault = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	Omit<CardReviewProps, "variant">
 >(({ review, activity, author, linked, children, style, ...props }, ref) => {
 	const now = useNow({ updateInterval: 1000 * 10 });
@@ -76,7 +76,7 @@ CardReviewDefault.displayName = "CardReviewDefault";
 
 
 const CardReview = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	CardReviewProps
 >(({ review, linked = true, variant = "default", ...props }, ref) => {
 	const router = useRouter();

@@ -1,4 +1,4 @@
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import * as React from 'react';
 import { TextInput, type TextInputProps } from 'react-native';
@@ -8,7 +8,7 @@ interface InputProps
     variant?: 'default' | 'outline';
   }
 
-const Input = React.forwardRef<React.ElementRef<typeof TextInput>, InputProps>(
+const Input = React.forwardRef<React.ComponentRef<typeof TextInput>, InputProps>(
   ({ style, variant, placeholderTextColor, ...props }, ref) => {
     const { colors } = useTheme();
     const variantStyles = React.useMemo(() => {

@@ -1,7 +1,7 @@
 import React from "react"
 import { Pressable } from "react-native";
 import { Icons } from "@/constants/Icons";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { Media } from "@/types/type.db";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetSendReco from "@/components/bottom-sheets/sheets/BottomSheetSendReco";
@@ -14,7 +14,7 @@ interface MediaActionUserRecosProps
 	}
 
 const MediaActionUserRecos = React.forwardRef<
-	React.ElementRef<typeof Pressable>,
+	React.ComponentRef<typeof Pressable>,
 	MediaActionUserRecosProps
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();

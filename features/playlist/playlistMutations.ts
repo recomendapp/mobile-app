@@ -1,4 +1,4 @@
-import { useSupabaseClient } from "@/context/SupabaseProvider";
+import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { userKeys } from "../user/userKeys";
 import { matchQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Playlist } from "@/types/type.db";

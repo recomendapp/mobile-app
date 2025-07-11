@@ -1,4 +1,4 @@
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import { forwardRef } from 'react';
 import { View, ViewProps } from 'react-native';
 // import { SafeAreaView, SafeAreaViewProps } from 'react-native-safe-area-context';

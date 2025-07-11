@@ -1,6 +1,6 @@
 import { Link, LinkProps, usePathname } from "expo-router";
 import tw from "@/lib/tw";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import Animated from "react-native-reanimated";
 
 interface NavProfileProps {

@@ -3,7 +3,7 @@ import '~/lib/i18n';
 import { SplashScreen } from 'expo-router';
 import * as React from 'react';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
-import { Providers } from '@/context/Providers';
+import { Providers } from '@/providers/Providers';
 import Drawer from 'expo-router/drawer';
 import CustomDrawerContent from '@/components/drawer/CustomDrawerContent';
 import StatusBar from '@/components/StatusBar';

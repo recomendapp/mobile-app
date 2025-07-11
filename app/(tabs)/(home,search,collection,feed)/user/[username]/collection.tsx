@@ -2,7 +2,7 @@ import { CardMedia } from "@/components/cards/CardMedia";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText"
 import { Icons } from "@/constants/Icons";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { useUserActivitiesInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";
 import { useActionSheet } from "@expo/react-native-action-sheet";

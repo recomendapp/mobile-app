@@ -1,8 +1,8 @@
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { playlistKeys } from "./playlistKeys";
 import { Playlist, PlaylistGuest, PlaylistItem } from "@/types/type.db";
-import { useSupabaseClient } from "@/context/SupabaseProvider";
-import { useAuth } from "@/context/AuthProvider";
+import { useSupabaseClient } from "@/providers/SupabaseProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 export const usePlaylistFull = (playlistId: number) => {
 	const queryClient = useQueryClient();

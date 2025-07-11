@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { userKeys } from "./userKeys"
 import { UserFeedCastCrew, Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserReview, UserWatchlist, PlaylistType } from "@/types/type.db";
-import { useSupabaseClient } from "@/context/SupabaseProvider";
+import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { playlistKeys } from "../playlist/playlistKeys";
 
 /* ---------------------------------- USER ---------------------------------- */

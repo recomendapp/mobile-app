@@ -1,12 +1,12 @@
 import * as React from "react"
 import { upperFirst } from "lodash";
 import { Pressable, Text } from "react-native";
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useTranslation } from "react-i18next";
 import { useUserReviewLikeQuery } from "@/features/user/userQueries";
 import { useUserReviewLikeDeleteMutation, useUserReviewLikeInsertMutation } from "@/features/user/userMutations";
 import { usePathname, useRouter } from "expo-router";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { Icons } from "@/constants/Icons";
 import Animated from "react-native-reanimated";
 import tw from "@/lib/tw";
@@ -19,7 +19,7 @@ interface ActionReviewLikeProps
 	}
 
 const ActionReviewLike = React.forwardRef<
-	React.ElementRef<typeof Animated.View>,
+	React.ComponentRef<typeof Animated.View>,
 	ActionReviewLikeProps
 >(({ reviewId, reviewLikesCount, style, ...props }, ref) => {
 	const { colors } = useTheme();

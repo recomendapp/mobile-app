@@ -1,10 +1,10 @@
 import React from "react"
 import { Pressable } from "react-native";
 import { Icons } from "@/constants/Icons";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { Media } from "@/types/type.db";
-import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetAddToPlaylist from "@/components/bottom-sheets/sheets/BottomSheetAddToPlaylist";
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
 
 const ICON_SIZE = 30;
 
@@ -14,7 +14,7 @@ interface MediaActionPlaylistAddProps
 	}
 
 const MediaActionPlaylistAdd = React.forwardRef<
-	React.ElementRef<typeof Pressable>,
+	React.ComponentRef<typeof Pressable>,
 	MediaActionPlaylistAddProps
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();

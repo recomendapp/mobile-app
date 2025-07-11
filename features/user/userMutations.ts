@@ -2,8 +2,8 @@
 import { User, UserActivity, UserFollower, UserRecosAggregated, UserWatchlist } from '@/types/type.db';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { userKeys } from './userKeys';
-import { useSupabaseClient } from '@/context/SupabaseProvider';
-import { useAuth } from '@/context/AuthProvider';
+import { useSupabaseClient } from '@/providers/SupabaseProvider';
+import { useAuth } from '@/providers/AuthProvider';
 import { mediaKeys } from '../media/mediaKeys';
 
 export const useUserUpdateMutation = ({

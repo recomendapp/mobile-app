@@ -2,7 +2,7 @@ import { UserActivity } from "@/types/type.db";
 import { Skeleton } from "@/components/ui/Skeleton";
 import tw from "@/lib/tw";
 import { View } from "react-native";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { forwardRef } from "react";
 import { AnimatedImageWithFallback } from "@/components/ui/AnimatedImageWithFallback";
 import { CardUser } from "@/components/cards/CardUser";
@@ -14,7 +14,7 @@ interface FeedItemProps
   }
 
 const FeedItem = forwardRef<
-	React.ElementRef<typeof View>,
+	React.ComponentRef<typeof View>,
 	FeedItemProps
 >(({ activity, ...props }, ref) => {
 	const { colors } = useTheme();

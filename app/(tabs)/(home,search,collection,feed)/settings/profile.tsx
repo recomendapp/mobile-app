@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/ui/ThemedText";
-import { useAuth } from "@/context/AuthProvider";
-import { useTheme } from "@/context/ThemeProvider";
+import { useAuth } from "@/providers/AuthProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { useUserUpdateMutation } from "@/features/user/userMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";

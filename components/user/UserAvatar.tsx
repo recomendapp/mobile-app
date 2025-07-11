@@ -10,7 +10,7 @@ interface UserAvatarProps extends Omit<React.ComponentPropsWithRef<typeof Avatar
 }
 
 const UserAvatar = React.forwardRef<
-	React.ElementRef<typeof Avatar.Root>,
+	React.ComponentRef<typeof Avatar.Root>,
 	UserAvatarProps
 >(({ full_name, avatar_url, skeleton, style, ...props }, ref) => {
 	if (!full_name || skeleton) {

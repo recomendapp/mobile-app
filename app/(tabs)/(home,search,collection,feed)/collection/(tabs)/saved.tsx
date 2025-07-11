@@ -1,6 +1,6 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistsSavedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { FlashList } from "@shopify/flash-list";
@@ -37,7 +37,6 @@ const CollectionSavedScreen = () => {
 			paddingBottom: tabBarHeight,
 		}}
 		keyExtractor={(_, index) => index.toString()}
-		estimatedItemSize={150}
 		showsVerticalScrollIndicator={false}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.3}

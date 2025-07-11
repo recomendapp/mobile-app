@@ -1,4 +1,4 @@
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { StatusBar as StatusBarNative, StatusBarProps } from "expo-status-bar";
 
 const StatusBar = (props: StatusBarProps) => {

@@ -2,7 +2,7 @@ import * as React from "react";
 import { Link, LinkProps, usePathname } from "expo-router";
 import Animated from "react-native-reanimated";
 import tw from "@/lib/tw";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { View, Text } from "react-native";
 
 interface FilmNavProps extends React.ComponentPropsWithRef<Animated.View> {

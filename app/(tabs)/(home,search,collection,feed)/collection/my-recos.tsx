@@ -1,6 +1,6 @@
 import HeaderOverlay from "@/components/ui/HeaderOverlay";
 import { ThemedAnimatedView } from "@/components/ui/ThemedAnimatedView";
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useUserRecosQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { capitalize } from "lodash";

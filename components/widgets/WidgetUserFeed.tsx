@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useUserFeedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { useTranslation } from "react-i18next";

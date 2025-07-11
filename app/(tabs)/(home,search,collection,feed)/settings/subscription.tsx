@@ -1,5 +1,5 @@
 
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { Text } from "react-native";
 import Animated from "react-native-reanimated";

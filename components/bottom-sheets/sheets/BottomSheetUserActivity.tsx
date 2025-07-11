@@ -5,7 +5,7 @@ import { Icons } from '@/constants/Icons';
 import { Media, UserActivity } from '@/types/type.db';
 import { LinkProps, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
@@ -14,6 +14,7 @@ import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import BottomSheetSendReco from './BottomSheetSendReco';
 import BottomSheetAddToPlaylist from './BottomSheetAddToPlaylist';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 
 interface BottomSheetUserActivityProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -30,7 +31,7 @@ interface Item {
 }
 
 const BottomSheetUserActivity = React.forwardRef<
-  React.ElementRef<typeof TrueSheet>,
+  React.ComponentRef<typeof TrueSheet>,
   BottomSheetUserActivityProps
 >(({ id, activity: { media, ...activity}, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const { closeSheet, openSheet } = useBottomSheetStore();
@@ -79,61 +80,46 @@ const BottomSheetUserActivity = React.forwardRef<
   ]), [media]);
 
   return (
-    <TrueSheet
-    ref={ref}
-    onLayout={async () => {
-      if (typeof ref === 'object' && ref?.current?.present) {
-        await ref.current.present();
-      };
-    }}
-    {...props}
-    >
+    <ThemedTrueSheet ref={ref} {...props}>
       <View
       style={[
-        { paddingBottom: inset.bottom },
-        tw`flex-1`,
+        { borderColor: colors.muted },
+        tw`flex-row items-center gap-2 border-b p-4`,
       ]}
       >
-        <View
+        <ImageWithFallback
+        alt={media?.title ?? ''}
+        source={{ uri: media?.avatar_url ?? '' }}
         style={[
-          { borderColor: colors.muted },
-          tw`flex-row items-center gap-2 border-b p-4`,
+          { aspectRatio: 2 / 3, height: 'fit-content' },
+          tw.style('rounded-md w-12'),
         ]}
-        >
-          <ImageWithFallback
-          alt={media?.title ?? ''}
-          source={{ uri: media?.avatar_url ?? '' }}
-          style={[
-            { aspectRatio: 2 / 3, height: 'fit-content' },
-            tw.style('rounded-md w-12'),
-          ]}
-          />
-          <View style={tw`shrink`}>
-            <ThemedText numberOfLines={2} style={tw`shrink`}>{media?.title}</ThemedText>
-            <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
-              {media?.main_credit?.map((director) => director.title).join(', ')}
-            </Text>
-          </View>
+        />
+        <View style={tw`shrink`}>
+          <ThemedText numberOfLines={2} style={tw`shrink`}>{media?.title}</ThemedText>
+          <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
+            {media?.main_credit?.map((director) => director.title).join(', ')}
+          </Text>
         </View>
-        {items.map((group, i) => (
-          <React.Fragment key={i}>
-            {group.map((item, j) => (
-              <TouchableOpacity
-              key={j}
-              onPress={() => {
-                closeSheet(id);
-                item.onPress();
-              }}
-              style={tw`flex-row items-center gap-2 p-4`}
-              >
-                <item.icon color={colors.mutedForeground} size={20} />
-                <ThemedText>{item.label}</ThemedText>
-              </TouchableOpacity>
-            ))}
-          </React.Fragment>
-        ))}
       </View>
-    </TrueSheet>
+      {items.map((group, i) => (
+        <React.Fragment key={i}>
+          {group.map((item, j) => (
+            <TouchableOpacity
+            key={j}
+            onPress={() => {
+              closeSheet(id);
+              item.onPress();
+            }}
+            style={tw`flex-row items-center gap-2 p-4`}
+            >
+              <item.icon color={colors.mutedForeground} size={20} />
+              <ThemedText>{item.label}</ThemedText>
+            </TouchableOpacity>
+          ))}
+        </React.Fragment>
+      ))}
+    </ThemedTrueSheet>
   );
 });
 BottomSheetUserActivity.displayName = 'BottomSheetUserActivity';

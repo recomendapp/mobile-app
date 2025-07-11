@@ -1,6 +1,6 @@
 import React from 'react';
 import tw from '@/lib/tw';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
@@ -15,11 +15,12 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import * as ImagePicker from 'expo-image-picker';
-import { useSupabaseClient } from '@/context/SupabaseProvider';
+import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { decode } from 'base64-arraybuffer';
 import Switch from '@/components/ui/Switch';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { Input } from '@/components/ui/Input';
+import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 
 interface BottomSheetPlaylistEditProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -32,7 +33,7 @@ const TITLE_MAX_LENGTH = 100;
 const DESCRIPTION_MAX_LENGTH = 300;
 
 const BottomSheetPlaylistEdit = React.forwardRef<
-	React.ElementRef<typeof TrueSheet>,
+	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetPlaylistEditProps
 >(({ id, playlist, onEdit, sizes, ...props }, ref) => {
   const supabase = useSupabaseClient();
@@ -181,107 +182,96 @@ const BottomSheetPlaylistEdit = React.forwardRef<
   };
 
   return (
-    <TrueSheet
+    <ThemedTrueSheet
     ref={ref}
-    onLayout={async () => {
-      if (typeof ref === 'object' && ref?.current?.present) {
-        await ref.current.present();
-      };
-    }}
     sizes={['large']}
+    contentContainerStyle={tw`gap-4 items-center mx-2`}
     {...props}
     >
-      <View
-      style={[
-        { paddingBottom: inset.bottom },
-        tw`flex-1 gap-4 items-center mx-2`,
-      ]}
-      >
-        <View style={tw`flex-row items-center justify-between w-full`}>
-          <TouchableOpacity
-          onPress={() => closeSheet(id)}
-          >
-            <ThemedText>{upperFirst(t('common.word.cancel'))}</ThemedText>
-          </TouchableOpacity>
-          <ThemedText style={tw`font-bold`}>
-            {upperFirst(t('common.playlist.actions.edit'))}
-          </ThemedText>
-          <TouchableOpacity
-          onPress={form.handleSubmit(submit)}
-          disabled={updatePlaylistMutation.isPending}
-          >
-            <ThemedText>{upperFirst(t('common.word.save'))}</ThemedText>
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity onPress={handlePosterOptions} style={tw`relative aspect-square rounded-md overflow-hidden w-2/4`}>
-          <ImageWithFallback
-            source={{uri: newPoster !== undefined ? (newPoster?.uri ?? '') : playlist.poster_url ?? ''}}
-            alt={playlist?.title ?? ''}
-            type="playlist"
-            style={{ backgroundColor: colors.background   }}
-          />
+      <View style={tw`flex-row items-center justify-between w-full`}>
+        <TouchableOpacity
+        onPress={() => closeSheet(id)}
+        >
+          <ThemedText>{upperFirst(t('common.word.cancel'))}</ThemedText>
         </TouchableOpacity>
-        <Controller
-        name='title'
-        control={form.control}
-        render={({ field: { onChange, onBlur, value} }) => (
-          <View style={tw`gap-2 w-full`}>
-            <Input
-            variant='outline'
-            placeholder={upperFirst(t('common.playlist.form.title.placeholder'))}
-            value={value}
-            autoCorrect={false}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            />
-            {form.formState.errors.title && (
-              <Text style={{ color: colors.destructive }}>
-                {form.formState.errors.title.message}
-              </Text>
-            )}
-          </View>
-        )}
-        />
-        <Controller
-        name='description'
-        control={form.control}
-        render={({ field: { onChange, onBlur, value} }) => (
-          <View style={tw`gap-2 w-full`}>
-            <Input
-            variant='outline'
-            placeholder={upperFirst(t('common.word.description'))}
-            style={tw`h-24`}
-            multiline
-            value={value ?? ''}
-            autoCorrect={false}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            />
-            {form.formState.errors.description && (
-              <Text style={{ color: colors.destructive }}>
-                {form.formState.errors.description.message}
-              </Text>
-            )}
-          </View>
-        )}
-        />
-        <View style={tw`w-full flex-row items-center justify-between gap-1`}>
-          <Controller
-          name='private'
-          control={form.control}
-          render={({ field: { onChange, onBlur, value} }) => (
-            <View style={tw`flex-row items-center gap-2`}>
-              <ThemedText>{upperFirst(t('common.messages.private', { context: 'female' }))}</ThemedText>
-              <Switch
-              value={value}
-              onValueChange={onChange}
-              />
-            </View>
-          )}
-          />
-        </View>
+        <ThemedText style={tw`font-bold`}>
+          {upperFirst(t('common.playlist.actions.edit'))}
+        </ThemedText>
+        <TouchableOpacity
+        onPress={form.handleSubmit(submit)}
+        disabled={updatePlaylistMutation.isPending}
+        >
+          <ThemedText>{upperFirst(t('common.word.save'))}</ThemedText>
+        </TouchableOpacity>
       </View>
-    </TrueSheet>
+      <TouchableOpacity onPress={handlePosterOptions} style={tw`relative aspect-square rounded-md overflow-hidden w-2/4`}>
+        <ImageWithFallback
+          source={{uri: newPoster !== undefined ? (newPoster?.uri ?? '') : playlist.poster_url ?? ''}}
+          alt={playlist?.title ?? ''}
+          type="playlist"
+          style={{ backgroundColor: colors.background   }}
+        />
+      </TouchableOpacity>
+      <Controller
+      name='title'
+      control={form.control}
+      render={({ field: { onChange, onBlur, value} }) => (
+        <View style={tw`gap-2 w-full`}>
+          <Input
+          variant='outline'
+          placeholder={upperFirst(t('common.playlist.form.title.placeholder'))}
+          value={value}
+          autoCorrect={false}
+          onBlur={onBlur}
+          onChangeText={onChange}
+          />
+          {form.formState.errors.title && (
+            <Text style={{ color: colors.destructive }}>
+              {form.formState.errors.title.message}
+            </Text>
+          )}
+        </View>
+      )}
+      />
+      <Controller
+      name='description'
+      control={form.control}
+      render={({ field: { onChange, onBlur, value} }) => (
+        <View style={tw`gap-2 w-full`}>
+          <Input
+          variant='outline'
+          placeholder={upperFirst(t('common.word.description'))}
+          style={tw`h-24`}
+          multiline
+          value={value ?? ''}
+          autoCorrect={false}
+          onBlur={onBlur}
+          onChangeText={onChange}
+          />
+          {form.formState.errors.description && (
+            <Text style={{ color: colors.destructive }}>
+              {form.formState.errors.description.message}
+            </Text>
+          )}
+        </View>
+      )}
+      />
+      <View style={tw`w-full flex-row items-center justify-between gap-1`}>
+        <Controller
+        name='private'
+        control={form.control}
+        render={({ field: { onChange, onBlur, value} }) => (
+          <View style={tw`flex-row items-center gap-2`}>
+            <ThemedText>{upperFirst(t('common.messages.private', { context: 'female' }))}</ThemedText>
+            <Switch
+            value={value}
+            onValueChange={onChange}
+            />
+          </View>
+        )}
+        />
+      </View>
+    </ThemedTrueSheet>
   );
 });
 BottomSheetPlaylistEdit.displayName = 'BottomSheetPlaylistEdit';

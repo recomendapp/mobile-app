@@ -1,4 +1,4 @@
-import { useSupabaseClient } from "@/context/SupabaseProvider";
+import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { searchKeys } from "./searchKeys";
 import { useTranslation } from "react-i18next";

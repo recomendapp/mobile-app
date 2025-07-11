@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { mediaKeys } from "./mediaKeys";
-import { useSupabaseClient } from "@/context/SupabaseProvider";
+import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { Media, MediaMovie } from "@/types/type.db";
 
 /* --------------------------------- DETAILS -------------------------------- */

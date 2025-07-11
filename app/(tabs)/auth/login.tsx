@@ -1,5 +1,5 @@
 import { Alert, ImageBackground, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View} from 'react-native';
-import { useAuth } from '@/context/AuthProvider';
+import { useAuth } from '@/providers/AuthProvider';
 import { useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -9,7 +9,7 @@ import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { InputPassword } from '@/components/ui/InputPassword';
 import tw from '@/lib/tw';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import { Label } from '@/components/ui/Label';
 
 const backgroundImages = [

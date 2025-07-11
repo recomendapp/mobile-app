@@ -2,13 +2,14 @@ import React from 'react';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { UserRecosAggregated } from '@/types/type.db';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import { View } from 'react-native';
 import { CardUser } from '@/components/cards/CardUser';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { FlashList } from '@shopify/flash-list';
+import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 
 interface BottomSheetMyRecosSendersProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -16,22 +17,17 @@ interface BottomSheetMyRecosSendersProps extends Omit<React.ComponentPropsWithou
 };
 
 const BottomSheetMyRecosSenders = React.forwardRef<
-  React.ElementRef<typeof TrueSheet>,
+  React.ComponentRef<typeof TrueSheet>,
   BottomSheetMyRecosSendersProps
 >(({ id, comments, sizes, ...props }, ref) => {
   const { colors, inset } = useTheme();
   const { t } = useTranslation();
-  const flashlistRef = React.useRef<FlashList<any>>(null);
+  const flashlistRef = React.useRef<FlashList<UserRecosAggregated['senders'][number]>>(null);
   return (
-    <TrueSheet
+    <ThemedTrueSheet
     ref={ref}
-	onLayout={async () => {
-		if (typeof ref === 'object' && ref?.current?.present) {
-		  await ref.current.present();
-		};
-	}}
 	sizes={['large']}
-	scrollRef={flashlistRef}
+	scrollRef={flashlistRef as React.RefObject<React.Component<unknown, {}, any>>}
     {...props}
     >
 		<FlashList
@@ -49,9 +45,9 @@ const BottomSheetMyRecosSenders = React.forwardRef<
 				) : null}
 			</View>
 		)}
-		ListHeaderComponent={() => (
+		ListHeaderComponent={
 			<ThemedText style={tw`text-center text-xl font-bold`}>{upperFirst(t('common.messages.reco', { count: comments.length }))}</ThemedText>
-  		)}
+  		}
 		estimatedItemSize={100}
 		keyExtractor={(item) => item.user.id}
 		contentContainerStyle={{
@@ -62,7 +58,7 @@ const BottomSheetMyRecosSenders = React.forwardRef<
 		}}
 		ItemSeparatorComponent={() => <View style={tw`h-2`} />}
 		/>
-    </TrueSheet>
+    </ThemedTrueSheet>
   );
 });
 BottomSheetMyRecosSenders.displayName = 'BottomSheetMyRecosSenders';

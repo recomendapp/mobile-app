@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useUserWatchlistQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Link } from "expo-router";

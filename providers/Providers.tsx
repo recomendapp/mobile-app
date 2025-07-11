@@ -1,3 +1,4 @@
+import '@/lib/actions-sheet/sheets';
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { AuthProvider } from "./AuthProvider";
 import { ReactQueryProvider } from "./ReactQueryProvider";
@@ -13,10 +14,10 @@ type ProvidersProps = {
 
 const Providers = ({ children } : ProvidersProps) => {
 	return (
-	<GestureHandlerRootView style={{ flex: 1 }}>
+	<GestureHandlerRootView style={{ flex: 1 }}>	
 		<SafeAreaProvider>
-			<ActionSheetProvider>
-				<ThemeProvider>
+			<ThemeProvider>
+				<ActionSheetProvider>
 					<SupabaseProvider>
 						<ReactQueryProvider>
 							<AuthProvider>
@@ -25,8 +26,8 @@ const Providers = ({ children } : ProvidersProps) => {
 							</AuthProvider>
 						</ReactQueryProvider>
 					</SupabaseProvider>
-				</ThemeProvider>
-			</ActionSheetProvider>
+				</ActionSheetProvider>
+			</ThemeProvider>
 		</SafeAreaProvider>
 	</GestureHandlerRootView>
 	)

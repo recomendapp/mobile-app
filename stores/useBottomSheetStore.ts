@@ -1,20 +1,21 @@
 import { create } from 'zustand';
-import React, { ForwardRefExoticComponent, RefAttributes } from 'react';
+import React from 'react';
 import BottomSheetConfirm from '@/components/bottom-sheets/templates/BottomSheetConfirm';
 import * as Haptics from 'expo-haptics';
 import { SheetSize, TrueSheet } from '@lodev09/react-native-true-sheet';
 
 type BottomSheetContentComponent<T> =
   | React.ComponentType<T>
-  | ForwardRefExoticComponent<T & RefAttributes<TrueSheet>>;
+  | React.ForwardRefExoticComponent<T & React.RefAttributes<TrueSheet>>;
 
-type SheetState<T = any> = {
+export type SheetState<T = any> = {
   id: string;
   ref: React.RefObject<TrueSheet> | null;
   content: BottomSheetContentComponent<T>;
   props?: Omit<T, 'id' | 'open' | 'onOpenChange'>;
   sizes?: SheetSize[];
-  persistent: boolean; // Nouvelle propriété
+  persistent: boolean;
+  parentId?: string;
 };
 
 const generateSheetId = <T>(
@@ -34,8 +35,11 @@ type BottomSheetStore = {
   openSheet: <T>(
     content: BottomSheetContentComponent<T>,
     props: Omit<T, 'id' | 'open' | 'onOpenChange'>,
-    sizes?: SheetSize[] | null,
-    persistent?: boolean // Optionnel, défaut à false
+    options?: {
+      sizes?: SheetSize[] | null | undefined,
+      persistent?: boolean,
+      parentId?: string,
+    },
   ) => Promise<string>;
   closeSheet: (id: string) => Promise<void>;
   removeSheet: (id: string) => void;
@@ -55,8 +59,15 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
   openSheet: async <T>(
     content: BottomSheetContentComponent<T>,
     props: Omit<T, 'id' | 'open' | 'onOpenChange'>,
-    sizes: SheetSize[] | null | undefined = ['auto'],
-    persistent = false
+    options: {
+      sizes?: SheetSize[] | null;
+      persistent?: boolean;
+      parentId?: string;
+    } = {
+      sizes: undefined,
+      persistent: false,
+      parentId: undefined,
+    },
   ) => {
     const id = Math.random().toString(36).substring(7);
     // const id = generateSheetId(content, props);
@@ -65,7 +76,7 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
     if (process.env.EXPO_OS === 'ios') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    const sheetRef = React.createRef<TrueSheet>();
+    const sheetRef = React.createRef<TrueSheet>() as React.RefObject<TrueSheet>;
     set((state) => ({
       sheets: [
         ...state.sheets,
@@ -74,8 +85,9 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
           ref: sheetRef,
           content,
           props,
-          sizes: sizes === null ? [] : sizes,
-          persistent,
+          sizes: options.sizes === null ? [] : options.sizes,
+          persistent: options.persistent ?? false,
+          parentId: options.parentId,
         },
       ],
     }));
@@ -108,7 +120,10 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
       onCancel,
       cancelLabel,
       confirmLabel,
-    }, ['auto'], true);
+    }, {
+      sizes: ['auto'],
+      persistent: true,
+    });
   },
 }));
 

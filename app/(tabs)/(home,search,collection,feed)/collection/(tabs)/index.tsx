@@ -2,10 +2,10 @@ import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import useCollectionStaticRoutes, { type CollectionStaticRoute } from "@/components/screens/collection/useCollectionStaticRoutes";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { ThemedText } from "@/components/ui/ThemedText";
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistsInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, MasonryFlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
 import { View } from "react-native";
 
@@ -35,7 +35,6 @@ const CollectionScreen = () => {
 	return (
 		<FlashList
 		data={combinedItems}
-		// ignore typescript error
 		renderItem={({ item, index } : { item: any, index: number }) => {
 			if (item.type === 'static') {
 			  return (
@@ -61,7 +60,6 @@ const CollectionScreen = () => {
 			paddingBottom: tabBarHeight,
 		}}
 		keyExtractor={(_, index) => index.toString()}
-		estimatedItemSize={150}
 		showsVerticalScrollIndicator={false}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.3}

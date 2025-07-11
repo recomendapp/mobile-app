@@ -3,7 +3,7 @@ import FeedItem from "@/components/screens/feed/FeedItem";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { ThemedText } from "@/components/ui/ThemedText"
 import { ThemedView } from "@/components/ui/ThemedView"
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useUserFeedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { FlashList } from "@shopify/flash-list";

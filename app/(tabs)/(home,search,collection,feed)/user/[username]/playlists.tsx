@@ -2,7 +2,7 @@ import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText"
 import { Icons } from "@/constants/Icons";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import {  useUserPlaylistsInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";
 import { useActionSheet } from "@expo/react-native-action-sheet";

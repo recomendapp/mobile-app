@@ -1,6 +1,6 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { usePlaylistFeaturedInfiniteQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { FlatList, View } from "react-native";

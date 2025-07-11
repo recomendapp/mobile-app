@@ -8,7 +8,7 @@ import { Image, ImageProps, ImageSource } from 'expo-image';
 import tailwind from 'twrnc';
 import Animated from 'react-native-reanimated';
 import tw from '@/lib/tw';
-import { useTheme } from '@/context/ThemeProvider';
+import { useTheme } from '@/providers/ThemeProvider';
 
 interface ImageWithFallbackProps extends ComponentProps<typeof Animated.View> {
   source: ImageSource;

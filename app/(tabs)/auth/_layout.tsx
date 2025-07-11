@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { Redirect, Stack } from "expo-router";
 
 const AuthLayout = () => {

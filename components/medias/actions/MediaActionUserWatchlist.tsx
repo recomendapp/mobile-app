@@ -1,11 +1,11 @@
 import React from "react"
 import { Pressable } from "react-native";
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityQuery, useUserWatchlistItemQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import { AlertCircleIcon } from "lucide-react-native";
 import { useUserWatchlistDeleteMutation, useUserWatchlistInsertMutation } from "@/features/user/userMutations";
-import { useTheme } from "@/context/ThemeProvider";
+import { useTheme } from "@/providers/ThemeProvider";
 import { Media } from "@/types/type.db";
 import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
@@ -20,7 +20,7 @@ interface MediaActionUserWatchlistProps
 	}
 
 const MediaActionUserWatchlist = React.forwardRef<
-	React.ElementRef<typeof Pressable>,
+	React.ComponentRef<typeof Pressable>,
 	MediaActionUserWatchlistProps
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();
