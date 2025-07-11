@@ -133,10 +133,10 @@ const BottomSheetAddToPlaylist = React.forwardRef<
     >
       <FlatList
       ref={refFlatList}
-      contentContainerStyle={[tw`flex-1 px-2`, { paddingBottom: footerHeight.get() }]}
+      contentContainerStyle={[tw`px-2`, { paddingBottom: footerHeight.get() }]}
       ListHeaderComponent={
         <View style={[tw`gap-2 pb-2`, {paddingTop: 16, backgroundColor: colors.muted }]}>
-          <View style={tw`gap-2 p-2 justify-center items-center`}>
+          <View style={tw`gap-2 p-2`}>
             <ThemedText style={tw`font-bold text-center`}>Ajouter à une playlist</ThemedText>
             <FlashList
             data={selected}
@@ -156,7 +156,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
               </Pressable>
             )}
             style={tw`h-12`}
-            contentContainerStyle={tw`items-center justify-center gap-2`}
+            contentContainerStyle={tw`w-full items-center justify-center gap-2`}
             ListEmptyComponent={() => (
               <Text style={[{ color: colors.mutedForeground }, tw`text-center`]}>
                 Ajouter <Text style={tw`font-bold`}>{media?.title}</Text> à une playlist.
@@ -239,7 +239,9 @@ const BottomSheetAddToPlaylist = React.forwardRef<
           </View>
         </TouchableWithoutFeedback>
       )}
+      keyExtractor={(item) => item.playlist.id.toString()}
       nestedScrollEnabled
+      showsVerticalScrollIndicator={false}
       refreshing={isRefetching}
       />
       <BottomSheetPlaylistCreate
