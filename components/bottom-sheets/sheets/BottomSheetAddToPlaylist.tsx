@@ -164,6 +164,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
             )}
             horizontal
             showsHorizontalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={tw`w-1`} />}
             />
           </View>
           <Input

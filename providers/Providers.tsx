@@ -1,4 +1,3 @@
-import '@/lib/actions-sheet/sheets';
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { AuthProvider } from "./AuthProvider";
 import { ReactQueryProvider } from "./ReactQueryProvider";
