@@ -3,7 +3,7 @@ import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { Json, Playlist, User } from '@/types/type.db';
-import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { usePlaylistGuests } from '@/features/playlist/playlistQueries';
@@ -35,7 +35,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
 >(({ id, playlist, sizes, ...props }, ref) => {
   const supabase = useSupabaseClient();
   const { colors, inset } = useTheme();
-  const { closeSheet, createConfirmSheet, openSheet } = useBottomSheetStore();
+  const { closeSheet } = useBottomSheetStore();
   const { t } = useTranslation();
   const { user: loggedUser } = useAuth();
   const queryClient = useQueryClient();
@@ -48,12 +48,14 @@ const BottomSheetPlaylistGuests = React.forwardRef<
   const loading = isLoading || guestsRequest === undefined;
 
   const [guests, setGuests] = React.useState<{ user: User, edit: boolean }[] | undefined>(undefined);
-  React.useEffect(() => {
-    setGuests(guestsRequest?.map((guest) => ({
-      user: guest.user,
-      edit: guest.edit,
-    })));
+    React.useEffect(() => {
+      setGuests(guestsRequest?.map((guest) => ({
+        user: guest.user,
+        edit: guest.edit,
+      })));
   }, [guestsRequest]);
+  // REFs
+  const BottomSheetPlaylistGuestsAddRef = React.useRef<TrueSheet>(null);
 
   const hasChanges = React.useMemo(() => {
     if (!guestsRequest || !guests) return false;
@@ -149,15 +151,21 @@ const BottomSheetPlaylistGuests = React.forwardRef<
         <TouchableOpacity
         onPress={() => {
           if (hasChanges) {
-            createConfirmSheet({
-              title: 'Abandonner les modifications ?',
-              description: 'Si vous revenez en arrière maintenant, vous perdrez vos modifications.',
-              cancelLabel: 'Ignorer',
-              confirmLabel: 'Poursuivre la modification',
-              onCancel: () => {
-                closeSheet(id);
-              }
-            })
+            Alert.alert(
+              upperFirst(t('common.word.cancel')),
+              upperFirst(t('common.playlist.actions.edit_guests.modal.cancel_without_saving')),
+              [
+                {
+                  text: upperFirst(t('common.word.cancel')),
+                  style: 'cancel',
+                },
+                {
+                  text: upperFirst(t('common.messages.ignore')),
+                  onPress: () => closeSheet(id),
+                  style: 'destructive',
+                }
+              ]
+            )
           } else {
             closeSheet(id)
           }
@@ -167,7 +175,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
           <ThemedText>{upperFirst(t('common.word.cancel'))}</ThemedText>
         </TouchableOpacity>
         <ThemedText style={tw`flex-1 text-center font-bold`}>
-          {upperFirst(t('common.playlist.actions.edit_guests'))}
+          {upperFirst(t('common.playlist.actions.edit_guests.label'))}
         </ThemedText>
         <TouchableOpacity
         onPress={handleSave}
@@ -187,12 +195,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
           style={tw`flex-1`}
           />
           <TouchableOpacity
-          onPress={async () => await openSheet(BottomSheetPlaylistGuestsAdd, {
-            playlistId: playlist.id,
-            guests: guests,
-            onAdd: handleAddGuest,
-            onRemove: handleRemoveGuest,
-          })}
+          onPress={() => BottomSheetPlaylistGuestsAddRef.current?.present()}
           >
             <Icons.Add color={colors.foreground} />
           </TouchableOpacity>
@@ -252,6 +255,14 @@ const BottomSheetPlaylistGuests = React.forwardRef<
           />
         </View>
       </View>
+      <BottomSheetPlaylistGuestsAdd
+      ref={BottomSheetPlaylistGuestsAddRef}
+      id={`${id}-add-guests`}
+      playlistId={playlist.id}
+      guests={guests}
+      onAdd={handleAddGuest}
+      onRemove={handleRemoveGuest}
+      />
     </ThemedTrueSheet>
   );
 });

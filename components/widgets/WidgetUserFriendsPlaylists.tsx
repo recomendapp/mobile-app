@@ -1,20 +1,22 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserPlaylistsFriendsInfinite, useUserRecosQuery } from "@/features/user/userQueries";
+import { useUserPlaylistsFriendsInfinite } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { FlatList, Text, View } from "react-native";
-import { CardMedia } from "@/components/cards/CardMedia";
-import UserAvatar from "@/components/user/UserAvatar";
-import { useTheme } from "@/providers/ThemeProvider";
+import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { ThemedText } from "@/components/ui/ThemedText";
-import { ThemedView } from "@/components/ui/ThemedView";
 import { CardPlaylist } from "../cards/CardPlaylist";
+import { LegendList } from "@legendapp/list";
+
+interface WidgetUserFriendsPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
+  labelStyle?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
+}
 
 export const WidgetUserFriendsPlaylists = ({
   style,
-} : React.ComponentPropsWithoutRef<typeof View>) => {
-  const { colors } = useTheme();
+  labelStyle,
+  containerStyle,
+} : WidgetUserFriendsPlaylistsProps) => {
   const { t } = useTranslation();
   const { user } = useAuth();
 
@@ -29,17 +31,19 @@ export const WidgetUserFriendsPlaylists = ({
 
   return (
   <View style={[tw`flex-1 gap-2`, style]}>
-    <ThemedText style={tw`p-0 font-semibold text-xl`}>{t('widgets.user_friends_playlists.label')}</ThemedText>
-    <FlatList
+    <ThemedText style={[tw`font-semibold text-xl`, labelStyle]}>{t('widgets.user_friends_playlists.label')}</ThemedText>
+    <LegendList
     data={playlists.pages.flat()}
     renderItem={({ item }) => (
-      <View key={item.id} style={tw`w-36`}>
-        <CardPlaylist playlist={item} />
-      </View>
+      <CardPlaylist key={item.id} playlist={item} style={tw`w-36`} />
     )}
+    snapToInterval={148}
+    decelerationRate="fast"
+    keyExtractor={(item) => item.id.toString()}
     horizontal
     showsHorizontalScrollIndicator={false}
     ItemSeparatorComponent={() => <View style={tw`w-1`} />}
+    contentContainerStyle={containerStyle}
     nestedScrollEnabled
     />
   </View>

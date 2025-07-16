@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Animated from 'react-native-reanimated';
 import { useAuth } from '@/providers/AuthProvider';
-import { FlatList, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { UserNav } from '@/components/user/UserNav';
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
 import { ThemedText } from '@/components/ui/ThemedText';
@@ -26,39 +26,33 @@ const HomeScreen = () => {
       <ThemedSafeAreaView style={tw.style("flex-1")}>
         <View style={tw.style("flex-1 gap-2")}>
           <HomeHeader />
-          <FlatList
-          data={[]}
-          renderItem={null}
+          <ScrollView
           contentContainerStyle={[
-            tw`gap-2 px-2`,
+            tw`gap-2`,
             { paddingBottom: bottomTabHeight + 8 },
           ]}
           showsVerticalScrollIndicator={false}
-          ListHeaderComponent={
-            <>
-              <WidgetMostRecommended />
-              {session ? (
-                <>
-                <WidgetUserRecos />
-                <WidgetUserWatchlist />
-                <WidgetUserFriendsPlaylists />
-                <WidgetUserFeed />
-                <WidgetUserDiscovery />
-                </>
-              ) : (
-                <>
-                <Link href="/auth/login" asChild>
-                  <Button>
-                    <ButtonText>{upperFirst(t('common.messages.get_started_its_free'))}</ButtonText>
-                  </Button>
-                </Link>
-                </>
-              )}
-            </>
-          }
-          ListHeaderComponentStyle={tw`gap-2`}
           nestedScrollEnabled
-          />
+          >
+            <WidgetMostRecommended />
+            {session ? (
+              <>
+              <WidgetUserRecos labelStyle={tw`px-2`} containerStyle={tw`px-2`} />
+              <WidgetUserWatchlist labelStyle={tw`px-2`} containerStyle={tw`px-2`} />
+              <WidgetUserFriendsPlaylists labelStyle={tw`px-2`} containerStyle={tw`px-2`} />
+              <WidgetUserFeed labelStyle={tw`px-2`} containerStyle={tw`px-2`} />
+              <WidgetUserDiscovery labelStyle={tw`px-2`} containerStyle={tw`px-2`} />
+              </>
+            ) : (
+              <>
+              <Link href="/auth/login" asChild>
+                <Button>
+                  <ButtonText>{upperFirst(t('common.messages.get_started_its_free'))}</ButtonText>
+                </Button>
+              </Link>
+              </>
+            )}
+          </ScrollView>
         </View>
       </ThemedSafeAreaView>
   );

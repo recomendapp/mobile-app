@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import React from 'react';
-import BottomSheetConfirm from '@/components/bottom-sheets/templates/BottomSheetConfirm';
 import * as Haptics from 'expo-haptics';
 import { SheetSize, TrueSheet } from '@lodev09/react-native-true-sheet';
 
@@ -44,14 +43,6 @@ type BottomSheetStore = {
   closeSheet: (id: string) => Promise<void>;
   removeSheet: (id: string) => void;
   closeAll: () => void;
-  createConfirmSheet: (options: {
-    title: string;
-    description?: string | React.ReactNode;
-    onConfirm?: () => void | Promise<void>;
-    onCancel?: () => void | Promise<void>;
-    cancelLabel?: string;
-    confirmLabel?: string;
-  }) => Promise<string>;
 };
 
 const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
@@ -110,19 +101,6 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
       if (sheet.ref) {
         sheet.ref.current?.dismiss();
       }
-    });
-  },
-  createConfirmSheet: async ({ title, description, onConfirm, onCancel, cancelLabel, confirmLabel }) => {
-    return await get().openSheet(BottomSheetConfirm, {
-      title,
-      description,
-      onConfirm,
-      onCancel,
-      cancelLabel,
-      confirmLabel,
-    }, {
-      sizes: ['auto'],
-      persistent: true,
     });
   },
 }));

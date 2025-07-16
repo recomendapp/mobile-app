@@ -111,7 +111,8 @@
       "public": "public",
       "guest_one": "guest",
       "guest_other": "guests",
-      "ok": "ok"
+      "ok": "ok",
+      "ignore": "ignore"
     },
     "errors": {
       "not_logged_in": "you are not logged in",
@@ -239,7 +240,7 @@
           "modal": {
             "delete_confirm": {
               "title": "delete from the guidelist",
-              "description": "Are you sure you want to delete <important>{film}</important> from your guidelist?"
+              "description": "Are you sure you want to delete {{title}} from your guidelist?"
             }
           }
         },
@@ -251,11 +252,11 @@
           "modal": {
             "delete_confirm": {
               "title": "delete from my recos",
-              "description": "Are you sure you want to delete <important>{title}</important> from your recos?"
+              "description": "Are you sure you want to delete {{title}} from your recos?"
             },
             "complete_confirm": {
               "title": "complete the reco",
-              "description": "Are you sure you want to complete the reco <important>{title}</important>?"
+              "description": "Are you sure you want to complete the reco {{title}}?"
             }
           }
         },
@@ -267,7 +268,7 @@
           "modal": {
             "delete_confirm": {
               "title": "delete from the watchlist",
-              "description": "Are you sure you want to delete <important>{title}</important> from your watchlist?"
+              "description": "Are you sure you want to delete {{title}} from your watchlist?"
             }
           }
         },
@@ -279,7 +280,7 @@
           "modal": {
             "delete_confirm": {
               "title": "delete from the likes",
-              "description": "Are you sure you want to delete <important>{title}</important> from your likes?"
+              "description": "Are you sure you want to delete {{title}} from your likes?"
             }
           }
         }
@@ -293,7 +294,12 @@
         "delete": {
           "description": "This will permanently delete {{title}} from your library."
         },
-        "edit_guests": "Edit guests",
+        "edit_guests": {
+          "label": "Edit guests",
+          "modal": {
+            "cancel_without_saving": "Abandon changes without saving?"
+          }
+        },
         "add_guests": "Add guests"
       },
       "form": {
