@@ -13,11 +13,12 @@ import * as Burnt from 'burnt';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useTheme } from '@/providers/ThemeProvider';
 import BottomSheetWatchlistComment from '@/components/bottom-sheets/sheets/BottomSheetWatchlistComment';
+import { Alert } from 'react-native';
 
 export const Columns = () => {
 	const { colors } = useTheme();
 	const { t } = useTranslation();
-	const { openSheet, createConfirmSheet } = useBottomSheetStore();
+	const { openSheet } = useBottomSheetStore();
 	const deleteWatchlist = useUserWatchlistDeleteMutation();
 
 	const handleDeleteWatchlist = React.useCallback(async (id: number) => {
@@ -56,10 +57,21 @@ export const Columns = () => {
 				{
 					icon: Icons.Delete,
 					label: upperFirst(t('common.word.delete')),
-					onPress: async () => await createConfirmSheet({
-						title: capitalize(t('common.library.collection.watchlist.modal.delete_confirm.title')),
-						onConfirm: () => handleDeleteWatchlist(data.id),
-					})
+					onPress: () => Alert.alert(
+						capitalize(t('common.library.collection.watchlist.modal.delete_confirm.title')),
+						upperFirst(t('common.library.collection.watchlist.modal.delete_confirm.description', { title: data.media!.title })),
+						[
+							{
+								text: upperFirst(t('common.word.cancel')),
+								style: 'cancel',
+							},
+							{
+								text: upperFirst(t('common.word.delete')),
+								onPress: () => handleDeleteWatchlist(data.id),
+								style: 'destructive',
+							}
+						]
+					)
 				}
 			]
 		});

@@ -3,16 +3,23 @@ import { useUserRecosQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { FlatList, Text, View } from "react-native";
+import { StyleProp, Text, TextStyle, View, ViewStyle } from "react-native";
 import { CardMedia } from "@/components/cards/CardMedia";
 import UserAvatar from "@/components/user/UserAvatar";
 import { useTheme } from "@/providers/ThemeProvider";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
+import { LegendList } from "@legendapp/list";
+
+interface WidgetUserRecosProps extends React.ComponentPropsWithoutRef<typeof View> {
+  labelStyle?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
+}
 
 export const WidgetUserRecos = ({
   style,
-} : React.ComponentPropsWithoutRef<typeof View>) => {
+  labelStyle,
+  containerStyle
+}: WidgetUserRecosProps) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -33,10 +40,10 @@ export const WidgetUserRecos = ({
 
   return (
   <View style={[tw`gap-2`, style]}>
-    <Link href={'/collection/my-recos'} asChild>
-      <ThemedText style={tw`p-0 font-semibold text-xl`}>{t('widgets.user_recos.label')}</ThemedText>
+    <Link href={'/collection/my-recos'} style={[tw`font-semibold text-xl`, { color: colors.foreground }, labelStyle]}>
+      {t('widgets.user_recos.label')}
     </Link>
-    <FlatList
+    <LegendList
     data={recos}
     renderItem={({ item }) => (
       <View key={item.media_id} style={tw`flex-0.5`}>
@@ -61,6 +68,7 @@ export const WidgetUserRecos = ({
     )}
     numColumns={2}
     columnWrapperStyle={tw`gap-1`}
+    contentContainerStyle={containerStyle}
     ItemSeparatorComponent={() => <View style={tw`h-1`} />}
     nestedScrollEnabled
     />

@@ -13,11 +13,12 @@ import * as Burnt from 'burnt';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useTheme } from '@/providers/ThemeProvider';
 import BottomSheetMyRecosSenders from '@/components/bottom-sheets/sheets/BottomSheetMyRecosSenders';
+import { Alert } from 'react-native';
 
 export const Columns = () => {
 	const { colors } = useTheme();
 	const { t } = useTranslation();
-	const { openSheet, createConfirmSheet } = useBottomSheetStore();
+	const { openSheet } = useBottomSheetStore();
 	const deleteReco = useUserRecosDeleteMutation();
 	const completeReco = useUserRecosCompleteMutation();
 
@@ -70,10 +71,21 @@ export const Columns = () => {
 				{
 					icon: Icons.Check,
 					label: upperFirst(t('common.messages.complete')),
-					onPress: async () => await createConfirmSheet({
-						title: capitalize(t('common.library.collection.my_recos.modal.complete_confirm.title')),
-						onConfirm: () => handleCompleteReco(data.user_id!, data.media_id!),
-					})
+					onPress: () => Alert.alert(
+						capitalize(t('common.library.collection.my_recos.modal.complete_confirm.title')),
+						upperFirst(t('common.library.collection.my_recos.modal.complete_confirm.description', { title: data.media!.title })),
+						[
+							{
+								text: upperFirst(t('common.word.cancel')),
+								style: 'cancel',
+							},
+							{
+								text: upperFirst(t('common.messages.complete')),
+								onPress: () => handleCompleteReco(data.user_id!, data.media_id!),
+								style: 'default',
+							}
+						]
+					)
 				},
 				{
 					icon: Icons.Comment,
@@ -87,10 +99,21 @@ export const Columns = () => {
 				{
 					icon: Icons.Delete,
 					label: upperFirst(t('common.word.delete')),
-					onPress: async () => await createConfirmSheet({
-						title: capitalize(t('common.library.collection.my_recos.modal.delete_confirm.title')),
-						onConfirm: () => handleDeleteReco(data.user_id!, data.media_id!),
-					})
+					onPress: () => Alert.alert(
+						capitalize(t('common.library.collection.my_recos.modal.delete_confirm.title')),
+						upperFirst(t('common.library.collection.my_recos.modal.delete_confirm.description', { title: data.media!.title })),
+						[
+							{
+								text: upperFirst(t('common.word.cancel')),
+								style: 'cancel',
+							},
+							{
+								text: upperFirst(t('common.word.delete')),
+								onPress: () => handleDeleteReco(data.user_id!, data.media_id!),
+								style: 'destructive',
+							}
+						]
+					)
 				}
 			]
 		});

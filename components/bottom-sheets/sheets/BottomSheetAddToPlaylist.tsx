@@ -36,12 +36,12 @@ const COMMENT_MAX_LENGTH = 180;
 const BottomSheetAddToPlaylist = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetAddToPlaylistProps
->(({ id, media, sizes = ["large"], ...props }, ref) => {
+>(({ id, media, sizes = ["medium", "large"], ...props }, ref) => {
   const { colors, inset } = useTheme();
   const { user } = useAuth();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { closeSheet, openSheet } = useBottomSheetStore();
+  const { closeSheet } = useBottomSheetStore();
   const BottomSheetPlaylistCreateRef = React.useRef<TrueSheet>(null);
   const {
 		data: playlists,
@@ -122,6 +122,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
         onChangeText={setComment}
         placeholder={upperFirst(t('common.messages.add_comment'))}
         maxLength={COMMENT_MAX_LENGTH}
+        autoCapitalize="sentences"
         />
         <Button disabled={!selected.length} onPress={submit}>
           <ButtonText>{upperFirst(t('common.messages.add'))}</ButtonText>
@@ -172,32 +173,14 @@ const BottomSheetAddToPlaylist = React.forwardRef<
           defaultValue={search}
           onChangeText={setSearch}
           placeholder={upperFirst(t('common.messages.search_playlist'))}
+          autoCapitalize='none'
+          autoCorrect={false}
           />
           <Button
           variant={'outline'}
           style={tw`w-full`}
           onPress={() => {
-            // console.log('Opening create playlist sheet', BottomSheetPlaylistCreateRef.current);
             BottomSheetPlaylistCreateRef.current?.present();
-            // openSheet(BottomSheetPlaylistCreate, {
-            //   onCreate: (playlist) => {
-            //     queryClient.setQueryData(userKeys.addMediaToPlaylist({
-            //       userId: user?.id!,
-            //       mediaId: media.media_id!,
-            //       type: 'personal',
-            //     }), (prev: { playlist: Playlist; already_added: boolean }[] | undefined) => {
-            //       if (!prev) return [{ playlist, already_added: false }];
-            //       return [
-            //         { playlist, already_added: false },
-            //         ...prev,
-            //       ];
-            //     });
-            //     setSelected((prev) => [...prev, playlist]);
-            //   },
-            //   placeholder: media.title,
-            // }, {
-            //   parentId: id,
-            // })
           }}
           >
             <Icons.Add size={20} color={colors.foreground} style={tw`mr-2`} />

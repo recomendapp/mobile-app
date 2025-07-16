@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/Input';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { FlashList } from '@shopify/flash-list';
 import { Pressable } from 'react-native-gesture-handler';
+import { useSharedValue } from 'react-native-reanimated';
 
 interface BottomSheetSendRecoProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -32,7 +33,7 @@ const COMMENT_MAX_LENGTH = 180;
 const BottomSheetSendReco = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetSendRecoProps
->(({ id, media, ...props }, ref) => {
+>(({ id, media, sizes = ["medium", "large"], ...props }, ref) => {
   const { colors, inset } = useTheme();
   const { user } = useAuth();
   const { t } = useTranslation();
@@ -46,6 +47,10 @@ const BottomSheetSendReco = React.forwardRef<
 		mediaId: media.media_id!,
 	});
 	const sendMovie = useUserRecosInsertMutation();
+  // REFs
+  const refFlatList = React.useRef<FlatList>(null);
+  // SharedValues
+  const footerHeight = useSharedValue(0);
 
   const [search, setSearch] = React.useState('');
   const fuse = React.useMemo(() => {
@@ -114,6 +119,119 @@ const BottomSheetSendReco = React.forwardRef<
     }
     setResults(fuse?.search(search).map(({ item }) => item));
 	}, [search, friends, fuse]);
+
+  return (
+    <ThemedTrueSheet
+    ref={ref}
+    sizes={sizes}
+    FooterComponent={
+      <View
+      onLayout={(e) => {
+        footerHeight.value = e.nativeEvent.layout.height;
+      }}
+      style={[{ paddingBottom: inset.bottom, backgroundColor: colors.muted }, tw`gap-2 pt-2 px-2`]}
+      >
+        <Input
+        variant='outline'
+        defaultValue={comment}
+        onChangeText={setComment}
+        placeholder={upperFirst(t('common.messages.add_comment'))}
+        maxLength={COMMENT_MAX_LENGTH}
+        autoCapitalize='sentences'
+        />
+        <Button disabled={!selected.length} onPress={submit}>
+          <ButtonText>{upperFirst(t('common.messages.send'))}</ButtonText>
+        </Button>
+      </View>
+    }
+    scrollRef={refFlatList as React.RefObject<React.Component<unknown, {}, any>>}
+    {...props}
+    >
+      <FlatList
+      ref={refFlatList}
+      contentContainerStyle={[tw`px-2`, { paddingBottom: footerHeight.get() }]}
+      ListHeaderComponent={
+        <View style={[tw`gap-2 pb-2`, {paddingTop: 16, backgroundColor: colors.muted }]}>
+          <View style={tw`gap-2 p-2`}>
+            <ThemedText style={tw`font-bold text-center`}>Envoyer à un(e) ami(e)</ThemedText>
+            <FlashList
+            data={selected}
+            renderItem={({ item }) => (
+              <Pressable
+              key={item.id}
+              onPress={() => setSelected((prev) => prev.filter(
+                (selectedUser) => selectedUser?.id !== item.id
+              ))}
+              >
+                <UserAvatar avatar_url={item.avatar_url} full_name={item.full_name} />
+              </Pressable>
+            )}
+            style={tw`h-12`}
+            contentContainerStyle={tw`w-full items-center justify-center gap-2`}
+            ListEmptyComponent={() => (
+              <Text style={[{ color: colors.mutedForeground }, tw`text-center`]}>
+                Recomender <Text style={tw`font-bold`}>{media?.title}</Text> à un ami pour lui faire découvrir.
+              </Text>
+            )}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={tw`w-1`} />}
+            />
+          </View>
+          <Input
+          variant='outline'
+          defaultValue={search}
+          onChangeText={setSearch}
+          placeholder={upperFirst(t('common.messages.search_friend'))}
+          autoCapitalize='none'
+          autoCorrect={false}
+          />
+        </View>
+      }
+      stickyHeaderIndices={[0]}
+      data={results}
+      renderItem={({ item: { friend, already_sent, as_watched } }) => (
+        <TouchableWithoutFeedback
+        onPress={() => {
+          if (selected.some((selectedUser) => selectedUser?.id === friend?.id)) {
+            return setSelected((prev) => prev.filter(
+              (selectedUser) => selectedUser?.id !== friend?.id
+            ))
+          }
+          return setSelected((prev) => [...prev, friend]);
+        }}
+        >
+          <View style={tw`flex-row items-center justify-between gap-2 p-2 py-2`}>
+            <View style={tw` shrink flex-row items-center gap-2`}>
+              <UserAvatar avatar_url={friend.avatar_url} full_name={friend.full_name} />
+              <View>
+                <ThemedText>{friend.full_name}</ThemedText>
+                <Text style={{ color: colors.mutedForeground }}>@{friend.username}</Text>
+              </View>
+            </View>
+            <View style={tw`flex-row items-center gap-2 shrink-0`}>
+              {already_sent && (
+                <Badge variant="accent-yellow">
+                  Déjà envoyé
+                </Badge>
+              )}
+              {as_watched && (
+                <Badge variant="destructive">
+                  Déjà vu
+                </Badge>
+              )}
+              <Icons.Check size={20} style={[{ color: colors.foreground }, tw`${!selected.some((selectedUser) => selectedUser?.id === friend?.id) ? 'opacity-0' : ''}`]} />
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      )}
+      keyExtractor={(item) => item.id}
+      nestedScrollEnabled
+      showsVerticalScrollIndicator={false}
+      refreshing={isRefetching}
+      />
+    </ThemedTrueSheet>
+  )
 
   return (
     <ThemedTrueSheet

@@ -9,7 +9,7 @@ import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAuth } from '@/providers/AuthProvider';
 import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
@@ -41,7 +41,7 @@ const BottomSheetPlaylist = React.forwardRef<
   BottomSheetPlaylistProps
 >(({ id, playlist, additionalItemsTop = [], ...props }, ref) => {
   const { user } = useAuth();
-  const { closeSheet, openSheet, createConfirmSheet } = useBottomSheetStore();
+  const { closeSheet, openSheet } = useBottomSheetStore();
   const { colors, inset } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
@@ -134,33 +134,43 @@ const BottomSheetPlaylist = React.forwardRef<
           {
             icon: Icons.Delete,
             onPress: async () => {
-              await createConfirmSheet({
-                title: upperFirst(t('common.messages.are_u_sure')),
-                description: upperFirst(t('common.playlist.actions.delete.description', { title: playlist.title })),
-                onConfirm: async () => {
-                  await playlistDeleteMutation.mutateAsync(
-                    { playlistId: playlist.id },
-                    {
-                      onSuccess: async () => {
-                        Burnt.toast({
-                          title: upperFirst(t('common.word.deleted')),
-                          preset: 'done',
-                        });
-                        if (pathname.startsWith(`/playlist/${playlist.id}`)) {
-                          router.replace('/collection');
+              Alert.alert(
+                upperFirst(t('common.messages.are_u_sure')),
+                upperFirst(t('common.playlist.actions.delete.description', { title: playlist.title })),
+                [
+                  {
+                    text: upperFirst(t('common.word.cancel')),
+                    style: 'cancel',
+                  },
+                  {
+                    text: upperFirst(t('common.word.delete')),
+                    onPress: async () => {
+                      await playlistDeleteMutation.mutateAsync(
+                        { playlistId: playlist.id },
+                        {
+                          onSuccess: () => {
+                            Burnt.toast({
+                              title: upperFirst(t('common.word.deleted')),
+                              preset: 'done',
+                            });
+                            if (pathname.startsWith(`/playlist/${playlist.id}`)) {
+                              router.replace('/collection');
+                            }
+                            closeSheet(id);
+                          },
+                          onError: () => {
+                            Burnt.toast({
+                              title: upperFirst(t('common.errors.an_error_occurred')),
+                              preset: 'error',
+                            });
+                          },
                         }
-                        await closeSheet(id);
-                      },
-                      onError: () => {
-                        Burnt.toast({
-                          title: upperFirst(t('common.errors.an_error_occurred')),
-                          preset: 'error',
-                        });
-                      },
-                    }
-                  );
-                },
-              })
+                      );
+                    },
+                    style: 'destructive',
+                  }
+                ]
+              )
             },
             label: upperFirst(t('common.word.delete')),
             closeSheet: false,
@@ -168,7 +178,7 @@ const BottomSheetPlaylist = React.forwardRef<
         ] : []),
       ]
     ]
-  }, [playlist, user, saved, additionalItemsTop, colors, t, router, closeSheet, id, createConfirmSheet, playlistDeleteMutation, insertPlaylistSaved, deletePlaylistSaved]);
+  }, [playlist, user, saved, additionalItemsTop, colors, t, router, closeSheet, id, playlistDeleteMutation, insertPlaylistSaved, deletePlaylistSaved]);
   return (
   <ThemedTrueSheet ref={ref} {...props}>
       <View

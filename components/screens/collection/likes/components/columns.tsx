@@ -12,11 +12,12 @@ import { Icons } from '@/constants/Icons';
 import * as Burnt from 'burnt';
 import { Pressable } from 'react-native-gesture-handler';
 import { useTheme } from '@/providers/ThemeProvider';
+import { Alert } from 'react-native';
 
 export const Columns = () => {
 	const { colors } = useTheme();
 	const { t } = useTranslation();
-	const { openSheet, createConfirmSheet } = useBottomSheetStore();
+	const { openSheet } = useBottomSheetStore();
 	const updateActivity = useUserActivityUpdateMutation();
 
 	const handleUnlike = React.useCallback(async (id: number) => {
@@ -46,10 +47,21 @@ export const Columns = () => {
 				{
 					icon: Icons.Delete,
 					label: upperFirst(t('common.word.delete')),
-					onPress: async () => await createConfirmSheet({
-						title: capitalize(t('common.library.collection.likes.modal.delete_confirm.title')),
-						onConfirm: () => handleUnlike(data.id),
-					})
+					onPress: () => Alert.alert(
+						capitalize(t('common.library.collection.likes.modal.delete_confirm.title')),
+						upperFirst(t('common.library.collection.likes.modal.delete_confirm.description', { title: data.media!.title })),
+						[
+							{
+								text: upperFirst(t('common.word.cancel')),
+								style: 'cancel',
+							},
+							{
+								text: upperFirst(t('common.word.delete')),
+								onPress: () => handleUnlike(data.id),
+								style: 'destructive',
+							}
+						]
+					)
 				}
 			]
 		});

@@ -2,14 +2,23 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useUserFeedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { useTranslation } from "react-i18next";
-import { FlatList, View } from "react-native";
-import { ThemedText } from "@/components/ui/ThemedText";
+import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { CardUserActivity } from "../cards/CardUserActivity";
 import { Link } from "expo-router";
+import { useTheme } from "@/providers/ThemeProvider";
+import { LegendList } from "@legendapp/list";
+
+interface WidgetUserFeedProps extends React.ComponentPropsWithoutRef<typeof View> {
+  labelStyle?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
+}
 
 export const WidgetUserFeed = ({
   style,
-} : React.ComponentPropsWithoutRef<typeof View>) => {
+  labelStyle,
+  containerStyle
+}: WidgetUserFeedProps) => {
+  const { colors } = useTheme();
   const { t } = useTranslation();
   const { user } = useAuth();
 
@@ -25,19 +34,23 @@ export const WidgetUserFeed = ({
 
   return (
   <View style={[tw`gap-2`, style]}>
-    <Link href={'/(tabs)/(feed)/feed'} asChild>
-      <ThemedText style={tw`p-0 font-semibold text-xl`}>{t('widgets.user_feed.label')}</ThemedText>
+    <Link href={'/(tabs)/(feed)/feed'}style={[tw`font-semibold text-xl`, { color: colors.foreground }, labelStyle]} >
+      {t('widgets.user_feed.label')}
     </Link>
-    <FlatList
+    <LegendList
     data={feed.pages.flat()}
     renderItem={({ item }) => (
       <CardUserActivity key={item.media_id} activity={item} style={tw`max-h-36 w-86`}/>
     )}
+    snapToInterval={348}
+    decelerationRate="fast"
+    keyExtractor={(item) => item.id.toString()}
     horizontal
     onEndReached={() => hasNextPage && fetchNextPage()}
     onEndReachedThreshold={0.2}
     showsHorizontalScrollIndicator={false}
     ItemSeparatorComponent={() => <View style={tw`w-1`} />}
+    contentContainerStyle={containerStyle}
     nestedScrollEnabled
     />
   </View>

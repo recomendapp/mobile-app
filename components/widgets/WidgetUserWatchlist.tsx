@@ -3,13 +3,22 @@ import { useUserWatchlistQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { FlatList, View } from "react-native";
+import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { CardMedia } from "@/components/cards/CardMedia";
-import { ThemedText } from "@/components/ui/ThemedText";
+import { useTheme } from "@/providers/ThemeProvider";
+import { LegendList } from "@legendapp/list";
+
+interface WidgetUserWatchlistProps extends React.ComponentPropsWithoutRef<typeof View> {
+  labelStyle?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
+}
 
 export const WidgetUserWatchlist = ({
   style,
-} : React.ComponentPropsWithoutRef<typeof View>) => {
+  labelStyle,
+  containerStyle,
+} : WidgetUserWatchlistProps) => {
+  const { colors } = useTheme();
   const { t } = useTranslation();
   const { user } = useAuth();
 
@@ -27,10 +36,10 @@ export const WidgetUserWatchlist = ({
 
   return (
   <View style={[tw`gap-2`, style]}>
-    <Link href={'/collection/watchlist'} asChild>
-      <ThemedText style={tw`p-0 font-semibold text-xl`}>{t('widgets.user_watchlist.label')}</ThemedText>
+    <Link href={'/collection/watchlist'} style={[tw`font-semibold text-xl`, { color: colors.foreground }, labelStyle]}>
+      {t('widgets.user_watchlist.label')}
     </Link>
-    <FlatList
+    <LegendList
     data={watchlist}
     renderItem={({ item }) => (
       <View key={item.media_id} style={tw`flex-0.5`}>
@@ -39,6 +48,7 @@ export const WidgetUserWatchlist = ({
     )}
     numColumns={2}
     columnWrapperStyle={tw`gap-1`}
+    contentContainerStyle={containerStyle}
     ItemSeparatorComponent={() => <View style={tw`h-1`} />}
     nestedScrollEnabled
     />

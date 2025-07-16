@@ -120,7 +120,8 @@
       "guest_female_other": "invitées",
       "guest_male_one": "invité",
       "guest_male_other": "invités",
-      "ok": "ok"
+      "ok": "ok",
+      "ignore": "ignorer"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",
@@ -248,7 +249,7 @@
           "modal": {
             "delete_confirm": {
               "title": "supprimer de la guidelist",
-              "description": "Êtes-vous sûr de vouloir supprimer <important>{film}</important> de votre guidelist ?"
+              "description": "Êtes-vous sûr de vouloir supprimer {{title}} de votre guidelist ?"
             }
           }
         },
@@ -260,11 +261,11 @@
           "modal": {
             "delete_confirm": {
               "title": "supprimer de mes recos",
-              "description": "Êtes-vous sûr de vouloir supprimer <important>{title}</important> de vos recos ?"
+                "description": "Êtes-vous sûr de vouloir supprimer {{title}} de vos recos ?"
             },
             "complete_confirm": {
               "title": "completer la reco",
-              "description": "Êtes-vous sûr de vouloir compléter la reco <important>{title}</important> ?"
+              "description": "Êtes-vous sûr de vouloir compléter la reco {{title}} ?"
             }
           }
         },
@@ -276,7 +277,7 @@
           "modal": {
             "delete_confirm": {
               "title": "supprimer de la watchlist",
-              "description": "Êtes-vous sûr de vouloir supprimer <important>{title}</important> de votre watchlist ?"
+              "description": "Êtes-vous sûr de vouloir supprimer {{title}} de votre watchlist ?"
             }
           }
         },
@@ -288,7 +289,7 @@
           "modal": {
             "delete_confirm": {
               "title": "supprimer des coups de coeur",
-              "description": "Êtes-vous sûr de vouloir supprimer <important>{title}</important> de vos coups de coeur ?"
+              "description": "Êtes-vous sûr de vouloir supprimer {{title}} de vos coups de coeur ?"
             }
           }
         }
@@ -302,7 +303,12 @@
         "delete": {
           "description": "Cela supprimera {{title}} définitivement de votre bibliothèque."
         },
-        "edit_guests": "Modifier les invité(e)s",
+        "edit_guests": {
+          "label": "Modifier les invité(e)s",
+          "modal": {
+            "cancel_without_saving": "Abandonner les modifications sans enregistrer ?"
+          }
+        },
         "add_guests": "Ajouter des invité(e)s"
       },
       "form": {
@@ -316,7 +322,7 @@
       "modal": {
         "delete_confirm": {
           "title": "supprimer de la playlist",
-          "description": "Êtes-vous sûr de vouloir supprimer <important>{title}</important> de votre playlist ?"
+          "description": "Êtes-vous sûr de vouloir supprimer {{title}} de votre playlist ?"
         }
       }
     },
