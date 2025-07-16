@@ -93,7 +93,11 @@ const BottomSheetMedia = React.forwardRef<
         <View style={tw`shrink`}>
           <ThemedText numberOfLines={2} style={tw`shrink`}>{media?.title}</ThemedText>
           <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
-            {media?.main_credit?.map((director) => director.title).join(', ')}
+            {(media?.media_type === 'movie' || media?.media_type === 'tv_series') ? (
+              media?.main_credit?.map((director) => director.title).join(', ')
+            ) : media?.media_type === 'person' ? (
+              media.extra_data.known_for_department
+            ) : null}
           </Text>
         </View>
       </View>

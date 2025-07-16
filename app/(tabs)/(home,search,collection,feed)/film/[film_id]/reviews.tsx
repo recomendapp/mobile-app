@@ -10,7 +10,7 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { upperFirst } from "lodash";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Dimensions, Pressable, View } from "react-native";
+import { Dimensions, Pressable, Text, View } from "react-native";
 import Animated, { runOnJS, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
 import ButtonMyReview from "@/components/buttons/ButtonMyReview";
 import { useRoute } from "@react-navigation/native";
@@ -128,7 +128,12 @@ const FilmReviewsScreen = () => {
 				</View>
 			</View>
 		}
-		ListEmptyComponent={() => !loading ? <ThemedText style={tw.style('text-center')}>{upperFirst(t('common.messages.no_results'))}</ThemedText> : null}
+		ListEmptyComponent={
+			loading ? <Icons.Loader /> :
+			<Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
+				{upperFirst(t('common.messages.no_results'))}
+			</Text>
+		}
 		onScroll={scrollHandler}
 		data={reviews?.pages.flat()}
 		renderItem={({ item, index }) => (

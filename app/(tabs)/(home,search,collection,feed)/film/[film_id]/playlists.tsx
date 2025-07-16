@@ -11,7 +11,7 @@ import { useRoute } from "@react-navigation/native";
 import { upperFirst } from "lodash";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Dimensions, Pressable, View } from "react-native";
+import { Dimensions, Pressable, Text, View } from "react-native";
 import Animated, { runOnJS, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
 
 const GRID_COLUMNS = 3;
@@ -127,9 +127,14 @@ const FilmPlaylistsScreen = () => {
 				</View>
 			</View>
 		}
-		ListEmptyComponent={() => !loading ? <ThemedText style={tw.style('text-center')}>{upperFirst(t('common.messages.no_results'))}</ThemedText> : null}
+		ListEmptyComponent={
+			loading ? <Icons.Loader /> :
+			<Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
+				{upperFirst(t('common.messages.no_results'))}
+			</Text>
+		}
 		onScroll={scrollHandler}
-		data={playlists?.pages.flat()}
+		data={playlists?.pages.flat() || []}
 		renderItem={({ item, index }) => (
 			<View key={index} style={[tw`p-1`, { flex: 1 / GRID_COLUMNS }]}>
 				<CardPlaylist
