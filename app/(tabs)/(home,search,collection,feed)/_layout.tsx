@@ -9,7 +9,7 @@ export const unstable_settings = {
 
 const AppLayout = () => {
   return (
-    <Stack screenOptions={{ headerShown: false }}/>
+    <Stack screenOptions={{ headerShown: false }} />
   );
 };
 

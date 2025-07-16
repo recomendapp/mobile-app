@@ -24,7 +24,7 @@ import { Input } from '@/components/ui/Input';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { useSharedValue } from 'react-native-reanimated';
 import { FlashList } from '@shopify/flash-list';
-import { Pressable } from 'react-native-gesture-handler';
+import { FlatList, Pressable } from 'react-native-gesture-handler';
 
 interface BottomSheetAddToPlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -57,7 +57,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
     mediaId: media.media_id!,
   });
   // REFs
-  const refFlatList = React.useRef<FlashList<NonNullable<typeof playlists>[number]>>(null);
+  const refFlatList = React.useRef<FlatList<NonNullable<typeof playlists>[number]>>(null);
   // SharedValues
   const footerHeight = useSharedValue(0);
 
@@ -132,7 +132,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
     scrollRef={refFlatList as React.RefObject<React.Component<unknown, {}, any>>}  
     {...props}
     >
-      <FlashList
+      <FlatList
       ref={refFlatList}
       contentContainerStyle={{
         ...tw`px-2`,
@@ -141,7 +141,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
       ListHeaderComponent={
         <View style={[tw`gap-2 pb-2`, {paddingTop: 16, backgroundColor: colors.muted }]}>
           <View style={tw`gap-2 p-2`}>
-            <ThemedText style={tw`font-bold text-center`}>Ajouter à une playlist</ThemedText>
+            <ThemedText style={tw`font-bold text-center`}>{upperFirst(t('common.messages.add_to_playlist'))}</ThemedText>
             <FlashList
             data={selected}
             renderItem={({ item }) => (

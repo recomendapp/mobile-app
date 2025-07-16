@@ -6,13 +6,12 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useUserActivitiesInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import { Picker } from "@react-native-picker/picker";
 import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
 
 const GRID_COLUMNS = 3;
 export const PER_PAGE = GRID_COLUMNS * 5;
