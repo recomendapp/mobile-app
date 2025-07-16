@@ -12,7 +12,7 @@ import BottomSheetMediaRating from "@/components/bottom-sheets/sheets/BottomShee
 import { Media } from "@/types/type.db";
 import tw from "@/lib/tw";
 
-const ICON_SIZE = 30;
+const ICON_SIZE = 24;
 
 interface MediaActionUserActivityRatingProps
 	extends React.ComponentProps<typeof Pressable> {

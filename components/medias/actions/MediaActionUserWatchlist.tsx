@@ -12,7 +12,7 @@ import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
 import * as Haptics from "expo-haptics";
 
-const ICON_SIZE = 30;
+const ICON_SIZE = 24;
 
 interface MediaActionUserWatchlistProps
 	extends React.ComponentProps<typeof Pressable> {

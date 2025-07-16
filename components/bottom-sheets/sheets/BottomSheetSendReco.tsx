@@ -192,6 +192,7 @@ const BottomSheetSendReco = React.forwardRef<
       data={results}
       renderItem={({ item: { friend, already_sent, as_watched } }) => (
         <TouchableWithoutFeedback
+        key={friend.id}
         onPress={() => {
           if (selected.some((selectedUser) => selectedUser?.id === friend?.id)) {
             return setSelected((prev) => prev.filter(

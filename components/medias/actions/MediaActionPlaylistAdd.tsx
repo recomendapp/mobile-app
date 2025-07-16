@@ -6,7 +6,7 @@ import { Media } from "@/types/type.db";
 import BottomSheetAddToPlaylist from "@/components/bottom-sheets/sheets/BottomSheetAddToPlaylist";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 
-const ICON_SIZE = 30;
+const ICON_SIZE = 24;
 
 interface MediaActionPlaylistAddProps
 	extends React.ComponentProps<typeof Pressable> {

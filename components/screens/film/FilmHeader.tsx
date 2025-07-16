@@ -222,8 +222,8 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 					alt={movie?.title ?? ''}
 					source={{ uri: movie?.avatar_url ?? '' }}
 					style={[
-						{ aspectRatio: 2 / 3, height: 'fit-content' },
-						tw.style('rounded-md w-48'),
+						{ aspectRatio: 2 / 3 },
+						tw.style('rounded-md w-48 h-auto'),
 						posterAnim
 					]}
 					type="movie"
