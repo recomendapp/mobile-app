@@ -42,14 +42,14 @@ export const WidgetUserFeed = ({
     renderItem={({ item }) => (
       <CardUserActivity key={item.media_id} activity={item} style={tw`max-h-36 w-86`}/>
     )}
-    snapToInterval={348}
+    snapToInterval={352}
     decelerationRate="fast"
     keyExtractor={(item) => item.id.toString()}
     horizontal
     onEndReached={() => hasNextPage && fetchNextPage()}
     onEndReachedThreshold={0.2}
     showsHorizontalScrollIndicator={false}
-    ItemSeparatorComponent={() => <View style={tw`w-1`} />}
+    ItemSeparatorComponent={() => <View style={tw`w-2`} />}
     contentContainerStyle={containerStyle}
     nestedScrollEnabled
     />

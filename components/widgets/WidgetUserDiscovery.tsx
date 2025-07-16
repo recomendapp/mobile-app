@@ -48,14 +48,14 @@ export const WidgetUserDiscovery = ({
 			<CardUser key={item.id} user={item} style={tw`h-full w-48`}/>
 		</View>
     )}
-    snapToInterval={196}
+    snapToInterval={200}
     decelerationRate="fast"
     keyExtractor={(item) => item.id.toString()}
     horizontal
     showsHorizontalScrollIndicator={false}
     onEndReached={() => hasNextPage && fetchNextPage()}
     onEndReachedThreshold={0.2}
-    ItemSeparatorComponent={() => <View style={tw`w-1`} />}
+    ItemSeparatorComponent={() => <View style={tw`w-2`} />}
     contentContainerStyle={containerStyle}
     nestedScrollEnabled
     />
