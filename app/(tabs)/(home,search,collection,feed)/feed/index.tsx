@@ -1,15 +1,14 @@
 import { CardUserActivity } from "@/components/cards/CardUserActivity";
-import FeedItem from "@/components/screens/feed/FeedItem";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { ThemedText } from "@/components/ui/ThemedText"
 import { ThemedView } from "@/components/ui/ThemedView"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserFeedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { FlashList } from "@shopify/flash-list";
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
+import { LegendList } from "@legendapp/list";
 
 const FeedScreen = () => {
 	const { user } = useAuth();
@@ -27,10 +26,10 @@ const FeedScreen = () => {
 	});
 	const loading = isLoading || feed === undefined;
 	return (
-		<FlashList
-		data={feed?.pages.flat()}
+		<LegendList
+		data={feed?.pages.flat() || []}
 		renderItem={({ item, index }) => (
-			<View key={index} style={tw`p-1`}>
+			<View key={index} style={tw`py-1`}>
 				<CardUserActivity activity={item} showReview />
 			</View>
 		)}
@@ -39,12 +38,12 @@ const FeedScreen = () => {
 				<ThemedText>{upperFirst(t('common.messages.no_results'))}</ThemedText>
 			</ThemedView>
 		) : null}
-		contentContainerStyle={{
-			paddingTop: 8,
-			paddingBottom: tabBarHeight,
-			paddingLeft: 8,
-			paddingRight: 8,
-		}}
+		contentContainerStyle={[
+			tw`px-2`,
+			{
+				paddingBottom: tabBarHeight
+			}
+		]}
 		keyExtractor={(_, index) => index.toString()}
 		estimatedItemSize={feed?.pages.flatMap((page) => page).length}
 		showsVerticalScrollIndicator={false}

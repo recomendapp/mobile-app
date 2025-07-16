@@ -50,7 +50,6 @@ const ProfileLastActivities = ({ profile }: { profile: Profile }) => {
 		keyExtractor={(_, index) => index.toString()}
 		estimatedItemSize={190 * 15}
 		refreshing={isFetching}
-		// onRefresh={refetch}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.25}
 		horizontal

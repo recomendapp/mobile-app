@@ -20,7 +20,7 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { Input } from '@/components/ui/Input';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { FlashList } from '@shopify/flash-list';
-import { Pressable } from 'react-native-gesture-handler';
+import { FlatList, Pressable } from 'react-native-gesture-handler';
 import { useSharedValue } from 'react-native-reanimated';
 
 interface BottomSheetSendRecoProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
@@ -48,7 +48,7 @@ const BottomSheetSendReco = React.forwardRef<
 	});
 	const sendMovie = useUserRecosInsertMutation();
   // REFs
-  const refFlatList = React.useRef<FlashList<NonNullable<typeof friends>[number]>>(null);
+  const refFlatList = React.useRef<FlatList<NonNullable<typeof friends>[number]>>(null);
   // SharedValues
   const footerHeight = useSharedValue(0);
 
@@ -147,7 +147,7 @@ const BottomSheetSendReco = React.forwardRef<
     scrollRef={refFlatList as React.RefObject<React.Component<unknown, {}, any>>}
     {...props}
     >
-      <FlashList
+      <FlatList
       ref={refFlatList}
       contentContainerStyle={{
         ...tw`px-2`,
@@ -156,7 +156,7 @@ const BottomSheetSendReco = React.forwardRef<
       ListHeaderComponent={
         <View style={[tw`gap-2 pb-2`, {paddingTop: 16, backgroundColor: colors.muted }]}>
           <View style={tw`gap-2 p-2`}>
-            <ThemedText style={tw`font-bold text-center`}>Envoyer à un(e) ami(e)</ThemedText>
+            <ThemedText style={tw`font-bold text-center`}>{upperFirst(t('common.messages.send_to_friend'))}</ThemedText>
             <FlashList
             data={selected}
             renderItem={({ item }) => (
