@@ -320,7 +320,7 @@ export const useUserRecosQuery = ({
 			if (mergedFilters) {
 				if (mergedFilters?.order !== 'random' && mergedFilters.order) {
 					const [ column, direction ] = mergedFilters.order.split('-');
-					request = request.order(column, { ascending: direction === 'asc', nullsFirst: false });
+					request = request.order(column, { ascending: direction === 'asc' });
 				}
 				if (mergedFilters.limit) {
 					request = request.limit(mergedFilters.limit);
@@ -419,7 +419,7 @@ export const useUserWatchlistQuery = ({
 			if (mergedFilters) {
 				if (mergedFilters?.order !== 'random' && mergedFilters.order) {
 					const [ column, direction ] = mergedFilters.order.split('-');
-					request = request.order(column, { ascending: direction === 'asc', nullsFirst: false });
+					request = request.order(column, { ascending: direction === 'asc' });
 				}
 				if (mergedFilters.limit) {
 					request = request.limit(mergedFilters.limit);
@@ -504,7 +504,7 @@ export const useUserLikesQuery = ({
 			if (mergedFilters) {
 				if (mergedFilters?.order !== 'random' && mergedFilters.order) {
 					const [ column, direction ] = mergedFilters.order.split('-');
-					request = request.order(column, { ascending: direction === 'asc', nullsFirst: false });
+					request = request.order(column, { ascending: direction === 'asc' });
 				}
 				if (mergedFilters.limit) {
 					request = request.limit(mergedFilters.limit);
@@ -564,7 +564,7 @@ export const useUserFeedInfiniteQuery = ({
 			if (mergedFilters) {
 				if (mergedFilters.order) {
 					const [ column, direction ] = mergedFilters.order.split('-');
-					request = request.order(column, { ascending: direction === 'asc', nullsFirst: false });
+					request = request.order(column, { ascending: direction === 'asc' });
 				}
 			}
 			const { data, error } = await request
@@ -616,7 +616,7 @@ export const useUserFeedCastCrewInfiniteQuery = ({
 					switch (column) {
 						case 'release_date':
 							request = request
-								.order('media(date)', { ascending: direction === 'asc', nullsFirst: false });
+								.order('media(date)', { ascending: direction === 'asc' });
 							break;
 					}
 				}
@@ -705,13 +705,13 @@ export const useUserPlaylistsSavedInfiniteQuery = ({
 	userId?: string;
 	filters?: {
 		resultsPerPage?: number;
-		sortBy?: 'created_at' | 'updated_at';
+		sortBy?: 'created_at';
 		sortOrder?: 'asc' | 'desc';
 	};
 }) => {
 	const mergedFilters = {
 		resultsPerPage: 20,
-		sortBy: 'updated_at',
+		sortBy: 'created_at',
 		sortOrder: 'desc',
 		...filters,
 	};
@@ -735,10 +735,7 @@ export const useUserPlaylistsSavedInfiniteQuery = ({
 				if (mergedFilters.sortBy) {
 					switch (mergedFilters.sortBy) {
 						case 'created_at':
-							request = request.order('created_at', { referencedTable: 'playlist', ascending: mergedFilters.sortOrder === 'asc', nullsFirst: false });
-							break;
-						case 'updated_at':
-							request = request.order('updated_at', { referencedTable: 'playlist', ascending: mergedFilters.sortOrder === 'asc', nullsFirst: false });
+							request = request.order('created_at', { ascending: mergedFilters.sortOrder === 'asc' });
 							break;
 						default:
 							break;
@@ -877,7 +874,7 @@ export const useUserPlaylistsFriendsInfinite = ({
 			if (mergedFilters) {
 				if (mergedFilters.order) {
 					const [ column, direction ] = mergedFilters.order.split('-');
-					request = request.order(column, { ascending: direction === 'asc', nullsFirst: false });
+					request = request.order(column, { ascending: direction === 'asc' });
 				}
 			}
 			const { data, error } = await request;

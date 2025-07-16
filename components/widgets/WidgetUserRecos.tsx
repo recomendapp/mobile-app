@@ -66,6 +66,7 @@ export const WidgetUserRecos = ({
         </CardMedia>
       </View>
     )}
+    keyExtractor={(item) => item.media_id!.toString()}
     numColumns={2}
     columnWrapperStyle={tw`gap-1`}
     contentContainerStyle={containerStyle}

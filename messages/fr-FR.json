@@ -121,7 +121,8 @@
       "guest_male_one": "invité",
       "guest_male_other": "invités",
       "ok": "ok",
-      "ignore": "ignorer"
+      "ignore": "ignorer",
+      "no_playlists_saved": "Aucune playlist enregistrée"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",

@@ -3,11 +3,17 @@ import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistsSavedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { FlashList } from "@shopify/flash-list";
-import { View } from "react-native";
+import { Text, View } from "react-native";
+import { LegendList } from "@legendapp/list";
+import { Icons } from "@/constants/Icons";
+import { upperFirst } from "lodash";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const CollectionSavedScreen = () => {
 	const { user } = useAuth();
+	const { t } = useTranslation();
+	const { colors } = useTheme();
 	const tabBarHeight = useBottomTabOverflow();
 	const {
 		data: playlists,
@@ -23,13 +29,23 @@ const CollectionSavedScreen = () => {
 	const loading = isLoading || playlists === undefined;
 
 	return (
-		<FlashList
+		<LegendList
 		data={playlists?.pages.flatMap((page) => page) ?? []}
 		renderItem={({ item, index }) => (
 			<View key={index} style={tw`p-1`}>
 				<CardPlaylist playlist={item.playlist} style={tw`w-full`} />
 			</View>
 		)}
+		ListEmptyComponent={
+			loading ? <Icons.Loader />
+			: (
+				<View style={tw`flex-1 items-center justify-center p-4`}>
+					<Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
+						{upperFirst(t('common.messages.no_playlists_saved'))}
+					</Text>
+				</View>
+			)
+		}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		numColumns={3}
