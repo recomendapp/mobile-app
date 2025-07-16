@@ -7,7 +7,7 @@ import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { FlatList, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Text, TouchableWithoutFeedback, View } from 'react-native';
 import { useUserAddMediaToPlaylistQuery } from '@/features/user/userQueries';
 import { useAuth } from '@/providers/AuthProvider';
 import Fuse from "fuse.js";
@@ -57,7 +57,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
     mediaId: media.media_id!,
   });
   // REFs
-  const refFlatList = React.useRef<FlatList>(null);
+  const refFlatList = React.useRef<FlashList<NonNullable<typeof playlists>[number]>>(null);
   // SharedValues
   const footerHeight = useSharedValue(0);
 
@@ -132,9 +132,12 @@ const BottomSheetAddToPlaylist = React.forwardRef<
     scrollRef={refFlatList as React.RefObject<React.Component<unknown, {}, any>>}  
     {...props}
     >
-      <FlatList
+      <FlashList
       ref={refFlatList}
-      contentContainerStyle={[tw`px-2`, { paddingBottom: footerHeight.get() }]}
+      contentContainerStyle={{
+        ...tw`px-2`,
+        paddingBottom: footerHeight.get(),
+      }}
       ListHeaderComponent={
         <View style={[tw`gap-2 pb-2`, {paddingTop: 16, backgroundColor: colors.muted }]}>
           <View style={tw`gap-2 p-2`}>

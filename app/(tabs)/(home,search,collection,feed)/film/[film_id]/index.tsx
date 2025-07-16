@@ -3,7 +3,7 @@ import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
 import { Link } from "expo-router"
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
-import { Dimensions, FlatList, View } from "react-native";
+import { Dimensions, View } from "react-native";
 import { Media, MediaMoviePerson } from "@/types/type.db";
 import { CardMedia } from "@/components/cards/CardMedia";
 import tw from "@/lib/tw";
@@ -13,6 +13,7 @@ import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useEffect } from "react";
 import { useRoute } from "@react-navigation/native";
 import { useFilmContext } from "@/components/screens/film/FilmContext";
+import { LegendList } from "@legendapp/list";
 
 const WINDOW_HEIGHT = Dimensions.get('window').height;
 
@@ -81,7 +82,6 @@ const FilmScreen = () => {
 	]}
 	ListHeaderComponent={
 		<>
-			{/* <View style={tw.style('h-96 bg-red-500')} /> */}
 			{/* SYNOPSIS */}
 			<View style={tw.style('gap-1 px-2')}>
 				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.word.overview'))}</ThemedText>
@@ -94,19 +94,6 @@ const FilmScreen = () => {
 				<ThemedText style={tw.style('px-2 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
 				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
 			</View>
-
-			{/* <View style={tw.style('gap-1')}> 
-				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
-				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
-			</View>
-			<View style={tw.style('gap-1')}> 
-				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
-				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
-			</View>
-			<View style={tw.style('gap-1')}> 
-				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
-				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
-			</View> */}
 		</>
 	}
 	showsVerticalScrollIndicator={false}
@@ -122,9 +109,8 @@ const FilmCast = ({
 	cast: MediaMoviePerson[]
 }) => {
 	const { colors } = useTheme();
-	const { t } = useTranslation();
 	return (
-		<FlatList
+		<LegendList
 		data={cast}
 		renderItem={({ item, index }) => {
 			if (!item.person) return null;
@@ -146,14 +132,15 @@ const FilmCast = ({
 			</Link>
 			)
 		}}
+    snapToInterval={136}
 		contentContainerStyle={tw`px-2`}
-		keyExtractor={(_, index) => index.toString()}
+		keyExtractor={(item) => item.id.toString()}
 		showsHorizontalScrollIndicator={false}
 		horizontal
 		ItemSeparatorComponent={() => <View style={tw.style('w-2')} />}
 		nestedScrollEnabled
 		/>
-	)
-}
+	);
+};
 
 export default FilmScreen;
