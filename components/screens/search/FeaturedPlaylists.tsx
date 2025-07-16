@@ -3,7 +3,8 @@ import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useTheme } from "@/providers/ThemeProvider";
 import { usePlaylistFeaturedInfiniteQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
-import { FlatList, View } from "react-native";
+import { View } from "react-native";
+import { LegendList } from "@legendapp/list";
 
 const GRID_COLUMNS = 3;
 
@@ -21,7 +22,7 @@ const FeaturedPlaylists = () => {
 	if (!playlists) return null;
 
 	return (
-		<FlatList
+		<LegendList
 		data={playlists?.pages.flat()}
 		renderItem={({ item: { playlist } }) => (
 			<View key={playlist.id} style={{ flex: 1 / GRID_COLUMNS }}>
@@ -34,6 +35,7 @@ const FeaturedPlaylists = () => {
 		contentContainerStyle={{
 			paddingBottom: bottomTabOverflow + inset.bottom,
 		}}
+		keyExtractor={(item) => item.playlist.id.toString()}
 		showsVerticalScrollIndicator={false}
 		columnWrapperStyle={tw`gap-2`}
 		ItemSeparatorComponent={() => <View style={tw`h-2`} />}

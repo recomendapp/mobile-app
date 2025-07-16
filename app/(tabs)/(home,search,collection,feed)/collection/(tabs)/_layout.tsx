@@ -4,14 +4,13 @@ import { Button, ButtonText } from "@/components/ui/Button";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { UserNav } from "@/components/user/UserNav";
-import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
 import { ParamListBase, TabNavigationState } from "@react-navigation/native";
 import { withLayoutContext } from "expo-router";
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import Animated from "react-native-reanimated";
 
 const Tab = createMaterialTopTabNavigator();

@@ -1,13 +1,13 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
-import useCollectionStaticRoutes, { type CollectionStaticRoute } from "@/components/screens/collection/useCollectionStaticRoutes";
+import useCollectionStaticRoutes from "@/components/screens/collection/useCollectionStaticRoutes";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistsInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { FlashList, MasonryFlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
 import { View } from "react-native";
+import { LegendList } from "@legendapp/list";
 
 const CollectionScreen = () => {
 	const { user } = useAuth();
@@ -16,7 +16,6 @@ const CollectionScreen = () => {
 	const {
 		data: playlists,
 		isLoading,
-		isFetching,
 		isRefetching,
 		fetchNextPage,
 		refetch,
@@ -24,7 +23,6 @@ const CollectionScreen = () => {
 	} = useUserPlaylistsInfiniteQuery({
 		userId: user?.id,
 	});
-	const loading = isLoading || playlists === undefined;
 
 	const combinedItems = [
 		...staticRoutes,
@@ -33,7 +31,7 @@ const CollectionScreen = () => {
 
 
 	return (
-		<FlashList
+		<LegendList
 		data={combinedItems}
 		renderItem={({ item, index } : { item: any, index: number }) => {
 			if (item.type === 'static') {

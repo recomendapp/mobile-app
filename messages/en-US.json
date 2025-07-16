@@ -112,7 +112,8 @@
       "guest_one": "guest",
       "guest_other": "guests",
       "ok": "ok",
-      "ignore": "ignore"
+      "ignore": "ignore",
+      "no_playlists_saved": "no playlists saved"
     },
     "errors": {
       "not_logged_in": "you are not logged in",

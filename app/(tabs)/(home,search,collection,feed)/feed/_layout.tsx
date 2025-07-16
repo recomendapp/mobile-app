@@ -1,14 +1,13 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { Redirect, Stack, withLayoutContext } from "expo-router";
+import { Redirect, withLayoutContext } from "expo-router";
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
 import { ParamListBase, TabNavigationState } from "@react-navigation/native";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import tw from "@/lib/tw";
-import Animated from "react-native-reanimated";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useTheme } from "@/providers/ThemeProvider";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { Pressable } from "react-native-gesture-handler";
 import { useTranslation } from "react-i18next";
 import { upperFirst } from "lodash";
 import { title } from "@/hooks/custom-lodash";
@@ -50,7 +49,7 @@ const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBar
             tw`flex-1 p-1 rounded-md`,
           ]}
           >
-            <TouchableOpacity onPress={onPress}>
+            <Pressable onPress={onPress}>
               <ThemedText
               style={[
                 {
@@ -61,7 +60,7 @@ const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBar
               >
                 {label}
               </ThemedText>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         );
       })}
@@ -80,7 +79,7 @@ const FeedLayout = () => {
   return (
     <ThemedSafeAreaView style={tw`flex-1`}>
       <MaterialTopTabs
-      tabBar={(props) => <TabBar {...props} />}
+      tabBar={TabBar}
       >
         <MaterialTopTabs.Screen name="index" options={{ title: upperFirst(t('common.word.community')) }} />
         <MaterialTopTabs.Screen name="cast-crew" options={{ title: title(t('common.word.cast_and_crew')) }} />
