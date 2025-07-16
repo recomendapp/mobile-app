@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import * as Haptics from "expo-haptics";
 import tw from "@/lib/tw";
 
-const ICON_SIZE = 30;
+const ICON_SIZE = 24;
 
 interface MediaActionUserActivityWatchProps
 	extends React.ComponentProps<typeof Pressable> {
@@ -83,7 +83,7 @@ const MediaActionUserActivityWatch = React.forwardRef<
 			<AlertCircleIcon size={ICON_SIZE} />
 		) : (
 			<View style={[{ backgroundColor: activity ? colors.accentBlue : undefined, borderColor: activity ? colors.accentBlue : colors.foreground, width: ICON_SIZE, height: ICON_SIZE }, tw`rounded-full border-2 items-center justify-center`]}>
-				<Icons.Check color={colors.foreground} />
+				<Icons.Check color={colors.foreground} size={ICON_SIZE * 0.7}/>
 			</View>
 		)}
 		</Pressable>

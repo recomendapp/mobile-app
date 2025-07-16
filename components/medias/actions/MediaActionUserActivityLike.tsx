@@ -13,10 +13,9 @@ import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
 import * as Haptics from "expo-haptics";
-import Animated, { interpolateColor, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
+import { interpolateColor, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
 
-const ICON_SIZE = 30;
-const AnimatedLikeIcon = Animated.createAnimatedComponent(Icons.like);
+const ICON_SIZE = 24;
 
 interface MediaActionUserActivityLikeProps
 	extends React.ComponentProps<typeof Pressable> {

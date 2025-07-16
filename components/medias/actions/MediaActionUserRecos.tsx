@@ -6,7 +6,7 @@ import { Media } from "@/types/type.db";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetSendReco from "@/components/bottom-sheets/sheets/BottomSheetSendReco";
 
-const ICON_SIZE = 30;
+const ICON_SIZE = 24;
 
 interface MediaActionUserRecosProps
 	extends React.ComponentProps<typeof Pressable> {
