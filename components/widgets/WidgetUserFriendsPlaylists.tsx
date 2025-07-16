@@ -37,12 +37,12 @@ export const WidgetUserFriendsPlaylists = ({
     renderItem={({ item }) => (
       <CardPlaylist key={item.id} playlist={item} style={tw`w-36`} />
     )}
-    snapToInterval={148}
+    snapToInterval={152}
     decelerationRate="fast"
     keyExtractor={(item) => item.id.toString()}
     horizontal
     showsHorizontalScrollIndicator={false}
-    ItemSeparatorComponent={() => <View style={tw`w-1`} />}
+    ItemSeparatorComponent={() => <View style={tw`w-2`} />}
     contentContainerStyle={containerStyle}
     nestedScrollEnabled
     />
