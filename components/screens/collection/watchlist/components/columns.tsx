@@ -41,14 +41,14 @@ export const Columns = () => {
 		});
 	}, []);
 
-	const handleOpenSheet = React.useCallback(async (data: UserWatchlist) => {
-		await openSheet(BottomSheetMedia, {
+	const handleOpenSheet = React.useCallback((data: UserWatchlist) => {
+		openSheet(BottomSheetMedia, {
 			media: data.media,
 			additionalItemsTop: [
 				{
 					icon: Icons.Comment,
 					label: data?.comment ? capitalize(t('common.messages.view_comment', { count: 1 })) : capitalize(t('common.messages.add_comment')),
-					onPress: async () => await openSheet(BottomSheetWatchlistComment, {
+					onPress: async () => openSheet(BottomSheetWatchlistComment, {
 						watchlistItem: data,
 					}),
 				},

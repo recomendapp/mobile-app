@@ -21,7 +21,7 @@ export const DataTableItem = ({ item, openSheet, ...props } : DataTableItemProps
 	return (
 	<TouchableWithoutFeedback
 	onPress={() => router.push(item.original.media?.url as LinkProps['href'])}
-	onLongPress={async () => await openSheet(item.original)}
+	onLongPress={() => openSheet(item.original)}
 	containerStyle={tw`flex-1`}
 	style={tw`flex-row items-center gap-2`}
 	>

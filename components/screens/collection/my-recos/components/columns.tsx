@@ -64,8 +64,8 @@ export const Columns = () => {
 		});
 	}, []);
 
-	const handleOpenSheet = React.useCallback(async (data: UserRecosAggregated) => {
-		await openSheet(BottomSheetMedia, {
+	const handleOpenSheet = React.useCallback((data: UserRecosAggregated) => {
+		openSheet(BottomSheetMedia, {
 			media: data.media,
 			additionalItemsTop: [
 				{
@@ -90,7 +90,7 @@ export const Columns = () => {
 				{
 					icon: Icons.Comment,
 					label: upperFirst(t('common.messages.view_recommendation', { count: 1})),
-					onPress: async () => await openSheet(BottomSheetMyRecosSenders, {
+					onPress: () => openSheet(BottomSheetMyRecosSenders, {
 						comments: data.senders,
 					}),
 				}

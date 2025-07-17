@@ -64,8 +64,8 @@ const CardPlaylist = React.forwardRef<
 	const onPress = () => {
 		router.push(`/playlist/${playlist?.id}`);
 	};
-	const onLongPress = async () => {
-		await openSheet(BottomSheetPlaylist, {
+	const onLongPress = () => {
+		openSheet(BottomSheetPlaylist, {
 			playlist: playlist,
 		})
 	}

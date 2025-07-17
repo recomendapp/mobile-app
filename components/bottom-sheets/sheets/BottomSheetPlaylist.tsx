@@ -120,8 +120,8 @@ const BottomSheetPlaylist = React.forwardRef<
         ...(user?.id === playlist.user?.id ? [
           {
             icon: Icons.Edit,
-            onPress: async () => {
-              await openSheet(BottomSheetPlaylistEdit, {
+            onPress: () => {
+              openSheet(BottomSheetPlaylistEdit, {
                 playlist: playlist,
               })
             },
@@ -129,7 +129,7 @@ const BottomSheetPlaylist = React.forwardRef<
           },
           {
             icon: Icons.Users,
-            onPress: async () => await openSheet(BottomSheetPlaylistGuests, {
+            onPress: () => openSheet(BottomSheetPlaylistGuests, {
               playlist: playlist,
             }),
             label: upperFirst(t('common.messages.guest', { context: 'male', count: 2 })),

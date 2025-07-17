@@ -10,8 +10,11 @@ import { ThemedText } from "../ui/ThemedText";
 import FeedActivity from "../screens/feed/FeedActivity";
 import { CardReview } from "./CardReview";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import BottomSheetUserActivity from "../bottom-sheets/sheets/BottomSheetUserActivity";
 import { useRouter } from "expo-router";
+import BottomSheetMedia from "../bottom-sheets/sheets/BottomSheetMedia";
+import { Icons } from "@/constants/Icons";
+import { upperFirst } from "lodash";
+import { useTranslation } from "react-i18next";
 
 interface CardUserActivityProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -83,13 +86,21 @@ const CardUserActivity = React.forwardRef<
 	CardUserActivityProps
 >(({ variant = "default", linked = false, ...props }, ref) => {
 	const router = useRouter();
+	const { t } = useTranslation();
 	const { openSheet } = useBottomSheetStore();
 	const onPress = () => {
 		router.push(`/user/${props.activity.user?.username}`);
 	};
-	const onLongPress = async () => {
-		await openSheet(BottomSheetUserActivity, {
-			activity: props.activity,
+	const onLongPress = () => {
+		openSheet(BottomSheetMedia, {
+			media: props.activity.media,
+			additionalItemsTop: [
+				{
+				icon: Icons.Feed,
+				onPress: () => router.push(`/user/${props.activity.user?.username}`),
+				label: upperFirst(t('common.messages.go_to_activity')),
+				},
+			]
 		})
 	};
 	return (
