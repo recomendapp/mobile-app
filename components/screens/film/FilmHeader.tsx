@@ -1,9 +1,11 @@
 import React from 'react';
 import {
+	Dimensions,
   LayoutChangeEvent,
   View,
 } from 'react-native';
 import Animated, {
+	cancelAnimation,
   Extrapolation,
   interpolate,
   runOnJS,
@@ -31,6 +33,8 @@ import MediaActionUserActivityWatch from '@/components/medias/actions/MediaActio
 import MediaActionUserWatchlist from '@/components/medias/actions/MediaActionUserWatchlist';
 import MediaActionPlaylistAdd from '@/components/medias/actions/MediaActionPlaylistAdd';
 import MediaActionUserRecos from '@/components/medias/actions/MediaActionUserRecos';
+
+const WINDOW_HEIGHT = Dimensions.get('window').height;
 
 interface FilmHeaderProps {
 	movie?: MediaMovie | null;
@@ -153,20 +157,26 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 	};
 
 	const headerGesture = Gesture.Pan()
-		.onBegin(() => {
+		.onStart(() => {
+			cancelAnimation(headerScrollY);
 			headerScrollStart.value = scrollY.get();
 		})
-		.onChange((event) => {
-			headerScrollY.value = headerScrollStart.get() - event.translationY;
+		.onUpdate((event) => {
+			const newScroll = headerScrollStart.get() - event.translationY;
+			if (newScroll < -WINDOW_HEIGHT / 2) {
+				headerScrollY.value = -WINDOW_HEIGHT / 2;
+			} else {
+				headerScrollY.value = newScroll;
+			}
 		})
-		.onFinalize((e) => {
-			console.log('headerScrollY', e.velocityY);
+		.onEnd((e) => {
 			if (headerScrollY.get() < 0) {
 				runOnJS(handleHeaderGestureEnd)()
 			} else {
 				if (Math.abs(e.velocityY) < 200) return;
 				headerScrollY.value = withDecay({
-					velocity: e.velocityY,
+					velocity: -e.velocityY,
+					deceleration: 0.9998,
 				})
 			}
 		});

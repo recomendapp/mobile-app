@@ -13,12 +13,12 @@ import useDebounce from "@/hooks/useDebounce";
 import tw from "@/lib/tw";
 import useSearchStore from "@/stores/useSearchStore";
 import { useCallback } from "react";
-import { TextInput, View } from "react-native";
+import { BetterInput } from "@/components/ui/BetterInput";
 
 const SearchScreen = () => {
 	const { colors, inset } = useTheme();
 	const { search, setSearch, filter } = useSearchStore(state => state);
-	const debouncedSearch = useDebounce(search, 500);
+	const debouncedSearch = useDebounce(search, 350);
 	const renderSearch = useCallback(() => {
 		if (debouncedSearch) {
 			switch (filter) {
@@ -36,7 +36,7 @@ const SearchScreen = () => {
 					return <ThemedText>Search for: {debouncedSearch}</ThemedText>
 			}
 		} else {
-			return <FeaturedPlaylists />
+			return <FeaturedPlaylists contentContainerStyle={tw`px-2`}/>
 		}
 	}, [debouncedSearch, filter]);
 
@@ -47,26 +47,13 @@ const SearchScreen = () => {
 			tw`flex-1 gap-2`
 		]}
 		>
-			<View
-			style={[
-				{ backgroundColor: colors.muted },
-				tw`flex-row items-center gap-2 rounded-md mx-2`,
-			]}
-			>
-				<Icons.Search color={colors.foreground} size={20} style={tw`my-2 ml-2`} />
-				<TextInput
-				placeholder="Search for movies, tv shows, and people"
-				placeholderTextColor={colors.mutedForeground}
-				style={[
-					{ color: colors.foreground },
-					tw`flex-1 py-2 pr-2`,
-				]}
-				textAlignVertical="center"
-
-				value={search}
-				onChangeText={setSearch}
-				/>
-			</View>
+			<BetterInput
+			value={search}
+			onChangeText={setSearch}
+			placeholder="Search for movies, tv shows, and people"
+			leftIcon="search"
+			containerStyle={tw`mx-2`}
+			/>
 			{debouncedSearch ? (
 				<Filters />
 			) : null}

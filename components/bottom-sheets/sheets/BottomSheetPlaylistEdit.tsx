@@ -35,7 +35,7 @@ const DESCRIPTION_MAX_LENGTH = 300;
 const BottomSheetPlaylistEdit = React.forwardRef<
 	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetPlaylistEditProps
->(({ id, playlist, onEdit, sizes, ...props }, ref) => {
+>(({ id, playlist, onEdit, sizes = ["auto"], ...props }, ref) => {
   const supabase = useSupabaseClient();
   const { closeSheet } = useBottomSheetStore();
   const { colors, inset } = useTheme();
@@ -184,7 +184,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
   return (
     <ThemedTrueSheet
     ref={ref}
-    sizes={['large']}
+    sizes={sizes}
     contentContainerStyle={tw`gap-4 items-center mx-2`}
     {...props}
     >
