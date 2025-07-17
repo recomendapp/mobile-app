@@ -54,7 +54,7 @@ const Playlist = ({
 	const fuse = React.useMemo(() => {
 		return new Fuse(playlistItems || [], {
 			keys: ['media.title'],
-			threshold: 0.3,
+			threshold: 0.5,
 		});
 	}, [playlistItems]);
 	const [sortBy, setSortBy] = React.useState<'rank' | 'title'>('rank');

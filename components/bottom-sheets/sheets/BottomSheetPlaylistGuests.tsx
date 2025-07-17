@@ -75,7 +75,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
   const fuse = React.useMemo(() => {
     return new Fuse(guests || [], {
       keys: ['user.username', 'user.full_name'],
-      threshold: 0.3,
+      threshold: 0.5,
     });
   }, [guests]);
   React.useEffect(() => {
