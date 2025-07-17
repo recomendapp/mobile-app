@@ -2,7 +2,7 @@ import React from 'react';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
-import { Media, UserActivity } from '@/types/type.db';
+import { UserActivity } from '@/types/type.db';
 import { LinkProps, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -15,6 +15,7 @@ import BottomSheetSendReco from './BottomSheetSendReco';
 import BottomSheetAddToPlaylist from './BottomSheetAddToPlaylist';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import { ScrollView } from 'react-native-gesture-handler';
 
 interface BottomSheetUserActivityProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -38,6 +39,8 @@ const BottomSheetUserActivity = React.forwardRef<
   const { colors, inset } = useTheme();
   const router = useRouter();
   const { t } = useTranslation();
+  // REFs
+  const scrollRef = React.useRef<ScrollView>(null);
   const items: Item[][] = React.useMemo(() => ([
     [
       ...additionalItemsTop,
@@ -80,45 +83,59 @@ const BottomSheetUserActivity = React.forwardRef<
   ]), [media]);
 
   return (
-    <ThemedTrueSheet ref={ref} {...props}>
-      <View
-      style={[
-        { borderColor: colors.mutedForeground },
-        tw`flex-row items-center gap-2 border-b p-4`,
-      ]}
+    <ThemedTrueSheet
+    ref={ref}
+    scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
+    contentContainerStyle={tw`p-0`}
+    {...props}
+    >
+      <ScrollView
+      ref={scrollRef}
+      bounces={false}
+      contentContainerStyle={{ paddingBottom: inset.bottom }}
+      stickyHeaderIndices={[0]}
       >
-        <ImageWithFallback
-        alt={media?.title ?? ''}
-        source={{ uri: media?.avatar_url ?? '' }}
+        <View
         style={[
-          { aspectRatio: 2 / 3, height: 'fit-content' },
-          tw.style('rounded-md w-12'),
+          { backgroundColor: colors.muted, borderColor: colors.mutedForeground },
+          tw`border-b p-4`,
         ]}
-        />
-        <View style={tw`shrink`}>
-          <ThemedText numberOfLines={2} style={tw`shrink`}>{media?.title}</ThemedText>
-          <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
-            {media?.main_credit?.map((director) => director.title).join(', ')}
-          </Text>
+        >
+          <View style={tw`flex-row items-center gap-2 `}>
+            <ImageWithFallback
+            alt={media?.title ?? ''}
+            source={{ uri: media?.avatar_url ?? '' }}
+            style={[
+              { aspectRatio: 2 / 3, height: 'fit-content' },
+              tw.style('rounded-md w-12'),
+            ]}
+            />
+            <View style={tw`shrink`}>
+              <ThemedText numberOfLines={2} style={tw`shrink`}>{media?.title}</ThemedText>
+              <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
+                {media?.main_credit?.map((director) => director.title).join(', ')}
+              </Text>
+            </View>
+          </View>
         </View>
-      </View>
-      {items.map((group, i) => (
-        <React.Fragment key={i}>
-          {group.map((item, j) => (
-            <TouchableOpacity
-            key={j}
-            onPress={() => {
-              closeSheet(id);
-              item.onPress();
-            }}
-            style={tw`flex-row items-center gap-2 p-4`}
-            >
-              <item.icon color={colors.mutedForeground} size={20} />
-              <ThemedText>{item.label}</ThemedText>
-            </TouchableOpacity>
-          ))}
-        </React.Fragment>
-      ))}
+        {items.map((group, i) => (
+          <React.Fragment key={i}>
+            {group.map((item, j) => (
+              <TouchableOpacity
+              key={j}
+              onPress={() => {
+                closeSheet(id);
+                item.onPress();
+              }}
+              style={tw`flex-row items-center gap-2 p-4`}
+              >
+                <item.icon color={colors.mutedForeground} size={20} />
+                <ThemedText>{item.label}</ThemedText>
+              </TouchableOpacity>
+            ))}
+          </React.Fragment>
+        ))}
+      </ScrollView>
     </ThemedTrueSheet>
   );
 });

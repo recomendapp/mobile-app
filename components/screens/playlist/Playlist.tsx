@@ -16,6 +16,7 @@ import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Icons } from "@/constants/Icons";
 import { BetterInput } from "@/components/ui/BetterInput";
 import useDebounce from "@/hooks/useDebounce";
+import Fuse from "fuse.js";
 
 interface PlaylistProps {
 	playlist?: TPlaylist | null;
@@ -46,7 +47,18 @@ const Playlist = ({
 	const backdrops = React.useMemo(() => {
 		return playlistItems?.map((item) => item.media?.backdrop_url) || [];
 	}, [playlistItems]);
+	const [renderItems, setRenderItems] = React.useState<typeof playlistItems>([]);
+	// Search and filters
 	const [search, setSearch] = React.useState('');
+	const debouncedSearch = useDebounce(search, 100);
+	const fuse = React.useMemo(() => {
+		return new Fuse(playlistItems || [], {
+			keys: ['media.title'],
+			threshold: 0.3,
+		});
+	}, [playlistItems]);
+	const [sortBy, setSortBy] = React.useState<'rank' | 'title'>('rank');
+	const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('asc');
 	// Handlers
 	const scrollHandler = useAnimatedScrollHandler({
 		onScroll: event => {
@@ -54,6 +66,37 @@ const Playlist = ({
 			scrollY.value = event.contentOffset.y;
 		},
 	});
+	// Effects
+	React.useEffect(() => {
+		if (playlistItems) {
+			setRenderItems(playlistItems);
+		}
+	}, [playlistItems]);
+	React.useEffect(() => {
+		if (debouncedSearch.length > 0) {
+			const results = fuse.search(debouncedSearch).map(({ item }) => item);
+			setRenderItems(results);
+		} else {
+			setRenderItems(playlistItems || []);
+		}
+	}, [debouncedSearch, fuse, playlistItems]);
+	React.useEffect(() => {
+		if (sortBy === 'rank') {
+			setRenderItems((prev) => prev?.sort((a, b) => {
+				if (sortOrder === 'asc') {
+					return (a.rank || 0) - (b.rank || 0);
+				}
+				return (b.rank || 0) - (a.rank || 0);
+			}));
+		} else if (sortBy === 'title') {
+			setRenderItems((prev) => prev?.sort((a, b) => {
+				if (sortOrder === 'asc') {
+					return a.media?.title!.localeCompare(b.media?.title!);
+				}
+				return b.media?.title!.localeCompare(a.media?.title!);
+			}));
+		}
+	}, [sortBy]);
 	return (
 	<AnimatedLegendList
 	onScroll={scrollHandler}
@@ -71,7 +114,7 @@ const Playlist = ({
 				<BetterInput
 				value={search}
 				onChangeText={setSearch}
-				placeholder="Search in this playlist"
+				placeholder={upperFirst(t('common.playlist.search.placeholder'))}
 				leftIcon="search"
 				containerStyle={tw`mx-2`}
 				/>
@@ -79,7 +122,7 @@ const Playlist = ({
 		</>
 	}
 	ListHeaderComponentStyle={tw`mb-2`}
-	data={playlistItems || []}
+	data={renderItems || []}
 	renderItem={({ item }) => (
 		<PlaylistItem key={item.id} item={item} style={tw`py-1 px-2`}/>
 	)}
@@ -89,9 +132,11 @@ const Playlist = ({
 		: (
 			<View style={tw`flex-1 items-center justify-center gap-2`}>
 				<Text style={{ color: colors.mutedForeground }}>{capitalize(t('common.messages.no_results'))}</Text>
-				<Button style={tw`rounded-full`}>
-					<ButtonText>{upperFirst(t('common.messages.add_to_this_playlist'))}</ButtonText>
-				</Button>
+				{playlistItems?.length === 0 && (
+					<Button style={tw`rounded-full`}>
+						<ButtonText>{upperFirst(t('common.messages.add_to_this_playlist'))}</ButtonText>
+					</Button>
+				)}
 			</View>
 		)
 	}
