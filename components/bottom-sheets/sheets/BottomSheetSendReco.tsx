@@ -56,7 +56,7 @@ const BottomSheetSendReco = React.forwardRef<
   const fuse = React.useMemo(() => {
     return new Fuse(friends || [], {
       keys: ['friend.username', 'friend.full_name'],
-      threshold: 0.3,
+      threshold: 0.5,
     });
 	}, [friends]);
   const [results, setResults] = React.useState<typeof friends>([]);
