@@ -34,7 +34,7 @@ export const WidgetUserFeed = ({
 
   return (
   <View style={[tw`gap-2`, style]}>
-    <Link href={'/(tabs)/(feed)/feed'}style={[tw`font-semibold text-xl`, { color: colors.foreground }, labelStyle]} >
+    <Link href={'/(tabs)/(feed)/feed'} style={[tw`font-semibold text-xl`, { color: colors.foreground }, labelStyle]}>
       {t('widgets.user_feed.label')}
     </Link>
     <LegendList

@@ -35,14 +35,12 @@ const CardPlaylistDefault = React.forwardRef<
 			]}
 			{...props}
 		>
-			<View style={tw.style("relative aspect-square rounded-sm overflow-hidden w-full")}>
-				<ImageWithFallback
-					source={{uri: playlist.poster_url ?? ''}}
-					alt={playlist?.title ?? ''}
-					type="playlist"
-					
-				/>
-			</View>
+			<ImageWithFallback
+				source={{uri: playlist.poster_url ?? ''}}
+				alt={playlist?.title ?? ''}
+				type="playlist"
+				style={tw`aspect-square w-auto h-auto`}
+			/>
 			<View>
 				<ThemedText numberOfLines={2} style={tw.style("font-medium")}>{playlist?.title}</ThemedText>
 				{showPlaylistAuthor ? <Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">

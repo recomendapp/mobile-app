@@ -8,6 +8,7 @@ import Drawer from 'expo-router/drawer';
 import CustomDrawerContent from '@/components/drawer/CustomDrawerContent';
 import StatusBar from '@/components/StatusBar';
 import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect';
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -16,6 +17,11 @@ export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
+
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false,
+})
 
 export default function RootLayout() {
   const hasMounted = React.useRef(false);

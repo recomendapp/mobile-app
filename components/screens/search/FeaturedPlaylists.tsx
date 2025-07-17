@@ -3,12 +3,18 @@ import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useTheme } from "@/providers/ThemeProvider";
 import { usePlaylistFeaturedInfiniteQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
-import { View } from "react-native";
+import { StyleProp, View, ViewStyle } from "react-native";
 import { LegendList } from "@legendapp/list";
 
 const GRID_COLUMNS = 3;
 
-const FeaturedPlaylists = () => {
+interface FeaturedPlaylistsProps {
+	contentContainerStyle?: StyleProp<ViewStyle>;
+}
+
+const FeaturedPlaylists = ({
+	contentContainerStyle,
+}: FeaturedPlaylistsProps) => {
 	const { inset } = useTheme();
 	const bottomTabOverflow = useBottomTabOverflow();
 	const {
@@ -32,9 +38,12 @@ const FeaturedPlaylists = () => {
 		numColumns={GRID_COLUMNS}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.3}
-		contentContainerStyle={{
-			paddingBottom: bottomTabOverflow + inset.bottom,
-		}}
+		contentContainerStyle={[
+			{
+				paddingBottom: bottomTabOverflow + inset.bottom,
+			},
+			contentContainerStyle,
+		]}
 		keyExtractor={(item) => item.playlist.id.toString()}
 		showsVerticalScrollIndicator={false}
 		columnWrapperStyle={tw`gap-2`}

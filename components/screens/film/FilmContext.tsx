@@ -1,12 +1,10 @@
 import { useTheme } from '@/providers/ThemeProvider';
 import { ParamListBase, TabNavigationState } from '@react-navigation/native';
-import React from 'react';
-import Animated, { AnimatedRef, runOnJS, SharedValue, useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
+import React, { useCallback } from 'react';
+import Animated, { AnimatedRef, runOnJS, scrollTo, SharedValue, useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 
 type ScrollableRef = AnimatedRef<
 	| Animated.FlatList<any>
-	// | Animated.FlatList<any>
-	// | FlashList<any>
 >;
 
 interface FilmContextType {
@@ -16,7 +14,6 @@ interface FilmContextType {
 	tabBarHeight: SharedValue<number>;
 	scrollY: SharedValue<number>;
 	headerScrollY: SharedValue<number>;
-  	headerMoveScrollY: SharedValue<number>;
 	movieId: number;
 	scrollRefs: Map<string, ScrollableRef>;
 	listOffsets: Map<string, number>;
@@ -49,22 +46,22 @@ const FilmProvider: React.FC<FilmProviderProps> = ({
 	const { inset } = useTheme();
 	const scrollRefs = React.useRef<Map<string, ScrollableRef>>(new Map()).current;
 	const listOffsets = React.useRef<Map<string, number>>(new Map()).current;
+	const currentKey = React.useMemo(() => tabState?.routes[tabState.index].key, [tabState]);
+	const currentRef = React.useMemo(() => currentKey ? scrollRefs.get(currentKey) : undefined, [currentKey, scrollRefs]);
 	const headerScrollY = useSharedValue(0);
-  	const headerMoveScrollY = useSharedValue(0);
 
-	const addScrollRef = (key: string, ref: ScrollableRef) => {
+	const addScrollRef = useCallback((key: string, ref: ScrollableRef) => {
 		const route = tabState?.routes.find((r) => r.key === key);
 		if (!route) return;
 		scrollRefs.set(route.key, ref);
-	};
-	const removeScrollRef = (key: string) => {
+	}, [scrollRefs, tabState]);
+	const removeScrollRef = useCallback((key: string) => {
 		const route = tabState?.routes.find((r) => r.key === key);
 		if (!route) return;
 		scrollRefs.delete(route.key);
-	};
-	const syncScrollOffset = () => {
+	}, [scrollRefs, tabState]);
+	const syncScrollOffset = useCallback(() => {
 		if (!tabState) return;
-		const currentKey = tabState?.routes[tabState.index].key;
 		const limitScrolll = headerHeight.get() - headerOverlayHeight.get() - inset.top;
 		scrollRefs.forEach((ref, refKey) => {
 			if (refKey !== currentKey) {
@@ -89,22 +86,21 @@ const FilmProvider: React.FC<FilmProviderProps> = ({
 				}
 			}
 		});
-	};
-	const handleHeaderScroll = (value: number) => {
-		const currRef = scrollRefs.get(tabState?.routes[tabState.index].key ?? '');
-		if (!currRef) return;
+	}, [headerHeight, headerOverlayHeight, inset, listOffsets, scrollRefs, scrollY, tabState, currentKey]);
+	const handleHeaderScroll = useCallback((value: number) => {
+		if (!currentRef) return;
 
 		// In case the header is not visible, we need to sync the scroll offset between tabs
 		if (value > headerHeight.value || value < 0) {
 			syncScrollOffset();
 		}
-		if (currRef.current && value <= headerHeight.value) {
-			currRef.current.scrollToOffset({
+		if (currentRef.current && value <= headerHeight.value) {
+			currentRef.current.scrollToOffset({
 				offset: value,
 				animated: false,
 			});
 		}
-	};
+	}, [currentRef, headerHeight, syncScrollOffset]);
 
 	// useAnimatedReaction(
 	// 	() => headerScrollY.value,
@@ -122,7 +118,6 @@ const FilmProvider: React.FC<FilmProviderProps> = ({
 			tabBarHeight,
 			scrollY,
 			headerScrollY,
-			headerMoveScrollY,
 			movieId,
 			scrollRefs,
 			listOffsets,
