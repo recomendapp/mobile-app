@@ -7,12 +7,12 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useUserWatchlistUpdateMutation } from '@/features/user/userMutations';
-import { Input } from '@/components/ui/Input';
 import { Button, ButtonText } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
 import { ActivityIndicator, View } from 'react-native';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import { BetterInput } from '@/components/ui/BetterInput';
 
 interface BottomSheetWatchlistCommentProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -69,7 +69,7 @@ const BottomSheetWatchlistComment = React.forwardRef<
 	{...props}
 	>
 		<ThemedText style={tw`text-center text-xl font-bold`}>{upperFirst(t('common.messages.comment', { count: 1 }))}</ThemedText>
-		<Input
+		<BetterInput
 		variant='outline'
 		multiline
 		defaultValue={comment}

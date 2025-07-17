@@ -20,11 +20,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import { userKeys } from '@/features/user/userKeys';
 import BottomSheetPlaylistCreate from './BottomSheetPlaylistCreate';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import { Input } from '@/components/ui/Input';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { useSharedValue } from 'react-native-reanimated';
 import { FlashList } from '@shopify/flash-list';
 import { FlatList, Pressable } from 'react-native-gesture-handler';
+import { BetterInput } from '@/components/ui/BetterInput';
 
 interface BottomSheetAddToPlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -115,7 +115,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
       }}
       style={[{ paddingBottom: inset.bottom, backgroundColor: colors.muted }, tw`gap-2 pt-2 px-2`]}
       >
-        <Input
+        <BetterInput
         variant='outline'
         defaultValue={comment}
         onChangeText={setComment}
@@ -170,13 +170,14 @@ const BottomSheetAddToPlaylist = React.forwardRef<
             ItemSeparatorComponent={() => <View style={tw`w-1`} />}
             />
           </View>
-          <Input
+          <BetterInput
           variant='outline'
           defaultValue={search}
           onChangeText={setSearch}
           placeholder={upperFirst(t('common.messages.search_playlist'))}
           autoCapitalize='none'
           autoCorrect={false}
+          leftIcon='search'
           />
           <Button
           variant={'outline'}

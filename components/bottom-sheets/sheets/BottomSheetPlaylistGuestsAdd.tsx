@@ -7,7 +7,6 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { upperCase, upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { usePlaylistGuestsSearchInfinite } from '@/features/playlist/playlistQueries';
-import { Input } from '@/components/ui/Input';
 import { Icons } from '@/constants/Icons';
 import { CardUser } from '@/components/cards/CardUser';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
@@ -15,6 +14,7 @@ import useDebounce from '@/hooks/useDebounce';
 import { FlashList } from '@shopify/flash-list';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import { BetterInput } from '@/components/ui/BetterInput';
 
 interface BottomSheetPlaylistGuestsAddProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -76,11 +76,12 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
         {upperFirst(t('common.playlist.actions.add_guests'))}
       </ThemedText> */}
       <View style={tw`flex-1 w-full gap-2`}>
-        <Input
+        <BetterInput
         variant='outline'
         defaultValue={search}
         onChangeText={setSearch}
         placeholder={upperFirst(t('common.messages.search_user'))}
+        leftIcon='search'
         />
         <View style={tw`flex-1`}>
           <FlashList
