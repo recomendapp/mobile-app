@@ -20,6 +20,7 @@ import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation 
 import BottomSheetPlaylistGuests from './BottomSheetPlaylistGuests';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import { ScrollView } from 'react-native-gesture-handler';
 
 interface BottomSheetPlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -46,6 +47,8 @@ const BottomSheetPlaylist = React.forwardRef<
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useTranslation();
+  // REFs
+  const scrollRef = React.useRef<ScrollView>(null);
   const {
 		data: saved,
 		isLoading: isLoadingSaved,
@@ -180,26 +183,39 @@ const BottomSheetPlaylist = React.forwardRef<
     ]
   }, [playlist, user, saved, additionalItemsTop, colors, t, router, closeSheet, id, playlistDeleteMutation, insertPlaylistSaved, deletePlaylistSaved]);
   return (
-  <ThemedTrueSheet ref={ref} {...props}>
+  <ThemedTrueSheet
+  ref={ref}
+  scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
+  contentContainerStyle={tw`p-0`}
+  {...props}
+  >
+    <ScrollView
+    ref={scrollRef}
+    bounces={false}
+    contentContainerStyle={{ paddingBottom: inset.bottom }}
+    stickyHeaderIndices={[0]}
+    >
       <View
       style={[
-        { borderColor: colors.mutedForeground },
-        tw`flex-row items-center gap-2 border-b p-4`,
+        { backgroundColor: colors.muted, borderColor: colors.mutedForeground },
+        tw`border-b p-4`,
       ]}
       >
-        <ImageWithFallback
-        alt={playlist.title ?? ''}
-        source={{ uri: playlist.poster_url ?? '' }}
-        style={[
-          { aspectRatio: 1 / 1, height: 'fit-content' },
-          tw.style('rounded-md w-12'),
-        ]}
-        />
-        <View style={tw`shrink`}>
-          <ThemedText numberOfLines={2} style={tw`shrink`}>{playlist.title}</ThemedText>
-          <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
-            {t('common.messages.by_name', { name: playlist.user?.username })}
-          </Text>
+        <View style={tw`flex-row items-center gap-2 `}>
+          <ImageWithFallback
+          alt={playlist.title ?? ''}
+          source={{ uri: playlist.poster_url ?? '' }}
+          style={[
+            { aspectRatio: 1 / 1, height: 'fit-content' },
+            tw.style('rounded-md w-12'),
+          ]}
+          />
+          <View style={tw`shrink`}>
+            <ThemedText numberOfLines={2} style={tw`shrink`}>{playlist.title}</ThemedText>
+            <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
+              {t('common.messages.by_name', { name: playlist.user?.username })}
+            </Text>
+          </View>
         </View>
       </View>
       {items.map((group, i) => (
@@ -220,7 +236,8 @@ const BottomSheetPlaylist = React.forwardRef<
           ))}
         </React.Fragment>
       ))}
-    </ThemedTrueSheet>
+    </ScrollView>
+  </ThemedTrueSheet>
   );
 });
 BottomSheetPlaylist.displayName = 'BottomSheetPlaylist';

@@ -114,7 +114,11 @@
       "guest_other": "guests",
       "ok": "ok",
       "ignore": "ignore",
-      "no_playlists_saved": "no playlists saved"
+      "no_playlists_saved": "no playlists saved",
+      "go_to_director_one": "go to director",
+      "show_director_other": "show directors",
+      "go_to_creator_one": "go to creator",
+      "show_creator_other": "show creators"
     },
     "errors": {
       "not_logged_in": "you are not logged in",

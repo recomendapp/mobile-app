@@ -73,8 +73,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
   const [search, setSearch] = React.useState('');
   const [filteredGuests, setFilteredGuests] = React.useState<typeof guests>([]);
   const fuse = React.useMemo(() => {
-    if (!guests) return null;
-    return new Fuse(guests, {
+    return new Fuse(guests || [], {
       keys: ['user.username', 'user.full_name'],
       threshold: 0.3,
     });

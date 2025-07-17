@@ -123,7 +123,13 @@
       "guest_male_other": "invités",
       "ok": "ok",
       "ignore": "ignorer",
-      "no_playlists_saved": "Aucune playlist enregistrée"
+      "no_playlists_saved": "Aucune playlist enregistrée",
+      "go_to_director_one": "accéder au réalisateur",
+      "go_to_director_female_one": "accéder à la réalisatrice",
+      "show_director_other": "afficher les réalisateurs",
+      "go_to_creator_one": "accéder au créateur",
+      "go_to_creator_female_one": "accéder à la créatrice",
+      "show_creator_other": "afficher les créateurs"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",

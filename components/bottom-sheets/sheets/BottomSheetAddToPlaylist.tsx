@@ -63,8 +63,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
 
   const [search, setSearch] = React.useState('');
   const fuse = React.useMemo(() => {
-    if (!playlists) return null;
-    return new Fuse(playlists, {
+    return new Fuse(playlists || [], {
       keys: ['playlist.title'],
       threshold: 0.3,
     });
