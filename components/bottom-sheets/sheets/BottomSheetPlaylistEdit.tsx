@@ -19,8 +19,8 @@ import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { decode } from 'base64-arraybuffer';
 import Switch from '@/components/ui/Switch';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import { Input } from '@/components/ui/Input';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import { BetterInput } from '@/components/ui/BetterInput';
 
 interface BottomSheetPlaylistEditProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -217,7 +217,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
       control={form.control}
       render={({ field: { onChange, onBlur, value} }) => (
         <View style={tw`gap-2 w-full`}>
-          <Input
+          <BetterInput
           variant='outline'
           placeholder={upperFirst(t('common.playlist.form.title.placeholder'))}
           value={value}
@@ -238,7 +238,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
       control={form.control}
       render={({ field: { onChange, onBlur, value} }) => (
         <View style={tw`gap-2 w-full`}>
-          <Input
+          <BetterInput
           variant='outline'
           placeholder={upperFirst(t('common.word.description'))}
           style={tw`h-24`}

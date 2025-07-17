@@ -17,11 +17,11 @@ import { Button, ButtonText } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
 import { Badge } from '@/components/ui/Badge';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import { Input } from '@/components/ui/Input';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { FlashList } from '@shopify/flash-list';
 import { FlatList, Pressable } from 'react-native-gesture-handler';
 import { useSharedValue } from 'react-native-reanimated';
+import { BetterInput } from '@/components/ui/BetterInput';
 
 interface BottomSheetSendRecoProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -130,7 +130,7 @@ const BottomSheetSendReco = React.forwardRef<
       }}
       style={[{ paddingBottom: inset.bottom, backgroundColor: colors.muted }, tw`gap-2 pt-2 px-2`]}
       >
-        <Input
+        <BetterInput
         variant='outline'
         defaultValue={comment}
         onChangeText={setComment}
@@ -180,13 +180,14 @@ const BottomSheetSendReco = React.forwardRef<
             ItemSeparatorComponent={() => <View style={tw`w-1`} />}
             />
           </View>
-          <Input
+          <BetterInput
           variant='outline'
           defaultValue={search}
           onChangeText={setSearch}
           placeholder={upperFirst(t('common.messages.search_friend'))}
           autoCapitalize='none'
           autoCorrect={false}
+          leftIcon='search'
           />
         </View>
       }

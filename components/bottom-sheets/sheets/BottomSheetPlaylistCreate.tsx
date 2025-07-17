@@ -15,9 +15,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Text, View } from 'react-native';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import { Input } from '@/components/ui/Input';
 import { BottomSheetProps } from '../BottomSheetManager';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import { BetterInput } from '@/components/ui/BetterInput';
 
 interface BottomSheetPlaylistCreateProps extends BottomSheetProps {
   onCreate?: (playlist: Playlist) => void;
@@ -92,7 +92,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
       control={form.control}
       render={({ field: { onChange, onBlur, value} }) => (
         <View style={tw`gap-2 w-full`}>
-          <Input
+          <BetterInput
           variant='outline'
           placeholder={placeholder ?? upperFirst(t('common.playlist.form.title.placeholder'))}
           value={value}

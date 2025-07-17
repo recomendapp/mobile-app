@@ -7,7 +7,6 @@ import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { usePlaylistGuests } from '@/features/playlist/playlistQueries';
-import { Input } from '@/components/ui/Input';
 import Fuse from 'fuse.js';
 import { Button, ButtonText } from '@/components/ui/Button';
 import { MinusCircleIcon } from 'lucide-react-native';
@@ -23,6 +22,7 @@ import { playlistKeys } from '@/features/playlist/playlistKeys';
 import BottomSheetPlaylistGuestsAdd from './BottomSheetPlaylistGuestsAdd';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import { BetterInput } from '@/components/ui/BetterInput';
 
 interface BottomSheetPlaylistGuestsProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
   id: string;
@@ -186,12 +186,12 @@ const BottomSheetPlaylistGuests = React.forwardRef<
       </View>
       <View style={tw`flex-1 w-full gap-2`}>
         <View style={tw`flex-row items-center justify-between gap-2`}>
-          <Input
+          <BetterInput
           variant='outline'
           defaultValue={search}
           onChangeText={setSearch}
           placeholder={upperFirst(t('common.messages.search_guest'))}
-          style={tw`flex-1`}
+          leftIcon='search'
           />
           <TouchableOpacity
           onPress={() => BottomSheetPlaylistGuestsAddRef.current?.present()}
