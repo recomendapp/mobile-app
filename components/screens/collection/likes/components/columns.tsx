@@ -40,8 +40,8 @@ export const Columns = () => {
 			}
 		});
 	}, []);
-	const handleOpenSheet = React.useCallback(async (data: UserActivity) => {
-		await openSheet(BottomSheetMedia, {
+	const handleOpenSheet = React.useCallback((data: UserActivity) => {
+		openSheet(BottomSheetMedia, {
 			media: data.media,
 			additionalItemsBottom: [
 				{
