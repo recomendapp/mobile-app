@@ -1,18 +1,14 @@
 import React from 'react';
 import {
-	Dimensions,
-  LayoutChangeEvent,
-  View,
+	LayoutChangeEvent,
+	View,
 } from 'react-native';
 import Animated, {
-	cancelAnimation,
-  Extrapolation,
-  interpolate,
-  runOnJS,
-  SharedValue,
-  useAnimatedStyle,
-  useSharedValue,
-  withDecay,
+	Extrapolation,
+	interpolate,
+	SharedValue,
+	useAnimatedStyle,
+	useSharedValue,
 } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import { ThemedText } from '@/components/ui/ThemedText';
@@ -25,8 +21,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { useFilmContext } from './FilmContext';
 import MediaActionUserActivityRating from '@/components/medias/actions/MediaActionUserActivityRating';
 import { Image } from 'expo-image';
 import MediaActionUserActivityLike from '@/components/medias/actions/MediaActionUserActivityLike';
@@ -34,8 +28,6 @@ import MediaActionUserActivityWatch from '@/components/medias/actions/MediaActio
 import MediaActionUserWatchlist from '@/components/medias/actions/MediaActionUserWatchlist';
 import MediaActionPlaylistAdd from '@/components/medias/actions/MediaActionPlaylistAdd';
 import MediaActionUserRecos from '@/components/medias/actions/MediaActionUserRecos';
-
-const WINDOW_HEIGHT = Dimensions.get('window').height;
 
 interface FilmHeaderProps {
 	movie?: MediaMovie | null;
@@ -101,13 +93,6 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 					'clamp',
 					),
 				},
-				// {
-				// 	translateY: interpolate(
-				// 		scrollY.get(),
-				// 		[layoutY.get() - 1, layoutY.get(), layoutY.get() + 1],
-				// 		[1, 0, -1],
-				// 	),
-				// },
 			],
 		};
 	});
@@ -131,7 +116,6 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 	<Animated.View
 	style={[
 		tw.style('w-full'),
-		// opacityAnim
 	]}
 	onLayout={(event: LayoutChangeEvent) => {
 		'worklet';
@@ -246,10 +230,6 @@ const Genres = ({
 	  name: string;
 	}[];
   }) => {
-	// const formattedGenres = new Intl.ListFormat(i18n.language, {
-	//   style: 'narrow',
-	//   type: 'conjunction',
-	// }).formatToParts(genres.map((genre) => genre.name));
 	return (
 	  	<>
 			{" | "}
