@@ -6,7 +6,6 @@ import { TextInput, type TextInputProps } from 'react-native';
 interface InputProps
   extends TextInputProps {
     variant?: 'default' | 'outline';
-    leftIcon?: React.ReactNode;
   }
 
 const Input = React.forwardRef<React.ComponentRef<typeof TextInput>, InputProps>(

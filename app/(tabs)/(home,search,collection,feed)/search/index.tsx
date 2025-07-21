@@ -53,6 +53,7 @@ const SearchScreen = () => {
 			placeholder="Search for movies, tv shows, and people"
 			leftIcon="search"
 			containerStyle={tw`mx-2`}
+			clearable
 			/>
 			{debouncedSearch ? (
 				<Filters />

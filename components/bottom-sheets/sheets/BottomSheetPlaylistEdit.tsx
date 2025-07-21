@@ -68,16 +68,16 @@ const BottomSheetPlaylistEdit = React.forwardRef<
   /* -------------------------------------------------------------------------- */
 
   const posterOptions = React.useMemo(() => [
-		{ label: "Choisir dans la bibliothèque", value: "library" },
-		{ label: "Prendre une photo", value: "camera" },
-    { label: "Supprimer l'image actuelle", value: "delete", disable: !playlist.poster_url && !newPoster },
-		{ label: t("common.word.cancel"), value: "cancel" },
+		{ label: upperFirst(t('common.messages.choose_from_the_library')), value: "library" },
+		{ label: upperFirst(t('common.messages.take_a_photo')), value: "camera" },
+    { label: upperFirst(t('common.messages.delete_current_image')), value: "delete", disable: !playlist.poster_url && !newPoster },
+		{ label: upperFirst(t("common.word.cancel")), value: "cancel" },
 	], [t, playlist.poster_url, newPoster]);
 
   const handlePosterOptions = () => {
     const cancelIndex = posterOptions.length - 1;
     showActionSheetWithOptions({
-      options: posterOptions.map((option) => upperFirst(option.label)),
+      options: posterOptions.map((option) => option.label),
       disabledButtonIndices: posterOptions.map((option, index) => option.disable ? index : -1).filter((index) => index !== -1),
       cancelButtonIndex: cancelIndex,
     }, async (selectedIndex) => {
@@ -129,7 +129,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
       let poster_url: string | null | undefined = undefined;
       if (newPoster) {
         const fileExt = newPoster.uri.split('.').pop();
-        const fileName = `${playlist.id}-${Math.random()}.${fileExt}`;
+        const fileName = `${playlist.id}.${fileExt}`;
         const { data, error } = await supabase.storage
           .from('playlist_posters')
           .upload(fileName, decode(newPoster.base64!), {
@@ -137,7 +137,10 @@ const BottomSheetPlaylistEdit = React.forwardRef<
             upsert: true,
           });
         if (error) throw error;
-        poster_url =  `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${data?.fullPath}`;
+        const { data: { publicUrl } } = supabase.storage
+          .from('playlist_posters')
+          .getPublicUrl(data.path);
+        poster_url = publicUrl;
       } else if (newPoster === null) {
         poster_url = null;
       }

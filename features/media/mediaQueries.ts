@@ -77,22 +77,28 @@ export const useMediaReviewsInfiniteQuery = ({
 	filters,
 } : {
 	id?: number | null;
-	filters: {
-		perPage: number;
-		sortBy: 'updated_at';
-		sortOrder: 'asc' | 'desc';
+	filters?: {
+		perPage?: number;
+		sortBy?: 'updated_at';
+		sortOrder?: 'asc' | 'desc';
 	};
 }) => {
+	const mergedFilters = {
+		perPage: 20,
+		sortBy: 'updated_at',
+		sortOrder: 'desc',
+		...filters,
+	};
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
 		queryKey: mediaKeys.reviews({
 			id: id!,
-			filters,
+			filters: mergedFilters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!id) throw Error('No id provided');
-			let from = (pageParam - 1) * filters.perPage;
-	  		let to = from - 1 + filters.perPage;
+			let from = (pageParam - 1) * mergedFilters.perPage;
+	  		let to = from - 1 + mergedFilters.perPage;
 			let request = supabase
 				.from('user_review')
 				.select(`
@@ -101,12 +107,12 @@ export const useMediaReviewsInfiniteQuery = ({
 				`)
 				.eq('activity.media_id', id)
 				.range(from, to)
-			
-			if (filters) {
-				if (filters.sortBy && filters.sortOrder) {
-					switch (filters.sortBy) {
+
+			if (mergedFilters) {
+				if (mergedFilters.sortBy && mergedFilters.sortOrder) {
+					switch (mergedFilters.sortBy) {
 						case 'updated_at':
-							request = request.order('updated_at', { ascending: filters.sortOrder === 'asc' });
+							request = request.order('updated_at', { ascending: mergedFilters.sortOrder === 'asc' });
 							break;
 						default:
 							break;
@@ -119,34 +125,42 @@ export const useMediaReviewsInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == filters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!id,
 	});
 
 };
 /* -------------------------------------------------------------------------- */
+
+/* -------------------------------- PLAYLISTS ------------------------------- */
 export const useMediaPlaylistsInfiniteQuery = ({
 	id,
 	filters,
 } : {
 	id?: number | null;
-	filters: {
-		perPage: number;
-		sortBy: 'created_at' | 'updated_at' | 'likes_count';
-		sortOrder: 'asc' | 'desc';
+	filters?: {
+		perPage?: number;
+		sortBy?: 'created_at' | 'updated_at' | 'likes_count';
+		sortOrder?: 'asc' | 'desc';
 	};
 }) => {
+	const mergedFilters = {
+		perPage: 20,
+		sortBy: 'created_at',
+		sortOrder: 'desc',
+		...filters,
+	};
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
 		queryKey: mediaKeys.playlists({
 			id: id!,
-			filters,
+			filters: mergedFilters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!id) throw Error('No id provided');
-			let from = (pageParam - 1) * filters.perPage;
-	  		let to = from - 1 + filters.perPage;
+			let from = (pageParam - 1) * mergedFilters.perPage;
+	  		let to = from - 1 + mergedFilters.perPage;
 			let request = supabase
 				.from('playlists')
 				.select('*, user(*), playlist_items!inner(*)')
@@ -155,17 +169,17 @@ export const useMediaPlaylistsInfiniteQuery = ({
 				})
 				.range(from, to);
 			
-			if (filters) {
-				if (filters.sortBy && filters.sortOrder) {
-					switch (filters.sortBy) {
+			if (mergedFilters) {
+				if (mergedFilters.sortBy && mergedFilters.sortOrder) {
+					switch (mergedFilters.sortBy) {
 						case 'updated_at':
-							request = request.order('updated_at', { ascending: filters.sortOrder === 'asc' });
+							request = request.order('updated_at', { ascending: mergedFilters.sortOrder === 'asc' });
 							break;
 						case 'created_at':
-							request = request.order('created_at', { ascending: filters.sortOrder === 'asc' });
+							request = request.order('created_at', { ascending: mergedFilters.sortOrder === 'asc' });
 							break;
 						case 'likes_count':
-							request = request.order('likes_count', { ascending: filters.sortOrder === 'asc' });
+							request = request.order('likes_count', { ascending: mergedFilters.sortOrder === 'asc' });
 							break;
 						default:
 							break;
@@ -178,63 +192,9 @@ export const useMediaPlaylistsInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == filters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!id,
 	});
 };
-/* -------------------------------- PLAYLISTS ------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-/*                                   PERSON                                   */
-/* -------------------------------------------------------------------------- */
-
-/* ------------------------------- FILMOGRAPHY ------------------------------ */
-// export const useMediaPersonMostRatedInfiniteQuery = ({
-// 	personId,
-// 	filters,
-// } : {
-// 	personId: number;
-// 	filters?: {
-// 		resultsPerPage?: number;
-// 		limit?: number;
-// 	};
-// }) => {
-// 	const mergedFilters = {
-// 		resultsPerPage: 20,
-// 		limit: 10,
-// 		...filters,
-// 	};
-// 	const supabase = useSupabaseClient();
-// 	return useInfiniteQuery({
-// 		queryKey: mediaKeys.mostRated({ personId, filters: mergedFilters }),
-// 		queryFn: async ({ pageParam = 1}) => {
-// 			if (!personId) throw Error('No person id provided');
-// 			let from = (pageParam - 1) * mergedFilters.resultsPerPage;
-// 			let to = from - 1 + mergedFilters.resultsPerPage;
-// 			let request = supabase
-// 				.from('media_person_combined_credits')
-// 				.select('*')
-// 				.eq('person_id', personId)
-// 				.order('popularity', { ascending: false, nullsFirst: false })
-// 				.order('tmdb_popularity', { ascending: false, nullsFirst: false })
-// 				.range(from, to);
-// 			if (mergedFilters) {
-// 				if (mergedFilters.limit) {
-// 					request = request.limit(mergedFilters.limit);
-// 				}
-// 			}
-// 			const { data, error } = await request;
-// 			if (error) throw error;
-// 			return data;
-// 		},
-// 		initialPageParam: 1,
-// 		getNextPageParam: (lastPage, pages) => {
-// 			return lastPage?.length == mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
-// 		},
-// 		enabled: !!personId,
-// 	});
-// };
 /* -------------------------------------------------------------------------- */

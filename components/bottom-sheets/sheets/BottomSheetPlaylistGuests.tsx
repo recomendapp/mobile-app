@@ -192,6 +192,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
           onChangeText={setSearch}
           placeholder={upperFirst(t('common.messages.search_guest'))}
           leftIcon='search'
+          clearable
           />
           <TouchableOpacity
           onPress={() => BottomSheetPlaylistGuestsAddRef.current?.present()}

@@ -16,7 +16,7 @@ export interface InputProps extends React.ComponentProps<typeof TextInput> {
 const BetterInput = React.forwardRef<
 	React.ComponentRef<typeof TextInput>,
 	InputProps
->(({ variant, style, clearable = true, containerStyle, leftIcon, leftIconStyle, onFocus, onBlur, ...props }, ref) => {
+>(({ variant, style, clearable, containerStyle, leftIcon, leftIconStyle, onFocus, onBlur, ...props }, ref) => {
 	const { colors } = useTheme();
 	const [isFocused, setIsFocused] = React.useState(false);
 	const getIcons = React.useCallback((name: string) => {

@@ -188,6 +188,7 @@ const BottomSheetSendReco = React.forwardRef<
           autoCapitalize='none'
           autoCorrect={false}
           leftIcon='search'
+          clearable
           />
         </View>
       }

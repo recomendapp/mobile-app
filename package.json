@@ -13,6 +13,7 @@
     "type-check": "yarn tsc"
   },
   "dependencies": {
+    "@10play/tentap-editor": "^0.7.5-alpha.0",
     "@dev-plugins/react-query": "^0.3.1",
     "@expo/react-native-action-sheet": "^4.1.1",
     "@hookform/resolvers": "^4.0.0",
@@ -45,6 +46,7 @@
     "expo-router": "^5.1.3",
     "expo-splash-screen": "^0.30.10",
     "expo-status-bar": "^2.2.3",
+    "expo-symbols": "~0.4.5",
     "expo-system-ui": "^5.0.10",
     "fuse.js": "^7.1.0",
     "i18next": "^25.3.2",
@@ -66,8 +68,7 @@
     "react-native-webview": "^13.15.0",
     "twrnc": "^4.9.1",
     "zod": "^4.0.2",
-    "zustand": "^5.0.6",
-    "expo-symbols": "~0.4.5"
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",

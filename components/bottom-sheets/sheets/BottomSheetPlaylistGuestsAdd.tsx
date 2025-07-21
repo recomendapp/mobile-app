@@ -82,6 +82,7 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
         onChangeText={setSearch}
         placeholder={upperFirst(t('common.messages.search_user'))}
         leftIcon='search'
+        clearable
         />
         <View style={tw`flex-1`}>
           <FlashList
