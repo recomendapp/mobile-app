@@ -419,6 +419,7 @@ export const useUserReviewUpdateMutation = () => {
 			title?: string | null;
 			body: any;
 		}) => {
+			console.log(`Updating review '${id}', typeof id: ${typeof id}`);
 			const { data, error } = await supabase
 				.from('user_review')
 				.update({
@@ -427,6 +428,7 @@ export const useUserReviewUpdateMutation = () => {
 				})
 				.eq('id', id)
 				.select('*')
+				.single();
 			if (error) throw error;
 			return data;
 		},

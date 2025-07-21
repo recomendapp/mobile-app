@@ -178,6 +178,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
           autoCapitalize='none'
           autoCorrect={false}
           leftIcon='search'
+          clearable
           />
           <Button
           variant={'outline'}

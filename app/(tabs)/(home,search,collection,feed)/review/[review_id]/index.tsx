@@ -8,7 +8,7 @@ import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useUserReviewQuery } from "@/features/user/userQueries";
-// import Viewer from "@/lib/10tap/viewer";
+import Viewer from "@/lib/10tap/viewer";
 import tw from "@/lib/tw";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
@@ -57,9 +57,9 @@ const ReviewScreen = () => {
 			activity={review.activity!}
 			showRating
 			/>
-			{/* <Viewer
+			<Viewer
 			content={review.body}
-			/> */}
+			/>
 			<View style={tw.style("flex-row items-center justify-end m-1")}>
 				<ActionReviewLike reviewId={review?.id} reviewLikesCount={review.likes_count} />
 			</View>

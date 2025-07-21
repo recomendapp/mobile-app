@@ -9,6 +9,7 @@ import Animated, {
   Extrapolation,
   interpolate,
   runOnJS,
+  SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withDecay,
@@ -39,45 +40,23 @@ const WINDOW_HEIGHT = Dimensions.get('window').height;
 interface FilmHeaderProps {
 	movie?: MediaMovie | null;
 	loading: boolean;
+	scrollY: SharedValue<number>;
+	headerHeight: SharedValue<number>;
+	headerOverlayHeight: SharedValue<number>;
 }
 const FilmHeader: React.FC<FilmHeaderProps> = ({
 	movie,
 	loading,
+	scrollY,
+	headerHeight,
+	headerOverlayHeight,
 }) => {
 	const { t } = useTranslation();
 	const { hslToRgb } = useColorConverter();
 	const { colors, inset } = useTheme();
-	const {
-		scrollY,
-		headerOverlayHeight,
-		headerHeight,
-		headerScrollY,
-		scrollRefs,
-		tabState,
-	} = useFilmContext();
+
 	const bgColor = hslToRgb(colors.background);
-	const layoutY = useSharedValue(0);
-	const headerScrollStart = useSharedValue(0);
 	const posterHeight = useSharedValue(0);
-	const opacityAnim = useAnimatedStyle(() => {
-		return {
-			opacity: interpolate(
-				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + inset.top) / 0.9],
-				[1, 0],
-				Extrapolation.CLAMP,
-			),
-			transform: [
-				{
-					translateY: interpolate(
-						scrollY.get(),
-						[layoutY.get() - 1, layoutY.get(), layoutY.get() + 1],
-						[1, 0, -1],
-					),
-				},
-			],
-		};
-	});
 	const posterAnim = useAnimatedStyle(() => {
 		const scaleValue = interpolate(
 			scrollY.get(),
@@ -147,151 +126,115 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 			],
 		};
 	});
-	const handleHeaderGestureEnd = () => {
-		scrollRefs.forEach((listRef) => {
-			listRef.current?.scrollToOffset({
-				offset: 0,
-				animated: true,
-			});
-		});
-	};
-
-	const headerGesture = Gesture.Pan()
-		.onStart(() => {
-			cancelAnimation(headerScrollY);
-			headerScrollStart.value = scrollY.get();
-		})
-		.onUpdate((event) => {
-			const newScroll = headerScrollStart.get() - event.translationY;
-			if (newScroll < -WINDOW_HEIGHT / 2) {
-				headerScrollY.value = -WINDOW_HEIGHT / 2;
-			} else {
-				headerScrollY.value = newScroll;
-			}
-		})
-		.onEnd((e) => {
-			if (headerScrollY.get() < 0) {
-				runOnJS(handleHeaderGestureEnd)()
-			} else {
-				if (Math.abs(e.velocityY) < 200) return;
-				headerScrollY.value = withDecay({
-					velocity: -e.velocityY,
-					deceleration: 0.9998,
-				})
-			}
-		});
 
 	return (
-	<GestureDetector gesture={headerGesture}>
+	<Animated.View
+	style={[
+		tw.style('w-full'),
+		// opacityAnim
+	]}
+	onLayout={(event: LayoutChangeEvent) => {
+		'worklet';
+		headerHeight.value = event.nativeEvent.layout.height;
+	}}
+	>
 		<Animated.View
 		style={[
-			tw.style('w-full absolute'),
-			opacityAnim
+			tw`absolute inset-0`,
+			bgAnim,
 		]}
-		onLayout={(event: LayoutChangeEvent) => {
-			'worklet';
-			headerHeight.value = event.nativeEvent.layout.height;
-			layoutY.value = event.nativeEvent.layout.y;
-		}}
 		>
-			<Animated.View
-			style={[
-				tw`absolute inset-0`,
-				bgAnim,
+			{movie ? <Image
+			style={tw`absolute inset-0`}
+			source={{ uri: movie.backdrop_url ?? '' }}
+			/> : null}
+			<LinearGradient
+			style={tw`absolute inset-0`}
+			colors={[
+				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
+				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
+				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.5)`,
+				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
+				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
+				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.8)`,
+				`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 1)`,
 			]}
-			>
-				{movie ? <Image
-				style={tw`absolute inset-0`}
-				source={{ uri: movie.backdrop_url ?? '' }}
-				/> : null}
-				<LinearGradient
-				style={tw`absolute inset-0`}
-				colors={[
-					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.3)`,
-					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.4)`,
-					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.5)`,
-					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
-					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.6)`,
-					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.8)`,
-					`rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 1)`,
-				]}
-				/>
-			</Animated.View>
-			<Animated.View
-			style={[
-				tw.style('items-center gap-4 p-2'),
-				{ paddingTop: inset.top === 0 ? 8 : inset.top }
-			]}
-			>
-				{!loading ? (
-					<AnimatedImageWithFallback
-					onLayout={(e) => {
-						'worklet';
-						posterHeight.value = e.nativeEvent.layout.height;
-					}}
-					alt={movie?.title ?? ''}
-					source={{ uri: movie?.avatar_url ?? '' }}
-					style={[
-						{ aspectRatio: 2 / 3 },
-						tw.style('rounded-md w-48 h-auto'),
-						posterAnim
-					]}
-					type="movie"
-					/>
-				) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw.style('w-48'), posterAnim]}/>}
-				<Animated.View
-				style={[
-					tw.style('gap-2 w-full'),
-					textAnim
-				]}
-				>
-					{/* GENRES */}
-					{movie ? <ThemedText>
-						<ThemedText style={{ color: colors.accentYellow }}>{upperFirst('film')}</ThemedText>
-						{movie?.genres ? <Genres genres={movie.genres} /> : null}
-					</ThemedText> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
-					{/* TITLE */}
-					{!loading ? (
-						<ThemedText
-						numberOfLines={2}
-						style={[
-							tw.style('text-4xl font-bold'),
-							(!movie && !loading) && { textAlign: 'center', color: colors.mutedForeground }
-						]}
-						>
-							{movie?.title ?? upperFirst(t('common.errors.film_not_found'))}
-						</ThemedText>
-					) : <Skeleton style={tw.style('w-64 h-12')} />}
-					{(movie?.extra_data.original_title && movie.extra_data.original_title !== movie.title) ? (
-						<ThemedText numberOfLines={1} style={[ { color: colors.mutedForeground }, tw.style('text-lg font-semibold')]}>
-							{movie.extra_data.original_title}
-						</ThemedText>
-					) : null}
-					{/* DIRECTORS & DURATION */}
-					{movie?.main_credit || movie?.extra_data.runtime ? (
-						<ThemedText>
-							{movie.main_credit ? <Directors directors={movie.main_credit} /> : null}
-						</ThemedText>
-					) : null}
-
-				</Animated.View>
-			</Animated.View>
-			{movie ? (
-			<View style={tw`flex-row items-center justify-between gap-4 p-2`}>
-				<View style={tw`flex-row items-center gap-4`}>
-					<MediaActionUserActivityRating media={movie as Media} />
-					<MediaActionUserActivityLike media={movie as Media} />
-					<MediaActionUserActivityWatch media={movie as Media} />
-					<MediaActionUserWatchlist media={movie as Media} />
-				</View>
-				<View style={tw`flex-row items-center gap-4`}>
-					<MediaActionPlaylistAdd media={movie as Media} />
-					<MediaActionUserRecos media={movie as Media} />
-				</View>
-			</View>
-			) : null}
+			/>
 		</Animated.View>
-	</GestureDetector>
+		<Animated.View
+		style={[
+			tw.style('items-center gap-4 p-2'),
+			{ paddingTop: inset.top === 0 ? 8 : inset.top }
+		]}
+		>
+			{!loading ? (
+				<AnimatedImageWithFallback
+				onLayout={(e) => {
+					'worklet';
+					posterHeight.value = e.nativeEvent.layout.height;
+				}}
+				alt={movie?.title ?? ''}
+				source={{ uri: movie?.avatar_url ?? '' }}
+				style={[
+					{ aspectRatio: 2 / 3 },
+					tw.style('rounded-md w-48 h-auto'),
+					posterAnim
+				]}
+				type="movie"
+				/>
+			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw.style('w-48'), posterAnim]}/>}
+			<Animated.View
+			style={[
+				tw.style('gap-2 w-full'),
+				textAnim
+			]}
+			>
+				{/* GENRES */}
+				{movie ? <ThemedText>
+					<ThemedText style={{ color: colors.accentYellow }}>{upperFirst('film')}</ThemedText>
+					{movie?.genres ? <Genres genres={movie.genres} /> : null}
+				</ThemedText> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
+				{/* TITLE */}
+				{!loading ? (
+					<ThemedText
+					numberOfLines={2}
+					style={[
+						tw.style('text-4xl font-bold'),
+						(!movie && !loading) && { textAlign: 'center', color: colors.mutedForeground }
+					]}
+					>
+						{movie?.title ?? upperFirst(t('common.errors.film_not_found'))}
+					</ThemedText>
+				) : <Skeleton style={tw.style('w-64 h-12')} />}
+				{(movie?.extra_data.original_title && movie.extra_data.original_title !== movie.title) ? (
+					<ThemedText numberOfLines={1} style={[ { color: colors.mutedForeground }, tw.style('text-lg font-semibold')]}>
+						{movie.extra_data.original_title}
+					</ThemedText>
+				) : null}
+				{/* DIRECTORS & DURATION */}
+				{movie?.main_credit || movie?.extra_data.runtime ? (
+					<ThemedText>
+						{movie.main_credit ? <Directors directors={movie.main_credit} /> : null}
+					</ThemedText>
+				) : null}
+
+			</Animated.View>
+		</Animated.View>
+		{movie ? (
+		<View style={tw`flex-row items-center justify-between gap-4 p-2`}>
+			<View style={tw`flex-row items-center gap-4`}>
+				<MediaActionUserActivityRating media={movie as Media} />
+				<MediaActionUserActivityLike media={movie as Media} />
+				<MediaActionUserActivityWatch media={movie as Media} />
+				<MediaActionUserWatchlist media={movie as Media} />
+			</View>
+			<View style={tw`flex-row items-center gap-4`}>
+				<MediaActionPlaylistAdd media={movie as Media} />
+				<MediaActionUserRecos media={movie as Media} />
+			</View>
+		</View>
+		) : null}
+	</Animated.View>
 	);
 };
 

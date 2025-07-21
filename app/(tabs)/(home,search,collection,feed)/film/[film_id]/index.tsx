@@ -1,105 +1,112 @@
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
-import { Link } from "expo-router"
+import { Href, Link, useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
-import { Dimensions, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Media, MediaMoviePerson } from "@/types/type.db";
 import { CardMedia } from "@/components/cards/CardMedia";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
-import Animated, { runOnJS, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle } from "react-native-reanimated";
+import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { useEffect } from "react";
-import { useRoute } from "@react-navigation/native";
-import { useFilmContext } from "@/components/screens/film/FilmContext";
 import { LegendList } from "@legendapp/list";
+import { getIdFromSlug } from "@/hooks/getIdFromSlug";
+import HeaderOverlay from "@/components/ui/HeaderOverlay";
+import BottomSheetMedia from "@/components/bottom-sheets/sheets/BottomSheetMedia";
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
+import FilmHeader from "@/components/screens/film/FilmHeader";
+import { useState } from "react";
+import FilmWidgetPlaylists from "@/components/screens/film/FilmWidgetPlaylists";
+import FilmWidgetReviews from "@/components/screens/film/FilmWidgetReviews";
 
-const WINDOW_HEIGHT = Dimensions.get('window').height;
+const PADDING_BOTTOM = 8;
 
 const FilmScreen = () => {
+	const { film_id } = useLocalSearchParams<{ film_id: string }>();
+	const { id: movieId} = getIdFromSlug(film_id as string);
 	const { colors, inset } = useTheme();
 	const { i18n, t } = useTranslation();
-	const route = useRoute();
-	const {
-		tabState,
-		syncScrollOffset,
-		movieId,
-		scrollY,
-		headerHeight,
-		tabBarHeight,
-		headerOverlayHeight,
-		addScrollRef 
-	} = useFilmContext();
+	const { openSheet } = useBottomSheetStore();
 	const bottomTabBarHeight = useBottomTabOverflow();
-	const scrollRef = useAnimatedRef<Animated.FlatList<any>>();
 	const {
 		data: movie,
+		isLoading,
 	} = useMediaMovieDetailsQuery({
 		id: movieId,
 		locale: i18n.language,
 	});
+	const loading = movie === undefined || isLoading;
+	// States
+	const [showFullSynopsis, setShowFullSynopsis] = useState(false);
+	// SharedValue
+	const headerHeight = useSharedValue<number>(0);
+	const headerOverlayHeight = useSharedValue<number>(0);
+	const scrollY = useSharedValue<number>(0);
 
 	const scrollHandler = useAnimatedScrollHandler({
 		onScroll: event => {
 			'worklet';
 			scrollY.value = event.contentOffset.y;
 		},
-		onMomentumEnd: event => {
-			'worklet';
-			runOnJS(syncScrollOffset)();
-		},
-		onEndDrag: event => {
-			'worklet';
-			runOnJS(syncScrollOffset)();
-		}
 	});
 
-	const flatlistStyle = useAnimatedStyle(() => ({
-		paddingTop: headerHeight.get() + tabBarHeight.get(),
-	}));
-
-	useEffect(() => {
-		if (scrollRef.current && tabState) {
-			addScrollRef(route.key, scrollRef);
-		}
-	}, [scrollRef, tabState]);
-
 	if (!movie) return null;
-	if (!tabState) return null;
 
 	return (
-	<Animated.FlatList
-	scrollToOverflowEnabled
-	ref={scrollRef}
-	onScroll={scrollHandler}
-	style={flatlistStyle}
-	contentContainerStyle={[
-		{
-			paddingBottom: bottomTabBarHeight + inset.bottom,
-			minHeight: WINDOW_HEIGHT - (headerOverlayHeight.get() + tabBarHeight.get() + inset.top),
-		},
-	]}
-	ListHeaderComponent={
-		<>
-			{/* SYNOPSIS */}
-			<View style={tw.style('gap-1 px-2')}>
-				<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.word.overview'))}</ThemedText>
-				<ThemedText style={[{ color: colors.mutedForeground }, tw.style('text-justify')]}>
-					{movie.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
-				</ThemedText>
+	<>
+		<HeaderOverlay
+		triggerHeight={headerHeight}
+		headerHeight={headerOverlayHeight}
+		onHeaderHeight={(height) => {
+			'worklet';
+			headerOverlayHeight.value = height;
+		}}
+		scrollY={scrollY}
+		title={movie?.title ?? ''}
+		onMenuPress={() => {
+			openSheet(BottomSheetMedia, {
+				media: movie as Media,
+			})
+		}}
+		/>
+		<Animated.ScrollView
+		onScroll={scrollHandler}
+		scrollToOverflowEnabled
+		contentContainerStyle={[
+			{
+				paddingBottom: bottomTabBarHeight + inset.bottom + PADDING_BOTTOM,
+			},
+		]}
+		>
+			<FilmHeader
+			movie={movie}
+			loading={loading}
+			scrollY={scrollY}
+			headerHeight={headerHeight}
+			headerOverlayHeight={headerOverlayHeight}
+			/>
+			<View style={tw.style('flex-col gap-4')}>
+				{/* SYNOPSIS */}
+				<Pressable
+				style={tw.style('gap-1 px-2')}
+				onPress={() => setShowFullSynopsis((prev) => !prev)}
+				>
+					<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.word.overview'))}</ThemedText>
+					<ThemedText numberOfLines={showFullSynopsis ? undefined : 5} style={[{ color: colors.mutedForeground }, tw.style('text-justify')]}>
+						{movie.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
+					</ThemedText>
+				</Pressable>
+				{/* CASTING */}
+				<View style={tw.style('gap-1')}> 
+					<ThemedText style={tw.style('px-2 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
+					{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
+				</View>
+				<FilmWidgetPlaylists mediaId={movie.media_id!} slug={film_id} containerStyle={tw`px-2`} labelStyle={tw`px-2`}/>
+				<FilmWidgetReviews mediaId={movie.media_id!} slug={film_id} containerStyle={tw`px-2`} labelStyle={tw`px-2`}/>
 			</View>
-			{/* CASTING */}
-			<View style={tw.style('gap-1')}> 
-				<ThemedText style={tw.style('px-2 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
-				{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
-			</View>
-		</>
-	}
-	showsVerticalScrollIndicator={false}
-	data={[null]}
-	renderItem={() => null}
-	/>
+		</Animated.ScrollView>
+	</>
 	)
 };
 
@@ -116,7 +123,7 @@ const FilmCast = ({
 			if (!item.person) return null;
 			return (
 			<Link key={index} href={`/person/${item.person?.id}`} asChild>
-				<View style={tw.style('gap-2 w-32')}>
+				<View style={tw.style('gap-2 w-24')}>
 					<CardMedia
 					key={item.id}
 					variant='poster'
@@ -132,7 +139,7 @@ const FilmCast = ({
 			</Link>
 			)
 		}}
-    snapToInterval={136}
+    	snapToInterval={104}
 		contentContainerStyle={tw`px-2`}
 		keyExtractor={(item) => item.id.toString()}
 		showsHorizontalScrollIndicator={false}

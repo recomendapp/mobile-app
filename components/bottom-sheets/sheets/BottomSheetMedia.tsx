@@ -3,7 +3,7 @@ import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
 import { Media } from '@/types/type.db';
-import { LinkProps, useRouter } from 'expo-router';
+import { LinkProps, usePathname, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
@@ -31,6 +31,7 @@ interface Item {
 	onPress: () => void;
 	submenu?: Item[];
   closeOnPress?: boolean;
+  disabled?: boolean;
 }
 
 const BottomSheetMedia = React.forwardRef<
@@ -41,6 +42,7 @@ const BottomSheetMedia = React.forwardRef<
   const { colors, inset } = useTheme();
   const router = useRouter();
   const { t } = useTranslation();
+  const pathname = usePathname();
   // REFs
   const scrollRef = React.useRef<ScrollView>(null);
   const BottomSheetMainCreditsRef = React.useRef<TrueSheet>(null);
@@ -50,9 +52,9 @@ const BottomSheetMedia = React.forwardRef<
       ...additionalItemsTop,
     ],
     [
-			{
-				icon: Icons.Movie,
-				onPress: () => router.push(media?.url as LinkProps['href']),
+      {
+        icon: Icons.Movie,
+        onPress: () => router.push(media?.url as LinkProps['href']),
         label: media?.media_type === 'movie'
           ? upperFirst(t('common.messages.go_to_film'))
           : media?.media_type === 'tv_series'
@@ -60,7 +62,8 @@ const BottomSheetMedia = React.forwardRef<
           : media?.media_type === 'person'
           ? upperFirst(t('common.messages.go_to_person'))
           : upperFirst(t('common.messages.go_to_media')),
-			},
+        disabled: pathname.startsWith(`/film/${media?.id}`),
+      },
       ...(((media?.media_type === 'movie' || media?.media_type === 'tv_series') && media.main_credit && media.main_credit.length > 0) ? [
         media.main_credit.length > 1 ? {
           icon: Icons.Users,
@@ -102,7 +105,7 @@ const BottomSheetMedia = React.forwardRef<
     [
       ...additionalItemsBottom,
     ],
-  ]), [media]);
+  ]), [media, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname]);
 
   return (
     <ThemedTrueSheet
@@ -131,6 +134,7 @@ const BottomSheetMedia = React.forwardRef<
               { aspectRatio: 2 / 3, height: 'fit-content' },
               tw.style('rounded-md w-12'),
             ]}
+            type={media?.media_type}
             />
             <View style={tw`shrink`}>
               <ThemedText numberOfLines={2} style={tw`shrink`}>{media?.title}</ThemedText>
@@ -153,7 +157,8 @@ const BottomSheetMedia = React.forwardRef<
                 (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
                 item.onPress();
               }}
-              style={tw`flex-row items-center gap-2 p-4`}
+              style={[tw`flex-row items-center gap-2 p-4`, { opacity: item.disabled ? 0.5 : 1 }]}
+              disabled={item.disabled}
               >
                 <item.icon color={colors.mutedForeground} size={20} />
                 <ThemedText>{item.label}</ThemedText>

@@ -111,6 +111,7 @@ const BottomSheetPlaylist = React.forwardRef<
           icon: Icons.Playlist,
           onPress: () => router.push(`/playlist/${playlist.id}`),
           label: upperFirst(t('common.messages.go_to_playlist')),
+          disabled: pathname.startsWith(`/playlist/${playlist.id}`),
         },
         {
           icon: Icons.user,
@@ -209,6 +210,7 @@ const BottomSheetPlaylist = React.forwardRef<
             { aspectRatio: 1 / 1, height: 'fit-content' },
             tw.style('rounded-md w-12'),
           ]}
+          type={"playlist"}
           />
           <View style={tw`shrink`}>
             <ThemedText numberOfLines={2} style={tw`shrink`}>{playlist.title}</ThemedText>

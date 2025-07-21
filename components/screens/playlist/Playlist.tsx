@@ -117,6 +117,7 @@ const Playlist = ({
 				placeholder={upperFirst(t('common.playlist.search.placeholder'))}
 				leftIcon="search"
 				containerStyle={tw`mx-2`}
+				clearable
 				/>
 			)}
 		</>
