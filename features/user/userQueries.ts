@@ -193,7 +193,7 @@ export const useUserActivityQuery = ({
 	});
 };
 
-export const useUserFollowersRating = ({
+export const useUserFollowersRatingQuery = ({
 	userId,
 	mediaId,
 } : {

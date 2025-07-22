@@ -10,9 +10,9 @@ import { CardUser } from '@/components/cards/CardUser';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { FlashList } from '@shopify/flash-list';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import { BottomSheetProps } from '../BottomSheetManager';
 
-interface BottomSheetMyRecosSendersProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
-  id: string;
+interface BottomSheetMyRecosSendersProps extends BottomSheetProps {
   comments: UserRecosAggregated['senders'];
 };
 

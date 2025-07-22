@@ -1,9 +1,9 @@
 import React from 'react';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import { BottomSheetProps } from '../BottomSheetManager';
 
-interface BottomSheetDefaultViewProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
-  id: string;
+interface BottomSheetDefaultViewProps extends BottomSheetProps {
   content: React.ReactNode;
 }
 

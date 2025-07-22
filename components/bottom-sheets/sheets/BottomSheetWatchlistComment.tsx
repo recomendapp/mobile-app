@@ -13,9 +13,9 @@ import { ActivityIndicator, View } from 'react-native';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BetterInput } from '@/components/ui/BetterInput';
+import { BottomSheetProps } from '../BottomSheetManager';
 
-interface BottomSheetWatchlistCommentProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
-  id: string;
+interface BottomSheetWatchlistCommentProps extends BottomSheetProps {
   watchlistItem: UserWatchlist
 };
 

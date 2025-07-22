@@ -17,9 +17,9 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import BottomSheetDefaultView from '../templates/BottomSheetDefaultView';
 import { ScrollView } from 'react-native-gesture-handler';
+import { BottomSheetProps } from '../BottomSheetManager';
 
-interface BottomSheetMediaProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
-  id: string;
+interface BottomSheetMediaProps extends BottomSheetProps {
   media?: Media,
   additionalItemsTop?: Item[];
   additionalItemsBottom?: Item[];

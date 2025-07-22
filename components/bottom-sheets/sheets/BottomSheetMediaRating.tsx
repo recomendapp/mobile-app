@@ -19,6 +19,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { useUserActivityInsertMutation, useUserActivityUpdateMutation } from '@/features/user/userMutations';
 import * as Burnt from 'burnt';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import { BottomSheetProps } from '../BottomSheetManager';
 
 const { width } = Dimensions.get('screen');
 const ITEM_WIDTH = width * 0.2;
@@ -83,8 +84,7 @@ const RatingItem = React.forwardRef<
 RatingItem.displayName = 'RatingItem';
 
 
-interface BottomSheetMediaRatingProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
-	id: string;
+interface BottomSheetMediaRatingProps extends BottomSheetProps {
 	media: Media;
 	/**
 	 * 
