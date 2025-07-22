@@ -7,8 +7,6 @@ import UserAvatar from "../user/UserAvatar";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { ThemedText } from "../ui/ThemedText";
-import { Icons } from "@/constants/Icons";
-import { ThemedView } from "../ui/ThemedView";
 
 interface CardUserProps
 	extends React.ComponentPropsWithoutRef<typeof Animated.View> {
@@ -19,6 +17,7 @@ interface CardUserProps
 		linked?: boolean;
 		width?: number;
 		height?: number;
+		children?: React.ReactNode;
 	}
 
 const CardUserDefault = React.forwardRef<
@@ -31,17 +30,19 @@ const CardUserDefault = React.forwardRef<
 		ref={ref}
 		style={[
 			{ backgroundColor: colors.card, borderColor: colors.border },
-			tw.style('flex-row items-center rounded-xl h-20 p-1 border'),
+			tw.style('flex-row items-center justify-between rounded-xl h-20 p-1 border'),
 			style,
 		]}
 		{...props}
 		>
-			<UserAvatar full_name={user?.full_name} avatar_url={user?.avatar_url} />
-			<View style={tw.style('shrink px-2 py-1 gap-1')}>
-				<ThemedText numberOfLines={2}>{user?.full_name}</ThemedText>
-				<Text numberOfLines={2} style={{ color: colors.mutedForeground }}>@{user?.username}</Text>
-				{/* {children} */}
+			<View style={tw`flex-row items-center justify-center`}>
+				<UserAvatar full_name={user?.full_name} avatar_url={user?.avatar_url} />
+				<View style={tw.style('shrink px-2 py-1 gap-1')}>
+					<ThemedText numberOfLines={2}>{user?.full_name}</ThemedText>
+					<Text numberOfLines={2} style={{ color: colors.mutedForeground }}>@{user?.username}</Text>
+				</View>
 			</View>
+			{children}
 		</Animated.View>
 	);
 });

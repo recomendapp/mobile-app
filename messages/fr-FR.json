@@ -150,7 +150,8 @@
       "playlist_other": "playlists",
       "choose_from_the_library": "choisir dans la bibliothèque",
       "take_a_photo": "prendre une photo",
-      "delete_current_image": "supprimer l'image actuelle"
+      "delete_current_image": "supprimer l'image actuelle",
+      "ratings_from_followees": "notes des suivi(e)s"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",
