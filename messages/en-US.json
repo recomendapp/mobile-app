@@ -139,7 +139,8 @@
       "playlists_other": "playlists",
       "choose_from_the_library": "choose from the library",
       "take_a_photo": "take a photo",
-      "delete_current_image": "delete current image"
+      "delete_current_image": "delete current image",
+      "ratings_from_followees": "ratings from followed users"
     },
     "errors": {
       "not_logged_in": "you are not logged in",

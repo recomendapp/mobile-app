@@ -1,31 +1,20 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
-import { ThemedText } from '@/components/ui/ThemedText';
-import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Playlist } from '@/types/type.db';
-import * as z from 'zod';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { usePlaylistUpdateMutation } from '@/features/playlist/playlistMutations';
-import * as Burnt from 'burnt';
-import { Text, TouchableOpacity, View } from 'react-native';
-import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
-import { useActionSheet } from '@expo/react-native-action-sheet';
-import * as ImagePicker from 'expo-image-picker';
-import { useSupabaseClient } from '@/providers/SupabaseProvider';
-import { decode } from 'base64-arraybuffer';
-import Switch from '@/components/ui/Switch';
+import { View } from 'react-native';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
-import { BetterInput } from '@/components/ui/BetterInput';
 import { BottomSheetProps } from '../BottomSheetManager';
-import { FlatList, Pressable } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native-gesture-handler';
 import { useUserFollowersRatingQuery } from '@/features/user/userQueries';
 import { useAuth } from '@/providers/AuthProvider';
 import { CardUser } from '@/components/cards/CardUser';
+import { BarChart } from '@/components/charts/bar-chart';
+import { IconMediaRating } from '@/components/medias/IconMediaRating';
+import { ThemedText } from '@/components/ui/ThemedText';
+import { upperFirst } from 'lodash';
+import { Icons } from '@/constants/Icons';
 
 interface BottomSheetMediaFollowersAverageRatingProps extends BottomSheetProps {
   mediaId: number;
@@ -36,23 +25,25 @@ const BottomSheetMediaFollowersAverageRating = React.forwardRef<
 	BottomSheetMediaFollowersAverageRatingProps
 >(({ id, mediaId, sizes = ['medium', 'large'], ...props }, ref) => {
   const { user } = useAuth();
-  const { closeSheet } = useBottomSheetStore();
   const { colors, inset } = useTheme();
   const { t } = useTranslation();
   const {
     data: followersRating,
 		isLoading,
-		isError,
 	} = useUserFollowersRatingQuery({
     userId: user?.id,
 		mediaId: mediaId,
 	});
+  const loading = followersRating === undefined || isLoading;
   const refFlatList = React.useRef<FlatList<NonNullable<typeof followersRating>[number]>>(null);
-
-  if (followersRating === null) {
-    closeSheet(id);
-    return null;
-	};
+  const chartsData = useMemo(() => {
+    if (!followersRating) return null;
+    return new Array(10).fill(0).map((_, index) => ({
+      label: (index + 1).toString(),
+      value: followersRating.filter((f) => f.rating === index + 1).length || 0,
+      color: colors.accentBlue,
+    }));
+  }, [followersRating]);
 
   return (
     <ThemedTrueSheet
@@ -63,13 +54,47 @@ const BottomSheetMediaFollowersAverageRating = React.forwardRef<
     >
       <FlatList
       ref={refFlatList}
-      data={followersRating} //  ? [...followersRating, ...followersRating, ...followersRating, ...followersRating, ...followersRating, ...followersRating] : []}
+      data={followersRating}
       renderItem={({ item }) => (
         <CardUser
         key={item.id}
         user={item.user!}
-        />
+        style={tw`h-auto`}
+        >
+          <IconMediaRating
+          rating={item.rating}
+          variant='follower'
+          />
+        </CardUser>
       )}
+      ListHeaderComponent={
+        chartsData ? (
+          <View style={tw`gap-2 mb-4`}>
+            <ThemedText style={tw`text-center font-bold text-lg`}>
+            {upperFirst(t('common.messages.ratings_from_followees'))}
+            </ThemedText>
+            <BarChart
+            data={chartsData}
+            config={{
+              height: 220,
+              showLabels: true,
+              animated: true,
+              duration: 1000,
+            }}
+            />
+          </View>
+        ) : null
+      }
+      ListEmptyComponent={
+        loading ? <Icons.Loader />
+        : (
+          <View style={tw`flex-1 items-center justify-center p-4`}>
+            <ThemedText style={[tw`text-center`, { color: colors.mutedForeground }]}>
+              {upperFirst(t('common.messages.no_results'))}
+            </ThemedText>
+          </View>
+        )
+      }
       contentContainerStyle={[
         tw`p-4`,
         {
@@ -81,7 +106,6 @@ const BottomSheetMediaFollowersAverageRating = React.forwardRef<
       nestedScrollEnabled
       showsVerticalScrollIndicator={false}
       />
-      
     </ThemedTrueSheet>
   );
 });
