@@ -89,7 +89,7 @@ const MediaPlaylists = ({
 				</View>
 			</>
 		}
-		ListEmptyComponent={() => (
+		ListEmptyComponent={
 			loading ? <Icons.Loader />
 			: (
 				<View style={tw`flex-1 items-center justify-center p-4`}>
@@ -98,7 +98,7 @@ const MediaPlaylists = ({
 					</Text>
 				</View>
 			) 
-		)}
+		}
 		numColumns={3}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.5}

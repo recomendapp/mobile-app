@@ -19,6 +19,14 @@ export const mediaKeys = {
 		? [...mediaKeys.specify({ type }), String(id)] as const
 		: [...mediaKeys.all, id] as const,
 
+	seasonDetail: ({
+		id,
+		seasonNumber,
+	} : {
+		id: number;
+		seasonNumber: number;
+	}) => [...mediaKeys.detail({ id, type: 'tv_series' }), 'season', seasonNumber] as const,
+
 	/* --------------------------------- REVIEWS -------------------------------- */
 	reviews: ({
 		id,
@@ -37,6 +45,16 @@ export const mediaKeys = {
 		id: number;
 		filters?: any;
 	}) => filters ? [...mediaKeys.detail({ id }), 'playlists', filters] as const : [...mediaKeys.detail({ id }), 'playlists'] as const,
+	/* -------------------------------------------------------------------------- */
+
+	/* -------------------------------- FOLLOWERS ------------------------------- */
+
+	followersAverageRating: ({
+		id,
+	} : {
+		id: number;
+	}) => [...mediaKeys.detail({ id }), 'followersAverageRating'] as const,
+
 	/* -------------------------------------------------------------------------- */
 
 	/* -------------------------------------------------------------------------- */

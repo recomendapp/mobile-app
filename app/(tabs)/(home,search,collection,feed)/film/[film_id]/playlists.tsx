@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 const FilmPlaylists = () => {
 	const { i18n } = useTranslation();
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
-	const { id: movieId} = getIdFromSlug(film_id);
+	const { id: movieId } = getIdFromSlug(film_id);
 	const { data: movie } = useMediaMovieDetailsQuery({ id: movieId, locale: i18n.language });
 	return (
 		<MediaPlaylists mediaId={movie?.media_id} />
