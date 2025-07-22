@@ -1,10 +1,10 @@
 import { ThemedText } from "@/components/ui/ThemedText";
-import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
+import { useMediaTvSeriesDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
-import { Media, MediaMoviePerson } from "@/types/type.db";
+import { Media, MediaTvSeriesPerson } from "@/types/type.db";
 import { CardMedia } from "@/components/cards/CardMedia";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -19,24 +19,25 @@ import { useState } from "react";
 import MediaWidgetPlaylists from "@/components/screens/media/MediaWidgetPlaylists";
 import MediaWidgetReviews from "@/components/screens/media/MediaWidgetReviews";
 import MediaHeader from "@/components/screens/media/MediaHeader";
+import TvSeriesWidgetSeasons from "@/components/screens/media/TvSeries/TvSeriesWidgetSeasons";
 
 const PADDING_BOTTOM = 8;
 
-const FilmScreen = () => {
-	const { film_id } = useLocalSearchParams<{ film_id: string }>();
-	const { id: movieId} = getIdFromSlug(film_id as string);
+const TvSeriesScreen = () => {
+	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
+	const { id: seriesId} = getIdFromSlug(tv_series_id as string);
 	const { colors, inset } = useTheme();
 	const { i18n, t } = useTranslation();
 	const { openSheet } = useBottomSheetStore();
 	const bottomTabBarHeight = useBottomTabOverflow();
 	const {
-		data: movie,
+		data: series,
 		isLoading,
-	} = useMediaMovieDetailsQuery({
-		id: movieId,
+	} = useMediaTvSeriesDetailsQuery({
+		id: seriesId,
 		locale: i18n.language,
 	});
-	const loading = movie === undefined || isLoading;
+	const loading = series === undefined || isLoading;
 	// States
 	const [showFullSynopsis, setShowFullSynopsis] = useState(false);
 	// SharedValue
@@ -51,7 +52,7 @@ const FilmScreen = () => {
 		},
 	});
 
-	if (!movie) return null;
+	if (!series) return null;
 
 	return (
 	<>
@@ -63,10 +64,10 @@ const FilmScreen = () => {
 			headerOverlayHeight.value = height;
 		}}
 		scrollY={scrollY}
-		title={movie?.title ?? ''}
+		title={series?.title ?? ''}
 		onMenuPress={() => {
 			openSheet(BottomSheetMedia, {
-				media: movie as Media,
+				media: series as Media,
 			})
 		}}
 		/>
@@ -80,7 +81,7 @@ const FilmScreen = () => {
 		]}
 		>
 			<MediaHeader
-			media={movie as Media}
+			media={series as Media}
 			loading={loading}
 			scrollY={scrollY}
 			headerHeight={headerHeight}
@@ -94,26 +95,27 @@ const FilmScreen = () => {
 				>
 					<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.word.overview'))}</ThemedText>
 					<ThemedText numberOfLines={showFullSynopsis ? undefined : 5} style={[{ color: colors.mutedForeground }, tw.style('text-justify')]}>
-						{movie.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
+						{series.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
 					</ThemedText>
 				</Pressable>
+				<TvSeriesWidgetSeasons seasons={series.seasons || []} containerStyle={tw`px-2`} labelStyle={tw`px-2`} />
 				{/* CASTING */}
 				<View style={tw.style('gap-1')}> 
 					<ThemedText style={tw.style('px-2 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
-					{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
+					{series.cast?.length ? <TvSeriesCast cast={series.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
 				</View>
-				<MediaWidgetPlaylists mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-2`} labelStyle={tw`px-2`}/>
-				<MediaWidgetReviews mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-2`} labelStyle={tw`px-2`}/>
+				<MediaWidgetPlaylists mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-2`} labelStyle={tw`px-2`} />
+				<MediaWidgetReviews mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-2`} labelStyle={tw`px-2`} />
 			</View>
 		</Animated.ScrollView>
 	</>
 	)
 };
 
-const FilmCast = ({
+const TvSeriesCast = ({
 	cast,
 } : {
-	cast: MediaMoviePerson[]
+	cast: MediaTvSeriesPerson[]
 }) => {
 	const { colors } = useTheme();
 	return (
@@ -133,7 +135,7 @@ const FilmCast = ({
 					/>
 					<View style={tw.style('flex-col gap-1 items-center')}>
 						<ThemedText numberOfLines={2}>{item.person?.title}</ThemedText>
-						{item.role?.character ? <ThemedText numberOfLines={2} style={[{ color: colors.accentYellow }, tw.style('italic text-sm')]}>{item.role?.character}</ThemedText> : null}
+						{item.character ? <ThemedText numberOfLines={2} style={[{ color: colors.accentYellow }, tw.style('italic text-sm')]}>{item.character}</ThemedText> : null}
 					</View>
 				</View>
 			</Link>
@@ -150,4 +152,4 @@ const FilmCast = ({
 	);
 };
 
-export default FilmScreen;
+export default TvSeriesScreen;

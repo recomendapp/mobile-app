@@ -12,23 +12,23 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useMediaPlaylistsInfiniteQuery, useMediaReviewsInfiniteQuery } from "@/features/media/mediaQueries";
 import { CardReview } from "@/components/cards/CardReview";
 
-interface FilmWidgetReviewsProps extends React.ComponentPropsWithoutRef<typeof View> {
+interface MediaWidgetReviewsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	mediaId: number;
-	slug: string;
+	url: Href;
 	labelStyle?: StyleProp<TextStyle>;
 	containerStyle?: StyleProp<ViewStyle>;
 }
 
-const FilmWidgetReviews = ({
+const MediaWidgetReviews = ({
 	mediaId,
-	slug,
+	url,
 	style,
 	labelStyle,
 	containerStyle,
-} : FilmWidgetReviewsProps) => {
+} : MediaWidgetReviewsProps) => {
 	const { colors } = useTheme();
 	const { t } = useTranslation();
-	const url = `/film/${slug}/reviews` as const;
+	const urlReviews = `${url}/reviews` as Href;
 	const {
 		data: reviews,
 		isLoading,
@@ -42,10 +42,10 @@ const FilmWidgetReviews = ({
 	return (
 	<View style={[tw`gap-1`, style]}>
 		<View style={tw`flex-row items-center justify-between gap-2`}>
-			<Link href={url} style={[tw`font-medium text-lg`, { color: colors.foreground }, labelStyle]}>
+			<Link href={urlReviews} style={[tw`font-medium text-lg`, { color: colors.foreground }, labelStyle]}>
 			{upperFirst(t('common.messages.review', { count: reviews.pages.flat().length }))}
 			</Link>
-			<Link href={url} style={[{ color: colors.mutedForeground }, tw`text-sm`]}>
+			<Link href={urlReviews} style={[{ color: colors.mutedForeground }, tw`text-sm`]}>
 				{upperFirst(t('common.messages.show_all'))}
 			</Link>
 		</View>
@@ -67,4 +67,4 @@ const FilmWidgetReviews = ({
 	);
 };
 
-export default FilmWidgetReviews;
+export default MediaWidgetReviews;
