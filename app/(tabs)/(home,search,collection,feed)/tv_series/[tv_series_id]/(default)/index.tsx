@@ -20,12 +20,13 @@ import MediaWidgetPlaylists from "@/components/screens/media/MediaWidgetPlaylist
 import MediaWidgetReviews from "@/components/screens/media/MediaWidgetReviews";
 import MediaHeader from "@/components/screens/media/MediaHeader";
 import TvSeriesWidgetSeasons from "@/components/screens/media/TvSeries/TvSeriesWidgetSeasons";
+import { RefreshControl } from "react-native-gesture-handler";
 
 const PADDING_BOTTOM = 8;
 
 const TvSeriesScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
-	const { id: seriesId} = getIdFromSlug(tv_series_id as string);
+	const { id: seriesId } = getIdFromSlug(tv_series_id);
 	const { colors, inset } = useTheme();
 	const { i18n, t } = useTranslation();
 	const { openSheet } = useBottomSheetStore();
@@ -33,6 +34,8 @@ const TvSeriesScreen = () => {
 	const {
 		data: series,
 		isLoading,
+		isRefetching,
+		refetch,
 	} = useMediaTvSeriesDetailsQuery({
 		id: seriesId,
 		locale: i18n.language,
@@ -52,8 +55,6 @@ const TvSeriesScreen = () => {
 		},
 	});
 
-	if (!series) return null;
-
 	return (
 	<>
 		<HeaderOverlay
@@ -65,11 +66,11 @@ const TvSeriesScreen = () => {
 		}}
 		scrollY={scrollY}
 		title={series?.title ?? ''}
-		onMenuPress={() => {
+		onMenuPress={series ? () => {
 			openSheet(BottomSheetMedia, {
 				media: series as Media,
 			})
-		}}
+		} : undefined}
 		/>
 		<Animated.ScrollView
 		onScroll={scrollHandler}
@@ -79,6 +80,12 @@ const TvSeriesScreen = () => {
 				paddingBottom: bottomTabBarHeight + inset.bottom + PADDING_BOTTOM,
 			},
 		]}
+		refreshControl={
+			<RefreshControl
+				refreshing={isRefetching}
+				onRefresh={refetch}
+			/>
+		}
 		>
 			<MediaHeader
 			media={series as Media}
@@ -87,7 +94,7 @@ const TvSeriesScreen = () => {
 			headerHeight={headerHeight}
 			headerOverlayHeight={headerOverlayHeight}
 			/>
-			<View style={tw.style('flex-col gap-4')}>
+			{series && <View style={tw.style('flex-col gap-4')}>
 				{/* SYNOPSIS */}
 				<Pressable
 				style={tw.style('gap-1 px-2')}
@@ -106,7 +113,7 @@ const TvSeriesScreen = () => {
 				</View>
 				<MediaWidgetPlaylists mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-2`} labelStyle={tw`px-2`} />
 				<MediaWidgetReviews mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-2`} labelStyle={tw`px-2`} />
-			</View>
+			</View>}
 		</Animated.ScrollView>
 	</>
 	)

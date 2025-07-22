@@ -62,7 +62,7 @@ const BottomSheetMedia = React.forwardRef<
           : media?.media_type === 'person'
           ? upperFirst(t('common.messages.go_to_person'))
           : upperFirst(t('common.messages.go_to_media')),
-        disabled: pathname.startsWith(`/film/${media?.id}`),
+        disabled: media?.url ? pathname.startsWith(media.url) : false
       },
       ...(((media?.media_type === 'movie' || media?.media_type === 'tv_series') && media.main_credit && media.main_credit.length > 0) ? [
         media.main_credit.length > 1 ? {

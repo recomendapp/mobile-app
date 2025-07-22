@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { mediaKeys } from "./mediaKeys";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { Media, MediaMovie, MediaTvSeries } from "@/types/type.db";
+import { Media, MediaMovie, MediaTvSeries, MediaTvSeriesSeason } from "@/types/type.db";
 
 /* --------------------------------- DETAILS -------------------------------- */
 export const useMediaDetailsQuery = ({
@@ -103,9 +103,55 @@ export const useMediaTvSeriesDetailsQuery = ({
 				.maybeSingle()
 				.overrideTypes<MediaTvSeries>();
 			if (error) throw error;
-			return data;
+			if (!data) return data;
+			const specials = data?.seasons?.filter(season => season.season_number === 0) || [];
+			const regularSeasons = data?.seasons?.filter(season => season.season_number !== 0) || [];
+			const tvSeries: MediaTvSeries = {
+				...data!,
+				seasons: regularSeasons,
+				specials: specials,
+			};
+			return tvSeries;
 		},
 		enabled: !!id && !!locale,
+	});
+};
+
+export const useMediaTvSeriesSeasonDetailsQuery = ({
+	id,
+	seasonNumber,
+} : {
+	id?: number | null;
+	seasonNumber?: number | null;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: mediaKeys.seasonDetail({ id: id!, seasonNumber: seasonNumber! }),
+		queryFn: async () => {
+			if (!id || !seasonNumber) throw Error('No id or season number provided');
+			const { data, error } = await supabase
+				.from('media_tv_series_seasons')
+				.select(`
+					*,
+					episodes:media_tv_series_episodes(
+						*
+					),
+					serie:media_tv_series(
+						id,
+						title
+					)
+				`)
+				.match({
+					serie_id: id,
+					season_number: seasonNumber,
+				})
+				.order('episode_number', { referencedTable: 'episodes', ascending: true })
+				.maybeSingle()
+				.overrideTypes<MediaTvSeriesSeason, { merge: false }>();
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!id && !!seasonNumber,
 	});
 };
 /* -------------------------------------------------------------------------- */
@@ -232,6 +278,32 @@ export const useMediaPlaylistsInfiniteQuery = ({
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
 			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+		},
+		enabled: !!id,
+	});
+};
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------- FOLLOWERS ------------------------------- */
+export const useMediaFollowersAverageRatingQuery = ({
+	id,
+} : {
+	id?: number | null;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: mediaKeys.followersAverageRating({ id: id! }),
+		queryFn: async () => {
+			if (!id) throw Error('No id provided');
+			const { data, error } = await supabase
+				.from('user_followers_average_rating')
+				.select('*')
+				.match({
+					media_id: id,
+				})
+				.maybeSingle();
+			if (error) throw error;
+			return data;
 		},
 		enabled: !!id,
 	});

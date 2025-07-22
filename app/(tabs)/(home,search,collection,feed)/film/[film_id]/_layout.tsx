@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 const FilmLayout = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
-	const { id: movieId} = getIdFromSlug(film_id as string);
+	const { id: movieId } = getIdFromSlug(film_id);
 	const { t, i18n } = useTranslation();
 	const { colors } = useTheme();
 	const {

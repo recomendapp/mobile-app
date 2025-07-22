@@ -19,12 +19,13 @@ import { useState } from "react";
 import MediaWidgetPlaylists from "@/components/screens/media/MediaWidgetPlaylists";
 import MediaWidgetReviews from "@/components/screens/media/MediaWidgetReviews";
 import MediaHeader from "@/components/screens/media/MediaHeader";
+import { RefreshControl } from "react-native-gesture-handler";
 
 const PADDING_BOTTOM = 8;
 
 const FilmScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
-	const { id: movieId} = getIdFromSlug(film_id as string);
+	const { id: movieId } = getIdFromSlug(film_id);
 	const { colors, inset } = useTheme();
 	const { i18n, t } = useTranslation();
 	const { openSheet } = useBottomSheetStore();
@@ -32,6 +33,8 @@ const FilmScreen = () => {
 	const {
 		data: movie,
 		isLoading,
+		isRefetching,
+		refetch,
 	} = useMediaMovieDetailsQuery({
 		id: movieId,
 		locale: i18n.language,
@@ -51,8 +54,6 @@ const FilmScreen = () => {
 		},
 	});
 
-	if (!movie) return null;
-
 	return (
 	<>
 		<HeaderOverlay
@@ -64,11 +65,11 @@ const FilmScreen = () => {
 		}}
 		scrollY={scrollY}
 		title={movie?.title ?? ''}
-		onMenuPress={() => {
+		onMenuPress={movie ? () => {
 			openSheet(BottomSheetMedia, {
 				media: movie as Media,
 			})
-		}}
+		} : undefined}
 		/>
 		<Animated.ScrollView
 		onScroll={scrollHandler}
@@ -78,6 +79,12 @@ const FilmScreen = () => {
 				paddingBottom: bottomTabBarHeight + inset.bottom + PADDING_BOTTOM,
 			},
 		]}
+		refreshControl={
+			<RefreshControl
+				refreshing={isRefetching}
+				onRefresh={refetch}
+			/>
+		}
 		>
 			<MediaHeader
 			media={movie as Media}
@@ -86,7 +93,7 @@ const FilmScreen = () => {
 			headerHeight={headerHeight}
 			headerOverlayHeight={headerOverlayHeight}
 			/>
-			<View style={tw.style('flex-col gap-4')}>
+			{movie && <View style={tw.style('flex-col gap-4')}>
 				{/* SYNOPSIS */}
 				<Pressable
 				style={tw.style('gap-1 px-2')}
@@ -104,7 +111,7 @@ const FilmScreen = () => {
 				</View>
 				<MediaWidgetPlaylists mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-2`} labelStyle={tw`px-2`}/>
 				<MediaWidgetReviews mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-2`} labelStyle={tw`px-2`}/>
-			</View>
+			</View>}
 		</Animated.ScrollView>
 	</>
 	)

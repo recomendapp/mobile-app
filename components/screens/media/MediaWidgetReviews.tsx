@@ -43,7 +43,7 @@ const MediaWidgetReviews = ({
 	<View style={[tw`gap-1`, style]}>
 		<View style={tw`flex-row items-center justify-between gap-2`}>
 			<Link href={urlReviews} style={[tw`font-medium text-lg`, { color: colors.foreground }, labelStyle]}>
-			{upperFirst(t('common.messages.review', { count: reviews.pages.flat().length }))}
+			{upperFirst(t('common.messages.review', { count: 2 }))}
 			</Link>
 			<Link href={urlReviews} style={[{ color: colors.mutedForeground }, tw`text-sm`]}>
 				{upperFirst(t('common.messages.show_all'))}

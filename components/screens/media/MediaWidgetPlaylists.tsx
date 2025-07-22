@@ -39,7 +39,7 @@ const MediaWidgetPlaylists = ({
 	<View style={[tw`gap-1`, style]}>
 		<View style={tw`flex-row items-center justify-between gap-2`}>
 			<Link href={urlPlaylists} style={[tw`font-medium text-lg`, { color: colors.foreground }, labelStyle]}>
-			{upperFirst(t('common.messages.playlist', { count: playlists.pages.flat().length }))}
+			{upperFirst(t('common.messages.playlist', { count: 2 }))}
 			</Link>
 			<Link href={urlPlaylists} style={[{ color: colors.mutedForeground }, tw`text-sm`]}>
 				{upperFirst(t('common.messages.show_all'))}

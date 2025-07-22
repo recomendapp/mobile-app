@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
 import { upperFirst } from 'lodash';
-import { Media, MediaMovie, MediaPerson } from '@/types/type.db';
+import { Media, MediaPerson } from '@/types/type.db';
 import useColorConverter from '@/hooks/useColorConverter';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -28,6 +28,9 @@ import MediaActionUserActivityWatch from '@/components/medias/actions/MediaActio
 import MediaActionUserWatchlist from '@/components/medias/actions/MediaActionUserWatchlist';
 import MediaActionPlaylistAdd from '@/components/medias/actions/MediaActionPlaylistAdd';
 import MediaActionUserRecos from '@/components/medias/actions/MediaActionUserRecos';
+import { IconMediaRating } from '@/components/medias/IconMediaRating';
+import { useMediaFollowersAverageRatingQuery } from '@/features/media/mediaQueries';
+import { Pressable } from 'react-native-gesture-handler';
 
 interface MediaHeaderProps {
 	media?: Media | null;
@@ -46,9 +49,15 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 	const { t } = useTranslation();
 	const { hslToRgb } = useColorConverter();
 	const { colors, inset } = useTheme();
-
 	const bgColor = hslToRgb(colors.background);
+	const {
+		data: followersAvgRating,
+	} = useMediaFollowersAverageRatingQuery({
+		id: media?.media_id,
+	});
+	// SharedValue
 	const posterHeight = useSharedValue(0);
+	// Animated styles
 	const posterAnim = useAnimatedStyle(() => {
 		const scaleValue = interpolate(
 			scrollY.get(),
@@ -165,7 +174,24 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 					posterAnim
 				]}
 				type={media?.media_type}
-				/>
+				>
+					<View style={tw`absolute gap-2 top-2 right-2`}>
+						{(media?.vote_average || media?.tmdb_vote_average) && (
+							<IconMediaRating
+							rating={media?.vote_average ?? media?.tmdb_vote_average}
+							variant="general"
+							/>
+						)}
+						{followersAvgRating && (
+							<Pressable onPress={() => console.log('followers rating pressed')}>
+								<IconMediaRating
+								rating={followersAvgRating.follower_avg_rating}
+								variant="follower"
+								/>
+							</Pressable>
+						)}
+					</View>
+				</AnimatedImageWithFallback>
 			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw.style('w-48'), posterAnim]}/>}
 			<Animated.View
 			style={[
@@ -175,7 +201,9 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 			>
 				{/* GENRES */}
 				{media ? <ThemedText>
-					<ThemedText style={{ color: colors.accentYellow }}>{upperFirst('film')}</ThemedText>
+					<ThemedText style={{ color: colors.accentYellow }}>
+						{upperFirst(t(`common.messages.${media.media_type}`, { count: 1 }))}
+					</ThemedText>
 					{media?.genres ? <Genres genres={media.genres} /> : null}
 				</ThemedText> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
 				{/* TITLE */}
@@ -187,7 +215,12 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 						(!media && !loading) && { textAlign: 'center', color: colors.mutedForeground }
 					]}
 					>
-						{media?.title ?? upperFirst(t('common.errors.film_not_found'))}
+						{media?.title ?? (
+							media?.media_type === 'tv_series' ? upperFirst(t('common.errors.tv_series_not_found')) :
+							media?.media_type === 'person' ? upperFirst(t('common.errors.person_not_found')) :
+							media?.media_type === 'movie' ? upperFirst(t('common.errors.film_not_found')) :
+							upperFirst(t('common.errors.media_not_found'))
+						)}
 					</ThemedText>
 				) : <Skeleton style={tw.style('w-64 h-12')} />}
 				{(media?.extra_data.original_title && media.extra_data.original_title !== media.title) ? (

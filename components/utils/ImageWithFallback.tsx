@@ -17,6 +17,7 @@ interface ImageWithFallbackProps extends ComponentProps<typeof Animated.View> {
   cachePolicy?: ImageProps['cachePolicy'];
   alt: string;
   type?: 'default' | 'playlist' | 'service' | 'watch-provider' | MediaType | null;
+  children?: React.ReactNode;
 }
 
 // const blurhash =
@@ -34,6 +35,7 @@ export const ImageWithFallback = React.forwardRef<
   transition = 250,
   cachePolicy = 'disk',
   style,
+  children,
   ...rest
 }, ref) => {
   const { colors } = useTheme();
@@ -48,7 +50,7 @@ export const ImageWithFallback = React.forwardRef<
     ref={ref}
     style={[
       { backgroundColor: colors.muted },
-      tw.style('overflow-hidden items-center justify-center w-full h-full rounded-md'),
+      tw.style('relative overflow-hidden items-center justify-center w-full h-full rounded-md'),
       style,
     ]}
     {...rest}
@@ -69,6 +71,7 @@ export const ImageWithFallback = React.forwardRef<
       ) : (
         <Fallback type={type} alt={alt} />
       )}
+      {children}
     </Animated.View>
   );
 });

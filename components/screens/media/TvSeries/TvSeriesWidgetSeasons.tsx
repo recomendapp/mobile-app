@@ -2,13 +2,11 @@ import tw from "@/lib/tw";
 import { useTranslation } from "react-i18next";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { LegendList } from "@legendapp/list";
-import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { upperFirst } from "lodash";
-import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
 import { MediaTvSeriesSeason } from "@/types/type.db";
 import { ThemedText } from "@/components/ui/ThemedText";
+import { CardTvSeriesSeason } from "@/components/cards/CardTvSeriesSeason";
 
 interface TvSeriesWidgetSeasonsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	seasons: MediaTvSeriesSeason[];
@@ -30,7 +28,7 @@ const TvSeriesWidgetSeasons = ({
 	return (
 	<View style={[tw`gap-1`, style]}>
 		<ThemedText style={[tw`font-medium text-lg`, labelStyle]}>
-			{upperFirst(t('common.messages.season', { count: seasons.length }))}
+			{upperFirst(t('common.messages.tv_season', { count: seasons.length }))}
 			<ThemedText style={[{ color: colors.mutedForeground }, tw`font-medium text-sm`]}>
 				{` ${seasons.length}`}
 			</ThemedText>
@@ -38,12 +36,9 @@ const TvSeriesWidgetSeasons = ({
 		<LegendList
 		data={seasons}
 		renderItem={({ item }) => (
-			<View key={item.id}>
-				<ThemedText>{item.title}</ThemedText>
-			</View>
-		// <CardPlaylist key={item.id} playlist={item} style={tw`w-36`} />
+			<CardTvSeriesSeason key={item.id} season={item} style={tw`w-32`} />
 		)}
-		snapToInterval={152}
+		snapToInterval={136}
 		decelerationRate="fast"
 		keyExtractor={(item) => item.id!.toString()}
 		horizontal
