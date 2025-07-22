@@ -1,19 +1,19 @@
-import { useMediaMovieDetailsQuery } from '@/features/media/mediaQueries';
+import { useMediaTvSeriesDetailsQuery } from '@/features/media/mediaQueries';
 import { getIdFromSlug } from '@/hooks/getIdFromSlug';
 import { useTheme } from '@/providers/ThemeProvider';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
-const FilmLayout = () => {
-	const { film_id } = useLocalSearchParams<{ film_id: string }>();
-	const { id: movieId} = getIdFromSlug(film_id as string);
+const TvSeriesLayout = () => {
+	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
+	const { id: seriesId} = getIdFromSlug(tv_series_id as string);
 	const { t, i18n } = useTranslation();
 	const { colors } = useTheme();
 	const {
-		data: movie,
-	} = useMediaMovieDetailsQuery({
-		id: movieId,
+		data: series,
+	} = useMediaTvSeriesDetailsQuery({
+		id: seriesId,
 		locale: i18n.language,
 	});
 	return (
@@ -29,7 +29,7 @@ const FilmLayout = () => {
 				options={{
 					animation: 'ios_from_right',
 					headerBackground: () => null,
-					headerTitle: movie?.title || '',
+					headerTitle: series?.title || '',
 					headerTitleStyle: {
 						color: colors.foreground,
 					},
@@ -42,7 +42,7 @@ const FilmLayout = () => {
 				options={{
 					animation: 'ios_from_right',
 					headerBackground: () => null,
-					headerTitle: movie?.title || '',
+					headerTitle: series?.title || '',
 					headerTitleStyle: {
 						color: colors.foreground,
 					},
@@ -54,4 +54,4 @@ const FilmLayout = () => {
 	)
 };
 
-export default FilmLayout;
+export default TvSeriesLayout;

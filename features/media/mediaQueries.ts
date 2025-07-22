@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { mediaKeys } from "./mediaKeys";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { Media, MediaMovie } from "@/types/type.db";
+import { Media, MediaMovie, MediaTvSeries } from "@/types/type.db";
 
 /* --------------------------------- DETAILS -------------------------------- */
 export const useMediaDetailsQuery = ({
@@ -61,8 +61,47 @@ export const useMediaMovieDetailsQuery = ({
 					'videos.type': 'Trailer',
 				})
 				.order('published_at', { referencedTable: 'videos', ascending: true, nullsFirst: false })
-				.returns<MediaMovie[]>()
-				.maybeSingle();
+				.maybeSingle()
+				.overrideTypes<MediaMovie>();
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!id && !!locale,
+	});
+};
+
+export const useMediaTvSeriesDetailsQuery = ({
+	id,
+	locale,
+} : {
+	id?: number | null;
+	locale: string;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: mediaKeys.detail({ id: id as number, type: 'tv_series' }),
+		queryFn: async () => {
+			if (!id) throw Error('No id or type provided');
+			const { data, error } = await supabase
+				.from('media_tv_series')
+				.select(`
+					*,
+					cast:tmdb_tv_series_credits(
+						*,
+						person:media_person(*)
+					),
+					videos:tmdb_tv_series_videos(*),
+					seasons:media_tv_series_seasons(*)
+				`)
+				.match({
+					'id': id,
+					'cast.job': 'Actor',
+					'videos.iso_639_1': locale.split('-')[0],
+					'videos.type': 'Trailer',
+				})
+				.order('published_at', { referencedTable: 'videos', ascending: true, nullsFirst: false })
+				.maybeSingle()
+				.overrideTypes<MediaTvSeries>();
 			if (error) throw error;
 			return data;
 		},

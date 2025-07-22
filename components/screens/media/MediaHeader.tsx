@@ -29,15 +29,15 @@ import MediaActionUserWatchlist from '@/components/medias/actions/MediaActionUse
 import MediaActionPlaylistAdd from '@/components/medias/actions/MediaActionPlaylistAdd';
 import MediaActionUserRecos from '@/components/medias/actions/MediaActionUserRecos';
 
-interface FilmHeaderProps {
-	movie?: MediaMovie | null;
+interface MediaHeaderProps {
+	media?: Media | null;
 	loading: boolean;
 	scrollY: SharedValue<number>;
 	headerHeight: SharedValue<number>;
 	headerOverlayHeight: SharedValue<number>;
 }
-const FilmHeader: React.FC<FilmHeaderProps> = ({
-	movie,
+const MediaHeader: React.FC<MediaHeaderProps> = ({
+	media,
 	loading,
 	scrollY,
 	headerHeight,
@@ -128,9 +128,9 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 			bgAnim,
 		]}
 		>
-			{movie ? <Image
+			{media ? <Image
 			style={tw`absolute inset-0`}
-			source={{ uri: movie.backdrop_url ?? '' }}
+			source={{ uri: media.backdrop_url ?? '' }}
 			/> : null}
 			<LinearGradient
 			style={tw`absolute inset-0`}
@@ -157,14 +157,14 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 					'worklet';
 					posterHeight.value = e.nativeEvent.layout.height;
 				}}
-				alt={movie?.title ?? ''}
-				source={{ uri: movie?.avatar_url ?? '' }}
+				alt={media?.title ?? ''}
+				source={{ uri: media?.avatar_url ?? '' }}
 				style={[
 					{ aspectRatio: 2 / 3 },
 					tw.style('rounded-md w-48 h-auto'),
 					posterAnim
 				]}
-				type="movie"
+				type={media?.media_type}
 				/>
 			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw.style('w-48'), posterAnim]}/>}
 			<Animated.View
@@ -174,9 +174,9 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 			]}
 			>
 				{/* GENRES */}
-				{movie ? <ThemedText>
+				{media ? <ThemedText>
 					<ThemedText style={{ color: colors.accentYellow }}>{upperFirst('film')}</ThemedText>
-					{movie?.genres ? <Genres genres={movie.genres} /> : null}
+					{media?.genres ? <Genres genres={media.genres} /> : null}
 				</ThemedText> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
 				{/* TITLE */}
 				{!loading ? (
@@ -184,37 +184,37 @@ const FilmHeader: React.FC<FilmHeaderProps> = ({
 					numberOfLines={2}
 					style={[
 						tw.style('text-4xl font-bold'),
-						(!movie && !loading) && { textAlign: 'center', color: colors.mutedForeground }
+						(!media && !loading) && { textAlign: 'center', color: colors.mutedForeground }
 					]}
 					>
-						{movie?.title ?? upperFirst(t('common.errors.film_not_found'))}
+						{media?.title ?? upperFirst(t('common.errors.film_not_found'))}
 					</ThemedText>
 				) : <Skeleton style={tw.style('w-64 h-12')} />}
-				{(movie?.extra_data.original_title && movie.extra_data.original_title !== movie.title) ? (
+				{(media?.extra_data.original_title && media.extra_data.original_title !== media.title) ? (
 					<ThemedText numberOfLines={1} style={[ { color: colors.mutedForeground }, tw.style('text-lg font-semibold')]}>
-						{movie.extra_data.original_title}
+						{media.extra_data.original_title}
 					</ThemedText>
 				) : null}
 				{/* DIRECTORS & DURATION */}
-				{movie?.main_credit || movie?.extra_data.runtime ? (
+				{media?.main_credit || media?.extra_data.runtime ? (
 					<ThemedText>
-						{movie.main_credit ? <Directors directors={movie.main_credit} /> : null}
+						{media.main_credit ? <Directors directors={media.main_credit} /> : null}
 					</ThemedText>
 				) : null}
 
 			</Animated.View>
 		</Animated.View>
-		{movie ? (
+		{media ? (
 		<View style={tw`flex-row items-center justify-between gap-4 p-2`}>
 			<View style={tw`flex-row items-center gap-4`}>
-				<MediaActionUserActivityRating media={movie as Media} />
-				<MediaActionUserActivityLike media={movie as Media} />
-				<MediaActionUserActivityWatch media={movie as Media} />
-				<MediaActionUserWatchlist media={movie as Media} />
+				<MediaActionUserActivityRating media={media} />
+				<MediaActionUserActivityLike media={media} />
+				<MediaActionUserActivityWatch media={media} />
+				<MediaActionUserWatchlist media={media} />
 			</View>
 			<View style={tw`flex-row items-center gap-4`}>
-				<MediaActionPlaylistAdd media={movie as Media} />
-				<MediaActionUserRecos media={movie as Media} />
+				<MediaActionPlaylistAdd media={media} />
+				<MediaActionUserRecos media={media} />
 			</View>
 		</View>
 		) : null}
@@ -259,4 +259,4 @@ const Directors = ({
 		</>
 	)
 };
-export default FilmHeader;
+export default MediaHeader;

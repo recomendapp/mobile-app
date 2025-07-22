@@ -2,7 +2,7 @@ import { Json as JsonGenerated } from "./__generated__/type.db";
 
 export type Json = JsonGenerated;
 
-// *========== USER ==========* //
+/* ---------------------------------- USER ---------------------------------- */
 export type Profile = Database['public']['Views']['profile']['Row'] & {
 };
 
@@ -11,13 +11,11 @@ export type User = (Database['public']['Tables']['user']['Row']) & {
 	favorite_movies?: Media[] | any;
 };
 
-// *========== USER_FRIEND ==========* //
 export type UserFriend = Database['public']['Tables']['user_friend']['Row'] & {
 	friend: User;
 	user: User;
 };
 
-// *========== USER_FOLLOW ==========* //
 export type UserFollower = Database['public']['Tables']['user_follower']['Row'] & {
 	followee: User;
 	user: User;
@@ -46,10 +44,20 @@ export type MediaTvSeries = Database['public']['Views']['media_tv_series']['Row'
 	production_countries?: Database['public']['Tables']['tmdb_tv_series_production_countries']['Row'][];
 	spoken_languages?: Database['public']['Tables']['tmdb_tv_series_spoken_languages']['Row'][];
 	cast?: MediaTvSeriesPerson[];
+	seasons?: MediaTvSeriesSeason[];
+	specials?: MediaTvSeriesSeason[];
 };
 
 export type MediaTvSeriesPerson = Database['public']['Tables']['tmdb_tv_series_credits']['Row'] & {
 	person?: MediaPerson;
+};
+
+export type MediaTvSeriesSeason = Database['public']['Views']['media_tv_series_seasons']['Row'] & {
+	episodes?: MediaTvSeriesEpisode[];
+	serie?: MediaTvSeries;
+};
+
+export type MediaTvSeriesEpisode = Database['public']['Views']['media_tv_series_episodes']['Row'] & {
 };
 
 export type MediaTvSeriesAggregateCredits = any;
@@ -57,14 +65,8 @@ export type MediaTvSeriesAggregateCredits = any;
 export type MediaPerson = Database['public']['Views']['media_person']['Row'] & {
 };
 
-export type Media =
-	// Database['public']['Views']['media']['Row'] &
-	MediaMovie & MediaTvSeries & MediaPerson & {
-	};
-
-// export type MediaPersonCombinedCredits = Database['public']['Views']['media_person_combined_credits']['Row'] & {
-// };
-
+export type Media = MediaMovie & MediaTvSeries & MediaPerson & {
+};
 /* -------------------------------------------------------------------------- */
 
 /* -------------------------------- ACTIVITY -------------------------------- */
@@ -94,12 +96,10 @@ export type UserReview =
 	};
 /* -------------------------------------------------------------------------- */
 
-
 /* -------------------------------- PLAYLIST -------------------------------- */
 export type Playlist = Database['public']['Tables']['playlists']['Row'] & {
 	user?: User;
 	guests?: PlaylistGuest[];
-	collaborators?: PlaylistGuest[] | any;
 	items?: PlaylistItem[];
 };
 

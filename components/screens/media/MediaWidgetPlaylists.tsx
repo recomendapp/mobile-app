@@ -4,27 +4,27 @@ import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { LegendList } from "@legendapp/list";
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { upperFirst } from "lodash";
-import { Link } from "expo-router";
+import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
 
-interface FilmWidgetPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
+interface MediaWidgetPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	mediaId: number;
-	slug: string;
+	url: Href;
 	labelStyle?: StyleProp<TextStyle>;
 	containerStyle?: StyleProp<ViewStyle>;
 }
 
-const FilmWidgetPlaylists = ({
+const MediaWidgetPlaylists = ({
 	mediaId,
-	slug,
+	url,
 	style,
 	labelStyle,
 	containerStyle,
-} : FilmWidgetPlaylistsProps) => {
+} : MediaWidgetPlaylistsProps) => {
 	const { colors } = useTheme();
 	const { t } = useTranslation();
-	const url = `/film/${slug}/playlists` as const;
+	const urlPlaylists = `${url}/playlists` as Href;
 	const {
 		data: playlists,
 		isLoading,
@@ -38,10 +38,10 @@ const FilmWidgetPlaylists = ({
 	return (
 	<View style={[tw`gap-1`, style]}>
 		<View style={tw`flex-row items-center justify-between gap-2`}>
-			<Link href={url} style={[tw`font-medium text-lg`, { color: colors.foreground }, labelStyle]}>
+			<Link href={urlPlaylists} style={[tw`font-medium text-lg`, { color: colors.foreground }, labelStyle]}>
 			{upperFirst(t('common.messages.playlist', { count: playlists.pages.flat().length }))}
 			</Link>
-			<Link href={url} style={[{ color: colors.mutedForeground }, tw`text-sm`]}>
+			<Link href={urlPlaylists} style={[{ color: colors.mutedForeground }, tw`text-sm`]}>
 				{upperFirst(t('common.messages.show_all'))}
 			</Link>
 		</View>
@@ -63,4 +63,4 @@ const FilmWidgetPlaylists = ({
 	);
 };
 
-export default FilmWidgetPlaylists;
+export default MediaWidgetPlaylists;
