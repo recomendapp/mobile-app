@@ -15,9 +15,9 @@ import { FlashList } from '@shopify/flash-list';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BetterInput } from '@/components/ui/BetterInput';
+import { BottomSheetProps } from '../BottomSheetManager';
 
-interface BottomSheetPlaylistGuestsAddProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
-  id: string;
+interface BottomSheetPlaylistGuestsAddProps extends BottomSheetProps {
   playlistId: number;
   guests: { user: User, edit: boolean }[] | undefined;
   onAdd: (user: User) => void;

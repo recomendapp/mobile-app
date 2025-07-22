@@ -25,9 +25,9 @@ import { useSharedValue } from 'react-native-reanimated';
 import { FlashList } from '@shopify/flash-list';
 import { FlatList, Pressable } from 'react-native-gesture-handler';
 import { BetterInput } from '@/components/ui/BetterInput';
+import { BottomSheetProps } from '../BottomSheetManager';
 
-interface BottomSheetAddToPlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
-  id: string;
+interface BottomSheetAddToPlaylistProps extends BottomSheetProps {
   media: Media,
 };
 

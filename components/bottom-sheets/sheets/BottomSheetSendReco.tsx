@@ -22,9 +22,9 @@ import { FlashList } from '@shopify/flash-list';
 import { FlatList, Pressable } from 'react-native-gesture-handler';
 import { useSharedValue } from 'react-native-reanimated';
 import { BetterInput } from '@/components/ui/BetterInput';
+import { BottomSheetProps } from '../BottomSheetManager';
 
-interface BottomSheetSendRecoProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
-  id: string;
+interface BottomSheetSendRecoProps extends BottomSheetProps {
   media: Media,
 };
 

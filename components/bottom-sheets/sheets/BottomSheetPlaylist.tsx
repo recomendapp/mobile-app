@@ -21,9 +21,9 @@ import BottomSheetPlaylistGuests from './BottomSheetPlaylistGuests';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { ScrollView } from 'react-native-gesture-handler';
+import { BottomSheetProps } from '../BottomSheetManager';
 
-interface BottomSheetPlaylistProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
-  id: string;
+interface BottomSheetPlaylistProps extends BottomSheetProps {
   playlist: Playlist,
   additionalItemsTop?: Item[];
 };

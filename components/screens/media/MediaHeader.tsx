@@ -31,6 +31,8 @@ import MediaActionUserRecos from '@/components/medias/actions/MediaActionUserRec
 import { IconMediaRating } from '@/components/medias/IconMediaRating';
 import { useMediaFollowersAverageRatingQuery } from '@/features/media/mediaQueries';
 import { Pressable } from 'react-native-gesture-handler';
+import BottomSheetMediaFollowersAverageRating from '@/components/bottom-sheets/sheets/BottomSheetMediaFollowersAverageRating';
+import useBottomSheetStore from '@/stores/useBottomSheetStore';
 
 interface MediaHeaderProps {
 	media?: Media | null;
@@ -46,6 +48,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 	headerHeight,
 	headerOverlayHeight,
 }) => {
+	const { openSheet } = useBottomSheetStore();
 	const { t } = useTranslation();
 	const { hslToRgb } = useColorConverter();
 	const { colors, inset } = useTheme();
@@ -183,7 +186,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 							/>
 						)}
 						{followersAvgRating && (
-							<Pressable onPress={() => console.log('followers rating pressed')}>
+							<Pressable onPress={() => openSheet(BottomSheetMediaFollowersAverageRating, { mediaId: media?.media_id! })}>
 								<IconMediaRating
 								rating={followersAvgRating.follower_avg_rating}
 								variant="follower"

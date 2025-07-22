@@ -23,9 +23,9 @@ import BottomSheetPlaylistGuestsAdd from './BottomSheetPlaylistGuestsAdd';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BetterInput } from '@/components/ui/BetterInput';
+import { BottomSheetProps } from '../BottomSheetManager';
 
-interface BottomSheetPlaylistGuestsProps extends Omit<React.ComponentPropsWithoutRef<typeof TrueSheet>, 'children'> {
-  id: string;
+interface BottomSheetPlaylistGuestsProps extends BottomSheetProps {
   playlist: Playlist;
 }
 
