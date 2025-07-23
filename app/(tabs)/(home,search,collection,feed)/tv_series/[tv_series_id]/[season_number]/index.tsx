@@ -170,11 +170,11 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 						{season.title}
 					</ThemedText>
 				)}
-				{season?.episode_count && (
+				{season?.episode_count ? (
 					<ThemedText numberOfLines={1}>
 						{upperFirst(t('common.messages.tv_episode_count', { count: season.episode_count }))}
 					</ThemedText>
-				)}
+				) : undefined}
 			</Animated.View>
 		</Animated.View>
 	</Animated.View>
@@ -281,7 +281,7 @@ const TvSeriesSeasonScreen = () => {
 			: (
 				<View style={tw`flex-1 items-center justify-center p-4`}>
 					<Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
-						{upperFirst(t('common.messages.no_results'))}
+						{upperFirst(t('common.messages.no_episodes'))}
 					</Text>
 				</View>
 			) 

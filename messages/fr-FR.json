@@ -3,6 +3,7 @@
     "messages": {
       "error": "erreur",
       "no_results": "aucun résultat",
+      "no_episodes": "aucun épisode",
       "added_by": "ajouté par",
       "sort_by": "trier par",
       "go_to_film": "accéder au film",
@@ -151,7 +152,9 @@
       "choose_from_the_library": "choisir dans la bibliothèque",
       "take_a_photo": "prendre une photo",
       "delete_current_image": "supprimer l'image actuelle",
-      "ratings_from_followees": "notes des suivi(e)s"
+      "ratings_from_followees": "notes des suivi(e)s",
+      "community": "communauté",
+      "cast_and_crew": "cast & crew"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",
@@ -188,8 +191,6 @@
       "column": "{count, plural, one {colonne} other {colonnes}}",
       "comment": "{count, plural, one {commentaire} other {commentaires}}",
       "unknown": "inconnu",
-      "community": "communauté",
-      "cast_and_crew": "cast & crew",
       "soon": "bientôt",
       "manage": "gérer",
       "upgrade": "mise à niveau",

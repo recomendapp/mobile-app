@@ -60,7 +60,7 @@ const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBar
 					</Button>
 				);
 			}}
-			contentContainerStyle={tw`gap-2 px-2`}
+			contentContainerStyle={tw`gap-2 px-4`}
 			horizontal
 			keyExtractor={(item) => item.key}
 			showsHorizontalScrollIndicator={false}
@@ -73,7 +73,7 @@ const CollectionLayout = () => {
 	const { t } = useTranslation();
 	return (
 		<ThemedSafeAreaView style={tw.style('flex-1')}>
-			<View style={tw.style('flex-row justify-between items-center gap-2 p-2')}>
+			<View style={tw.style('flex-row justify-between items-center gap-2 py-2 px-4')}>
 				<View style={tw`flex-row items-center gap-2`}>
 					<ThemedText style={tw`text-2xl font-bold`}>{upperFirst(t('common.messages.library'))}</ThemedText>
 					<ButtonCreatePlaylist redirectAfterCreate={false} />
@@ -83,7 +83,7 @@ const CollectionLayout = () => {
 			<MaterialTopTabs
 			tabBar={(props) => <TabBar {...props} />}
 			screenLayout={(props) => (
-				<View style={tw`flex-1 p-2`}>
+				<View style={tw`flex-1 py-2 px-4`}>
 					{props.children}
 				</View>
 			)}
