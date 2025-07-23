@@ -39,7 +39,7 @@ const FeedScreen = () => {
 			</ThemedView>
 		) : null}
 		contentContainerStyle={[
-			tw`px-2`,
+			tw`px-4`,
 			{
 				paddingBottom: tabBarHeight
 			}

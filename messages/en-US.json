@@ -3,6 +3,7 @@
     "messages": {
       "error": "error",
       "no_results": "no results",
+      "no_episodes": "no episodes",
       "added_by": "added by",
       "sort_by": "sort by",
       "go_to_film": "go to film",
@@ -140,7 +141,9 @@
       "choose_from_the_library": "choose from the library",
       "take_a_photo": "take a photo",
       "delete_current_image": "delete current image",
-      "ratings_from_followees": "ratings from followed users"
+      "ratings_from_followees": "ratings from followed users",
+      "community": "community",
+      "cast_and_crew": "cast & crew"
     },
     "errors": {
       "not_logged_in": "you are not logged in",
@@ -176,8 +179,6 @@
       "column": "{count, plural, one {column} other {columns}}",
       "comment": "{count, plural, one {comment} other {comments}}",
       "unknown": "unknown",
-      "community": "community",
-      "cast_and_crew": "cast & crew",
       "soon": "soon",
       "manage": "manage",
       "upgrade": "upgrade",
