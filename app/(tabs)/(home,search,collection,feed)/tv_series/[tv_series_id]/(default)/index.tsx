@@ -97,7 +97,7 @@ const TvSeriesScreen = () => {
 			{series && <View style={tw.style('flex-col gap-4')}>
 				{/* SYNOPSIS */}
 				<Pressable
-				style={tw.style('gap-1 px-2')}
+				style={tw.style('gap-1 px-4')}
 				onPress={() => setShowFullSynopsis((prev) => !prev)}
 				>
 					<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.word.overview'))}</ThemedText>
@@ -105,14 +105,14 @@ const TvSeriesScreen = () => {
 						{series.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
 					</ThemedText>
 				</Pressable>
-				<TvSeriesWidgetSeasons seasons={series.seasons || []} containerStyle={tw`px-2`} labelStyle={tw`px-2`} />
+				<TvSeriesWidgetSeasons seasons={series.seasons || []} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
 				{/* CASTING */}
 				<View style={tw.style('gap-1')}> 
-					<ThemedText style={tw.style('px-2 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
+					<ThemedText style={tw.style('px-4 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
 					{series.cast?.length ? <TvSeriesCast cast={series.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
 				</View>
-				<MediaWidgetPlaylists mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-2`} labelStyle={tw`px-2`} />
-				<MediaWidgetReviews mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-2`} labelStyle={tw`px-2`} />
+				<MediaWidgetPlaylists mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
+				<MediaWidgetReviews mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
 			</View>}
 		</Animated.ScrollView>
 	</>
@@ -149,7 +149,7 @@ const TvSeriesCast = ({
 			)
 		}}
     	snapToInterval={104}
-		contentContainerStyle={tw`px-2`}
+		contentContainerStyle={tw`px-4`}
 		keyExtractor={(item) => item.id.toString()}
 		showsHorizontalScrollIndicator={false}
 		horizontal

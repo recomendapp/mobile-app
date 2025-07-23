@@ -116,7 +116,7 @@ const Playlist = ({
 				onChangeText={setSearch}
 				placeholder={upperFirst(t('common.playlist.search.placeholder'))}
 				leftIcon="search"
-				containerStyle={tw`mx-2`}
+				containerStyle={tw`mx-4`}
 				clearable
 				/>
 			)}
@@ -125,7 +125,7 @@ const Playlist = ({
 	ListHeaderComponentStyle={tw`mb-2`}
 	data={renderItems || []}
 	renderItem={({ item }) => (
-		<PlaylistItem key={item.id} item={item} style={tw`py-1 px-2`}/>
+		<PlaylistItem key={item.id} item={item} style={tw`py-1 px-4`}/>
 	)}
 	keyExtractor={(item) => item.id.toString()}
 	ListEmptyComponent={

@@ -147,7 +147,7 @@ const PlaylistHeader = forwardRef<
 			</Animated.View>
 			<Animated.View
 			style={[
-				tw`items-center justify-center gap-2 p-2`,
+				tw`items-center justify-center gap-2 py-2 px-4`,
 				{
 					paddingTop: inset.top === 0 ? 8 : inset.top,
 				}

@@ -159,7 +159,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 		</Animated.View>
 		<Animated.View
 		style={[
-			tw.style('items-center gap-4 p-2'),
+			tw.style('items-center gap-4 py-2 px-4'),
 			{ paddingTop: inset.top === 0 ? 8 : inset.top }
 		]}
 		>
@@ -241,7 +241,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 			</Animated.View>
 		</Animated.View>
 		{media ? (
-		<View style={tw`flex-row items-center justify-between gap-4 p-2`}>
+		<View style={tw`flex-row items-center justify-between gap-4 py-2 px-4`}>
 			<View style={tw`flex-row items-center gap-4`}>
 				<MediaActionUserActivityRating media={media} />
 				<MediaActionUserActivityLike media={media} />

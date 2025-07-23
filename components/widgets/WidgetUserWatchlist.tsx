@@ -7,6 +7,8 @@ import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { CardMedia } from "@/components/cards/CardMedia";
 import { useTheme } from "@/providers/ThemeProvider";
 import { LegendList } from "@legendapp/list";
+import { ThemedText } from "../ui/ThemedText";
+import { Icons } from "@/constants/Icons";
 
 interface WidgetUserWatchlistProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -36,8 +38,13 @@ export const WidgetUserWatchlist = ({
 
   return (
   <View style={[tw`gap-2`, style]}>
-    <Link href={'/collection/watchlist'} style={[tw`font-semibold text-xl`, { color: colors.foreground }, labelStyle]}>
-      {t('widgets.user_watchlist.label')}
+    <Link href={'/collection/watchlist'} style={labelStyle}>
+      <View style={tw`flex-row items-center`}>
+        <ThemedText style={tw`font-semibold text-xl`} numberOfLines={1}>
+          {t('widgets.user_watchlist.label')}
+        </ThemedText>
+        <Icons.ChevronRight color={colors.mutedForeground} />
+      </View>
     </Link>
     <LegendList
     data={watchlist}

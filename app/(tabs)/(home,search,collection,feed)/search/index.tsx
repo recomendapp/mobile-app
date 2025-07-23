@@ -36,7 +36,7 @@ const SearchScreen = () => {
 					return <ThemedText>Search for: {debouncedSearch}</ThemedText>
 			}
 		} else {
-			return <FeaturedPlaylists contentContainerStyle={tw`px-2`}/>
+			return <FeaturedPlaylists contentContainerStyle={tw`px-4`}/>
 		}
 	}, [debouncedSearch, filter]);
 
@@ -52,7 +52,7 @@ const SearchScreen = () => {
 			onChangeText={setSearch}
 			placeholder="Search for movies, tv shows, and people"
 			leftIcon="search"
-			containerStyle={tw`mx-2`}
+			containerStyle={tw`mx-4`}
 			clearable
 			/>
 			{debouncedSearch ? (

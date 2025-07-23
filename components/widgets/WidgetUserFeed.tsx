@@ -7,6 +7,8 @@ import { CardUserActivity } from "../cards/CardUserActivity";
 import { Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { LegendList } from "@legendapp/list";
+import { ThemedText } from "../ui/ThemedText";
+import { Icons } from "@/constants/Icons";
 
 interface WidgetUserFeedProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -34,8 +36,13 @@ export const WidgetUserFeed = ({
 
   return (
   <View style={[tw`gap-2`, style]}>
-    <Link href={'/(tabs)/(feed)/feed'} style={[tw`font-semibold text-xl`, { color: colors.foreground }, labelStyle]}>
-      {t('widgets.user_feed.label')}
+    <Link href={'/(tabs)/(feed)/feed'} style={labelStyle}>
+      <View style={tw`flex-row items-center`}>
+        <ThemedText style={tw`font-semibold text-xl`} numberOfLines={1}>
+          {t('widgets.user_feed.label')}
+        </ThemedText>
+        <Icons.ChevronRight color={colors.mutedForeground} />
+      </View>
     </Link>
     <LegendList
     data={feed.pages.flat()}

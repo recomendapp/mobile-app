@@ -7,6 +7,8 @@ import { upperFirst } from "lodash";
 import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { Icons } from "@/constants/Icons";
 
 interface MediaWidgetPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	mediaId: number;
@@ -37,14 +39,14 @@ const MediaWidgetPlaylists = ({
 
 	return (
 	<View style={[tw`gap-1`, style]}>
-		<View style={tw`flex-row items-center justify-between gap-2`}>
-			<Link href={urlPlaylists} style={[tw`font-medium text-lg`, { color: colors.foreground }, labelStyle]}>
-			{upperFirst(t('common.messages.playlist', { count: 2 }))}
-			</Link>
-			<Link href={urlPlaylists} style={[{ color: colors.mutedForeground }, tw`text-sm`]}>
-				{upperFirst(t('common.messages.show_all'))}
-			</Link>
-		</View>
+		<Link href={urlPlaylists} style={labelStyle}>
+			<View style={tw`flex-row items-center`}>
+				<ThemedText style={tw`font-medium text-lg`} numberOfLines={1}>
+					{upperFirst(t('common.messages.playlist', { count: 2 }))}
+				</ThemedText>
+				<Icons.ChevronRight color={colors.mutedForeground} />
+			</View>
+		</Link>
 		<LegendList
 		data={playlists.pages.flat()}
 		renderItem={({ item }) => (

@@ -9,6 +9,8 @@ import UserAvatar from "@/components/user/UserAvatar";
 import { useTheme } from "@/providers/ThemeProvider";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { LegendList } from "@legendapp/list";
+import { Icons } from "@/constants/Icons";
+import { ThemedText } from "../ui/ThemedText";
 
 interface WidgetUserRecosProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -40,8 +42,13 @@ export const WidgetUserRecos = ({
 
   return (
   <View style={[tw`gap-2`, style]}>
-    <Link href={'/collection/my-recos'} style={[tw`font-semibold text-xl`, { color: colors.foreground }, labelStyle]}>
-      {t('widgets.user_recos.label')}
+    <Link href={'/collection/my-recos'} style={labelStyle}>
+      <View style={tw`flex-row items-center`}>
+        <ThemedText style={tw`font-semibold text-xl`} numberOfLines={1}>
+          {t('widgets.user_recos.label')}
+        </ThemedText>
+        <Icons.ChevronRight color={colors.mutedForeground} />
+      </View>
     </Link>
     <LegendList
     data={recos}
