@@ -11,6 +11,7 @@ import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useMediaPlaylistsInfiniteQuery, useMediaReviewsInfiniteQuery } from "@/features/media/mediaQueries";
 import { CardReview } from "@/components/cards/CardReview";
+import { Icons } from "@/constants/Icons";
 
 interface MediaWidgetReviewsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	mediaId: number;
@@ -41,14 +42,14 @@ const MediaWidgetReviews = ({
 
 	return (
 	<View style={[tw`gap-1`, style]}>
-		<View style={tw`flex-row items-center justify-between gap-2`}>
-			<Link href={urlReviews} style={[tw`font-medium text-lg`, { color: colors.foreground }, labelStyle]}>
-			{upperFirst(t('common.messages.review', { count: 2 }))}
-			</Link>
-			<Link href={urlReviews} style={[{ color: colors.mutedForeground }, tw`text-sm`]}>
-				{upperFirst(t('common.messages.show_all'))}
-			</Link>
-		</View>
+		<Link href={urlReviews} style={labelStyle}>
+			<View style={tw`flex-row items-center`}>
+				<ThemedText style={tw`font-medium text-lg`} numberOfLines={1}>
+					{upperFirst(t('common.messages.review', { count: 2 }))}
+				</ThemedText>
+				<Icons.ChevronRight color={colors.mutedForeground} />
+			</View>
+		</Link>
 		<LegendList
 		data={reviews.pages.flat()}
 		renderItem={({ item }) => (

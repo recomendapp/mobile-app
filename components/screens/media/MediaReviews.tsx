@@ -102,7 +102,7 @@ const MediaReviews = ({
 			{
 				paddingBottom: bottomTabBarHeight + inset.bottom + PADDING_BOTTOM,
 			},
-			tw`px-2`,
+			tw`px-4`,
 		]}
 		keyExtractor={(item) => item.id.toString()}
 		columnWrapperStyle={tw`gap-2`}

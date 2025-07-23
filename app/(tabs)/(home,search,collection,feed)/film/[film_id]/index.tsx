@@ -96,7 +96,7 @@ const FilmScreen = () => {
 			{movie && <View style={tw.style('flex-col gap-4')}>
 				{/* SYNOPSIS */}
 				<Pressable
-				style={tw.style('gap-1 px-2')}
+				style={tw.style('gap-1 px-4')}
 				onPress={() => setShowFullSynopsis((prev) => !prev)}
 				>
 					<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.word.overview'))}</ThemedText>
@@ -106,11 +106,11 @@ const FilmScreen = () => {
 				</Pressable>
 				{/* CASTING */}
 				<View style={tw.style('gap-1')}> 
-					<ThemedText style={tw.style('px-2 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
+					<ThemedText style={tw.style('px-4 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
 					{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
 				</View>
-				<MediaWidgetPlaylists mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-2`} labelStyle={tw`px-2`}/>
-				<MediaWidgetReviews mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-2`} labelStyle={tw`px-2`}/>
+				<MediaWidgetPlaylists mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`}/>
+				<MediaWidgetReviews mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`}/>
 			</View>}
 		</Animated.ScrollView>
 	</>
@@ -147,7 +147,7 @@ const FilmCast = ({
 			)
 		}}
     	snapToInterval={104}
-		contentContainerStyle={tw`px-2`}
+		contentContainerStyle={tw`px-4`}
 		keyExtractor={(item) => item.id.toString()}
 		showsHorizontalScrollIndicator={false}
 		horizontal

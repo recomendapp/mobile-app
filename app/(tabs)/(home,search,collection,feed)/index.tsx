@@ -37,11 +37,11 @@ const HomeScreen = () => {
             <WidgetMostRecommended />
             {session ? (
               <>
-              <WidgetUserRecos labelStyle={tw`px-2`} containerStyle={tw`px-2`} />
-              <WidgetUserWatchlist labelStyle={tw`px-2`} containerStyle={tw`px-2`} />
-              <WidgetUserFriendsPlaylists labelStyle={tw`px-2`} containerStyle={tw`px-2`} />
-              <WidgetUserFeed labelStyle={tw`px-2`} containerStyle={tw`px-2`} />
-              <WidgetUserDiscovery labelStyle={tw`px-2`} containerStyle={tw`px-2`} />
+              <WidgetUserRecos labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+              <WidgetUserWatchlist labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+              <WidgetUserFriendsPlaylists labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+              <WidgetUserFeed labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+              <WidgetUserDiscovery labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
               </>
             ) : (
               <>
@@ -62,7 +62,7 @@ const HomeHeader = () => {
   const { session, user } = useAuth();
   const { t } = useTranslation();
   return (
-    <View style={tw.style('flex-row justify-between items-center px-2')}>
+    <View style={tw.style('flex-row justify-between items-center px-4')}>
       <ThemedText numberOfLines={1} style={tw.style('text-2xl font-bold')}>
         {session
           ? `Welcome, ${user?.full_name}`

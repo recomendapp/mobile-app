@@ -116,7 +116,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 		</Animated.View>
 		<Animated.View
 		style={[
-			tw.style('flex-row items-center gap-4 p-2'),
+			tw.style('flex-row items-center gap-4 py-2 px-4'),
 			{ paddingTop: inset.top === 0 ? 8 : inset.top },
 			textAnim
 		]}
@@ -230,7 +230,7 @@ const TvSeriesSeasonScreen = () => {
 			key={item.id}
 			style={[
 				{ backgroundColor: colors.card, borderColor: colors.border },
-				tw`flex-row justify-between items-center rounded-xl h-24 p-1 gap-2 border overflow-hidden`,
+				tw`flex-row justify-between items-center rounded-xl h-24 p-1 gap-2 border overflow-hidden mx-4`,
 			]}
 			>
 				<View style={tw`flex-1 flex-row items-center gap-2`}>
@@ -290,7 +290,6 @@ const TvSeriesSeasonScreen = () => {
 			{
 				paddingBottom: bottomTabBarHeight + inset.bottom + PADDING_BOTTOM,
 			},
-			tw`px-2`,
 		]}
 		keyExtractor={(item) => item.id!.toString()}
 		columnWrapperStyle={tw`gap-2`}
