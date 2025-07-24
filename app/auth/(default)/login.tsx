@@ -1,16 +1,18 @@
-import { Alert, ImageBackground, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View} from 'react-native';
+import { ImageBackground, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View} from 'react-native';
 import { useAuth } from '@/providers/AuthProvider';
 import { useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button, ButtonText } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { InputPassword } from '@/components/ui/InputPassword';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
-import { Label } from '@/components/ui/Label';
+import { Input } from '@/components/ui/input';
+import { upperFirst } from 'lodash';
+import { Icons } from '@/constants/Icons';
+import { InputPassword } from '@/components/ui/InputPassword';
+import * as Burnt from 'burnt';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
@@ -30,9 +32,16 @@ const LoginScreen = () => {
 			await login({ email: email, password: password });
 		} catch (error) {
 			if (error instanceof AuthError) {
-				Alert.alert(error.message);
+				Burnt.toast({
+					title: upperFirst(t('common.messages.error')),
+					message: error.message,
+					preset: 'error',
+				});
 			} else {
-				Alert.alert('An unexpected error occurred. Please try again later.');
+				Burnt.toast({
+					title: upperFirst(t('common.messages.error')),
+					preset: 'error',
+				});
 			}
 		} finally {
 			setIsLoading(false);
@@ -50,55 +59,47 @@ const LoginScreen = () => {
 				x: 0,
 				y: 0.7,
 			}}
-			style={{
-				flex: 1,
-				flexDirection: 'column',
-				justifyContent: 'flex-end',
-				alignItems: 'center',
-				gap: 24,
-				padding: 32,
-				paddingBottom: 114
-			}}
+			style={[
+				{
+					flex: 1,
+					flexDirection: 'column',
+					justifyContent: 'flex-end',
+					alignItems: 'center',
+					gap: 24,
+					paddingBottom: 114
+				},
+				tw`px-4`
+			]}
 			>
 				<KeyboardAvoidingView
 				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
 				style={tw.style('w-full gap-4')}
 				>
-					{/* EMAIL */}
-					<View style={tw.style('w-full gap-1')}>
-						<Label nativeID='email'>Email</Label>
-						<Input
-						nativeID="email"
-						placeholder="Email"
-						inputMode='email'
-						autoComplete='email'
-						autoCapitalize='none'
-						value={email}
-						onChangeText={setEmail}
-						aria-labelledby="email"
-						aria-errormessage="email"
-						aria-disabled={isLoading}
-						/>
-					</View>
-					{/* PASSWORD */}
-					<View style={tw.style('w-full gap-1')}>
-						<Label nativeID='password'>Password</Label>
-						<InputPassword
-						nativeID="password"
-						placeholder="Password"
-						autoComplete='password'
-						autoCapitalize='none'
-						value={password}
-						onChangeText={setPassword}
-						secureTextEntry
-						aria-labelledby="password"
-						aria-errormessage="password"
-						aria-disabled={isLoading}
-						/>
-					</View>
+					<Input
+					icon={Icons.Mail}
+					nativeID="email"
+					placeholder={upperFirst(t('common.form.email.label'))}
+					autoComplete='email'
+					autoCapitalize='none'
+					value={email}
+					onChangeText={setEmail}
+					disabled={isLoading}
+					keyboardType='email-address'
+					/>
+					<InputPassword
+					label={null}
+					nativeID="password"
+					placeholder="Password"
+					autoComplete='password'
+					autoCapitalize='none'
+					value={password}
+					onChangeText={setPassword}
+					secureTextEntry
+					disabled={isLoading}
+					/>
 					{/* FORGOT PASSWORD */}
 					<TouchableOpacity style={tw.style('w-full')}>
-						<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Forgot Password?</Text>
+						<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>{t('pages.auth.login.form.forgot_password')}</Text>
 					</TouchableOpacity>
 					{/* SUBMIT BUTTON */}
 					<Button onPress={handleSubmit} disabled={isLoading} style={tw.style('w-full rounded-xl')}>
@@ -106,7 +107,7 @@ const LoginScreen = () => {
 					</Button>
 				</KeyboardAvoidingView>
 				{/* SIGNUP */}
-				<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Don't have an account? <Link href={'/auth/signup'} style={{ color: colors.accentYellow }}>Sign Up</Link></Text>
+				<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>{t('pages.auth.login.no_account_yet')} <Link href={'/auth/signup'} replace style={{ color: colors.accentYellow }}>{t('common.word.signup')}</Link></Text>
 			</LinearGradient>
 		</ImageBackground>
 	)

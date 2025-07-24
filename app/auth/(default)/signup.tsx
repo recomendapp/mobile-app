@@ -1,0 +1,305 @@
+import { Alert, ImageBackground, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View} from 'react-native';
+import { useAuth } from '@/providers/AuthProvider';
+import { useEffect, useState } from 'react';
+import { AuthError } from '@supabase/supabase-js';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Button, ButtonText } from '@/components/ui/Button';
+import { Link } from 'expo-router';
+import * as z from 'zod';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import useDebounce from '@/hooks/useDebounce';
+import { useUsernameAvailability } from '@/hooks/useUsernameAvailability';
+import { useTranslation } from 'react-i18next';
+import { Icons } from '@/constants/Icons';
+import tw from '@/lib/tw';
+import { useTheme } from '@/providers/ThemeProvider';
+import { Input } from '@/components/ui/input';
+import { upperFirst } from 'lodash';
+import { InputPassword } from '@/components/ui/InputPassword';
+
+const backgroundImages = [
+	require('@/assets/images/auth/signup/background/1.gif'),
+]
+
+const USERNAME_MIN_LENGTH = 3;
+const USERNAME_MAX_LENGTH = 15;
+const FULL_NAME_MIN_LENGTH = 1;
+const FULL_NAME_MAX_LENGTH = 50;
+const PASSWORD_MIN_LENGTH = 8;
+
+const SignupScreen = () => {
+	const { colors } = useTheme();
+	const { signup } = useAuth();
+	const [ isLoading, setIsLoading ] = useState(false);
+	const { t, i18n } = useTranslation();
+
+	/* ------------------------------- FORM SCHEMA ------------------------------ */
+	const signupSchema = z.object({
+		email: z.email({
+			error: t('common.form.email.error.invalid')
+		}),
+		username: z
+			.string()
+			.min(USERNAME_MIN_LENGTH, {
+				message: t('common.form.length.char_min', { count: USERNAME_MIN_LENGTH }),
+			})
+			.max(USERNAME_MAX_LENGTH, {
+				message: t('common.form.length.char_max', { count: USERNAME_MAX_LENGTH }),
+			})
+			.regex(/^[^\W]/, {
+				message: t('common.form.username.schema.first_char'),
+			})
+			.regex(/^(?!.*\.\.)/, {
+				message: t('common.form.username.schema.double_dot'),
+			})
+			.regex(/^(?!.*\.$)/, {
+				message: t('common.form.username.schema.ends_with_dot'),
+			})
+			.regex(/^[\w.]+$/, {
+				message: t('common.form.username.schema.format'),
+			}),
+		full_name: z
+			.string()
+			.min(FULL_NAME_MIN_LENGTH, {
+				message: t('common.form.length.char_min', { count: FULL_NAME_MIN_LENGTH }),
+			})
+			.max(FULL_NAME_MAX_LENGTH, {
+				message: t('common.form.length.char_max', { count: FULL_NAME_MAX_LENGTH }),
+			})
+			.regex(/^[a-zA-Z0-9\s\S]*$/, {
+				message: t('common.form.full_name.schema.format'),
+			}),
+		password: z
+			.string()
+			.min(PASSWORD_MIN_LENGTH, {
+				message: t('common.form.length.char_min', { count: PASSWORD_MIN_LENGTH }),
+			})
+			.regex(/[A-Z]/, {
+				message: t('common.form.password.schema.uppercase'),
+			})
+			.regex(/[a-z]/, {
+				message: t('common.form.password.schema.lowercase'),
+			})
+			.regex(/[0-9]/, {
+				message: t('common.form.password.schema.number'),
+			})
+			.regex(/[\W_]/, {
+				message: t('common.form.password.schema.special'),
+			}),
+		confirm_password: z
+			.string()
+	}).refine(data => data.password === data.confirm_password, {
+		message: t('common.form.password.schema.match'),
+		path: ['confirm_password'],
+	});
+
+	type SignupFormValues = z.infer<typeof signupSchema>;
+
+	const defaultValues: Partial<SignupFormValues> = {
+		email: '',
+		full_name: '',
+		username: '',
+		password: '',
+		confirm_password: '',
+	};
+	/* -------------------------------------------------------------------------- */
+
+	const form = useForm<SignupFormValues>({
+		resolver: zodResolver(signupSchema),
+		defaultValues: defaultValues,
+		mode: 'onChange',
+	});
+	const usernameAvailability = useUsernameAvailability();
+	const usernameToCheck = useDebounce(form.watch('username'), 500);
+	// OTP
+	const numberOfDigits = 6;
+	const [showOtp, setShowOtp] = useState<boolean>(false);
+
+	// Handlers
+	const handleSubmit = async (data: SignupFormValues) => {
+		try {
+			setIsLoading(true);
+			await signup({
+				email: data.email,
+				name: data.full_name,
+				username: data.username,
+				password: data.password,
+				language: i18n.language,
+			});
+			// toast.success(t('common.form.success', { email: data.email }));
+			setShowOtp(true);
+		} catch (error) {
+			if (error instanceof AuthError) {
+				switch (error.status) {
+					case 422:
+						Alert.alert(t('common.form.email.error.unavailable'));
+						break;
+					case 500:
+						Alert.alert(t('common.form.username.schema.unavailable'));
+						break;
+					default:
+						Alert.alert(error.message);
+				}
+			} else {
+				Alert.alert(t('common.error'));
+			}
+		} finally {
+			setIsLoading(false);
+		}
+	};
+	// useEffects
+	useEffect(() => {
+		if (!form.formState.errors.username?.message && usernameToCheck) {
+			usernameAvailability.check(usernameToCheck);
+		}
+	}, [usernameToCheck]);
+	useEffect(() => {
+		if (usernameAvailability.isAvailable === false) {
+			form.setError('username', {
+				message: t('common.form.username.schema.unavailable'),
+			});
+		}
+	}, [usernameAvailability.isAvailable, t]);
+
+	return (
+		<ImageBackground source={backgroundImages[0]} style={{ flex: 1 }}>
+			<LinearGradient
+			colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
+			start={{
+				x: 0,
+				y: 0,
+			}}
+			end={{
+				x: 0,
+				y: 0.4,
+			}}
+			style={[
+				{
+					flex: 1,
+					flexDirection: 'column',
+					justifyContent: 'flex-end',
+					alignItems: 'center',
+					gap: 24,
+					paddingBottom: 114
+				},
+				tw`px-4`
+			]}
+			>
+				<KeyboardAvoidingView
+				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+				style={tw.style('w-full gap-4')}
+				>
+					{/* EMAIL */}
+					<Controller
+					name="email"
+					control={form.control}
+					render={({field: { onChange, onBlur, value }}) => (
+						<Input
+						icon={Icons.Mail}
+						placeholder={upperFirst(t('common.form.email.label'))}
+						nativeID='email'
+						inputMode='email'
+						autoComplete='email'
+						autoCapitalize='none'
+						value={value}
+						onChangeText={value => onChange(value)}
+						disabled={isLoading}
+						keyboardType='email-address'
+						onBlur={onBlur}
+						error={form.formState.errors.email?.message}
+						/>
+					)}
+					/>
+					<Controller
+					name='username'
+					control={form.control}
+					render={({ field: { onChange, onBlur, value } }) => (
+						<Input
+						icon={Icons.User}
+						placeholder={t('pages.settings.account.username.label')}
+						disabled={isLoading}
+						autoComplete="username"
+						autoCapitalize='none'
+						value={value}
+						autoCorrect={false}
+						onBlur={onBlur}
+						onChangeText={onChange}
+						rightComponent={(!form.formState.errors.username && usernameAvailability.isAvailable !== undefined) ? (
+							usernameAvailability.isLoading ? <Icons.Loader />
+							: (
+								<View style={[{ backgroundColor: usernameAvailability.isAvailable ? colors.success : colors.destructive }, tw`rounded-full h-6 w-6 items-center justify-center`]}>
+									{usernameAvailability.isAvailable ? (
+										<Icons.Check size={17} color={colors.successForeground} />
+									) : <Icons.Cancel size={17} color={colors.destructiveForeground} />}
+								</View>
+							)
+						) : undefined}
+						error={form.formState.errors.username?.message}
+						/>
+					)}
+					/>
+					<Controller
+					name="full_name"
+					control={form.control}
+					render={({field: { onChange, onBlur, value }}) => (
+						<Input
+						placeholder={upperFirst(t('common.form.full_name.label'))}
+						icon={Icons.Add}
+						nativeID='full_name'
+						value={value}
+						autoComplete="given-name"
+						autoCapitalize='words'
+						onBlur={onBlur}
+						onChangeText={onChange}
+						disabled={isLoading}
+						error={form.formState.errors.full_name?.message}
+						/>
+					)}
+					/>
+					<Controller
+					name="password"
+					control={form.control}
+					render={({field: { onChange, onBlur, value }}) => (
+						<InputPassword
+						label={null}
+						placeholder={t('common.form.password.placeholder')}
+						nativeID='password'
+						value={value}
+						onChangeText={onChange}
+						autoComplete='new-password'
+						autoCapitalize='none'
+						onBlur={onBlur}
+						error={form.formState.errors.password?.message}
+						/>
+					)}
+					/>
+					<Controller
+					name="confirm_password"
+					control={form.control}
+					render={({field: { onChange, onBlur, value }}) => (
+						<InputPassword
+						label={null}
+						placeholder={t('common.form.password.confirm.label')}
+						nativeID='confirm_password'
+						value={value}
+						onChangeText={onChange}
+						autoCapitalize='none'
+						onBlur={onBlur}
+						error={form.formState.errors.confirm_password?.message}
+						/>
+					)}
+					/>
+				{/* SUBMIT BUTTON */}
+				<Button onPress={form.handleSubmit(handleSubmit)} disabled={isLoading} style={tw.style('w-full rounded-xl')}>
+					<ButtonText style={tw.style('font-bold text-xl')}>{t('common.word.signup')}</ButtonText>
+				</Button>
+				</KeyboardAvoidingView>
+				{/* SIGNUP */}
+				<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Already have an account? <Link href={'/auth/login'} replace style={{ color: colors.accentYellow }}>{t('common.word.login')}</Link></Text>
+			</LinearGradient>
+		</ImageBackground>
+	)
+};
+
+export default SignupScreen;

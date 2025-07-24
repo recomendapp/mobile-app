@@ -76,7 +76,7 @@ const BottomSheetMedia = React.forwardRef<
           )),
           closeOnPress: false,
         } : {
-          icon: Icons.user,
+          icon: Icons.User,
           onPress: () => router.push(media.main_credit![0].url as LinkProps['href']),
           label: upperFirst(t(
             media.media_type === 'movie' ? 'common.messages.go_to_director' : 'common.messages.go_to_creator',

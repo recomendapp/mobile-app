@@ -1,13 +1,10 @@
 import { User } from "@/types/type.db";
 import { Session } from "@supabase/supabase-js";
-import { SplashScreen } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
 import { useUserQuery } from "@/features/user/userQueries";
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-SplashScreen.preventAutoHideAsync();
 
 type AuthContextProps = {
 	session: Session | null | undefined;
@@ -61,15 +58,6 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			syncLanguage();
 		}
 	}, [user, i18n]);
-
-	useEffect(() => {
-		if (
-			session === null ||
-			(session !== undefined && user !== undefined)
-		) {
-			SplashScreen.hide();
-		}
-	}, [session, user]);
 
 	const login = async ({ email, password }: { email: string; password: string }) => {
 		const { error } = await supabase.auth.signInWithPassword({

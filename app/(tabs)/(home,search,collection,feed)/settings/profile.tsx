@@ -11,7 +11,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
 import { Label } from "@/components/ui/Label";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/InputOld";
 import { Button, ButtonText } from "@/components/ui/Button";
 
 const ProfileSettings = () => {

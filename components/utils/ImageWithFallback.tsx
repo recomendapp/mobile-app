@@ -88,7 +88,7 @@ const Fallback = ({
     case 'playlist':
       return <ListVideoIcon color={colors.foreground} style={tw.style('w-2/5 h-2/5')} />;
     case 'person':
-      return <Icons.user color={colors.foreground} style={tw.style('w-2/5 h-2/5')} />;
+      return <Icons.User color={colors.foreground} style={tw.style('w-2/5 h-2/5')} />;
     case 'movie':
       return <Text numberOfLines={2} style={[{ color: colors.mutedForeground }, tw.style('text-center')]}>{alt}</Text>;
     case 'tv_series':

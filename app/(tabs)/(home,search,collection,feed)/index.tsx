@@ -45,7 +45,7 @@ const HomeScreen = () => {
               </>
             ) : (
               <>
-              <Link href="/auth/login" asChild>
+              <Link href="/auth" asChild>
                 <Button>
                   <ButtonText>{upperFirst(t('common.messages.get_started_its_free'))}</ButtonText>
                 </Button>
