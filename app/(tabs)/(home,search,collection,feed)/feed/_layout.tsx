@@ -14,6 +14,7 @@ import { title } from "@/hooks/custom-lodash";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { Icons } from "@/constants/Icons";
+import { useMemo } from "react";
 
 const FeedLayout = () => {
   const { t } = useTranslation();
@@ -26,7 +27,9 @@ const FeedLayout = () => {
     { label: upperFirst(t('common.messages.community')), value: 'community', route: '/feed' },
     { label: title(t('common.messages.cast_and_crew')), value: 'cast_and_crew', route: '/feed/cast-crew' },
   ];
-  const activeOption = feedOptions.find(option => option.route === pathname);
+  const activeOption = useMemo(() => {
+    return feedOptions.find(option => option.route === pathname) || feedOptions[0];
+  }, [feedOptions, pathname]);
   // Handlers
   const handleFeedOptions = () => {
     const feedOptionsWithCancel = [
