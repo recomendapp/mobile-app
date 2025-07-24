@@ -1,36 +1,46 @@
 import * as React from "react"
-import { Input } from "./Input"
-import { TextInput, TextInputProps, View } from "react-native"
+import { Input } from "./input"
 import { Pressable } from "react-native-gesture-handler"
 import { useTheme } from "@/providers/ThemeProvider"
-import tw from "@/lib/tw"
 import { Icons } from "@/constants/Icons"
+import { useTranslation } from "react-i18next"
+import { upperFirst } from "lodash"
 
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+export interface InputPasswordProps
+  extends React.ComponentProps<typeof Input> {}
 
-const InputPassword = React.forwardRef<React.ComponentRef<typeof TextInput>, TextInputProps>(
-  ({ style, secureTextEntry, ...props }, ref) => {
-  const { colors } = useTheme()
+const InputPassword = React.forwardRef<React.ComponentRef<typeof Input>, InputPasswordProps>(
+  ({ secureTextEntry, icon = Icons.Password, onFocus, onBlur, label, ...props }, ref) => {
+  const { colors } = useTheme();
+  const { t } = useTranslation();
   const [show, setShow] = React.useState(false);
+  const [isFocused, setIsFocused] = React.useState(false);
   return (
-    <View className="relative">
-      <Input
-        ref={ref}
-        secureTextEntry={!show}
-        style={[
-          tw.style("pr-10"),
-          style,
-        ]}
-        {...props}
-      />
-      <Pressable
-      style={{ position: "absolute", top: "50%", right: 8, transform: [{ translateY: "-50%" }] }}
-      onPress={() => setShow((prev) => !prev)}
-      >
-        {show ? <Icons.EyeOff color={colors.mutedForeground} size={20} /> : <Icons.Eye color={colors.mutedForeground} size={20} />}
-      </Pressable>
-    </View>
+    <Input
+      ref={ref}
+      secureTextEntry={!show}
+      label={label === null ? undefined : (label ?? upperFirst(t('common.form.password.label')))}
+      icon={Icons.Password}
+      rightComponent={isFocused ? (
+        <Pressable onPress={() => setShow((prev) => !prev)}>
+          {show ? (
+            <Icons.EyeOff size={20} color={colors.mutedForeground} />
+          ) : (
+            <Icons.Eye size={20} color={colors.mutedForeground} />
+          )}
+        </Pressable>
+      ) : undefined}
+      onFocus={(e) => {
+        setIsFocused(true);
+        onFocus?.(e);
+      }}
+      onBlur={(e) => {
+        if (show) setShow(false);
+        setIsFocused(false);
+        onBlur?.(e);
+      }}
+      {...props}
+    />
   )
 })
 InputPassword.displayName = "InputPassword"

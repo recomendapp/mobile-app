@@ -114,7 +114,7 @@ const BottomSheetPlaylist = React.forwardRef<
           disabled: pathname.startsWith(`/playlist/${playlist.id}`),
         },
         {
-          icon: Icons.user,
+          icon: Icons.User,
           onPress: () => router.push(`/user/${playlist.user?.username}`),
           label: upperFirst(t('common.messages.go_to_user')),
         },

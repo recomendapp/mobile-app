@@ -82,7 +82,7 @@ const ProfileLayout = () => {
 					/>
 				}
 				>
-					<Icons.user color={colors.foreground} size={50} />
+					<Icons.User color={colors.foreground} size={50} />
 					<ThemedText>{upperFirst(t('common.errors.user_not_found'))}</ThemedText>
 				</ScrollView>
 			)}

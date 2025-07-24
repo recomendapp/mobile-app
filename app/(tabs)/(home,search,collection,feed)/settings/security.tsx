@@ -7,7 +7,7 @@ import * as Burnt from 'burnt';
 import { ActivityIndicator, Text, View } from "react-native";
 import tw from "@/lib/tw";
 import { Label } from "@/components/ui/Label";
-import { InputPassword } from "@/components/ui/InputPassword";
+import { InputPassword } from "@/components/ui/InputPasswordOld";
 import { Button, ButtonText } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useState } from "react";

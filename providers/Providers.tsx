@@ -6,6 +6,7 @@ import { ThemeProvider } from "./ThemeProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetManager } from "@/components/bottom-sheets/BottomSheetManager";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import SplashScreenController from "@/components/SplashScreenController";
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -19,9 +20,10 @@ const Providers = ({ children } : ProvidersProps) => {
 				<ActionSheetProvider>
 					<SupabaseProvider>
 						<ReactQueryProvider>
-							<AuthProvider>
-								{children}
-								<BottomSheetManager />
+							<AuthProvider>										<SplashScreenController>
+									{children}
+									<BottomSheetManager />
+								</SplashScreenController>
 							</AuthProvider>
 						</ReactQueryProvider>
 					</SupabaseProvider>

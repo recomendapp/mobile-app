@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import { Icons } from "@/constants/Icons";
 import { Platform } from 'react-native';
 import { useAuth } from '@/providers/AuthProvider';
@@ -11,6 +11,7 @@ const TabsLayout = () => {
 	const { session } = useAuth();
 	const { colors } = useTheme();
 	const { t } = useTranslation();
+	const router = useRouter();
 	return (
 		<Tabs
 			screenOptions={{
@@ -62,11 +63,17 @@ const TabsLayout = () => {
 			{/* ANON ONLY */}
 			<Tabs.Protected guard={!session}>
 				<Tabs.Screen
-					name="auth"
-					options={{
-						title: t('common.word.login'),
-						tabBarIcon: ({ color }) => <Icons.user size={28} color={color} />,
-					}}
+				name='auth'
+				options={{
+					title: t('common.word.login'),
+					tabBarIcon: ({ color }) => <Icons.User size={28} color={color} />,
+				}}
+				listeners={() => ({
+					tabPress: (e) => {
+						e.preventDefault();
+						router.push('/auth');
+					},
+				})}
 				/>
 			</Tabs.Protected>
 		</Tabs>

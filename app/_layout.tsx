@@ -10,9 +10,6 @@ import StatusBar from '@/components/StatusBar';
 import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,

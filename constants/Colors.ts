@@ -11,6 +11,8 @@ export type ColorTheme = {
   cardForeground: string;
   destructive: string;
   destructiveForeground: string;
+  success: string;
+  successForeground: string;
   tint: string;
   // Accent colors
   accentYellow: string;
@@ -52,6 +54,8 @@ const Colors: ColorPalettes = {
     cardForeground: 'hsl(0 0% 100%)',
     destructive: 'hsl(0 62.8% 30.6%)',
     destructiveForeground: 'hsl(0 0% 98%)',
+    success: 'hsl(144.07 100% 39%)',
+    successForeground: 'hsl(0 0% 98%)',
     tint: 'hsl(0 0% 100%)',
     // Accent colors
     accentYellow: 'hsl(51 100% 73%)',
@@ -78,6 +82,8 @@ const Colors: ColorPalettes = {
     cardForeground: 'hsl(0 0% 98%)',
     destructive: 'hsl(0 84.2% 60.2%)',
     destructiveForeground: 'hsl(0 0% 98%)',
+    success: 'hsl(144.07 100% 39%)',
+    successForeground: 'hsl(0 0% 98%)',
     tint: 'hsl(240 5.9% 10%)',
     // Accent colors
     accentYellow: 'hsl(51 100% 73%)',
