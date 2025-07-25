@@ -246,44 +246,4 @@ export {
 	CardMedia,
 	CardMediaDefault,
 	CardMediaPoster,
-	// CardMediaRow,
 }
-  
-
-// const Credits = ({
-// 	credits,
-// 	linked,
-// 	className,
-// } : {
-// 	credits: MediaPerson[];
-// 	linked?: boolean;
-// 	className?: string;
-// }) => {
-// 	if (!credits || credits.length === 0) return null;
-// 	return (
-// 	  <p className={cn('line-clamp-1', className)}>
-// 		{credits?.map((credit, index) => (
-// 		  <span key={index}>
-// 			<Button
-// 			  variant={'link'}
-// 			  className={`
-// 				p-0 h-full italic text-muted-foreground transition
-// 				${linked ? 'hover:text-accent-1' : 'hover:text-muted-foreground hover:no-underline'}
-// 			`}
-// 			  asChild
-// 			>
-// 			  <WithLink
-// 			  href={linked ? (credit.url ?? '') : undefined}
-// 			  onClick={linked ? (e) => e.stopPropagation() : undefined}
-// 			  >
-// 				{credit.title}
-// 			  </WithLink>
-// 			</Button>
-// 			{index !== credits.length - 1 && (
-// 			  <span className='text-muted-foreground'>, </span>
-// 			)}
-// 		  </span>
-// 		))}
-// 	  </p>
-// 	)
-// }

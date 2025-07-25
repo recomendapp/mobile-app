@@ -1,9 +1,7 @@
 import { CardMedia } from "@/components/cards/CardMedia";
-import { IconMediaRating } from "@/components/medias/IconMediaRating";
 import ActionReviewLike from "@/components/reviews/actions/ActionReviewLike";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { Button, ButtonText } from "@/components/ui/Button";
-import { ThemedText } from "@/components/ui/ThemedText"
+import { Button } from "@/components/ui/button";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -73,10 +71,10 @@ const ReviewScreen = () => {
 						transform: 'translate(-50%, -50%)',
 					}
 				]}
-				pressableStyle={tw`flex-0`}
+				// pressableStyle={tw`flex-0`}
 				onPress={() => router.push(`/review/${review.id}/edit`)}
 				>
-					<ButtonText>{upperFirst(t('common.messages.edit'))}</ButtonText>
+				{upperFirst(t('common.messages.edit'))}
 				</Button>
 			) : null}
 		</View>

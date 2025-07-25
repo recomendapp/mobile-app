@@ -11,7 +11,7 @@ import { Text, TouchableWithoutFeedback, View } from 'react-native';
 import { useUserAddMediaToPlaylistQuery } from '@/features/user/userQueries';
 import { useAuth } from '@/providers/AuthProvider';
 import Fuse from "fuse.js";
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/Badge';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAddMediaToPlaylists } from '@/features/playlist/playlistMutations';
@@ -124,7 +124,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
         autoCapitalize="sentences"
         />
         <Button disabled={!selected.length} onPress={submit}>
-          <ButtonText>{upperFirst(t('common.messages.add'))}</ButtonText>
+          {upperFirst(t('common.messages.add'))}
         </Button>
       </View>
     }
@@ -181,14 +181,14 @@ const BottomSheetAddToPlaylist = React.forwardRef<
           clearable
           />
           <Button
+          icon={Icons.Add}
           variant={'outline'}
           style={tw`w-full`}
           onPress={() => {
             BottomSheetPlaylistCreateRef.current?.present();
           }}
           >
-            <Icons.Add size={20} color={colors.foreground} style={tw`mr-2`} />
-            <ButtonText variant='outline'>{t('common.playlist.actions.create')}</ButtonText>
+            {t('common.playlist.actions.create')}
           </Button>
         </View>
       }

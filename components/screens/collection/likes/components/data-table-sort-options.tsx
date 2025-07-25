@@ -4,7 +4,7 @@ import { Icons } from '@/constants/Icons';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import BottomSheetDefaultView from '@/components/bottom-sheets/templates/BottomSheetDefaultView';
 import { Pressable } from 'react-native-gesture-handler';
@@ -64,12 +64,12 @@ export function DataTableSortOptions<TData>({
   };
   return (
     <Button
+    icon={Icons.Filter}
     variant="outline"
     className="ml-auto flex h-8"
     onPress={handleOnPress}
     >
-      <Icons.Filter color={colors.foreground} size={16} style={tw`mr-2`} />
-      <ButtonText variant="outline">{capitalize(t('common.word.sort'))}</ButtonText>
+      {capitalize(t('common.word.sort'))}
     </Button>
   );
 }

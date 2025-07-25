@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuth } from '@/providers/AuthProvider';
 import { useTranslation } from 'react-i18next';
@@ -79,11 +79,9 @@ const ButtonUserFollow = React.forwardRef<
     ]}
     {...props}
     >
-      <ButtonText variant="accent-yellow">
-        {isFollow ? (
-          isFollow.is_pending ? upperFirst(t('common.messages.request_sent')) : upperFirst(t('common.messages.followed'))
-        ) : upperFirst(t('common.messages.follow'))}
-      </ButtonText>
+      {isFollow ? (
+        isFollow.is_pending ? upperFirst(t('common.messages.request_sent')) : upperFirst(t('common.messages.followed'))
+      ) : upperFirst(t('common.messages.follow'))}
     </Button>
   );
 });

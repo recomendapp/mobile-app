@@ -1,7 +1,6 @@
 import PlaylistHeader from "@/components/screens/playlist/PlaylistHeader";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { Button, ButtonText } from "@/components/ui/Button";
-import { ThemedText } from "@/components/ui/ThemedText";
+import { Button } from "@/components/ui/button";
 import { usePlaylistItems } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -134,9 +133,7 @@ const Playlist = ({
 			<View style={tw`flex-1 items-center justify-center gap-2`}>
 				<Text style={{ color: colors.mutedForeground }}>{capitalize(t('common.messages.no_results'))}</Text>
 				{playlistItems?.length === 0 && (
-					<Button style={tw`rounded-full`}>
-						<ButtonText>{upperFirst(t('common.messages.add_to_this_playlist'))}</ButtonText>
-					</Button>
+					<Button style={tw`rounded-full`}>{upperFirst(t('common.messages.add_to_this_playlist'))}</Button>
 				)}
 			</View>
 		)

@@ -5,7 +5,7 @@ import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { DataTableSortOptions } from './data-table-sort-options';
 import { Input } from '@/components/ui/InputOld';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Icons } from '@/constants/Icons';
 import { useTheme } from '@/providers/ThemeProvider';
 interface DataTableToolbarProps<TData> {
@@ -37,12 +37,12 @@ export function DataTableToolbar<TData>({
         />
         {isFiltered && (
           <Button
+            icon={Icons.Cancel}
             variant="outline"
+            size='icon'
             onPress={() => table.resetColumnFilters()}
             style={tw`px-2`}
-          >
-            <Icons.Cancel color={colors.foreground} size={20} />
-          </Button>
+          />
         )}
       </View>
       <View style={tw`flex-row items-center justify-end gap-2`}>

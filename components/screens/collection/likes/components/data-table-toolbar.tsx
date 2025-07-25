@@ -5,7 +5,7 @@ import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
 import { DataTableSortOptions } from './data-table-sort-options';
 import { Input } from '@/components/ui/InputOld';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Icons } from '@/constants/Icons';
 import { useTheme } from '@/providers/ThemeProvider';
 interface DataTableToolbarProps<TData> {

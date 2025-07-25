@@ -7,9 +7,8 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useUserWatchlistUpdateMutation } from '@/features/user/userMutations';
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import * as Burnt from 'burnt';
-import { ActivityIndicator, View } from 'react-native';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BetterInput } from '@/components/ui/BetterInput';
@@ -77,9 +76,8 @@ const BottomSheetWatchlistComment = React.forwardRef<
 		placeholder='Ajouter un commentaire...'
 		style={tw`h-24`}
 		/>
-		<Button onPress={handleUpdateComment} disabled={updateWatchlist.isPending}>
-			{updateWatchlist.isPending ? <ActivityIndicator color={colors.background} /> : null}
-			<ButtonText>{upperFirst(t('common.word.save'))}</ButtonText>
+		<Button loading={updateWatchlist.isPending} onPress={handleUpdateComment} disabled={updateWatchlist.isPending}>
+			{upperFirst(t('common.word.save'))}
 		</Button>
     </ThemedTrueSheet>
   );

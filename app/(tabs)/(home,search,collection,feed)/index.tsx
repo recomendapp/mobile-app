@@ -9,7 +9,7 @@ import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 import tw from '@/lib/tw';
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { upperFirst } from 'lodash';
 import { WidgetUserRecos } from '@/components/widgets/WidgetUserRecos';
 import { WidgetUserWatchlist } from '@/components/widgets/WidgetUserWatchlist';
@@ -46,9 +46,7 @@ const HomeScreen = () => {
             ) : (
               <>
               <Link href="/auth" asChild>
-                <Button>
-                  <ButtonText>{upperFirst(t('common.messages.get_started_its_free'))}</ButtonText>
-                </Button>
+                <Button>{upperFirst(t('common.messages.get_started_its_free'))}</Button>
               </Link>
               </>
             )}

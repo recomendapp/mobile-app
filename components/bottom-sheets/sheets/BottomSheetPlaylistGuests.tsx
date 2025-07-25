@@ -8,7 +8,7 @@ import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { usePlaylistGuests } from '@/features/playlist/playlistQueries';
 import Fuse from 'fuse.js';
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { MinusCircleIcon } from 'lucide-react-native';
 import { Icons } from '@/constants/Icons';
 import { CardUser } from '@/components/cards/CardUser';
@@ -233,9 +233,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
                   });
                 }}
                 >
-                  <ButtonText variant={edit ? 'accent-yellow' : 'outline'}>
-                    Edit
-                  </ButtonText>
+                  Edit
                 </Button>
             </View>
           )}

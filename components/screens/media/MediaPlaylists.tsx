@@ -1,6 +1,6 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { Button, ButtonText } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Icons } from "@/constants/Icons";
 import { useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
@@ -79,12 +79,14 @@ const MediaPlaylists = ({
 		ListHeaderComponent={
 			<>
 				<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
-					<Button variant="muted" style={tw`w-10 h-10 rounded-full`} onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}>
-						{sortOrder === 'desc' ? <Icons.ArrowDownNarrowWide color={colors.foreground} size={20} /> : <Icons.ArrowUpNarrowWide color={colors.foreground} size={20} />}
-					</Button>
-					<Button variant="muted" style={tw`h-10 rounded-full`} onPress={handleSortBy}>
-						<ButtonText variant="muted">{sortBy.label}</ButtonText>
-						<Icons.ChevronDown color={colors.foreground} size={20} />
+					<Button
+					icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
+					variant="muted"
+					size='icon'
+					onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}
+					/>
+					<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>
+						{sortBy.label}
 					</Button>
 				</View>
 			</>
