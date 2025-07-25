@@ -12,14 +12,7 @@ const AuthLayout = () => {
     }
   }, [session]);
   return (
-    <Stack screenOptions={{ headerShown: false, presentation: 'modal' }}>
-      <Stack.Screen
-      name="onboarding"
-      options={{
-        presentation: 'fullScreenModal'
-      }}
-      />
-    </Stack>
+    <Stack screenOptions={{ headerShown: false, presentation: 'modal' }} />
   );
 };
 

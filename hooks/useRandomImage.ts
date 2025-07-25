@@ -1,11 +1,7 @@
 import { DependencyList, useMemo } from "react";
+import { ImageSourcePropType } from "react-native";
 
-export type ImageObject = {
-  src: string;
-  alt?: string;
-};
-
-export function useRandomImage(images: ImageObject[], deps: DependencyList = []): ImageObject | null {
+export function useRandomImage(images: ImageSourcePropType[], deps: DependencyList = []): ImageSourcePropType | undefined {
   const randomer = (min: number, max: number) => {
     return Math.floor(Math.random() * (max - min + 1) + min);
   };
@@ -15,5 +11,5 @@ export function useRandomImage(images: ImageObject[], deps: DependencyList = [])
     return images[randomer(0, images.length - 1)];
   }, [images, ...deps]);
 
-  return image;
+  return image ?? undefined;
 }

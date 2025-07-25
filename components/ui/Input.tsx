@@ -1,9 +1,12 @@
 import { Icon } from '@/components/ui/icon';
+import { Icons } from '@/constants/Icons';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
 import { BORDER_RADIUS, CORNERS, FONT_SIZE, HEIGHT } from '@/theme/globals';
+import { upperFirst } from 'lodash';
 import { LucideProps } from 'lucide-react-native';
 import React, { forwardRef, ReactElement, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Pressable,
   TextInput,
@@ -13,6 +16,7 @@ import {
   ViewStyle,
   Text
 } from 'react-native';
+import { ThemedText } from './ThemedText';
 
 export interface InputProps extends Omit<TextInputProps, 'style'> {
   label?: string | null;
@@ -26,7 +30,7 @@ export interface InputProps extends Omit<TextInputProps, 'style'> {
   leftSectionStyle?: ViewStyle;
   variant?: 'filled' | 'outline';
   disabled?: boolean;
-  type?: 'input' | 'textarea';
+  type?: 'input' | 'textarea' | 'password';
   placeholder?: string;
   rows?: number; // Only used when type="textarea"
 }
@@ -34,11 +38,12 @@ export interface InputProps extends Omit<TextInputProps, 'style'> {
 export const Input = forwardRef<TextInput, InputProps>(
   (
     {
-      label,
+      label: labelProp,
       error,
-      icon,
-      rightComponent,
+      icon: iconProp,
+      rightComponent: rightComponentProp,
       containerStyle,
+      secureTextEntry: secureTextEntryProp,
       inputStyle,
       labelStyle,
       errorStyle,
@@ -54,7 +59,9 @@ export const Input = forwardRef<TextInput, InputProps>(
     },
     ref
   ) => {
+    const [showPassword, setShowPassword] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
+    const { t } = useTranslation();
 
     // Theme colors
     const { colors } = useTheme();
@@ -65,11 +72,27 @@ export const Input = forwardRef<TextInput, InputProps>(
     const primary = colors.accentYellow;
     const danger = colors.destructive;
 
-    const isTextarea = type === 'textarea';
+    // Default value
+    const label = type === 'password' ?
+      labelProp === null ? undefined : (labelProp ?? upperFirst(t('common.form.password.label')))
+      : labelProp;
+    const icon = type === 'password' ?
+      (iconProp ?? Icons.Password)
+      : iconProp;
+    const secureTextEntry = type === 'password' ? !showPassword : secureTextEntryProp;
+    const rightComponent = (type === 'password' && isFocused) ? (
+      <Pressable onPress={() => setShowPassword((prev) => !prev)}>
+        {showPassword ? (
+          <Icons.EyeOff size={20} color={colors.mutedForeground} />
+        ) : (
+          <Icons.Eye size={20} color={colors.mutedForeground} />
+        )}
+      </Pressable>
+    ) : rightComponentProp;
 
     // Calculate height based on type
     const getHeight = () => {
-      if (isTextarea) {
+      if (type === 'textarea') {
         return rows * 20 + 32; // Approximate line height + padding
       }
       return HEIGHT;
@@ -78,12 +101,12 @@ export const Input = forwardRef<TextInput, InputProps>(
     // Variant styles
     const getVariantStyle = (): ViewStyle => {
       const baseStyle: ViewStyle = {
-        borderRadius: isTextarea ? BORDER_RADIUS : CORNERS,
-        flexDirection: isTextarea ? 'column' : 'row',
-        alignItems: isTextarea ? 'stretch' : 'center',
+        borderRadius: type ==='textarea' ? BORDER_RADIUS : CORNERS,
+        flexDirection: type ==='textarea' ? 'column' : 'row',
+        alignItems: type ==='textarea' ? 'stretch' : 'center',
         minHeight: getHeight(),
         paddingHorizontal: 16,
-        paddingVertical: isTextarea ? 12 : 0,
+        paddingVertical: type ==='textarea' ? 12 : 0,
       };
 
       switch (variant) {
@@ -108,10 +131,10 @@ export const Input = forwardRef<TextInput, InputProps>(
     const getInputStyle = (): TextStyle => ({
       flex: 1,
       fontSize: FONT_SIZE,
-      lineHeight: isTextarea ? 20 : undefined,
+      lineHeight: type ==='textarea' ? 20 : undefined,
       color: disabled ? muted : error ? danger : textColor,
       paddingVertical: 0, // Remove default padding
-      textAlignVertical: isTextarea ? 'top' : 'center',
+      textAlignVertical: type ==='textarea' ? 'top' : 'center',
     });
 
     const handleFocus = (e: any) => {
@@ -120,6 +143,7 @@ export const Input = forwardRef<TextInput, InputProps>(
     };
 
     const handleBlur = (e: any) => {
+      if (showPassword) setShowPassword(false);
       setIsFocused(false);
       onBlur?.(e);
     };
@@ -146,7 +170,7 @@ export const Input = forwardRef<TextInput, InputProps>(
           }}
           disabled={disabled}
         >
-          {isTextarea ? (
+          {type ==='textarea' ? (
             // Textarea Layout (Column)
             <>
               {/* Header section with icon, label, and right component */}
@@ -210,6 +234,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                 onBlur={handleBlur}
                 editable={!disabled}
                 selectionColor={primary}
+                secureTextEntry={secureTextEntry}
                 {...props}
               />
             </>
@@ -264,6 +289,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                   editable={!disabled}
                   placeholder={placeholder}
                   selectionColor={primary}
+                  secureTextEntry={secureTextEntry}
                   {...props}
                 />
               </View>
@@ -327,15 +353,14 @@ export const GroupedInput = ({
   const renderGroupedContent = () => (
     <View style={containerStyle}>
       {!!title && (
-        <Text
+        <ThemedText
           style={[
-            { marginBottom: 8, marginLeft: 8 },
-            tw`font-semibold`,
+            tw`ml-2 mb-2 font-semibold`,
             titleStyle
           ]}
         >
           {title}
-        </Text>
+        </ThemedText>
       )}
 
       <View
@@ -396,17 +421,18 @@ export interface GroupedInputItemProps extends Omit<TextInputProps, 'style'> {
   labelStyle?: TextStyle;
   errorStyle?: TextStyle;
   disabled?: boolean;
-  type?: 'input' | 'textarea';
+  type?: 'input' | 'textarea' | 'password';
   rows?: number; // Only used when type="textarea"
 }
 
 export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
   (
     {
-      label,
+      label: labelProp,
       error,
-      icon,
-      rightComponent,
+      icon: iconProp,
+      rightComponent: rightComponentProp,
+      secureTextEntry: secureTextEntryProp,
       inputStyle,
       labelStyle,
       errorStyle,
@@ -420,6 +446,8 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
     },
     ref
   ) => {
+    const { t } = useTranslation();
+    const [showPassword, setShowPassword] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
 
     const { colors } = useTheme();
@@ -428,7 +456,23 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
     const primary = colors.accentYellow;
     const danger = colors.destructive;
 
-    const isTextarea = type === 'textarea';
+    // Default values
+    const label = type === 'password' ?
+      labelProp === null ? undefined : (labelProp ?? upperFirst(t('common.form.password.label')))
+      : labelProp;
+    const icon = type === 'password' ?
+      (iconProp ?? Icons.Password)
+      : iconProp;
+    const secureTextEntry = type === 'password' ? !showPassword : secureTextEntryProp;
+    const rightComponent = (type === 'password' && isFocused) ? (
+      <Pressable onPress={() => setShowPassword((prev) => !prev)}>
+        {showPassword ? (
+          <Icons.EyeOff size={20} color={colors.mutedForeground} />
+        ) : (
+          <Icons.Eye size={20} color={colors.mutedForeground} />
+        )}
+      </Pressable>
+    ) : rightComponentProp;
 
     const handleFocus = (e: any) => {
       setIsFocused(true);
@@ -455,12 +499,12 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
       >
         <View
           style={{
-            flexDirection: isTextarea ? 'column' : 'row',
-            alignItems: isTextarea ? 'stretch' : 'center',
+            flexDirection: type ==='textarea' ? 'column' : 'row',
+            alignItems: type ==='textarea' ? 'stretch' : 'center',
             backgroundColor: 'transparent',
           }}
         >
-          {isTextarea ? (
+          {type ==='textarea' ? (
             // Textarea Layout (Column)
             <>
               {/* Header section with icon, label, and right component */}
@@ -534,6 +578,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                 selectionColor={primary}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
+                secureTextEntry={secureTextEntry}
                 {...props}
               />
             </>
@@ -596,6 +641,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                   selectionColor={primary}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
+                  secureTextEntry={secureTextEntry}
                   {...props}
                 />
               </View>

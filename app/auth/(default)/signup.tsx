@@ -1,4 +1,4 @@
-import { Alert, ImageBackground, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View} from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View} from 'react-native';
 import { useAuth } from '@/providers/AuthProvider';
 import { useEffect, useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
@@ -14,9 +14,10 @@ import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
-import { Input } from '@/components/ui/input';
+import { GroupedInput, GroupedInputItem, Input } from '@/components/ui/input';
 import { upperFirst } from 'lodash';
-import { InputPassword } from '@/components/ui/InputPassword';
+import app from '@/constants/app';
+import { ImageBackground } from 'expo-image';
 
 const backgroundImages = [
 	require('@/assets/images/auth/signup/background/1.gif'),
@@ -190,113 +191,116 @@ const SignupScreen = () => {
 				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
 				style={tw.style('w-full gap-4')}
 				>
-					{/* EMAIL */}
-					<Controller
-					name="email"
-					control={form.control}
-					render={({field: { onChange, onBlur, value }}) => (
-						<Input
-						icon={Icons.Mail}
-						placeholder={upperFirst(t('common.form.email.label'))}
-						nativeID='email'
-						inputMode='email'
-						autoComplete='email'
-						autoCapitalize='none'
-						value={value}
-						onChangeText={value => onChange(value)}
-						disabled={isLoading}
-						keyboardType='email-address'
-						onBlur={onBlur}
-						error={form.formState.errors.email?.message}
+					<GroupedInput title={t('pages.auth.signup.label', { app: app.name })} titleStyle={tw`text-center text-xl font-bold`}>
+						<Controller
+						name="email"
+						control={form.control}
+						render={({field: { onChange, onBlur, value }}) => (
+							<GroupedInputItem
+							icon={Icons.Mail}
+							placeholder={upperFirst(t('common.form.email.label'))}
+							nativeID='email'
+							inputMode='email'
+							autoComplete='email'
+							autoCapitalize='none'
+							value={value}
+							onChangeText={value => onChange(value)}
+							disabled={isLoading}
+							keyboardType='email-address'
+							onBlur={onBlur}
+							error={form.formState.errors.email?.message}
+							/>
+						)}
 						/>
-					)}
-					/>
-					<Controller
-					name='username'
-					control={form.control}
-					render={({ field: { onChange, onBlur, value } }) => (
-						<Input
-						icon={Icons.User}
-						placeholder={t('pages.settings.account.username.label')}
-						disabled={isLoading}
-						autoComplete="username"
-						autoCapitalize='none'
-						value={value}
-						autoCorrect={false}
-						onBlur={onBlur}
-						onChangeText={onChange}
-						rightComponent={(!form.formState.errors.username && usernameAvailability.isAvailable !== undefined) ? (
-							usernameAvailability.isLoading ? <Icons.Loader />
-							: (
-								<View style={[{ backgroundColor: usernameAvailability.isAvailable ? colors.success : colors.destructive }, tw`rounded-full h-6 w-6 items-center justify-center`]}>
-									{usernameAvailability.isAvailable ? (
-										<Icons.Check size={17} color={colors.successForeground} />
-									) : <Icons.Cancel size={17} color={colors.destructiveForeground} />}
-								</View>
-							)
-						) : undefined}
-						error={form.formState.errors.username?.message}
+						<Controller
+						name='username'
+						control={form.control}
+						render={({ field: { onChange, onBlur, value } }) => (
+							<GroupedInputItem
+							icon={Icons.User}
+							placeholder={t('pages.settings.account.username.label')}
+							disabled={isLoading}
+							autoComplete="username"
+							autoCapitalize='none'
+							value={value}
+							autoCorrect={false}
+							onBlur={onBlur}
+							onChangeText={onChange}
+							rightComponent={(!form.formState.errors.username && usernameAvailability.isAvailable !== undefined) ? (
+								usernameAvailability.isLoading ? <Icons.Loader />
+								: (
+									<View style={[{ backgroundColor: usernameAvailability.isAvailable ? colors.success : colors.destructive }, tw`rounded-full h-6 w-6 items-center justify-center`]}>
+										{usernameAvailability.isAvailable ? (
+											<Icons.Check size={17} color={colors.successForeground} />
+										) : <Icons.Cancel size={17} color={colors.destructiveForeground} />}
+									</View>
+								)
+							) : undefined}
+							error={form.formState.errors.username?.message}
+							/>
+						)}
 						/>
-					)}
-					/>
-					<Controller
-					name="full_name"
-					control={form.control}
-					render={({field: { onChange, onBlur, value }}) => (
-						<Input
-						placeholder={upperFirst(t('common.form.full_name.label'))}
-						icon={Icons.Add}
-						nativeID='full_name'
-						value={value}
-						autoComplete="given-name"
-						autoCapitalize='words'
-						onBlur={onBlur}
-						onChangeText={onChange}
-						disabled={isLoading}
-						error={form.formState.errors.full_name?.message}
+						<Controller
+						name="full_name"
+						control={form.control}
+						render={({field: { onChange, onBlur, value }}) => (
+							<GroupedInputItem
+							placeholder={upperFirst(t('common.form.full_name.label'))}
+							icon={Icons.Add}
+							nativeID='full_name'
+							value={value}
+							autoComplete="given-name"
+							autoCapitalize='words'
+							onBlur={onBlur}
+							onChangeText={onChange}
+							disabled={isLoading}
+							error={form.formState.errors.full_name?.message}
+							/>
+						)}
 						/>
-					)}
-					/>
-					<Controller
-					name="password"
-					control={form.control}
-					render={({field: { onChange, onBlur, value }}) => (
-						<InputPassword
-						label={null}
-						placeholder={t('common.form.password.placeholder')}
-						nativeID='password'
-						value={value}
-						onChangeText={onChange}
-						autoComplete='new-password'
-						autoCapitalize='none'
-						onBlur={onBlur}
-						error={form.formState.errors.password?.message}
+						<Controller
+						name="password"
+						control={form.control}
+						render={({field: { onChange, onBlur, value }}) => (
+							<GroupedInputItem
+							label={null}
+							placeholder={t('common.form.password.placeholder')}
+							nativeID='password'
+							value={value}
+							onChangeText={onChange}
+							autoComplete='new-password'
+							autoCapitalize='none'
+							onBlur={onBlur}
+							error={form.formState.errors.password?.message}
+							type='password'
+							/>
+						)}
 						/>
-					)}
-					/>
-					<Controller
-					name="confirm_password"
-					control={form.control}
-					render={({field: { onChange, onBlur, value }}) => (
-						<InputPassword
-						label={null}
-						placeholder={t('common.form.password.confirm.label')}
-						nativeID='confirm_password'
-						value={value}
-						onChangeText={onChange}
-						autoCapitalize='none'
-						onBlur={onBlur}
-						error={form.formState.errors.confirm_password?.message}
+						<Controller
+						name="confirm_password"
+						control={form.control}
+						render={({field: { onChange, onBlur, value }}) => (
+							<GroupedInputItem
+							label={null}
+							placeholder={t('common.form.password.confirm.label')}
+							nativeID='confirm_password'
+							value={value}
+							onChangeText={onChange}
+							autoCapitalize='none'
+							onBlur={onBlur}
+							error={form.formState.errors.confirm_password?.message}
+							type='password'
+							/>
+						)}
 						/>
-					)}
-					/>
-				{/* SUBMIT BUTTON */}
-				<Button onPress={form.handleSubmit(handleSubmit)} disabled={isLoading} style={tw.style('w-full rounded-xl')}>
-					<ButtonText style={tw.style('font-bold text-xl')}>{t('common.word.signup')}</ButtonText>
-				</Button>
+					</GroupedInput>
+					{/* SUBMIT BUTTON */}
+					<Button onPress={form.handleSubmit(handleSubmit)} disabled={isLoading} style={tw.style('w-full rounded-xl')}>
+						<ButtonText style={tw.style('font-bold text-xl')}>{t('pages.auth.signup.form.submit')}</ButtonText>
+					</Button>
 				</KeyboardAvoidingView>
 				{/* SIGNUP */}
-				<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>Already have an account? <Link href={'/auth/login'} replace style={{ color: colors.accentYellow }}>{t('common.word.login')}</Link></Text>
+				<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>{t('pages.auth.signup.return_to_login')} <Link href={'/auth/login'} replace style={{ color: colors.accentYellow }}>{t('common.word.login')}</Link></Text>
 			</LinearGradient>
 		</ImageBackground>
 	)

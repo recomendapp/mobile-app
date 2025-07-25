@@ -412,7 +412,7 @@
         "metadata": {
           "description": "Log in to your {app} account."
         },
-        "label": "Login",
+        "label": "Sign in to {{app}}",
         "description": "Discover the best movie recommendations.",
         "or_continue_with": "Or continue with",
         "no_account_yet": "No account yet?",
@@ -421,7 +421,7 @@
             "label": "Password",
             "placeholder": "Enter your password"
           },
-          "submit": "Login with email",
+          "submit": "Go !",
           "forgot_password": "Forgot password?",
           "wrong_credentials": "Email or password is incorrect"
         },
@@ -442,9 +442,11 @@
         "metadata": {
           "description": "Sign up for {app} to discover and share movie recommendations."
         },
+        "label": "Sign up to {{app}}",
         "description": "Create an account to recommend a movie to your friend who always forgets the titles.",
         "form": {
-          "success": "A verification email has been sent to {email}"
+          "success": "A verification email has been sent to {email}",
+          "submit": "Go !"
         },
         "confirm_form": {
           "label": "Confirm email",
