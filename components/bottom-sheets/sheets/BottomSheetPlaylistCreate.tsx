@@ -4,7 +4,7 @@ import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import * as Burnt from 'burnt';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { usePlaylistInsertMutation } from '@/features/playlist/playlistMutations';
@@ -118,7 +118,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
       }}
       disabled={createPlaylistMutation.isPending}
       >
-        <ButtonText>{upperFirst(t('common.messages.create'))}</ButtonText>
+        {upperFirst(t('common.messages.create'))}
       </Button>
     </ThemedTrueSheet>
   );

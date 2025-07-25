@@ -154,7 +154,10 @@
       "delete_current_image": "supprimer l'image actuelle",
       "ratings_from_followees": "notes des suivi(e)s",
       "community": "communauté",
-      "cast_and_crew": "cast & crew"
+      "cast_and_crew": "cast & crew",
+      "skip": "passer",
+      "back": "retour",
+      "next": "suivant"
     },
     "errors": {
       "not_logged_in": "vous n'êtes pas connecté",

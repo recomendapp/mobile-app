@@ -13,7 +13,7 @@ import { useUserRecosInsertMutation } from '@/features/user/userMutations';
 import { useAuth } from '@/providers/AuthProvider';
 import Fuse from "fuse.js";
 import UserAvatar from '@/components/user/UserAvatar';
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import * as Burnt from 'burnt';
 import { Badge } from '@/components/ui/Badge';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
@@ -139,7 +139,7 @@ const BottomSheetSendReco = React.forwardRef<
         autoCapitalize='sentences'
         />
         <Button disabled={!selected.length} onPress={submit}>
-          <ButtonText>{upperFirst(t('common.messages.send'))}</ButtonText>
+          {upperFirst(t('common.messages.send'))}
         </Button>
       </View>
     }

@@ -1,4 +1,4 @@
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
@@ -218,16 +218,16 @@ const BottomSheetMediaRating = React.forwardRef<
 			<View style={[{ paddingBottom: inset.bottom }, tw`flex-1 flex-row gap-2 justify-between px-4`]}>
 				{activity?.rating ? (
 					<>
-						<Button variant="outline" onPress={handleDeleteRating} pressableStyle={tw`flex-1`}>
-							<ButtonText variant="outline">Delete</ButtonText>
+						<Button variant="outline" onPress={handleDeleteRating} style={{ flex: 1 }}>
+							Delete
 						</Button>
-						<Button variant="accent-yellow" onPress={handleSaveRating} pressableStyle={tw`flex-1`}>
-							<ButtonText variant="accent-yellow">{upperFirst(t('common.word.save'))}</ButtonText>
+						<Button variant="accent-yellow" onPress={handleSaveRating} style={{ flex: 1 }}>
+							{upperFirst(t('common.word.save'))}
 						</Button>
 					</>
 				) : (
-					<Button variant="accent-yellow" onPress={handleSaveRating} pressableStyle={tw`flex-1`}>
-						<ButtonText variant="accent-yellow">Ajouter une note</ButtonText>
+					<Button variant="accent-yellow" onPress={handleSaveRating} style={{ flex: 1 }}>
+						Ajouter une note
 					</Button>
 				)}
 			</View>

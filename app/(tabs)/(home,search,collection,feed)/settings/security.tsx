@@ -8,7 +8,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 import tw from "@/lib/tw";
 import { Label } from "@/components/ui/Label";
 import { InputPassword } from "@/components/ui/InputPasswordOld";
-import { Button, ButtonText } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
@@ -135,11 +135,11 @@ const SecuritySettings = () => {
 			)}
 			/>
 			<Button
+			loading={isLoading}
 			onPress={form.handleSubmit(onSubmit)}
 			disabled={isLoading}
 			>
-				{isLoading ? <ActivityIndicator color={colors.background} /> : null}
-				<ButtonText>{t('common.word.save')}</ButtonText>
+				{t('common.word.save')}
 			</Button>
 		</>
 	)

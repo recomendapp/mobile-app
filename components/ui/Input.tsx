@@ -14,7 +14,8 @@ import {
   TextStyle,
   View,
   ViewStyle,
-  Text
+  Text,
+  TextInputFocusEvent
 } from 'react-native';
 import { ThemedText } from './ThemedText';
 
@@ -137,12 +138,12 @@ export const Input = forwardRef<TextInput, InputProps>(
       textAlignVertical: type ==='textarea' ? 'top' : 'center',
     });
 
-    const handleFocus = (e: any) => {
+    const handleFocus = (e: TextInputFocusEvent) => {
       setIsFocused(true);
       onFocus?.(e);
     };
 
-    const handleBlur = (e: any) => {
+    const handleBlur = (e: TextInputFocusEvent) => {
       if (showPassword) setShowPassword(false);
       setIsFocused(false);
       onBlur?.(e);
@@ -328,6 +329,7 @@ export interface GroupedInputProps {
   containerStyle?: ViewStyle;
   title?: string;
   titleStyle?: TextStyle;
+  showErrors?: boolean;
 }
 
 export const GroupedInput = ({
@@ -335,6 +337,7 @@ export const GroupedInput = ({
   containerStyle,
   title,
   titleStyle,
+  showErrors = false,
 }: GroupedInputProps) => {
   const { colors } = useTheme();
   const border = colors.border;
@@ -389,7 +392,7 @@ export const GroupedInput = ({
         ))}
       </View>
 
-      {errors.length > 0 && (
+      {showErrors && errors.length > 0 && (
         <View style={{ marginTop: 6 }}>
           {errors.map((error, i) => (
             <Text
@@ -467,19 +470,20 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
     const rightComponent = (type === 'password' && isFocused) ? (
       <Pressable onPress={() => setShowPassword((prev) => !prev)}>
         {showPassword ? (
-          <Icons.EyeOff size={20} color={colors.mutedForeground} />
+          <Icons.EyeOff size={16} color={colors.mutedForeground} />
         ) : (
-          <Icons.Eye size={20} color={colors.mutedForeground} />
+          <Icons.Eye size={16} color={colors.mutedForeground} />
         )}
       </Pressable>
     ) : rightComponentProp;
 
-    const handleFocus = (e: any) => {
+    const handleFocus = (e: TextInputFocusEvent) => {
       setIsFocused(true);
       onFocus?.(e);
     };
 
-    const handleBlur = (e: any) => {
+    const handleBlur = (e: TextInputFocusEvent) => {
+      if (showPassword) setShowPassword(false);
       setIsFocused(false);
       onBlur?.(e);
     };
@@ -492,6 +496,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
     };
 
     const renderItemContent = () => (
+    <View>
       <Pressable
         onPress={() => ref && 'current' in ref && ref.current?.focus()}
         disabled={disabled}
@@ -652,6 +657,22 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
           )}
         </View>
       </Pressable>
+      {/* Error Message */}
+        {error && (
+          <Text
+            style={[
+              {
+                marginTop: 4,
+                fontSize: 14,
+                color: danger,
+              },
+              errorStyle,
+            ]}
+          >
+            {error}
+          </Text>
+        )}
+    </View>
     );
 
     return renderItemContent();

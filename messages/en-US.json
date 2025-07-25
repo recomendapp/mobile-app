@@ -143,7 +143,10 @@
       "delete_current_image": "delete current image",
       "ratings_from_followees": "ratings from followed users",
       "community": "community",
-      "cast_and_crew": "cast & crew"
+      "cast_and_crew": "cast & crew",
+      "skip": "skip",
+      "back": "back",
+      "next": "next"
     },
     "errors": {
       "not_logged_in": "you are not logged in",

@@ -1,4 +1,4 @@
-import { Button, ButtonText } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import useSearchStore from "@/stores/useSearchStore";
@@ -75,11 +75,7 @@ const Filters = ({
 					}
 				}}
 				>
-					<ButtonText
-					variant={item.value === filter ? 'default' : 'outline'}
-					>
-						{upperFirst(item.label)}
-					</ButtonText>
+					{upperFirst(item.label)}
 				</Button>
 			)}
 			keyExtractor={(item) => item.value ?? ''}

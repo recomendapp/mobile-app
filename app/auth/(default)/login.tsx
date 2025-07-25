@@ -2,7 +2,7 @@ import { KeyboardAvoidingView, Platform, Text, TouchableOpacity, View} from 'rea
 import { useAuth } from '@/providers/AuthProvider';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import tw from '@/lib/tw';
@@ -14,14 +14,17 @@ import * as Burnt from 'burnt';
 import app from '@/constants/app';
 import { useRandomImage } from '@/hooks/useRandomImage';
 import { ImageBackground } from 'expo-image';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
 ]
 
+const PADDING = 16;
+
 const LoginScreen = () => {
 	const { login } = useAuth();
-	const { colors } = useTheme();
+	const { colors, inset } = useTheme();
 	const { t } = useTranslation();
 	const [ email, setEmail ] = useState('');
 	const [ password, setPassword ] = useState('');
@@ -54,44 +57,53 @@ const LoginScreen = () => {
 				x: 0,
 				y: 0.7,
 			}}
-			style={tw`flex-1 gap-6 pb-28 justify-end items-center px-4`}
+			style={tw`flex-1`}
 			>
-				<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={tw`w-full gap-4`}>
-					<GroupedInput title={t('pages.auth.login.label', { app: app.name })} titleStyle={tw`text-center text-xl font-bold`}>
-						<GroupedInputItem
-						icon={Icons.Mail}
-						nativeID="email"
-						placeholder={upperFirst(t('common.form.email.label'))}
-						autoComplete='email'
-						autoCapitalize='none'
-						value={email}
-						onChangeText={setEmail}
-						disabled={isLoading}
-						keyboardType='email-address'
-						/>
-						<GroupedInputItem
-						label={null}
-						nativeID="password"
-						placeholder="Password"
-						autoComplete='password'
-						autoCapitalize='none'
-						value={password}
-						onChangeText={setPassword}
-						disabled={isLoading}
-						type="password"
-						/>
-					</GroupedInput>
-					{/* FORGOT PASSWORD */}
-					<TouchableOpacity style={tw.style('w-full')}>
-						<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>{t('pages.auth.login.form.forgot_password')}</Text>
-					</TouchableOpacity>
-					{/* SUBMIT BUTTON */}
-					<Button onPress={handleSubmit} disabled={isLoading} style={tw.style('w-full rounded-xl')}>
-						<ButtonText style={tw.style('font-bold text-xl')}>{t('pages.auth.login.form.submit')}</ButtonText>
-					</Button>
-				</KeyboardAvoidingView>
-				{/* SIGNUP */}
-				<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>{t('pages.auth.login.no_account_yet')} <Link href={'/auth/signup'} replace style={{ color: colors.accentYellow }}>{t('common.word.signup')}</Link></Text>
+				<ScrollView
+				contentContainerStyle={[
+					tw`flex-1 gap-6 justify-end items-center`,
+					{
+						paddingBottom: inset.bottom + PADDING,
+						paddingLeft: inset.left + PADDING,
+						paddingRight: inset.right + PADDING,
+					}
+				]}
+				>
+					<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={tw`w-full gap-4`}>
+						<GroupedInput title={t('pages.auth.login.label', { app: app.name })} titleStyle={tw`text-center text-xl font-bold`}>
+							<GroupedInputItem
+							icon={Icons.Mail}
+							nativeID="email"
+							placeholder={upperFirst(t('common.form.email.label'))}
+							autoComplete='email'
+							autoCapitalize='none'
+							value={email}
+							onChangeText={setEmail}
+							disabled={isLoading}
+							keyboardType='email-address'
+							/>
+							<GroupedInputItem
+							label={null}
+							nativeID="password"
+							placeholder="Password"
+							autoComplete='password'
+							autoCapitalize='none'
+							value={password}
+							onChangeText={setPassword}
+							disabled={isLoading}
+							type="password"
+							/>
+						</GroupedInput>
+						{/* FORGOT PASSWORD */}
+						<TouchableOpacity style={tw`w-full`}>
+							<Text style={[{ color: colors.mutedForeground }, tw`text-right`]}>{t('pages.auth.login.form.forgot_password')}</Text>
+						</TouchableOpacity>
+						{/* SUBMIT BUTTON */}
+						<Button loading={isLoading} onPress={handleSubmit} style={tw`w-full rounded-xl`}>{t('pages.auth.login.form.submit')}</Button>
+					</KeyboardAvoidingView>
+					{/* SIGNUP */}
+					<Text style={[{ color: colors.mutedForeground }, tw`text-right`]}>{t('pages.auth.login.no_account_yet')} <Link href={'/auth/signup'} replace style={{ color: colors.accentYellow }}>{t('common.word.signup')}</Link></Text>
+				</ScrollView>
 			</LinearGradient>
 		</ImageBackground>
 	)

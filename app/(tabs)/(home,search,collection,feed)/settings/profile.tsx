@@ -7,12 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/InputOld";
-import { Button, ButtonText } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 const ProfileSettings = () => {
 	const { user } = useAuth();
@@ -168,11 +168,11 @@ const ProfileSettings = () => {
 			)}
 			/>
 			<Button
+			loading={updateProfileMutation.isPending}
 			onPress={form.handleSubmit(onSubmit)}
 			disabled={isLoading}
 			>
-				{isLoading ? <ActivityIndicator color={colors.background} /> : null}
-				<ButtonText>{t('common.word.save')}</ButtonText>
+				{t('common.word.save')}
 			</Button>
 		</>
 	)

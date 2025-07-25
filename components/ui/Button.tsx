@@ -1,151 +1,405 @@
-import { useTheme } from '@/providers/ThemeProvider';
+import { Icon } from '@/components/ui/icon';
+import { ButtonSpinner, SpinnerVariant } from '@/components/ui/spinner';
+import { Text } from '@/components/ui/text';
 import tw from '@/lib/tw';
-import * as React from 'react';
-import { Pressable, PressableProps, StyleProp } from 'react-native';
-import Animated from 'react-native-reanimated';
+import { useTheme } from '@/providers/ThemeProvider';
+import {  HEIGHT } from '@/theme/globals';
+import * as Haptics from 'expo-haptics';
+import { LucideProps } from 'lucide-react-native';
+import { forwardRef } from 'react';
+import {
+  Pressable,
+  TextStyle,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  View,
+  ViewStyle,
+} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 
-type Variant =
-  'default'
+export type ButtonVariant =
+  | 'default'
   | 'destructive'
+  | 'success'
   | 'outline'
-  | 'accent-yellow'
-  | 'muted';
+  | 'muted'
+  | 'ghost'
+  | 'link'
+  | 'accent-yellow';
 
-interface ButtonTextProps
-  extends React.ComponentPropsWithoutRef<typeof Animated.Text> {
-    variant?: Variant;
-  }
+export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon';
 
-const ButtonText = React.forwardRef<
-  React.ComponentRef<typeof Animated.Text>,
-  ButtonTextProps
->(({ variant, style, ...props }, ref) => {
+export interface ButtonProps extends Omit<TouchableOpacityProps, 'style'> {
+  label?: string;
+  children?: React.ReactNode;
+  animation?: boolean;
+  haptic?: boolean;
+  icon?: React.ComponentType<LucideProps>;
+  onPress?: () => void;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  disabled?: boolean;
+  loading?: boolean;
+  loadingVariant?: SpinnerVariant;
+  style?: ViewStyle | ViewStyle[];
+  textStyle?: TextStyle;
+}
+
+export const Button = forwardRef<View, ButtonProps>(
+  (
+    {
+      children,
+      icon,
+      onPress,
+      variant = 'default',
+      size = 'default',
+      disabled = false,
+      loading = false,
+      animation = true,
+      haptic = true,
+      loadingVariant = 'default',
+      style,
+      textStyle,
+      ...props
+    },
+    ref
+  ) => {
     const { colors } = useTheme();
-    const variantStyles = React.useMemo(() => {
-      const shared = "text-sm font-medium";
-      let style = {};
-      switch (variant) {
-        case 'destructive':
-          style = {
-            color: colors.destructiveForeground,
-          }
+    const primaryColor = colors.primary;
+    const primaryForegroundColor = colors.primaryForeground;
+    const mutedColor = colors.muted;
+    const mutedForegroundColor = colors.mutedForeground;
+    const destructiveColor = colors.destructive;
+    const destructiveForegroundColor = colors.destructiveForeground;
+    const successColor = colors.success;
+    const successColorForegroundColor = colors.successForeground;
+    const borderColor = colors.border;
+
+    // Animation values for liquid glass effect
+    const scale = useSharedValue(1);
+    const brightness = useSharedValue(1);
+
+    const getButtonStyle = (): ViewStyle => {
+      const baseStyle: ViewStyle = {
+        ...tw`rounded-lg`,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+      };
+
+      // Size variants
+      switch (size) {
+        case 'sm':
+          Object.assign(baseStyle, { height: 44, paddingHorizontal: 24 });
           break;
-        case 'outline':
-          style = {
-            color: colors.foreground,
-          }
+        case 'lg':
+          Object.assign(baseStyle, { height: 54, paddingHorizontal: 36 });
           break;
-        case 'accent-yellow':
-          style = {
-            color: colors.accentYellowForeground,
-          }
-          break;
-        case 'muted':
-          style = {
-            color: colors.foreground,
-          }
+        case 'icon':
+          Object.assign(baseStyle, {
+            height: HEIGHT,
+            width: HEIGHT,
+            paddingHorizontal: 0,
+          });
           break;
         default:
-          style = {
-            color: colors.primaryForeground,
-          }
+          Object.assign(baseStyle, { height: HEIGHT, ...tw`px-4` });
       }
-      return {
-        shared,
-        variant: style,
-      }
-    }, [variant, colors]);
-    return (
-      <Animated.Text
-        ref={ref}
-        style={[
-          tw.style(variantStyles.shared),
-          variantStyles.variant,
-          style,
-        ]}
-        {...props}
-      />
-    );
-  }
-);
 
-
-
-interface ButtonProps
-  extends React.ComponentPropsWithoutRef<typeof Animated.View> {
-    variant?: Variant;
-    disabled?: boolean;
-    onPress?: () => void;
-    pressableStyle?: StyleProp<PressableProps>;
-  }
-
-const Button = React.forwardRef<React.ComponentRef<typeof Animated.View>, ButtonProps>(
-  ({ variant, disabled, role = 'button', pressableStyle, style, ...props }, ref) => {
-    const { colors } = useTheme();
-    const variantStyles = React.useMemo(() => {
-      const shared = "flex-row items-center justify-center gap-2 rounded-md text-sm font-medium px-4 py-2 border";
-      let style = {};
+      // Variant styles
       switch (variant) {
         case 'destructive':
-          style = {
-            backgroundColor: colors.destructive,
-            borderColor: colors.destructive,
-          }
-          break;
+          return { ...baseStyle, backgroundColor: destructiveColor };
+        case 'success':
+          return { ...baseStyle, backgroundColor: successColor };
         case 'outline':
-          style = {
-            backgroundColor: colors.background,
-            borderColor: colors.muted,
-          }
-          break;
+          return {
+            ...baseStyle,
+            backgroundColor: 'transparent',
+            borderWidth: 1,
+            borderColor,
+          };
+        case 'muted':
+          return { ...baseStyle, backgroundColor: mutedColor };
+        case 'ghost':
+          return { ...baseStyle, backgroundColor: 'transparent' };
+        case 'link':
+          return {
+            ...baseStyle,
+            backgroundColor: 'transparent',
+            height: 'auto',
+            paddingHorizontal: 0,
+          };
         case 'accent-yellow':
-          style = {
+          return {
+            ...baseStyle,
             backgroundColor: colors.accentYellow,
-            borderColor: colors.accentYellow,
-          }
-          break;
-        case 'muted':
-          style = {
-            backgroundColor: colors.muted,
-            borderColor: colors.muted,
-          }
-          break;
+          };
         default:
-          style = {
-            backgroundColor: colors.primary,
-            borderColor: colors.primary,
-          }
+          return { ...baseStyle, backgroundColor: primaryColor };
       }
+    };
+
+    const getButtonTextStyle = (): TextStyle => {
+      const baseTextStyle: TextStyle = tw``;
+
+      switch (variant) {
+        case 'destructive':
+          return { ...baseTextStyle, color: destructiveForegroundColor };
+        case 'success':
+          return { ...baseTextStyle, color: successColorForegroundColor };
+        case 'outline':
+          return { ...baseTextStyle, color: primaryColor };
+        case 'muted':
+          return { ...baseTextStyle, color: mutedForegroundColor };
+        case 'ghost':
+          return { ...baseTextStyle, color: primaryColor };
+        case 'link':
+          return {
+            ...baseTextStyle,
+            color: primaryColor,
+            textDecorationLine: 'underline',
+          };
+        case 'accent-yellow':
+          return {
+            ...baseTextStyle,
+            color: colors.accentYellowForeground,
+          };
+        default:
+          return { ...baseTextStyle, color: primaryForegroundColor };
+      }
+    };
+
+    const getColor = (): string => {
+      switch (variant) {
+        case 'destructive':
+          return destructiveForegroundColor;
+        case 'success':
+          return destructiveForegroundColor;
+        case 'outline':
+          return primaryColor;
+        case 'muted':
+          return mutedForegroundColor;
+        case 'ghost':
+          return primaryColor;
+        case 'link':
+          return primaryColor;
+        case 'accent-yellow':
+          return colors.accentYellowForeground;
+        default:
+          return primaryForegroundColor;
+      }
+    };
+
+    // Helper function to get icon size based on button size
+    const getIconSize = (): number => {
+      switch (size) {
+        case 'sm':
+          return 16;
+        case 'lg':
+          return 24;
+        case 'icon':
+          return 20;
+        default:
+          return 18;
+      }
+    };
+
+    // Trigger haptic feedback
+    const triggerHapticFeedback = () => {
+      if (haptic && !disabled && !loading) {
+        if (process.env.EXPO_OS === 'ios') {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
+      }
+    };
+
+    // Improved animation handlers for liquid glass effect
+    const handlePressIn = (ev?: any) => {
+      'worklet';
+      // Trigger haptic feedback
+      triggerHapticFeedback();
+
+      // Scale up with bouncy spring animation
+      scale.value = withSpring(1.05, {
+        damping: 15,
+        stiffness: 400,
+        mass: 0.5,
+      });
+
+      // Slight brightness increase for glass effect
+      brightness.value = withSpring(1.1, {
+        damping: 20,
+        stiffness: 300,
+      });
+
+      // Call original onPressIn if provided
+      props.onPressIn?.(ev);
+    };
+
+    const handlePressOut = (ev?: any) => {
+      'worklet';
+      // Return to original size with smooth spring
+      scale.value = withSpring(1, {
+        damping: 20,
+        stiffness: 400,
+        mass: 0.8,
+        overshootClamping: false,
+      });
+
+      // Return brightness to normal
+      brightness.value = withSpring(1, {
+        damping: 20,
+        stiffness: 300,
+      });
+
+      // Call original onPressOut if provided
+      props.onPressOut?.(ev);
+    };
+
+    // Handle actual press action
+    const handlePress = () => {
+      if (onPress && !disabled && !loading) {
+        onPress();
+      }
+    };
+
+    // Handle press for TouchableOpacity (non-animated version)
+    const handleTouchablePress = () => {
+      triggerHapticFeedback();
+      handlePress();
+    };
+
+    // Animated styles using useAnimatedStyle
+    const animatedStyle = useAnimatedStyle(() => {
       return {
-        shared,
-        variant: style,
+        transform: [{ scale: scale.value }],
+        opacity: brightness.value * (disabled ? 0.5 : 1),
+      };
+    });
+
+    // Extract flex value from style prop
+    const getFlexFromStyle = () => {
+      if (!style) return null;
+
+      const styleArray = Array.isArray(style) ? style : [style];
+
+      // Find the last occurrence of flex (in case of multiple styles with flex)
+      for (let i = styleArray.length - 1; i >= 0; i--) {
+        const s = styleArray[i];
+        if (s && typeof s === 'object' && 'flex' in s) {
+          return s.flex;
+        }
       }
-    }, [variant, colors]);
-    return (
-      <Pressable disabled={disabled} onPress={props.onPress} style={[{ opacity: disabled ? 0.5 : 1 }, pressableStyle]}>
-        <Animated.View
+      return null;
+    };
+
+    // Alternative simpler solution - replace flex with alignSelf
+    const getPressableStyle = (): ViewStyle => {
+      const flexValue = getFlexFromStyle();
+      // If flex: 1 is applied, use alignSelf: 'stretch' instead to only affect width
+      return flexValue === 1
+        ? {
+            flex: 1,
+            alignSelf: 'stretch',
+          }
+        : flexValue !== null
+        ? {
+            flex: flexValue,
+            maxHeight: size === 'sm' ? 44 : size === 'lg' ? 54 : HEIGHT,
+          }
+        : {};
+    };
+
+    // Updated getStyleWithoutFlex function
+    const getStyleWithoutFlex = () => {
+      if (!style) return style;
+
+      const styleArray = Array.isArray(style) ? style : [style];
+      return styleArray.map((s) => {
+        if (s && typeof s === 'object' && 'flex' in s) {
+          const { flex, ...restStyle } = s;
+          return restStyle;
+        }
+        return s;
+      });
+    };
+
+    const buttonStyle = getButtonStyle();
+    const finalTextStyle = getButtonTextStyle();
+    const contentColor = getColor();
+    const iconSize = getIconSize();
+    const styleWithoutFlex = getStyleWithoutFlex();
+
+    return animation ? (
+      <Pressable
         ref={ref}
-        role={role}
-        style={[
-          tw.style(variantStyles.shared),
-          variantStyles.variant,
-          style,
-        ]}
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={disabled || loading}
+        style={getPressableStyle()}
         {...props}
-        >
-          {props.children}
+      >
+        <Animated.View style={[animatedStyle, buttonStyle, styleWithoutFlex]}>
+          {loading ? (
+            <ButtonSpinner
+              size={size}
+              variant={loadingVariant}
+              color={contentColor}
+            />
+          ) : typeof children === 'string' ? (
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+            >
+              {icon && (
+                <Icon name={icon} color={contentColor} size={iconSize} />
+              )}
+              <Text style={[finalTextStyle, textStyle]}>{children}</Text>
+            </View>
+          ) : (
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+            >
+              {icon && (
+                <Icon name={icon} color={contentColor} size={iconSize} />
+              )}
+              {children}
+            </View>
+          )}
         </Animated.View>
       </Pressable>
+    ) : (
+      <TouchableOpacity
+        ref={ref}
+        style={[buttonStyle, disabled && { opacity: 0.5 }, styleWithoutFlex]}
+        onPress={handleTouchablePress}
+        disabled={disabled || loading}
+        activeOpacity={0.8}
+        {...props}
+      >
+        {loading ? (
+          <ButtonSpinner
+            size={size}
+            variant={loadingVariant}
+            color={contentColor}
+          />
+        ) : typeof children === 'string' ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            {icon && <Icon name={icon} color={contentColor} size={iconSize} />}
+            <Text style={[finalTextStyle, textStyle]}>{children}</Text>
+          </View>
+        ) : (
+          children
+        )}
+      </TouchableOpacity>
     );
   }
 );
-Button.displayName = 'Button';
 
-export {
-  Button,
-  ButtonText,
-};
-export type {
-  ButtonProps,
-  ButtonTextProps,
-};
+// Add display name for better debugging
+Button.displayName = 'Button';

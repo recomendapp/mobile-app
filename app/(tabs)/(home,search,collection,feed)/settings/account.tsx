@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import { ActivityIndicator, View } from "react-native";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
-import { Button, ButtonText } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
 import useDebounce from "@/hooks/useDebounce";
 import { Input } from "@/components/ui/input";
@@ -154,11 +154,11 @@ const AccountSettings = () => {
 			)}
 			/>
 			<Button
+			loading={updateProfileMutation.isPending}
 			onPress={form.handleSubmit(onSubmit)}
 			disabled={isLoading}
 			>
-				{isLoading ? <ActivityIndicator color={colors.background} /> : null}
-				<ButtonText>{t('common.word.save')}</ButtonText>
+				{t('common.word.save')}
 			</Button>
 		</>
 	)

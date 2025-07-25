@@ -1,5 +1,5 @@
 
-import { Button, ButtonText } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { UserNav } from "@/components/user/UserNav";
@@ -52,11 +52,7 @@ const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBar
 					style={{ borderRadius: 9999}}
 					onPress={onPress}
 					>
-						<ButtonText
-						variant={isFocused ? 'default' : 'outline'}
-						>
-							{upperFirst(label)}
-						</ButtonText>
+						{upperFirst(label)}
 					</Button>
 				);
 			}}
