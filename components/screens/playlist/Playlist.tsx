@@ -9,13 +9,13 @@ import { capitalize, upperFirst } from "lodash";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
-import Animated, { SharedValue, useAnimatedScrollHandler } from "react-native-reanimated";
+import { SharedValue, useAnimatedScrollHandler } from "react-native-reanimated";
 import PlaylistItem from "./PlaylistItem";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Icons } from "@/constants/Icons";
-import { BetterInput } from "@/components/ui/BetterInput";
 import useDebounce from "@/hooks/useDebounce";
 import Fuse from "fuse.js";
+import { SearchBar } from "@/components/ui/searchbar";
 
 interface PlaylistProps {
 	playlist?: TPlaylist | null;
@@ -65,20 +65,20 @@ const Playlist = ({
 			scrollY.value = event.contentOffset.y;
 		},
 	});
+	const handleSearch = React.useCallback((query: string) => {
+		if (query.length > 0) {
+			const results = fuse.search(query).map(({ item }) => item);
+			setRenderItems(results);
+		} else {
+			setRenderItems(playlistItems || []);
+		}
+	}, [fuse, playlistItems]);
 	// Effects
 	React.useEffect(() => {
 		if (playlistItems) {
 			setRenderItems(playlistItems);
 		}
 	}, [playlistItems]);
-	React.useEffect(() => {
-		if (debouncedSearch.length > 0) {
-			const results = fuse.search(debouncedSearch).map(({ item }) => item);
-			setRenderItems(results);
-		} else {
-			setRenderItems(playlistItems || []);
-		}
-	}, [debouncedSearch, fuse, playlistItems]);
 	React.useEffect(() => {
 		if (sortBy === 'rank') {
 			setRenderItems((prev) => prev?.sort((a, b) => {
@@ -110,13 +110,13 @@ const Playlist = ({
 			backdrops={backdrops}
 			/>
 			{!loading && (
-				<BetterInput
+				<SearchBar
 				value={search}
 				onChangeText={setSearch}
+				onSearch={handleSearch}
+				debounceMs={200}
 				placeholder={upperFirst(t('common.playlist.search.placeholder'))}
-				leftIcon="search"
 				containerStyle={tw`mx-4`}
-				clearable
 				/>
 			)}
 		</>

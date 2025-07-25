@@ -81,7 +81,7 @@ const Filters = ({
 			keyExtractor={(item) => item.value ?? ''}
 			horizontal
 			showsHorizontalScrollIndicator={false}
-			contentContainerStyle={tw`px-2`}
+			contentContainerStyle={tw`px-4`}
 			ItemSeparatorComponent={() => <View style={tw`w-2`} />}
 			/>
 		</View>
