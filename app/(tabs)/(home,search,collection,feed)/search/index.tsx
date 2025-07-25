@@ -10,7 +10,7 @@ import useDebounce from "@/hooks/useDebounce";
 import tw from "@/lib/tw";
 import useSearchStore from "@/stores/useSearchStore";
 import { useCallback } from "react";
-import { BetterInput } from "@/components/ui/BetterInput";
+import { SearchBar } from "@/components/ui/searchbar";
 
 const SearchScreen = () => {
 	const { colors, inset } = useTheme();
@@ -44,13 +44,11 @@ const SearchScreen = () => {
 			tw`flex-1 gap-2`
 		]}
 		>
-			<BetterInput
+			<SearchBar
 			value={search}
 			onChangeText={setSearch}
 			placeholder="Search for movies, tv shows, and people"
-			leftIcon="search"
 			containerStyle={tw`mx-4`}
-			clearable
 			/>
 			{debouncedSearch ? (
 				<Filters />
