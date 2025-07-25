@@ -1,4 +1,4 @@
-import { View, Dimensions, ImageBackground, ViewProps } from "react-native";
+import { View, Dimensions, ViewProps } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useWidgetMostRecommended } from "@/features/widget/widgetQueries";
 import { Skeleton } from "../ui/Skeleton";
@@ -7,6 +7,7 @@ import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated
 import { useSharedValue } from "react-native-reanimated";
 import { ThemedText } from "../ui/ThemedText";
 import tw from "@/lib/tw";
+import { ImageBackground } from "expo-image";
 
 const width = Dimensions.get("window").width;
 

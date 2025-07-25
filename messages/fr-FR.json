@@ -424,7 +424,7 @@
         "metadata": {
           "description": "Connectez-vous à votre compte {app}."
         },
-        "label": "Se connecter",
+        "label": "Se connecter à {{app}}",
         "description": "Découvrez les meilleures recommandations de films.",
         "or_continue_with": "Ou continuer avec",
         "no_account_yet": "Pas encore de compte ?",
@@ -433,7 +433,7 @@
             "label": "Mot de passe",
             "placeholder": "Entrez votre mot de passe"
           },
-          "submit": "Se connecter avec un email",
+          "submit": "Go !",
           "forgot_password": "Mot de passe oublié ?",
           "wrong_credentials": "L'email ou le mot de passe est incorrect"
         },
@@ -454,9 +454,11 @@
         "metadata": {
           "description": "Inscrivez-vous à {app} pour découvrir et partager des recommandations de films."
         },
+        "label": "S'inscire à {{app}}",
         "description": "Créez un compte pour recomender un film à votre pote qui oublie toujours les titres.",
         "form": {
-          "success": "Un email de vérification a été envoyé à {email}"
+          "success": "Un email de vérification a été envoyé à {email}",
+          "submit": "Go !"
         },
         "confirm_form": {
           "label": "Confirmer l'email",

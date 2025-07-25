@@ -20,7 +20,8 @@ const Providers = ({ children } : ProvidersProps) => {
 				<ActionSheetProvider>
 					<SupabaseProvider>
 						<ReactQueryProvider>
-							<AuthProvider>										<SplashScreenController>
+							<AuthProvider>	
+								<SplashScreenController>
 									{children}
 									<BottomSheetManager />
 								</SplashScreenController>
