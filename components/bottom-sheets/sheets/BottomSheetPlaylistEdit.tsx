@@ -52,7 +52,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
     description: z.string()
       .max(DESCRIPTION_MAX_LENGTH, { message: upperFirst(t('common.form.length.char_max', { count: DESCRIPTION_MAX_LENGTH }))})
       .optional().nullable(),
-    private: z.boolean().default(false),
+    private: z.boolean(),
   });
   type PlaylistFormValues = z.infer<typeof playlistSchema>;
   const defaultValues: Partial<PlaylistFormValues> = {

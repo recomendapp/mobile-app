@@ -20,6 +20,7 @@ import app from '@/constants/app';
 import { ImageBackground } from 'expo-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as Burnt from 'burnt';
+import { useRandomImage } from '@/hooks/useRandomImage';
 
 const backgroundImages = [
 	require('@/assets/images/auth/signup/background/1.gif'),
@@ -38,6 +39,7 @@ const SignupScreen = () => {
 	const { signup } = useAuth();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const { t, i18n } = useTranslation();
+	const bgImage = useRandomImage(backgroundImages);
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
 	const signupSchema = z.object({
@@ -180,7 +182,7 @@ const SignupScreen = () => {
 	}, [usernameAvailability.isAvailable, t]);
 
 	return (
-		<ImageBackground source={backgroundImages[0]} style={{ flex: 1 }}>
+		<ImageBackground source={bgImage} style={{ flex: 1 }}>
 			<LinearGradient
 			colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
 			start={{
@@ -237,13 +239,13 @@ const SignupScreen = () => {
 								icon={Icons.User}
 								placeholder={t('pages.settings.account.username.label')}
 								disabled={isLoading}
-								autoComplete="username"
+								autoComplete='username-new'
 								autoCapitalize='none'
 								value={value}
 								autoCorrect={false}
 								onBlur={onBlur}
 								onChangeText={onChange}
-								rightComponent={(usernameAvailability.isAvailable !== undefined) ? (
+								rightComponent={((form.formState.errors.username?.message !== t('common.form.username.schema.unavailable'))  && usernameAvailability.isAvailable !== undefined) ? (
 									usernameAvailability.isLoading ? <Icons.Loader size={16}/>
 									: (
 										<View style={[{ backgroundColor: usernameAvailability.isAvailable ? colors.success : colors.destructive }, tw`rounded-full h-4 w-4 items-center justify-center`]}>

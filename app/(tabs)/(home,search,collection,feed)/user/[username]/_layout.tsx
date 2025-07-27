@@ -151,7 +151,7 @@ const ProfilePrivateAccountCard = () => {
 	const { t } = useTranslation();
 	return (
 	<View style={tw.style('flex gap-4 justify-center items-center px-4 py-8 border-y-2')}>
-		<Icons.lock color={colors.foreground} />
+		<Icons.Lock color={colors.foreground} />
 		<View>
 			<ThemedText >{upperFirst(t('common.messages.this_account_is_private'))}</ThemedText>
 			<ThemedText style={[{ color: colors.mutedForeground }]}>{upperFirst(t('common.messages.follow_to_see_activities'))}</ThemedText>

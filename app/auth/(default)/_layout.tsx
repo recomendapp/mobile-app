@@ -1,6 +1,4 @@
-import { useAuth } from "@/providers/AuthProvider";
-import { Stack, useRouter } from "expo-router";
-import { useEffect } from "react";
+import { Stack } from "expo-router";
 
 const AuthLayout = () => {
   return (
