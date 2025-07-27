@@ -43,10 +43,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 	const title = upperFirst(t('common.messages.tv_season_value', { number: season?.season_number! }));
 	const bgColor = hslToRgb(colors.background);
 	const posterHeight = useSharedValue(0);
-	const randomBg = useRandomImage(season?.episodes?.map(episode => ({
-		src: episode.avatar_url ?? '',
-		alt: upperFirst(t('common.messages.tv_episode_value', { number: episode.episode_number! })),
-	})) ?? []);
+	const randomBg = useRandomImage(season?.episodes?.filter(episode => episode.avatar_url).map(episode => episode.avatar_url!) ?? []);
 
 	const textAnim = useAnimatedStyle(() => {
 		return {
@@ -97,10 +94,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 			bgAnim,
 		]}
 		>
-			{season ? <Image
-			style={tw`absolute inset-0`}
-			source={{ uri: randomBg?.src ?? '' }}
-			/> : null}
+			{(season && randomBg) && <Image source={randomBg} style={tw`absolute inset-0`} />}
 			<LinearGradient
 			style={tw`absolute inset-0`}
 			colors={[

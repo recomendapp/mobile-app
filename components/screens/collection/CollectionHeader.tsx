@@ -73,10 +73,7 @@ const CollectionHeader = forwardRef<
 				scaleAnim,
 			]}
 			>
-				<Image
-				style={tw`absolute inset-0`}
-				source={{ uri: bgBackdrop ?? 'https://media.giphy.com/media/Ic0IOSkS23UAw/giphy.gif' }}
-				/>
+				<Image style={tw`absolute inset-0`} source={bgBackdrop ?? 'https://media.giphy.com/media/Ic0IOSkS23UAw/giphy.gif'} />
 				<LinearGradient
 				style={tw`absolute inset-0`}
 				colors={[

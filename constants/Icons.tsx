@@ -54,4 +54,5 @@ export const Icons = {
 	Star: StarIcon,
 	Mail: MailIcon,
 	Password: LockIcon,
+	Lock: LockIcon,
 };

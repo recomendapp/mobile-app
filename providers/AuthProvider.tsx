@@ -5,6 +5,23 @@ import { useSupabaseClient } from "./SupabaseProvider";
 import { useUserQuery } from "@/features/user/userQueries";
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AppState } from "react-native";
+import { supabase } from "@/lib/supabase/client";
+import app from "@/constants/app";
+
+// Tells Supabase Auth to continuously refresh the session automatically
+// if the app is in the foreground. When this is added, you will continue
+// to receive `onAuthStateChange` events with the `TOKEN_REFRESHED` or
+// `SIGNED_OUT` event if the user's session is terminated. This should
+// only be registered once.
+AppState.addEventListener('change', (state) => {
+	console.log("AppState changed:", state);
+	if (state === 'active') {
+		supabase.auth.startAutoRefresh()
+	} else {
+		supabase.auth.stopAutoRefresh()
+	}
+})
 
 type AuthContextProps = {
 	session: Session | null | undefined;
@@ -85,8 +102,7 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			email: credentials.email,
 			password: credentials.password,
 			options: {
-				// TOOD: handle deep linking
-				emailRedirectTo: undefined,
+				emailRedirectTo: `${app.domain}/auth/callback${credentials.redirectTo ? `?redirectTo=${encodeURIComponent(credentials.redirectTo)}` : ''}`,
 				data: {
 					full_name: credentials.name,
 					username: credentials.username,

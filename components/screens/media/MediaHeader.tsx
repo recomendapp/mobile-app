@@ -13,7 +13,7 @@ import Animated, {
 import { useTranslation } from 'react-i18next';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
-import { upperFirst } from 'lodash';
+import { lowerCase, upperFirst } from 'lodash';
 import { Media, MediaPerson } from '@/types/type.db';
 import useColorConverter from '@/hooks/useColorConverter';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -140,10 +140,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 			bgAnim,
 		]}
 		>
-			{media ? <Image
-			style={tw`absolute inset-0`}
-			source={{ uri: media.backdrop_url ?? '' }}
-			/> : null}
+			{(media && media.backdrop_url) && <Image style={tw`absolute inset-0`} source={media.backdrop_url} />}
 			<LinearGradient
 			style={tw`absolute inset-0`}
 			colors={[
@@ -226,7 +223,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 						)}
 					</ThemedText>
 				) : <Skeleton style={tw.style('w-64 h-12')} />}
-				{(media?.extra_data.original_title && media.extra_data.original_title !== media.title) ? (
+				{(media?.extra_data.original_title && lowerCase(media.extra_data.original_title) !== lowerCase(media.title!)) ? (
 					<ThemedText numberOfLines={1} style={[ { color: colors.mutedForeground }, tw.style('text-lg font-semibold')]}>
 						{media.extra_data.original_title}
 					</ThemedText>

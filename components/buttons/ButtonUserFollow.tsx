@@ -5,7 +5,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { useTranslation } from 'react-i18next';
 import upperFirst from 'lodash/upperFirst';
 import { useUserFollowProfile } from '@/features/user/userQueries';
-import { Pressable, Text } from 'react-native';
+import { Pressable, Text, ViewStyle } from 'react-native';
 import { useUserFollowProfileInsert, useUserUnfollowProfileDelete } from '@/features/user/userMutations';
 import Animated from 'react-native-reanimated';
 import { useTheme } from "@/providers/ThemeProvider";
@@ -75,7 +75,7 @@ const ButtonUserFollow = React.forwardRef<
     variant="accent-yellow"
     style={[
       tw.style('px-4 py-2 rounded-full'),
-      style,
+      style as ViewStyle,
     ]}
     {...props}
     >
