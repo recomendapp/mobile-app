@@ -437,7 +437,7 @@
           },
           "confirm_form": {
             "label": "Confirm code",
-            "description": "A verification code has been sent to the address {email}"
+            "description": "A verification code has been sent to the address {{email}}"
           }
         }
       },
@@ -453,7 +453,7 @@
         },
         "confirm_form": {
           "label": "Confirm email",
-          "description": "A verification code has been sent to the address {email}"
+          "description": "A verification code has been sent to the address {{email}}"
         },
         "return_to_login": "Oops, I already have an account."
       },

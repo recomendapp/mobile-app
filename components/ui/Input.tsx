@@ -81,7 +81,7 @@ export const Input = forwardRef<TextInput, InputProps>(
       (iconProp ?? Icons.Password)
       : iconProp;
     const secureTextEntry = type === 'password' ? !showPassword : secureTextEntryProp;
-    const rightComponent = (type === 'password' && isFocused) ? (
+    const rightComponent = (type === 'password') ? (
       <Pressable onPress={() => setShowPassword((prev) => !prev)}>
         {showPassword ? (
           <Icons.EyeOff size={20} color={colors.mutedForeground} />
@@ -467,7 +467,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
       (iconProp ?? Icons.Password)
       : iconProp;
     const secureTextEntry = type === 'password' ? !showPassword : secureTextEntryProp;
-    const rightComponent = (type === 'password' && isFocused) ? (
+    const rightComponent = (type === 'password') ? (
       <Pressable onPress={() => setShowPassword((prev) => !prev)}>
         {showPassword ? (
           <Icons.EyeOff size={16} color={colors.mutedForeground} />

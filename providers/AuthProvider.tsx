@@ -27,6 +27,7 @@ type AuthContextProps = {
 	session: Session | null | undefined;
 	user: User | null | undefined;
 	login: (credentials: { email: string; password: string }) => Promise<void>;
+	loginWithOtp: (email: string, redirectTo?: string | null) => Promise<void>;
 	logout: () => Promise<void>;
 	signup: (credentials: {
 		email: string;
@@ -59,8 +60,18 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			setSession(session);
 		});
 
-		supabase.auth.onAuthStateChange((_event, session) => {
-			setSession(session);
+		supabase.auth.onAuthStateChange(async (_event, session) => {
+			if (session) {
+				const { data } = await supabase.auth.getUser();
+				if (!data.user) {
+					await supabase.auth.signOut();
+					setSession(null);
+				} else {
+				setSession(session);
+				}
+			} else {
+				setSession(null);
+			}
 		});
 	}, []);
 
@@ -84,6 +95,16 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		if (error) throw error;
 	};
 
+	const loginWithOtp = async (email: string, redirectTo?: string | null) => {
+		const { error } = await supabase.auth.signInWithOtp({
+		email: email,
+		options: {
+			emailRedirectTo: `${app.domain}/auth/callback${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`,
+		}
+		});
+		if (error) throw error;
+	};
+
 	const logout = async () => {
 		await supabase.auth.signOut();
 	};
@@ -102,7 +123,7 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			email: credentials.email,
 			password: credentials.password,
 			options: {
-				emailRedirectTo: `${app.domain}/auth/callback${credentials.redirectTo ? `?redirectTo=${encodeURIComponent(credentials.redirectTo)}` : ''}`,
+				emailRedirectTo: `${app.domain}/auth/callback${credentials.redirectTo ? `?redirect=${encodeURIComponent(credentials.redirectTo)}` : ''}`,
 				data: {
 					full_name: credentials.name,
 					username: credentials.username,
@@ -113,13 +134,13 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		if (error) throw error;
 	};
 
-
 	return (
 		<AuthContext.Provider
 		value={{
 			session: session,
 			user: user,
 			login: login,
+			loginWithOtp: loginWithOtp,
 			logout: logout,
 			signup: signup,
 		}}
