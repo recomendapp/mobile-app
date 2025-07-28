@@ -1,6 +1,6 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";

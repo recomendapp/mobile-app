@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import useSearchStore from "@/stores/useSearchStore";

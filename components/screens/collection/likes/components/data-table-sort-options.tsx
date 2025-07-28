@@ -4,7 +4,7 @@ import { Icons } from '@/constants/Icons';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import BottomSheetDefaultView from '@/components/bottom-sheets/templates/BottomSheetDefaultView';
 import { Pressable } from 'react-native-gesture-handler';

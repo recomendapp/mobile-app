@@ -1,6 +1,6 @@
 import PlaylistHeader from "@/components/screens/playlist/PlaylistHeader";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { usePlaylistItems } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";

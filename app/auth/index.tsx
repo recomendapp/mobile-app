@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Onboarding } from "@/components/ui/onboarding";
 import { Text } from "@/components/ui/text";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";

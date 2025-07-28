@@ -15,7 +15,6 @@ import app from "@/constants/app";
 // `SIGNED_OUT` event if the user's session is terminated. This should
 // only be registered once.
 AppState.addEventListener('change', (state) => {
-	console.log("AppState changed:", state);
 	if (state === 'active') {
 		supabase.auth.startAutoRefresh()
 	} else {

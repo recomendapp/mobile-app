@@ -11,7 +11,7 @@ import { Text, TouchableWithoutFeedback, View } from 'react-native';
 import { useUserAddMediaToPlaylistQuery } from '@/features/user/userQueries';
 import { useAuth } from '@/providers/AuthProvider';
 import Fuse from "fuse.js";
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAddMediaToPlaylists } from '@/features/playlist/playlistMutations';

@@ -1,7 +1,7 @@
 import { CardMedia } from "@/components/cards/CardMedia";
 import ActionReviewLike from "@/components/reviews/actions/ActionReviewLike";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";

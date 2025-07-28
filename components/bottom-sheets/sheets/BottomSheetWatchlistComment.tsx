@@ -7,7 +7,7 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useUserWatchlistUpdateMutation } from '@/features/user/userMutations';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';

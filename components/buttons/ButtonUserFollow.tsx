@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuth } from '@/providers/AuthProvider';
 import { useTranslation } from 'react-i18next';
