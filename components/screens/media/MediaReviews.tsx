@@ -1,6 +1,6 @@
 import { CardReview } from "@/components/cards/CardReview";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { useMediaReviewsInfiniteQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";

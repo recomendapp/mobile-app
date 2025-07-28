@@ -2,12 +2,12 @@ import { KeyboardAvoidingView, Platform, Text, TouchableOpacity, View} from 'rea
 import { useAuth } from '@/providers/AuthProvider';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
-import { GroupedInput, GroupedInputItem, Input } from '@/components/ui/input';
+import { GroupedInput, GroupedInputItem, Input } from '@/components/ui/Input';
 import { upperFirst } from 'lodash';
 import { Icons } from '@/constants/Icons';
 import * as Burnt from 'burnt';

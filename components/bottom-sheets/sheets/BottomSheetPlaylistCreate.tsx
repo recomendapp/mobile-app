@@ -4,7 +4,7 @@ import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { usePlaylistInsertMutation } from '@/features/playlist/playlistMutations';

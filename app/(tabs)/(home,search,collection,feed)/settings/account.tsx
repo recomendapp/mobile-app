@@ -9,10 +9,10 @@ import { useTranslation } from "react-i18next";
 import { ActivityIndicator, View } from "react-native";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
 import useDebounce from "@/hooks/useDebounce";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/Input";
 import { Icons } from "@/constants/Icons";
 
 const USERNAME_MIN_LENGTH = 3;

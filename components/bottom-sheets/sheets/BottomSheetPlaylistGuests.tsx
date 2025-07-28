@@ -8,7 +8,7 @@ import { upperFirst } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { usePlaylistGuests } from '@/features/playlist/playlistQueries';
 import Fuse from 'fuse.js';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { MinusCircleIcon } from 'lucide-react-native';
 import { Icons } from '@/constants/Icons';
 import { CardUser } from '@/components/cards/CardUser';

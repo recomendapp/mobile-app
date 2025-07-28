@@ -8,7 +8,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 import tw from "@/lib/tw";
 import { Label } from "@/components/ui/Label";
 import { InputPassword } from "@/components/ui/InputPasswordOld";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useState } from "react";
 import { AuthError } from "@supabase/supabase-js";

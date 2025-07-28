@@ -14,7 +14,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/providers/ThemeProvider';
 import { useTranslation } from 'react-i18next';
 import { upperFirst } from 'lodash';

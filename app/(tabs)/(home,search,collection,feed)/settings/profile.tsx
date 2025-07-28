@@ -12,7 +12,7 @@ import * as z from 'zod';
 import * as Burnt from 'burnt';
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/InputOld";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 
 const ProfileSettings = () => {
 	const { user } = useAuth();

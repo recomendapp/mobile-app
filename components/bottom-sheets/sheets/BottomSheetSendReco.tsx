@@ -13,7 +13,7 @@ import { useUserRecosInsertMutation } from '@/features/user/userMutations';
 import { useAuth } from '@/providers/AuthProvider';
 import Fuse from "fuse.js";
 import UserAvatar from '@/components/user/UserAvatar';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
 import { Badge } from '@/components/ui/Badge';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
