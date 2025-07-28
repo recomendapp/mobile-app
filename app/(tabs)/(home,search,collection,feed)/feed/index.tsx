@@ -1,14 +1,13 @@
 import { CardUserActivity } from "@/components/cards/CardUserActivity";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { ThemedText } from "@/components/ui/ThemedText"
-import { ThemedView } from "@/components/ui/ThemedView"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserFeedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { upperFirst } from "lodash";
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
 import { LegendList } from "@legendapp/list";
+import { View } from "@/components/ui/view";
+import { Text } from "@/components/ui/text";
 
 const FeedScreen = () => {
 	const { user } = useAuth();
@@ -34,9 +33,9 @@ const FeedScreen = () => {
 			</View>
 		)}
 		ListEmptyComponent={() => !loading ? (
-			<ThemedView style={tw`flex-1 items-center justify-center`}>
-				<ThemedText>{upperFirst(t('common.messages.no_results'))}</ThemedText>
-			</ThemedView>
+			<View style={tw`flex-1 items-center justify-center`}>
+				<Text variant="muted">{upperFirst(t('common.messages.no_results'))}</Text>
+			</View>
 		) : null}
 		contentContainerStyle={[
 			tw`px-4`,

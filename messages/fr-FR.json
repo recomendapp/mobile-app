@@ -449,7 +449,7 @@
           },
           "confirm_form": {
             "label": "Confirmer le code",
-            "description": "Un code de vérification a été envoyé à l'adresse {email}"
+            "description": "Un code de vérification a été envoyé à l'adresse {{email}}"
           }
         }
       },
@@ -465,7 +465,7 @@
         },
         "confirm_form": {
           "label": "Confirmer l'email",
-          "description": "Un code de vérification a été envoyé à l'adresse {email}"
+          "description": "Un code de vérification a été envoyé à l'adresse {{email}}"
         },
         "return_to_login": "Oups, finalement j'ai déjà un compte."
       },

@@ -11,7 +11,7 @@ type TextVariant =
   | 'body'
   | 'title'
   | 'subtitle'
-  | 'caption'
+  | 'muted'
   | 'heading'
   | 'link';
 
@@ -52,7 +52,7 @@ export const Text = forwardRef<RNText, TextProps>(
             fontSize: 19,
             fontWeight: '600',
           };
-        case 'caption':
+        case 'muted':
           return {
             ...baseStyle,
             fontSize: FONT_SIZE,
