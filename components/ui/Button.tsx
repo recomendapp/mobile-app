@@ -39,6 +39,7 @@ export interface ButtonProps extends Omit<TouchableOpacityProps, 'style'> {
   animation?: boolean;
   haptic?: boolean;
   icon?: React.ComponentType<LucideProps>;
+  iconProps?: LucideProps;
   onPress?: () => void;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -54,6 +55,7 @@ export const Button = forwardRef<View, ButtonProps>(
     {
       children,
       icon,
+      iconProps,
       onPress,
       variant = 'default',
       size = 'default',
@@ -357,7 +359,7 @@ export const Button = forwardRef<View, ButtonProps>(
               style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
             >
               {icon && (
-                <Icon name={icon} color={contentColor} size={iconSize} />
+                <Icon name={icon} color={contentColor} size={iconSize} {...iconProps} />
               )}
               <Text style={[finalTextStyle, textStyle]}>{children}</Text>
             </View>
@@ -366,7 +368,7 @@ export const Button = forwardRef<View, ButtonProps>(
               style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
             >
               {icon && (
-                <Icon name={icon} color={contentColor} size={iconSize} />
+                <Icon name={icon} color={contentColor} size={iconSize} {...iconProps} />
               )}
               {children}
             </View>
@@ -390,7 +392,7 @@ export const Button = forwardRef<View, ButtonProps>(
           />
         ) : typeof children === 'string' ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            {icon && <Icon name={icon} color={contentColor} size={iconSize} />}
+            {icon && <Icon name={icon} color={contentColor} size={iconSize} {...iconProps} />}
             <Text style={[finalTextStyle, textStyle]}>{children}</Text>
           </View>
         ) : (

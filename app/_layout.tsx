@@ -7,7 +7,7 @@ import StatusBar from '@/components/StatusBar';
 import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import { useAuth } from '@/providers/AuthProvider';
-import { Stack } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -21,9 +21,15 @@ configureReanimatedLogger({
 
 const DrawerLayout = () => {
   const { session } = useAuth();
-  if (!session) return (
-    <Stack screenOptions={{ headerShown: false }} />
-  );
+  const pathname = usePathname();
+
+  useIsomorphicLayoutEffect(() => {
+    console.log("============ DRAWER pathname:", pathname);
+  }, [pathname]);
+
+  // if (!session) return (
+  //   <Stack screenOptions={{ headerShown: false }} />
+  // );
   return (
     <Drawer
       screenOptions={{
@@ -55,7 +61,14 @@ export default function RootLayout() {
   return (
     <Providers>
       <StatusBar />
-        <DrawerLayout />
+        <Drawer
+        screenOptions={{
+          drawerPosition: 'right',
+          headerShown: false
+        }}
+        drawerContent={CustomDrawerContent}
+        />
+        {/* <DrawerLayout /> */}
     </Providers>
   );
 }

@@ -73,7 +73,7 @@ const TabsLayout = () => {
 					tabPress: (e) => {
 						e.preventDefault();
 						router.push('/auth');
-					},
+					}
 				})}
 				/>
 			</Tabs.Protected>

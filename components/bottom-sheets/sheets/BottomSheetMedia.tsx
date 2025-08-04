@@ -5,10 +5,9 @@ import { Media } from '@/types/type.db';
 import { LinkProps, usePathname, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
-import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import BottomSheetSendReco from './BottomSheetSendReco';
 import BottomSheetAddToPlaylist from './BottomSheetAddToPlaylist';
@@ -18,6 +17,8 @@ import BottomSheetDefaultView from '../templates/BottomSheetDefaultView';
 import { ScrollView } from 'react-native-gesture-handler';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
+import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/text';
 
 interface BottomSheetMediaProps extends BottomSheetProps {
   media?: Media,
@@ -138,7 +139,7 @@ const BottomSheetMedia = React.forwardRef<
             type={media?.media_type}
             />
             <View style={tw`shrink`}>
-              <ThemedText numberOfLines={2} style={tw`shrink`}>{media?.title}</ThemedText>
+              <Text numberOfLines={2} style={tw`shrink`}>{media?.title}</Text>
               {media?.main_credit && media?.main_credit?.length > 0 && <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
                 {(media?.media_type === 'movie' || media?.media_type === 'tv_series') ? (
                   media?.main_credit?.map((director) => director.title).join(', ')
@@ -152,18 +153,19 @@ const BottomSheetMedia = React.forwardRef<
         {items.map((group, i) => (
           <React.Fragment key={i}>
             {group.map((item, j) => (
-              <TouchableOpacity
+              <Button
               key={j}
+              variant='ghost'
+              icon={item.icon}
+              disabled={item.disabled}
+              style={tw`justify-start h-auto py-4`}
               onPress={() => {
                 (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
                 item.onPress();
               }}
-              style={[tw`flex-row items-center gap-2 p-4`, { opacity: item.disabled ? 0.5 : 1 }]}
-              disabled={item.disabled}
               >
-                <item.icon color={colors.mutedForeground} size={20} />
-                <ThemedText>{item.label}</ThemedText>
-              </TouchableOpacity>
+                {item.label}
+              </Button>
             ))}
           </React.Fragment>
         ))}
@@ -173,7 +175,7 @@ const BottomSheetMedia = React.forwardRef<
       id={`${id}-credits`}
       content={
         <View>
-          <ThemedText>ok</ThemedText>
+          <Text>ok</Text>
         </View>
       }
       />

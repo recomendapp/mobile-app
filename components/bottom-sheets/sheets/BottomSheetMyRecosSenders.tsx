@@ -7,7 +7,7 @@ import { upperFirst } from 'lodash';
 import { View } from 'react-native';
 import { CardUser } from '@/components/cards/CardUser';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import { FlashList } from '@shopify/flash-list';
+import { FlashList, FlashListRef } from '@shopify/flash-list';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
@@ -22,12 +22,13 @@ const BottomSheetMyRecosSenders = React.forwardRef<
 >(({ id, comments, sizes, ...props }, ref) => {
   const { colors, inset } = useTheme();
   const t = useTranslations();
-  const flashlistRef = React.useRef<FlashList<UserRecosAggregated['senders'][number]>>(null);
+  const flashlistRef = React.useRef<FlashListRef<UserRecosAggregated['senders'][number]>>(null);
   return (
     <ThemedTrueSheet
     ref={ref}
 	sizes={['large']}
-	scrollRef={flashlistRef as React.RefObject<React.Component<unknown, {}, any>>}
+	// scrollRef={flashlistRef as React.RefObject<React.Component<unknown, {}, any>>}
+	scrollRef={flashlistRef as any}
     {...props}
     >
 		<FlashList
@@ -48,7 +49,6 @@ const BottomSheetMyRecosSenders = React.forwardRef<
 		ListHeaderComponent={
 			<ThemedText style={tw`text-center text-xl font-bold`}>{upperFirst(t('common.messages.reco', { count: comments.length }))}</ThemedText>
   		}
-		estimatedItemSize={100}
 		keyExtractor={(item) => item.user.id}
 		contentContainerStyle={{
 			paddingTop: 16,

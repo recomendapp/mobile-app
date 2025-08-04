@@ -63,8 +63,8 @@ const CardTvSeriesSeasonDefault = React.forwardRef<
 			</ImageWithFallback>
 			
 			<View style={tw`shrink px-2 py-1 gap-1`}>
-				<ThemedText numberOfLines={1} style={tw`text-center`}>{upperFirst(t('common.messages.season_value', { number: season.season_number! }))}</ThemedText>
-				<ThemedText numberOfLines={1} style={[tw`text-center`, { color: colors.mutedForeground }]}>{upperFirst(t('common.messages.episode_count', { count: season.episode_count! }))}</ThemedText>
+				<ThemedText numberOfLines={1} style={tw`text-center`}>{upperFirst(t('common.messages.tv_season_value', { number: season.season_number! }))}</ThemedText>
+				<ThemedText numberOfLines={1} style={[tw`text-center`, { color: colors.mutedForeground }]}>{upperFirst(t('common.messages.tv_episode_count', { count: season.episode_count! }))}</ThemedText>
 				{children}
 			</View>
 		</Animated.View>

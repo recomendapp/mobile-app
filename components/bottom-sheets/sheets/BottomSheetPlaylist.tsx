@@ -5,10 +5,9 @@ import { Playlist } from '@/types/type.db';
 import { usePathname, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
-import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAuth } from '@/providers/AuthProvider';
 import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
@@ -22,6 +21,8 @@ import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { ScrollView } from 'react-native-gesture-handler';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
+import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/text';
 
 interface BottomSheetPlaylistProps extends BottomSheetProps {
   playlist: Playlist,
@@ -213,9 +214,9 @@ const BottomSheetPlaylist = React.forwardRef<
           type={"playlist"}
           />
           <View style={tw`shrink`}>
-            <ThemedText numberOfLines={2} style={tw`shrink`}>{playlist.title}</ThemedText>
-            <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
-              {t('common.messages.by_name', { name: playlist.user?.username })}
+            <Text numberOfLines={2} style={tw`shrink`}>{playlist.title}</Text>
+            <Text variant="muted" numberOfLines={1} style={tw`shrink`}>
+              {t('common.messages.by_name', { name: playlist.user?.username! })}
             </Text>
           </View>
         </View>
@@ -223,18 +224,19 @@ const BottomSheetPlaylist = React.forwardRef<
       {items.map((group, i) => (
         <React.Fragment key={i}>
           {group.map((item, j) => (
-            <TouchableOpacity
+            <Button
             key={j}
+            variant='ghost'
+            icon={item.icon}
+            disabled={item.disabled}
+            style={tw`justify-start h-auto py-4`}
             onPress={() => {
               (item.closeSheet === undefined || item.closeSheet === true) && closeSheet(id);
               item.onPress();
             }}
-            style={[tw`flex-row items-center gap-2 p-4`, { opacity: item.disabled ? 0.5 : 1 }]}
-            disabled={item.disabled}
             >
-              <item.icon color={colors.mutedForeground} size={20} />
-              <ThemedText>{item.label}</ThemedText>
-            </TouchableOpacity>
+              {item.label}
+            </Button>
           ))}
         </React.Fragment>
       ))}

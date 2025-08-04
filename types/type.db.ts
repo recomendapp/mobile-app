@@ -2,6 +2,19 @@ import { Json as JsonGenerated } from "./__generated__/type.db";
 
 export type Json = JsonGenerated;
 
+export type JSONContent = {
+    [key: string]: any;
+    type?: string;
+    attrs?: Record<string, any>;
+    content?: JSONContent[];
+    marks?: {
+        type: string;
+        attrs?: Record<string, any>;
+        [key: string]: any;
+    }[];
+    text?: string;
+}
+
 /* ---------------------------------- USER ---------------------------------- */
 export type Profile = Database['public']['Views']['profile']['Row'] & {
 };

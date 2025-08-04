@@ -28,9 +28,9 @@ const backgroundImages = [
 
 const PADDING = 16;
 
-const ForgotPasswordScreen = () => {
+const LoginOtpScreen = () => {
 	const supabase = useSupabaseClient();
-	const { resetPasswordForEmail } = useAuth();
+	const { loginWithOtp } = useAuth();
 	const { colors, inset } = useTheme();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
@@ -61,7 +61,7 @@ const ForgotPasswordScreen = () => {
 	const handleSubmit = async (data: ForgotPasswordFormValues) => {
 		try {
 			setIsLoading(true);
-			await resetPasswordForEmail(data.email);
+			await loginWithOtp(data.email);
 			Burnt.toast({
 				title: upperFirst(t('common.form.code_sent')),
 				preset: "done",
@@ -76,6 +76,12 @@ const ForgotPasswordScreen = () => {
 				});
 			} else if (error instanceof AuthError) {
 				switch (error.status) {
+					case 500:
+						Burnt.toast({
+							title: upperFirst(t('pages.auth.login.otp.form.error.no_user_found')),
+							preset: 'error',
+						});
+						break;
 					case 429:
 						Burnt.toast({
 							title: upperFirst(t('common.messages.error')),
@@ -83,13 +89,13 @@ const ForgotPasswordScreen = () => {
 							preset: 'error',
 						});
 						break;
-					default:
-						Burnt.toast({
-							title: upperFirst(t('common.messages.error')),
-							message: error.message,
-							preset: 'error',
-						});
-						break;
+				default:
+					Burnt.toast({
+						title: upperFirst(t('common.messages.error')),
+						message: error.message,
+						preset: 'error',
+					});
+					break;
 				}
 			} else {
 				Burnt.toast({
@@ -108,7 +114,7 @@ const ForgotPasswordScreen = () => {
 			const { error } = await supabase.auth.verifyOtp({
 				email: form.getValues('email'),
 				token: otp,
-				type: 'recovery',
+				type: 'email',
 			});
 			if (error) throw error;
 			Burnt.toast({
@@ -118,7 +124,7 @@ const ForgotPasswordScreen = () => {
 		} catch (error) {
 			if (error instanceof AuthError) {
 				switch (error.status) {
-				case 403:
+				case 400:
 					Burnt.toast({
 						title: upperFirst(t('common.form.error.invalid_code')),
 						preset: 'error',
@@ -170,7 +176,7 @@ const ForgotPasswordScreen = () => {
 					{!showOtp ? (
 						<>
 							<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={tw`w-full gap-4`}>
-								<GroupedInput title={t('pages.auth.forgot_password.label')} titleStyle={tw`text-center text-xl font-bold`}>
+								<GroupedInput title={t('common.messages.otp')} titleStyle={tw`text-center text-xl font-bold`}>
 									<Controller
 										name="email"
 										control={form.control}
@@ -192,18 +198,18 @@ const ForgotPasswordScreen = () => {
 									/>
 								</GroupedInput>
 								{/* SUBMIT BUTTON */}
-								<Button loading={isLoading} onPress={form.handleSubmit(handleSubmit)} style={tw`w-full rounded-xl`}>{t('pages.auth.forgot_password.form.submit')}</Button>
+								<Button loading={isLoading} onPress={form.handleSubmit(handleSubmit)} style={tw`w-full rounded-xl`}>{t('pages.auth.login.otp.form.submit')}</Button>
 							</KeyboardAvoidingView>
-							<Text variant="muted" style={tw`text-center`}>{t('pages.auth.forgot_password.return_to_login')} <Link href={'/auth/login'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.login'))}</Link></Text>
+							<Text variant="muted" style={tw`text-center`}>{t('pages.auth.login.otp.password_login')} <Link href={'/auth/login'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.login'))}</Link></Text>
 						</>
 					) : (
 						<>
 						<View style={tw`gap-2 items-center`}>
 							<Text variant='title'>
-								{t('pages.auth.forgot_password.confirm_form.label')}
+								{t('pages.auth.login.otp.confirm_form.label')}
 							</Text>
 							<Text variant='muted'>
-								{t('pages.auth.forgot_password.confirm_form.description', { email: form.getValues('email') })}
+								{t('pages.auth.login.otp.confirm_form.description', { email: form.getValues('email') })}
 							</Text>
 						</View>
 						<InputOTP
@@ -234,4 +240,4 @@ const ForgotPasswordScreen = () => {
 	)
 };
 
-export default ForgotPasswordScreen;
+export default LoginOtpScreen;

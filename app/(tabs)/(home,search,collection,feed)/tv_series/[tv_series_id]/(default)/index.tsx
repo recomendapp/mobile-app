@@ -1,4 +1,3 @@
-import { ThemedText } from "@/components/ui/ThemedText";
 import { useMediaTvSeriesDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
@@ -21,6 +20,7 @@ import MediaHeader from "@/components/screens/media/MediaHeader";
 import TvSeriesWidgetSeasons from "@/components/screens/media/TvSeries/TvSeriesWidgetSeasons";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useLocale, useTranslations } from "use-intl";
+import { Text } from "@/components/ui/text";
 
 const PADDING_BOTTOM = 8;
 
@@ -101,16 +101,16 @@ const TvSeriesScreen = () => {
 				style={tw.style('gap-1 px-4')}
 				onPress={() => setShowFullSynopsis((prev) => !prev)}
 				>
-					<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.overview'))}</ThemedText>
-					<ThemedText numberOfLines={showFullSynopsis ? undefined : 5} style={[{ color: colors.mutedForeground }, tw.style('text-justify')]}>
+					<Text style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.overview'))}</Text>
+					<Text variant="muted" numberOfLines={showFullSynopsis ? undefined : 5} style={tw.style('text-justify')}>
 						{series.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
-					</ThemedText>
+					</Text>
 				</Pressable>
 				<TvSeriesWidgetSeasons seasons={series.seasons || []} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
 				{/* CASTING */}
 				<View style={tw.style('gap-1')}> 
-					<ThemedText style={tw.style('px-4 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
-					{series.cast?.length ? <TvSeriesCast cast={series.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
+					<Text style={tw.style('px-4 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</Text>
+					{series.cast?.length ? <TvSeriesCast cast={series.cast} /> : <Text variant="muted" style={tw`px-4`}>{upperFirst(t('common.messages.no_cast'))}</Text>}
 				</View>
 				<MediaWidgetPlaylists mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
 				<MediaWidgetReviews mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
@@ -142,8 +142,8 @@ const TvSeriesCast = ({
 					style={tw.style('w-full')}
 					/>
 					<View style={tw.style('flex-col gap-1 items-center')}>
-						<ThemedText numberOfLines={2}>{item.person?.title}</ThemedText>
-						{item.character ? <ThemedText numberOfLines={2} style={[{ color: colors.accentYellow }, tw.style('italic text-sm')]}>{item.character}</ThemedText> : null}
+						<Text numberOfLines={2}>{item.person?.title}</Text>
+						{item.character ? <Text numberOfLines={2} style={[{ color: colors.accentYellow }, tw.style('italic text-sm')]}>{item.character}</Text> : null}
 					</View>
 				</View>
 			</Link>

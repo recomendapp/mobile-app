@@ -58,7 +58,6 @@ const ResultUsers = ({
 		onEndReachedThreshold={0.3}
 		refreshing={isRefetching}
 		onRefresh={refetch}
-		estimatedItemSize={100}
 		/>
 	)
 };

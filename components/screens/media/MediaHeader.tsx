@@ -10,7 +10,6 @@ import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
 } from 'react-native-reanimated';
-import { ThemedText } from '@/components/ui/ThemedText';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
 import { lowerCase, upperFirst } from 'lodash';
 import { Media, MediaPerson } from '@/types/type.db';
@@ -33,6 +32,7 @@ import { Pressable } from 'react-native-gesture-handler';
 import BottomSheetMediaFollowersAverageRating from '@/components/bottom-sheets/sheets/BottomSheetMediaFollowersAverageRating';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useTranslations } from 'use-intl';
+import { Text } from '@/components/ui/text';
 
 interface MediaHeaderProps {
 	media?: Media | null;
@@ -160,7 +160,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 			{ paddingTop: inset.top === 0 ? 8 : inset.top }
 		]}
 		>
-			{!loading ? (
+			{/* {!loading ? (
 				<AnimatedImageWithFallback
 				onLayout={(e) => {
 					'worklet';
@@ -192,7 +192,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 						)}
 					</View>
 				</AnimatedImageWithFallback>
-			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw.style('w-48'), posterAnim]}/>}
+			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw.style('w-48'), posterAnim]}/>} */}
 			<Animated.View
 			style={[
 				tw.style('gap-2 w-full'),
@@ -200,15 +200,22 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 			]}
 			>
 				{/* GENRES */}
-				{media ? <ThemedText>
-					<ThemedText style={{ color: colors.accentYellow }}>
-						{upperFirst(t(`common.messages.${media.media_type}`, { count: 1 }))}
-					</ThemedText>
+				{media ? <Text>
+					<Text style={{ color: colors.accentYellow }}>
+						{
+							media.media_type === 'tv_series' ? upperFirst(t('common.messages.tv_series', { count: 1 }))
+							: media.media_type === 'tv_season' ? upperFirst(t('common.messages.tv_season', { count: 1 }))
+							: media.media_type === 'tv_episode' ? upperFirst(t('common.messages.tv_episode', { count: 1 }))
+							: media.media_type === 'movie' ? upperFirst(t('common.messages.film', { count: 1 }))
+							: media.media_type === 'person' ? upperFirst(t('common.messages.person', { count: 1 }))
+							: upperFirst(t('common.messages.media', { count: 1 }))
+						}
+					</Text>
 					{media?.genres ? <Genres genres={media.genres} /> : null}
-				</ThemedText> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
+				</Text> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
 				{/* TITLE */}
 				{!loading ? (
-					<ThemedText
+					<Text
 					numberOfLines={2}
 					style={[
 						tw.style('text-4xl font-bold'),
@@ -219,20 +226,22 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 							media?.media_type === 'tv_series' ? upperFirst(t('common.messages.tv_series_not_found')) :
 							media?.media_type === 'person' ? upperFirst(t('common.messages.person_not_found')) :
 							media?.media_type === 'movie' ? upperFirst(t('common.messages.film_not_found')) :
+							media?.media_type === 'tv_episode' ? upperFirst(t('common.messages.tv_episode_not_found')) :
+							media?.media_type === 'tv_season' ? upperFirst(t('common.messages.tv_season_not_found')) :
 							upperFirst(t('common.messages.media_not_found'))
 						)}
-					</ThemedText>
+					</Text>
 				) : <Skeleton style={tw.style('w-64 h-12')} />}
 				{(media?.extra_data.original_title && lowerCase(media.extra_data.original_title) !== lowerCase(media.title!)) ? (
-					<ThemedText numberOfLines={1} style={[ { color: colors.mutedForeground }, tw.style('text-lg font-semibold')]}>
+					<Text numberOfLines={1} style={[ { color: colors.mutedForeground }, tw.style('text-lg font-semibold')]}>
 						{media.extra_data.original_title}
-					</ThemedText>
+					</Text>
 				) : null}
 				{/* DIRECTORS & DURATION */}
 				{media?.main_credit || media?.extra_data.runtime ? (
-					<ThemedText>
+					<Text>
 						{media.main_credit ? <Directors directors={media.main_credit} /> : null}
-					</ThemedText>
+					</Text>
 				) : null}
 
 			</Animated.View>

@@ -28,7 +28,7 @@ const TvSeriesWidgetSeasons = ({
 	return (
 	<View style={[tw`gap-1`, style]}>
 		<ThemedText style={[tw`font-medium text-lg`, labelStyle]}>
-			{upperFirst(t('common.messages.season', { count: seasons.length }))}
+			{upperFirst(t('common.messages.tv_season', { count: seasons.length }))}
 			<ThemedText style={[{ color: colors.mutedForeground }, tw`font-medium text-sm`]}>
 				{` ${seasons.length}`}
 			</ThemedText>

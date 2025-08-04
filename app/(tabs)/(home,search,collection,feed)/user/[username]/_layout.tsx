@@ -147,7 +147,7 @@ const ProfileHeader = () => {
 
 const ProfilePrivateAccountCard = () => {
 	const { colors } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	return (
 	<View style={tw.style('flex gap-4 justify-center items-center px-4 py-8 border-y-2')}>
 		<Icons.Lock color={colors.foreground} />
