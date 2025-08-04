@@ -1,6 +1,6 @@
 const app = {
 	name: 'Recomend',
-	domain: process.env.EXPO_PUBLIC_APP_DOMAIN!,
+	webDomain: process.env.EXPO_PUBLIC_WEB_APP!,
 };
 
 export default app;
