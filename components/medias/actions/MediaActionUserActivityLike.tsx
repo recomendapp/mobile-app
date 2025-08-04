@@ -14,6 +14,7 @@ import { upperFirst } from "lodash";
 import * as Haptics from "expo-haptics";
 import { interpolateColor, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
+import { usePathname, useRouter } from "expo-router";
 
 const ICON_SIZE = 24;
 
@@ -27,7 +28,9 @@ const MediaActionUserActivityLike = React.forwardRef<
 	MediaActionUserActivityLikeProps
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();
-	const { user } = useAuth();
+	const { session, user } = useAuth();
+	const router = useRouter();
+	const pathname = usePathname();
 	const t = useTranslations();
 	const queryClient = useQueryClient();
 	const {
@@ -137,12 +140,25 @@ const MediaActionUserActivityLike = React.forwardRef<
 		<Pressable
 		ref={ref}
 		onPress={() => {
-			if (process.env.EXPO_OS === 'ios') {
-				Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+			if (session) {
+				if (process.env.EXPO_OS === 'ios') {
+					Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+				}
+				activity?.is_liked ? handleUnlike() : handleLike();
+			} else {
+				router.push({
+					pathname: '/auth',
+					params: {
+						redirect: pathname,
+					},
+				});
 			}
-			activity?.is_liked ? handleUnlike() : handleLike();
 		}}
-		disabled={isLoading || isError || activity === undefined || insertActivity.isPending || updateActivity.isPending}
+		disabled={
+			session ? (
+				isLoading || isError || activity === undefined || insertActivity.isPending || updateActivity.isPending
+			) : false
+		}
 		{...props}
 		>
 		{isError ? (

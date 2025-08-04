@@ -14,7 +14,8 @@ import {
   View,
   ViewStyle,
   Text,
-  TextInputFocusEvent
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
 } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { useTranslations } from 'use-intl';
@@ -138,12 +139,12 @@ export const Input = forwardRef<TextInput, InputProps>(
       textAlignVertical: type ==='textarea' ? 'top' : 'center',
     });
 
-    const handleFocus = (e: TextInputFocusEvent) => {
+    const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       setIsFocused(true);
       onFocus?.(e);
     };
 
-    const handleBlur = (e: TextInputFocusEvent) => {
+    const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       if (showPassword) setShowPassword(false);
       setIsFocused(false);
       onBlur?.(e);
@@ -477,12 +478,12 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
       </Pressable>
     ) : rightComponentProp;
 
-    const handleFocus = (e: TextInputFocusEvent) => {
+    const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       setIsFocused(true);
       onFocus?.(e);
     };
 
-    const handleBlur = (e: TextInputFocusEvent) => {
+    const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       if (showPassword) setShowPassword(false);
       setIsFocused(false);
       onBlur?.(e);

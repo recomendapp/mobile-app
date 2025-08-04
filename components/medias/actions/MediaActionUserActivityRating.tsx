@@ -11,6 +11,7 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMediaRating from "@/components/bottom-sheets/sheets/BottomSheetMediaRating";
 import { Media } from "@/types/type.db";
 import tw from "@/lib/tw";
+import { usePathname, useRouter } from "expo-router";
 
 const ICON_SIZE = 24;
 
@@ -24,7 +25,9 @@ const MediaActionUserActivityRating = React.forwardRef<
 	MediaActionUserActivityRatingProps
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();
-	const { user } = useAuth();
+	const { session, user } = useAuth();
+	const router = useRouter();
+	const pathname = usePathname();
 	const { openSheet } = useBottomSheetStore();
 	const {
 		data: activity,
@@ -40,10 +43,25 @@ const MediaActionUserActivityRating = React.forwardRef<
 	return (
 		<Pressable
 		ref={ref}
-		onPress={() => openSheet(BottomSheetMediaRating, {
-			media: media,
-		})}
-		disabled={isLoading || isError || activity === undefined || insertActivity.isPending || updateActivity.isPending}
+		onPress={() =>{
+			if (session) {
+				openSheet(BottomSheetMediaRating, {
+					media: media,
+				});
+			} else {
+				router.push({
+					pathname: '/auth',
+					params: {
+						redirect: pathname,
+					},
+				});
+			}
+		}}
+		disabled={
+			session ? (
+				isLoading || isError || activity === undefined || insertActivity.isPending || updateActivity.isPending
+			) : false
+		}
 		{...props}
 		>
 		{isError ? (

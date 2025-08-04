@@ -5,7 +5,6 @@ import { Text, View } from 'react-native';
 import { ImageIcon, ListVideoIcon } from 'lucide-react-native';
 import { Icons } from '@/constants/Icons';
 import { Image, ImageProps, ImageSource } from 'expo-image';
-import tailwind from 'twrnc';
 import Animated from 'react-native-reanimated';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -62,7 +61,7 @@ export const ImageWithFallback = React.forwardRef<
           setImgSrc(null);
         }}
         style={
-          tailwind.style('w-full h-full')
+          tw`w-full h-full`
         }
         transition={transition}
         contentFit={contentFit}

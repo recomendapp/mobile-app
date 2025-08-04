@@ -111,9 +111,7 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 	};
 
 	const logout = async () => {
-		console.log("Logging out...");
 		const { error } = await supabase.auth.signOut();
-		console.log("error", error?.code, error?.message);
 		if (error) throw error;
 	};
 

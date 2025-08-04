@@ -11,6 +11,7 @@ import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import * as Haptics from "expo-haptics";
 import { useTranslations } from "use-intl";
+import { usePathname, useRouter } from "expo-router";
 
 const ICON_SIZE = 24;
 
@@ -24,7 +25,9 @@ const MediaActionUserWatchlist = React.forwardRef<
 	MediaActionUserWatchlistProps
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();
-	const { user } = useAuth();
+	const { session, user } = useAuth();
+	const router = useRouter();
+	const pathname = usePathname();
 	const t = useTranslations();
 	const {
 		data: activity,
@@ -90,12 +93,26 @@ const MediaActionUserWatchlist = React.forwardRef<
 		<Pressable
 		ref={ref}
 		onPress={() => {
-			if (process.env.EXPO_OS === 'ios') {
-				Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+			if (session) {
+				if (process.env.EXPO_OS === 'ios') {
+					Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+				}
+				watchlist ? handleUnwatchlist() : handleWatchlist();
+			} else {
+				router.push({
+					pathname: '/auth',
+					params: {
+						redirect: pathname,
+					},
+				});
 			}
-			watchlist ? handleUnwatchlist() : handleWatchlist();
 		}}
-		disabled={isLoading || isError || watchlist === undefined || insertWatchlist.isPending || deleteWatchlist.isPending}
+		disabled={
+			session ? (
+				isLoading || isError || watchlist === undefined || insertWatchlist.isPending || deleteWatchlist.isPending
+			) : false
+		}
+
 		{...props}
 		>
 		{isError ? (

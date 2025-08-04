@@ -160,7 +160,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 			{ paddingTop: inset.top === 0 ? 8 : inset.top }
 		]}
 		>
-			{/* {!loading ? (
+			{!loading ? (
 				<AnimatedImageWithFallback
 				onLayout={(e) => {
 					'worklet';
@@ -176,12 +176,12 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 				type={media?.media_type}
 				>
 					<View style={tw`absolute gap-2 top-2 right-2`}>
-						{(media?.vote_average || media?.tmdb_vote_average) && (
+						{(media?.vote_average || media?.tmdb_vote_average) ? (
 							<IconMediaRating
 							rating={media?.vote_average ?? media?.tmdb_vote_average}
 							variant="general"
 							/>
-						)}
+						) : null}
 						{followersAvgRating && (
 							<Pressable onPress={() => openSheet(BottomSheetMediaFollowersAverageRating, { mediaId: media?.media_id! })}>
 								<IconMediaRating
@@ -192,7 +192,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 						)}
 					</View>
 				</AnimatedImageWithFallback>
-			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw.style('w-48'), posterAnim]}/>} */}
+			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw.style('w-48'), posterAnim]}/>}
 			<Animated.View
 			style={[
 				tw.style('gap-2 w-full'),
@@ -216,9 +216,9 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 				{/* TITLE */}
 				{!loading ? (
 					<Text
+					variant="title"
 					numberOfLines={2}
 					style={[
-						tw.style('text-4xl font-bold'),
 						(!media && !loading) && { textAlign: 'center', color: colors.mutedForeground }
 					]}
 					>

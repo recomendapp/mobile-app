@@ -12,6 +12,7 @@ import { upperFirst } from "lodash";
 import * as Haptics from "expo-haptics";
 import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
+import { usePathname, useRouter } from "expo-router";
 
 const ICON_SIZE = 24;
 
@@ -25,7 +26,9 @@ const MediaActionUserActivityWatch = React.forwardRef<
 	MediaActionUserActivityWatchProps
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();
-	const { user } = useAuth();
+	const { session, user } = useAuth();
+	const router = useRouter();
+	const pathname = usePathname();
 	const t = useTranslations();
 	const {
 		data: activity,
@@ -71,12 +74,25 @@ const MediaActionUserActivityWatch = React.forwardRef<
 		<Pressable
 		ref={ref}
 		onPress={() => {
-			if (process.env.EXPO_OS === 'ios') {
-				Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+			if (session) {
+				if (process.env.EXPO_OS === 'ios') {
+					Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+				}
+				activity ? handleUnwatch() : handleWatch();
+			} else {
+				router.push({
+					pathname: '/auth',
+					params: {
+						redirect: pathname,
+					},
+				});
 			}
-			activity ? handleUnwatch() : handleWatch();
 		}}
-		disabled={isLoading || isError || activity === undefined || insertActivity.isPending || deleteActivity.isPending}
+		disabled={
+			session ? (
+				isLoading || isError || activity === undefined || insertActivity.isPending || deleteActivity.isPending
+			) : false
+		}
 		{...props}
 		>
 		{isError ? (
