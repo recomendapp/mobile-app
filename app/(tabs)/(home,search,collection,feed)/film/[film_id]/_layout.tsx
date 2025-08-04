@@ -3,18 +3,19 @@ import { getIdFromSlug } from '@/hooks/getIdFromSlug';
 import { useTheme } from '@/providers/ThemeProvider';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { upperFirst } from 'lodash';
-import { useTranslation } from 'react-i18next';
+import { useLocale, useTranslations } from 'use-intl';
 
 const FilmLayout = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
-	const { t, i18n } = useTranslation();
+	const locale = useLocale();
+	const t = useTranslations();
 	const { colors } = useTheme();
 	const {
 		data: movie,
 	} = useMediaMovieDetailsQuery({
 		id: movieId,
-		locale: i18n.language,
+		locale: locale,
 	});
 	return (
 		<Stack>

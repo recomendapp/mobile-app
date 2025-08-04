@@ -3,9 +3,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useUserReviewInsertMutation, useUserReviewUpdateMutation } from "@/features/user/userMutations";
 import tw from "@/lib/tw";
 import { Media, UserReview } from "@/types/type.db";
-import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Platform, Text, TouchableOpacity, View } from "react-native";
 import { RichText, Toolbar } from "@10play/tentap-editor";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
@@ -17,8 +15,8 @@ import * as Burnt from "burnt";
 import useEditor from "@/lib/10tap/editor";
 import { useSharedValue } from "react-native-reanimated";
 import { BetterInput } from "@/components/ui/BetterInput";
-import { PostgrestError } from "@supabase/supabase-js";
 import isPostgrestError from "@/utils/isPostgrestError";
+import { useTranslations } from "use-intl";
 
 const MAX_TITLE_LENGTH = 50;
 const MAX_BODY_LENGTH = 5000;
@@ -35,7 +33,7 @@ const ReviewForm = ({
 	onSave,
 } : ReviewFormProps) => {
 	const { colors, inset } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const bottomTabBarHeight = useBottomTabOverflow();
 	const { user } = useAuth();
 	const [title, setTitle] = useState(review?.title ?? '');
@@ -155,7 +153,7 @@ const ReviewForm = ({
 						</TouchableOpacity>
 					) : (
 						<TouchableOpacity onPress={handleSave}>
-							<Text style={[{ color: colors.accentYellow }, tw`text-lg`]}>{upperFirst(t('common.word.save'))}</Text>
+							<Text style={[{ color: colors.accentYellow }, tw`text-lg`]}>{upperFirst(t('common.messages.save'))}</Text>
 						</TouchableOpacity>
 					)}
 				</View>

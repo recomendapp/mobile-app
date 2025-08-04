@@ -9,9 +9,9 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { Media } from "@/types/type.db";
 import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import * as Haptics from "expo-haptics";
 import tw from "@/lib/tw";
+import { useTranslations } from "use-intl";
 
 const ICON_SIZE = 24;
 
@@ -26,7 +26,7 @@ const MediaActionUserActivityWatch = React.forwardRef<
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { user } = useAuth();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const {
 		data: activity,
 		isLoading,
@@ -46,7 +46,7 @@ const MediaActionUserActivityWatch = React.forwardRef<
 		}), {
 			onError: () => {
 				Burnt.toast({
-					title: upperFirst(t('errors.an_error_occurred')),
+					title: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
 				});
 			}
@@ -60,7 +60,7 @@ const MediaActionUserActivityWatch = React.forwardRef<
 		}), {
 			onError: () => {
 				Burnt.toast({
-					title: upperFirst(t('errors.an_error_occurred')),
+					title: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
 				});
 			}

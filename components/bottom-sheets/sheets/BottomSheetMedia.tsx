@@ -1,6 +1,5 @@
 import React from 'react';
 import tw from '@/lib/tw';
-import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
 import { Media } from '@/types/type.db';
 import { LinkProps, usePathname, useRouter } from 'expo-router';
@@ -18,6 +17,7 @@ import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import BottomSheetDefaultView from '../templates/BottomSheetDefaultView';
 import { ScrollView } from 'react-native-gesture-handler';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
 
 interface BottomSheetMediaProps extends BottomSheetProps {
   media?: Media,
@@ -41,7 +41,7 @@ const BottomSheetMedia = React.forwardRef<
   const { closeSheet, openSheet } = useBottomSheetStore();
   const { colors, inset } = useTheme();
   const router = useRouter();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const pathname = usePathname();
   // REFs
   const scrollRef = React.useRef<ScrollView>(null);
@@ -69,8 +69,9 @@ const BottomSheetMedia = React.forwardRef<
           icon: Icons.Users,
           onPress: () => BottomSheetMainCreditsRef.current?.present(),
           label: upperFirst(t(
-            media.media_type === 'movie' ? 'common.messages.show_director_other' : 'common.messages.show_creator_other',
+            media.media_type === 'movie' ? 'common.messages.show_director' : 'common.messages.show_creator',
             {
+              gender: 'male',
               count: media.main_credit.length,
             }
           )),
@@ -81,7 +82,7 @@ const BottomSheetMedia = React.forwardRef<
           label: upperFirst(t(
             media.media_type === 'movie' ? 'common.messages.go_to_director' : 'common.messages.go_to_creator',
             {
-              context: media.main_credit![0].extra_data.gender === 1 ? 'female' : 'male',
+              gender: media.main_credit![0].extra_data.gender === 1 ? 'female' : 'male',
               count: 1,
             }
           ))
@@ -138,13 +139,13 @@ const BottomSheetMedia = React.forwardRef<
             />
             <View style={tw`shrink`}>
               <ThemedText numberOfLines={2} style={tw`shrink`}>{media?.title}</ThemedText>
-              <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
+              {media?.main_credit && media?.main_credit?.length > 0 && <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
                 {(media?.media_type === 'movie' || media?.media_type === 'tv_series') ? (
                   media?.main_credit?.map((director) => director.title).join(', ')
                 ) : media?.media_type === 'person' ? (
                   media.extra_data.known_for_department
                 ) : null}
-              </Text>
+              </Text>}
             </View>
           </View>
         </View>

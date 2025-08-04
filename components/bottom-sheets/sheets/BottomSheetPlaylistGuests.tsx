@@ -5,7 +5,6 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { Json, Playlist, User } from '@/types/type.db';
 import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { upperFirst } from 'lodash';
-import { useTranslation } from 'react-i18next';
 import { usePlaylistGuests } from '@/features/playlist/playlistQueries';
 import Fuse from 'fuse.js';
 import { Button } from '@/components/ui/Button';
@@ -24,6 +23,7 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BetterInput } from '@/components/ui/BetterInput';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
 
 interface BottomSheetPlaylistGuestsProps extends BottomSheetProps {
   playlist: Playlist;
@@ -34,9 +34,9 @@ const BottomSheetPlaylistGuests = React.forwardRef<
   BottomSheetPlaylistGuestsProps
 >(({ id, playlist, sizes, ...props }, ref) => {
   const supabase = useSupabaseClient();
-  const { colors, inset } = useTheme();
+  const { colors } = useTheme();
   const { closeSheet } = useBottomSheetStore();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { user: loggedUser } = useAuth();
   const queryClient = useQueryClient();
   const {
@@ -102,7 +102,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
         queryKey: playlistKeys.guests(playlist.id),
       })
       Burnt.toast({
-        title: upperFirst(t('common.word.saved')),
+        title: upperFirst(t('common.messages.saved')),
         preset: 'done',
       });
       await closeSheet(id);
@@ -116,7 +116,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
       } else {
         Burnt.toast({
           title: upperFirst(t('common.messages.error')),
-          message: upperFirst(t('common.errors.an_error_occurred')),
+          message: upperFirst(t('common.messages.an_error_occurred')),
           preset: 'error',
         });
       }
@@ -151,11 +151,11 @@ const BottomSheetPlaylistGuests = React.forwardRef<
         onPress={() => {
           if (hasChanges) {
             Alert.alert(
-              upperFirst(t('common.word.cancel')),
-              upperFirst(t('common.playlist.actions.edit_guests.modal.cancel_without_saving')),
+              upperFirst(t('common.messages.cancel')),
+              upperFirst(t('pages.playlist.actions.edit_guests.modal.cancel_without_saving')),
               [
                 {
-                  text: upperFirst(t('common.word.cancel')),
+                  text: upperFirst(t('common.messages.cancel')),
                   style: 'cancel',
                 },
                 {
@@ -171,17 +171,17 @@ const BottomSheetPlaylistGuests = React.forwardRef<
         }}
         style={tw`flex-1`}
         >
-          <ThemedText>{upperFirst(t('common.word.cancel'))}</ThemedText>
+          <ThemedText>{upperFirst(t('common.messages.cancel'))}</ThemedText>
         </TouchableOpacity>
         <ThemedText style={tw`flex-1 text-center font-bold`}>
-          {upperFirst(t('common.playlist.actions.edit_guests.label'))}
+          {upperFirst(t('pages.playlist.actions.edit_guests.label'))}
         </ThemedText>
         <TouchableOpacity
         onPress={handleSave}
         disabled={!hasChanges}
         style={[{ opacity: hasChanges ? 1 : 0.5}, tw`flex-1`]}
         >
-          <ThemedText style={tw`text-right`}>{upperFirst(t('common.word.save'))}</ThemedText>
+          <ThemedText style={tw`text-right`}>{upperFirst(t('common.messages.save'))}</ThemedText>
         </TouchableOpacity>
       </View>
       <View style={tw`flex-1 w-full gap-2`}>

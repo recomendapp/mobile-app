@@ -4,14 +4,14 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useUserFeedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { LegendList } from "@legendapp/list";
 import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
+import { useTranslations } from "use-intl";
 
 const FeedScreen = () => {
 	const { user } = useAuth();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const tabBarHeight = useBottomTabOverflow();
 	const {
 		data: feed,

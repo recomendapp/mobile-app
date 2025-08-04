@@ -1,16 +1,11 @@
-import { useAuth } from "@/providers/AuthProvider";
 import { useUserDiscoveryInfinite } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { Link } from "expo-router";
-import { useTranslation } from "react-i18next";
-import { FlatList, StyleProp, Text, TextStyle, View, ViewStyle } from "react-native";
-import { CardMedia } from "@/components/cards/CardMedia";
-import UserAvatar from "@/components/user/UserAvatar";
-import { useTheme } from "@/providers/ThemeProvider";
+import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { ThemedText } from "@/components/ui/ThemedText";
-import { ThemedView } from "@/components/ui/ThemedView";
 import { CardUser } from "../cards/CardUser";
 import { LegendList } from "@legendapp/list";
+import { useTranslations } from "use-intl";
+import { upperFirst } from "lodash";
 
 interface WidgetUserDiscoveryProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -22,9 +17,7 @@ export const WidgetUserDiscovery = ({
   labelStyle,
   containerStyle
 }: WidgetUserDiscoveryProps) => {
-  const { colors } = useTheme();
-  const { t } = useTranslation();
-
+  const t = useTranslations();
   const {
 	data: users,
 	fetchNextPage,
@@ -40,7 +33,7 @@ export const WidgetUserDiscovery = ({
 
   return (
   <View style={[tw`gap-2`, style]}>
-	  <ThemedText style={[tw`font-semibold text-xl`, labelStyle]}>{t('widgets.user_discovery.label')}</ThemedText>
+	  <ThemedText style={[tw`font-semibold text-xl`, labelStyle]}>{upperFirst(t('common.messages.discover_users'))}</ThemedText>
     <LegendList
     data={users.pages.flat()}
     renderItem={({ item }) => (

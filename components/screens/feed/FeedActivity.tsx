@@ -1,12 +1,12 @@
 import { IconMediaRating } from "@/components/medias/IconMediaRating";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { UserActivity } from "@/types/type.db";
 import { forwardRef } from "react";
-import { useTranslation } from "react-i18next";
 import { View } from "react-native";
+import { useTranslations } from "use-intl";
+import { Text } from "@/components/ui/text";
 
 interface FeedActivityProps
   extends React.ComponentProps<typeof View> {
@@ -18,8 +18,7 @@ const FeedActivity = forwardRef<
 	FeedActivityProps
 >(({ activity, style, ...props }, ref) => {
 	const { colors } = useTheme();
-	const { t } = useTranslation();
-  
+	const t = useTranslations();
 	return (
 	  <View
 	  ref={ref}
@@ -31,38 +30,58 @@ const FeedActivity = forwardRef<
 	  >
 		{activity?.review ? (
 		  <>
-			<ThemedText>
-			  {t('pages.feed.reviewed', {
-				name: activity.user?.username,
+			<Text>
+			  {t.rich('pages.feed.actions.reviewed', {
+				name: () => (
+				  <Text style={tw`font-semibold`}>
+					{activity.user?.username}
+				  </Text>
+				),
 			  })}
-			</ThemedText>
+			</Text>
 		  </>
 		) : (
 		  <>
 			{activity?.is_liked && activity?.rating ? (
-			  <ThemedText>
-				{t('pages.feed.rated_liked', {
-				  name: activity.user?.username,
+			  <Text>
+				{t.rich('pages.feed.actions.rated_liked', {
+				  name: () => (
+					<Text style={tw`font-semibold`}>
+					  {activity.user?.username}
+					</Text>
+				  ),
 				})}
-			  </ThemedText>
+			  </Text>
 			) : activity?.is_liked && !activity?.rating ? (
-			  <ThemedText>
-				{t('pages.feed.liked', {
-					name: activity.user?.username,
+			  <Text>
+				{t.rich('pages.feed.actions.liked', {
+					name: () => (
+					  <Text style={tw`font-semibold`}>
+						{activity.user?.username}
+					  </Text>
+					),
 				})}
-			  </ThemedText>
+			  </Text>
 			) : !activity?.is_liked && activity?.rating ? (
-			  <ThemedText>
-				{t('pages.feed.rated', {
-				  name: activity.user?.username,
+			  <Text>
+				{t.rich('pages.feed.actions.rated', {
+				  name: () => (
+					<Text style={tw`font-semibold`}>
+					  {activity.user?.username}
+					</Text>
+				  ),
 				})}
-			  </ThemedText>
+			  </Text>
 			) : (
-			  <ThemedText>
-				{t('pages.feed.watched', {
-				  name: activity?.user?.username,
+			  <Text>
+				{t.rich('pages.feed.actions.watched', {
+				  name: () => (
+					<Text style={tw`font-semibold`}>
+					  {activity?.user?.username}
+					</Text>
+				  ),
 				})}
-			  </ThemedText>
+			  </Text>
 			)}
 		  	{activity?.rating && (
 				<IconMediaRating

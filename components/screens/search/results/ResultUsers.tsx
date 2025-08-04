@@ -5,8 +5,8 @@ import { useSearchUsersInfiniteQuery } from "@/features/search/searchQueries";
 import tw from "@/lib/tw";
 import { FlashList } from "@shopify/flash-list";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Text, View } from "react-native";
+import { useTranslations } from "use-intl";
 
 interface ResultUsersProps {
 	search: string;
@@ -15,7 +15,7 @@ interface ResultUsersProps {
 const ResultUsers = ({
 	search,
 } : ResultUsersProps) => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { inset, colors } = useTheme();
 	const tabBarHeight = useBottomTabOverflow();
 	const {

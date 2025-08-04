@@ -1,15 +1,15 @@
 import React, { Fragment } from "react";
 import { UserActivity } from "@/types/type.db";
-import { useTranslation } from "react-i18next";
 import Animated, { SharedValue, useAnimatedScrollHandler } from "react-native-reanimated";
 import CollectionHeader from "../CollectionHeader";
-import { capitalize } from "lodash";
+import { upperFirst } from "lodash";
 import { View } from "react-native";
 import tw from "@/lib/tw";
 import { ColumnFiltersState, flexRender, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, Row, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { Columns } from "./components/columns";
 import { DataTableToolbar } from "./components/data-table-toolbar";
 import { ThemedText } from "@/components/ui/ThemedText";
+import { useTranslations } from "use-intl";
 
 interface TableLikesProps {
 	likes: UserActivity[];
@@ -29,7 +29,7 @@ const TableLikes = ({
 	isRefetching,
 	refetch,
 } : TableLikesProps) => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const backdrops = React.useMemo(() => {
 		return likes.map((like) => like.media?.backdrop_url);
 	}, [likes]);
@@ -81,39 +81,17 @@ const TableLikes = ({
 		headerHeight={headerHeight}
 		headerOverlayHeight={headerOverlayHeight}
 		scrollY={scrollY}
-		title={capitalize(t('common.library.collection.likes.label'))}
+		title={upperFirst(t('common.messages.heart_pick', { count: 2 }))}
 		numberOfItems={likes.length}
 		backdrops={backdrops}
 		/>
 		<DataTableToolbar table={table} />
-		{/* <View>
-			{table.getHeaderGroups().map((headerGroup) => (
-				<View
-				key={headerGroup.id}
-				style={tw`flex-row items-center justify-between p-1`}
-				>
-					{headerGroup.headers.map((header) => (
-						<View
-						key={header.id}
-						style={tw`flex-1 flex-row items-center gap-2`}
-						>
-							{header.isPlaceholder
-								? null
-								: flexRender(
-									header.column.columnDef.header,
-									header.getContext()
-								)}
-						</View>
-					))}
-				</View>
-			))}
-		</View> */}
 	</>
 	), [likes]);
 
 	const renderEmpty = React.useCallback(() => (
 		<View style={tw`flex-1 items-center justify-center`}>
-			<ThemedText>{capitalize(t('common.messages.no_results'))}</ThemedText>
+			<ThemedText>{upperFirst(t('common.messages.no_results'))}</ThemedText>
 		</View>
 	), []);
 

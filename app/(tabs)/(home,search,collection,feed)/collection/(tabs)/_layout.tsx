@@ -9,9 +9,9 @@ import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, Materi
 import { ParamListBase, TabNavigationState } from "@react-navigation/native";
 import { withLayoutContext } from "expo-router";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
+import { useTranslations } from "use-intl";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -66,7 +66,7 @@ const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBar
 };
 
 const CollectionLayout = () => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	return (
 		<ThemedSafeAreaView style={tw.style('flex-1')}>
 			<View style={tw.style('flex-row justify-between items-center gap-2 py-2 px-4')}>
@@ -85,7 +85,7 @@ const CollectionLayout = () => {
 			)}
 			>
 				<MaterialTopTabs.Screen name="index" options={{ title: "perso" }} />
-				<MaterialTopTabs.Screen name="saved" options={{ title: upperFirst(t('common.word.saved')) }} />
+				<MaterialTopTabs.Screen name="saved" options={{ title: upperFirst(t('common.messages.saved', { gender: 'female', count: 2 })) }} />
 			</MaterialTopTabs> 
 		</ThemedSafeAreaView>
 	)

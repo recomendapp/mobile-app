@@ -7,12 +7,12 @@ import { Text, View } from "react-native";
 import { LegendList } from "@legendapp/list";
 import { Icons } from "@/constants/Icons";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { useTheme } from "@/providers/ThemeProvider";
+import { useTranslations } from "use-intl";
 
 const CollectionSavedScreen = () => {
 	const { user } = useAuth();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { colors } = useTheme();
 	const tabBarHeight = useBottomTabOverflow();
 	const {

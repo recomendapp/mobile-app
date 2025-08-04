@@ -1,12 +1,10 @@
 import * as React from 'react';
-import Animated from 'react-native-reanimated';
 import { useAuth } from '@/providers/AuthProvider';
 import { ScrollView, View } from 'react-native';
 import { UserNav } from '@/components/user/UserNav';
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { Link } from 'expo-router';
-import { useTranslation } from 'react-i18next';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 import tw from '@/lib/tw';
 import { Button } from '@/components/ui/Button';
@@ -17,9 +15,10 @@ import { useBottomTabOverflow } from '@/components/TabBar/TabBarBackground';
 import { WidgetUserFriendsPlaylists } from '@/components/widgets/WidgetUserFriendsPlaylists';
 import { WidgetUserFeed } from '@/components/widgets/WidgetUserFeed';
 import { WidgetUserDiscovery } from '@/components/widgets/WidgetUserDiscovery';
+import { useTranslations } from 'use-intl';
 
 const HomeScreen = () => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { session } = useAuth();
   const bottomTabHeight = useBottomTabOverflow();
   return (
@@ -58,7 +57,6 @@ const HomeScreen = () => {
 
 const HomeHeader = () => {
   const { session, user } = useAuth();
-  const { t } = useTranslation();
   return (
     <View style={tw.style('flex-row justify-between items-center px-4')}>
       <ThemedText numberOfLines={1} style={tw.style('text-2xl font-bold')}>

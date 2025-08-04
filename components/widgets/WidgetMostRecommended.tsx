@@ -1,5 +1,4 @@
 import { View, Dimensions, ViewProps } from "react-native";
-import { useTranslation } from "react-i18next";
 import { useWidgetMostRecommended } from "@/features/widget/widgetQueries";
 import { Skeleton } from "../ui/Skeleton";
 import { useRef } from "react";
@@ -14,7 +13,6 @@ const width = Dimensions.get("window").width;
 const WidgetMostRecommended = ({
 	style,
 } : ViewProps) => {
-	const t = useTranslation();
 	const {
 		data,
 		isLoading,

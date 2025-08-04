@@ -2,12 +2,12 @@ import { Table } from '@tanstack/react-table';
 import { capitalize } from 'lodash';
 import { View } from 'react-native';
 import tw from '@/lib/tw';
-import { useTranslation } from 'react-i18next';
 import { DataTableSortOptions } from './data-table-sort-options';
 import { Input } from '@/components/ui/InputOld';
 import { Button } from '@/components/ui/Button';
 import { Icons } from '@/constants/Icons';
-import { useTheme } from '@/providers/ThemeProvider';
+import { useTranslations } from 'use-intl';
+
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }
@@ -15,15 +15,14 @@ interface DataTableToolbarProps<TData> {
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
-  const { t } = useTranslation();
-  const { colors } = useTheme();
+  const t = useTranslations();
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
     <View style={tw`gap-2 px-2`}>
       <View style={tw`flex-row flex-1 items-center gap-2`}>
         <Input
-        placeholder={capitalize(t('common.library.collection.my_recos.search.placeholder'))}
+        placeholder={capitalize(t('pages.collection.my_recos.search.placeholder'))}
         value={
           (table.getColumn('item')?.getFilterValue() as string) ??
           ''

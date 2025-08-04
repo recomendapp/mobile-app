@@ -6,7 +6,6 @@ import { BORDER_RADIUS, CORNERS, FONT_SIZE, HEIGHT } from '@/theme/globals';
 import { upperFirst } from 'lodash';
 import { LucideProps } from 'lucide-react-native';
 import React, { forwardRef, ReactElement, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   Pressable,
   TextInput,
@@ -18,6 +17,7 @@ import {
   TextInputFocusEvent
 } from 'react-native';
 import { ThemedText } from './ThemedText';
+import { useTranslations } from 'use-intl';
 
 export interface InputProps extends Omit<TextInputProps, 'style'> {
   label?: string | null;
@@ -62,7 +62,7 @@ export const Input = forwardRef<TextInput, InputProps>(
   ) => {
     const [showPassword, setShowPassword] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
-    const { t } = useTranslation();
+    const t = useTranslations();
 
     // Theme colors
     const { colors } = useTheme();
@@ -449,7 +449,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
     },
     ref
   ) => {
-    const { t } = useTranslation();
+    const t = useTranslations();
     const [showPassword, setShowPassword] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
 

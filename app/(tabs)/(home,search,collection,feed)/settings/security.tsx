@@ -1,10 +1,9 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
-import { ActivityIndicator, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import tw from "@/lib/tw";
 import { Label } from "@/components/ui/Label";
 import { InputPassword } from "@/components/ui/InputPasswordOld";
@@ -12,11 +11,12 @@ import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
+import { useTranslations } from "use-intl";
 
 const SecuritySettings = () => {
 	const supabase = useSupabaseClient();
 	const { colors } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const profileFormSchema = z.object({
 		newpassword: z
@@ -63,7 +63,7 @@ const SecuritySettings = () => {
 			});
 			if (error) throw error;
 			Burnt.toast({
-				title: t('common.word.saved'),
+				title: t('common.messages.saved', { count: 1, gender: 'male' }),
 				preset: 'done',
 			})
 			form.reset();
@@ -139,7 +139,7 @@ const SecuritySettings = () => {
 			onPress={form.handleSubmit(onSubmit)}
 			disabled={isLoading}
 			>
-				{t('common.word.save')}
+				{t('common.messages.save')}
 			</Button>
 		</>
 	)

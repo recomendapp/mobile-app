@@ -3,11 +3,9 @@ import { Onboarding } from "@/components/ui/onboarding";
 import { Text } from "@/components/ui/text";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import tw from "@/lib/tw";
-import { useTheme } from "@/providers/ThemeProvider";
-import { Href, Link, useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslations } from "use-intl";
 
 export const OnboardingPresets = {
   welcome: [
@@ -83,45 +81,32 @@ export const OnboardingPresets = {
 };
 
 const AuthScreen = () => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const router = useRouter();
-	const { inset } = useTheme();
-	const routes = useMemo<{
-		label: string;
-		href: Href;
-	}[]>(() => ([
-		{
-			label: 'login',
-			href: '/auth/login',
-		},
-		{
-			label: 'signup',
-			href: '/auth/signup',
-		},
-	]), []);
-
+  
 	return (
+    <>
     <Onboarding
-      onComplete={() => {}}
-	  onCancel={router.canGoBack() ? router.back : () => router.replace('/')}
-      steps={OnboardingPresets.welcome}
-      showSkip={false}
-	  showNavigation={false}
-	  footer={
-		<ThemedSafeAreaView style={tw`flex-row justify-between items-center gap-2 px-4`}>
-			<Link href="/auth/signup" asChild>
-				<Button variant="accent-yellow" style={{ flex: 1 }} textStyle={tw`font-semibold`}>
-					{upperFirst(t('common.word.signup'))}
-				</Button>
-			</Link>
-			<Link href="/auth/login" asChild>
-				<Button variant="default" style={{ flex: 1 }} textStyle={tw`font-semibold`}>
-					{upperFirst(t('common.word.login'))}
-				</Button>
-			</Link>
-		</ThemedSafeAreaView>
-	  }
+    showCancel={true}
+    onCancel={router.back}
+    onComplete={() => {}}
+    steps={OnboardingPresets.welcome}
+    showSkip={false}
+    showNavigation={false}
     />
+    <ThemedSafeAreaView style={tw`flex-row justify-between items-center gap-2 px-4`}>
+      <Link href="/auth/signup" asChild>
+        <Button variant="accent-yellow" style={{ flex: 1 }} textStyle={tw`font-semibold`}>
+          {upperFirst(t('common.messages.signup'))}
+        </Button>
+      </Link>
+      <Link href="/auth/login" asChild>
+        <Button variant="default" style={{ flex: 1 }} textStyle={tw`font-semibold`}>
+          {upperFirst(t('common.messages.login'))}
+        </Button>
+      </Link>
+    </ThemedSafeAreaView>
+    </>
   	);
 };
 

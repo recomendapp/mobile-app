@@ -2,14 +2,12 @@ import * as React from "react"
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuth } from '@/providers/AuthProvider';
-import { useTranslation } from 'react-i18next';
 import upperFirst from 'lodash/upperFirst';
 import { useUserFollowProfile } from '@/features/user/userQueries';
-import { Pressable, Text, ViewStyle } from 'react-native';
+import { ViewStyle } from 'react-native';
 import { useUserFollowProfileInsert, useUserUnfollowProfileDelete } from '@/features/user/userMutations';
-import Animated from 'react-native-reanimated';
-import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
+import { useTranslations } from "use-intl";
 
 interface ButtonUserFollowProps
   extends React.ComponentProps<typeof Button> {
@@ -21,7 +19,7 @@ const ButtonUserFollow = React.forwardRef<
   React.ComponentRef<typeof Button>,
   ButtonUserFollowProps
 >(({ profileId, skeleton, style, ...props }, ref) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { user } = useAuth();
 
   const {

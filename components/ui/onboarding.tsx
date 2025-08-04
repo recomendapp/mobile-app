@@ -16,9 +16,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/providers/ThemeProvider';
-import { useTranslation } from 'react-i18next';
 import { upperFirst } from 'lodash';
 import { title } from '@/hooks/custom-lodash';
+import { useTranslations } from 'use-intl';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -65,7 +65,7 @@ export function Onboarding({
   onCancel,
   showNavigation = true,
   showSkip = true,
-  showCancel = true,
+  showCancel = false,
   showProgress = true,
   swipeEnabled = true,
   primaryButtonText: primaryButtonTextProp,
@@ -87,10 +87,10 @@ export function Onboarding({
   const mutedColor = colors.mutedForeground;
 
   // Default values
-  const { t } = useTranslation();
+  const t = useTranslations();
   const primaryButtonText = primaryButtonTextProp || title(t('common.messages.get_started'));
   const skipButtonText = skipButtonTextProp || upperFirst(t('common.messages.skip'));
-  const cancelButtonText = cancelButtonTextProp || upperFirst(t('common.word.cancel'));
+  const cancelButtonText = cancelButtonTextProp || upperFirst(t('common.messages.cancel'));
   const nextButtonText = nextButtonTextProp || upperFirst(t('common.messages.next'));
   const backButtonText = backButtonTextProp || upperFirst(t('common.messages.back'));
 

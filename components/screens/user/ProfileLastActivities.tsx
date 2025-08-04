@@ -8,8 +8,8 @@ import { Profile } from "@/types/type.db";
 import { LegendList } from "@legendapp/list";
 import { Link } from "expo-router";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
+import { useTranslations } from "use-intl";
 
 interface ProfileLastActivitiesProps extends React.ComponentPropsWithoutRef<typeof View> {
 	profile: Profile;
@@ -23,7 +23,7 @@ const ProfileLastActivities = ({
 	labelStyle,
 	containerStyle
 } : ProfileLastActivitiesProps) => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { colors } = useTheme();
 	const {
 	  data: activities,

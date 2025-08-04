@@ -2,7 +2,6 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useUserRecosQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Link } from "expo-router";
-import { useTranslation } from "react-i18next";
 import { StyleProp, Text, TextStyle, View, ViewStyle } from "react-native";
 import { CardMedia } from "@/components/cards/CardMedia";
 import UserAvatar from "@/components/user/UserAvatar";
@@ -11,6 +10,8 @@ import { ThemedView } from "@/components/ui/ThemedView";
 import { LegendList } from "@legendapp/list";
 import { Icons } from "@/constants/Icons";
 import { ThemedText } from "../ui/ThemedText";
+import { useTranslations } from "use-intl";
+import { upperFirst } from "lodash";
 
 interface WidgetUserRecosProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -23,9 +24,8 @@ export const WidgetUserRecos = ({
   containerStyle
 }: WidgetUserRecosProps) => {
   const { colors } = useTheme();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { user } = useAuth();
-
   const { data: recos } = useUserRecosQuery({
     userId: user?.id,
     filters: {
@@ -45,7 +45,7 @@ export const WidgetUserRecos = ({
     <Link href={'/collection/my-recos'} style={labelStyle}>
       <View style={tw`flex-row items-center`}>
         <ThemedText style={tw`font-semibold text-xl`} numberOfLines={1}>
-          {t('widgets.user_recos.label')}
+          {upperFirst(t('common.messages.reco_by_your_friends'))}
         </ThemedText>
         <Icons.ChevronRight color={colors.mutedForeground} />
       </View>

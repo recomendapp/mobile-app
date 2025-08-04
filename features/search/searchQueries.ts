@@ -1,7 +1,7 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { searchKeys } from "./searchKeys";
-import { useTranslation } from "react-i18next";
+import { useLocale } from "use-intl";
 
 export const useSearchPlaylistsInfiniteQuery = ({
 	query,
@@ -20,11 +20,11 @@ export const useSearchPlaylistsInfiniteQuery = ({
 		perPage: 20,
 		...filters,
 	};
-	const { i18n } = useTranslation();
+	const locale = useLocale();
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
 		queryKey: searchKeys.playlists({
-			locale: i18n.language,
+			locale: locale,
 			query: query,
 			filters: filters,
 		}),
@@ -76,11 +76,11 @@ export const useSearchUsersInfiniteQuery = ({
 		perPage: 20,
 		...filters,
 	};
-	const { i18n } = useTranslation();
+	const locale = useLocale();
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
 		queryKey: searchKeys.users({
-			locale: i18n.language,
+			locale: locale,
 			query: query,
 			filters: filters,
 		}),

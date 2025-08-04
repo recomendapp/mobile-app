@@ -2,7 +2,6 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { useMediaTvSeriesDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { Media, MediaTvSeriesPerson } from "@/types/type.db";
 import { CardMedia } from "@/components/cards/CardMedia";
@@ -21,6 +20,7 @@ import MediaWidgetReviews from "@/components/screens/media/MediaWidgetReviews";
 import MediaHeader from "@/components/screens/media/MediaHeader";
 import TvSeriesWidgetSeasons from "@/components/screens/media/TvSeries/TvSeriesWidgetSeasons";
 import { RefreshControl } from "react-native-gesture-handler";
+import { useLocale, useTranslations } from "use-intl";
 
 const PADDING_BOTTOM = 8;
 
@@ -28,7 +28,8 @@ const TvSeriesScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
 	const { colors, inset } = useTheme();
-	const { i18n, t } = useTranslation();
+	const t = useTranslations();
+	const locale = useLocale();
 	const { openSheet } = useBottomSheetStore();
 	const bottomTabBarHeight = useBottomTabOverflow();
 	const {
@@ -38,7 +39,7 @@ const TvSeriesScreen = () => {
 		refetch,
 	} = useMediaTvSeriesDetailsQuery({
 		id: seriesId,
-		locale: i18n.language,
+		locale: locale,
 	});
 	const loading = series === undefined || isLoading;
 	// States
@@ -100,7 +101,7 @@ const TvSeriesScreen = () => {
 				style={tw.style('gap-1 px-4')}
 				onPress={() => setShowFullSynopsis((prev) => !prev)}
 				>
-					<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.word.overview'))}</ThemedText>
+					<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.overview'))}</ThemedText>
 					<ThemedText numberOfLines={showFullSynopsis ? undefined : 5} style={[{ color: colors.mutedForeground }, tw.style('text-justify')]}>
 						{series.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
 					</ThemedText>

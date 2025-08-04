@@ -1,6 +1,3 @@
-import '~/lib/i18n';
-
-import { SplashScreen } from 'expo-router';
 import * as React from 'react';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { Providers } from '@/providers/Providers';
@@ -9,6 +6,8 @@ import CustomDrawerContent from '@/components/drawer/CustomDrawerContent';
 import StatusBar from '@/components/StatusBar';
 import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+import { useAuth } from '@/providers/AuthProvider';
+import { Stack } from 'expo-router';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -19,6 +18,22 @@ configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
   strict: false,
 })
+
+const DrawerLayout = () => {
+  const { session } = useAuth();
+  if (!session) return (
+    <Stack screenOptions={{ headerShown: false }} />
+  );
+  return (
+    <Drawer
+      screenOptions={{
+        drawerPosition: 'right',
+        headerShown: false
+      }}
+      drawerContent={CustomDrawerContent}
+    />
+  );
+};
 
 export default function RootLayout() {
   const hasMounted = React.useRef(false);
@@ -40,13 +55,7 @@ export default function RootLayout() {
   return (
     <Providers>
       <StatusBar />
-        <Drawer
-          screenOptions={{
-            drawerPosition: 'right',
-            headerShown: false
-          }}
-          drawerContent={CustomDrawerContent}
-        />
+        <DrawerLayout />
     </Providers>
   );
 }

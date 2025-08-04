@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
-import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
@@ -15,6 +14,7 @@ import { IconMediaRating } from '@/components/medias/IconMediaRating';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import { Icons } from '@/constants/Icons';
+import { useTranslations } from 'use-intl';
 
 interface BottomSheetMediaFollowersAverageRatingProps extends BottomSheetProps {
   mediaId: number;
@@ -26,7 +26,7 @@ const BottomSheetMediaFollowersAverageRating = React.forwardRef<
 >(({ id, mediaId, sizes = ['medium', 'large'], ...props }, ref) => {
   const { user } = useAuth();
   const { colors, inset } = useTheme();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const {
     data: followersRating,
 		isLoading,

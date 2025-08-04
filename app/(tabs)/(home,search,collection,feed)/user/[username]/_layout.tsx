@@ -5,12 +5,10 @@ import ButtonUserFollow from "@/components/buttons/ButtonUserFollow";
 import UserAvatar from "@/components/user/UserAvatar";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
-import { Pressable, View, Text, ActivityIndicator, ScrollView } from "react-native";
+import { Pressable, View, ScrollView } from "react-native";
 import ProfileNav from "@/components/screens/user/ProfileNav";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
-import { useTranslation } from "react-i18next";
 import { upperFirst } from "lodash";
-// import * as SeparatorPrimitive from '@rn-primitives/separator';
 import { Skeleton } from "@/components/ui/Skeleton";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useQueryClient } from "@tanstack/react-query";
@@ -18,11 +16,12 @@ import { userKeys } from "@/features/user/userKeys";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
+import { useTranslations } from "use-intl";
 
 const ProfileLayout = () => {
 	const { colors } = useTheme();
 	const tabBarHeight = useBottomTabOverflow();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { username } = useLocalSearchParams();
 	const queryClient = useQueryClient();
 	const {
@@ -83,7 +82,7 @@ const ProfileLayout = () => {
 				}
 				>
 					<Icons.User color={colors.foreground} size={50} />
-					<ThemedText>{upperFirst(t('common.errors.user_not_found'))}</ThemedText>
+					<ThemedText>{upperFirst(t('common.messages.user_not_found'))}</ThemedText>
 				</ScrollView>
 			)}
 		</ThemedSafeAreaView>

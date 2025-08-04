@@ -10,14 +10,14 @@ import Viewer from "@/lib/10tap/viewer";
 import tw from "@/lib/tw";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { Text } from "react-native";
 import { View } from "react-native"
+import { useTranslations } from "use-intl";
 
 const ReviewScreen = () => {
 	const { user } = useAuth();
 	const { inset, colors } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const bottomTabBarHeight = useBottomTabOverflow();
 	const router = useRouter();
 	const { review_id } = useLocalSearchParams();

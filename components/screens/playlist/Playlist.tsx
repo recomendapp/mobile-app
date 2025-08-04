@@ -5,9 +5,8 @@ import { usePlaylistItems } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { type Playlist as TPlaylist } from "@/types/type.db";
-import { capitalize, upperFirst } from "lodash";
+import { upperFirst } from "lodash";
 import React from "react";
-import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
 import { SharedValue, useAnimatedScrollHandler } from "react-native-reanimated";
 import PlaylistItem from "./PlaylistItem";
@@ -16,6 +15,7 @@ import { Icons } from "@/constants/Icons";
 import useDebounce from "@/hooks/useDebounce";
 import Fuse from "fuse.js";
 import { SearchBar } from "@/components/ui/searchbar";
+import { useTranslations } from "use-intl";
 
 interface PlaylistProps {
 	playlist?: TPlaylist | null;
@@ -37,7 +37,7 @@ const Playlist = ({
 	headerOverlayHeight,
 } : PlaylistProps) => {
 	const { colors, inset } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const tabBarHeight = useBottomTabOverflow();
 	// States
 	const {
@@ -115,7 +115,7 @@ const Playlist = ({
 				onChangeText={setSearch}
 				onSearch={handleSearch}
 				debounceMs={200}
-				placeholder={upperFirst(t('common.playlist.search.placeholder'))}
+				placeholder={upperFirst(t('pages.playlist.search.placeholder'))}
 				containerStyle={tw`mx-4`}
 				/>
 			)}
@@ -131,7 +131,7 @@ const Playlist = ({
 		loading ? <Icons.Loader />
 		: (
 			<View style={tw`flex-1 items-center justify-center gap-2`}>
-				<Text style={{ color: colors.mutedForeground }}>{capitalize(t('common.messages.no_results'))}</Text>
+				<Text style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_results'))}</Text>
 				{playlistItems?.length === 0 && (
 					<Button style={tw`rounded-full`}>{upperFirst(t('common.messages.add_to_this_playlist'))}</Button>
 				)}

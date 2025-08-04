@@ -3,11 +3,13 @@ import { Session } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
 import { useUserQuery } from "@/features/user/userQueries";
-import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AppState } from "react-native";
 import { supabase } from "@/lib/supabase/client";
 import app from "@/constants/app";
+import { useSplashScreen } from "./SplashScreenProvider";
+import { useLocale } from "use-intl";
+import { useLocaleContext } from "./LocaleProvider";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -36,6 +38,7 @@ type AuthContextProps = {
 		language: string;
 		redirectTo?: string;
 	}) => Promise<void>;
+	resetPasswordForEmail: (email: string) => Promise<void>;
 };
 
 type AuthProviderProps = {
@@ -45,7 +48,8 @@ type AuthProviderProps = {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 const AuthProvider = ({children }: AuthProviderProps) => {
-	const { i18n } = useTranslation();
+	const { auth } = useSplashScreen();
+	const { setLocale } = useLocaleContext();
 	const supabase = useSupabaseClient();
 	const [session, setSession] = useState<Session | null | undefined>(undefined);
 	const {
@@ -66,25 +70,31 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 					await supabase.auth.signOut();
 					setSession(null);
 				} else {
-				setSession(session);
+					setSession(session);
 				}
 			} else {
 				setSession(null);
+
 			}
 		});
 	}, []);
 
 	useEffect(() => {
 		const syncLanguage = async () => {
-			if (user?.language && user.language !== i18n.language) {
-				await i18n.changeLanguage(user.language);
-				await AsyncStorage.setItem("language", user.language);
+			if (user?.language) {
+				setLocale(user.language);
 			}
 		};
 		if (user) {
 			syncLanguage();
 		}
-	}, [user, i18n]);
+	}, [user]);
+
+	useEffect(() => {
+		if (session === undefined) return;
+		if (session && !user) return;
+		auth.setReady(true);
+	}, [session, user]);
 
 	const login = async ({ email, password }: { email: string; password: string }) => {
 		const { error } = await supabase.auth.signInWithPassword({
@@ -133,6 +143,13 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		if (error) throw error;
 	};
 
+	const resetPasswordForEmail = async (email: string) => {
+		const { error } = await supabase.auth.resetPasswordForEmail(email, {
+			redirectTo: `${app.domain}/auth/reset-password`,
+		});
+		if (error) throw error;
+	};
+
 	return (
 		<AuthContext.Provider
 		value={{
@@ -142,6 +159,7 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			loginWithOtp: loginWithOtp,
 			logout: logout,
 			signup: signup,
+			resetPasswordForEmail: resetPasswordForEmail,
 		}}
 		>
 			{children}

@@ -9,8 +9,8 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useCallback, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
+import { useTranslations } from "use-intl";
 
 const PADDING_BOTTOM = 8;
 
@@ -26,13 +26,13 @@ interface MediaReviewsProps {
 const MediaReviews = ({
 	mediaId,
 } : MediaReviewsProps) => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { colors, inset } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const bottomTabBarHeight = useBottomTabOverflow();
 	// States
 	const sortByOptions: sortBy[] = [
-		{ label: upperFirst(t('common.messages.date_published')), value: 'updated_at' },
+		{ label: upperFirst(t('common.messages.date_updated')), value: 'updated_at' },
 	];
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -55,7 +55,7 @@ const MediaReviews = ({
 	const handleSortBy = useCallback(() => {
 		const sortByOptionsWithCancel = [
 			...sortByOptions,
-			{ label: upperFirst(t('common.word.cancel')), value: 'cancel' },
+			{ label: upperFirst(t('common.messages.cancel')), value: 'cancel' },
 		];
 		const cancelIndex = sortByOptionsWithCancel.length - 1;
 		showActionSheetWithOptions({

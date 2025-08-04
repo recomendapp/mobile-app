@@ -1,6 +1,5 @@
 import React, { Fragment } from "react";
 import { UserWatchlist } from "@/types/type.db";
-import { useTranslation } from "react-i18next";
 import Animated, { SharedValue, useAnimatedScrollHandler } from "react-native-reanimated";
 import CollectionHeader from "../CollectionHeader";
 import { capitalize } from "lodash";
@@ -12,6 +11,7 @@ import { Columns } from "./components/columns";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { DataTableToolbar } from "./components/data-table-toolbar";
 import { useTheme } from "@/providers/ThemeProvider";
+import { useTranslations } from "use-intl";
 
 interface TableWatchlistProps {
 	watchlist: UserWatchlist[];
@@ -33,7 +33,7 @@ const TableWatchlist = ({
 	refetch,
 } : TableWatchlistProps) => {
 	const { inset } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const backdrops = React.useMemo(() => {
 		return watchlist.map((watchlist) => watchlist.media?.backdrop_url);
 	}, [watchlist]);
@@ -86,7 +86,7 @@ const TableWatchlist = ({
 		headerHeight={headerHeight}
 		headerOverlayHeight={headerOverlayHeight}
 		scrollY={scrollY}
-		title={capitalize(t('common.library.collection.watchlist.label'))}
+		title={capitalize(t('common.messages.watchlist'))}
 		numberOfItems={watchlist.length}
 		backdrops={backdrops}
 		/>

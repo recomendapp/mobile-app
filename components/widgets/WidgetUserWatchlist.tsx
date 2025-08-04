@@ -2,13 +2,14 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useUserWatchlistQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Link } from "expo-router";
-import { useTranslation } from "react-i18next";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { CardMedia } from "@/components/cards/CardMedia";
 import { useTheme } from "@/providers/ThemeProvider";
 import { LegendList } from "@legendapp/list";
 import { ThemedText } from "../ui/ThemedText";
 import { Icons } from "@/constants/Icons";
+import { useTranslations } from "use-intl";
+import { upperFirst } from "lodash";
 
 interface WidgetUserWatchlistProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -21,9 +22,8 @@ export const WidgetUserWatchlist = ({
   containerStyle,
 } : WidgetUserWatchlistProps) => {
   const { colors } = useTheme();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { user } = useAuth();
-
   const { data: watchlist } = useUserWatchlistQuery({
     userId: user?.id,
     filters: {
@@ -41,7 +41,7 @@ export const WidgetUserWatchlist = ({
     <Link href={'/collection/watchlist'} style={labelStyle}>
       <View style={tw`flex-row items-center`}>
         <ThemedText style={tw`font-semibold text-xl`} numberOfLines={1}>
-          {t('widgets.user_watchlist.label')}
+          {upperFirst(t('common.messages.to_watch'))}
         </ThemedText>
         <Icons.ChevronRight color={colors.mutedForeground} />
       </View>

@@ -1,8 +1,6 @@
 import React from 'react';
 import tw from '@/lib/tw';
-import { useTranslation } from 'react-i18next';
 import { UserWatchlist } from '@/types/type.db';
-import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
@@ -13,6 +11,7 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BetterInput } from '@/components/ui/BetterInput';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
 
 interface BottomSheetWatchlistCommentProps extends BottomSheetProps {
   watchlistItem: UserWatchlist
@@ -23,8 +22,7 @@ const BottomSheetWatchlistComment = React.forwardRef<
   BottomSheetWatchlistCommentProps
 >(({ id, watchlistItem, ...props }, ref) => {
   const { closeSheet } = useBottomSheetStore();
-  const { colors, inset } = useTheme();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [comment, setComment] = React.useState(watchlistItem.comment || '');
   const updateWatchlist = useUserWatchlistUpdateMutation();
 
@@ -36,7 +34,7 @@ const BottomSheetWatchlistComment = React.forwardRef<
 	if (!watchlistItem?.id) {
 		Burnt.toast({
 			title: upperFirst(t('common.messages.error')),
-			message: upperFirst(t('common.errors.an_error_occurred')),
+			message: upperFirst(t('common.messages.an_error_occurred')),
 			preset: 'error',
 		});
 		return;
@@ -47,7 +45,7 @@ const BottomSheetWatchlistComment = React.forwardRef<
 	}, {
 		onSuccess: () => {
 			Burnt.toast({
-				title: upperFirst(t('common.word.saved')),
+				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
 				preset: 'done',
 			});
 			closeSheet(id);
@@ -55,7 +53,7 @@ const BottomSheetWatchlistComment = React.forwardRef<
 		onError: () => {
 			Burnt.toast({
 				title: upperFirst(t('common.messages.error')),
-				message: upperFirst(t('common.errors.an_error_occurred')),
+				message: upperFirst(t('common.messages.an_error_occurred')),
 				preset: 'error',
 			});
 		}
@@ -77,7 +75,7 @@ const BottomSheetWatchlistComment = React.forwardRef<
 		style={tw`h-24`}
 		/>
 		<Button loading={updateWatchlist.isPending} onPress={handleUpdateComment} disabled={updateWatchlist.isPending}>
-			{upperFirst(t('common.word.save'))}
+			{upperFirst(t('common.messages.save'))}
 		</Button>
     </ThemedTrueSheet>
   );

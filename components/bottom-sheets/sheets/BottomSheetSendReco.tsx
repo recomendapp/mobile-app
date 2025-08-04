@@ -1,6 +1,5 @@
 import React from 'react';
 import tw from '@/lib/tw';
-import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
 import { Media, User } from '@/types/type.db';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -23,6 +22,7 @@ import { FlatList, Pressable } from 'react-native-gesture-handler';
 import { useSharedValue } from 'react-native-reanimated';
 import { BetterInput } from '@/components/ui/BetterInput';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
 
 interface BottomSheetSendRecoProps extends BottomSheetProps {
   media: Media,
@@ -36,7 +36,7 @@ const BottomSheetSendReco = React.forwardRef<
 >(({ id, media, sizes = ["medium", "large"], ...props }, ref) => {
   const { colors, inset } = useTheme();
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { closeSheet } = useBottomSheetStore();
   const {
 		data: friends,
@@ -100,7 +100,7 @@ const BottomSheetSendReco = React.forwardRef<
 							break;
 						default:
 							Burnt.toast({
-                title: upperFirst(t('common.errors.an_error_occurred')),
+                title: upperFirst(t('common.messages.an_error_occurred')),
                 preset: 'error',
               })
 							break;
@@ -134,7 +134,7 @@ const BottomSheetSendReco = React.forwardRef<
         variant='outline'
         defaultValue={comment}
         onChangeText={setComment}
-        placeholder={upperFirst(t('common.messages.add_comment'))}
+        placeholder={upperFirst(t('common.messages.add_comment', { count: 1 }))}
         maxLength={COMMENT_MAX_LENGTH}
         autoCapitalize='sentences'
         />
@@ -184,7 +184,7 @@ const BottomSheetSendReco = React.forwardRef<
           variant='outline'
           defaultValue={search}
           onChangeText={setSearch}
-          placeholder={upperFirst(t('common.messages.search_friend'))}
+          placeholder={upperFirst(t('common.messages.search_user'))}
           autoCapitalize='none'
           autoCorrect={false}
           leftIcon='search'

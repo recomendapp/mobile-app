@@ -5,7 +5,6 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { User } from '@/types/type.db';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { upperCase, upperFirst } from 'lodash';
-import { useTranslation } from 'react-i18next';
 import { usePlaylistGuestsSearchInfinite } from '@/features/playlist/playlistQueries';
 import { Icons } from '@/constants/Icons';
 import { CardUser } from '@/components/cards/CardUser';
@@ -16,6 +15,7 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BetterInput } from '@/components/ui/BetterInput';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
 
 interface BottomSheetPlaylistGuestsAddProps extends BottomSheetProps {
   playlistId: number;
@@ -28,9 +28,9 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetPlaylistGuestsAddProps
 >(({ id, playlistId, guests: guestsParent, onAdd, onRemove, sizes, ...props }, ref) => {
-  const { colors, inset } = useTheme();
+  const { colors } = useTheme();
   const { closeSheet } = useBottomSheetStore();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [search, setSearch] = React.useState('');
   const searchQuery = useDebounce(search, 500);
   const [guests, setGuests] = React.useState(guestsParent);
@@ -63,7 +63,7 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
       <View style={tw`flex-row items-center justify-between w-full`}>
         <View style={tw`flex-1`}/>
         <ThemedText style={tw`flex-1 text-center font-bold`}>
-          {upperFirst(t('common.playlist.actions.add_guests'))}
+          {upperFirst(t('pages.playlist.actions.add_guests'))}
         </ThemedText>
         <TouchableOpacity
         style={tw`flex-1`}

@@ -10,8 +10,8 @@ import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { View, Pressable } from "react-native";
+import { useTranslations } from "use-intl";
 
 const GRID_COLUMNS = 3;
 export const PER_PAGE = GRID_COLUMNS * 5;
@@ -19,13 +19,13 @@ export const PER_PAGE = GRID_COLUMNS * 5;
 const ProfileCollectionScreen = () => {
 	const { colors } = useTheme();
 	const { username } = useLocalSearchParams();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const [display, setDisplay] = useState<'grid' | 'row'>('grid');
 	const sortByOptions = [
 		{ label: t('common.messages.watched_date'), value: 'watched_date' },
 		{ label: t('common.messages.rating'), value: 'rating' },
-		{ label: t('common.word.cancel'), value: 'cancel' },
+		{ label: t('common.messages.cancel'), value: 'cancel' },
 	];
 	const [sortBy, setSortBy] = useState<'watched_date' | 'rating'>('watched_date');
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');

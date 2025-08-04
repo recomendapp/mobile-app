@@ -1,6 +1,5 @@
 import React, { Fragment } from "react";
 import { UserRecosAggregated } from "@/types/type.db";
-import { useTranslation } from "react-i18next";
 import Animated, { SharedValue, useAnimatedScrollHandler } from "react-native-reanimated";
 import CollectionHeader from "../CollectionHeader";
 import { capitalize } from "lodash";
@@ -12,6 +11,7 @@ import { Columns } from "./components/columns";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { DataTableToolbar } from "./components/data-table-toolbar";
 import { useTheme } from "@/providers/ThemeProvider";
+import { useTranslations } from "use-intl";
 
 interface TableMyRecosProps {
 	recos: UserRecosAggregated[];
@@ -33,7 +33,7 @@ const TableMyRecos = ({
 	refetch,
 } : TableMyRecosProps) => {
 	const { inset } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const backdrops = React.useMemo(() => {
 		return recos.map((reco) => reco.media?.backdrop_url);
 	}, [recos]);

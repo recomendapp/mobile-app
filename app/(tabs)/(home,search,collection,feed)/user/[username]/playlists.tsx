@@ -10,22 +10,22 @@ import { FlashList } from "@shopify/flash-list";
 import { useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { View, Pressable } from "react-native";
+import { useTranslations } from "use-intl";
 
 const GRID_COLUMNS = 3;
 
 const ProfilePlaylistsScreen = () => {
 	const { colors } = useTheme();
 	const { username } = useLocalSearchParams();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const [display, setDisplay] = useState<'grid' | 'row'>('grid');
 	const sortByOptions = [
 		{ label: t('common.messages.created_at'), value: 'created_at' },
 		{ label: t('common.messages.updated_at'), value: 'updated_at' },
 		{ label: t('common.messages.likes_count'), value: 'likes_count' },
-		{ label: t('common.word.cancel'), value: 'cancel' },
+		{ label: t('common.messages.cancel'), value: 'cancel' },
 	];
 	const [sortBy, setSortBy] = useState<'created_at' | 'updated_at' | 'likes_count'>('updated_at');
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');

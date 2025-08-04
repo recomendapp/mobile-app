@@ -3,13 +3,13 @@ import { ThemedAnimatedView } from "@/components/ui/ThemedAnimatedView";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserRecosQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { capitalize } from "lodash";
-import { useTranslation } from "react-i18next";
+import { upperFirst } from "lodash";
 import { useSharedValue } from "react-native-reanimated";
 import TableMyRecos from "@/components/screens/collection/my-recos/TableMyRecos";
+import { useTranslations } from "use-intl";
 
 const MyRecosScreen = () => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { user } = useAuth();
 	const {
 		data: recos,
@@ -36,7 +36,7 @@ const MyRecosScreen = () => {
 					headerOverlayHeight.value = height;
 				}}
 				scrollY={scrollY}
-				title={capitalize(t('common.library.collection.watchlist.label'))}
+				title={upperFirst(t('common.messages.my_recos'))}
 				/>
 				<TableMyRecos
 				recos={recos}

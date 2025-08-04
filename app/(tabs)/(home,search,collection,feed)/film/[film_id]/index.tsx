@@ -2,7 +2,6 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { Media, MediaMoviePerson } from "@/types/type.db";
 import { CardMedia } from "@/components/cards/CardMedia";
@@ -20,6 +19,8 @@ import MediaWidgetPlaylists from "@/components/screens/media/MediaWidgetPlaylist
 import MediaWidgetReviews from "@/components/screens/media/MediaWidgetReviews";
 import MediaHeader from "@/components/screens/media/MediaHeader";
 import { RefreshControl } from "react-native-gesture-handler";
+import { useLocale, useTranslations } from "use-intl";
+import { Text } from "@/components/ui/text";
 
 const PADDING_BOTTOM = 8;
 
@@ -27,7 +28,8 @@ const FilmScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
 	const { colors, inset } = useTheme();
-	const { i18n, t } = useTranslation();
+	const locale = useLocale();
+	const t = useTranslations();
 	const { openSheet } = useBottomSheetStore();
 	const bottomTabBarHeight = useBottomTabOverflow();
 	const {
@@ -37,7 +39,7 @@ const FilmScreen = () => {
 		refetch,
 	} = useMediaMovieDetailsQuery({
 		id: movieId,
-		locale: i18n.language,
+		locale: locale,
 	});
 	const loading = movie === undefined || isLoading;
 	// States
@@ -99,7 +101,7 @@ const FilmScreen = () => {
 				style={tw.style('gap-1 px-4')}
 				onPress={() => setShowFullSynopsis((prev) => !prev)}
 				>
-					<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.word.overview'))}</ThemedText>
+					<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.overview'))}</ThemedText>
 					<ThemedText numberOfLines={showFullSynopsis ? undefined : 5} style={[{ color: colors.mutedForeground }, tw.style('text-justify')]}>
 						{movie.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
 					</ThemedText>
@@ -107,7 +109,7 @@ const FilmScreen = () => {
 				{/* CASTING */}
 				<View style={tw.style('gap-1')}> 
 					<ThemedText style={tw.style('px-4 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
-					{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <ThemedText style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_cast'))}</ThemedText>}
+					{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <Text style={tw`px-4`}>{upperFirst(t('common.messages.no_cast'))}</Text>}
 				</View>
 				<MediaWidgetPlaylists mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`}/>
 				<MediaWidgetReviews mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`}/>
