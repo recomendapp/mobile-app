@@ -7,7 +7,7 @@ import { Link } from 'expo-router';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
 import { GroupedInput, GroupedInputItem, Input } from '@/components/ui/Input';
-import { upperFirst } from 'lodash';
+import { upperCase, upperFirst } from 'lodash';
 import { Icons } from '@/constants/Icons';
 import * as Burnt from 'burnt';
 import app from '@/constants/app';
@@ -16,6 +16,7 @@ import { ImageBackground } from 'expo-image';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslations } from 'use-intl';
 import { Text } from '@/components/ui/text';
+import { View } from '@/components/ui/view';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
@@ -102,6 +103,14 @@ const LoginScreen = () => {
 						{/* SUBMIT BUTTON */}
 						<Button loading={isLoading} onPress={handleSubmit} style={tw`w-full rounded-xl`}>{t('pages.auth.login.form.submit')}</Button>
 					</KeyboardAvoidingView>
+					<View style={tw`gap-2 w-full`}>
+						<Link href={'/auth/login/otp'} replace asChild>
+							<Button variant="outline" icon={Icons.OTP}>
+								{upperCase(t('common.messages.otp'))}
+							</Button>
+						</Link>
+
+					</View>
 					{/* SIGNUP */}
 					<Text style={[{ color: colors.mutedForeground }, tw`text-right`]}>{t('pages.auth.login.no_account_yet')} <Link href={'/auth/signup'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.signup'))}</Link></Text>
 				</ScrollView>

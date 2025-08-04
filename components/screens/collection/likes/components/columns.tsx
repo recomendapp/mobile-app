@@ -49,7 +49,7 @@ export const Columns = () => {
 					label: upperFirst(t('common.messages.delete')),
 					onPress: () => Alert.alert(
 						upperFirst(t('pages.collection.heart_picks.modal.delete_confirm.label')),
-						upperFirst(t('pages.collection.heart_picks.modal.delete_confirm.description', { title: data.media!.title })),
+						upperFirst(t('pages.collection.heart_picks.modal.delete_confirm.description', { title: data.media!.title! })),
 						[
 							{
 								text: upperFirst(t('common.messages.cancel')),

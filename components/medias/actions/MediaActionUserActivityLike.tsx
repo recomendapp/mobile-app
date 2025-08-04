@@ -149,10 +149,6 @@ const MediaActionUserActivityLike = React.forwardRef<
 			<AlertCircleIcon size={ICON_SIZE} />
 		) : (
 			<Icons.like color={activity?.is_liked ? colors.accentPink : colors.foreground} fill={activity?.is_liked ? colors.accentPink : undefined} size={ICON_SIZE} />
-			// <AnimatedLikeIcon
-			// animatedProps={anim}
-			// size={ICON_SIZE}
-			// />
 		)}
 		</Pressable>
 	);

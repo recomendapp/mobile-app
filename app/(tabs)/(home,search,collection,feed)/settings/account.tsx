@@ -100,7 +100,7 @@ const AccountSettings = () => {
 
 	// useEffects
 	useEffect(() => {
-		if (!form.formState.errors.username?.message && usernameToCheck) {
+		if (!form.formState.errors.username?.message && usernameToCheck && usernameToCheck !== user?.username) {
 			usernameAvailability.check(usernameToCheck);
 		}
 	}, [usernameToCheck]);
@@ -154,7 +154,7 @@ const AccountSettings = () => {
 			)}
 			/>
 			<Button
-			loading={updateProfileMutation.isPending}
+			loading={isLoading}
 			onPress={form.handleSubmit(onSubmit)}
 			disabled={isLoading}
 			>

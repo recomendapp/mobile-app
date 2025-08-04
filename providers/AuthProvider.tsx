@@ -3,13 +3,13 @@ import { Session } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
 import { useUserQuery } from "@/features/user/userQueries";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AppState } from "react-native";
 import { supabase } from "@/lib/supabase/client";
 import app from "@/constants/app";
 import { useSplashScreen } from "./SplashScreenProvider";
-import { useLocale } from "use-intl";
 import { useLocaleContext } from "./LocaleProvider";
+import * as QueryParams from "expo-auth-session/build/QueryParams";
+import { makeRedirectUri } from "expo-auth-session";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -39,6 +39,7 @@ type AuthContextProps = {
 		redirectTo?: string;
 	}) => Promise<void>;
 	resetPasswordForEmail: (email: string) => Promise<void>;
+	createSessionFromUrl: (url: string) => Promise<Session | null>;
 };
 
 type AuthProviderProps = {
@@ -64,18 +65,7 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		});
 
 		supabase.auth.onAuthStateChange(async (_event, session) => {
-			if (session) {
-				const { data } = await supabase.auth.getUser();
-				if (!data.user) {
-					await supabase.auth.signOut();
-					setSession(null);
-				} else {
-					setSession(session);
-				}
-			} else {
-				setSession(null);
-
-			}
+			setSession(session);
 		});
 	}, []);
 
@@ -108,14 +98,23 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		const { error } = await supabase.auth.signInWithOtp({
 		email: email,
 		options: {
-			emailRedirectTo: `${app.domain}/auth/callback${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`,
+			// emailRedirectTo: `${app.domain}/auth/callback${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`,
+			emailRedirectTo: makeRedirectUri({
+				path: "/auth/callback",
+				queryParams: {
+					redirect: redirectTo ? encodeURIComponent(redirectTo) : undefined,
+				}
+			})
 		}
 		});
 		if (error) throw error;
 	};
 
 	const logout = async () => {
-		await supabase.auth.signOut();
+		console.log("Logging out...");
+		const { error } = await supabase.auth.signOut();
+		console.log("error", error?.code, error?.message);
+		if (error) throw error;
 	};
 
 	const signup = async (
@@ -145,9 +144,25 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 
 	const resetPasswordForEmail = async (email: string) => {
 		const { error } = await supabase.auth.resetPasswordForEmail(email, {
-			redirectTo: `${app.domain}/auth/reset-password`,
+			// redirectTo: `${app.domain}/auth/reset-password`,
+			redirectTo: makeRedirectUri({
+				path: "/auth/reset-password",
+			})
 		});
 		if (error) throw error;
+	};
+
+	const createSessionFromUrl = async (url: string) => {
+		const { params, errorCode } = QueryParams.getQueryParams(url);
+		if (errorCode) throw new Error(errorCode);
+		const { access_token, refresh_token } = params;
+		if (!access_token) throw new Error("No access token provided in the URL");
+		const { data, error } = await supabase.auth.setSession({
+			access_token,
+			refresh_token,
+		});
+		if (error) throw error;
+		return data.session;
 	};
 
 	return (
@@ -160,6 +175,7 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			logout: logout,
 			signup: signup,
 			resetPasswordForEmail: resetPasswordForEmail,
+			createSessionFromUrl: createSessionFromUrl,
 		}}
 		>
 			{children}

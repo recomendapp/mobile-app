@@ -1,6 +1,6 @@
 import * as React from "react"
-import { User, UserActivity, UserReview } from "@/types/type.db";
-import { JSONContent } from "@tiptap/react";
+import { JSONContent, User, UserActivity, UserReview } from "@/types/type.db";
+// import { JSONContent } from "@tiptap/react";
 import Animated from "react-native-reanimated";
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";

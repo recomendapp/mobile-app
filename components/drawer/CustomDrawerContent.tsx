@@ -9,9 +9,12 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
+import { upperFirst } from "lodash";
+import { useTranslations } from "use-intl";
 
 const CustomDrawerContent = (props: any) => {
     const router = useRouter();
+    const t = useTranslations();
     const { colors } = useTheme();
     const { user, logout } = useAuth();
 
@@ -84,7 +87,7 @@ const CustomDrawerContent = (props: any) => {
                 }}
                 style={tw.style("px-4")}
                 >
-                    <Text style={{ color: colors.destructive }}>Logout</Text>
+                    <Text style={{ color: colors.destructive }}>{upperFirst(t('common.messages.logout'))}</Text>
                 </Pressable>
             </SafeAreaView>
         </SafeAreaView>

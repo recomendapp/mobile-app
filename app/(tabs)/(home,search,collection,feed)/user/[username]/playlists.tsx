@@ -85,7 +85,6 @@ const ProfilePlaylistsScreen = () => {
 					</View>
 				)}
 				keyExtractor={(_, index) => index.toString()}
-				estimatedItemSize={190 * 15}
 				refreshing={isFetching}
 				numColumns={display === 'grid' ? GRID_COLUMNS : 1}
 				onEndReached={() => hasNextPage && fetchNextPage()}

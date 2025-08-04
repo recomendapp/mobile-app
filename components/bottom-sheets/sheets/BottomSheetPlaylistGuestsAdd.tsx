@@ -128,7 +128,6 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
             )
           )}
           keyExtractor={(item) => item.id}
-          estimatedItemSize={100}
           showsVerticalScrollIndicator={false}
           refreshing={isRefetching}
           // onRefresh={refetch}

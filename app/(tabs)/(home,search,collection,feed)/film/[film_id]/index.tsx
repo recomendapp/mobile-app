@@ -1,4 +1,3 @@
-import { ThemedText } from "@/components/ui/ThemedText";
 import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
@@ -101,15 +100,15 @@ const FilmScreen = () => {
 				style={tw.style('gap-1 px-4')}
 				onPress={() => setShowFullSynopsis((prev) => !prev)}
 				>
-					<ThemedText style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.overview'))}</ThemedText>
-					<ThemedText numberOfLines={showFullSynopsis ? undefined : 5} style={[{ color: colors.mutedForeground }, tw.style('text-justify')]}>
+					<Text style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.overview'))}</Text>
+					<Text variant="muted" numberOfLines={showFullSynopsis ? undefined : 5} style={tw.style('text-justify')}>
 						{movie.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
-					</ThemedText>
+					</Text>
 				</Pressable>
 				{/* CASTING */}
 				<View style={tw.style('gap-1')}> 
-					<ThemedText style={tw.style('px-4 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</ThemedText>
-					{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <Text style={tw`px-4`}>{upperFirst(t('common.messages.no_cast'))}</Text>}
+					<Text style={tw.style('px-4 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</Text>
+					{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <Text variant="muted" style={tw`px-4`}>{upperFirst(t('common.messages.no_cast'))}</Text>}
 				</View>
 				<MediaWidgetPlaylists mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`}/>
 				<MediaWidgetReviews mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`}/>
@@ -141,8 +140,8 @@ const FilmCast = ({
 					style={tw.style('w-full')}
 					/>
 					<View style={tw.style('flex-col gap-1 items-center')}>
-						<ThemedText numberOfLines={2}>{item.person?.title}</ThemedText>
-						{item.role?.character ? <ThemedText numberOfLines={2} style={[{ color: colors.accentYellow }, tw.style('italic text-sm')]}>{item.role?.character}</ThemedText> : null}
+						<Text numberOfLines={2}>{item.person?.title}</Text>
+						{item.role?.character ? <Text numberOfLines={2} style={[{ color: colors.accentYellow }, tw.style('italic text-sm')]}>{item.role?.character}</Text> : null}
 					</View>
 				</View>
 			</Link>
