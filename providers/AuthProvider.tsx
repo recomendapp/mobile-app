@@ -129,7 +129,13 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			email: credentials.email,
 			password: credentials.password,
 			options: {
-				emailRedirectTo: `${app.domain}/auth/callback${credentials.redirectTo ? `?redirect=${encodeURIComponent(credentials.redirectTo)}` : ''}`,
+				// emailRedirectTo: `${app.domain}/auth/callback${credentials.redirectTo ? `?redirect=${encodeURIComponent(credentials.redirectTo)}` : ''}`,
+				emailRedirectTo: makeRedirectUri({
+					path: "/auth/callback",
+					queryParams: {
+						redirect: credentials.redirectTo ? encodeURIComponent(credentials.redirectTo) : undefined,
+					}
+				}),
 				data: {
 					full_name: credentials.name,
 					username: credentials.username,
