@@ -2,15 +2,16 @@ import { Tabs, useRouter } from 'expo-router';
 import { Icons } from "@/constants/Icons";
 import { Platform } from 'react-native';
 import { useAuth } from '@/providers/AuthProvider';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/providers/ThemeProvider';
 import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/TabBar/TabBarBackground';
+import { useTranslations } from 'use-intl';
+import { upperFirst } from 'lodash';
 
 const TabsLayout = () => {
 	const { session } = useAuth();
 	const { colors } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const router = useRouter();
 	return (
 		<Tabs
@@ -30,14 +31,14 @@ const TabsLayout = () => {
 			<Tabs.Screen
 				name="(home)"
 				options={{
-					title: t('routes.home'),
+					title: upperFirst(t('common.messages.home')),
 					tabBarIcon: ({ color }) => <Icons.home size={28} color={color} />,
 				}}
 			/>
 			<Tabs.Screen
 				name="(search)"
 				options={{
-					title: t('routes.search'),
+					title: upperFirst(t('common.messages.search')),
 					tabBarIcon: ({ color }) => <Icons.Search size={28} color={color} />,
 				}}
 			/>
@@ -47,14 +48,14 @@ const TabsLayout = () => {
 				<Tabs.Screen
 					name="(feed)"
 					options={{
-						title: t('routes.feed'),
+						title: upperFirst(t('common.messages.feed')),
 						tabBarIcon: ({ color }) => <Icons.Feed size={28} color={color} />,
 					}}
 				/>
 				<Tabs.Screen
 					name="(collection)"
 					options={{
-						title: t('routes.library'),
+						title: upperFirst(t('common.messages.library')),
 						tabBarIcon: ({ color }) => <Icons.library size={28} color={color} />,
 					}}
 				/>
@@ -65,7 +66,7 @@ const TabsLayout = () => {
 				<Tabs.Screen
 				name='auth'
 				options={{
-					title: t('common.word.login'),
+					title: upperFirst(t('common.messages.login')),
 					tabBarIcon: ({ color }) => <Icons.User size={28} color={color} />,
 				}}
 				listeners={() => ({

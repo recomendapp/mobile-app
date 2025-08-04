@@ -3,13 +3,13 @@ import { ThemedAnimatedView } from "@/components/ui/ThemedAnimatedView";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserWatchlistQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { capitalize } from "lodash";
-import { useTranslation } from "react-i18next";
+import { upperFirst } from "lodash";
 import { useSharedValue } from "react-native-reanimated";
 import TableWatchlist from "@/components/screens/collection/watchlist/TableWatchlist";
+import { useTranslations } from "use-intl";
 
 const WatchlistScreen = () => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { user } = useAuth();
 	const {
 		data: watchlist,
@@ -36,7 +36,7 @@ const WatchlistScreen = () => {
 					headerOverlayHeight.value = height;
 				}}
 				scrollY={scrollY}
-				title={capitalize(t('common.library.collection.watchlist.label'))}
+				title={upperFirst(t('common.messages.watchlist'))}
 				/>
 				<TableWatchlist
 				watchlist={watchlist}

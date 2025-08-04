@@ -6,7 +6,8 @@ import { ThemeProvider } from "./ThemeProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetManager } from "@/components/bottom-sheets/BottomSheetManager";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import SplashScreenController from "@/components/SplashScreenController";
+import { SplashScreenProvider } from "./SplashScreenProvider";
+import { LocaleProvider } from "./LocaleProvider";
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -16,20 +17,23 @@ const Providers = ({ children } : ProvidersProps) => {
 	return (
 	<GestureHandlerRootView style={{ flex: 1 }}>	
 		<SafeAreaProvider>
-			<ThemeProvider>
-				<ActionSheetProvider>
-					<SupabaseProvider>
-						<ReactQueryProvider>
-							<AuthProvider>	
-								<SplashScreenController>
-									{children}
-									<BottomSheetManager />
-								</SplashScreenController>
-							</AuthProvider>
-						</ReactQueryProvider>
-					</SupabaseProvider>
-				</ActionSheetProvider>
-			</ThemeProvider>
+			<SplashScreenProvider>
+				<LocaleProvider>
+					<ThemeProvider>
+						<ActionSheetProvider>
+							<SupabaseProvider>
+								<ReactQueryProvider>
+									<AuthProvider>	
+											{children}
+											<BottomSheetManager />
+									</AuthProvider>
+								</ReactQueryProvider>
+							</SupabaseProvider>
+						</ActionSheetProvider>
+					</ThemeProvider>
+
+				</LocaleProvider>
+			</SplashScreenProvider>
 		</SafeAreaProvider>
 	</GestureHandlerRootView>
 	)

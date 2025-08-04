@@ -1,7 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { UserRecosAggregated } from '@/types/type.db';
-import { capitalize, upperFirst } from 'lodash';
-import { useTranslation } from 'react-i18next';
+import { upperFirst } from 'lodash';
 import { DataTableColumnHeader } from './data-table-column-header';
 import { DataTableItem } from './data-table-item';
 import React from 'react';
@@ -10,14 +9,15 @@ import { useUserRecosCompleteMutation, useUserRecosDeleteMutation } from '@/feat
 import BottomSheetMedia from '@/components/bottom-sheets/sheets/BottomSheetMedia';
 import { Icons } from '@/constants/Icons';
 import * as Burnt from 'burnt';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useTheme } from '@/providers/ThemeProvider';
 import BottomSheetMyRecosSenders from '@/components/bottom-sheets/sheets/BottomSheetMyRecosSenders';
 import { Alert } from 'react-native';
+import { useTranslations } from 'use-intl';
+import { Pressable } from 'react-native-gesture-handler';
 
 export const Columns = () => {
 	const { colors } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { openSheet } = useBottomSheetStore();
 	const deleteReco = useUserRecosDeleteMutation();
 	const completeReco = useUserRecosCompleteMutation();
@@ -29,14 +29,14 @@ export const Columns = () => {
 		}, {
 			onSuccess: () => {
 				Burnt.toast({
-					title: capitalize(t('common.word.deleted')),
+					title: upperFirst(t('common.messages.deleted', { count: 1, gender: 'male' })),
 					preset: 'done',
 				});
 			},
 			onError: () => {
 				Burnt.toast({
 					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.errors.an_error_occurred')),
+					message: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
 				});
 			}
@@ -50,14 +50,14 @@ export const Columns = () => {
 		}, {
 			onSuccess: () => {
 				Burnt.toast({
-					title: capitalize(t('common.messages.completed')),
+					title: upperFirst(t('common.messages.completed', { count: 1, gender: 'male' })),
 					preset: 'done',
 				});
 			},
 			onError: () => {
 				Burnt.toast({
 					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.errors.an_error_occurred')),
+					message: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
 				});
 			}
@@ -72,11 +72,11 @@ export const Columns = () => {
 					icon: Icons.Check,
 					label: upperFirst(t('common.messages.complete')),
 					onPress: () => Alert.alert(
-						capitalize(t('common.library.collection.my_recos.modal.complete_confirm.title')),
-						upperFirst(t('common.library.collection.my_recos.modal.complete_confirm.description', { title: data.media!.title })),
+						upperFirst(t('pages.collection.my_recos.modal.complete_confirm.title')),
+						upperFirst(t('pages.collection.my_recos.modal.complete_confirm.description', { title: data.media!.title! })),
 						[
 							{
-								text: upperFirst(t('common.word.cancel')),
+								text: upperFirst(t('common.messages.cancel')),
 								style: 'cancel',
 							},
 							{
@@ -98,17 +98,17 @@ export const Columns = () => {
 			additionalItemsBottom: [
 				{
 					icon: Icons.Delete,
-					label: upperFirst(t('common.word.delete')),
+					label: upperFirst(t('common.messages.delete')),
 					onPress: () => Alert.alert(
-						capitalize(t('common.library.collection.my_recos.modal.delete_confirm.title')),
-						upperFirst(t('common.library.collection.my_recos.modal.delete_confirm.description', { title: data.media!.title })),
+						upperFirst(t('common.library.collection.my_recos.modal.delete_confirm.title')),
+						upperFirst(t('common.library.collection.my_recos.modal.delete_confirm.description', { title: data.media!.title! })),
 						[
 							{
-								text: upperFirst(t('common.word.cancel')),
+								text: upperFirst(t('common.messages.cancel')),
 								style: 'cancel',
 							},
 							{
-								text: upperFirst(t('common.word.delete')),
+								text: upperFirst(t('common.messages.delete')),
 								onPress: () => handleDeleteReco(data.user_id!, data.media_id!),
 								style: 'destructive',
 							}
@@ -124,10 +124,10 @@ export const Columns = () => {
 			id: 'item',
 			accessorFn: (row) => row?.media?.title,
 			meta: {
-				displayName: capitalize(t('common.messages.title')),
+				displayName: upperFirst(t('common.messages.title')),
 			},
 			header: ({ column }) => (
-			<DataTableColumnHeader column={column} title={capitalize(t('common.messages.item', { count: 1 }))} />
+			<DataTableColumnHeader column={column} title={upperFirst(t('common.messages.item', { count: 1 }))} />
 			),
 			cell: ({ row }) => <DataTableItem key={row.index} item={row} openSheet={handleOpenSheet} />,
 			enableHiding: false,
@@ -135,11 +135,11 @@ export const Columns = () => {
 		{
 			id: 'actions',
 			cell: ({ row }) => (
-				<TouchableOpacity
+				<Pressable
 				onPress={() => handleOpenSheet(row.original)}
 				>
 					<Icons.EllipsisHorizontal color={colors.foreground}/>
-				</TouchableOpacity>
+				</Pressable>
 			),
 		},
 		// Sorting columns
@@ -147,14 +147,14 @@ export const Columns = () => {
 			id: 'created_at',
 			accessorFn: (row) => row.created_at,
 			meta: {
-				displayName: capitalize(t('common.messages.added_date')),
+				displayName: upperFirst(t('common.messages.date_added')),
 			},
 		},
 		{
 			id: 'by',
       		accessorFn: (row) => row?.senders.length,
 			meta: {
-				displayName: capitalize(t('common.messages.added_by')),
+				displayName: upperFirst(t('common.messages.added_by')),
 			},
 		}
 	], []);

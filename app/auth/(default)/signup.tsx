@@ -10,7 +10,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import useDebounce from '@/hooks/useDebounce';
 import { useUsernameAvailability } from '@/hooks/useUsernameAvailability';
-import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -24,6 +23,7 @@ import { useRandomImage } from '@/hooks/useRandomImage';
 import { InputOTP } from '@/components/ui/input-otp';
 import { Text } from '@/components/ui/text';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
+import { useLocale, useTranslations } from 'use-intl';
 
 const backgroundImages = [
 	require('@/assets/images/auth/signup/background/1.gif'),
@@ -42,7 +42,8 @@ const SignupScreen = () => {
 	const { colors, inset } = useTheme();
 	const { signup, loginWithOtp } = useAuth();
 	const [ isLoading, setIsLoading ] = useState(false);
-	const { t, i18n } = useTranslation();
+	const locale = useLocale();
+	const t = useTranslations();
 	const bgImage = useRandomImage(backgroundImages);
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
@@ -137,7 +138,7 @@ const SignupScreen = () => {
 				name: data.full_name,
 				username: data.username,
 				password: data.password,
-				language: i18n.language,
+				language: locale,
 			});
 			Burnt.toast({
 				title: upperFirst(t('common.form.success')),
@@ -163,7 +164,7 @@ const SignupScreen = () => {
 			} else {
 				Burnt.toast({
 					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.errors.an_error_occurred')),
+					message: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
 				});
 			}
@@ -198,7 +199,7 @@ const SignupScreen = () => {
 			} else {
 				Burnt.toast({
 					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.errors.an_error_occurred')),
+					message: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
 				});
 			}
@@ -292,7 +293,7 @@ const SignupScreen = () => {
 						behavior={Platform.OS === 'ios' ? 'padding' : undefined}
 						style={tw.style('w-full gap-4')}
 						>
-							<GroupedInput title={t('pages.auth.signup.label', { app: app.name })} titleStyle={tw`text-center text-xl font-bold`}>
+							<GroupedInput title={upperFirst(t('common.messages.signup'))} titleStyle={tw`text-center text-xl font-bold`}>
 								<Controller
 								name="email"
 								control={form.control}
@@ -403,11 +404,11 @@ const SignupScreen = () => {
 							loading={isLoading}
 							style={tw.style('w-full rounded-xl')}
 							>
-								{t('pages.auth.signup.form.submit')}
+								{upperFirst(t('common.messages.signup'))}
 							</Button>
 						</KeyboardAvoidingView>
 						{/* SIGNUP */}
-						<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>{t('pages.auth.signup.return_to_login')} <Link href={'/auth/login'} replace style={{ color: colors.accentYellow }}>{t('common.word.login')}</Link></Text>
+						<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>{t('pages.auth.signup.return_to_login')} <Link href={'/auth/login'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.login'))}</Link></Text>
 						</>
 					) : (
 						<>

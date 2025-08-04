@@ -5,8 +5,7 @@ import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
 import { Button } from "@/components/ui/Button";
@@ -14,13 +13,14 @@ import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
 import useDebounce from "@/hooks/useDebounce";
 import { Input } from "@/components/ui/Input";
 import { Icons } from "@/constants/Icons";
+import { useTranslations } from "use-intl";
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
 
 const AccountSettings = () => {
 	const { user, session } = useAuth();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { colors } = useTheme();
 	const updateProfileMutation = useUserUpdateMutation({
 		userId: user?.id,
@@ -85,7 +85,7 @@ const AccountSettings = () => {
 				});
 			}
 			Burnt.toast({
-				title: t('common.word.saved'),
+				title: t('common.messages.saved', { count: 1, gender: 'male' }),
 				preset: 'done',
 			})
 		} catch (error: any) {
@@ -158,7 +158,7 @@ const AccountSettings = () => {
 			onPress={form.handleSubmit(onSubmit)}
 			disabled={isLoading}
 			>
-				{t('common.word.save')}
+				{t('common.messages.save')}
 			</Button>
 		</>
 	)

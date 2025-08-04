@@ -9,10 +9,10 @@ import { AnimatedImageWithFallback } from "@/components/ui/AnimatedImageWithFall
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { CardUser } from "@/components/cards/CardUser";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTranslations } from "use-intl";
 
 interface PlaylistHeaderProps
 	extends React.ComponentPropsWithoutRef<typeof Animated.View> {
@@ -30,7 +30,7 @@ const PlaylistHeader = forwardRef<
 >(({ playlist, loading, headerHeight, headerOverlayHeight, scrollY, backdrops, ...props }, ref) => {
 	const { colors, inset } = useTheme();
 	const { hslToRgb } = useColorConverter();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const bgBackdrop = useRandomBackdrop(backdrops);
 	const bgColor = hslToRgb(colors.background);
 	const posterHeight = useSharedValue(0);
@@ -175,9 +175,9 @@ const PlaylistHeader = forwardRef<
 				]}
 				>
 					{playlist ? <ThemedText>
-						<ThemedText style={{ color: colors.accentYellow }}>{upperFirst('playlist')}</ThemedText>
+						<ThemedText style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.playlist', { count: 1 }))}</ThemedText>
 						{" | "}
-						{playlist.private ? upperFirst(t('common.messages.private', { context: 'female' })) : upperFirst(t('common.messages.public', { context: 'female' }))}
+						{playlist.private ? upperFirst(t('common.messages.private', { gender: 'female', count: 1 })) : upperFirst(t('common.messages.public', { gender: 'female', count: 1 }))}
 					</ThemedText> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
 					{/* TITLE */}
 					{!loading ? (
@@ -188,7 +188,7 @@ const PlaylistHeader = forwardRef<
 							(!playlist && !loading) && { textAlign: 'center', color: colors.mutedForeground }
 						]}
 						>
-							{playlist?.title ?? upperFirst(t('common.errors.playlist_not_found'))}
+							{playlist?.title ?? upperFirst(t('common.messages.playlist_not_found'))}
 						</ThemedText>
 					) : <Skeleton style={tw.style('w-64 h-12')} />}
 					{playlist ? (

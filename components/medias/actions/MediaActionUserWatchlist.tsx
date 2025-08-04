@@ -9,8 +9,8 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { Media } from "@/types/type.db";
 import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import * as Haptics from "expo-haptics";
+import { useTranslations } from "use-intl";
 
 const ICON_SIZE = 24;
 
@@ -25,7 +25,7 @@ const MediaActionUserWatchlist = React.forwardRef<
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { user } = useAuth();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const {
 		data: activity,
 	} = useUserActivityQuery({
@@ -50,7 +50,7 @@ const MediaActionUserWatchlist = React.forwardRef<
 		if (watchlist) return;
 		if (!user || !media.media_id) {
 			return Burnt.toast({
-				title: upperFirst(t('common.errors.an_error_occurred')),
+				title: upperFirst(t('common.messages.an_error_occurred')),
 				preset: 'error',
 			});
 		}
@@ -60,7 +60,7 @@ const MediaActionUserWatchlist = React.forwardRef<
 		}, {
 		  onError: () => {
 			Burnt.toast({
-				title: upperFirst(t('common.errors.an_error_occurred')),
+				title: upperFirst(t('common.messages.an_error_occurred')),
 				preset: 'error',
 			});
 		  }
@@ -70,7 +70,7 @@ const MediaActionUserWatchlist = React.forwardRef<
 		if (!watchlist) return;
 		if (!watchlist.id) {
 			return Burnt.toast({
-				title: upperFirst(t('common.errors.an_error_occurred')),
+				title: upperFirst(t('common.messages.an_error_occurred')),
 				preset: 'error',
 			});
 		}
@@ -79,7 +79,7 @@ const MediaActionUserWatchlist = React.forwardRef<
 		}, {
 		  onError: () => {
 			Burnt.toast({
-				title: upperFirst(t('common.errors.an_error_occurred')),
+				title: upperFirst(t('common.messages.an_error_occurred')),
 				preset: 'error',
 			});
 		  }

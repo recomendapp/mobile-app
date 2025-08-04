@@ -10,7 +10,6 @@ import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
 } from 'react-native-reanimated';
-import { useTranslation } from 'react-i18next';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
 import { lowerCase, upperFirst } from 'lodash';
@@ -33,6 +32,7 @@ import { useMediaFollowersAverageRatingQuery } from '@/features/media/mediaQueri
 import { Pressable } from 'react-native-gesture-handler';
 import BottomSheetMediaFollowersAverageRating from '@/components/bottom-sheets/sheets/BottomSheetMediaFollowersAverageRating';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
+import { useTranslations } from 'use-intl';
 
 interface MediaHeaderProps {
 	media?: Media | null;
@@ -49,7 +49,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 	headerOverlayHeight,
 }) => {
 	const { openSheet } = useBottomSheetStore();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { hslToRgb } = useColorConverter();
 	const { colors, inset } = useTheme();
 	const bgColor = hslToRgb(colors.background);
@@ -216,10 +216,10 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 					]}
 					>
 						{media?.title ?? (
-							media?.media_type === 'tv_series' ? upperFirst(t('common.errors.tv_series_not_found')) :
-							media?.media_type === 'person' ? upperFirst(t('common.errors.person_not_found')) :
-							media?.media_type === 'movie' ? upperFirst(t('common.errors.film_not_found')) :
-							upperFirst(t('common.errors.media_not_found'))
+							media?.media_type === 'tv_series' ? upperFirst(t('common.messages.tv_series_not_found')) :
+							media?.media_type === 'person' ? upperFirst(t('common.messages.person_not_found')) :
+							media?.media_type === 'movie' ? upperFirst(t('common.messages.film_not_found')) :
+							upperFirst(t('common.messages.media_not_found'))
 						)}
 					</ThemedText>
 				) : <Skeleton style={tw.style('w-64 h-12')} />}

@@ -5,7 +5,6 @@ import tw from '@/lib/tw';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { upperFirst } from 'lodash';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { Dimensions, FlatList, View } from 'react-native';
 import Animated, { clamp, interpolate, runOnJS, SharedValue, useAnimatedProps, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
@@ -20,6 +19,7 @@ import { useUserActivityInsertMutation, useUserActivityUpdateMutation } from '@/
 import * as Burnt from 'burnt';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
 
 const { width } = Dimensions.get('screen');
 const ITEM_WIDTH = width * 0.2;
@@ -99,7 +99,7 @@ const BottomSheetMediaRating = React.forwardRef<
 >(({ id, media, onRatingChange, sizes, ...props }, ref) => {
 	const { user } = useAuth();
 	const { colors, inset } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { closeSheet } = useBottomSheetStore();
 	const {
 		data: activity,
@@ -143,7 +143,7 @@ const BottomSheetMediaRating = React.forwardRef<
 			}, {
 				onError: () => {
 					Burnt.toast({
-						title: upperFirst(t('common.errors.an_error_occurred')),
+						title: upperFirst(t('common.messages.an_error_occurred')),
 						preset: 'error',
 					});
 				}
@@ -156,7 +156,7 @@ const BottomSheetMediaRating = React.forwardRef<
 			}, {
 				onError: () => {
 					Burnt.toast({
-						title: upperFirst(t('common.errors.an_error_occurred')),
+						title: upperFirst(t('common.messages.an_error_occurred')),
 						preset: 'error',
 					});
 				}
@@ -166,7 +166,7 @@ const BottomSheetMediaRating = React.forwardRef<
 	const handleUnrate = async () => {
 		if (activity?.review) {
 			return Burnt.toast({
-				title: upperFirst(t('common.errors.an_error_occurred')),
+				title: upperFirst(t('common.messages.an_error_occurred')),
 				message: 'You cannot unrate a media with a review.',
 				duration: 3,
 				haptic: 'error',
@@ -179,7 +179,7 @@ const BottomSheetMediaRating = React.forwardRef<
 		}, {
 			onError: () => {
 				Burnt.toast({
-					title: upperFirst(t('common.errors.an_error_occurred')),
+					title: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
 				});
 			}
@@ -222,7 +222,7 @@ const BottomSheetMediaRating = React.forwardRef<
 							Delete
 						</Button>
 						<Button variant="accent-yellow" onPress={handleSaveRating} style={{ flex: 1 }}>
-							{upperFirst(t('common.word.save'))}
+							{upperFirst(t('common.messages.save'))}
 						</Button>
 					</>
 				) : (

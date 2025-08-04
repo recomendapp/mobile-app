@@ -2,7 +2,6 @@ import { ImageWithFallback } from '../utils/ImageWithFallback';
 import { Playlist } from '@/types/type.db';
 import React from 'react';
 import Animated from 'react-native-reanimated';
-import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { ThemedText } from '../ui/ThemedText';
 import { useRouter } from 'expo-router';
@@ -11,6 +10,7 @@ import { Text } from 'react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import BottomSheetPlaylist from '../bottom-sheets/sheets/BottomSheetPlaylist';
+import { useTranslations } from 'use-intl';
 
 interface CardPlaylistProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -24,7 +24,7 @@ const CardPlaylistDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	Omit<CardPlaylistProps, "variant">
 >(({ style, playlist, showPlaylistAuthor = true, showItemsCount = false, children, ...props }, ref) => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { colors } = useTheme();
 	return (
 		<Animated.View
@@ -44,7 +44,7 @@ const CardPlaylistDefault = React.forwardRef<
 			<View>
 				<ThemedText numberOfLines={2} style={tw.style("font-medium")}>{playlist?.title}</ThemedText>
 				{showPlaylistAuthor ? <Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
-					{t('common.messages.by_name', { name: playlist.user?.username })}
+					{t('common.messages.by_name', { name: playlist.user?.username! })}
 				</Text> : null}
 				{showItemsCount ? <Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
 					{t('common.messages.item_count', { count: playlist.items_count })}

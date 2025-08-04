@@ -9,9 +9,9 @@ import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, Materi
 import { ParamListBase, TabNavigationState } from "@react-navigation/native";
 import { withLayoutContext } from "expo-router";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
 import Animated from "react-native-reanimated";
+import { useTranslations } from "use-intl";
 
 const { Navigator } = createMaterialTopTabNavigator();
 
@@ -66,7 +66,7 @@ const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBar
 };
 
 const SettingsLayout = () => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { colors } = useTheme();
 	return (
 		<ThemedSafeAreaView style={tw.style('flex-1')}>

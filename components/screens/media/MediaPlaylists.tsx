@@ -9,8 +9,8 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useCallback, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
+import { useTranslations } from "use-intl";
 
 const PADDING_BOTTOM = 8;
 
@@ -26,7 +26,7 @@ interface MediaPlaylistsProps {
 const MediaPlaylists = ({
 	mediaId,
 } : MediaPlaylistsProps) => {
-	const { t, i18n } = useTranslation();
+	const t = useTranslations();
 	const { colors, inset } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const bottomTabBarHeight = useBottomTabOverflow();
@@ -57,7 +57,7 @@ const MediaPlaylists = ({
 	const handleSortBy = useCallback(() => {
 		const sortByOptionsWithCancel = [
 			...sortByOptions,
-			{ label: upperFirst(t('common.word.cancel')), value: 'cancel' },
+			{ label: upperFirst(t('common.messages.cancel')), value: 'cancel' },
 		];
 		const cancelIndex = sortByOptionsWithCancel.length - 1;
 		showActionSheetWithOptions({

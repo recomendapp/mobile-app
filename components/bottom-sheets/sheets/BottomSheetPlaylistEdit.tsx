@@ -3,7 +3,6 @@ import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
-import { useTranslation } from 'react-i18next';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { Playlist } from '@/types/type.db';
 import * as z from 'zod';
@@ -22,6 +21,7 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BetterInput } from '@/components/ui/BetterInput';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
 
 interface BottomSheetPlaylistEditProps extends BottomSheetProps {
   playlist: Playlist;
@@ -39,7 +39,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
   const supabase = useSupabaseClient();
   const { closeSheet } = useBottomSheetStore();
   const { colors, inset } = useTheme();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { showActionSheetWithOptions } = useActionSheet();
   const updatePlaylistMutation = usePlaylistUpdateMutation();
   const [newPoster, setNewPoster] = React.useState<ImagePicker.ImagePickerAsset | null | undefined>(undefined);
@@ -71,7 +71,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
 		{ label: upperFirst(t('common.messages.choose_from_the_library')), value: "library" },
 		{ label: upperFirst(t('common.messages.take_a_photo')), value: "camera" },
     { label: upperFirst(t('common.messages.delete_current_image')), value: "delete", disable: !playlist.poster_url && !newPoster },
-		{ label: upperFirst(t("common.word.cancel")), value: "cancel" },
+		{ label: upperFirst(t("common.messages.cancel")), value: "cancel" },
 	], [t, playlist.poster_url, newPoster]);
 
   const handlePosterOptions = () => {
@@ -101,7 +101,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
           if (!hasPermission.granted) {
             Burnt.toast({
               title: upperFirst(t('common.messages.error')),
-              message: upperFirst(t('common.errors.camera_permission_denied')),
+              message: upperFirst(t('common.messages.camera_permission_denied')),
               preset: 'error',
             });
             return;
@@ -153,7 +153,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
       }, {
         onSuccess: async (playlist) => {
           Burnt.toast({
-            title: upperFirst(t('common.word.saved')),
+            title: upperFirst(t('common.messages.saved')),
             preset: 'done',
           });
           onEdit && onEdit(playlist);
@@ -162,7 +162,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
         onError: (error) => {
           Burnt.toast({
             title: upperFirst(t('common.messages.error')),
-            message: upperFirst(t('common.errors.an_error_occurred')),
+            message: upperFirst(t('common.messages.an_error_occurred')),
             preset: 'error',
           });
         }
@@ -177,7 +177,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
       } else {
         Burnt.toast({
           title: upperFirst(t('common.messages.error')),
-          message: upperFirst(t('common.errors.an_error_occurred')),
+          message: upperFirst(t('common.messages.an_error_occurred')),
           preset: 'error',
         });
       }
@@ -195,16 +195,16 @@ const BottomSheetPlaylistEdit = React.forwardRef<
         <TouchableOpacity
         onPress={() => closeSheet(id)}
         >
-          <ThemedText>{upperFirst(t('common.word.cancel'))}</ThemedText>
+          <ThemedText>{upperFirst(t('common.messages.cancel'))}</ThemedText>
         </TouchableOpacity>
         <ThemedText style={tw`font-bold`}>
-          {upperFirst(t('common.playlist.actions.edit'))}
+          {upperFirst(t('pages.playlist.actions.edit'))}
         </ThemedText>
         <TouchableOpacity
         onPress={form.handleSubmit(submit)}
         disabled={updatePlaylistMutation.isPending}
         >
-          <ThemedText>{upperFirst(t('common.word.save'))}</ThemedText>
+          <ThemedText>{upperFirst(t('common.messages.save'))}</ThemedText>
         </TouchableOpacity>
       </View>
       <TouchableOpacity onPress={handlePosterOptions} style={tw`relative aspect-square rounded-md overflow-hidden w-2/4`}>
@@ -222,7 +222,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
         <View style={tw`gap-2 w-full`}>
           <BetterInput
           variant='outline'
-          placeholder={upperFirst(t('common.playlist.form.title.placeholder'))}
+          placeholder={upperFirst(t('pages.playlist.form.title.placeholder'))}
           value={value}
           autoCorrect={false}
           onBlur={onBlur}
@@ -243,7 +243,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
         <View style={tw`gap-2 w-full`}>
           <BetterInput
           variant='outline'
-          placeholder={upperFirst(t('common.word.description'))}
+          placeholder={upperFirst(t('common.messages.description'))}
           style={tw`h-24`}
           multiline
           value={value ?? ''}
@@ -265,7 +265,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
         control={form.control}
         render={({ field: { onChange, onBlur, value} }) => (
           <View style={tw`flex-row items-center gap-2`}>
-            <ThemedText>{upperFirst(t('common.messages.private', { context: 'female' }))}</ThemedText>
+            <ThemedText>{upperFirst(t('common.messages.private', { gender: 'female', count: 1 }))}</ThemedText>
             <Switch
             value={value}
             onValueChange={onChange}

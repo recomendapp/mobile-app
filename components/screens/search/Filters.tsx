@@ -1,44 +1,36 @@
 import { Button } from "@/components/ui/Button";
-import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import useSearchStore from "@/stores/useSearchStore";
 import { upperFirst } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
+import { useTranslations } from "use-intl";
 
-interface FiltersProps {
-	
-}
-
-const Filters = ({
-
-} : FiltersProps) => {
-	const { colors } = useTheme();
-	const { t } = useTranslation();
+const Filters = () => {
+	const t = useTranslations();
 	const { filter, setFilter } = useSearchStore(state => state);
 	const ref = useRef<FlatList>(null);
 	const filters: { label: string, value: typeof filter }[] = useMemo(() => (
 		[
 			{
-				label: "Movies",
+				label: upperFirst(t('common.messages.film', { count: 2 })),
 				value: "movies"
 			},
 			{
-				label: "TV Series",
+				label: upperFirst(t('common.messages.tv_series', { count: 2 })),
 				value: "tv_series"
 			},
 			{
-				label: "Playlists",
+				label: upperFirst(t('common.messages.playlist', { count: 2 })),
 				value: "playlists"
 			},
 			{
-				label: "Persons",
+				label: upperFirst(t('common.messages.person', { count: 2 })),
 				value: "persons"
 			},
 			{
-				label: "Users",
+				label: upperFirst(t('common.messages.user', { count: 2 })),
 				value: "users"
 			},
 		]

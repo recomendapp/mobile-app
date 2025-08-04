@@ -2,19 +2,20 @@ import { useMediaTvSeriesDetailsQuery } from '@/features/media/mediaQueries';
 import { getIdFromSlug } from '@/hooks/getIdFromSlug';
 import { useTheme } from '@/providers/ThemeProvider';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { head, upperFirst } from 'lodash';
-import { useTranslation } from 'react-i18next';
+import { upperFirst } from 'lodash';
+import { useLocale, useTranslations } from 'use-intl';
 
 const TvSeriesLayout = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
-	const { t, i18n } = useTranslation();
+	const locale = useLocale();
+	const t = useTranslations();
 	const { colors } = useTheme();
 	const {
 		data: series,
 	} = useMediaTvSeriesDetailsQuery({
 		id: seriesId,
-		locale: i18n.language,
+		locale: locale,
 	});
 	return (
 		<Stack

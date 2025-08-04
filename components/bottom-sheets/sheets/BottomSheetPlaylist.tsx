@@ -1,6 +1,5 @@
 import React from 'react';
 import tw from '@/lib/tw';
-import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
 import { Playlist } from '@/types/type.db';
 import { usePathname, useRouter } from 'expo-router';
@@ -22,6 +21,7 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { ScrollView } from 'react-native-gesture-handler';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
 
 interface BottomSheetPlaylistProps extends BottomSheetProps {
   playlist: Playlist,
@@ -46,7 +46,7 @@ const BottomSheetPlaylist = React.forwardRef<
   const { colors, inset } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
-  const { t } = useTranslation();
+  const t = useTranslations();
   // REFs
   const scrollRef = React.useRef<ScrollView>(null);
   const {
@@ -82,7 +82,7 @@ const BottomSheetPlaylist = React.forwardRef<
                   onError: () => {
                     Burnt.toast({
                       title: upperFirst(t('common.messages.error')),
-                      message: upperFirst(t('common.errors.an_error_occurred')),
+                      message: upperFirst(t('common.messages.an_error_occurred')),
                       preset: 'error',
                     });
                   }
@@ -94,7 +94,7 @@ const BottomSheetPlaylist = React.forwardRef<
                   onError: () => {
                     Burnt.toast({
                       title: upperFirst(t('common.messages.error')),
-                      message: upperFirst(t('common.errors.an_error_occurred')),
+                      message: upperFirst(t('common.messages.an_error_occurred')),
                       preset: 'error',
                     });
                   }
@@ -133,28 +133,28 @@ const BottomSheetPlaylist = React.forwardRef<
             onPress: () => openSheet(BottomSheetPlaylistGuests, {
               playlist: playlist,
             }),
-            label: upperFirst(t('common.messages.guest', { context: 'male', count: 2 })),
+            label: upperFirst(t('common.messages.guest', { gender: 'male', count: 2 })),
           },
           {
             icon: Icons.Delete,
             onPress: async () => {
               Alert.alert(
                 upperFirst(t('common.messages.are_u_sure')),
-                upperFirst(t('common.playlist.actions.delete.description', { title: playlist.title })),
+                upperFirst(t('pages.playlist.actions.delete.description', { title: playlist.title })),
                 [
                   {
-                    text: upperFirst(t('common.word.cancel')),
+                    text: upperFirst(t('common.messages.cancel')),
                     style: 'cancel',
                   },
                   {
-                    text: upperFirst(t('common.word.delete')),
+                    text: upperFirst(t('common.messages.delete')),
                     onPress: async () => {
                       await playlistDeleteMutation.mutateAsync(
                         { playlistId: playlist.id },
                         {
                           onSuccess: () => {
                             Burnt.toast({
-                              title: upperFirst(t('common.word.deleted')),
+                              title: upperFirst(t('common.messages.deleted')),
                               preset: 'done',
                             });
                             if (pathname.startsWith(`/playlist/${playlist.id}`)) {
@@ -164,7 +164,7 @@ const BottomSheetPlaylist = React.forwardRef<
                           },
                           onError: () => {
                             Burnt.toast({
-                              title: upperFirst(t('common.errors.an_error_occurred')),
+                              title: upperFirst(t('common.messages.an_error_occurred')),
                               preset: 'error',
                             });
                           },
@@ -176,7 +176,7 @@ const BottomSheetPlaylist = React.forwardRef<
                 ]
               )
             },
-            label: upperFirst(t('common.word.delete')),
+            label: upperFirst(t('common.messages.delete')),
             closeSheet: false,
           }
         ] : []),

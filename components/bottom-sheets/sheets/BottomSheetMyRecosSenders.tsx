@@ -1,6 +1,5 @@
 import React from 'react';
 import tw from '@/lib/tw';
-import { useTranslation } from 'react-i18next';
 import { UserRecosAggregated } from '@/types/type.db';
 import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
@@ -11,6 +10,7 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { FlashList } from '@shopify/flash-list';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
 
 interface BottomSheetMyRecosSendersProps extends BottomSheetProps {
   comments: UserRecosAggregated['senders'];
@@ -21,7 +21,7 @@ const BottomSheetMyRecosSenders = React.forwardRef<
   BottomSheetMyRecosSendersProps
 >(({ id, comments, sizes, ...props }, ref) => {
   const { colors, inset } = useTheme();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const flashlistRef = React.useRef<FlashList<UserRecosAggregated['senders'][number]>>(null);
   return (
     <ThemedTrueSheet

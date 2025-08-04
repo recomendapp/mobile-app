@@ -5,8 +5,8 @@ import { useSearchPlaylistsInfiniteQuery } from "@/features/search/searchQueries
 import tw from "@/lib/tw";
 import { FlashList } from "@shopify/flash-list";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Text, View } from "react-native";
+import { useTranslations } from "use-intl";
 
 const GRID_COLS = 3;
 
@@ -17,7 +17,7 @@ interface ResultPlaylistsProps {
 const ResultPlaylists = ({
 	search,
 } : ResultPlaylistsProps) => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { inset, colors } = useTheme();
 	const tabBarHeight = useBottomTabOverflow();
 	const {

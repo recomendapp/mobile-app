@@ -11,9 +11,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { userKeys } from "@/features/user/userKeys";
 import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import * as Haptics from "expo-haptics";
 import { interpolateColor, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
+import { useTranslations } from "use-intl";
 
 const ICON_SIZE = 24;
 
@@ -28,7 +28,7 @@ const MediaActionUserActivityLike = React.forwardRef<
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { user } = useAuth();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const queryClient = useQueryClient();
 	const {
 		data: activity,
@@ -58,7 +58,7 @@ const MediaActionUserActivityLike = React.forwardRef<
 				onError: () => {
 					isLiked.value = 0;
 					Burnt.toast({
-						title: upperFirst(t('errors.an_error_occurred')),
+						title: upperFirst(t('common.messages.an_error_occurred')),
 						preset: 'error',
 					});
 				}
@@ -77,7 +77,7 @@ const MediaActionUserActivityLike = React.forwardRef<
 				onError: () => {
 					isLiked.value = 0;
 					Burnt.toast({
-						title: upperFirst(t('errors.an_error_occurred')),
+						title: upperFirst(t('common.messages.an_error_occurred')),
 						preset: 'error',
 					});
 				}
@@ -98,7 +98,7 @@ const MediaActionUserActivityLike = React.forwardRef<
 			},
 			onError: () => {
 				Burnt.toast({
-					title: upperFirst(t('errors.an_error_occurred')),
+					title: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
 				});
 				isLiked.value = 1;

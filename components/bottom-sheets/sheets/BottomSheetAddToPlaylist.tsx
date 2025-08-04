@@ -1,13 +1,11 @@
 import React from 'react';
 import tw from '@/lib/tw';
-import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
 import { Media, Playlist } from '@/types/type.db';
 import { useTheme } from '@/providers/ThemeProvider';
-import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Text, TouchableWithoutFeedback, View } from 'react-native';
+import { TouchableWithoutFeedback, View } from 'react-native';
 import { useUserAddMediaToPlaylistQuery } from '@/features/user/userQueries';
 import { useAuth } from '@/providers/AuthProvider';
 import Fuse from "fuse.js";
@@ -26,6 +24,8 @@ import { FlashList } from '@shopify/flash-list';
 import { FlatList, Pressable } from 'react-native-gesture-handler';
 import { BetterInput } from '@/components/ui/BetterInput';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
+import { Text } from '@/components/ui/text';
 
 interface BottomSheetAddToPlaylistProps extends BottomSheetProps {
   media: Media,
@@ -39,7 +39,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
 >(({ id, media, sizes = ["medium", "large"], ...props }, ref) => {
   const { colors, inset } = useTheme();
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const queryClient = useQueryClient();
   const { closeSheet } = useBottomSheetStore();
   const BottomSheetPlaylistCreateRef = React.useRef<TrueSheet>(null);
@@ -88,7 +88,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
 			onError: () => {	
         Burnt.toast({
           title: upperFirst(t('common.messages.error')),
-          message: upperFirst(t('common.errors.an_error_occurred')),
+          message: upperFirst(t('common.messages.an_error_occurred')),
           preset: 'error',
         })
 			}
@@ -119,7 +119,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
         variant='outline'
         defaultValue={comment}
         onChangeText={setComment}
-        placeholder={upperFirst(t('common.messages.add_comment'))}
+        placeholder={upperFirst(t('common.messages.add_comment', { count: 1 }))}
         maxLength={COMMENT_MAX_LENGTH}
         autoCapitalize="sentences"
         />
@@ -140,7 +140,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
       ListHeaderComponent={
         <View style={[tw`gap-2 pb-2`, {paddingTop: 16, backgroundColor: colors.muted }]}>
           <View style={tw`gap-2 p-2`}>
-            <ThemedText style={tw`font-bold text-center`}>{upperFirst(t('common.messages.add_to_playlist'))}</ThemedText>
+            <Text style={tw`font-bold text-center`}>{upperFirst(t('common.messages.add_to_playlist'))}</Text>
             <FlashList
             data={selected}
             renderItem={({ item }) => (
@@ -161,8 +161,11 @@ const BottomSheetAddToPlaylist = React.forwardRef<
             style={tw`h-12`}
             contentContainerStyle={tw`w-full items-center justify-center gap-2`}
             ListEmptyComponent={() => (
-              <Text style={[{ color: colors.mutedForeground }, tw`text-center`]}>
-                Ajouter <Text style={tw`font-bold`}>{media?.title}</Text> à une playlist.
+              <Text variant='muted' style={tw`text-center`}>
+                {t.rich('common.messages.add_to_one_or_more_playlists', {
+                  title: media.title!,
+                  strong: (chunks) => <Text variant='muted' style={tw`font-bold`}>{chunks}</Text>
+                })}
               </Text>
             )}
             horizontal
@@ -188,7 +191,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
             BottomSheetPlaylistCreateRef.current?.present();
           }}
           >
-            {t('common.playlist.actions.create')}
+            {t('pages.playlist.actions.create')}
           </Button>
         </View>
       }
@@ -214,12 +217,12 @@ const BottomSheetAddToPlaylist = React.forwardRef<
               style={tw`rounded-md w-10 h-10`}
               type="playlist"
               />
-              <ThemedText style={tw`shrink`} numberOfLines={1}>{playlist.title}</ThemedText>
+              <Text style={tw`shrink`} numberOfLines={1}>{playlist.title}</Text>
             </View>
             <View style={tw`flex-row items-center gap-2 shrink-0`}>
                 {already_added && (
                   <Badge variant="destructive">
-                    {upperFirst(t('common.messages.already_added'))}
+                    {upperFirst(t('common.messages.already_added', { count: 1, gender: 'male' }))}
                   </Badge>
                 )}
                 <Icons.Check size={20} style={[{ color: colors.foreground }, tw`${!selected.some((selectedUser) => selectedUser?.id === playlist?.id) ? 'opacity-0' : ''}`]} />

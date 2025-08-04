@@ -1,15 +1,15 @@
 import { RowData, Table } from '@tanstack/react-table';
-import { capitalize } from 'lodash';
+import { upperFirst } from 'lodash';
 import { Icons } from '@/constants/Icons';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
-import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import BottomSheetDefaultView from '@/components/bottom-sheets/templates/BottomSheetDefaultView';
 import { Pressable } from 'react-native-gesture-handler';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { ChevronsUpDownIcon } from 'lucide-react-native';
+import { useTranslations } from 'use-intl';
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -25,7 +25,7 @@ export function DataTableSortOptions<TData>({
   table,
 }: DataTableSortOptionsProps<TData>) {
   const { colors } = useTheme();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { openSheet, closeSheet } = useBottomSheetStore();
   const handleOnPress = async () => {
     const sheetId = await openSheet(BottomSheetDefaultView, {
@@ -69,7 +69,7 @@ export function DataTableSortOptions<TData>({
     className="ml-auto flex h-8"
     onPress={handleOnPress}
     >
-      {capitalize(t('common.word.sort'))}
+      {upperFirst(t('common.messages.sort'))}
     </Button>
   );
 }

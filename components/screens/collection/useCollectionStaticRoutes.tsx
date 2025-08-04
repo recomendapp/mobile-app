@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import { useTranslation } from "react-i18next";
 import CollectionIcon from "./CollectionIcon";
 import { Icons } from "@/constants/Icons";
 import { capitalize } from "lodash";
 import { LinkProps } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
+import { useTranslations } from "use-intl";
 
 interface CollectionStaticRoute {
 	type: 'static';
@@ -14,7 +14,7 @@ interface CollectionStaticRoute {
 }
 
 const useCollectionStaticRoutes = () => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { colors } = useTheme();
 	const routes: CollectionStaticRoute[] = useMemo(() => [
 		{
@@ -34,7 +34,7 @@ const useCollectionStaticRoutes = () => {
 					<Icons.Watchlist color={colors.white} fill={colors.white}  className="w-2/5 h-2/5" />
 				</CollectionIcon>
 			),
-			label: capitalize(t('common.library.collection.watchlist.label')),
+			label: capitalize(t('common.messages.watchlist')),
 			href: '/collection/watchlist',
 		},
 		{
@@ -44,7 +44,7 @@ const useCollectionStaticRoutes = () => {
 					<Icons.like color={colors.white} fill={colors.white}  className="w-2/5 h-2/5" />
 				</CollectionIcon>
 			),
-			label: capitalize(t('common.library.collection.likes.label')),
+			label: capitalize(t('common.messages.heart_pick', { count: 2 })),
 			href: '/collection/likes',
 		},
 	], [t]);
