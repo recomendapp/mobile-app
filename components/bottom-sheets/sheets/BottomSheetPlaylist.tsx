@@ -228,6 +228,9 @@ const BottomSheetPlaylist = React.forwardRef<
             key={j}
             variant='ghost'
             icon={item.icon}
+            iconProps={{
+              color: colors.mutedForeground,
+            }}
             disabled={item.disabled}
             style={tw`justify-start h-auto py-4`}
             onPress={() => {

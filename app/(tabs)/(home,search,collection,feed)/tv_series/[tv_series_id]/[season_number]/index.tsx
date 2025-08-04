@@ -216,7 +216,7 @@ const TvSeriesSeasonScreen = () => {
 			headerOverlayHeight.value = height;
 		}}
 		scrollY={scrollY}
-		title={upperFirst(t('common.messages.tv_season_value', { number: season?.season_number! }))}
+		title={`${season?.serie?.title ?? ''} (${upperFirst(t('common.messages.tv_season_short', { number: season?.season_number! }))})`}
 		/>
 		<AnimatedLegendList
 		data={season?.episodes ?? []}
@@ -244,7 +244,7 @@ const TvSeriesSeasonScreen = () => {
 					<View style={tw`shrink px-2 py-1 gap-1`}>
 						<ThemedText numberOfLines={1}>
 							<ThemedText style={{ color: colors.accentYellow }}>
-								{upperFirst(t('common.messages.tv_episode_short', { season: season?.season_number!, episode: item.episode_number! }))}
+								{upperFirst(t('common.messages.tv_episode_short', { seasonNumber: season?.season_number!, episodeNumber: item.episode_number! }))}
 							</ThemedText>
 							<ThemedText style={tw`font-bold`}>
 								{" • "}
@@ -276,7 +276,7 @@ const TvSeriesSeasonScreen = () => {
 			: (
 				<View style={tw`flex-1 items-center justify-center p-4`}>
 					<Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
-						{upperFirst(t('common.messages.no_episodes'))}
+						{upperFirst(t('common.messages.no_tv_episodes'))}
 					</Text>
 				</View>
 			) 

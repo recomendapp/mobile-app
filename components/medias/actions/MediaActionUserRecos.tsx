@@ -5,6 +5,8 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { Media } from "@/types/type.db";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetSendReco from "@/components/bottom-sheets/sheets/BottomSheetSendReco";
+import { useAuth } from "@/providers/AuthProvider";
+import { usePathname, useRouter } from "expo-router";
 
 const ICON_SIZE = 24;
 
@@ -18,14 +20,26 @@ const MediaActionUserRecos = React.forwardRef<
 	MediaActionUserRecosProps
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();
+	const { session } = useAuth();
+	const router = useRouter();
+	const pathname = usePathname();
 	const { openSheet } = useBottomSheetStore();
 	return (
 		<Pressable
 		ref={ref}
 		onPress={() => {
-			openSheet(BottomSheetSendReco, {
-				media: media,
-			})
+			if (session) {
+				openSheet(BottomSheetSendReco, {
+					media: media,
+				});
+			} else {
+				router.push({
+					pathname: '/auth',
+					params: {
+						redirect: pathname,
+					},
+				});
+			}
 		}}
 		{...props}
 		>
