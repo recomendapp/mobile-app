@@ -104,11 +104,21 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				},
 			},
 		],
-		['expo-image-picker', {
-			photosPermission: 'The app accesses your photos to let you share them with your friends.',
-		}],
+		[
+			'expo-image-picker', {
+				photosPermission: 'The app accesses your photos to let you share them with your friends.',
+			}
+		],
 		'expo-secure-store',
-		'expo-notifications',
+		[
+			"expo-notifications",
+			{
+			"sounds":
+				[
+					"./assets/sounds/notif.wav"
+				]
+			}
+      	]
 	],
 	experiments: {
 		typedRoutes: true,
