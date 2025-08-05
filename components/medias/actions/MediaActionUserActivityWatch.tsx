@@ -51,6 +51,7 @@ const MediaActionUserActivityWatch = React.forwardRef<
 				Burnt.toast({
 					title: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 			}
 		};
@@ -65,6 +66,7 @@ const MediaActionUserActivityWatch = React.forwardRef<
 				Burnt.toast({
 					title: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 			}
 		};

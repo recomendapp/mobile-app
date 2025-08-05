@@ -5,6 +5,9 @@ import { useSupabaseClient } from "./SupabaseProvider";
 import { Platform } from "react-native";
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
+import { useRouter } from "expo-router";
+import { NotificationPayload } from "@/types/notifications";
+import * as Burnt from 'burnt';
 
 type NotificationsContextType = {
   permissionStatus: Notifications.PermissionStatus | null;
@@ -23,6 +26,7 @@ export const useNotifications = () => {
 
 export const NotificationsProvider = ({ children }: { children: React.ReactNode }) => {
   const supabase = useSupabaseClient();
+  const router = useRouter();
   const { session } = useAuth();
   const [permissionStatus, setPermissionStatus] = useState<Notifications.PermissionStatus | null>(null);
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
@@ -90,6 +94,35 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
       console.error("Error saving push token:", err);
     }
   };
+  const handleResponse = (response: Notifications.NotificationResponse) => {
+    const data = response.notification.request.content.data as NotificationPayload;
+    if (data) {
+      handleRedirect(data);
+    }
+  };
+  const handleRedirect = (data: NotificationPayload) => {
+    console.log("🔔 Redirecting based on notification data:", data);
+    switch (data.type) {
+      case 'reco_sent':
+        router.push({
+          pathname: '/collection/my-recos',
+          params: { recoId: data.id },
+        });
+        break;
+      case 'reco_completed':
+        router.push({
+          pathname: '/collection/my-recos',
+          params: { recoId: data.id },
+        });
+        break;
+      case 'follower_created':
+        router.push(`/user/${data.sender.username}`);
+        break;
+      default:
+        console.warn("Unhandled notification type:", data.type);
+        break;
+    }
+  };
 
   useEffect(() => {
     if (!session) return;
@@ -110,15 +143,16 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     notificationsListener.current = Notifications.addNotificationReceivedListener((notification) => {
       console.log("🔔 Notification received:", notification);
       setNotifications((prev) => (prev ? [...prev, notification] : [notification]));
+      Burnt.toast({
+        title: notification.request.content.title || "New Notification",
+        message: notification.request.content.body ?? undefined,
+        preset: 'none',
+      });
     });
 
     // Listener when notification is clicked
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log(
-        "🔔 Notification response received: ",
-        JSON.stringify(response, null, 2),
-        JSON.stringify(response.notification.request.content.data, null, 2)
-      );
+      handleResponse(response);
     });
 
     // Handle notification that opened the app

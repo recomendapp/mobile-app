@@ -83,6 +83,7 @@ const BottomSheetSendReco = React.forwardRef<
           Burnt.toast({
             title: error.message,
             preset: 'error',
+            haptic: 'error',
           })
 				} else {
 					switch (error.code) {
@@ -90,18 +91,21 @@ const BottomSheetSendReco = React.forwardRef<
               Burnt.toast({
 							  title: `Vous avez déjà envoyé ce film à ${selected.length === 1 ? 'cet ami(e)' : 'un ou plusieurs de ces amis'}`,
                 preset: 'error',
+                haptic: 'error',
               })
 							break;
 						case '23514':
               Burnt.toast({
 							  title: `Le commentaire est trop long (max ${COMMENT_MAX_LENGTH} caractère${COMMENT_MAX_LENGTH > 1 ? 's' : ''})`,
                 preset: 'error',
+                haptic: 'error',
               })
 							break;
 						default:
 							Burnt.toast({
                 title: upperFirst(t('common.messages.an_error_occurred')),
                 preset: 'error',
+                haptic: 'error',
               })
 							break;
 					}

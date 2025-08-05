@@ -42,6 +42,7 @@ const LoginScreen = () => {
 				title: upperFirst(t('common.messages.error')),
 				message: t('pages.auth.login.form.wrong_credentials'),
 				preset: 'error',
+				haptic: 'error',
 			});
 		} finally {
 			setIsLoading(false);

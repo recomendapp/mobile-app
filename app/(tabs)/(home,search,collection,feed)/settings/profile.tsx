@@ -91,6 +91,7 @@ const ProfileSettings = () => {
 			Burnt.toast({
 				title: error.message,
 				preset: 'error',
+				haptic: 'error',
 			});
 		} finally {
 			setIsLoading(false);

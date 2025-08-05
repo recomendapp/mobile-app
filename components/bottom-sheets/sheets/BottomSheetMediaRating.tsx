@@ -145,6 +145,7 @@ const BottomSheetMediaRating = React.forwardRef<
 					Burnt.toast({
 						title: upperFirst(t('common.messages.an_error_occurred')),
 						preset: 'error',
+						haptic: 'error',
 					});
 				}
 			});
@@ -158,6 +159,7 @@ const BottomSheetMediaRating = React.forwardRef<
 					Burnt.toast({
 						title: upperFirst(t('common.messages.an_error_occurred')),
 						preset: 'error',
+						haptic: 'error',
 					});
 				}
 			});
@@ -169,8 +171,8 @@ const BottomSheetMediaRating = React.forwardRef<
 				title: upperFirst(t('common.messages.an_error_occurred')),
 				message: 'You cannot unrate a media with a review.',
 				duration: 3,
-				haptic: 'error',
 				preset: 'error',
+				haptic: 'error',
 			})
 		}
 		await updateActivity.mutateAsync({
@@ -181,6 +183,7 @@ const BottomSheetMediaRating = React.forwardRef<
 				Burnt.toast({
 					title: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 			}
 		});

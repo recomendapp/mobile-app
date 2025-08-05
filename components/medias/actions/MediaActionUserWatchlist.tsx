@@ -55,6 +55,7 @@ const MediaActionUserWatchlist = React.forwardRef<
 			return Burnt.toast({
 				title: upperFirst(t('common.messages.an_error_occurred')),
 				preset: 'error',
+				haptic: 'error',
 			});
 		}
 		await insertWatchlist.mutateAsync({
@@ -65,6 +66,7 @@ const MediaActionUserWatchlist = React.forwardRef<
 			Burnt.toast({
 				title: upperFirst(t('common.messages.an_error_occurred')),
 				preset: 'error',
+				haptic: 'error',
 			});
 		  }
 		});
@@ -75,6 +77,7 @@ const MediaActionUserWatchlist = React.forwardRef<
 			return Burnt.toast({
 				title: upperFirst(t('common.messages.an_error_occurred')),
 				preset: 'error',
+				haptic: 'error',
 			});
 		}
 		await deleteWatchlist.mutateAsync({
@@ -84,6 +87,7 @@ const MediaActionUserWatchlist = React.forwardRef<
 			Burnt.toast({
 				title: upperFirst(t('common.messages.an_error_occurred')),
 				preset: 'error',
+				haptic: 'error',
 			});
 		  }
 		});
