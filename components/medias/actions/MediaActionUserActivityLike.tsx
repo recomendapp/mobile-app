@@ -63,6 +63,7 @@ const MediaActionUserActivityLike = React.forwardRef<
 					Burnt.toast({
 						title: upperFirst(t('common.messages.an_error_occurred')),
 						preset: 'error',
+						haptic: 'error',
 					});
 				}
 			});
@@ -82,6 +83,7 @@ const MediaActionUserActivityLike = React.forwardRef<
 					Burnt.toast({
 						title: upperFirst(t('common.messages.an_error_occurred')),
 						preset: 'error',
+						haptic: 'error',
 					});
 				}
 			});
@@ -103,6 +105,7 @@ const MediaActionUserActivityLike = React.forwardRef<
 				Burnt.toast({
 					title: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 				isLiked.value = 1;
 			}

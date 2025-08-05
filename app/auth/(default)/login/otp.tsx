@@ -73,6 +73,7 @@ const LoginOtpScreen = () => {
 					title: upperFirst(t('common.messages.error')),
 					message: error.message,
 					preset: 'error',
+					haptic: 'error',
 				});
 			} else if (error instanceof AuthError) {
 				switch (error.status) {
@@ -80,6 +81,7 @@ const LoginOtpScreen = () => {
 						Burnt.toast({
 							title: upperFirst(t('pages.auth.login.otp.form.error.no_user_found')),
 							preset: 'error',
+							haptic: 'error',
 						});
 						break;
 					case 429:
@@ -87,6 +89,7 @@ const LoginOtpScreen = () => {
 							title: upperFirst(t('common.messages.error')),
 							message: t('common.form.error.too_many_attempts'),
 							preset: 'error',
+							haptic: 'error',
 						});
 						break;
 				default:
@@ -94,6 +97,7 @@ const LoginOtpScreen = () => {
 						title: upperFirst(t('common.messages.error')),
 						message: error.message,
 						preset: 'error',
+						haptic: 'error',
 					});
 					break;
 				}
@@ -102,6 +106,7 @@ const LoginOtpScreen = () => {
 					title: upperFirst(t('common.messages.error')),
 					message: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 			}
 		} finally {
@@ -128,6 +133,7 @@ const LoginOtpScreen = () => {
 					Burnt.toast({
 						title: upperFirst(t('common.form.error.invalid_code')),
 						preset: 'error',
+						haptic: 'error',
 					});
 					break;
 				default:
@@ -135,6 +141,7 @@ const LoginOtpScreen = () => {
 						title: upperFirst(t('common.messages.error')),
 						message: error.message,
 						preset: 'error',
+						haptic: 'error',
 					});
 					break;
 				}
@@ -143,6 +150,7 @@ const LoginOtpScreen = () => {
 					title: upperFirst(t('common.messages.error')),
 					message: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 			}
 		} finally {

@@ -159,6 +159,7 @@ const SignupScreen = () => {
 							title: upperFirst(t('common.messages.error')),
 							message: error.message,
 							preset: 'error',
+							haptic: 'error',
 						});
 				}
 			} else {
@@ -166,6 +167,7 @@ const SignupScreen = () => {
 					title: upperFirst(t('common.messages.error')),
 					message: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 			}
 		} finally {

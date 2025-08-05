@@ -74,11 +74,13 @@ const SecuritySettings = () => {
 					title: t('common.messages.error'),
 					message: error.message,
 					preset: 'error',
+					haptic: 'error',
 				});
 			} else {
 				Burnt.toast({
 					title: t('common.messages.error'),
 					preset: 'error',
+					haptic: 'error',
 				})
 			}
 		} finally {

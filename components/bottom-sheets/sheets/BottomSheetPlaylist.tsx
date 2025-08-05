@@ -86,6 +86,7 @@ const BottomSheetPlaylist = React.forwardRef<
                       title: upperFirst(t('common.messages.error')),
                       message: upperFirst(t('common.messages.an_error_occurred')),
                       preset: 'error',
+                      haptic: 'error',
                     });
                   }
                 });
@@ -98,6 +99,7 @@ const BottomSheetPlaylist = React.forwardRef<
                       title: upperFirst(t('common.messages.error')),
                       message: upperFirst(t('common.messages.an_error_occurred')),
                       preset: 'error',
+                      haptic: 'error',
                     });
                   }
                 });
@@ -168,6 +170,7 @@ const BottomSheetPlaylist = React.forwardRef<
                             Burnt.toast({
                               title: upperFirst(t('common.messages.an_error_occurred')),
                               preset: 'error',
+                              haptic: 'error',
                             });
                           },
                         }

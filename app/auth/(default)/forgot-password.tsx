@@ -73,6 +73,7 @@ const ForgotPasswordScreen = () => {
 					title: upperFirst(t('common.messages.error')),
 					message: error.message,
 					preset: 'error',
+					haptic: 'error',
 				});
 			} else if (error instanceof AuthError) {
 				switch (error.status) {
@@ -81,6 +82,7 @@ const ForgotPasswordScreen = () => {
 							title: upperFirst(t('common.messages.error')),
 							message: t('common.form.error.too_many_attempts'),
 							preset: 'error',
+							haptic: 'error',
 						});
 						break;
 					default:
@@ -88,6 +90,7 @@ const ForgotPasswordScreen = () => {
 							title: upperFirst(t('common.messages.error')),
 							message: error.message,
 							preset: 'error',
+							haptic: 'error',
 						});
 						break;
 				}
@@ -96,6 +99,7 @@ const ForgotPasswordScreen = () => {
 					title: upperFirst(t('common.messages.error')),
 					message: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 			}
 		} finally {
@@ -122,6 +126,7 @@ const ForgotPasswordScreen = () => {
 					Burnt.toast({
 						title: upperFirst(t('common.form.error.invalid_code')),
 						preset: 'error',
+						haptic: 'error',
 					});
 					break;
 				default:
@@ -129,6 +134,7 @@ const ForgotPasswordScreen = () => {
 						title: upperFirst(t('common.messages.error')),
 						message: error.message,
 						preset: 'error',
+						haptic: 'error',
 					});
 					break;
 				}
@@ -137,6 +143,7 @@ const ForgotPasswordScreen = () => {
 					title: upperFirst(t('common.messages.error')),
 					message: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 			}
 		} finally {

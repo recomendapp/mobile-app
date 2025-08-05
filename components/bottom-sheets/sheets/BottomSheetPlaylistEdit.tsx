@@ -103,6 +103,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
               title: upperFirst(t('common.messages.error')),
               message: upperFirst(t('common.messages.camera_permission_denied')),
               preset: 'error',
+              haptic: 'error',
             });
             return;
           }
@@ -164,6 +165,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
             title: upperFirst(t('common.messages.error')),
             message: upperFirst(t('common.messages.an_error_occurred')),
             preset: 'error',
+            haptic: 'error',
           });
         }
       });
@@ -173,12 +175,14 @@ const BottomSheetPlaylistEdit = React.forwardRef<
           title: upperFirst(t('common.messages.error')),
           message: upperFirst(error.message),
           preset: 'error',
+          haptic: 'error',
         });
       } else {
         Burnt.toast({
           title: upperFirst(t('common.messages.error')),
           message: upperFirst(t('common.messages.an_error_occurred')),
           preset: 'error',
+          haptic: 'error',
         });
       }
     }

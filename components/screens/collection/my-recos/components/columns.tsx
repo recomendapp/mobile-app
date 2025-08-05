@@ -38,6 +38,7 @@ export const Columns = () => {
 					title: upperFirst(t('common.messages.error')),
 					message: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 			}
 		});
@@ -59,6 +60,7 @@ export const Columns = () => {
 					title: upperFirst(t('common.messages.error')),
 					message: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 			}
 		});

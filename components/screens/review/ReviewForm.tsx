@@ -97,12 +97,14 @@ const ReviewForm = ({
 					title: upperFirst(t('common.messages.error')),
 					message: error.message,
 					preset: 'error',
+					haptic: 'error',
 				});
 			} else if (isPostgrestError(error)) {
 				Burnt.toast({
 					title: upperFirst(t('common.messages.error')),
 					message: error.details,
 					preset: 'error',
+					haptic: 'error',
 				});
 			} else {
 				console.log('error', error);
