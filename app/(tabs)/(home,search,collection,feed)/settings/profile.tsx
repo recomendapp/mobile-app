@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/InputOld";
 import { Button } from "@/components/ui/Button";
 import { useTranslations } from "use-intl";
+import { upperFirst } from "lodash";
 
 const ProfileSettings = () => {
 	const { user } = useAuth();
@@ -83,7 +84,7 @@ const ProfileSettings = () => {
 				await updateProfileMutation.mutateAsync(userPayload);
 			}
 			Burnt.toast({
-				title: t('common.messages.saved', { count: 1, gender: 'male' }),
+				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
 				preset: 'done',
 			})
 		} catch (error: any) {

@@ -108,6 +108,7 @@ const SettingsLayout = () => {
 				<MaterialTopTabs.Screen name="appearance" options={{ title: t('pages.settings.appearance.label') }} />
 				<MaterialTopTabs.Screen name="subscription" options={{ title: t('pages.settings.subscription.label') }} />
 				<MaterialTopTabs.Screen name="security" options={{ title: t('pages.settings.security.label') }} />
+				<MaterialTopTabs.Screen name="notifications" options={{ title: t('pages.settings.notifications.label') }} />
 			</MaterialTopTabs> 
 		</ThemedSafeAreaView>
 	)

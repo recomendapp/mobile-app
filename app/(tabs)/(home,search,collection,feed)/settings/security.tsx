@@ -12,6 +12,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
 import { useTranslations } from "use-intl";
+import { upperFirst } from "lodash";
 
 const SecuritySettings = () => {
 	const supabase = useSupabaseClient();
@@ -63,7 +64,7 @@ const SecuritySettings = () => {
 			});
 			if (error) throw error;
 			Burnt.toast({
-				title: t('common.messages.saved', { count: 1, gender: 'male' }),
+				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
 				preset: 'done',
 			})
 			form.reset();
