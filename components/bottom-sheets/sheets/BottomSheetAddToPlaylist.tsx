@@ -80,7 +80,7 @@ const BottomSheetAddToPlaylist = React.forwardRef<
 		}, {
 			onSuccess: () => {
         Burnt.toast({
-          title: upperFirst(t('common.messages.added')),
+          title: upperFirst(t('common.messages.added', { gender: 'male', count: selected.length })),
           preset: 'done',
         })
 				closeSheet(id);

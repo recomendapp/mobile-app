@@ -102,7 +102,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
         queryKey: playlistKeys.guests(playlist.id),
       })
       Burnt.toast({
-        title: upperFirst(t('common.messages.saved')),
+        title: upperFirst(t('common.messages.saved', { gender: 'male', count: 1 })),
         preset: 'done',
       });
       await closeSheet(id);

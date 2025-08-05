@@ -23,6 +23,7 @@ import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
+import richTextToPlainString from '@/utils/richTextToPlainString';
 
 interface BottomSheetPlaylistProps extends BottomSheetProps {
   playlist: Playlist,
@@ -141,7 +142,7 @@ const BottomSheetPlaylist = React.forwardRef<
             onPress: async () => {
               Alert.alert(
                 upperFirst(t('common.messages.are_u_sure')),
-                upperFirst(t('pages.playlist.actions.delete.description', { title: playlist.title })),
+                upperFirst(richTextToPlainString(t.rich('pages.playlist.actions.delete.description', { title: playlist.title, important: (chunk) => `"${chunk}"` }))),
                 [
                   {
                     text: upperFirst(t('common.messages.cancel')),

@@ -62,7 +62,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
     }, {
       onSuccess: (playlist) => {
         Burnt.toast({
-          title: upperFirst(t('common.messages.added')),
+          title: upperFirst(t('common.messages.added', { gender: 'female', count: 1 })),
           preset: 'done',
         });
         onCreate && onCreate(playlist);

@@ -14,6 +14,7 @@ import useDebounce from "@/hooks/useDebounce";
 import { Input } from "@/components/ui/Input";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
+import { upperFirst } from "lodash";
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -85,7 +86,7 @@ const AccountSettings = () => {
 				});
 			}
 			Burnt.toast({
-				title: t('common.messages.saved', { count: 1, gender: 'male' }),
+				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
 				preset: 'done',
 			})
 		} catch (error: any) {

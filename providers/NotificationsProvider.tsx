@@ -1,13 +1,15 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import * as Notification from "expo-notifications";
-import registerForPushNotificationsAsync from "@/utils/registerForPushNotificationsAsync";
+import * as Notifications from "expo-notifications";
 import { useAuth } from "./AuthProvider";
 import { useSupabaseClient } from "./SupabaseProvider";
 import { Platform } from "react-native";
+import * as Device from 'expo-device';
+import Constants from 'expo-constants';
 
 type NotificationsContextType = {
+  permissionStatus: Notifications.PermissionStatus | null;
   expoPushToken: string | null;
-  notifications: Notification.Notification[] | null;
+  notifications: Notifications.Notification[] | null;
   error?: Error | null;
 };
 
@@ -22,12 +24,54 @@ export const useNotifications = () => {
 export const NotificationsProvider = ({ children }: { children: React.ReactNode }) => {
   const supabase = useSupabaseClient();
   const { session } = useAuth();
+  const [permissionStatus, setPermissionStatus] = useState<Notifications.PermissionStatus | null>(null);
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
-  const [notifications, setNotifications] = useState<Notification.Notification[] | null>(null);
+  const [notifications, setNotifications] = useState<Notifications.Notification[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
-  const notificationsListener = useRef<Notification.EventSubscription | null>(null);
-  const responseListener = useRef<Notification.EventSubscription | null>(null);
+  const notificationsListener = useRef<Notifications.EventSubscription | null>(null);
+  const responseListener = useRef<Notifications.EventSubscription | null>(null);
+
+  const handleRegisterForPushNotificationsAsync = async () => {
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      console.log("🔔 Final notification permission status:", finalStatus);
+      setPermissionStatus(finalStatus);
+      if (finalStatus !== 'granted') {
+        throw new Error('Permission not granted to get push token for push notification!');
+      }
+      const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+      if (!projectId) {
+        throw new Error('Project ID not found');
+      }
+      try {
+        const pushTokenString = (
+          await Notifications.getExpoPushTokenAsync({
+            projectId,
+          })
+        ).data;
+        return pushTokenString;
+      } catch (e) {
+        throw new Error(`${e}`);
+      }
+    } else {
+      throw new Error('Must use physical device for push notifications');
+    }
+  };
 
   const handleSaveToken = async (token: string) => {
     try {
@@ -44,15 +88,15 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
       if (error) throw error;
     } catch (err) {
       console.error("Error saving push token:", err);
-      setError(err instanceof Error ? err : new Error(String(err)));
     }
   };
 
   useEffect(() => {
     if (!session) return;
-    registerForPushNotificationsAsync().then(
+
+    // Register token
+    handleRegisterForPushNotificationsAsync().then(
       async (token) => {
-        console.log("🔔 Push token:", token);
         setExpoPushToken(token);
         await handleSaveToken(token);
       },
@@ -61,12 +105,15 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         setError(err);
       }
     );
-    notificationsListener.current = Notification.addNotificationReceivedListener((notification) => {
+
+    // Listener when app is open
+    notificationsListener.current = Notifications.addNotificationReceivedListener((notification) => {
       console.log("🔔 Notification received:", notification);
       setNotifications((prev) => (prev ? [...prev, notification] : [notification]));
     });
 
-    responseListener.current = Notification.addNotificationResponseReceivedListener((response) => {
+    // Listener when notification is clicked
+    responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
       console.log(
         "🔔 Notification response received: ",
         JSON.stringify(response, null, 2),
@@ -74,13 +121,18 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
       );
     });
 
+    // Handle notification that opened the app
+    (async () => {
+      const initialResponse = await Notifications.getLastNotificationResponseAsync();
+      if (initialResponse) {
+        const data = initialResponse.notification.request.content.data;
+        console.log("🔔 Initial notification response:", JSON.stringify(data, null, 2));
+      }
+    })();
+
     return () => {
-      if (notificationsListener.current) {
-        notificationsListener.current.remove();
-      }
-      if (responseListener.current) {
-        responseListener.current.remove();
-      }
+      notificationsListener.current?.remove();
+      responseListener.current?.remove();
     };
   }, [session]);
 
@@ -88,6 +140,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
   return (
     <NotificationsContext.Provider
     value={{
+      permissionStatus: permissionStatus,
       expoPushToken: expoPushToken,
       notifications: notifications,
       error: error,

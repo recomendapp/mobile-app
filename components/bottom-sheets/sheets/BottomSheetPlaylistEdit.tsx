@@ -153,7 +153,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
       }, {
         onSuccess: async (playlist) => {
           Burnt.toast({
-            title: upperFirst(t('common.messages.saved')),
+            title: upperFirst(t('common.messages.saved', { gender: 'male', count: 1 })),
             preset: 'done',
           });
           onEdit && onEdit(playlist);
