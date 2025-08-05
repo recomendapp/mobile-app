@@ -3191,6 +3191,42 @@ export type Database = {
           },
         ]
       }
+      user_deletion_requests: {
+        Row: {
+          delete_after: string
+          id: number
+          requested_at: string
+          user_id: string
+        }
+        Insert: {
+          delete_after?: string
+          id?: number
+          requested_at?: string
+          user_id: string
+        }
+        Update: {
+          delete_after?: string
+          id?: number
+          requested_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_deletion_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_deletion_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_follower: {
         Row: {
           created_at: string
@@ -3952,6 +3988,58 @@ export type Database = {
           watchlist_count: number | null
         }
         Relationships: []
+      }
+      media_tv_series_aggregate_credits: {
+        Row: {
+          credits: Json | null
+          last_appearance_date: string | null
+          person_id: number | null
+          serie_id: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tmdb_tv_series_credits_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "media_person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tmdb_tv_series_credits_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tmdb_tv_series_credits_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "person_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tmdb_tv_series_credits_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "tmdb_person"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tmdb_tv_series_credits_serie_id_fkey"
+            columns: ["serie_id"]
+            isOneToOne: false
+            referencedRelation: "media_tv_series"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tmdb_tv_series_credits_serie_id_fkey"
+            columns: ["serie_id"]
+            isOneToOne: false
+            referencedRelation: "tmdb_tv_series"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       media_tv_series_episodes: {
         Row: {
@@ -5013,6 +5101,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      utils_delete_expired_users: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       utils_generate_username: {
         Args: {
           user_details: unknown
@@ -5026,8 +5118,8 @@ export type Database = {
       image_type: "backdrop" | "poster" | "logo" | "profile"
       language_app: "en-US" | "fr-FR"
       media_type: "movie" | "tv_series" | "person" | "tv_season" | "tv_episode"
-      notifications_device_type: "web" | "ios" | "android"
-      notifications_provider: "fcm"
+      notifications_device_type: "web" | "ios" | "android" | "windows" | "macos"
+      notifications_provider: "fcm" | "expo" | "apns"
       pricing_plan_interval: "day" | "week" | "month" | "year"
       pricing_type: "one_time" | "recurring"
       reco_status: "active" | "completed" | "deleted"

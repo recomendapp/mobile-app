@@ -21,14 +21,11 @@ const registerForPushNotificationsAsync = async () => {
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-		  console.error('Permission not granted to get push token for push notification!')
-      //   handleRegistrationError('Permission not granted to get push token for push notification!');
-      return;
+      throw new Error('Permission not granted to get push token for push notification!');
     }
     const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
     if (!projectId) {
-      //   handleRegistrationError('Project ID not found');
-      console.error('Project ID not found');
+      throw new Error('Project ID not found');
     }
     try {
       const pushTokenString = (
@@ -36,15 +33,12 @@ const registerForPushNotificationsAsync = async () => {
           projectId,
         })
       ).data;
-      console.log(pushTokenString);
       return pushTokenString;
-    } catch (e: unknown) {
-      //   handleRegistrationError(`${e}`);
-      console.error(`Error getting push token: ${e}`);
+    } catch (e) {
+      throw new Error(`${e}`);
     }
   } else {
-    console.error('Must use physical device for push notifications');
-    // handleRegistrationError('Must use physical device for push notifications');
+    throw new Error('Must use physical device for push notifications');
   }
 };
 export default registerForPushNotificationsAsync;

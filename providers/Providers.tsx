@@ -8,6 +8,7 @@ import { BottomSheetManager } from "@/components/bottom-sheets/BottomSheetManage
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SplashScreenProvider } from "./SplashScreenProvider";
 import { LocaleProvider } from "./LocaleProvider";
+import { NotificationsProvider } from "./NotificationsProvider";
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -23,9 +24,11 @@ const Providers = ({ children } : ProvidersProps) => {
 						<ActionSheetProvider>
 							<SupabaseProvider>
 								<ReactQueryProvider>
-									<AuthProvider>	
+									<AuthProvider>
+										<NotificationsProvider>
 											{children}
 											<BottomSheetManager />
+										</NotificationsProvider>
 									</AuthProvider>
 								</ReactQueryProvider>
 							</SupabaseProvider>
