@@ -40,7 +40,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
           device_type: Platform.OS,
           provider: "expo",
           updated_at: new Date().toISOString(),
-        });
+        }, { onConflict: "user_id, device_type, provider, token", ignoreDuplicates: true });
       if (error) throw error;
     } catch (err) {
       console.error("Error saving push token:", err);
