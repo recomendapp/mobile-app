@@ -1,19 +1,17 @@
 import React from 'react';
 import tw from '@/lib/tw';
-import { useTranslation } from 'react-i18next';
 import { UserWatchlist } from '@/types/type.db';
-import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useUserWatchlistUpdateMutation } from '@/features/user/userMutations';
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
-import { ActivityIndicator, View } from 'react-native';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BetterInput } from '@/components/ui/BetterInput';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
 
 interface BottomSheetWatchlistCommentProps extends BottomSheetProps {
   watchlistItem: UserWatchlist
@@ -23,9 +21,8 @@ const BottomSheetWatchlistComment = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetWatchlistCommentProps
 >(({ id, watchlistItem, ...props }, ref) => {
-  const { closeSheet } = useBottomSheetStore();
-  const { colors, inset } = useTheme();
-  const { t } = useTranslation();
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
+  const t = useTranslations();
   const [comment, setComment] = React.useState(watchlistItem.comment || '');
   const updateWatchlist = useUserWatchlistUpdateMutation();
 
@@ -37,8 +34,9 @@ const BottomSheetWatchlistComment = React.forwardRef<
 	if (!watchlistItem?.id) {
 		Burnt.toast({
 			title: upperFirst(t('common.messages.error')),
-			message: upperFirst(t('common.errors.an_error_occurred')),
+			message: upperFirst(t('common.messages.an_error_occurred')),
 			preset: 'error',
+			haptic: 'error',
 		});
 		return;
 	}
@@ -48,7 +46,7 @@ const BottomSheetWatchlistComment = React.forwardRef<
 	}, {
 		onSuccess: () => {
 			Burnt.toast({
-				title: upperFirst(t('common.word.saved')),
+				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
 				preset: 'done',
 			});
 			closeSheet(id);
@@ -56,8 +54,9 @@ const BottomSheetWatchlistComment = React.forwardRef<
 		onError: () => {
 			Burnt.toast({
 				title: upperFirst(t('common.messages.error')),
-				message: upperFirst(t('common.errors.an_error_occurred')),
+				message: upperFirst(t('common.messages.an_error_occurred')),
 				preset: 'error',
+				haptic: 'error',
 			});
 		}
 	});
@@ -77,9 +76,8 @@ const BottomSheetWatchlistComment = React.forwardRef<
 		placeholder='Ajouter un commentaire...'
 		style={tw`h-24`}
 		/>
-		<Button onPress={handleUpdateComment} disabled={updateWatchlist.isPending}>
-			{updateWatchlist.isPending ? <ActivityIndicator color={colors.background} /> : null}
-			<ButtonText>{upperFirst(t('common.word.save'))}</ButtonText>
+		<Button loading={updateWatchlist.isPending} onPress={handleUpdateComment} disabled={updateWatchlist.isPending}>
+			{upperFirst(t('common.messages.save'))}
 		</Button>
     </ThemedTrueSheet>
   );

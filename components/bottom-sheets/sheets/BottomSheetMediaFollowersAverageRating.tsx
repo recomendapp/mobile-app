@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
-import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
@@ -12,9 +11,11 @@ import { useAuth } from '@/providers/AuthProvider';
 import { CardUser } from '@/components/cards/CardUser';
 import { BarChart } from '@/components/charts/bar-chart';
 import { IconMediaRating } from '@/components/medias/IconMediaRating';
-import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import { Icons } from '@/constants/Icons';
+import { useTranslations } from 'use-intl';
+import { interpolateRgb } from 'd3-interpolate'; 
+import { Text } from '@/components/ui/text';
 
 interface BottomSheetMediaFollowersAverageRatingProps extends BottomSheetProps {
   mediaId: number;
@@ -26,7 +27,7 @@ const BottomSheetMediaFollowersAverageRating = React.forwardRef<
 >(({ id, mediaId, sizes = ['medium', 'large'], ...props }, ref) => {
   const { user } = useAuth();
   const { colors, inset } = useTheme();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const {
     data: followersRating,
 		isLoading,
@@ -38,10 +39,15 @@ const BottomSheetMediaFollowersAverageRating = React.forwardRef<
   const refFlatList = React.useRef<FlatList<NonNullable<typeof followersRating>[number]>>(null);
   const chartsData = useMemo(() => {
     if (!followersRating) return null;
+    const startColor = '#ff6f6fff';
+    const endColor = '#5fff57ff';
+    const interpolateColor = interpolateRgb(startColor, endColor);
+
+
     return new Array(10).fill(0).map((_, index) => ({
       label: (index + 1).toString(),
       value: followersRating.filter((f) => f.rating === index + 1).length || 0,
-      color: colors.accentBlue,
+      color: interpolateColor(index / 9),
     }));
   }, [followersRating]);
 
@@ -70,9 +76,9 @@ const BottomSheetMediaFollowersAverageRating = React.forwardRef<
       ListHeaderComponent={
         chartsData ? (
           <View style={tw`gap-2 mb-4`}>
-            <ThemedText style={tw`text-center font-bold text-lg`}>
+            <Text variant="title" style={tw`text-center`}>
             {upperFirst(t('common.messages.ratings_from_followees'))}
-            </ThemedText>
+            </Text>
             <BarChart
             data={chartsData}
             config={{
@@ -89,9 +95,9 @@ const BottomSheetMediaFollowersAverageRating = React.forwardRef<
         loading ? <Icons.Loader />
         : (
           <View style={tw`flex-1 items-center justify-center p-4`}>
-            <ThemedText style={[tw`text-center`, { color: colors.mutedForeground }]}>
+            <Text variant="muted" style={tw`text-center`}>
               {upperFirst(t('common.messages.no_results'))}
-            </ThemedText>
+            </Text>
           </View>
         )
       }

@@ -1,15 +1,13 @@
 import React from 'react';
 import tw from '@/lib/tw';
-import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
-import { Media } from '@/types/type.db';
+import { Media, UserActivity } from '@/types/type.db';
 import { LinkProps, usePathname, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
-import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import BottomSheetSendReco from './BottomSheetSendReco';
 import BottomSheetAddToPlaylist from './BottomSheetAddToPlaylist';
@@ -18,9 +16,14 @@ import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import BottomSheetDefaultView from '../templates/BottomSheetDefaultView';
 import { ScrollView } from 'react-native-gesture-handler';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
+import { Button } from '@/components/ui/Button';
+import { Text } from '@/components/ui/text';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface BottomSheetMediaProps extends BottomSheetProps {
   media?: Media,
+  activity?: UserActivity,
   additionalItemsTop?: Item[];
   additionalItemsBottom?: Item[];
 };
@@ -37,11 +40,13 @@ interface Item {
 const BottomSheetMedia = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetMediaProps
->(({ id, media, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
-  const { closeSheet, openSheet } = useBottomSheetStore();
+>(({ id, media, activity, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
+  const openSheet = useBottomSheetStore((state) => state.openSheet);
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors, inset } = useTheme();
+  const { session } = useAuth();
   const router = useRouter();
-  const { t } = useTranslation();
+  const t = useTranslations();
   const pathname = usePathname();
   // REFs
   const scrollRef = React.useRef<ScrollView>(null);
@@ -52,6 +57,13 @@ const BottomSheetMedia = React.forwardRef<
       ...additionalItemsTop,
     ],
     [
+      ...((activity) ? [
+        {
+          icon: Icons.Feed,
+          onPress: () => router.push(`/user/${activity.user?.username}`),
+          label: upperFirst(t('common.messages.go_to_activity')),
+        },
+      ] : []),
       {
         icon: Icons.Movie,
         onPress: () => router.push(media?.url as LinkProps['href']),
@@ -69,43 +81,46 @@ const BottomSheetMedia = React.forwardRef<
           icon: Icons.Users,
           onPress: () => BottomSheetMainCreditsRef.current?.present(),
           label: upperFirst(t(
-            media.media_type === 'movie' ? 'common.messages.show_director_other' : 'common.messages.show_creator_other',
+            media.media_type === 'movie' ? 'common.messages.show_director' : 'common.messages.show_creator',
             {
+              gender: 'male',
               count: media.main_credit.length,
             }
           )),
           closeOnPress: false,
         } : {
-          icon: Icons.user,
+          icon: Icons.User,
           onPress: () => router.push(media.main_credit![0].url as LinkProps['href']),
           label: upperFirst(t(
             media.media_type === 'movie' ? 'common.messages.go_to_director' : 'common.messages.go_to_creator',
             {
-              context: media.main_credit![0].extra_data.gender === 1 ? 'female' : 'male',
+              gender: media.main_credit![0].extra_data.gender === 1 ? 'female' : 'male',
               count: 1,
             }
           ))
         },
       ] : []),
-      {
-				icon: Icons.AddPlaylist,
-        onPress: () => openSheet(BottomSheetAddToPlaylist, {
-          media: media!,
-        }),
-				label: upperFirst(t('common.messages.add_to_playlist')),
-			},
-			{
-				icon: Icons.Reco,
-        onPress: () => openSheet(BottomSheetSendReco, {
-          media: media!,
-        }),
-				label: upperFirst(t('common.messages.send_to_friend')),
-			}
+      ...(session ? [
+        {
+          icon: Icons.AddPlaylist,
+          onPress: () => openSheet(BottomSheetAddToPlaylist, {
+            media: media!,
+          }),
+          label: upperFirst(t('common.messages.add_to_playlist')),
+        },
+        {
+          icon: Icons.Reco,
+          onPress: () => openSheet(BottomSheetSendReco, {
+            media: media!,
+          }),
+          label: upperFirst(t('common.messages.send_to_friend')),
+        }
+      ] : []),
     ],
     [
       ...additionalItemsBottom,
     ],
-  ]), [media, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname]);
+  ]), [media, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, activity, session]);
 
   return (
     <ThemedTrueSheet
@@ -137,32 +152,36 @@ const BottomSheetMedia = React.forwardRef<
             type={media?.media_type}
             />
             <View style={tw`shrink`}>
-              <ThemedText numberOfLines={2} style={tw`shrink`}>{media?.title}</ThemedText>
-              <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
+              <Text numberOfLines={2} style={tw`shrink`}>{media?.title}</Text>
+              {media?.main_credit && media?.main_credit?.length > 0 && <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
                 {(media?.media_type === 'movie' || media?.media_type === 'tv_series') ? (
                   media?.main_credit?.map((director) => director.title).join(', ')
                 ) : media?.media_type === 'person' ? (
                   media.extra_data.known_for_department
                 ) : null}
-              </Text>
+              </Text>}
             </View>
           </View>
         </View>
         {items.map((group, i) => (
           <React.Fragment key={i}>
             {group.map((item, j) => (
-              <TouchableOpacity
+              <Button
               key={j}
+              variant='ghost'
+              icon={item.icon}
+              iconProps={{
+                color: colors.mutedForeground,
+              }}
+              disabled={item.disabled}
+              style={tw`justify-start h-auto py-4`}
               onPress={() => {
                 (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
                 item.onPress();
               }}
-              style={[tw`flex-row items-center gap-2 p-4`, { opacity: item.disabled ? 0.5 : 1 }]}
-              disabled={item.disabled}
               >
-                <item.icon color={colors.mutedForeground} size={20} />
-                <ThemedText>{item.label}</ThemedText>
-              </TouchableOpacity>
+                {item.label}
+              </Button>
             ))}
           </React.Fragment>
         ))}
@@ -172,7 +191,7 @@ const BottomSheetMedia = React.forwardRef<
       id={`${id}-credits`}
       content={
         <View>
-          <ThemedText>ok</ThemedText>
+          <Text>ok</Text>
         </View>
       }
       />

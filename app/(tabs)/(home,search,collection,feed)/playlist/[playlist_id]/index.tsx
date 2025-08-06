@@ -11,7 +11,7 @@ import { useSharedValue } from "react-native-reanimated";
 
 const PlaylistScreen = () => {
 	const { playlist_id } = useLocalSearchParams();
-	const { openSheet } = useBottomSheetStore();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const {
 		data: playlist,
 		isLoading,

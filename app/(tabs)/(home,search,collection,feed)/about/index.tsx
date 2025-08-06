@@ -1,12 +1,9 @@
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
 import { ThemedText } from '@/components/ui/ThemedText';
 import tw from '@/lib/tw';
-import { useTranslation } from 'react-i18next';
 
 
 const AboutScreen = () => {
-	const { t } = useTranslation();
-
 	const resources = [
 		{
 			name: 'Eyecandy',

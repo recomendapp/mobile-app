@@ -49,55 +49,12 @@ const FeedItem = forwardRef<
 		/>
 		<View style={tw`gap-4`}>
 			<View style={tw`flex-row justify-between`}>
-				<View style={tw`flex-row items-center gap-2`}>
-					{activity.user ? <CardUser user={activity.user} variant="icon" /> : null}
+				<View style={tw`flex-row items-center gap-1`}>
+					{activity.user && <CardUser user={activity.user} variant="icon" />}
 					<FeedActivity activity={activity} />
 				</View>
 			</View>
 		</View>
-		{/* <MoviePoster
-		className="w-20 @md/feed-item:w-24"
-		src={activity.media?.avatar_url ?? ''}
-		alt={activity.media?.title ?? ''}
-		width={96}
-		height={144}
-		classNameFallback="h-full"
-		/>
-		<div className="flex flex-col gap-4 w-full">
-			<div className="flex justify-between">
-				<div className="flex items-center gap-2">
-					{activity.user ? <UserCard user={activity.user} icon /> : null}
-					<FeedActivity activity={activity} className="text-sm @md/feed-item:text-base text-muted-foreground"/>
-				</div>
-				<div className='hidden @md/feed-item:block text-sm text-muted-foreground opacity-0 group-hover:opacity-100 duration-500'>
-					{format.relativeTime(new Date(activity.watched_date), new Date())}
-				</div>
-			</div>
-			<Link href={activity.media?.url ?? ''} className="text-md @md/feed-item:text-xl space-x-1 line-clamp-2">
-				<span className='font-bold'>{activity.media?.title}</span>
-				<sup>
-					<DateOnlyYearTooltip date={activity.media?.date ?? ''} className='text-xs @md/feed-item:text-sm font-medium'/>
-				</sup>
-			</Link>
-			{activity.review ? (
-				activity.user ? <CardReview
-					className="bg-background"
-					review={activity.review}
-					activity={activity}
-					author={activity.user}
-				/> : null
-			) : (
-				<>
-				{(activity.media?.extra_data?.overview) ? (
-					<>
-					<p className={cn("text-xs @md/feed-item:text-sm line-clamp-3 text-justify", !activity.media?.extra_data.overview?.length && 'text-muted-foreground')}>
-						{activity.media?.extra_data.overview?.length ? activity.media.extra_data.overview : 'Aucune description'}
-					</p>
-					</>
-				) : null}
-				</>
-			)}
-		</div> */}
 	  </View>
 	);
 });

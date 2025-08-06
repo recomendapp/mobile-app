@@ -1,9 +1,7 @@
 import { CardMedia } from "@/components/cards/CardMedia";
-import { IconMediaRating } from "@/components/medias/IconMediaRating";
 import ActionReviewLike from "@/components/reviews/actions/ActionReviewLike";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { Button, ButtonText } from "@/components/ui/Button";
-import { ThemedText } from "@/components/ui/ThemedText"
+import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -12,14 +10,14 @@ import Viewer from "@/lib/10tap/viewer";
 import tw from "@/lib/tw";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { Text } from "react-native";
 import { View } from "react-native"
+import { useTranslations } from "use-intl";
 
 const ReviewScreen = () => {
 	const { user } = useAuth();
 	const { inset, colors } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const bottomTabBarHeight = useBottomTabOverflow();
 	const router = useRouter();
 	const { review_id } = useLocalSearchParams();
@@ -73,10 +71,10 @@ const ReviewScreen = () => {
 						transform: 'translate(-50%, -50%)',
 					}
 				]}
-				pressableStyle={tw`flex-0`}
+				// pressableStyle={tw`flex-0`}
 				onPress={() => router.push(`/review/${review.id}/edit`)}
 				>
-					<ButtonText>{upperFirst(t('common.messages.edit'))}</ButtonText>
+				{upperFirst(t('common.messages.edit'))}
 				</Button>
 			) : null}
 		</View>

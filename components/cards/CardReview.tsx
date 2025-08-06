@@ -1,19 +1,17 @@
 import * as React from "react"
-import { User, UserActivity, UserReview } from "@/types/type.db";
-import { JSONContent } from "@tiptap/react";
-// import { IconMediaRating } from "@/components/Media/icons/IconMediaRating";
-// import ActionReviewLike from "@/components/Review/actions/ActionReviewLike";
+import { JSONContent, User, UserActivity, UserReview } from "@/types/type.db";
+// import { JSONContent } from "@tiptap/react";
 import Animated from "react-native-reanimated";
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useTranslation } from "react-i18next";
-import useNow from "@/hooks/useNow";
 import { ThemedText } from "../ui/ThemedText";
 import { IconMediaRating } from "../medias/IconMediaRating";
 import { CardUser } from "./CardUser";
 import ActionReviewLike from "../reviews/actions/ActionReviewLike";
+import { useFormatter, useNow } from "use-intl";
+import { Text } from "../ui/text";
 
 interface CardReviewProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -29,14 +27,7 @@ const CardReviewDefault = React.forwardRef<
 	Omit<CardReviewProps, "variant">
 >(({ review, activity, author, linked, children, style, ...props }, ref) => {
 	const now = useNow({ updateInterval: 1000 * 10 });
-	const { i18n } = useTranslation();
-	// const format: Intl.RelativeTimeFormat = React.useMemo(
-	// 	() =>
-	// 		new Intl.RelativeTimeFormat(i18n.language, {
-	// 			style: 'short',
-	// 		}),
-	// 	[i18n.language]
-	// );
+	// const format = useFormatter();
 	const { colors } = useTheme();
 	return (
 		<Animated.View
@@ -53,12 +44,7 @@ const CardReviewDefault = React.forwardRef<
 				{/* <View style={[{ backgroundColor: colors.mutedForeground }, tw.style("h-full w-0.5 rounded-full")]} /> */}
 			</View>
 			<View style={tw.style("w-full flex-col gap-1 shrink")}>
-				<View style={tw.style("w-full flex-row justify-between items-center gap-2")}>
-					<CardUser variant="inline" user={author} />
-					<View style={[{ color: colors.mutedForeground }, tw.style('text-sm')]}>
-						{/* {format.format((new Date(review?.updated_at ?? '').getTime() - now.getTime()) / 1000, 'seconds')} */}
-					</View>
-				</View>
+				<CardUser variant="inline" user={author} />
 				{review?.title ? (
 					<ThemedText numberOfLines={1} style={tw.style("font-semibold")}>
 						{review?.title}

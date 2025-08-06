@@ -1,34 +1,45 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import * as Localization from "expo-localization";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import en_US from "@/messages/en-US.json";
-import fr_FR from "@/messages/fr-FR.json";
+import * as Localization from "expo-localization";
+import deepmerge from "deepmerge";
+import defaultMessages from "@/translations/en-US.json";
 
-const resources = {
-  "en-US": { translation: en_US },
-  "fr-FR": { translation: fr_FR },
-};
+export const DEFAULT_LOCALE = "en-US";
 
-const initI18n = async () => {
-  let savedLanguage = await AsyncStorage.getItem("language");
+export const getLocale = async (): Promise<string> => {
+  let saved = await AsyncStorage.getItem("language");
 
-  if (!savedLanguage) {
-    savedLanguage = Localization.getLocales()[0].languageTag ?? "en-US";
-    await AsyncStorage.setItem("language", savedLanguage);
+  if (!saved) {
+    const deviceLocale = Localization.getLocales()[0]?.languageTag ?? DEFAULT_LOCALE;
+    saved = deviceLocale;
+    await AsyncStorage.setItem("language", saved);
   }
 
-  i18n.use(initReactI18next).init({
-    compatibilityJSON: "v4",
-    resources,
-    lng: savedLanguage,
-    fallbackLng: "en-US",
-    interpolation: {
-      escapeValue: false,
-    },
-  });
+  return saved;
 };
 
-initI18n();
+export const setLocale = async (locale: string): Promise<void> => {
+  await AsyncStorage.setItem("language", locale);
+};
 
-export default i18n;
+export const loadMessages = async (locale: string) => {
+  const fallback = defaultMessages;
+  let userMessages;
+  try {
+    switch (locale) {
+      case "fr":
+      case "fr-FR":
+        userMessages = (await import("@/translations/fr-FR.json")).default;
+        break;
+      case "en":
+      case "en-US":
+        userMessages = fallback;
+        break;
+      default:
+        userMessages = {};
+        break;
+    }
+  } catch {
+    userMessages = {};
+  }
+  return deepmerge(fallback, userMessages as Record<string, string>);
+};

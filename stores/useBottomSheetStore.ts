@@ -54,17 +54,19 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
       sizes?: SheetSize[] | null;
       persistent?: boolean;
       parentId?: string;
+      haptics?: boolean;
     } = {
       sizes: undefined,
       persistent: false,
       parentId: undefined,
+      haptics: true,
     },
   ) => {
     const id = Math.random().toString(36).substring(7);
     // const id = generateSheetId(content, props);
     // const existingSheet = get().sheets.find((s) => s.id === id);
     // if (existingSheet) return id;
-    if (process.env.EXPO_OS === 'ios') {
+    if (options.haptics && process.env.EXPO_OS === 'ios') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     const sheetRef = React.createRef<TrueSheet>() as React.RefObject<TrueSheet>;

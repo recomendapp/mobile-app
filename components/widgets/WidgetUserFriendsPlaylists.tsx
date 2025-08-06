@@ -1,11 +1,12 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistsFriendsInfinite } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { useTranslation } from "react-i18next";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { CardPlaylist } from "../cards/CardPlaylist";
 import { LegendList } from "@legendapp/list";
+import { useTranslations } from "use-intl";
+import { upperFirst } from "lodash";
 
 interface WidgetUserFriendsPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -17,9 +18,8 @@ export const WidgetUserFriendsPlaylists = ({
   labelStyle,
   containerStyle,
 } : WidgetUserFriendsPlaylistsProps) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { user } = useAuth();
-
   const { data: playlists } = useUserPlaylistsFriendsInfinite({
     userId: user?.id,
 		filters: {
@@ -31,7 +31,7 @@ export const WidgetUserFriendsPlaylists = ({
 
   return (
   <View style={[tw`flex-1 gap-2`, style]}>
-    <ThemedText style={[tw`font-semibold text-xl`, labelStyle]}>{t('widgets.user_friends_playlists.label')}</ThemedText>
+    <ThemedText style={[tw`font-semibold text-xl`, labelStyle]}>{upperFirst(t('common.messages.friends_playlists'))}</ThemedText>
     <LegendList
     data={playlists.pages.flat()}
     renderItem={({ item }) => (

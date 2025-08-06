@@ -9,8 +9,8 @@ import { Pressable, View } from "react-native";
 import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { IconMediaRating } from "../medias/IconMediaRating";
+import { useTranslations } from "use-intl";
 
 interface CardTvSeriesSeasonProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -33,7 +33,7 @@ const CardTvSeriesSeasonDefault = React.forwardRef<
 	Omit<CardTvSeriesSeasonProps, "variant">
 >(({ style, season, showAction, children, linked, showRating, posterClassName, ...props }, ref) => {
 	const { colors } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	return (
 		<Animated.View
 		ref={ref}
@@ -77,7 +77,7 @@ const CardTvSeriesSeason = React.forwardRef<
 	CardTvSeriesSeasonProps
 >(({ hideMediaType = true, showRating = true, linked = true, variant = "default", ...props }, ref) => {
 	const router = useRouter();
-	const { openSheet } = useBottomSheetStore();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const onPress = () => {
 		if (linked && props.season.url) {
 			router.push(props.season.url as Href);

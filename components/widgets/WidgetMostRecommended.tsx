@@ -1,5 +1,4 @@
-import { View, Dimensions, ImageBackground, ViewProps } from "react-native";
-import { useTranslation } from "react-i18next";
+import { View, Dimensions, ViewProps } from "react-native";
 import { useWidgetMostRecommended } from "@/features/widget/widgetQueries";
 import { Skeleton } from "../ui/Skeleton";
 import { useRef } from "react";
@@ -7,13 +6,13 @@ import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated
 import { useSharedValue } from "react-native-reanimated";
 import { ThemedText } from "../ui/ThemedText";
 import tw from "@/lib/tw";
+import { ImageBackground } from "expo-image";
 
 const width = Dimensions.get("window").width;
 
 const WidgetMostRecommended = ({
 	style,
 } : ViewProps) => {
-	const t = useTranslation();
 	const {
 		data,
 		isLoading,

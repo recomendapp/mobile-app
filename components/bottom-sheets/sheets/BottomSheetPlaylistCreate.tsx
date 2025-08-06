@@ -3,8 +3,7 @@ import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
-import { useTranslation } from 'react-i18next';
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { usePlaylistInsertMutation } from '@/features/playlist/playlistMutations';
@@ -18,6 +17,7 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BetterInput } from '@/components/ui/BetterInput';
+import { useTranslations } from 'use-intl';
 
 interface BottomSheetPlaylistCreateProps extends BottomSheetProps {
   onCreate?: (playlist: Playlist) => void;
@@ -32,9 +32,9 @@ const BottomSheetPlaylistCreate = React.forwardRef<
 	BottomSheetPlaylistCreateProps
 >(({ id, onCreate, placeholder, ...props }, ref) => {
   const { user } = useAuth();
-  const { closeSheet } = useBottomSheetStore();
-  const { colors, inset } = useTheme();
-  const { t } = useTranslation();
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
+  const { colors } = useTheme();
+  const t = useTranslations();
   const createPlaylistMutation = usePlaylistInsertMutation({
     userId: user?.id,
   });
@@ -62,7 +62,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
     }, {
       onSuccess: (playlist) => {
         Burnt.toast({
-          title: upperFirst(t('common.messages.added')),
+          title: upperFirst(t('common.messages.added', { gender: 'female', count: 1 })),
           preset: 'done',
         });
         onCreate && onCreate(playlist);
@@ -71,8 +71,9 @@ const BottomSheetPlaylistCreate = React.forwardRef<
       onError: () => {
         Burnt.toast({
           title: upperFirst(t('common.messages.error')),
-          message: upperFirst(t('common.errors.an_error_occurred')),
+          message: upperFirst(t('common.messages.an_error_occurred')),
           preset: 'error',
+          haptic: 'error',
         });
       }
     });
@@ -86,7 +87,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
     ]}
     {...props}
     >
-      <ThemedText style={tw`text-lg font-bold`}>Donner un nom à la playlist</ThemedText>
+      <ThemedText style={tw`text-lg font-bold`}>{upperFirst(t('common.messages.give_a_name_to_playlist'))}</ThemedText>
       <Controller
       name='title'
       control={form.control}
@@ -94,7 +95,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
         <View style={tw`gap-2 w-full`}>
           <BetterInput
           variant='outline'
-          placeholder={placeholder ?? upperFirst(t('common.playlist.form.title.placeholder'))}
+          placeholder={placeholder ?? upperFirst(t('common.messages.title'))}
           value={value}
           autoCorrect={false}
           onBlur={onBlur}
@@ -118,7 +119,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
       }}
       disabled={createPlaylistMutation.isPending}
       >
-        <ButtonText>{upperFirst(t('common.messages.create'))}</ButtonText>
+        {upperFirst(t('common.messages.create'))}
       </Button>
     </ThemedTrueSheet>
   );
