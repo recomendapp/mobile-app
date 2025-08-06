@@ -4,7 +4,6 @@ import { useAuth } from "./AuthProvider";
 import { useSupabaseClient } from "./SupabaseProvider";
 import { Platform } from "react-native";
 import * as Device from 'expo-device';
-import Constants from 'expo-constants';
 import { useRouter } from "expo-router";
 import { NotificationPayload } from "@/types/notifications";
 import * as Burnt from 'burnt';
@@ -53,20 +52,13 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
       }
-      console.log("🔔 Final notification permission status:", finalStatus);
       setPermissionStatus(finalStatus);
       if (finalStatus !== 'granted') {
         throw new Error('Permission not granted to get push token for push notification!');
       }
-      const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
-      if (!projectId) {
-        throw new Error('Project ID not found');
-      }
       try {
         const pushTokenString = (
-          await Notifications.getExpoPushTokenAsync({
-            projectId,
-          })
+          await Notifications.getDevicePushTokenAsync()
         ).data;
         return pushTokenString;
       } catch (e) {
@@ -80,28 +72,33 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
   const handleSaveToken = async (token: string) => {
     try {
       if (!session) return;
+      const provider = (Platform.OS === 'ios' || Platform.OS === 'macos') ? 'apns' : 'fcm';
       const { error } = await supabase
         .from("user_notification_tokens")
         .upsert({
           user_id: session.user.id,
           token: token,
           device_type: Platform.OS,
-          provider: "expo",
+          provider: provider,
           updated_at: new Date().toISOString(),
-        }, { onConflict: "user_id, device_type, provider, token", ignoreDuplicates: true });
+        }, { onConflict: "user_id, device_type, provider, token" });
       if (error) throw error;
     } catch (err) {
       console.error("Error saving push token:", err);
     }
   };
   const handleResponse = (response: Notifications.NotificationResponse) => {
-    const data = response.notification.request.content.data as NotificationPayload;
+    // iOS APNs : data in response.notification.request.trigger.payload.data
+    // Android FCM : data in response.notification.request.content.data
+    const data = (
+      response.notification.request.content.data ||
+      (response.notification.request.trigger as any).payload.data
+    ) as NotificationPayload;
     if (data) {
       handleRedirect(data);
     }
   };
   const handleRedirect = (data: NotificationPayload) => {
-    console.log("🔔 Redirecting based on notification data:", data);
     switch (data.type) {
       case 'reco_sent':
         router.push({
@@ -119,7 +116,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         router.push(`/user/${data.sender.username}`);
         break;
       default:
-        console.warn("Unhandled notification type:", data.type);
+        // Not handled or no redirect needed
         break;
     }
   };
@@ -152,6 +149,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
 
     // Listener when notification is clicked
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
+      console.log("🔔 Notification response received:", JSON.stringify(response, null, 2));
       handleResponse(response);
     });
 
@@ -159,8 +157,8 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     (async () => {
       const initialResponse = await Notifications.getLastNotificationResponseAsync();
       if (initialResponse) {
-        const data = initialResponse.notification.request.content.data;
-        console.log("🔔 Initial notification response:", JSON.stringify(data, null, 2));
+        console.log("🔔 Initial notification response:", JSON.stringify(initialResponse, null, 2));
+        handleResponse(initialResponse);
       }
     })();
 

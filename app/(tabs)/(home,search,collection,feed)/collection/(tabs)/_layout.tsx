@@ -1,14 +1,11 @@
 
 import ButtonCreatePlaylist from "@/components/buttons/ButtonCreatePlaylist";
-import Header from "@/components/header/Header";
 import { Button } from "@/components/ui/Button";
-import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { UserNav } from "@/components/user/UserNav";
 import tw from "@/lib/tw";
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
 import { ParamListBase, TabNavigationState } from "@react-navigation/native";
-import { withLayoutContext } from "expo-router";
+import { Stack, withLayoutContext } from "expo-router";
 import { upperFirst } from "lodash";
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
@@ -91,29 +88,30 @@ const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => 
 const CollectionLayout = () => {
 	const t = useTranslations();
 	return (
-		<ThemedSafeAreaView style={tw.style('flex-1')}>
-			<Header
-			right={
-				<View style={tw`flex-row items-center gap-2`}>
-					<ThemedText style={tw`text-2xl font-bold`}>{upperFirst(t('common.messages.library'))}</ThemedText>
-					<ButtonCreatePlaylist redirectAfterCreate={false} />
-				</View>
-			}
-			left={<UserNav />}
-			backButton={false}
-			/>
-			<MaterialTopTabs
-			tabBar={(props) => <TabBar {...props} />}
-			screenLayout={(props) => (
-				<View style={tw`flex-1 py-2 px-4`}>
-					{props.children}
-				</View>
-			)}
-			>
-				<MaterialTopTabs.Screen name="index" options={{ title: "perso" }} />
-				<MaterialTopTabs.Screen name="saved" options={{ title: upperFirst(t('common.messages.saved', { gender: 'female', count: 2 })) }} />
-			</MaterialTopTabs> 
-		</ThemedSafeAreaView>
+	<>
+		<Stack.Screen
+		options={{
+			headerTitle: upperFirst(t('common.messages.library')),
+			headerRight: () => (
+			<View style={tw`flex-row items-center gap-2`}>
+				<ButtonCreatePlaylist redirectAfterCreate={false} />
+				<UserNav />
+			</View>
+			),
+		}}
+		/>
+		<MaterialTopTabs
+		tabBar={(props) => <TabBar {...props} />}
+		screenLayout={(props) => (
+			<View style={tw`flex-1 py-2 px-4`}>
+				{props.children}
+			</View>
+		)}
+		>
+			<MaterialTopTabs.Screen name="index" options={{ title: "perso" }} />
+			<MaterialTopTabs.Screen name="saved" options={{ title: upperFirst(t('common.messages.saved', { gender: 'female', count: 2 })) }} />
+		</MaterialTopTabs> 
+	</>
 	)
 };
 

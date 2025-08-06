@@ -1,101 +1,128 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
-import { Skeleton } from "@/components/ui/Skeleton";
-import { ThemedText } from "@/components/ui/ThemedText"
+import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
+import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
-import { useTheme } from "@/providers/ThemeProvider";
-import {  useUserPlaylistsInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries"
+import { useUserPlaylistsInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
+import { useTheme } from "@/providers/ThemeProvider";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import { FlashList } from "@shopify/flash-list";
-import { useLocalSearchParams } from "expo-router"
+import { LegendList } from "@legendapp/list";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
-import { useState } from "react";
-import { View, Pressable } from "react-native";
+import { useCallback, useState } from "react";
+import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
+import { HeaderTitle } from "@react-navigation/elements";
 
-const GRID_COLUMNS = 3;
+const PADDING_BOTTOM = 8;
 
-const ProfilePlaylistsScreen = () => {
-	const { colors } = useTheme();
-	const { username } = useLocalSearchParams();
+interface sortBy {
+	label: string;
+	value: 'updated_at' | 'created_at' | 'likes_count';
+}
+
+const UserPlaylistsScreen = () => {
 	const t = useTranslations();
+	const { username } = useLocalSearchParams<{ username: string }>();
+	const { data, } = useUserProfileQuery({ username: username });
+	const { colors, inset } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
-	const [display, setDisplay] = useState<'grid' | 'row'>('grid');
-	const sortByOptions = [
-		{ label: t('common.messages.created_at'), value: 'created_at' },
-		{ label: t('common.messages.updated_at'), value: 'updated_at' },
-		{ label: t('common.messages.likes_count'), value: 'likes_count' },
-		{ label: t('common.messages.cancel'), value: 'cancel' },
+	const bottomTabBarHeight = useBottomTabOverflow();
+	// States
+	const sortByOptions: sortBy[] = [
+		{ label: upperFirst(t('common.messages.date_created')), value: 'updated_at' },
+		{ label: upperFirst(t('common.messages.date_updated')), value: 'created_at' },
+		{ label: upperFirst(t('common.messages.number_of_likes')), value: 'likes_count' },
 	];
-	const [sortBy, setSortBy] = useState<'created_at' | 'updated_at' | 'likes_count'>('updated_at');
+	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-
-	const { data, } = useUserProfileQuery({ username: username as string });
 	const {
-		data: activities,
+		data: playlists,
 		isLoading,
-		isFetching,
 		fetchNextPage,
 		hasNextPage,
+		isRefetching,
+		refetch,
 	} = useUserPlaylistsInfiniteQuery({
 		userId: data?.id,
 		filters: {
-			sortBy: sortBy,
-			sortOrder: sortOrder,
-			perPage: GRID_COLUMNS * 5,
+			sortBy: sortBy.value,
+			sortOrder,
 		}
 	});
-
-	const loading = isLoading || activities === undefined;
-
-	const handleSortBy = () => {
-		const cancelIndex = sortByOptions.length - 1;
+	const loading = playlists === undefined || isLoading;
+	// Handlers
+	const handleSortBy = useCallback(() => {
+		const sortByOptionsWithCancel = [
+			...sortByOptions,
+			{ label: upperFirst(t('common.messages.cancel')), value: 'cancel' },
+		];
+		const cancelIndex = sortByOptionsWithCancel.length - 1;
 		showActionSheetWithOptions({
-			options: sortByOptions.map((option) => upperFirst(option.label)),
+			options: sortByOptionsWithCancel.map((option) => option.label),
+			disabledButtonIndices: sortByOptions ? [sortByOptionsWithCancel.findIndex(option => option.value === sortBy.value)] : [],
 			cancelButtonIndex: cancelIndex,
 		}, (selectedIndex) => {
 			if (selectedIndex === undefined || selectedIndex === cancelIndex) return;
-			setSortBy(sortByOptions[selectedIndex].value as 'created_at' | 'updated_at' | 'likes_count');
+			setSortBy(sortByOptionsWithCancel[selectedIndex] as sortBy);
 		});
-	};
+	}, [sortByOptions, showActionSheetWithOptions]);
+
 
 	return (
-		<>
-			<View>
-				<View style={tw.style('flex flex-row justify-end items-center gap-2')}>
-					<Pressable onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}>
-					{sortOrder === 'desc' ? <Icons.ArrowDownNarrowWide color={colors.foreground} size={20} /> : <Icons.ArrowUpNarrowWide color={colors.foreground} size={20} />}
-					</Pressable>
-					<Pressable onPress={handleSortBy} style={tw.style('flex-row items-center gap-1')}>
-						<ThemedText>{upperFirst(t(`common.messages.${sortBy}`))}</ThemedText>
-						<Icons.ChevronDown color={colors.foreground} size={20} />
-					</Pressable>
+	<>
+		<Stack.Screen
+		options={{
+			title: data ? `@${data.username}` : '',
+			headerTitle: (props) => <HeaderTitle {...props}>{upperFirst(t('common.messages.playlist', { count: 2 }))}</HeaderTitle>
+		}}
+		/>
+		<LegendList
+		data={playlists?.pages.flatMap((page) => page) ?? []}
+		renderItem={({ item }) => (
+			<CardPlaylist key={item.id} playlist={item} />
+		)}
+		ListHeaderComponent={
+			<>
+				<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
+					<Button
+					icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
+					variant="muted"
+					size='icon'
+					onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}
+					/>
+					<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>
+						{sortBy.label}
+					</Button>
 				</View>
-			</View>
-			{activities?.pages[0].length ?
-				<FlashList
-				data={activities.pages.flat()}
-				renderItem={({ item, index }) => (
-					<View key={index} style={tw.style('p-1')}>
-						<CardPlaylist
-						key={item.id}
-						playlist={item}
-						style={tw.style('w-full')}
-						/>
-					</View>
-				)}
-				keyExtractor={(_, index) => index.toString()}
-				refreshing={isFetching}
-				numColumns={display === 'grid' ? GRID_COLUMNS : 1}
-				onEndReached={() => hasNextPage && fetchNextPage()}
-				onEndReachedThreshold={0.3}
-				nestedScrollEnabled
-				// ItemSeparatorComponent={() => <View className="w-2" />}
-				/>
-			: loading ? <Skeleton style={tw.style('h-48 w-full')} />
-			: <ThemedText style={tw.style('text-center')}>{upperFirst(t('common.messages.no_results'))}</ThemedText>}
-		</>
+			</>
+		}
+		ListEmptyComponent={
+			loading ? <Icons.Loader />
+			: (
+				<View style={tw`flex-1 items-center justify-center p-4`}>
+					<Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
+						{upperFirst(t('common.messages.no_results'))}
+					</Text>
+				</View>
+			) 
+		}
+		numColumns={3}
+		onEndReached={() => hasNextPage && fetchNextPage()}
+		onEndReachedThreshold={0.5}
+		contentContainerStyle={[
+			{
+				paddingBottom: bottomTabBarHeight + inset.bottom + PADDING_BOTTOM,
+			},
+			tw`px-4`,
+		]}
+		keyExtractor={(item) => item.id.toString()}
+		columnWrapperStyle={tw`gap-2`}
+		refreshing={isRefetching}
+		onRefresh={refetch}
+		/>
+	</>
 	);
 };
 
-export default ProfilePlaylistsScreen;
+export default UserPlaylistsScreen;

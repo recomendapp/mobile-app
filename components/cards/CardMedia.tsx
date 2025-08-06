@@ -119,101 +119,12 @@ React.ComponentRef<typeof Animated.View>,
 });
 CardMediaPoster.displayName = "CardMediaPoster";
 
-// const CardMediaRow = React.forwardRef<
-// 	HTMLDivElement,
-// 	Omit<CardMediaProps, "variant">
-// >(({ className, posterClassName, media, activity, profileActivity, hideMediaType, linked, showRating, children, ...props }, ref) => {
-// 	const mediaUrlPrefix = getMediaUrlPrefix(media.media_type!);
-// 	return (
-// 		<Card
-// 			ref={ref}
-// 			className={cn(
-// 				"group flex gap-4 items-center p-1",
-// 				linked ? "hover:bg-muted-hover" : "",
-// 				className
-// 			)}
-// 			{...props}
-// 		>
-// 			<div className={cn("relative w-24 aspect-[2/3] rounded-md overflow-hidden", posterClassName)}>
-// 				<ImageWithFallback
-// 					src={media.avatar_url ?? ''}
-// 					alt={media.title ?? ''}
-// 					fill
-// 					className="object-cover"
-// 					type={media.media_type}
-// 					sizes={`
-// 					(max-width: 640px) 96px,
-// 					(max-width: 1024px) 120px,
-// 					150px
-// 					`}
-// 				/>
-// 			</div>
-// 			<div className="flex items-center gap-4 justify-between w-full">
-// 				<div className='space-y-1'>
-// 					<div className="flex items-center gap-2">
-// 						<WithLink
-// 						href={linked ? (media.url ?? '') : undefined}
-// 						className='line-clamp-2 break-words'
-// 						onClick={linked ? (e) => e.stopPropagation() : undefined}
-// 						>
-// 							{media.title}
-// 						</WithLink>
-// 						{profileActivity?.rating ? (
-// 							<WithLink
-// 							href={linked ? `/@${profileActivity?.user?.username}${mediaUrlPrefix}/${media.slug ?? media.id}` : undefined}
-// 							className="pointer-events-auto"
-// 							onClick={linked ? (e) => e.stopPropagation() : undefined}
-// 							>
-// 								<IconMediaRating
-// 								rating={profileActivity.rating}
-// 								className="inline-flex"
-// 								/>
-// 							</WithLink>
-// 						) : null}
-// 						{profileActivity?.is_liked && (
-// 							<Link
-// 							href={`/@${profileActivity?.user?.username}${mediaUrlPrefix}/${media.slug ?? media.id}`}
-// 							className="pointer-events-auto"
-// 							onClick={linked ? (e) => e.stopPropagation() : undefined}
-// 							>
-// 								<Icons.like
-// 								size={24}
-// 								className="text-accent-pink fill-accent-pink inline-flex"
-// 								/>
-// 							</Link>
-// 						)}
-// 						{profileActivity?.review ? (
-// 							<Link
-// 							href={`/review/${profileActivity.review.id}`}
-// 							className="pointer-events-auto"
-// 							onClick={linked ? (e) => e.stopPropagation() : undefined}
-// 							>
-// 								<Icons.comment
-// 								size={24}
-// 								className="text-foreground inline-flex"
-// 								/>
-// 							</Link>
-// 						) : null}
-// 					</div>
-// 					{media.main_credit ? <Credits credits={media.main_credit} linked={linked} className="line-clamp-2"/> : null}
-// 					{media.extra_data.known_for_department ? <div className="text-xs text-muted-foreground">{media.extra_data.known_for_department}</div> : null}
-// 					{!hideMediaType ? <BadgeMedia type={media.media_type} /> : null}
-// 				</div>
-// 				{media.date ? (
-// 					<DateOnlyYearTooltip date={media.date} className="text-xs text-muted-foreground"/>
-// 				) : null}
-// 			</div>
-// 		</Card>
-// 	);
-// });
-// CardMediaRow.displayName = "CardMediaRow";
-
 const CardMedia = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CardMediaProps
 >(({ hideMediaType = true, showRating = true, linked = true, variant = "default", ...props }, ref) => {
 	const router = useRouter();
-	const { openSheet } = useBottomSheetStore();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const onPress = () => {
 		if (linked && props.media.url) {
 			router.push(props.media.url as Href);

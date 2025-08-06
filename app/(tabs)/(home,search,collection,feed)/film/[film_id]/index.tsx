@@ -10,7 +10,6 @@ import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { LegendList } from "@legendapp/list";
 import { getIdFromSlug } from "@/hooks/getIdFromSlug";
-import HeaderOverlay from "@/components/ui/HeaderOverlay";
 import BottomSheetMedia from "@/components/bottom-sheets/sheets/BottomSheetMedia";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useState } from "react";
@@ -20,16 +19,17 @@ import MediaHeader from "@/components/screens/media/MediaHeader";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useLocale, useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
+import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 
 const PADDING_BOTTOM = 8;
 
 const FilmScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
-	const { colors, inset } = useTheme();
+	const { inset } = useTheme();
 	const locale = useLocale();
 	const t = useTranslations();
-	const { openSheet } = useBottomSheetStore();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const bottomTabBarHeight = useBottomTabOverflow();
 	const {
 		data: movie,
@@ -57,15 +57,13 @@ const FilmScreen = () => {
 
 	return (
 	<>
-		<HeaderOverlay
-		triggerHeight={headerHeight}
-		headerHeight={headerOverlayHeight}
-		onHeaderHeight={(height) => {
-			'worklet';
-			headerOverlayHeight.value = height;
+		<AnimatedStackScreen
+		options={{
+			headerTitle: movie?.title || '',
+			headerTransparent: true,
 		}}
 		scrollY={scrollY}
-		title={movie?.title ?? ''}
+		triggerHeight={headerHeight}
 		onMenuPress={movie ? () => {
 			openSheet(BottomSheetMedia, {
 				media: movie as Media,

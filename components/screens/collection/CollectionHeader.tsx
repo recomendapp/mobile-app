@@ -7,32 +7,35 @@ import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle, us
 import useRandomBackdrop from "@/hooks/useRandomBackdrop";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
+import { useHeaderHeight } from '@react-navigation/elements';
+import { Skeleton } from "@/components/ui/Skeleton";
 
 interface CollectionHeaderProps
 	extends React.ComponentPropsWithoutRef<typeof Animated.View> {
 		headerHeight: SharedValue<number>;
-		headerOverlayHeight: SharedValue<number>;
 		scrollY: SharedValue<number>;
 		title: string;
 		numberOfItems: number;
 		backdrops: (string | null | undefined)[];
+		loading: boolean;
 	}
 
 const CollectionHeader = forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CollectionHeaderProps
->(({ headerHeight, headerOverlayHeight, scrollY, title, numberOfItems, backdrops, ...props }, ref) => {
+>(({ loading, headerHeight, scrollY, title, numberOfItems, backdrops, ...props }, ref) => {
 	const { colors, inset } = useTheme();
 	const { hslToRgb } = useColorConverter();
 	const bgBackdrop = useRandomBackdrop(backdrops);
 	const bgColor = hslToRgb(colors.background);
+	const navigationHeaderHeight = useHeaderHeight();
 
 	const layoutY = useSharedValue(0);
 	const opacityAnim = useAnimatedStyle(() => {
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + inset.top) / 0.9],
+				[0, headerHeight.get() - inset.top / 0.9],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -89,9 +92,9 @@ const CollectionHeader = forwardRef<
 			</Animated.View>
 			<Animated.View
 			style={[
-				tw`items-center justify-center px-4 py-8 h-56`,
+				tw`items-center justify-center px-4 pb-4 h-40`,
 				{
-					paddingTop: inset.top === 0 ? 8 : inset.top,
+					marginTop: navigationHeaderHeight > 0 ? navigationHeaderHeight : inset.top,
 				}
 			]}
 			>
@@ -103,9 +106,9 @@ const CollectionHeader = forwardRef<
 				>
 					{title}
 				</Text>
-				<Text style={[{ color: colors.mutedForeground }]}>
+				{!loading ? <Text style={[{ color: colors.mutedForeground }]}>
 					{numberOfItems} items
-				</Text>
+				</Text> : <Skeleton style={tw`h-4 w-10`} />}
 			</Animated.View>
 		</Animated.View>
 	)

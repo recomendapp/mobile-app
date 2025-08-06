@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { Database } from "@/types";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { createContext, useContext, useMemo } from "react";
 import { useLocale } from "use-intl";

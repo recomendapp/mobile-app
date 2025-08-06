@@ -77,7 +77,7 @@ const CardTvSeriesSeason = React.forwardRef<
 	CardTvSeriesSeasonProps
 >(({ hideMediaType = true, showRating = true, linked = true, variant = "default", ...props }, ref) => {
 	const router = useRouter();
-	const { openSheet } = useBottomSheetStore();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const onPress = () => {
 		if (linked && props.season.url) {
 			router.push(props.season.url as Href);

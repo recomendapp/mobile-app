@@ -88,12 +88,12 @@ const Playlist = ({
 				return (b.rank || 0) - (a.rank || 0);
 			}));
 		} else if (sortBy === 'title') {
-			setRenderItems((prev) => prev?.sort((a, b) => {
-				if (sortOrder === 'asc') {
-					return a.media?.title!.localeCompare(b.media?.title!);
-				}
-				return b.media?.title!.localeCompare(a.media?.title!);
-			}));
+			setRenderItems((prev) =>
+				[...(prev ?? [])].sort((a, b) => {
+					const result = a.media?.title?.localeCompare(b.media?.title ?? '') ?? 0;
+					return sortOrder === 'asc' ? result : -result;
+				})
+			);
 		}
 	}, [sortBy]);
 	return (

@@ -35,7 +35,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
 >(({ id, playlist, sizes, ...props }, ref) => {
   const supabase = useSupabaseClient();
   const { colors } = useTheme();
-  const { closeSheet } = useBottomSheetStore();
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const t = useTranslations();
   const { user: loggedUser } = useAuth();
   const queryClient = useQueryClient();

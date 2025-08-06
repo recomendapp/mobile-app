@@ -37,7 +37,7 @@ const BottomSheetSendReco = React.forwardRef<
   const { colors, inset } = useTheme();
   const { user } = useAuth();
   const t = useTranslations();
-  const { closeSheet } = useBottomSheetStore();
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const {
 		data: friends,
     isRefetching,

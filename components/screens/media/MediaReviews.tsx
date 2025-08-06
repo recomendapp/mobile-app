@@ -16,7 +16,7 @@ const PADDING_BOTTOM = 8;
 
 interface sortBy {
 	label: string;
-	value: 'updated_at';
+	value: 'updated_at' | 'created_at' | 'likes_count';
 }
 
 interface MediaReviewsProps {
@@ -33,6 +33,8 @@ const MediaReviews = ({
 	// States
 	const sortByOptions: sortBy[] = [
 		{ label: upperFirst(t('common.messages.date_updated')), value: 'updated_at' },
+		{ label: upperFirst(t('common.messages.date_created')), value: 'created_at' },
+		{ label: upperFirst(t('common.messages.number_of_likes')), value: 'likes_count' },
 	];
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -60,6 +62,7 @@ const MediaReviews = ({
 		const cancelIndex = sortByOptionsWithCancel.length - 1;
 		showActionSheetWithOptions({
 			options: sortByOptionsWithCancel.map((option) => option.label),
+			disabledButtonIndices: sortByOptions ? [sortByOptionsWithCancel.findIndex(option => option.value === sortBy.value)] : [],
 			cancelButtonIndex: cancelIndex,
 		}, (selectedIndex) => {
 			if (selectedIndex === undefined || selectedIndex === cancelIndex) return;
@@ -106,7 +109,6 @@ const MediaReviews = ({
 		]}
 		keyExtractor={(item) => item.id.toString()}
 		columnWrapperStyle={tw`gap-2`}
-		ItemSeparatorComponent={() => <View style={tw`h-2`} />}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		/>
