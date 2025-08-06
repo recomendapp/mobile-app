@@ -100,7 +100,7 @@ const BottomSheetMediaRating = React.forwardRef<
 	const { user } = useAuth();
 	const { colors, inset } = useTheme();
 	const t = useTranslations();
-	const { closeSheet } = useBottomSheetStore();
+	const closeSheet = useBottomSheetStore((state) => state.closeSheet);
 	const {
 		data: activity,
 	} = useUserActivityQuery({

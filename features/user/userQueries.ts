@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { userKeys } from "./userKeys"
-import { UserFeedCastCrew, Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserReview, UserWatchlist, PlaylistType } from "@/types/type.db";
+import { UserFeedCastCrew, Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserReview, UserWatchlist, PlaylistType, Profile } from "@/types/type.db";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 
 /* ---------------------------------- USER ---------------------------------- */
@@ -48,7 +48,8 @@ export const useUserProfileQuery = ({
 				.from('profile')
 				.select('*')
 				.eq('username', username)
-				.maybeSingle();
+				.maybeSingle()
+				.overrideTypes<Profile, { merge: true }>();
 			if (error) throw error;
 			return data;
 		},
@@ -168,13 +169,13 @@ export const useUserActivityQuery = ({
 	mediaId,
 } : {
 	userId?: string;
-	mediaId: number;
+	mediaId?: number | null;
 }) => {
 	const supabase = useSupabaseClient();
 	return useQuery({
 		queryKey: userKeys.activity({
-			userId: userId as string,
-			mediaId: mediaId,
+			userId: userId!,
+			mediaId: mediaId!,
 		}),
 		queryFn: async () => {
 			if (!userId) throw Error('Missing user id');

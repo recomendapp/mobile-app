@@ -25,6 +25,10 @@ const TabsLayout = () => {
 					android: { backgroundColor: colors.background },
 					default: {},
 				}),
+				tabBarItemStyle: {
+					paddingTop: 4,
+				},
+				tabBarShowLabel: false,
 				lazy: true,
 			}}
 		>

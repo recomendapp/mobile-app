@@ -37,7 +37,7 @@ const BottomSheetPlaylistEdit = React.forwardRef<
 	BottomSheetPlaylistEditProps
 >(({ id, playlist, onEdit, sizes = ["auto"], ...props }, ref) => {
   const supabase = useSupabaseClient();
-  const { closeSheet } = useBottomSheetStore();
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors, inset } = useTheme();
   const t = useTranslations();
   const { showActionSheetWithOptions } = useActionSheet();

@@ -48,7 +48,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 	headerHeight,
 	headerOverlayHeight,
 }) => {
-	const { openSheet } = useBottomSheetStore();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
 	const { hslToRgb } = useColorConverter();
 	const { colors, inset } = useTheme();

@@ -60,7 +60,7 @@ const CardPlaylist = React.forwardRef<
 	CardPlaylistProps
 >(({ playlist, variant = "default", ...props }, ref) => {
 	const router = useRouter();
-	const { openSheet } = useBottomSheetStore();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const onPress = () => {
 		router.push(`/playlist/${playlist?.id}`);
 	};

@@ -1,7 +1,7 @@
 import React from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
-import { Media } from '@/types/type.db';
+import { Media, UserActivity } from '@/types/type.db';
 import { LinkProps, usePathname, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -19,9 +19,11 @@ import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface BottomSheetMediaProps extends BottomSheetProps {
   media?: Media,
+  activity?: UserActivity,
   additionalItemsTop?: Item[];
   additionalItemsBottom?: Item[];
 };
@@ -38,9 +40,11 @@ interface Item {
 const BottomSheetMedia = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetMediaProps
->(({ id, media, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
-  const { closeSheet, openSheet } = useBottomSheetStore();
+>(({ id, media, activity, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
+  const openSheet = useBottomSheetStore((state) => state.openSheet);
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors, inset } = useTheme();
+  const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
   const pathname = usePathname();
@@ -53,6 +57,13 @@ const BottomSheetMedia = React.forwardRef<
       ...additionalItemsTop,
     ],
     [
+      ...((activity) ? [
+        {
+          icon: Icons.Feed,
+          onPress: () => router.push(`/user/${activity.user?.username}`),
+          label: upperFirst(t('common.messages.go_to_activity')),
+        },
+      ] : []),
       {
         icon: Icons.Movie,
         onPress: () => router.push(media?.url as LinkProps['href']),
@@ -89,25 +100,27 @@ const BottomSheetMedia = React.forwardRef<
           ))
         },
       ] : []),
-      {
-				icon: Icons.AddPlaylist,
-        onPress: () => openSheet(BottomSheetAddToPlaylist, {
-          media: media!,
-        }),
-				label: upperFirst(t('common.messages.add_to_playlist')),
-			},
-			{
-				icon: Icons.Reco,
-        onPress: () => openSheet(BottomSheetSendReco, {
-          media: media!,
-        }),
-				label: upperFirst(t('common.messages.send_to_friend')),
-			}
+      ...(session ? [
+        {
+          icon: Icons.AddPlaylist,
+          onPress: () => openSheet(BottomSheetAddToPlaylist, {
+            media: media!,
+          }),
+          label: upperFirst(t('common.messages.add_to_playlist')),
+        },
+        {
+          icon: Icons.Reco,
+          onPress: () => openSheet(BottomSheetSendReco, {
+            media: media!,
+          }),
+          label: upperFirst(t('common.messages.send_to_friend')),
+        }
+      ] : []),
     ],
     [
       ...additionalItemsBottom,
     ],
-  ]), [media, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname]);
+  ]), [media, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, activity, session]);
 
   return (
     <ThemedTrueSheet

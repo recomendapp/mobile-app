@@ -29,7 +29,7 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
   BottomSheetPlaylistGuestsAddProps
 >(({ id, playlistId, guests: guestsParent, onAdd, onRemove, sizes, ...props }, ref) => {
   const { colors } = useTheme();
-  const { closeSheet } = useBottomSheetStore();
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const t = useTranslations();
   const [search, setSearch] = React.useState('');
   const searchQuery = useDebounce(search, 500);

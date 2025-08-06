@@ -21,7 +21,7 @@ const BottomSheetWatchlistComment = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetWatchlistCommentProps
 >(({ id, watchlistItem, ...props }, ref) => {
-  const { closeSheet } = useBottomSheetStore();
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const t = useTranslations();
   const [comment, setComment] = React.useState(watchlistItem.comment || '');
   const updateWatchlist = useUserWatchlistUpdateMutation();

@@ -41,7 +41,8 @@ const BottomSheetAddToPlaylist = React.forwardRef<
   const { user } = useAuth();
   const t = useTranslations();
   const queryClient = useQueryClient();
-  const { closeSheet } = useBottomSheetStore();
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
+
   const BottomSheetPlaylistCreateRef = React.useRef<TrueSheet>(null);
   const {
 		data: playlists,

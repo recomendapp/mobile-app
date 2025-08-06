@@ -28,7 +28,7 @@ const MediaActionUserActivityRating = React.forwardRef<
 	const { session, user } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
-	const { openSheet } = useBottomSheetStore();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const {
 		data: activity,
 		isLoading,

@@ -11,9 +11,6 @@ import { CardReview } from "@/components/cards/CardReview";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useRouter } from "expo-router";
 import BottomSheetMedia from "@/components/bottom-sheets/sheets/BottomSheetMedia";
-import { Icons } from "@/constants/Icons";
-import { upperFirst } from "lodash";
-import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 
 interface CardUserActivityProps
@@ -77,21 +74,18 @@ const CardUserActivity = React.forwardRef<
 	CardUserActivityProps
 >(({ variant = "default", linked = false, ...props }, ref) => {
 	const router = useRouter();
-	const t = useTranslations();
-	const { openSheet } = useBottomSheetStore();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const onPress = () => {
 		router.push(`/user/${props.activity.user?.username}`);
 	};
 	const onLongPress = () => {
+		const {
+			media,
+			...activity
+		} = props.activity;
 		openSheet(BottomSheetMedia, {
-			media: props.activity.media,
-			additionalItemsTop: [
-				{
-				icon: Icons.Feed,
-				onPress: () => router.push(`/user/${props.activity.user?.username}`),
-				label: upperFirst(t('common.messages.go_to_activity')),
-				},
-			]
+			media: media,
+			activity: activity,
 		})
 	};
 	return (

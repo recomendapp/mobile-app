@@ -3,7 +3,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { ScrollView, View } from 'react-native';
 import { UserNav } from '@/components/user/UserNav';
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
-import { Link } from 'expo-router';
+import { Link, Stack } from 'expo-router';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 import tw from '@/lib/tw';
 import { Button } from '@/components/ui/Button';
@@ -22,6 +22,7 @@ const HomeScreen = () => {
   const { session, user } = useAuth();
   const bottomTabHeight = useBottomTabOverflow();
   return (
+    <>
       <ThemedSafeAreaView style={tw.style("flex-1")}>
         <View style={tw.style("flex-1 gap-2")}>
           <Header
@@ -56,6 +57,7 @@ const HomeScreen = () => {
           </ScrollView>
         </View>
       </ThemedSafeAreaView>
+    </>
   );
 }
 

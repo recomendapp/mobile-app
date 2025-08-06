@@ -23,7 +23,7 @@ const MediaActionPlaylistAdd = React.forwardRef<
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
-	const { openSheet } = useBottomSheetStore();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	return (
 		<Pressable
 		ref={ref}

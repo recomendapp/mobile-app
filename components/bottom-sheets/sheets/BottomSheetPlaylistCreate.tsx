@@ -32,7 +32,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
 	BottomSheetPlaylistCreateProps
 >(({ id, onCreate, placeholder, ...props }, ref) => {
   const { user } = useAuth();
-  const { closeSheet } = useBottomSheetStore();
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors } = useTheme();
   const t = useTranslations();
   const createPlaylistMutation = usePlaylistInsertMutation({

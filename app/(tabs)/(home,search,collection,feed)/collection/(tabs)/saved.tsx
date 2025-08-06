@@ -13,7 +13,7 @@ import { useTranslations } from "use-intl";
 const CollectionSavedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
-	const { colors } = useTheme();
+	const { colors, inset } = useTheme();
 	const tabBarHeight = useBottomTabOverflow();
 	const {
 		data: playlists,
@@ -50,7 +50,7 @@ const CollectionSavedScreen = () => {
 		onRefresh={refetch}
 		numColumns={3}
 		contentContainerStyle={{
-			paddingBottom: tabBarHeight,
+			paddingBottom: tabBarHeight + inset.bottom,
 		}}
 		keyExtractor={(_, index) => index.toString()}
 		showsVerticalScrollIndicator={false}

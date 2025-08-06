@@ -164,7 +164,7 @@ export const useMediaReviewsInfiniteQuery = ({
 	id?: number | null;
 	filters?: {
 		perPage?: number;
-		sortBy?: 'updated_at';
+		sortBy?: 'updated_at' | 'created_at' | 'likes_count';
 		sortOrder?: 'asc' | 'desc';
 	};
 }) => {
@@ -198,6 +198,12 @@ export const useMediaReviewsInfiniteQuery = ({
 					switch (mergedFilters.sortBy) {
 						case 'updated_at':
 							request = request.order('updated_at', { ascending: mergedFilters.sortOrder === 'asc' });
+							break;
+						case 'created_at':
+							request = request.order('created_at', { ascending: mergedFilters.sortOrder === 'asc' });
+							break;
+						case 'likes_count':
+							request = request.order('likes_count', { ascending: mergedFilters.sortOrder === 'asc' });
 							break;
 						default:
 							break;

@@ -11,7 +11,9 @@ export interface BottomSheetProps extends Omit<React.ComponentPropsWithoutRef<ty
 export const BottomSheetManager = () => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const { sheets, closeSheet, removeSheet } = useBottomSheetStore();
+  const sheets = useBottomSheetStore((state) => state.sheets);
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
+  const removeSheet = useBottomSheetStore((state) => state.removeSheet);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('state', () => {

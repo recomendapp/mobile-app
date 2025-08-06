@@ -44,7 +44,8 @@ const BottomSheetPlaylist = React.forwardRef<
   BottomSheetPlaylistProps
 >(({ id, playlist, additionalItemsTop = [], ...props }, ref) => {
   const { user } = useAuth();
-  const { closeSheet, openSheet } = useBottomSheetStore();
+  const openSheet = useBottomSheetStore((state) => state.openSheet);
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors, inset } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
