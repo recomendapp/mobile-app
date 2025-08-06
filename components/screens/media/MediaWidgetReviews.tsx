@@ -1,17 +1,14 @@
-import { useAuth } from "@/providers/AuthProvider";
-import { useUserPlaylistsFriendsInfinite } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { useTranslation } from "react-i18next";
-import { StyleProp, Text, TextStyle, View, ViewStyle } from "react-native";
+import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { LegendList } from "@legendapp/list";
-import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { upperFirst } from "lodash";
 import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useMediaPlaylistsInfiniteQuery, useMediaReviewsInfiniteQuery } from "@/features/media/mediaQueries";
+import { useMediaReviewsInfiniteQuery } from "@/features/media/mediaQueries";
 import { CardReview } from "@/components/cards/CardReview";
 import { Icons } from "@/constants/Icons";
+import { useTranslations } from "use-intl";
 
 interface MediaWidgetReviewsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	mediaId: number;
@@ -28,7 +25,7 @@ const MediaWidgetReviews = ({
 	containerStyle,
 } : MediaWidgetReviewsProps) => {
 	const { colors } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const urlReviews = `${url}/reviews` as Href;
 	const {
 		data: reviews,

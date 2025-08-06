@@ -1,6 +1,5 @@
 import React from 'react';
 import tw from '@/lib/tw';
-import { useTranslation } from 'react-i18next';
 import { Icons } from '@/constants/Icons';
 import { Media, User } from '@/types/type.db';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -13,7 +12,7 @@ import { useUserRecosInsertMutation } from '@/features/user/userMutations';
 import { useAuth } from '@/providers/AuthProvider';
 import Fuse from "fuse.js";
 import UserAvatar from '@/components/user/UserAvatar';
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import * as Burnt from 'burnt';
 import { Badge } from '@/components/ui/Badge';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
@@ -23,6 +22,7 @@ import { FlatList, Pressable } from 'react-native-gesture-handler';
 import { useSharedValue } from 'react-native-reanimated';
 import { BetterInput } from '@/components/ui/BetterInput';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
 
 interface BottomSheetSendRecoProps extends BottomSheetProps {
   media: Media,
@@ -36,8 +36,8 @@ const BottomSheetSendReco = React.forwardRef<
 >(({ id, media, sizes = ["medium", "large"], ...props }, ref) => {
   const { colors, inset } = useTheme();
   const { user } = useAuth();
-  const { t } = useTranslation();
-  const { closeSheet } = useBottomSheetStore();
+  const t = useTranslations();
+  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const {
 		data: friends,
     isRefetching,
@@ -83,6 +83,7 @@ const BottomSheetSendReco = React.forwardRef<
           Burnt.toast({
             title: error.message,
             preset: 'error',
+            haptic: 'error',
           })
 				} else {
 					switch (error.code) {
@@ -90,18 +91,21 @@ const BottomSheetSendReco = React.forwardRef<
               Burnt.toast({
 							  title: `Vous avez déjà envoyé ce film à ${selected.length === 1 ? 'cet ami(e)' : 'un ou plusieurs de ces amis'}`,
                 preset: 'error',
+                haptic: 'error',
               })
 							break;
 						case '23514':
               Burnt.toast({
 							  title: `Le commentaire est trop long (max ${COMMENT_MAX_LENGTH} caractère${COMMENT_MAX_LENGTH > 1 ? 's' : ''})`,
                 preset: 'error',
+                haptic: 'error',
               })
 							break;
 						default:
 							Burnt.toast({
-                title: upperFirst(t('common.errors.an_error_occurred')),
+                title: upperFirst(t('common.messages.an_error_occurred')),
                 preset: 'error',
+                haptic: 'error',
               })
 							break;
 					}
@@ -134,12 +138,12 @@ const BottomSheetSendReco = React.forwardRef<
         variant='outline'
         defaultValue={comment}
         onChangeText={setComment}
-        placeholder={upperFirst(t('common.messages.add_comment'))}
+        placeholder={upperFirst(t('common.messages.add_comment', { count: 1 }))}
         maxLength={COMMENT_MAX_LENGTH}
         autoCapitalize='sentences'
         />
         <Button disabled={!selected.length} onPress={submit}>
-          <ButtonText>{upperFirst(t('common.messages.send'))}</ButtonText>
+          {upperFirst(t('common.messages.send'))}
         </Button>
       </View>
     }
@@ -184,7 +188,7 @@ const BottomSheetSendReco = React.forwardRef<
           variant='outline'
           defaultValue={search}
           onChangeText={setSearch}
-          placeholder={upperFirst(t('common.messages.search_friend'))}
+          placeholder={upperFirst(t('common.messages.search_user'))}
           autoCapitalize='none'
           autoCorrect={false}
           leftIcon='search'

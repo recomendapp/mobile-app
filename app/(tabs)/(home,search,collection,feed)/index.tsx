@@ -1,15 +1,12 @@
 import * as React from 'react';
-import Animated from 'react-native-reanimated';
 import { useAuth } from '@/providers/AuthProvider';
 import { ScrollView, View } from 'react-native';
 import { UserNav } from '@/components/user/UserNav';
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
-import { ThemedText } from '@/components/ui/ThemedText';
-import { Link } from 'expo-router';
-import { useTranslation } from 'react-i18next';
+import { Link, Stack } from 'expo-router';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 import tw from '@/lib/tw';
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import { upperFirst } from 'lodash';
 import { WidgetUserRecos } from '@/components/widgets/WidgetUserRecos';
 import { WidgetUserWatchlist } from '@/components/widgets/WidgetUserWatchlist';
@@ -17,15 +14,22 @@ import { useBottomTabOverflow } from '@/components/TabBar/TabBarBackground';
 import { WidgetUserFriendsPlaylists } from '@/components/widgets/WidgetUserFriendsPlaylists';
 import { WidgetUserFeed } from '@/components/widgets/WidgetUserFeed';
 import { WidgetUserDiscovery } from '@/components/widgets/WidgetUserDiscovery';
+import { useTranslations } from 'use-intl';
+import Header from '@/components/header/Header';
 
 const HomeScreen = () => {
-  const { t } = useTranslation();
-  const { session } = useAuth();
+  const t = useTranslations();
+  const { session, user } = useAuth();
   const bottomTabHeight = useBottomTabOverflow();
   return (
+    <>
       <ThemedSafeAreaView style={tw.style("flex-1")}>
         <View style={tw.style("flex-1 gap-2")}>
-          <HomeHeader />
+          <Header
+          right={session ? `Welcome, ${user?.full_name}` : `Welcome on Recomend.`}
+          left={<UserNav />}
+          backButton={false}
+          />
           <ScrollView
           contentContainerStyle={[
             tw`gap-2`,
@@ -45,36 +49,16 @@ const HomeScreen = () => {
               </>
             ) : (
               <>
-              <Link href="/auth/login" asChild>
-                <Button>
-                  <ButtonText>{upperFirst(t('common.messages.get_started_its_free'))}</ButtonText>
-                </Button>
+              <Link href="/auth" asChild>
+                <Button>{upperFirst(t('common.messages.get_started_its_free'))}</Button>
               </Link>
               </>
             )}
           </ScrollView>
         </View>
       </ThemedSafeAreaView>
+    </>
   );
 }
-
-const HomeHeader = () => {
-  const { session, user } = useAuth();
-  const { t } = useTranslation();
-  return (
-    <View style={tw.style('flex-row justify-between items-center px-4')}>
-      <ThemedText numberOfLines={1} style={tw.style('text-2xl font-bold')}>
-        {session
-          ? `Welcome, ${user?.full_name}`
-          : `Welcome on Recomend.`}
-      </ThemedText>
-      {session ? (
-        <View style={tw.style('flex-row items-center gap-2')}>
-          <UserNav />
-        </View>
-      ) : null}
-    </View>
-  );
-};
 
 export default HomeScreen;

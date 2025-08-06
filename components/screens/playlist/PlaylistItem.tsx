@@ -20,7 +20,7 @@ const PlaylistItem = React.forwardRef<
 	PlaylistItemProps
 >(({ style, item, ...props }, ref) => {
 	const router = useRouter();
-	const { openSheet } = useBottomSheetStore();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const { colors } = useTheme();
 	return (
 		<Pressable

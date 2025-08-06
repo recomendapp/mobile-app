@@ -1,8 +1,6 @@
 import * as React from "react"
-import { upperFirst } from "lodash";
 import { Pressable, Text } from "react-native";
 import { useAuth } from "@/providers/AuthProvider";
-import { useTranslation } from "react-i18next";
 import { useUserReviewLikeQuery } from "@/features/user/userQueries";
 import { useUserReviewLikeDeleteMutation, useUserReviewLikeInsertMutation } from "@/features/user/userMutations";
 import { usePathname, useRouter } from "expo-router";
@@ -25,7 +23,6 @@ const ActionReviewLike = React.forwardRef<
 	const { colors } = useTheme();
 	const { user } = useAuth();
 	const router = useRouter();
-	const common = useTranslation();
 	const pathname = usePathname();
 	const {
 		data: like,

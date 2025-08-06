@@ -2,7 +2,6 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { useMediaTvSeriesSeasonDetailsQuery } from "@/features/media/mediaQueries";
 import { useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { LayoutChangeEvent, Text, View } from "react-native";
 import { MediaTvSeriesSeason } from "@/types/type.db";
 import tw from "@/lib/tw";
@@ -21,6 +20,7 @@ import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Icons } from "@/constants/Icons";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { IconMediaRating } from "@/components/medias/IconMediaRating";
+import { useLocale, useTranslations } from "use-intl";
 
 interface MediaHeaderProps {
 	season?: MediaTvSeriesSeason | null;
@@ -37,16 +37,13 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 	headerHeight,
 	headerOverlayHeight,
 }) => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { hslToRgb } = useColorConverter();
 	const { colors, inset } = useTheme();
 	const title = upperFirst(t('common.messages.tv_season_value', { number: season?.season_number! }));
 	const bgColor = hslToRgb(colors.background);
 	const posterHeight = useSharedValue(0);
-	const randomBg = useRandomImage(season?.episodes?.map(episode => ({
-		src: episode.avatar_url ?? '',
-		alt: upperFirst(t('common.messages.tv_episode_value', { number: episode.episode_number! })),
-	})) ?? []);
+	const randomBg = useRandomImage(season?.episodes?.filter(episode => episode.avatar_url).map(episode => episode.avatar_url!) ?? []);
 
 	const textAnim = useAnimatedStyle(() => {
 		return {
@@ -97,10 +94,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 			bgAnim,
 		]}
 		>
-			{season ? <Image
-			style={tw`absolute inset-0`}
-			source={{ uri: randomBg?.src ?? '' }}
-			/> : null}
+			{(season && randomBg) && <Image source={randomBg} style={tw`absolute inset-0`} />}
 			<LinearGradient
 			style={tw`absolute inset-0`}
 			colors={[
@@ -162,7 +156,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 						(!season && !loading) && { textAlign: 'center', color: colors.mutedForeground }
 					]}
 					>
-						{title ?? upperFirst(t('common.errors.media_not_found'))}
+						{title ?? upperFirst(t('common.messages.media_not_found'))}
 					</ThemedText>
 				) : <Skeleton style={tw.style('w-64 h-12')} />}
 				{season?.title && (
@@ -187,7 +181,8 @@ const TvSeriesSeasonScreen = () => {
 	const { tv_series_id, season_number } = useLocalSearchParams<{ tv_series_id: string, season_number: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
 	const { colors, inset } = useTheme();
-	const { i18n, t } = useTranslation();
+	const locale = useLocale();
+	const t = useTranslations();
 	const bottomTabBarHeight = useBottomTabOverflow();
 	const {
 		data: season,
@@ -221,7 +216,7 @@ const TvSeriesSeasonScreen = () => {
 			headerOverlayHeight.value = height;
 		}}
 		scrollY={scrollY}
-		title={upperFirst(t('common.messages.tv_season_value', { number: season?.season_number }))}
+		title={`${season?.serie?.title ?? ''} (${upperFirst(t('common.messages.tv_season_short', { number: season?.season_number! }))})`}
 		/>
 		<AnimatedLegendList
 		data={season?.episodes ?? []}
@@ -249,18 +244,18 @@ const TvSeriesSeasonScreen = () => {
 					<View style={tw`shrink px-2 py-1 gap-1`}>
 						<ThemedText numberOfLines={1}>
 							<ThemedText style={{ color: colors.accentYellow }}>
-								{upperFirst(t('common.messages.tv_episode_short', { season: season?.season_number, episode: item.episode_number }))}
+								{upperFirst(t('common.messages.tv_episode_short', { seasonNumber: season?.season_number!, episodeNumber: item.episode_number! }))}
 							</ThemedText>
 							<ThemedText style={tw`font-bold`}>
 								{" • "}
-								{item.title ?? upperFirst(t('common.messages.tv_episode_value', { number: item.episode_number }))}
+								{item.title ?? upperFirst(t('common.messages.tv_episode_value', { number: item.episode_number! }))}
 							</ThemedText>
 						</ThemedText>
 						<ThemedText numberOfLines={2}>
 							{item.overview ?? upperFirst(t('common.messages.no_overview'))}
 						</ThemedText>
 						<ThemedText numberOfLines={1} style={[tw`text-sm`, { color: colors.mutedForeground }]}>
-							{item.air_date ? new Intl.DateTimeFormat(i18n.language, { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(item.air_date)) : upperFirst(t('common.word.unknown'))}
+							{item.air_date ? new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(item.air_date)) : upperFirst(t('common.messages.unknown'))}
 						</ThemedText>
 					</View>
 				</View>
@@ -281,7 +276,7 @@ const TvSeriesSeasonScreen = () => {
 			: (
 				<View style={tw`flex-1 items-center justify-center p-4`}>
 					<Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
-						{upperFirst(t('common.messages.no_episodes'))}
+						{upperFirst(t('common.messages.no_tv_episodes'))}
 					</Text>
 				</View>
 			) 

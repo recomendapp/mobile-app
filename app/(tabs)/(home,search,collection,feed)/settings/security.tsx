@@ -1,22 +1,23 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
-import { ActivityIndicator, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import tw from "@/lib/tw";
 import { Label } from "@/components/ui/Label";
-import { InputPassword } from "@/components/ui/InputPassword";
-import { Button, ButtonText } from "@/components/ui/Button";
+import { InputPassword } from "@/components/ui/InputPasswordOld";
+import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
+import { useTranslations } from "use-intl";
+import { upperFirst } from "lodash";
 
 const SecuritySettings = () => {
 	const supabase = useSupabaseClient();
 	const { colors } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const profileFormSchema = z.object({
 		newpassword: z
@@ -63,7 +64,7 @@ const SecuritySettings = () => {
 			});
 			if (error) throw error;
 			Burnt.toast({
-				title: t('common.word.saved'),
+				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
 				preset: 'done',
 			})
 			form.reset();
@@ -73,11 +74,13 @@ const SecuritySettings = () => {
 					title: t('common.messages.error'),
 					message: error.message,
 					preset: 'error',
+					haptic: 'error',
 				});
 			} else {
 				Burnt.toast({
 					title: t('common.messages.error'),
 					preset: 'error',
+					haptic: 'error',
 				})
 			}
 		} finally {
@@ -135,11 +138,11 @@ const SecuritySettings = () => {
 			)}
 			/>
 			<Button
+			loading={isLoading}
 			onPress={form.handleSubmit(onSubmit)}
 			disabled={isLoading}
 			>
-				{isLoading ? <ActivityIndicator color={colors.background} /> : null}
-				<ButtonText>{t('common.word.save')}</ButtonText>
+				{t('common.messages.save')}
 			</Button>
 		</>
 	)

@@ -7,13 +7,13 @@ import { Text, View } from "react-native";
 import { LegendList } from "@legendapp/list";
 import { Icons } from "@/constants/Icons";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { useTheme } from "@/providers/ThemeProvider";
+import { useTranslations } from "use-intl";
 
 const CollectionSavedScreen = () => {
 	const { user } = useAuth();
-	const { t } = useTranslation();
-	const { colors } = useTheme();
+	const t = useTranslations();
+	const { colors, inset } = useTheme();
 	const tabBarHeight = useBottomTabOverflow();
 	const {
 		data: playlists,
@@ -50,7 +50,7 @@ const CollectionSavedScreen = () => {
 		onRefresh={refetch}
 		numColumns={3}
 		contentContainerStyle={{
-			paddingBottom: tabBarHeight,
+			paddingBottom: tabBarHeight + inset.bottom,
 		}}
 		keyExtractor={(_, index) => index.toString()}
 		showsVerticalScrollIndicator={false}

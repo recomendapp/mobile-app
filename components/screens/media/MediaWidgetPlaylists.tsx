@@ -1,5 +1,4 @@
 import tw from "@/lib/tw";
-import { useTranslation } from "react-i18next";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { LegendList } from "@legendapp/list";
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
@@ -9,6 +8,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
+import { useTranslations } from "use-intl";
 
 interface MediaWidgetPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	mediaId: number;
@@ -25,7 +25,7 @@ const MediaWidgetPlaylists = ({
 	containerStyle,
 } : MediaWidgetPlaylistsProps) => {
 	const { colors } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const urlPlaylists = `${url}/playlists` as Href;
 	const {
 		data: playlists,

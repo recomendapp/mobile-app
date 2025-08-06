@@ -11,9 +11,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { userKeys } from "@/features/user/userKeys";
 import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import * as Haptics from "expo-haptics";
 import { interpolateColor, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
+import { useTranslations } from "use-intl";
+import { usePathname, useRouter } from "expo-router";
 
 const ICON_SIZE = 24;
 
@@ -27,8 +28,10 @@ const MediaActionUserActivityLike = React.forwardRef<
 	MediaActionUserActivityLikeProps
 >(({ media, style, ...props }, ref) => {
 	const { colors } = useTheme();
-	const { user } = useAuth();
-	const { t } = useTranslation();
+	const { session, user } = useAuth();
+	const router = useRouter();
+	const pathname = usePathname();
+	const t = useTranslations();
 	const queryClient = useQueryClient();
 	const {
 		data: activity,
@@ -58,8 +61,9 @@ const MediaActionUserActivityLike = React.forwardRef<
 				onError: () => {
 					isLiked.value = 0;
 					Burnt.toast({
-						title: upperFirst(t('errors.an_error_occurred')),
+						title: upperFirst(t('common.messages.an_error_occurred')),
 						preset: 'error',
+						haptic: 'error',
 					});
 				}
 			});
@@ -77,8 +81,9 @@ const MediaActionUserActivityLike = React.forwardRef<
 				onError: () => {
 					isLiked.value = 0;
 					Burnt.toast({
-						title: upperFirst(t('errors.an_error_occurred')),
+						title: upperFirst(t('common.messages.an_error_occurred')),
 						preset: 'error',
+						haptic: 'error',
 					});
 				}
 			});
@@ -98,8 +103,9 @@ const MediaActionUserActivityLike = React.forwardRef<
 			},
 			onError: () => {
 				Burnt.toast({
-					title: upperFirst(t('errors.an_error_occurred')),
+					title: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 				isLiked.value = 1;
 			}
@@ -137,22 +143,31 @@ const MediaActionUserActivityLike = React.forwardRef<
 		<Pressable
 		ref={ref}
 		onPress={() => {
-			if (process.env.EXPO_OS === 'ios') {
-				Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+			if (session) {
+				if (process.env.EXPO_OS === 'ios') {
+					Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+				}
+				activity?.is_liked ? handleUnlike() : handleLike();
+			} else {
+				router.push({
+					pathname: '/auth',
+					params: {
+						redirect: pathname,
+					},
+				});
 			}
-			activity?.is_liked ? handleUnlike() : handleLike();
 		}}
-		disabled={isLoading || isError || activity === undefined || insertActivity.isPending || updateActivity.isPending}
+		disabled={
+			session ? (
+				isLoading || isError || activity === undefined || insertActivity.isPending || updateActivity.isPending
+			) : false
+		}
 		{...props}
 		>
 		{isError ? (
 			<AlertCircleIcon size={ICON_SIZE} />
 		) : (
 			<Icons.like color={activity?.is_liked ? colors.accentPink : colors.foreground} fill={activity?.is_liked ? colors.accentPink : undefined} size={ICON_SIZE} />
-			// <AnimatedLikeIcon
-			// animatedProps={anim}
-			// size={ICON_SIZE}
-			// />
 		)}
 		</Pressable>
 	);

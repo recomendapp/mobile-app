@@ -1,0 +1,6 @@
+[submodule "translations"]
+	path = translations
+	url = ../i18n.git
+[submodule "types"]
+	path = types
+	url = ../types.git

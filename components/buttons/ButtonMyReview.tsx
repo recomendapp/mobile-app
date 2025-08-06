@@ -1,7 +1,6 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityQuery } from "@/features/user/userQueries";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
 import { Skeleton } from "../ui/Skeleton";
 import { Link } from "expo-router";
 import { FileEditIcon } from "lucide-react-native";
@@ -9,13 +8,14 @@ import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { ThemedText } from "../ui/ThemedText";
 import { TouchableOpacity, View } from "react-native";
+import { useTranslations } from "use-intl";
 
 const ButtonMyReview = ({
 	mediaId,
  } : {
 	mediaId: number;
 }) => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { user } = useAuth();
 	const { colors } = useTheme();
 	const {

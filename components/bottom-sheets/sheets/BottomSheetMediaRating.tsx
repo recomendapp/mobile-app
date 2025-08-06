@@ -1,11 +1,10 @@
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { upperFirst } from 'lodash';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { Dimensions, FlatList, View } from 'react-native';
 import Animated, { clamp, interpolate, runOnJS, SharedValue, useAnimatedProps, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
@@ -20,6 +19,7 @@ import { useUserActivityInsertMutation, useUserActivityUpdateMutation } from '@/
 import * as Burnt from 'burnt';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
+import { useTranslations } from 'use-intl';
 
 const { width } = Dimensions.get('screen');
 const ITEM_WIDTH = width * 0.2;
@@ -99,8 +99,8 @@ const BottomSheetMediaRating = React.forwardRef<
 >(({ id, media, onRatingChange, sizes, ...props }, ref) => {
 	const { user } = useAuth();
 	const { colors, inset } = useTheme();
-	const { t } = useTranslation();
-	const { closeSheet } = useBottomSheetStore();
+	const t = useTranslations();
+	const closeSheet = useBottomSheetStore((state) => state.closeSheet);
 	const {
 		data: activity,
 	} = useUserActivityQuery({
@@ -143,8 +143,9 @@ const BottomSheetMediaRating = React.forwardRef<
 			}, {
 				onError: () => {
 					Burnt.toast({
-						title: upperFirst(t('common.errors.an_error_occurred')),
+						title: upperFirst(t('common.messages.an_error_occurred')),
 						preset: 'error',
+						haptic: 'error',
 					});
 				}
 			});
@@ -156,8 +157,9 @@ const BottomSheetMediaRating = React.forwardRef<
 			}, {
 				onError: () => {
 					Burnt.toast({
-						title: upperFirst(t('common.errors.an_error_occurred')),
+						title: upperFirst(t('common.messages.an_error_occurred')),
 						preset: 'error',
+						haptic: 'error',
 					});
 				}
 			});
@@ -166,11 +168,11 @@ const BottomSheetMediaRating = React.forwardRef<
 	const handleUnrate = async () => {
 		if (activity?.review) {
 			return Burnt.toast({
-				title: upperFirst(t('common.errors.an_error_occurred')),
+				title: upperFirst(t('common.messages.an_error_occurred')),
 				message: 'You cannot unrate a media with a review.',
 				duration: 3,
-				haptic: 'error',
 				preset: 'error',
+				haptic: 'error',
 			})
 		}
 		await updateActivity.mutateAsync({
@@ -179,8 +181,9 @@ const BottomSheetMediaRating = React.forwardRef<
 		}, {
 			onError: () => {
 				Burnt.toast({
-					title: upperFirst(t('common.errors.an_error_occurred')),
+					title: upperFirst(t('common.messages.an_error_occurred')),
 					preset: 'error',
+					haptic: 'error',
 				});
 			}
 		});
@@ -218,16 +221,16 @@ const BottomSheetMediaRating = React.forwardRef<
 			<View style={[{ paddingBottom: inset.bottom }, tw`flex-1 flex-row gap-2 justify-between px-4`]}>
 				{activity?.rating ? (
 					<>
-						<Button variant="outline" onPress={handleDeleteRating} pressableStyle={tw`flex-1`}>
-							<ButtonText variant="outline">Delete</ButtonText>
+						<Button variant="outline" onPress={handleDeleteRating} style={{ flex: 1 }}>
+							Delete
 						</Button>
-						<Button variant="accent-yellow" onPress={handleSaveRating} pressableStyle={tw`flex-1`}>
-							<ButtonText variant="accent-yellow">{upperFirst(t('common.word.save'))}</ButtonText>
+						<Button variant="accent-yellow" onPress={handleSaveRating} style={{ flex: 1 }}>
+							{upperFirst(t('common.messages.save'))}
 						</Button>
 					</>
 				) : (
-					<Button variant="accent-yellow" onPress={handleSaveRating} pressableStyle={tw`flex-1`}>
-						<ButtonText variant="accent-yellow">Ajouter une note</ButtonText>
+					<Button variant="accent-yellow" onPress={handleSaveRating} style={{ flex: 1 }}>
+						Ajouter une note
 					</Button>
 				)}
 			</View>

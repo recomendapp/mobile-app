@@ -1,18 +1,34 @@
 import { User } from "@/types/type.db";
 import { Session } from "@supabase/supabase-js";
-import { SplashScreen } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
 import { useUserQuery } from "@/features/user/userQueries";
-import { useTranslation } from "react-i18next";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AppState } from "react-native";
+import { supabase } from "@/lib/supabase/client";
+import app from "@/constants/app";
+import { useSplashScreen } from "./SplashScreenProvider";
+import { useLocaleContext } from "./LocaleProvider";
+import * as QueryParams from "expo-auth-session/build/QueryParams";
+import { makeRedirectUri } from "expo-auth-session";
 
-SplashScreen.preventAutoHideAsync();
+// Tells Supabase Auth to continuously refresh the session automatically
+// if the app is in the foreground. When this is added, you will continue
+// to receive `onAuthStateChange` events with the `TOKEN_REFRESHED` or
+// `SIGNED_OUT` event if the user's session is terminated. This should
+// only be registered once.
+AppState.addEventListener('change', (state) => {
+	if (state === 'active') {
+		supabase.auth.startAutoRefresh()
+	} else {
+		supabase.auth.stopAutoRefresh()
+	}
+})
 
 type AuthContextProps = {
 	session: Session | null | undefined;
 	user: User | null | undefined;
 	login: (credentials: { email: string; password: string }) => Promise<void>;
+	loginWithOtp: (email: string, redirectTo?: string | null) => Promise<void>;
 	logout: () => Promise<void>;
 	signup: (credentials: {
 		email: string;
@@ -22,6 +38,8 @@ type AuthContextProps = {
 		language: string;
 		redirectTo?: string;
 	}) => Promise<void>;
+	resetPasswordForEmail: (email: string) => Promise<void>;
+	createSessionFromUrl: (url: string) => Promise<Session | null>;
 };
 
 type AuthProviderProps = {
@@ -31,7 +49,8 @@ type AuthProviderProps = {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 const AuthProvider = ({children }: AuthProviderProps) => {
-	const { i18n } = useTranslation();
+	const { auth } = useSplashScreen();
+	const { setLocale } = useLocaleContext();
 	const supabase = useSupabaseClient();
 	const [session, setSession] = useState<Session | null | undefined>(undefined);
 	const {
@@ -45,30 +64,26 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			setSession(session);
 		});
 
-		supabase.auth.onAuthStateChange((_event, session) => {
+		supabase.auth.onAuthStateChange(async (_event, session) => {
 			setSession(session);
 		});
 	}, []);
 
 	useEffect(() => {
 		const syncLanguage = async () => {
-			if (user?.language && user.language !== i18n.language) {
-				await i18n.changeLanguage(user.language);
-				await AsyncStorage.setItem("language", user.language);
+			if (user?.language) {
+				setLocale(user.language);
 			}
 		};
 		if (user) {
 			syncLanguage();
 		}
-	}, [user, i18n]);
+	}, [user]);
 
 	useEffect(() => {
-		if (
-			session === null ||
-			(session !== undefined && user !== undefined)
-		) {
-			SplashScreen.hide();
-		}
+		if (session === undefined) return;
+		if (session && !user) return;
+		auth.setReady(true);
 	}, [session, user]);
 
 	const login = async ({ email, password }: { email: string; password: string }) => {
@@ -79,8 +94,25 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		if (error) throw error;
 	};
 
+	const loginWithOtp = async (email: string, redirectTo?: string | null) => {
+		const { error } = await supabase.auth.signInWithOtp({
+		email: email,
+		options: {
+			// emailRedirectTo: `${app.domain}/auth/callback${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`,
+			emailRedirectTo: makeRedirectUri({
+				path: "/auth/callback",
+				queryParams: {
+					redirect: redirectTo ? encodeURIComponent(redirectTo) : undefined,
+				}
+			})
+		}
+		});
+		if (error) throw error;
+	};
+
 	const logout = async () => {
-		await supabase.auth.signOut();
+		const { error } = await supabase.auth.signOut();
+		if (error) throw error;
 	};
 
 	const signup = async (
@@ -97,8 +129,13 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			email: credentials.email,
 			password: credentials.password,
 			options: {
-				// TOOD: handle deep linking
-				emailRedirectTo: undefined,
+				// emailRedirectTo: `${app.domain}/auth/callback${credentials.redirectTo ? `?redirect=${encodeURIComponent(credentials.redirectTo)}` : ''}`,
+				emailRedirectTo: makeRedirectUri({
+					path: "/auth/callback",
+					queryParams: {
+						redirect: credentials.redirectTo ? encodeURIComponent(credentials.redirectTo) : undefined,
+					}
+				}),
 				data: {
 					full_name: credentials.name,
 					username: credentials.username,
@@ -109,6 +146,28 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		if (error) throw error;
 	};
 
+	const resetPasswordForEmail = async (email: string) => {
+		const { error } = await supabase.auth.resetPasswordForEmail(email, {
+			// redirectTo: `${app.domain}/auth/reset-password`,
+			redirectTo: makeRedirectUri({
+				path: "/auth/reset-password",
+			})
+		});
+		if (error) throw error;
+	};
+
+	const createSessionFromUrl = async (url: string) => {
+		const { params, errorCode } = QueryParams.getQueryParams(url);
+		if (errorCode) throw new Error(errorCode);
+		const { access_token, refresh_token } = params;
+		if (!access_token) throw new Error("No access token provided in the URL");
+		const { data, error } = await supabase.auth.setSession({
+			access_token,
+			refresh_token,
+		});
+		if (error) throw error;
+		return data.session;
+	};
 
 	return (
 		<AuthContext.Provider
@@ -116,8 +175,11 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			session: session,
 			user: user,
 			login: login,
+			loginWithOtp: loginWithOtp,
 			logout: logout,
 			signup: signup,
+			resetPasswordForEmail: resetPasswordForEmail,
+			createSessionFromUrl: createSessionFromUrl,
 		}}
 		>
 			{children}

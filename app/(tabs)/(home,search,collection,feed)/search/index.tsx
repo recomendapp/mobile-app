@@ -3,17 +3,14 @@ import FeaturedPlaylists from "@/components/screens/search/FeaturedPlaylists";
 import Filters from "@/components/screens/search/Filters";
 import ResultPlaylists from "@/components/screens/search/results/ResultPlaylists";
 import ResultUsers from "@/components/screens/search/results/ResultUsers";
-import { Input } from "@/components/ui/Input";
-import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
-import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/providers/ThemeProvider";
 import useDebounce from "@/hooks/useDebounce";
 import tw from "@/lib/tw";
 import useSearchStore from "@/stores/useSearchStore";
 import { useCallback } from "react";
-import { BetterInput } from "@/components/ui/BetterInput";
+import { SearchBar } from "@/components/ui/searchbar";
 
 const SearchScreen = () => {
 	const { colors, inset } = useTheme();
@@ -47,13 +44,11 @@ const SearchScreen = () => {
 			tw`flex-1 gap-2`
 		]}
 		>
-			<BetterInput
+			<SearchBar
 			value={search}
 			onChangeText={setSearch}
 			placeholder="Search for movies, tv shows, and people"
-			leftIcon="search"
 			containerStyle={tw`mx-4`}
-			clearable
 			/>
 			{debouncedSearch ? (
 				<Filters />

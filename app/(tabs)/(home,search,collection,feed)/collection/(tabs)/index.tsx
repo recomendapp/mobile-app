@@ -8,9 +8,11 @@ import tw from "@/lib/tw";
 import { Link } from "expo-router";
 import { View } from "react-native";
 import { LegendList } from "@legendapp/list";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const CollectionScreen = () => {
 	const { user } = useAuth();
+	const { inset } = useTheme();
 	const tabBarHeight = useBottomTabOverflow();
 	const staticRoutes = useCollectionStaticRoutes();
 	const {
@@ -55,7 +57,7 @@ const CollectionScreen = () => {
 		onRefresh={refetch}
 		numColumns={3}
 		contentContainerStyle={{
-			paddingBottom: tabBarHeight,
+			paddingBottom: tabBarHeight + inset.bottom,
 		}}
 		keyExtractor={(_, index) => index.toString()}
 		showsVerticalScrollIndicator={false}

@@ -1,15 +1,13 @@
 import * as React from "react"
-import { Button, ButtonText } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuth } from '@/providers/AuthProvider';
-import { useTranslation } from 'react-i18next';
 import upperFirst from 'lodash/upperFirst';
 import { useUserFollowProfile } from '@/features/user/userQueries';
-import { Pressable, Text } from 'react-native';
+import { ViewStyle } from 'react-native';
 import { useUserFollowProfileInsert, useUserUnfollowProfileDelete } from '@/features/user/userMutations';
-import Animated from 'react-native-reanimated';
-import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
+import { useTranslations } from "use-intl";
 
 interface ButtonUserFollowProps
   extends React.ComponentProps<typeof Button> {
@@ -21,7 +19,7 @@ const ButtonUserFollow = React.forwardRef<
   React.ComponentRef<typeof Button>,
   ButtonUserFollowProps
 >(({ profileId, skeleton, style, ...props }, ref) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { user } = useAuth();
 
   const {
@@ -75,15 +73,13 @@ const ButtonUserFollow = React.forwardRef<
     variant="accent-yellow"
     style={[
       tw.style('px-4 py-2 rounded-full'),
-      style,
+      style as ViewStyle,
     ]}
     {...props}
     >
-      <ButtonText variant="accent-yellow">
-        {isFollow ? (
-          isFollow.is_pending ? upperFirst(t('common.messages.request_sent')) : upperFirst(t('common.messages.followed'))
-        ) : upperFirst(t('common.messages.follow'))}
-      </ButtonText>
+      {isFollow ? (
+        isFollow.is_pending ? upperFirst(t('common.messages.request_sent')) : upperFirst(t('common.messages.followed'))
+      ) : upperFirst(t('common.messages.follow'))}
     </Button>
   );
 });

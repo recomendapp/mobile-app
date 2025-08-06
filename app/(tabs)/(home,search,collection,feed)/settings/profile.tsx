@@ -6,17 +6,18 @@ import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
 import { Label } from "@/components/ui/Label";
-import { Input } from "@/components/ui/Input";
-import { Button, ButtonText } from "@/components/ui/Button";
+import { Input } from "@/components/ui/InputOld";
+import { Button } from "@/components/ui/Button";
+import { useTranslations } from "use-intl";
+import { upperFirst } from "lodash";
 
 const ProfileSettings = () => {
 	const { user } = useAuth();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const { colors, inset } = useTheme();
 	const updateProfileMutation = useUserUpdateMutation({
 		userId: user?.id,
@@ -83,13 +84,14 @@ const ProfileSettings = () => {
 				await updateProfileMutation.mutateAsync(userPayload);
 			}
 			Burnt.toast({
-				title: t('common.word.saved'),
+				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
 				preset: 'done',
 			})
 		} catch (error: any) {
 			Burnt.toast({
 				title: error.message,
 				preset: 'error',
+				haptic: 'error',
 			});
 		} finally {
 			setIsLoading(false);
@@ -168,11 +170,11 @@ const ProfileSettings = () => {
 			)}
 			/>
 			<Button
+			loading={updateProfileMutation.isPending}
 			onPress={form.handleSubmit(onSubmit)}
 			disabled={isLoading}
 			>
-				{isLoading ? <ActivityIndicator color={colors.background} /> : null}
-				<ButtonText>{t('common.word.save')}</ButtonText>
+				{t('common.messages.save')}
 			</Button>
 		</>
 	)

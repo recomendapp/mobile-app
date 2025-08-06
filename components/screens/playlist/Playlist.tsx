@@ -1,22 +1,21 @@
 import PlaylistHeader from "@/components/screens/playlist/PlaylistHeader";
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
-import { Button, ButtonText } from "@/components/ui/Button";
-import { ThemedText } from "@/components/ui/ThemedText";
+import { Button } from "@/components/ui/Button";
 import { usePlaylistItems } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { type Playlist as TPlaylist } from "@/types/type.db";
-import { capitalize, upperFirst } from "lodash";
+import { upperFirst } from "lodash";
 import React from "react";
-import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
-import Animated, { SharedValue, useAnimatedScrollHandler } from "react-native-reanimated";
+import { SharedValue, useAnimatedScrollHandler } from "react-native-reanimated";
 import PlaylistItem from "./PlaylistItem";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Icons } from "@/constants/Icons";
-import { BetterInput } from "@/components/ui/BetterInput";
 import useDebounce from "@/hooks/useDebounce";
 import Fuse from "fuse.js";
+import { SearchBar } from "@/components/ui/searchbar";
+import { useTranslations } from "use-intl";
 
 interface PlaylistProps {
 	playlist?: TPlaylist | null;
@@ -38,7 +37,7 @@ const Playlist = ({
 	headerOverlayHeight,
 } : PlaylistProps) => {
 	const { colors, inset } = useTheme();
-	const { t } = useTranslation();
+	const t = useTranslations();
 	const tabBarHeight = useBottomTabOverflow();
 	// States
 	const {
@@ -66,20 +65,20 @@ const Playlist = ({
 			scrollY.value = event.contentOffset.y;
 		},
 	});
+	const handleSearch = React.useCallback((query: string) => {
+		if (query.length > 0) {
+			const results = fuse.search(query).map(({ item }) => item);
+			setRenderItems(results);
+		} else {
+			setRenderItems(playlistItems || []);
+		}
+	}, [fuse, playlistItems]);
 	// Effects
 	React.useEffect(() => {
 		if (playlistItems) {
 			setRenderItems(playlistItems);
 		}
 	}, [playlistItems]);
-	React.useEffect(() => {
-		if (debouncedSearch.length > 0) {
-			const results = fuse.search(debouncedSearch).map(({ item }) => item);
-			setRenderItems(results);
-		} else {
-			setRenderItems(playlistItems || []);
-		}
-	}, [debouncedSearch, fuse, playlistItems]);
 	React.useEffect(() => {
 		if (sortBy === 'rank') {
 			setRenderItems((prev) => prev?.sort((a, b) => {
@@ -89,12 +88,12 @@ const Playlist = ({
 				return (b.rank || 0) - (a.rank || 0);
 			}));
 		} else if (sortBy === 'title') {
-			setRenderItems((prev) => prev?.sort((a, b) => {
-				if (sortOrder === 'asc') {
-					return a.media?.title!.localeCompare(b.media?.title!);
-				}
-				return b.media?.title!.localeCompare(a.media?.title!);
-			}));
+			setRenderItems((prev) =>
+				[...(prev ?? [])].sort((a, b) => {
+					const result = a.media?.title?.localeCompare(b.media?.title ?? '') ?? 0;
+					return sortOrder === 'asc' ? result : -result;
+				})
+			);
 		}
 	}, [sortBy]);
 	return (
@@ -111,13 +110,13 @@ const Playlist = ({
 			backdrops={backdrops}
 			/>
 			{!loading && (
-				<BetterInput
+				<SearchBar
 				value={search}
 				onChangeText={setSearch}
-				placeholder={upperFirst(t('common.playlist.search.placeholder'))}
-				leftIcon="search"
+				onSearch={handleSearch}
+				debounceMs={200}
+				placeholder={upperFirst(t('pages.playlist.search.placeholder'))}
 				containerStyle={tw`mx-4`}
-				clearable
 				/>
 			)}
 		</>
@@ -132,11 +131,9 @@ const Playlist = ({
 		loading ? <Icons.Loader />
 		: (
 			<View style={tw`flex-1 items-center justify-center gap-2`}>
-				<Text style={{ color: colors.mutedForeground }}>{capitalize(t('common.messages.no_results'))}</Text>
+				<Text style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.no_results'))}</Text>
 				{playlistItems?.length === 0 && (
-					<Button style={tw`rounded-full`}>
-						<ButtonText>{upperFirst(t('common.messages.add_to_this_playlist'))}</ButtonText>
-					</Button>
+					<Button style={tw`rounded-full`}>{upperFirst(t('common.messages.add_to_this_playlist'))}</Button>
 				)}
 			</View>
 		)

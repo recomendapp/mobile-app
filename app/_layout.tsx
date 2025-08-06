@@ -1,6 +1,3 @@
-import '~/lib/i18n';
-
-import { SplashScreen } from 'expo-router';
 import * as React from 'react';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { Providers } from '@/providers/Providers';
@@ -9,9 +6,6 @@ import CustomDrawerContent from '@/components/drawer/CustomDrawerContent';
 import StatusBar from '@/components/StatusBar';
 import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -43,13 +37,14 @@ export default function RootLayout() {
   return (
     <Providers>
       <StatusBar />
-        <Drawer
-          screenOptions={{
-            drawerPosition: 'right',
-            headerShown: false
-          }}
-          drawerContent={CustomDrawerContent}
-        />
+      <Drawer
+      initialRouteName='(tabs)'
+      screenOptions={{
+        drawerPosition: 'right',
+        headerShown: false
+      }}
+      drawerContent={CustomDrawerContent}
+      />
     </Providers>
   );
 }

@@ -1,22 +1,19 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { Href, Redirect, Stack, usePathname, useRouter, withLayoutContext } from "expo-router";
-import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
-import { ParamListBase, TabNavigationState } from "@react-navigation/native";
-import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
+import { Href, Redirect, Stack, usePathname, useRouter } from "expo-router";
 import tw from "@/lib/tw";
-import { View } from "react-native";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Pressable } from "react-native-gesture-handler";
-import { useTranslation } from "react-i18next";
 import { upperFirst } from "lodash";
 import { title } from "@/hooks/custom-lodash";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { Icons } from "@/constants/Icons";
+import { useMemo } from "react";
+import { useTranslations } from "use-intl";
 
 const FeedLayout = () => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { colors } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
@@ -26,12 +23,14 @@ const FeedLayout = () => {
     { label: upperFirst(t('common.messages.community')), value: 'community', route: '/feed' },
     { label: title(t('common.messages.cast_and_crew')), value: 'cast_and_crew', route: '/feed/cast-crew' },
   ];
-  const activeOption = feedOptions.find(option => option.route === pathname);
+  const activeOption = useMemo(() => {
+    return feedOptions.find(option => option.route === pathname) || feedOptions[0];
+  }, [feedOptions, pathname]);
   // Handlers
   const handleFeedOptions = () => {
     const feedOptionsWithCancel = [
       ...feedOptions,
-      { label: upperFirst(t('common.word.cancel')), value: 'cancel', route: '' as Href },
+      { label: upperFirst(t('common.messages.cancel')), value: 'cancel', route: '' as Href },
     ];
     const cancelIndex = feedOptionsWithCancel.length - 1;
     showActionSheetWithOptions({

@@ -5,7 +5,6 @@ import { Text, View } from 'react-native';
 import { ImageIcon, ListVideoIcon } from 'lucide-react-native';
 import { Icons } from '@/constants/Icons';
 import { Image, ImageProps, ImageSource } from 'expo-image';
-import tailwind from 'twrnc';
 import Animated from 'react-native-reanimated';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -62,7 +61,7 @@ export const ImageWithFallback = React.forwardRef<
           setImgSrc(null);
         }}
         style={
-          tailwind.style('w-full h-full')
+          tw`w-full h-full`
         }
         transition={transition}
         contentFit={contentFit}
@@ -88,7 +87,7 @@ const Fallback = ({
     case 'playlist':
       return <ListVideoIcon color={colors.foreground} style={tw.style('w-2/5 h-2/5')} />;
     case 'person':
-      return <Icons.user color={colors.foreground} style={tw.style('w-2/5 h-2/5')} />;
+      return <Icons.User color={colors.foreground} style={tw.style('w-2/5 h-2/5')} />;
     case 'movie':
       return <Text numberOfLines={2} style={[{ color: colors.mutedForeground }, tw.style('text-center')]}>{alt}</Text>;
     case 'tv_series':

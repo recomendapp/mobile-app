@@ -1,17 +1,17 @@
 
 import ButtonCreatePlaylist from "@/components/buttons/ButtonCreatePlaylist";
-import { Button, ButtonText } from "@/components/ui/Button";
-import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
-import { ThemedText } from "@/components/ui/ThemedText";
+import { Button } from "@/components/ui/Button";
 import { UserNav } from "@/components/user/UserNav";
 import tw from "@/lib/tw";
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
 import { ParamListBase, TabNavigationState } from "@react-navigation/native";
-import { withLayoutContext } from "expo-router";
+import { Stack, withLayoutContext } from "expo-router";
 import { upperFirst } from "lodash";
-import { useTranslation } from "react-i18next";
+import { useEffect, useRef } from "react";
 import { View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
+import { useTranslations } from "use-intl";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -22,10 +22,30 @@ const MaterialTopTabs = withLayoutContext<
 	MaterialTopTabNavigationEventMap
 >(Tab.Navigator);
 
-const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBarProps) => {
+const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => {
+	const flatListRef = useRef<FlatList>(null);
+	
+	useEffect(() => {
+		onPressTab(state.routes[state.index], state.index, true);
+	}, [state.index]);
+
+	const onPressTab = (item: typeof state.routes[0], index: number, isFocused: boolean) => {
+		const event = navigation.emit({
+			type: 'tabPress',
+			target: item.key,
+			canPreventDefault: true,
+		});
+
+		if (!isFocused && !event.defaultPrevented) {
+			navigation.navigate(item.name);
+		}
+
+		flatListRef.current?.scrollToIndex({ index, animated: true });
+	};
 	return (
 		<View>
 			<Animated.FlatList
+			ref={flatListRef}
 			data={state.routes}
 			renderItem={({ item, index }) => {
 				const { options } = descriptors[item.key];
@@ -52,17 +72,13 @@ const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBar
 					style={{ borderRadius: 9999}}
 					onPress={onPress}
 					>
-						<ButtonText
-						variant={isFocused ? 'default' : 'outline'}
-						>
-							{upperFirst(label)}
-						</ButtonText>
+						{upperFirst(label)}
 					</Button>
 				);
 			}}
-			contentContainerStyle={tw`gap-2 px-4`}
-			horizontal
 			keyExtractor={(item) => item.key}
+			contentContainerStyle={tw`gap-2 px-4 py-1`}
+			horizontal
 			showsHorizontalScrollIndicator={false}
 			/>
 		</View>
@@ -70,28 +86,32 @@ const TabBar = ({ state, descriptors, navigation, position } : MaterialTopTabBar
 };
 
 const CollectionLayout = () => {
-	const { t } = useTranslation();
+	const t = useTranslations();
 	return (
-		<ThemedSafeAreaView style={tw.style('flex-1')}>
-			<View style={tw.style('flex-row justify-between items-center gap-2 py-2 px-4')}>
-				<View style={tw`flex-row items-center gap-2`}>
-					<ThemedText style={tw`text-2xl font-bold`}>{upperFirst(t('common.messages.library'))}</ThemedText>
-					<ButtonCreatePlaylist redirectAfterCreate={false} />
-				</View>
+	<>
+		<Stack.Screen
+		options={{
+			headerTitle: upperFirst(t('common.messages.library')),
+			headerRight: () => (
+			<View style={tw`flex-row items-center gap-2`}>
+				<ButtonCreatePlaylist redirectAfterCreate={false} />
 				<UserNav />
 			</View>
-			<MaterialTopTabs
-			tabBar={(props) => <TabBar {...props} />}
-			screenLayout={(props) => (
-				<View style={tw`flex-1 py-2 px-4`}>
-					{props.children}
-				</View>
-			)}
-			>
-				<MaterialTopTabs.Screen name="index" options={{ title: "perso" }} />
-				<MaterialTopTabs.Screen name="saved" options={{ title: upperFirst(t('common.word.saved')) }} />
-			</MaterialTopTabs> 
-		</ThemedSafeAreaView>
+			),
+		}}
+		/>
+		<MaterialTopTabs
+		tabBar={(props) => <TabBar {...props} />}
+		screenLayout={(props) => (
+			<View style={tw`flex-1 py-2 px-4`}>
+				{props.children}
+			</View>
+		)}
+		>
+			<MaterialTopTabs.Screen name="index" options={{ title: "perso" }} />
+			<MaterialTopTabs.Screen name="saved" options={{ title: upperFirst(t('common.messages.saved', { gender: 'female', count: 2 })) }} />
+		</MaterialTopTabs> 
+	</>
 	)
 };
 
