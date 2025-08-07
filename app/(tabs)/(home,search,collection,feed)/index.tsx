@@ -10,17 +10,17 @@ import { Button } from '@/components/ui/Button';
 import { upperFirst } from 'lodash';
 import { WidgetUserRecos } from '@/components/widgets/WidgetUserRecos';
 import { WidgetUserWatchlist } from '@/components/widgets/WidgetUserWatchlist';
-import { useBottomTabOverflow } from '@/components/TabBar/TabBarBackground';
 import { WidgetUserFriendsPlaylists } from '@/components/widgets/WidgetUserFriendsPlaylists';
 import { WidgetUserFeed } from '@/components/widgets/WidgetUserFeed';
 import { WidgetUserDiscovery } from '@/components/widgets/WidgetUserDiscovery';
 import { useTranslations } from 'use-intl';
 import Header from '@/components/header/Header';
+import { useTheme } from '@/providers/ThemeProvider';
 
 const HomeScreen = () => {
   const t = useTranslations();
   const { session, user } = useAuth();
-  const bottomTabHeight = useBottomTabOverflow();
+  const { bottomTabHeight } = useTheme();
   return (
     <>
       <ThemedSafeAreaView style={tw.style("flex-1")}>

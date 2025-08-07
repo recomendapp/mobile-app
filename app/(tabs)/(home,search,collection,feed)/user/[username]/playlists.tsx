@@ -1,5 +1,4 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { useUserPlaylistsInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries";
@@ -25,9 +24,8 @@ const UserPlaylistsScreen = () => {
 	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data, } = useUserProfileQuery({ username: username });
-	const { colors, inset } = useTheme();
+	const { colors, bottomTabHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
-	const bottomTabBarHeight = useBottomTabOverflow();
 	// States
 	const sortByOptions: sortBy[] = [
 		{ label: upperFirst(t('common.messages.date_created')), value: 'updated_at' },
@@ -112,7 +110,7 @@ const UserPlaylistsScreen = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabBarHeight + inset.bottom + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
 			},
 			tw`px-4`,
 		]}

@@ -1,5 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
-import { useTheme } from '@/providers/ThemeProvider';
+import { TabBarHeightUpdater, useTheme } from '@/providers/ThemeProvider';
 import { Stack } from 'expo-router';
 import { upperFirst } from 'lodash';
 import { useTranslations } from 'use-intl';
@@ -9,6 +9,8 @@ const AppLayout = ({ segment } : { segment: string }) => {
   const t = useTranslations();
   const { session } = useAuth();
   return (
+  <>
+    <TabBarHeightUpdater />
     <Stack
     initialRouteName={
       segment === '(search)' ? 'search/index' :
@@ -28,12 +30,18 @@ const AppLayout = ({ segment } : { segment: string }) => {
       <Stack.Screen name="index" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.home')) }} />
       <Stack.Screen name="feed" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.feed')) }} />
       <Stack.Screen name="search/index" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.search')) }} />
-      {/* REVIEW */}
+      {/* LOGIN ONLY */}
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="review/create/[media_id]" options={{ headerTitle: upperFirst(t('common.messages.new_review')) }} />
+        {/* SETTINGS */}
+        <Stack.Screen name="settings/index" options={{ headerTitle: upperFirst(t('pages.settings.label')) }} />
+        <Stack.Screen name="settings/profile" />
+        <Stack.Screen name="settings/account" options={{ headerTitle: upperFirst(t('pages.settings.account.label')) }} />
+        <Stack.Screen name="settings/subscription" options={{ headerTitle: upperFirst(t('pages.settings.subscription.label')) }} />
+        <Stack.Screen name="settings/security" options={{ headerTitle: upperFirst(t('pages.settings.security.label')) }} />
+        <Stack.Screen name="settings/notifications" options={{ headerTitle: upperFirst(t('pages.settings.notifications.label')) }} />
+        <Stack.Screen name="settings/appearance" options={{ headerTitle: upperFirst(t('pages.settings.appearance.label')) }} />
       </Stack.Protected>
-      {/* SETTINGS */}
-      <Stack.Screen name="settings" options={{ headerTitle: upperFirst(t('pages.settings.label')) }} />
 
       {/* MODALS */}
       <Stack.Protected guard={!session}>
@@ -54,6 +62,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
       }}
       />
     </Stack>
+  </>
   );
 };
 

@@ -3,7 +3,6 @@ import Animated, { SharedValue, useAnimatedScrollHandler, useAnimatedStyle, useS
 import { useTranslations } from "use-intl";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import React, { useCallback } from "react";
 import Fuse, { FuseOptionKey } from "fuse.js";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
@@ -269,9 +268,8 @@ const CollectionScreen = <T extends {}>({
 	// Props for the AnimatedLegendList
 	...props
 }: CollectionScreenConfig<T>) => {
-    const { colors, inset } = useTheme();
+    const { colors, bottomTabHeight } = useTheme();
     const t = useTranslations();
-    const tabBarHeight = useBottomTabOverflow();
     const { showActionSheetWithOptions } = useActionSheet();
 
     const { data, isLoading, isRefetching, refetch } = queryData;
@@ -423,7 +421,7 @@ const CollectionScreen = <T extends {}>({
 			refreshing={isRefetching}
 			onRefresh={refetch}
 			contentContainerStyle={{
-				paddingBottom: tabBarHeight + inset.bottom + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
 			}}
 			{...props}
             />

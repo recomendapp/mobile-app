@@ -1,5 +1,4 @@
 import { CardUserActivity } from "@/components/cards/CardUserActivity";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserFeedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
@@ -8,11 +7,12 @@ import { LegendList } from "@legendapp/list";
 import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
 import { useTranslations } from "use-intl";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const FeedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
-	const tabBarHeight = useBottomTabOverflow();
+	const { bottomTabHeight } = useTheme();
 	const {
 		data: feed,
 		isLoading,
@@ -40,7 +40,7 @@ const FeedScreen = () => {
 		contentContainerStyle={[
 			tw`px-4`,
 			{
-				paddingBottom: tabBarHeight
+				paddingBottom: bottomTabHeight + 8
 			}
 		]}
 		keyExtractor={(_, index) => index.toString()}

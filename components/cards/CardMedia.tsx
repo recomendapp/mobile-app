@@ -11,29 +11,43 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMedia from "../bottom-sheets/sheets/BottomSheetMedia";
 import { IconMediaRating } from "../medias/IconMediaRating";
 import MediaActionUserActivityRating from "../medias/actions/MediaActionUserActivityRating";
+import { FixedOmit } from "@/types";
+import { Skeleton } from "../ui/Skeleton";
 
-interface CardMediaProps
+interface CardMediaBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
 		variant?: "default" | "poster" | "row";
-		media: Media;
 		activity?: UserActivity;
 		profileActivity?: UserActivity;
 		linked?: boolean;
-		posterClassName?: string;
 		disableActions?: boolean;
-		showRating?: boolean;
-		showAction?: {
-			rating?: boolean;
-		}
-		hideMediaType?: boolean;
-		index?: number;
 		children?: React.ReactNode;
+		// Stats
+		showRating?: boolean;
+		// Actions
+		showActionRating?: boolean;
+		hideMediaType?: boolean;
+		onPress?: () => void;
+		onLongPress?: () => void;
 	}
+
+type CardMediaSkeletonProps = {
+	skeleton: true;
+	media?: never;
+};
+
+type CardMediaDataProps = {
+	skeleton?: false;
+	media: Media;
+};
+
+export type CardMediaProps = CardMediaBaseProps &
+	(CardMediaSkeletonProps | CardMediaDataProps);
 
 const CardMediaDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	Omit<CardMediaProps, "variant">
->(({ style, media, activity, showAction, profileActivity, children, linked, showRating, posterClassName, ...props }, ref) => {
+	FixedOmit<CardMediaProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ style, media, skeleton, activity, showActionRating, profileActivity, children, showRating, ...props }, ref) => {
 	const { colors } = useTheme();
 	return (
 		<Animated.View
@@ -46,7 +60,7 @@ const CardMediaDefault = React.forwardRef<
 		{...props}
 		>
 			<View style={tw`flex-1 flex-row items-center gap-2`}>
-				<ImageWithFallback
+				{!skeleton ? <ImageWithFallback
 					source={{uri: media.avatar_url ?? ''}}
 					alt={media.title ?? ''}
 					type={media.media_type}
@@ -54,22 +68,20 @@ const CardMediaDefault = React.forwardRef<
 						aspectRatio: 2 / 3,
 						width: 'auto',
 					}}
-				/>
+				/> : <Skeleton style={{ aspectRatio: 2 / 3, width: 'auto' }} />}
 				<View style={tw`shrink px-2 py-1 gap-1`}>
-					<ThemedText numberOfLines={2}>{media.title}</ThemedText>
+					{!skeleton ? <ThemedText numberOfLines={2}>{media.title}</ThemedText> : <Skeleton style={tw.style('w-full h-5')} />}
 					{children}
 				</View>
 			</View>
-			{showAction || showRating ? (
-			<View style={tw`flex-row items-center gap-2`}>
-				{showAction?.rating ? (
-					<MediaActionUserActivityRating media={media} />
-				) : null}
-				{showRating ? (
-					<IconMediaRating rating={activity?.rating} />
-				) : null}
-			</View>
- 			) : null}
+			{!skeleton && (
+				(showActionRating || showRating) && (
+					<View style={tw`flex-row items-center gap-2`}>
+						{showActionRating && <MediaActionUserActivityRating media={media} />}
+						{showRating && <IconMediaRating rating={activity?.rating} />}
+					</View>
+				)
+			)}
 		</Animated.View>
 	);
 });
@@ -77,8 +89,8 @@ CardMediaDefault.displayName = "CardMediaDefault";
 
 const CardMediaPoster = React.forwardRef<
 React.ComponentRef<typeof Animated.View>,
-	Omit<CardMediaProps, "variant">
->(({ style, media, activity, profileActivity, linked, disableActions, showRating, children, ...props }, ref) => {
+	FixedOmit<CardMediaProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ style, media, skeleton, activity, profileActivity, disableActions, showRating, children, ...props }, ref) => {
 	return (
 		<Animated.View
 			ref={ref}
@@ -89,12 +101,12 @@ React.ComponentRef<typeof Animated.View>,
 			]}
 			{...props}
 		>
-			<ImageWithFallback
+			{!skeleton ? <ImageWithFallback
 				source={{uri: media.avatar_url ?? ''}}
 				alt={media.title ?? ''}
 				type={media.media_type}
-			/>
-			{(media.vote_average
+			/> : <Skeleton style={tw.style('w-full h-full')} />}
+			{!skeleton && (media.vote_average
 			|| media.tmdb_vote_average
 			|| profileActivity?.rating
 			|| profileActivity?.is_liked
@@ -122,38 +134,40 @@ CardMediaPoster.displayName = "CardMediaPoster";
 const CardMedia = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CardMediaProps
->(({ hideMediaType = true, showRating = true, linked = true, variant = "default", ...props }, ref) => {
+>(({ variant = "default", linked = true, onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
-	const onPress = () => {
-		if (linked && props.media.url) {
-			router.push(props.media.url as Href);
-		}
-	};
-	const onLongPress = () => {
+
+	const content = (
+		variant === "default" ? (
+			<CardMediaDefault ref={ref} {...props} />
+		) : variant == "poster" ? (
+			<CardMediaPoster ref={ref} {...props} />
+		) : null
+	)
+
+	if (props.skeleton) return content;
+
+	return (
+	<Pressable
+	onPress={() => {
+		if (linked) router.push(props.media.url as Href);
+		onPress?.();
+	}}
+	onLongPress={() => {
 		openSheet(BottomSheetMedia, {
 			media: props.media,
 		});
-	};
-	return (
-	<Pressable
-	onPress={onPress}
-	onLongPress={onLongPress}
+		onLongPress?.();
+	}}
 	>
-		{variant === "default" ? (
-			<CardMediaDefault ref={ref} linked={linked} showRating={showRating} {...props} />
-		) : variant == "poster" ? (
-			<CardMediaPoster ref={ref} linked={linked} showRating={showRating} {...props} />
-		// ) : variant == "row" ? (
-			// <CardMediaRow ref={ref} className={cn(linked ? 'cursor-pointer' : '', className)} media={media} linked={linked} onClick={customOnClick} showRating={showRating} hideMediaType={hideMediaType} {...props} />
-		) : null}
+		{content}
 	</Pressable>
 	);
 });
 CardMedia.displayName = "CardMedia";
 
 export {
-	type CardMediaProps,
 	CardMedia,
 	CardMediaDefault,
 	CardMediaPoster,

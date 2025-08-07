@@ -1,30 +1,44 @@
 import * as React from "react"
 import { useRouter } from "expo-router";
-import { Pressable, View, Text, StyleProp, ViewStyle } from "react-native";
+import { Pressable, View, StyleProp, ViewStyle } from "react-native";
 import Animated from "react-native-reanimated";
 import { User } from "@/types/type.db";
 import UserAvatar from "../user/UserAvatar";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
-import { ThemedText } from "../ui/ThemedText";
 import { Icons } from "@/constants/Icons";
+import { Skeleton } from "../ui/Skeleton";
+import { Text } from "../ui/text";
+import { FixedOmit } from "@/types";
 
-interface CardUserProps
-	extends React.ComponentPropsWithoutRef<typeof Animated.View> {
-		onPress?: () => void;
-		containerStyle?: StyleProp<ViewStyle>;
-		variant?: "default" | "icon" | "username" | "inline";
-		user: User;
-		linked?: boolean;
-		width?: number;
-		height?: number;
-		children?: React.ReactNode;
-	}
+interface CardUserBaseProps
+  extends React.ComponentPropsWithoutRef<typeof Animated.View> {
+  onPress?: () => void;
+  containerStyle?: StyleProp<ViewStyle>;
+  variant?: "default" | "icon" | "username" | "inline";
+  linked?: boolean;
+  width?: number;
+  height?: number;
+  children?: React.ReactNode;
+}
+
+type CardUserSkeletonProps = {
+  skeleton: true;
+  user?: never;
+};
+
+type CardUserDataProps = {
+  skeleton?: false;
+  user: User;
+};
+
+export type CardUserProps = CardUserBaseProps &
+(CardUserSkeletonProps | CardUserDataProps);
 
 const CardUserDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	Omit<CardUserProps, "variant">
->(({ user, linked, children, style, ...props }, ref) => {
+	FixedOmit<CardUserProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ user, skeleton, children, style, ...props }, ref) => {
 	const { colors } = useTheme();
 	return (
 		<Animated.View
@@ -37,15 +51,19 @@ const CardUserDefault = React.forwardRef<
 		{...props}
 		>
 			<View style={tw`flex-row items-center justify-center`}>
-				<UserAvatar full_name={user?.full_name} avatar_url={user?.avatar_url} />
+				{!skeleton ? <UserAvatar full_name={user.full_name} avatar_url={user?.avatar_url} /> : <UserAvatar skeleton />}
 				<View style={tw.style('shrink px-2 py-1 gap-1')}>
 					<View style={tw.style('flex-row items-center gap-1')}>
-						<ThemedText numberOfLines={2}>{user?.full_name}</ThemedText>
-						{user?.premium && (
+						{!skeleton ? <Text numberOfLines={2}>{user?.full_name}</Text> : <Skeleton style={tw`w-20 h-5`} />}
+						{!skeleton && user?.premium && (
 							<Icons.premium color={colors.accentBlue} size={14}/>
 						)}
 					</View>
-					<Text numberOfLines={2} style={{ color: colors.mutedForeground }}>@{user?.username}</Text>
+					{!skeleton ? (
+						<Text numberOfLines={2} style={{ color: colors.mutedForeground }}>@{user?.username}</Text>
+					) : (
+						<Skeleton style={tw`w-20 h-5`} />
+					)}
 				</View>
 			</View>
 			{children}
@@ -56,18 +74,23 @@ CardUserDefault.displayName = "CardUserDefault";
 
 const CardUserIcon = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	Omit<CardUserProps, "variant">
->(({ user, linked, width = 25, height = 25, children, style, ...props }, ref) => {
+	FixedOmit<CardUserProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ user, width = 25, height = 25, skeleton, children, style, ...props }, ref) => {
 	return (
 		<Animated.View
 		ref={ref}
 		{...props}
 		>
-			<UserAvatar
-			style={{ width: width, height: height }}
-			full_name={user?.full_name}
-			avatar_url={user?.avatar_url}
-			/>
+			{!skeleton ? (
+				<UserAvatar
+				style={{ width: width, height: height }}
+				full_name={user?.full_name}
+				avatar_url={user?.avatar_url}
+				skeleton={skeleton}
+				/>
+			) : (
+				<UserAvatar skeleton />
+			)}
 		</Animated.View>
 	);
 });
@@ -75,8 +98,8 @@ CardUserIcon.displayName = "CardUserIcon";
 
 const CardUserUsername = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	Omit<CardUserProps, "variant">
->(({ user, linked, width, height, children, style, ...props }, ref) => {
+	FixedOmit<CardUserProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ user, width, height, skeleton, children, style, ...props }, ref) => {
 	const { colors } = useTheme();
 	return (
 		<Animated.View
@@ -87,8 +110,8 @@ const CardUserUsername = React.forwardRef<
 		]}
 		{...props}
 		>
-			<ThemedText>{user?.username}</ThemedText>
-			{user?.premium && (
+			{!skeleton ? <Text>{user?.username}</Text> : <Skeleton style={tw`w-20 h-5`} />}
+			{!skeleton && user?.premium && (
 				<Icons.premium color={colors.accentBlue} size={14}/>
 			)}
 		</Animated.View>
@@ -98,12 +121,12 @@ CardUserUsername.displayName = "CardUserUsername";
 
 const CardUserInline = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	Omit<CardUserProps, "variant">
->(({ user, children, style, ...props }, ref) => {
+	FixedOmit<CardUserProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ user, children, skeleton, style, ...props }, ref) => {
 	return (
 		<Animated.View style={[tw.style('flex-row items-center gap-1'), style]}>
-			<CardUserIcon user={user} {...props}/>
-			<CardUserUsername user={user} {...props}/>
+			{!skeleton ? <CardUserIcon user={user} {...props}/> : <CardUserIcon skeleton {...props} />}
+			{!skeleton ? <CardUserUsername user={user} {...props}/> : <CardUserUsername skeleton {...props} />}
 		</Animated.View>
 	);
 });
@@ -114,29 +137,36 @@ const CardUser = React.forwardRef<
 	CardUserProps
 >(({ variant = "default", linked = true, onPress, containerStyle, ...props }, ref) => {
 	const router = useRouter();
-	const onPressDefault = () => {
-		router.push(`/user/${props.user?.username}`);
-	};
-	const Container = linked ? Pressable : Animated.View;
+
+	const content = (
+		variant === "default" ? (
+			<CardUserDefault ref={ref} {...props} />
+		) : variant === "icon" ? (
+			<CardUserIcon ref={ref} {...props} />
+		) : variant === "username" ? (
+			<CardUserUsername ref={ref} {...props} />
+		) : variant === "inline" ? (
+			<CardUserInline ref={ref} {...props} />
+		) : null
+	);
+
+	if (props.skeleton) return content;
 
 	return (
-		<Container onPress={onPress ?? (linked ? onPressDefault : undefined)} style={containerStyle}>
-			{variant === "default" ? (
-				<CardUserDefault ref={ref} {...props} />
-			) : variant === "icon" ? (
-				<CardUserIcon ref={ref} {...props} />
-			) : variant === "username" ? (
-				<CardUserUsername ref={ref} {...props} />
-			) : variant === "inline" ? (
-				<CardUserInline ref={ref} {...props} />
-			) : null}
-		</Container>
+		<Pressable
+		onPress={() => {
+			if (linked) router.push(`/user/${props.user.username}`);
+			onPress?.();
+		}}
+		style={containerStyle}
+		>
+			{content}
+		</Pressable>
 	);
 });
 CardUser.displayName = "CardUser";
 
 export {
-	type CardUserProps,
 	CardUser,
 	CardUserDefault,
 }

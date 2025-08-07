@@ -7,7 +7,6 @@ import { MediaTvSeriesSeason } from "@/types/type.db";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { getIdFromSlug } from "@/hooks/getIdFromSlug";
 import HeaderOverlay from "@/components/ui/HeaderOverlay";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -180,10 +179,9 @@ const PADDING_BOTTOM = 8;
 const TvSeriesSeasonScreen = () => {
 	const { tv_series_id, season_number } = useLocalSearchParams<{ tv_series_id: string, season_number: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
-	const { colors, inset } = useTheme();
+	const { colors, bottomTabHeight } = useTheme();
 	const locale = useLocale();
 	const t = useTranslations();
-	const bottomTabBarHeight = useBottomTabOverflow();
 	const {
 		data: season,
 		isLoading,
@@ -283,7 +281,7 @@ const TvSeriesSeasonScreen = () => {
 		}
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabBarHeight + inset.bottom + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
 			},
 		]}
 		keyExtractor={(item) => item.id!.toString()}

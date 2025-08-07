@@ -1,5 +1,4 @@
 import PlaylistHeader from "@/components/screens/playlist/PlaylistHeader";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { Button } from "@/components/ui/Button";
 import { usePlaylistItems } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
@@ -16,6 +15,8 @@ import useDebounce from "@/hooks/useDebounce";
 import Fuse from "fuse.js";
 import { SearchBar } from "@/components/ui/searchbar";
 import { useTranslations } from "use-intl";
+
+const PADDING_BOTTOM = 8;
 
 interface PlaylistProps {
 	playlist?: TPlaylist | null;
@@ -36,9 +37,8 @@ const Playlist = ({
 	headerHeight,
 	headerOverlayHeight,
 } : PlaylistProps) => {
-	const { colors, inset } = useTheme();
+	const { colors, bottomTabHeight } = useTheme();
 	const t = useTranslations();
-	const tabBarHeight = useBottomTabOverflow();
 	// States
 	const {
 		data: playlistItems
@@ -142,7 +142,7 @@ const Playlist = ({
 	refreshing={isRefetching}
 	onRefresh={refetch}
 	contentContainerStyle={{
-		paddingBottom: tabBarHeight + inset.bottom,
+		paddingBottom: bottomTabHeight + PADDING_BOTTOM,
 	}}
 	/>
 	);

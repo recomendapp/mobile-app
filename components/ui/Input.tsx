@@ -125,7 +125,7 @@ export const Input = forwardRef<TextInput, InputProps>(
             ...baseStyle,
             borderWidth: 1,
             borderColor: error ? danger : cardColor,
-            backgroundColor: disabled ? muted + '20' : cardColor,
+            backgroundColor: cardColor,
           };
       }
     };

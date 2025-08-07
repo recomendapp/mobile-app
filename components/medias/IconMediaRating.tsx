@@ -2,17 +2,19 @@ import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import * as React from "react";
 import Animated from "react-native-reanimated";
+import { Skeleton } from "../ui/Skeleton";
 
 interface IconMediaRatingProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
 		variant?: "general" | "follower" | "user" | "profile";
 		rating?: number | null;
+		skeleton?: boolean;
 }
 
 const IconMediaRating = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	IconMediaRatingProps
->(({ rating, variant = "general", style, ...props }, ref) => {
+>(({ rating, variant = "general", skeleton, style, ...props }, ref) => {
 	const { colors } = useTheme();
 	const variantStyles = React.useMemo(() => {
 		switch (variant) {
@@ -38,13 +40,24 @@ const IconMediaRating = React.forwardRef<
 				}
 		}
 	}, [variant, colors]);
+	if (skeleton) {
+		return (
+			<Skeleton
+			style={[
+				{ aspectRatio: 3 / 2 },
+				tw`relative w-8`,
+				style,
+			]}
+			/>
+		)
+	}
 	if (!rating) return null;
 	return (
 	<Animated.View
 	ref={ref}
 	style={[
 		{ aspectRatio: 3 / 2, backgroundColor:  colors.background, borderColor: variantStyles.border },
-		tw.style('relative flex shadow-sm w-8 rounded-sm border-2 justify-center items-center shrink-0 font-bold text-sm'),
+		tw.style('relative flex shadow-sm w-8 rounded-sm border-2 justify-center items-center shrink-0'),
 		style,
 	]}
 	{...props}

@@ -4,21 +4,34 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuth } from '@/providers/AuthProvider';
 import upperFirst from 'lodash/upperFirst';
 import { useUserFollowProfile } from '@/features/user/userQueries';
-import { ViewStyle } from 'react-native';
+import { Alert, ViewStyle } from 'react-native';
 import { useUserFollowProfileInsert, useUserUnfollowProfileDelete } from '@/features/user/userMutations';
 import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
+import * as Burnt from "burnt";
+import { CORNERS } from "@/theme/globals";
 
-interface ButtonUserFollowProps
+interface ButtonUserFollowBaseProps
   extends React.ComponentProps<typeof Button> {
-    profileId?: string | null;
-    skeleton?: boolean;
   }
+
+type ButtonUserFollowSkeletonProps = {
+  skeleton: true;
+  profileId?: never;
+}
+
+type ButtonUserFollowDataProps = {
+  skeleton?: false;
+  profileId: string;
+}
+
+export type ButtonUserFollowProps = ButtonUserFollowBaseProps &
+  (ButtonUserFollowSkeletonProps | ButtonUserFollowDataProps);
 
 const ButtonUserFollow = React.forwardRef<
   React.ComponentRef<typeof Button>,
   ButtonUserFollowProps
->(({ profileId, skeleton, style, ...props }, ref) => {
+>(({ profileId, onPress, skeleton, style, ...props }, ref) => {
   const t = useTranslations();
   const { user } = useAuth();
 
@@ -29,48 +42,77 @@ const ButtonUserFollow = React.forwardRef<
     userId: user?.id,
     followeeId: profileId,
   });
+  const loading = skeleton || !profileId || isLoading || isFollow === undefined;
 
   const insertFollow = useUserFollowProfileInsert();
   const deleteFollowerMutation = useUserUnfollowProfileDelete();
 
   const followUser = async () => {
-    (user?.id && profileId) &&
-      (await insertFollow.mutateAsync({
-        userId: user?.id,
-        followeeId: profileId,
-      }, {
-        onError: (error) => {
-          // toast.error(upperFirst(t('common.errors.an_error_occurred')));
-        }
-      }));
+    if (!user || !profileId) return;
+    await insertFollow.mutateAsync({
+      userId: user?.id,
+      followeeId: profileId,
+    }, {
+      onError: (error) => {
+        Burnt.toast({
+          title: upperFirst(t('common.messages.error')),
+          message: upperFirst(t('common.messages.an_error_occurred')),
+          preset: 'error',
+          haptic: 'error',
+        });
+      }
+    });
   }
 
   const unfollowUser = async () => {
-    (user?.id && profileId) &&
-      (await deleteFollowerMutation.mutateAsync({
-        userId: user?.id,
-        followeeId: profileId,
-      }, {
-        onError: (error) => {
-          // toast.error(upperFirst(t('common.errors.an_error_occurred')));
+    if (!user || !profileId) return;
+    Alert.alert(
+      upperFirst(t('common.messages.are_u_sure')),
+      undefined,
+      [
+        {
+          text: upperFirst(t('common.messages.cancel')),
+          style: 'cancel',
+        },
+        {
+          text: isFollow?.is_pending ? upperFirst(t('common.messages.cancel_request')) : upperFirst(t('common.messages.unfollow')),
+          onPress: async () => {
+            await deleteFollowerMutation.mutateAsync({
+              userId: user?.id,
+              followeeId: profileId,
+            }, {
+              onError: (error) => {
+                Burnt.toast({
+                  title: upperFirst(t('common.messages.error')),
+                  message: upperFirst(t('common.messages.an_error_occurred')),
+                  preset: 'error',
+                  haptic: 'error',
+                });
+              }
+            });
+          },
+          style: 'destructive',
         }
-      }));
+      ]
+    );
   }
-  const loading = skeleton || !profileId || isLoading || isFollow === undefined;
 
   if (!user || user.id == profileId) return null;
 
   if (loading) {
     return (
-      <Skeleton borderRadius={999} style={tw.style("h-10 w-32")} />
+      <Skeleton borderRadius={CORNERS} style={tw.style("h-10 w-32")} />
     )
   }
 
   return (
     <Button
     ref={ref}
-    onPress={() => (isFollow ? unfollowUser() : followUser())}
-    variant="accent-yellow"
+    onPress={() => {
+      isFollow ? unfollowUser() : followUser();
+      onPress?.();
+    }}
+    variant={isFollow ? "muted" : "accent-yellow"}
     style={[
       tw.style('px-4 py-2 rounded-full'),
       style as ViewStyle,

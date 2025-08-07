@@ -3,6 +3,7 @@ import { IntlProvider } from "use-intl";
 import { createContext, useContext, useEffect, useState } from "react";
 import { getLocale, loadMessages, setLocale as setLocaleHook } from "@/lib/i18n"; // à toi d’implémenter
 import { useSplashScreen } from "./SplashScreenProvider";
+import { getCalendars } from 'expo-localization';
 
 type LocaleContextType = {
   locale: string;
@@ -21,6 +22,7 @@ export const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
   const { i18n } = useSplashScreen();
   const [locale, setLocaleState] = useState<string | undefined>(undefined);
   const [messages, setMessages] = useState<Record<string, string> | null>(null);
+  const timeZone = getCalendars()[0]?.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const setLocale = async (newLocale: string) => {
 	  if (newLocale === locale) return;
@@ -44,7 +46,7 @@ export const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <LocaleContext.Provider value={{ locale, setLocale }}>
-      <IntlProvider locale={locale} messages={messages}>
+      <IntlProvider locale={locale} messages={messages} timeZone={timeZone}>
         {children}
       </IntlProvider>
     </LocaleContext.Provider>

@@ -1,7 +1,6 @@
 import { RecomendLogo } from "@/lib/icons/RecomendLogo";
-import { AlertCircleIcon, ArrowDownNarrowWideIcon, ArrowUpNarrowWideIcon, BookmarkIcon, CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, ClapperboardIcon, CompassIcon, EditIcon, EllipsisIcon, EllipsisVerticalIcon, EyeIcon, EyeOffIcon, FilterIcon, HeartIcon, HomeIcon, InfoIcon, LibraryIcon, LinkIcon, ListPlusIcon, ListVideoIcon, Loader2Icon, LockIcon, LogOutIcon, LucideProps, MailIcon, PlusIcon, RectangleEllipsisIcon, SearchIcon, Send, SendIcon, SettingsIcon, StarIcon, StoreIcon, TextIcon, TrashIcon, UserIcon, UsersIcon, XIcon, ZapIcon } from "lucide-react-native";
+import { AlertCircleIcon, ArrowDownNarrowWideIcon, ArrowUpNarrowWideIcon, BellIcon, BookmarkIcon, CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, ClapperboardIcon, CompassIcon, CreditCardIcon, EditIcon, EllipsisIcon, EllipsisVerticalIcon, EyeIcon, EyeOffIcon, FilterIcon, HeartIcon, HomeIcon, InfoIcon, LibraryIcon, LinkIcon, ListPlusIcon, ListVideoIcon, Loader2Icon, LockIcon, LogOutIcon, LucideProps, MailIcon, PlusIcon, RectangleEllipsisIcon, SearchIcon, Send, SendIcon, SettingsIcon, ShieldIcon, StarIcon, StoreIcon, TextIcon, TrashIcon, UserIcon, UsersIcon, XIcon, ZapIcon } from "lucide-react-native";
 import { Premium } from "@/lib/icons/Premium";
-import tw from "@/lib/tw";
 import { ActivityIndicator } from "react-native";
 
 export const Icons = {
@@ -15,6 +14,10 @@ export const Icons = {
 	Loader: ActivityIndicator,
 	premium: Premium,
 	home: HomeIcon,
+	Text: TextIcon,
+	Bell: BellIcon,
+	Shield: ShieldIcon,
+	CreditCard: CreditCardIcon,
 	Search: SearchIcon,
 	explore: CompassIcon,
 	Feed: ZapIcon,

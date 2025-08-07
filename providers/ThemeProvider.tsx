@@ -1,25 +1,19 @@
+import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import Colors, { TColors } from "@/constants/Colors";
 import { DefaultTheme } from "@react-navigation/native";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type ThemeContextType = {
 	colors: TColors;
 	applyColors: (colors: TColors) => void;
 	inset: EdgeInsets;
+	tabBarHeight: number;
+	setTabBarHeight: (height: number) => void;
+	bottomTabHeight: number;
 };
-  
-const ThemeContext = createContext<ThemeContextType>({
-	colors: Colors.dark,
-	applyColors: () => {},
-	inset: {
-		top: 0,
-		right: 0,
-		bottom: 0,
-		left: 0,
-	},
-});
 
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 type ThemeProviderProps = {
 	children?: React.ReactNode;
@@ -31,6 +25,11 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 		setColors(colorTheme);
 	};
 	const inset = useSafeAreaInsets();
+	const [tabBarHeight, setTabBarHeight] = useState(0);
+
+	const bottomTabHeight = useMemo(() => {
+		return tabBarHeight + inset.bottom;
+	}, [tabBarHeight, inset.bottom]);
 
 	DefaultTheme.colors.background = colors.background;
 
@@ -40,6 +39,9 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 			applyColors,
 			colors,
 			inset,
+			tabBarHeight,
+			setTabBarHeight,
+			bottomTabHeight,
 		}}
 		>
 			{children}
@@ -58,4 +60,18 @@ const useTheme = () => {
 export {
 	ThemeProvider,
 	useTheme,
+	TabBarHeightUpdater,
+};
+
+/* ---------------------------------- UTILS --------------------------------- */
+const TabBarHeightUpdater = () => {
+	const tabBarHeight = useBottomTabOverflow();
+	const { setTabBarHeight } = useTheme();
+	useEffect(() => {
+		setTabBarHeight(tabBarHeight);
+		return () => {
+			setTabBarHeight(0);
+		}
+	}, [tabBarHeight, setTabBarHeight]);
+	return null;
 };

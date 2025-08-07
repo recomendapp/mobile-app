@@ -3,6 +3,7 @@ import { userKeys } from "../user/userKeys";
 import { matchQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Playlist } from "@/types/type.db";
 import { playlistKeys } from "./playlistKeys";
+import { mediaKeys } from "../media/mediaKeys";
 
 /**
  * Creates a new playlist
@@ -161,6 +162,12 @@ export const useAddMediaToPlaylists = ({
 		onSuccess: (playlists) => {
 			queryClient.invalidateQueries({
 				predicate: (query) => playlists.some((playlist) => matchQuery({ queryKey: playlistKeys.items(playlist?.id as number) }, query)) ?? false,
+			});
+			// Invalidate playlists for the media
+			queryClient.invalidateQueries({
+				queryKey: mediaKeys.playlists({
+					id: mediaId,
+				}),
 			});
 		},
 		meta: {

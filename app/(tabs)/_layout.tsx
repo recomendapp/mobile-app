@@ -14,74 +14,75 @@ const TabsLayout = () => {
 	const t = useTranslations();
 	const router = useRouter();
 	return (
-		<Tabs
-			screenOptions={{
-				tabBarActiveTintColor: colors.tint,
-				headerShown: false,
-				tabBarButton: HapticTab,
-				tabBarBackground: TabBarBackground,
-				tabBarStyle: Platform.select({
-					ios: { position: 'absolute' },
-					android: { backgroundColor: colors.background },
-					default: {},
-				}),
-				tabBarItemStyle: {
-					paddingTop: 4,
-				},
-				tabBarShowLabel: false,
-				lazy: true,
+	<Tabs
+		screenOptions={{
+			tabBarActiveTintColor: colors.tint,
+			headerShown: false,
+			tabBarButton: HapticTab,
+			tabBarBackground: TabBarBackground,
+			tabBarStyle: Platform.select({
+				ios: { position: 'absolute' },
+				android: { backgroundColor: colors.background },
+				default: {},
+			}),
+			tabBarItemStyle: {
+				paddingTop: 4,
+			},
+			tabBarShowLabel: false,
+			lazy: true,
+		}}
+	>
+		<Tabs.Screen
+			name="(home)"
+			options={{
+				title: upperFirst(t('common.messages.home')),
+				tabBarIcon: ({ color }) => <Icons.home size={28} color={color} />,
 			}}
-		>
+		/>
+		<Tabs.Screen
+			name="(search)"
+			options={{
+				title: upperFirst(t('common.messages.search')),
+				tabBarIcon: ({ color }) => <Icons.Search size={28} color={color} />,
+			}}
+		/>
+
+		{/* LOGIN ONLY */}
+		<Tabs.Protected guard={!!session}>
 			<Tabs.Screen
-				name="(home)"
+				name="(feed)"
 				options={{
-					title: upperFirst(t('common.messages.home')),
-					tabBarIcon: ({ color }) => <Icons.home size={28} color={color} />,
+					title: upperFirst(t('common.messages.feed')),
+					tabBarIcon: ({ color }) => <Icons.Feed size={28} color={color} />,
 				}}
 			/>
 			<Tabs.Screen
-				name="(search)"
+				name="(collection)"
 				options={{
-					title: upperFirst(t('common.messages.search')),
-					tabBarIcon: ({ color }) => <Icons.Search size={28} color={color} />,
+					title: upperFirst(t('common.messages.library')),
+					tabBarIcon: ({ color }) => <Icons.library size={28} color={color} />,
 				}}
 			/>
+		</Tabs.Protected>
 
-			{/* LOGIN ONLY */}
-			<Tabs.Protected guard={!!session}>
-				<Tabs.Screen
-					name="(feed)"
-					options={{
-						title: upperFirst(t('common.messages.feed')),
-						tabBarIcon: ({ color }) => <Icons.Feed size={28} color={color} />,
-					}}
-				/>
-				<Tabs.Screen
-					name="(collection)"
-					options={{
-						title: upperFirst(t('common.messages.library')),
-						tabBarIcon: ({ color }) => <Icons.library size={28} color={color} />,
-					}}
-				/>
-			</Tabs.Protected>
+		{/* ANON ONLY */}
+		<Tabs.Protected guard={!session}>
+			<Tabs.Screen
+			name='auth'
+			options={{
+				title: upperFirst(t('common.messages.login')),
+				tabBarIcon: ({ color }) => <Icons.User size={28} color={color} />,
+			}}
+			listeners={() => ({
+				tabPress: (e) => {
+					e.preventDefault();
+					router.push('/auth');
+				}
+			})}
+			/>
+		</Tabs.Protected>
 
-			{/* ANON ONLY */}
-			<Tabs.Protected guard={!session}>
-				<Tabs.Screen
-				name='auth'
-				options={{
-					title: upperFirst(t('common.messages.login')),
-					tabBarIcon: ({ color }) => <Icons.User size={28} color={color} />,
-				}}
-				listeners={() => ({
-					tabPress: (e) => {
-						e.preventDefault();
-						router.push('/auth');
-					}
-				})}
-				/>
-			</Tabs.Protected>
-		</Tabs>
+	</Tabs>
 	);
 };
 

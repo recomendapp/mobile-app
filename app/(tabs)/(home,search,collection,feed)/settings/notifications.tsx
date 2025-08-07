@@ -8,11 +8,10 @@ import { View } from "@/components/ui/view";
 import { Label } from "@/components/ui/Label";
 import { upperFirst } from "lodash";
 
-const NotificationsSettings = () => {
+const SettingsNotificationsScreen = () => {
 	const t = useTranslations();
 	const { colors } = useTheme();
 	const { permissionStatus } = useNotifications();
-	console.log("🔔 Notifications permission status:", permissionStatus);
 	return (
 	<>
 		<View style={tw`gap-2`}>
@@ -25,4 +24,4 @@ const NotificationsSettings = () => {
 	)
 };
 
-export default NotificationsSettings;
+export default SettingsNotificationsScreen;

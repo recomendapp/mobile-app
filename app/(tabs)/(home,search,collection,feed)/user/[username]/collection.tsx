@@ -1,5 +1,4 @@
 import { CardMedia } from "@/components/cards/CardMedia";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { useUserActivitiesInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries";
@@ -25,9 +24,8 @@ const UserCollectionScreen = () => {
 	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data, } = useUserProfileQuery({ username: username });
-	const { colors, inset } = useTheme();
+	const { colors, bottomTabHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
-	const bottomTabBarHeight = useBottomTabOverflow();
 	// States
 	const sortByOptions: sortBy[] = [
 		{ label: upperFirst(t('common.messages.watched_date')), value: 'watched_date' },
@@ -117,7 +115,7 @@ const UserCollectionScreen = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabBarHeight + inset.bottom + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
 			},
 			tw`px-4`,
 		]}

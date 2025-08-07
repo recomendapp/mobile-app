@@ -419,7 +419,6 @@ export const useUserReviewUpdateMutation = () => {
 			title?: string | null;
 			body: any;
 		}) => {
-			console.log(`Updating review '${id}', typeof id: ${typeof id}`);
 			const { data, error } = await supabase
 				.from('user_review')
 				.update({

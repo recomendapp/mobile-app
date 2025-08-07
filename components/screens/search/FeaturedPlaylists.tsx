@@ -1,5 +1,4 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useTheme } from "@/providers/ThemeProvider";
 import { usePlaylistFeaturedInfiniteQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
@@ -15,8 +14,7 @@ interface FeaturedPlaylistsProps {
 const FeaturedPlaylists = ({
 	contentContainerStyle,
 }: FeaturedPlaylistsProps) => {
-	const { inset } = useTheme();
-	const bottomTabOverflow = useBottomTabOverflow();
+	const { bottomTabHeight } = useTheme();
 	const {
 		data: playlists,
 		fetchNextPage,
@@ -40,7 +38,7 @@ const FeaturedPlaylists = ({
 		onEndReachedThreshold={0.3}
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabOverflow + inset.bottom,
+				paddingBottom: bottomTabHeight + 8,
 			},
 			contentContainerStyle,
 		]}

@@ -1,4 +1,3 @@
-import { ThemedText } from "@/components/ui/ThemedText";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useUserUpdateMutation } from "@/features/user/userMutations";
@@ -6,47 +5,59 @@ import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Text, View } from "react-native";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
-import { Label } from "@/components/ui/Label";
-import { Input } from "@/components/ui/InputOld";
 import { Button } from "@/components/ui/Button";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
+import { Input } from "@/components/ui/Input";
+import { Icons } from "@/constants/Icons";
+import { Stack } from "expo-router";
+import { ScrollView } from "react-native-gesture-handler";
+import { Text } from "@/components/ui/text";
+import { View } from "@/components/ui/view";
+import { Label } from "@/components/ui/Label";
 
-const ProfileSettings = () => {
+const FULL_NAME_MIN_LENGTH = 1;
+const FULL_NAME_MAX_LENGTH = 30;
+const BIO_MAX_LENGTH = 150;
+
+const SettingsProfileScreen = () => {
 	const { user } = useAuth();
+	const { colors, bottomTabHeight } = useTheme();
 	const t = useTranslations();
-	const { colors, inset } = useTheme();
 	const updateProfileMutation = useUserUpdateMutation({
 		userId: user?.id,
 	});
+	const [ hasUnsavedChanges, setHasUnsavedChanges ] = useState(false);
 	const [ isLoading, setIsLoading ] = useState(false);
 	const [ newAvatar, setNewAvatar ] = useState<File>();
+
+	// Form
 	const profileFormSchema = z.object({
 		full_name: z
 		  .string()
-		  .min(1, {
-			message: t('pages.settings.profile.full_name.form.min_length'),
+		  .min(FULL_NAME_MIN_LENGTH, {
+			message: t('common.form.length.char_min', { count: FULL_NAME_MIN_LENGTH }),
 		  })
-		  .max(50, {
-			message: t('pages.settings.profile.full_name.form.max_length'),
+		  .max(FULL_NAME_MAX_LENGTH, {
+			message: t('common.form.length.char_max', { count: FULL_NAME_MAX_LENGTH }),
 		  })
-		  .regex(/^(?!\s+$)[a-zA-Z0-9\s\S]*$/),
+		  .regex(/^(?!\s+$)[\s\S]*$/),
 		bio: z
 		  .string()
-		  .max(150, {
-			message: t('pages.settings.profile.bio.form.max_length'),
+		  .max(BIO_MAX_LENGTH, {
+			message: t('common.form.length.char_max', { count: BIO_MAX_LENGTH }),
+		  })
+		  .regex(/^(?!\s+$)(?!.*\n\s*\n)[\s\S]*$/, {
+			message: t('pages.settings.profile.bio.form.format'),
 		  })
 		  .optional()
 		  .nullable(),
 		website: z
-		  .string()
 		  .url({
-			message: t('pages.settings.profile.url.form.invalid'),
+			  message: t('pages.settings.profile.url.form.invalid'),
 		  })
-		  .or(z.literal(''))
 		  .optional()
 		  .nullable(),
 	});
@@ -61,7 +72,9 @@ const ProfileSettings = () => {
 		defaultValues,
 		mode: 'onChange',
 	});
-	const onSubmit = async (values: ProfileFormValues) => {
+
+	// Handlers
+	const handleSubmit = async (values: ProfileFormValues) => {
 		try {
 			if (!user) return;
 			setIsLoading(true);
@@ -73,8 +86,8 @@ const ProfileSettings = () => {
 			) {
 				const userPayload  = {
 					fullName: values.full_name,
-					bio: values.bio?.trim() ?? null,
-					website: values.website?.trim() ?? null,
+					bio: values.bio?.trim() || null,
+					website: values.website?.trim() || null,
 					avatarUrl: user.avatar_url,
 				};
 				// if (newAvatar) {
@@ -98,6 +111,7 @@ const ProfileSettings = () => {
 		}
 	};
 
+	// useEffects
 	useEffect(() => {
 		if (user) {
 			form.reset({
@@ -107,26 +121,62 @@ const ProfileSettings = () => {
 			});
 		}
 	}, [user]);
+	useEffect(() => {
+		const subscription = form.watch((value) => {
+			const isChanged = 
+				value.full_name !== defaultValues.full_name ||
+				(value.bio?.trim() || null) !== defaultValues.bio ||
+				(value.website?.trim() || null) !== defaultValues.website ||
+				!!newAvatar;
+			setHasUnsavedChanges(() => isChanged);
+		});
+		return () => subscription.unsubscribe();
+	}, [form, defaultValues, newAvatar]);
 
 	return (
-		<>
+	<>
+		<Stack.Screen
+			options={{
+				headerTitle: upperFirst(t('pages.settings.profile.label')),
+				headerRight: () => (
+					<Button
+					variant="ghost"
+					style={tw`p-0`}
+					loading={isLoading}
+					onPress={form.handleSubmit(handleSubmit)}
+					disabled={!hasUnsavedChanges || !form.formState.isValid}
+					>
+						{upperFirst(t('common.messages.save'))}
+					</Button>
+				),
+			}}
+		/>
+		<ScrollView
+		contentContainerStyle={[
+			tw`gap-2 p-4`,
+			{ paddingBottom: bottomTabHeight + 8 }
+		]}
+		>
 			<Controller
 			name='full_name'
 			control={form.control}
 			render={({ field: { onChange, onBlur, value} }) => (
 				<View style={tw`gap-2`}>
-					<View style={tw`flex-row items-center justify-between`}>
-						<Label>{t('pages.settings.profile.full_name.label')}</Label>
-						<ThemedText>{value?.length ?? 0} / 50</ThemedText>
-					</View>
+					<Label>{t('pages.settings.profile.full_name.label')}</Label>
 					<Input
-					placeholder={t('pages.settings.profile.full_name.placeholder')}
 					value={value}
-					autoCorrect={false}
-					onBlur={onBlur}
 					onChangeText={onChange}
+					onBlur={onBlur}
+					placeholder={t('pages.settings.profile.full_name.placeholder')}
+					icon={Icons.User}
+					nativeID="full_name"
+					autoComplete="name"
+					autoCapitalize="words"
+					disabled={isLoading}
+					leftSectionStyle={tw`w-auto`}
+					error={form.formState.errors.full_name?.message}
 					/>
-					<Text style={[{ color: colors.mutedForeground }, tw`text-sm text-justify`]}>
+					<Text variant='muted' style={tw`text-xs text-justify`}>
 						{t('pages.settings.profile.full_name.description')}
 					</Text>
 				</View>
@@ -137,18 +187,21 @@ const ProfileSettings = () => {
 			control={form.control}
 			render={({ field: { onChange, onBlur, value} }) => (
 				<View style={tw`gap-2`}>
-					<View style={tw`flex-row items-center justify-between`}>
-						<Label>{t('pages.settings.profile.bio.label')}</Label>
-						<ThemedText>{value?.length ?? 0} / 150</ThemedText>
-					</View>
+					<Label>{t('pages.settings.profile.bio.label')}</Label>
 					<Input
-					placeholder={t('pages.settings.profile.bio.placeholder')}
-					style={tw`h-24`}
-					multiline
 					value={value ?? ''}
-					onBlur={onBlur}
 					onChangeText={onChange}
+					onBlur={onBlur}
+					placeholder={t('pages.settings.profile.bio.placeholder')}
+					nativeID="bio"
+					autoCapitalize="sentences"
+					type="textarea"
+					disabled={isLoading}
+					error={form.formState.errors.bio?.message}
 					/>
+					<Text variant='muted' style={tw`text-xs text-justify`}>
+						{t('pages.settings.profile.bio.description')}
+					</Text>
 				</View>
 			)}
 			/>
@@ -159,25 +212,27 @@ const ProfileSettings = () => {
 				<View style={tw`gap-2`}>
 					<Label>{t('pages.settings.profile.url.label')}</Label>
 					<Input
-					placeholder={'https://example.com'}
 					value={value ?? ''}
-					autoCapitalize='none'
-					autoCorrect={false}
-					onBlur={onBlur}
 					onChangeText={onChange}
+					onBlur={onBlur}
+					placeholder="https://example.com"
+					icon={Icons.link}
+					nativeID="website"
+					autoCapitalize="none"
+					autoCorrect={false}
+					leftSectionStyle={tw`w-auto`}
+					disabled={isLoading}
+					error={form.formState.errors.website?.message}
 					/>
+					<Text variant='muted' style={tw`text-xs text-justify`}>
+						{t('pages.settings.profile.url.description')}
+					</Text>
 				</View>
 			)}
 			/>
-			<Button
-			loading={updateProfileMutation.isPending}
-			onPress={form.handleSubmit(onSubmit)}
-			disabled={isLoading}
-			>
-				{t('common.messages.save')}
-			</Button>
-		</>
+		</ScrollView>
+	</>
 	)
 };
 
-export default ProfileSettings;
+export default SettingsProfileScreen;

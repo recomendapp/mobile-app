@@ -6,7 +6,6 @@ import { Media, UserReview } from "@/types/type.db";
 import { useEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, Text, TouchableOpacity, View } from "react-native";
 import { RichText, Toolbar } from "@10play/tentap-editor";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { CardMedia } from "@/components/cards/CardMedia";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { upperFirst } from "lodash";
@@ -32,9 +31,8 @@ const ReviewForm = ({
 	review,
 	onSave,
 } : ReviewFormProps) => {
-	const { colors, inset } = useTheme();
+	const { colors, inset, bottomTabHeight } = useTheme();
 	const t = useTranslations();
-	const bottomTabBarHeight = useBottomTabOverflow();
 	const { user } = useAuth();
 	const [title, setTitle] = useState(review?.title ?? '');
 	const updateReview = useUserReviewUpdateMutation();
@@ -131,7 +129,7 @@ const ReviewForm = ({
 	style={[
 		{
 			paddingTop: inset.top,
-			paddingBottom: bottomTabBarHeight + inset.bottom,
+			paddingBottom: bottomTabHeight,
 		},
 		tw`flex-1 gap-2`
 	]}
@@ -181,9 +179,7 @@ const ReviewForm = ({
 			<CardMedia
 			media={media}
 			linked={false}
-			showAction={{
-				rating: true,
-			}}
+			showActionRating
 			/>
 		</View>
 		<View style={tw`flex-1`}>

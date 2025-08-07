@@ -17,7 +17,6 @@ interface CardTvSeriesSeasonProps
 		variant?: "default" | "poster" | "row";
 		season: MediaTvSeriesSeason
 		linked?: boolean;
-		posterClassName?: string;
 		disableActions?: boolean;
 		showRating?: boolean;
 		showAction?: {
@@ -31,7 +30,7 @@ interface CardTvSeriesSeasonProps
 const CardTvSeriesSeasonDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	Omit<CardTvSeriesSeasonProps, "variant">
->(({ style, season, showAction, children, linked, showRating, posterClassName, ...props }, ref) => {
+>(({ style, season, showAction, children, linked, showRating, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
 	return (

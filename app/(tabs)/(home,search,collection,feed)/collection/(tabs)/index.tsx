@@ -1,6 +1,5 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import useCollectionStaticRoutes from "@/components/screens/collection/useCollectionStaticRoutes";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistsInfiniteQuery } from "@/features/user/userQueries";
@@ -12,8 +11,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 
 const CollectionScreen = () => {
 	const { user } = useAuth();
-	const { inset } = useTheme();
-	const tabBarHeight = useBottomTabOverflow();
+	const { bottomTabHeight } = useTheme();
 	const staticRoutes = useCollectionStaticRoutes();
 	const {
 		data: playlists,
@@ -57,7 +55,7 @@ const CollectionScreen = () => {
 		onRefresh={refetch}
 		numColumns={3}
 		contentContainerStyle={{
-			paddingBottom: tabBarHeight + inset.bottom,
+			paddingBottom: bottomTabHeight + 8,
 		}}
 		keyExtractor={(_, index) => index.toString()}
 		showsVerticalScrollIndicator={false}

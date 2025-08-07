@@ -1,8 +1,7 @@
 import { CardMedia } from "@/components/cards/CardMedia";
-import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { Text } from "@/components/ui/text";
 import { Icons } from "@/constants/Icons";
-import { useUserActivitiesInfiniteQuery, useUserPlaylistsInfiniteQuery } from "@/features/user/userQueries"
+import { useUserActivitiesInfiniteQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Profile } from "@/types/type.db";
@@ -12,47 +11,49 @@ import { upperFirst } from "lodash";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { useTranslations } from "use-intl";
 
-interface WidgetProfilePlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
+interface ProfileWidgetActivitiesProps extends React.ComponentPropsWithoutRef<typeof View> {
 	profile: Profile;
 	labelStyle?: StyleProp<TextStyle>;
 	containerStyle?: StyleProp<ViewStyle>;
 }
 
-const WidgetProfilePlaylists = ({
+const ProfileWidgetActivities = ({
 	profile,
 	style,
 	labelStyle,
 	containerStyle
-} : WidgetProfilePlaylistsProps) => {
+} : ProfileWidgetActivitiesProps) => {
 	const t = useTranslations();
 	const { colors } = useTheme();
 	const {
-	  data: playlists,
+	  data: activities,
 	  fetchNextPage,
 	  isFetching,
 	  hasNextPage,
-	} = useUserPlaylistsInfiniteQuery({
+	} = useUserActivitiesInfiniteQuery({
 	  userId: profile?.id ?? undefined,
 	});
 
-	if (!playlists?.pages.flat().length) return null;
+	if (!activities?.pages.flat().length) return null;
   
 	return (
 	  <View style={[tw`gap-2`, style]}>
-		<Link href={`/user/${profile.username}/playlists`} style={labelStyle}>
+		<Link href={`/user/${profile.username}/collection`} style={labelStyle}>
 			<View style={tw`flex-row items-center`}>
 				<Text style={tw`font-semibold text-xl`} numberOfLines={1}>
-				{upperFirst(t('common.messages.playlist', { count: 2 }))}
+				{upperFirst(t('common.messages.last_activities'))}
 				</Text>
 				<Icons.ChevronRight color={colors.mutedForeground} />
 			</View>
 		</Link>
 		<LegendList
-		data={playlists?.pages.flat() || []}
-		renderItem={({ item, index }) => (
-			<CardPlaylist
+		data={activities?.pages.flat() || []}
+		renderItem={({ item }) => (
+			<CardMedia
 			key={item.id}
-			playlist={item}
+			variant='poster'
+			media={item.media!}
+			profileActivity={item}
 			style={tw`w-32`}
 			/>
 		)}
@@ -71,4 +72,4 @@ const WidgetProfilePlaylists = ({
 	);
 };
 
-export default WidgetProfilePlaylists;
+export default ProfileWidgetActivities;

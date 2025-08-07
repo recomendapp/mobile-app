@@ -1,5 +1,5 @@
 import ButtonUserFollow from "@/components/buttons/ButtonUserFollow";
-import WidgetProfileActivities from "@/components/screens/user/WidgetProfileActivities";
+import ProfileWidgetActivities from "@/components/screens/user/ProfileWidgetActivities";
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import UserAvatar from "@/components/user/UserAvatar";
@@ -18,18 +18,17 @@ import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { View } from "@/components/ui/view";
 import { GridView } from "@/components/ui/GridView";
-import WidgetProfilePlaylists from "@/components/screens/user/WidgetProfilePlaylists";
+import ProfileWidgetPlaylists from "@/components/screens/user/ProfileWidgetPlaylists";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground.ios";
 
 const PADDING_BOTTOM = 8;
 
 const ProfileHeader = ({
 	profile,
-	loading,
+	skeleton,
 } : {
 	profile?: Profile | null;
-	loading: boolean;
+	skeleton: boolean;
 }) => {
 	const { user } = useAuth();
 	const { colors } = useTheme();
@@ -43,9 +42,9 @@ const ProfileHeader = ({
 		]}
 		>
 			<View style={tw`flex-row gap-4 shrink-0 items-start justify-between`}>
-				<UserAvatar style={tw`w-24 h-24`} full_name={profile?.full_name} avatar_url={profile?.avatar_url} skeleton={loading} />
+				{!skeleton ? <UserAvatar style={tw`w-24 h-24`} full_name={profile?.full_name!} avatar_url={profile?.avatar_url} /> : <UserAvatar skeleton style={tw`w-24 h-24`} />}
 				<View style={tw`flex-1 gap-2`}>
-					{!loading ? <Text style={tw`font-medium`}>
+					{!skeleton ? <Text style={tw`font-medium`}>
 						{profile?.full_name}
 					</Text> : <Skeleton style={tw`w-12 h-5`} />}
 					<GridView
@@ -61,10 +60,10 @@ const ProfileHeader = ({
 					]}
 					renderItem={(item) => (
 						<Pressable style={tw`gap-0.5`}>
-							{!loading ? <Text style={tw`font-semibold`}>
+							{!skeleton ? <Text style={tw`font-semibold`}>
 								{item.value}
 							</Text> : <Skeleton style={tw`w-8 h-5`} />}
-							{!loading ? <Text style={[{ color: colors.mutedForeground }, tw.style('text-sm')]}>
+							{!skeleton ? <Text style={[{ color: colors.mutedForeground }, tw.style('text-sm')]}>
 								{item.label}
 							</Text> : <Skeleton style={tw`w-20 h-5`} />}
 						</Pressable>
@@ -83,6 +82,10 @@ const ProfileHeader = ({
 					</Link>
 				)}
 			</View>
+			{/* ACTION BUTTON */}
+			{profile?.id && profile.id !== user?.id && (
+				!skeleton ? <ButtonUserFollow profileId={profile.id} /> : <ButtonUserFollow skeleton />
+			)}
 		</View>
 	)
 };
@@ -104,8 +107,7 @@ const ProfilePrivateAccountCard = () => {
 const ProfileScreen = () => {
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { session } = useAuth();
-	const tabarHeight = useBottomTabOverflow();
-	const { colors, inset } = useTheme();
+	const { colors, bottomTabHeight } = useTheme();
 	const router = useRouter();
 	const queryClient = useQueryClient();
 
@@ -147,7 +149,7 @@ const ProfileScreen = () => {
 					variant="ghost"
 					size="icon"
 					icon={Icons.settings}
-					onPress={() => router.push('/settings/profile')}
+					onPress={() => router.push('/settings')}
 					/>
 				) : (
 					<Button
@@ -164,15 +166,15 @@ const ProfileScreen = () => {
 		contentContainerStyle={[
 			tw`gap-2`,
 			{
-				paddingBottom: tabarHeight + inset.bottom + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
 			}
 		]}>
-			<ProfileHeader profile={profile} loading={loading} />
+			<ProfileHeader profile={profile} skeleton={loading} />
 			{!loading ? (
 				profile?.visible ? (
 					<>
-					<WidgetProfileActivities profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
-					<WidgetProfilePlaylists profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+					<ProfileWidgetActivities profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+					<ProfileWidgetPlaylists profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
 					</>
 				) : <ProfilePrivateAccountCard />
 			) : null}

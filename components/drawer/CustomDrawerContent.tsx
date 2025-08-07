@@ -21,21 +21,21 @@ const CustomDrawerContent = (props: any) => {
     const routes = useMemo(() => {
         return [
             {
-                name: 'Settings',
+                name: upperFirst(t('pages.settings.label')),
                 icon: Icons.settings,
                 onPress: async () => {
-                    router.push('/settings/profile');
+                    router.push('/settings');
                 }
             },
             {
-                name: 'About',
+                name: upperFirst(t('common.messages.about')),
                 icon: Icons.info,
                 onPress: () => {
                     router.push('/about');
                 }
             }
         ];
-    }, []);
+    }, [t, router]);
 
     const closeDrawer = () => {
         props.navigation.closeDrawer();
