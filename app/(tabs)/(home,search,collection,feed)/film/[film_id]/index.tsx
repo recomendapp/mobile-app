@@ -7,7 +7,6 @@ import { CardMedia } from "@/components/cards/CardMedia";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { LegendList } from "@legendapp/list";
 import { getIdFromSlug } from "@/hooks/getIdFromSlug";
 import BottomSheetMedia from "@/components/bottom-sheets/sheets/BottomSheetMedia";
@@ -26,11 +25,10 @@ const PADDING_BOTTOM = 8;
 const FilmScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
-	const { inset } = useTheme();
+	const { bottomTabHeight } = useTheme();
 	const locale = useLocale();
 	const t = useTranslations();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
-	const bottomTabBarHeight = useBottomTabOverflow();
 	const {
 		data: movie,
 		isLoading,
@@ -75,7 +73,7 @@ const FilmScreen = () => {
 		scrollToOverflowEnabled
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabBarHeight + inset.bottom + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
 			},
 		]}
 		refreshControl={
@@ -134,7 +132,6 @@ const FilmCast = ({
 					key={item.id}
 					variant='poster'
 					media={item.person as Media}
-					index={index}
 					style={tw.style('w-full')}
 					/>
 					<View style={tw.style('flex-col gap-1 items-center')}>

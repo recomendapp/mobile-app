@@ -7,7 +7,6 @@ import { CardMedia } from "@/components/cards/CardMedia";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { LegendList } from "@legendapp/list";
 import { getIdFromSlug } from "@/hooks/getIdFromSlug";
 import BottomSheetMedia from "@/components/bottom-sheets/sheets/BottomSheetMedia";
@@ -27,11 +26,10 @@ const PADDING_BOTTOM = 8;
 const TvSeriesScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
-	const { inset } = useTheme();
+	const { bottomTabHeight } = useTheme();
 	const t = useTranslations();
 	const locale = useLocale();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
-	const bottomTabBarHeight = useBottomTabOverflow();
 	const {
 		data: series,
 		isLoading,
@@ -76,7 +74,7 @@ const TvSeriesScreen = () => {
 		scrollToOverflowEnabled
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabBarHeight + inset.bottom + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
 			},
 		]}
 		refreshControl={
@@ -136,7 +134,6 @@ const TvSeriesCast = ({
 					key={item.id}
 					variant='poster'
 					media={item.person as Media}
-					index={index}
 					style={tw.style('w-full')}
 					/>
 					<View style={tw.style('flex-col gap-1 items-center')}>

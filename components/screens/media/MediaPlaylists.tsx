@@ -1,5 +1,4 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
@@ -27,9 +26,8 @@ const MediaPlaylists = ({
 	mediaId,
 } : MediaPlaylistsProps) => {
 	const t = useTranslations();
-	const { colors, inset } = useTheme();
+	const { colors, bottomTabHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
-	const bottomTabBarHeight = useBottomTabOverflow();
 	// States
 	const sortByOptions: sortBy[] = [
 		{ label: upperFirst(t('common.messages.date_updated')), value: 'updated_at' },
@@ -107,7 +105,7 @@ const MediaPlaylists = ({
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabBarHeight + inset.bottom + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
 			},
 			tw`px-4`,
 		]}

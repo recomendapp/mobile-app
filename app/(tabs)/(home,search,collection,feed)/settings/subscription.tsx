@@ -4,7 +4,7 @@ import tw from "@/lib/tw";
 import { Text } from "react-native";
 import Animated from "react-native-reanimated";
 
-const SubscriptionSettings = () => {
+const SettingsSubscriptionScreen = () => {
 	const { colors } = useTheme();
 	return (
 		<Animated.ScrollView>
@@ -15,4 +15,4 @@ const SubscriptionSettings = () => {
 	)
 };
 
-export default SubscriptionSettings;
+export default SettingsSubscriptionScreen;

@@ -1,5 +1,4 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useSearchPlaylistsInfiniteQuery } from "@/features/search/searchQueries";
 import tw from "@/lib/tw";
@@ -18,8 +17,7 @@ const ResultPlaylists = ({
 	search,
 } : ResultPlaylistsProps) => {
 	const t = useTranslations();
-	const { inset, colors } = useTheme();
-	const tabBarHeight = useBottomTabOverflow();
+	const { colors, bottomTabHeight } = useTheme();
 	const {
 		data: results,
 		isLoading,
@@ -55,7 +53,7 @@ const ResultPlaylists = ({
 		contentContainerStyle={{
 			paddingLeft: 4,
 			paddingRight: 4,
-			paddingBottom: tabBarHeight + inset.bottom + 8,
+			paddingBottom: bottomTabHeight + 8,
 		}}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.3}

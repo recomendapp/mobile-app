@@ -1,12 +1,12 @@
-import { useBottomTabOverflow } from '@/components/TabBar/TabBarBackground';
 import { Button } from '@/components/ui/Button';
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
 import { ThemedText } from '@/components/ui/ThemedText';
 import tw from '@/lib/tw';
+import { useTheme } from '@/providers/ThemeProvider';
 import { useNavigation } from '@react-navigation/native';
 
 const NotFoundScreen = () => {
-  const tabBarHeight = useBottomTabOverflow();
+  const { tabBarHeight } = useTheme();
   const navigation = useNavigation();
   return (
       <ThemedSafeAreaView

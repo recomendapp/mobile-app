@@ -1,6 +1,5 @@
 import { CardMedia } from "@/components/cards/CardMedia";
 import ActionReviewLike from "@/components/reviews/actions/ActionReviewLike";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
@@ -16,9 +15,8 @@ import { useTranslations } from "use-intl";
 
 const ReviewScreen = () => {
 	const { user } = useAuth();
-	const { inset, colors } = useTheme();
+	const { bottomTabHeight, inset, colors } = useTheme();
 	const t = useTranslations();
-	const bottomTabBarHeight = useBottomTabOverflow();
 	const router = useRouter();
 	const { review_id } = useLocalSearchParams();
 	const {
@@ -42,7 +40,7 @@ const ReviewScreen = () => {
 		style={[
 			{
 				paddingTop: inset.top,
-				paddingBottom: bottomTabBarHeight + inset.bottom,
+				paddingBottom: bottomTabHeight + 8,
 			},
 			tw`flex-1 gap-2 px-2`
 		]}

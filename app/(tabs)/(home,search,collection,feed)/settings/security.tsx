@@ -3,20 +3,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
-import { Text, View } from "react-native";
 import tw from "@/lib/tw";
 import { Label } from "@/components/ui/Label";
-import { InputPassword } from "@/components/ui/InputPasswordOld";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
+import { Input } from "@/components/ui/Input";
+import { ScrollView } from "react-native-gesture-handler";
+import { Stack } from "expo-router";
+import { Text } from "@/components/ui/text";
+import { View } from "@/components/ui/view";
 
-const SecuritySettings = () => {
+const SettingsSecurityScreen = () => {
 	const supabase = useSupabaseClient();
-	const { colors } = useTheme();
+	const { colors, bottomTabHeight } = useTheme();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const profileFormSchema = z.object({
@@ -56,7 +59,8 @@ const SecuritySettings = () => {
 		mode: 'onChange',
 	});
 
-	const onSubmit = async (data: ProfileFormValues) => {
+	// Handlers
+	const handleSubmit = async (data: ProfileFormValues) => {
 		try {
 			setIsLoading(true);
 			const { error } = await supabase.auth.updateUser({
@@ -90,62 +94,78 @@ const SecuritySettings = () => {
 
 	return (
 		<>
-			<Controller
-			name="newpassword"
-			control={form.control}
-			render={({ field: { onChange, onBlur, value } }) => (
+			<Stack.Screen
+				options={{
+					headerTitle: upperFirst(t('pages.settings.security.label')),
+					headerRight: () => (
+						<Button
+						variant="ghost"
+						style={tw`p-0`}
+						loading={isLoading}
+						onPress={form.handleSubmit(handleSubmit)}
+						disabled={!form.formState.isValid}
+						>
+							{upperFirst(t('common.messages.save'))}
+						</Button>
+					),
+				}}
+			/>
+			<ScrollView
+			contentContainerStyle={[
+				tw`gap-2 p-4`,
+				{ paddingBottom: bottomTabHeight + 8 }
+			]}
+			>
+				<Text variant="muted" style={tw`text-sm text-justify`}>{t(`pages.settings.security.description`)}</Text>
+				<Controller
+				name="newpassword"
+				control={form.control}
+				render={({ field: { onChange, onBlur, value } }) => (
 				<View style={tw`gap-2`}>
-					<Label>{t('pages.settings.security.new_password.label')}</Label>
-					<InputPassword
-					nativeID="newpassword"
+					<Label>{upperFirst(t('common.form.password.label'))}</Label>
+					<Input
+					label={null}
 					placeholder={t('pages.settings.security.new_password.placeholder')}
 					value={value ?? ''}
+					onChangeText={onChange}
+					onBlur={onBlur}
+					nativeID="newpassword"
 					autoComplete="new-password"
 					autoCapitalize="none"
-					autoCorrect={false}
-					onBlur={onBlur}
-					onChangeText={onChange}
+					disabled={isLoading}
+					leftSectionStyle={tw`w-auto`}
+					error={form.formState.errors.newpassword?.message}
+					type="password"
 					/>
-					{form.formState.errors.newpassword && (
-						<Text style={{ color: colors.destructive }}>
-						{form.formState.errors.newpassword.message}
-						</Text>
-					)}
 				</View>
-			)}
-			/>
-			<Controller
-			name="confirmnewpassword"
-			control={form.control}
-			render={({ field: { onChange, onBlur, value } }) => (
+				)}
+				/>
+				<Controller
+				name="confirmnewpassword"
+				control={form.control}
+				render={({ field: { onChange, onBlur, value } }) => (
 				<View style={tw`gap-2`}>
-					<Label>{t('pages.settings.security.confirm_password.label')}</Label>
-					<InputPassword
-					nativeID="confirmnewpassword"
+					<Label>{upperFirst(t('common.form.password.confirm.label'))}</Label>
+					<Input
+					label={null}
 					placeholder={t('pages.settings.security.confirm_password.placeholder')}
 					value={value ?? ''}
-					autoCapitalize="none"
-					autoCorrect={false}
-					onBlur={onBlur}
 					onChangeText={onChange}
+					onBlur={onBlur}
+					nativeID="confirmnewpassword"
+					autoComplete="new-password"
+					autoCapitalize="none"
+					disabled={isLoading}
+					leftSectionStyle={tw`w-auto`}
+					error={form.formState.errors.confirmnewpassword?.message}
+					type="password"
 					/>
-					{form.formState.errors.confirmnewpassword && (
-						<Text style={{ color: colors.destructive }}>
-						{form.formState.errors.confirmnewpassword.message}
-						</Text>
-					)}
 				</View>
-			)}
-			/>
-			<Button
-			loading={isLoading}
-			onPress={form.handleSubmit(onSubmit)}
-			disabled={isLoading}
-			>
-				{t('common.messages.save')}
-			</Button>
+				)}
+				/>
+			</ScrollView>
 		</>
 	)
 };
 
-export default SecuritySettings;
+export default SettingsSecurityScreen;

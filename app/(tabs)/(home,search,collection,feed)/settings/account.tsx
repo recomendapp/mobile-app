@@ -3,9 +3,8 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useUserUpdateMutation } from "@/features/user/userMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { View } from "react-native";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
 import { Button } from "@/components/ui/Button";
@@ -13,19 +12,26 @@ import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
 import useDebounce from "@/hooks/useDebounce";
 import { Input } from "@/components/ui/Input";
 import { Icons } from "@/constants/Icons";
-import { useTranslations } from "use-intl";
+import { useFormatter, useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
+import { Stack } from "expo-router";
+import { ScrollView } from "react-native-gesture-handler";
+import { View } from "@/components/ui/view";
+import { Text } from "@/components/ui/text";
+import { Label } from "@/components/ui/Label";
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
 
-const AccountSettings = () => {
+const SettingsAccountScreen = () => {
 	const { user, session } = useAuth();
+	const format = useFormatter();
 	const t = useTranslations();
-	const { colors } = useTheme();
+	const { colors, bottomTabHeight } = useTheme();
 	const updateProfileMutation = useUserUpdateMutation({
 		userId: user?.id,
 	});
+	const [ hasUnsavedChanges, setHasUnsavedChanges ] = useState(false);
 	const [ isLoading, setIsLoading ] = useState(false);
 	const date = new Date();
 	const dateLastUsernameUpdate = user?.username_updated_at
@@ -33,6 +39,7 @@ const AccountSettings = () => {
 		: new Date('01/01/1970');
 	const usernameDisabled = (date.getTime() - dateLastUsernameUpdate.getTime()) / (1000 * 60 * 60 * 24) < 30 ? true : false;
 
+	// Form
 	const accountFormSchema = z.object({
 		username: z
 			.string()
@@ -123,47 +130,87 @@ const AccountSettings = () => {
 		}
 	}, [user, session]);
 
+	useEffect(() => {
+		const subscription = form.watch((value) => {
+			const isChanged = 
+				value.username !== defaultValues.username ||
+				value.private !== defaultValues.private ||
+				value.email !== defaultValues.email;
+			setHasUnsavedChanges(() => isChanged);
+		});
+		return () => subscription.unsubscribe();
+	}, [form, defaultValues]);
+
 	return (
 		<>
-			<Controller
-			name='username'
-			control={form.control}
-			render={({ field: { onChange, onBlur, value } }) => (
-				<Input
-				label={t('pages.settings.account.username.label')}
-				icon={Icons.User}
-				disabled={usernameDisabled}
-				autoComplete="username"
-				autoCapitalize='none'
-				placeholder={t('pages.settings.account.username.placeholder')}
-				value={value}
-				autoCorrect={false}
-				onBlur={onBlur}
-				onChangeText={onChange}
-				leftSectionStyle={tw`w-auto`}
-				rightComponent={!form.formState.errors.username ? (
-					usernameAvailability.isLoading ? <Icons.Loader />
-					: (
-						<View style={[{ backgroundColor: usernameAvailability.isAvailable ? colors.success : colors.destructive }, tw`rounded-full h-6 w-6 items-center justify-center`]}>
-							{usernameAvailability.isAvailable ? (
-								<Icons.Check size={17} color={colors.successForeground} />
-							) : <Icons.Cancel size={17} color={colors.destructiveForeground} />}
-						</View>
-					)
-				) : undefined}
-				error={form.formState.errors.username?.message}
-				/>
-			)}
+			<Stack.Screen
+				options={{
+					headerTitle: upperFirst(t('pages.settings.account.label')),
+					headerRight: () => (
+						<Button
+						variant="ghost"
+						style={tw`p-0`}
+						loading={isLoading}
+						onPress={form.handleSubmit(onSubmit)}
+						disabled={!hasUnsavedChanges || !form.formState.isValid}
+						>
+							{upperFirst(t('common.messages.save'))}
+						</Button>
+					),
+				}}
 			/>
-			<Button
-			loading={isLoading}
-			onPress={form.handleSubmit(onSubmit)}
-			disabled={isLoading}
+			<ScrollView
+			contentContainerStyle={[
+				tw`gap-2 p-4`,
+				{ paddingBottom: bottomTabHeight + 8 }
+			]}
 			>
-				{t('common.messages.save')}
-			</Button>
+				{/* <Text variant="muted" style={tw`text-sm text-justify`}>{t(`pages.settings.account.description`)}</Text> */}
+				<Controller
+				name='username'
+				control={form.control}
+				render={({ field: { onChange, onBlur, value } }) => (
+				<View style={tw`gap-2`}>
+					<Label>{t('pages.settings.account.username.label')}</Label>
+					<Input
+					icon={Icons.User}
+					disabled={usernameDisabled}
+					autoComplete="username"
+					autoCapitalize='none'
+					placeholder={t('pages.settings.account.username.placeholder')}
+					value={value}
+					autoCorrect={false}
+					onBlur={onBlur}
+					onChangeText={onChange}
+					leftSectionStyle={tw`w-auto`}
+					rightComponent={(!form.formState.errors.username && hasUnsavedChanges && !usernameDisabled) ? (
+						usernameAvailability.isLoading ? <Icons.Loader />
+						: (
+							<View style={[{ backgroundColor: usernameAvailability.isAvailable ? colors.success : colors.destructive }, tw`rounded-full h-6 w-6 items-center justify-center`]}>
+								{usernameAvailability.isAvailable ? (
+									<Icons.Check size={17} color={colors.successForeground} />
+								) : <Icons.Cancel size={17} color={colors.destructiveForeground} />}
+							</View>
+						)
+					) : undefined}
+					error={form.formState.errors.username?.message}
+					/>
+					{usernameDisabled && (
+						<Text style={[{ color: colors.destructive }, tw`text-right`]}>
+							{upperFirst(t('common.messages.last_updated_at_date', {
+								date: format.dateTime(dateLastUsernameUpdate, { dateStyle: 'long', timeStyle: 'short' })
+							}))}
+						</Text>
+					)}
+					<Text variant='muted' style={tw`text-xs text-justify`}>
+						{t('pages.settings.account.username.description')}
+					</Text>
+				</View>
+				)}
+				/>
+			</ScrollView>
 		</>
 	)
 };
 
-export default AccountSettings;
+export default SettingsAccountScreen;

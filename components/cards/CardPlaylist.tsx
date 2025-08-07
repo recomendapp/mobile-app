@@ -3,52 +3,80 @@ import { Playlist } from '@/types/type.db';
 import React from 'react';
 import Animated from 'react-native-reanimated';
 import { Pressable, View } from 'react-native';
-import { ThemedText } from '../ui/ThemedText';
 import { useRouter } from 'expo-router';
 import tw from '@/lib/tw';
-import { Text } from 'react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import BottomSheetPlaylist from '../bottom-sheets/sheets/BottomSheetPlaylist';
 import { useTranslations } from 'use-intl';
+import { Skeleton } from '../ui/Skeleton';
+import { Text } from '../ui/text';
+import { FixedOmit } from '@/types';
 
-interface CardPlaylistProps
+interface CardPlaylistBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
 		variant?: "default";
-		playlist: Playlist;
+		linked?: boolean;
+		onPress?: () => void;
+		onLongPress?: () => void;
 		showPlaylistAuthor?: boolean;
 		showItemsCount?: boolean;
 	}
 
+type CardPlaylistSkeletonProps = {
+	skeleton: true;
+	playlist?: never;
+};
+
+type CardPlaylistDataProps = {
+	skeleton?: false;
+	playlist: Playlist;
+};
+
+export type CardPlaylistProps = CardPlaylistBaseProps &
+	(CardPlaylistSkeletonProps | CardPlaylistDataProps);
+
 const CardPlaylistDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	Omit<CardPlaylistProps, "variant">
->(({ style, playlist, showPlaylistAuthor = true, showItemsCount = false, children, ...props }, ref) => {
+	FixedOmit<CardPlaylistProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ style, playlist, skeleton, showPlaylistAuthor = true, showItemsCount = false, children, ...props }, ref) => {
 	const t = useTranslations();
 	const { colors } = useTheme();
 	return (
 		<Animated.View
 			ref={ref}
 			style={[
-				tw.style("gap-2"),
+				tw`gap-2`,
 				style,
 			]}
 			{...props}
 		>
-			<ImageWithFallback
-				source={{uri: playlist.poster_url ?? ''}}
+			{!skeleton ? <ImageWithFallback
+				source={{uri: playlist?.poster_url ?? ''}}
 				alt={playlist?.title ?? ''}
 				type="playlist"
 				style={tw`aspect-square w-auto h-auto`}
-			/>
-			<View>
-				<ThemedText numberOfLines={2} style={tw.style("font-medium")}>{playlist?.title}</ThemedText>
-				{showPlaylistAuthor ? <Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
-					{t('common.messages.by_name', { name: playlist.user?.username! })}
-				</Text> : null}
-				{showItemsCount ? <Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
-					{t('common.messages.item_count', { count: playlist.items_count })}
-				</Text> : null}
+			/> : <Skeleton style={tw`aspect-square w-auto h-auto`} />}
+			<View style={skeleton ? tw`gap-1` : undefined}>
+				{!skeleton ? <Text numberOfLines={2} style={tw`font-medium`}>{playlist?.title}</Text> : <Skeleton style={tw`w-24 h-5`} />}
+				{showPlaylistAuthor && (
+					!skeleton ? (
+						<Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
+							{t('common.messages.by_name', { name: playlist?.user?.username! })}
+						</Text>
+					) : (
+						<Skeleton style={tw`w-24 h-5`} />
+					)
+				)}
+				{showItemsCount && (
+					!skeleton ? (
+						<Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
+							{t('common.messages.item_count', { count: playlist?.items_count! })}
+						</Text>
+					) : (
+						<Skeleton style={tw`w-10 h-5`} />
+					)
+				)}
 			</View>
 		</Animated.View>
 	);
@@ -58,32 +86,38 @@ CardPlaylistDefault.displayName = "CardPlaylistDefault";
 const CardPlaylist = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CardPlaylistProps
->(({ playlist, variant = "default", ...props }, ref) => {
+>(({ variant = "default", linked = true, onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
-	const onPress = () => {
-		router.push(`/playlist/${playlist?.id}`);
-	};
-	const onLongPress = () => {
-		openSheet(BottomSheetPlaylist, {
-			playlist: playlist,
-		})
-	}
+
+	const content = (
+		variant === "default" ? (
+			<CardPlaylistDefault ref={ref} {...props} />
+		) : null
+	);
+
+	if (props.skeleton) return content;
+
 	return (
 		<Pressable
-		onPress={onPress}
-		onLongPress={onLongPress}
+		onPress={() => {
+			if (linked) router.push(`/playlist/${props.playlist.id}`);
+			onPress?.();
+		}}
+		onLongPress={() => {
+			openSheet(BottomSheetPlaylist, {
+				playlist: props.playlist,
+			});
+			onLongPress?.();
+		}}
 		>
-			{variant === "default" ? (
-				<CardPlaylistDefault ref={ref}  playlist={playlist} {...props} />
-			) : null}
+			{content}
 		</Pressable>
 	);
 });
 CardPlaylist.displayName = "CardPlaylist";
 
 export {
-	type CardPlaylistProps,
 	CardPlaylist,
 	CardPlaylistDefault,
 }

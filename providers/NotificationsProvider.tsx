@@ -5,8 +5,8 @@ import { useSupabaseClient } from "./SupabaseProvider";
 import { Platform } from "react-native";
 import * as Device from 'expo-device';
 import { useRouter } from "expo-router";
-import { NotificationPayload } from "@/types/notifications";
 import * as Burnt from 'burnt';
+import { NotificationPayload } from "@/types";
 
 type NotificationsContextType = {
   permissionStatus: Notifications.PermissionStatus | null;

@@ -1,5 +1,4 @@
 import { CardUser } from "@/components/cards/CardUser";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useSearchUsersInfiniteQuery } from "@/features/search/searchQueries";
 import tw from "@/lib/tw";
@@ -16,8 +15,7 @@ const ResultUsers = ({
 	search,
 } : ResultUsersProps) => {
 	const t = useTranslations();
-	const { inset, colors } = useTheme();
-	const tabBarHeight = useBottomTabOverflow();
+	const { bottomTabHeight, colors } = useTheme();
 	const {
 		data: results,
 		isLoading,
@@ -52,7 +50,7 @@ const ResultUsers = ({
 		contentContainerStyle={{
 			paddingLeft: 4,
 			paddingRight: 4,
-			paddingBottom: tabBarHeight + inset.bottom + 8,
+			paddingBottom: bottomTabHeight + 8,
 		}}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.3}

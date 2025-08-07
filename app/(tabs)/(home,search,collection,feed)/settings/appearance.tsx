@@ -3,7 +3,7 @@ import tw from "@/lib/tw";
 import { Text } from "react-native";
 import Animated from "react-native-reanimated";
 
-const AppearanceSettings = () => {
+const SettingsAppearanceScreen = () => {
 	const { colors } = useTheme();
 	return (
 		<Animated.ScrollView>
@@ -14,4 +14,4 @@ const AppearanceSettings = () => {
 	)
 };
 
-export default AppearanceSettings;
+export default SettingsAppearanceScreen;

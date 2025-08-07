@@ -1,6 +1,5 @@
 import * as React from "react"
 import { JSONContent, User, UserActivity, UserReview } from "@/types/type.db";
-// import { JSONContent } from "@tiptap/react";
 import Animated from "react-native-reanimated";
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
@@ -10,24 +9,38 @@ import { ThemedText } from "../ui/ThemedText";
 import { IconMediaRating } from "../medias/IconMediaRating";
 import { CardUser } from "./CardUser";
 import ActionReviewLike from "../reviews/actions/ActionReviewLike";
-import { useFormatter, useNow } from "use-intl";
-import { Text } from "../ui/text";
+import { Skeleton } from "../ui/Skeleton";
+import { FixedOmit } from "@/types";
 
-interface CardReviewProps
+interface CardReviewBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
 		variant?: "default";
-		review: UserReview;
-		activity: UserActivity;
-		author: User;
+		onPress?: () => void;
+		onLongPress?: () => void;
 		linked?: boolean;
 	}
 
+type CardReviewSkeletonProps = {
+  skeleton: true;
+  review?: never;
+  activity?: never;
+  author?: never;
+};
+
+type CardReviewDataProps = {
+  skeleton?: false;
+  review: UserReview;
+  activity: UserActivity;
+  author: User;
+};
+
+export type CardReviewProps = CardReviewBaseProps &
+  (CardReviewSkeletonProps | CardReviewDataProps);
+
 const CardReviewDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	Omit<CardReviewProps, "variant">
->(({ review, activity, author, linked, children, style, ...props }, ref) => {
-	const now = useNow({ updateInterval: 1000 * 10 });
-	// const format = useFormatter();
+	FixedOmit<CardReviewProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ review, skeleton, activity, author, children, style, ...props }, ref) => {
 	const { colors } = useTheme();
 	return (
 		<Animated.View
@@ -40,20 +53,29 @@ const CardReviewDefault = React.forwardRef<
 			{...props}
 		>
 			<View style={tw.style("items-center gap-1 shrink")}>
-				<IconMediaRating rating={activity?.rating!} />
-				{/* <View style={[{ backgroundColor: colors.mutedForeground }, tw.style("h-full w-0.5 rounded-full")]} /> */}
+				<IconMediaRating rating={activity?.rating} skeleton={skeleton} />
 			</View>
 			<View style={tw.style("w-full flex-col gap-1 shrink")}>
-				<CardUser variant="inline" user={author} />
-				{review?.title ? (
-					<ThemedText numberOfLines={1} style={tw.style("font-semibold")}>
-						{review?.title}
-					</ThemedText>
-				) : null}
-				<Overview data={review?.body} />
-				<View style={tw.style("flex-row items-center justify-end m-1")}>
-					<ActionReviewLike reviewId={review?.id} reviewLikesCount={review.likes_count} />
-				</View>
+				{!skeleton ? <CardUser variant="inline" user={author} /> : <CardUser variant="inline" skeleton={skeleton} />}
+				{review?.title && (
+					!skeleton ? (
+						<ThemedText numberOfLines={1} style={tw.style("font-semibold")}>
+							{review?.title}
+						</ThemedText>
+					) : (
+						<Skeleton style={tw.style("h-4 w-1/3")} />
+					)
+				)}
+				{!skeleton ? (
+					<Overview data={review?.body} />
+				) : (
+					<Skeleton style={tw.style("h-12 w-full")} />
+				)}
+				{!skeleton && (
+					<View style={tw.style("flex-row items-center justify-end m-1")}>
+						<ActionReviewLike reviewId={review?.id} reviewLikesCount={review.likes_count} />
+					</View>
+				)}
 			</View>
 		</Animated.View>
 	);
@@ -64,18 +86,28 @@ CardReviewDefault.displayName = "CardReviewDefault";
 const CardReview = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CardReviewProps
->(({ review, linked = true, variant = "default", ...props }, ref) => {
+>(({ linked = true, variant = "default", onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
-	const onPress = () => {
-		if (linked) {
-			router.push(`/review/${review?.id}`);
-		}
-	};
+
+	const content = (
+		variant === "default" ? (
+			<CardReviewDefault ref={ref} {...props} />
+		) : null
+	);
+
+	if (props.skeleton) return content;
+
 	return (
-		<Pressable onPress={onPress}>
-			{variant === "default" ? (
-				<CardReviewDefault ref={ref} review={review} linked={linked} {...props} />
-			) : null}
+		<Pressable
+		onPress={() => {
+			if (linked) router.push(`/review/${props.review?.id}`);
+			onPress?.();
+		}}
+		onLongPress={() => {
+			onLongPress?.();
+		}}
+		>
+			{content}
 		</Pressable>
 	);
 });
@@ -96,7 +128,6 @@ const Overview = ({ data }: { data: JSONContent }) => {
 };
 
 export {
-	type CardReviewProps,
 	CardReview,
 	CardReviewDefault,
 	Overview,

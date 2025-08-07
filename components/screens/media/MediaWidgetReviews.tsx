@@ -9,6 +9,8 @@ import { useMediaReviewsInfiniteQuery } from "@/features/media/mediaQueries";
 import { CardReview } from "@/components/cards/CardReview";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
+import { Text } from "@/components/ui/text";
+import { UserReview } from "@/types/type.db";
 
 interface MediaWidgetReviewsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	mediaId: number;
@@ -30,12 +32,12 @@ const MediaWidgetReviews = ({
 	const {
 		data: reviews,
 		isLoading,
+		fetchNextPage,
+		hasNextPage,
 	} = useMediaReviewsInfiniteQuery({
 		id: mediaId,
 	});
 	const loading = reviews === undefined || isLoading;
-
-	if (!reviews || !reviews.pages[0].length) return null;
 
 	return (
 	<View style={[tw`gap-1`, style]}>
@@ -47,19 +49,31 @@ const MediaWidgetReviews = ({
 				<Icons.ChevronRight color={colors.mutedForeground} />
 			</View>
 		</Link>
-		<LegendList
-		data={reviews.pages.flat()}
+		<LegendList<UserReview>
+		key={loading ? 'loading' : 'reviews'}
+		data={loading ? new Array(3).fill(null) : reviews?.pages.flat()}
 		renderItem={({ item }) => (
-			<CardReview key={item.id} review={item} activity={item.activity} author={item.activity.user} style={tw`w-86`} />
+			!loading ? (
+				<CardReview key={item.id} review={item} activity={item.activity!} author={item.activity?.user!} style={tw`w-86`} />
+			) : (
+				<CardReview skeleton style={tw`w-86`} />
+			)
 		)}
+		ListEmptyComponent={
+			<Text style={[tw``, { color: colors.mutedForeground }]}>
+				{upperFirst(t('common.messages.no_reviews'))}
+			</Text>
+		}
 		snapToInterval={352}
 		decelerationRate="fast"
-		keyExtractor={(item) => item.id.toString()}
+		keyExtractor={(item, index) => loading ? index.toString() : item.id.toString()}
 		horizontal
 		showsHorizontalScrollIndicator={false}
 		ItemSeparatorComponent={() => <View style={tw`w-2`} />}
 		contentContainerStyle={containerStyle}
 		nestedScrollEnabled
+		onEndReached={() => hasNextPage && fetchNextPage()}
+		onEndReachedThreshold={0.5}
 		/>
 	</View>
 	);

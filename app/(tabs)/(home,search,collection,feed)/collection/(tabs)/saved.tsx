@@ -1,5 +1,4 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistsSavedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
@@ -13,8 +12,7 @@ import { useTranslations } from "use-intl";
 const CollectionSavedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
-	const { colors, inset } = useTheme();
-	const tabBarHeight = useBottomTabOverflow();
+	const { colors, bottomTabHeight } = useTheme();
 	const {
 		data: playlists,
 		isLoading,
@@ -50,7 +48,7 @@ const CollectionSavedScreen = () => {
 		onRefresh={refetch}
 		numColumns={3}
 		contentContainerStyle={{
-			paddingBottom: tabBarHeight + inset.bottom,
+			paddingBottom: bottomTabHeight + 8,
 		}}
 		keyExtractor={(_, index) => index.toString()}
 		showsVerticalScrollIndicator={false}

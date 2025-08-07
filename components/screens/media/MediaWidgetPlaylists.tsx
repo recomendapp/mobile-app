@@ -1,5 +1,5 @@
 import tw from "@/lib/tw";
-import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
+import { ActivityIndicator, StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { LegendList } from "@legendapp/list";
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { upperFirst } from "lodash";
@@ -9,6 +9,8 @@ import { useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
+import { Text } from "@/components/ui/text";
+import { Playlist } from "@/types/type.db";
 
 interface MediaWidgetPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	mediaId: number;
@@ -30,12 +32,15 @@ const MediaWidgetPlaylists = ({
 	const {
 		data: playlists,
 		isLoading,
+		fetchNextPage,
+		hasNextPage,
 	} = useMediaPlaylistsInfiniteQuery({
 		id: mediaId,
+		filters: {
+			perPage: 2,
+		}
 	});
 	const loading = playlists === undefined || isLoading;
-
-	if (!playlists || !playlists.pages[0].length) return null;
 
 	return (
 	<View style={[tw`gap-1`, style]}>
@@ -47,19 +52,31 @@ const MediaWidgetPlaylists = ({
 				<Icons.ChevronRight color={colors.mutedForeground} />
 			</View>
 		</Link>
-		<LegendList
-		data={playlists.pages.flat()}
+		<LegendList<Playlist>
+		key={loading ? 'loading' : 'playlists'}
+		data={loading ? new Array(3).fill(null) : playlists?.pages.flat()}
 		renderItem={({ item }) => (
-		<CardPlaylist key={item.id} playlist={item} style={tw`w-36`} />
+			!loading ? (
+				<CardPlaylist playlist={item} style={tw`w-36`} />
+			) : (
+				<CardPlaylist skeleton style={tw`w-36`} />
+			)
 		)}
+		ListEmptyComponent={
+			<Text style={[tw``, { color: colors.mutedForeground }]}>
+				{upperFirst(t('common.messages.no_playlists'))}
+			</Text>
+		}
 		snapToInterval={152}
 		decelerationRate="fast"
-		keyExtractor={(item) => item.id.toString()}
+		keyExtractor={(item, index) => loading ? index.toString() : item.id.toString()}
 		horizontal
 		showsHorizontalScrollIndicator={false}
 		ItemSeparatorComponent={() => <View style={tw`w-2`} />}
 		contentContainerStyle={containerStyle}
 		nestedScrollEnabled
+		onEndReached={() => hasNextPage && fetchNextPage()}
+		onEndReachedThreshold={0.5}
 		/>
 	</View>
 	);
