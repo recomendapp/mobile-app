@@ -35,7 +35,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
         <Stack.Screen name="review/create/[media_id]" options={{ headerTitle: upperFirst(t('common.messages.new_review')) }} />
         {/* SETTINGS */}
         <Stack.Screen name="settings/index" options={{ headerTitle: upperFirst(t('pages.settings.label')) }} />
-        <Stack.Screen name="settings/profile" />
+        <Stack.Screen name="settings/profile" options={{ headerTitle: upperFirst(t('pages.settings.profile.label')) }} />
         <Stack.Screen name="settings/account" options={{ headerTitle: upperFirst(t('pages.settings.account.label')) }} />
         <Stack.Screen name="settings/subscription" options={{ headerTitle: upperFirst(t('pages.settings.subscription.label')) }} />
         <Stack.Screen name="settings/security" options={{ headerTitle: upperFirst(t('pages.settings.security.label')) }} />
