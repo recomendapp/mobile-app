@@ -7,10 +7,12 @@ import { useAuth } from "@/providers/AuthProvider";
 import { AuthError } from "@supabase/supabase-js";
 import { Redirect, useRouter } from "expo-router";
 import * as Burnt from "burnt";
+import { upperFirst } from "lodash";
+import { useTranslations } from "use-intl";
 
 const AuthResetPasswordScreen = () => {
 	const url = useLinkingURL();
-	const router = useRouter();
+	const t = useTranslations();
 	const { createSessionFromUrl } = useAuth();
 	const [error, setError] = useState<string | null>(null);
 
@@ -18,14 +20,14 @@ const AuthResetPasswordScreen = () => {
 		if (url) {
 			createSessionFromUrl(url)
 				.catch((error) => {
-				let errorMessage = "An unknown error occurred while processing the reset password.";
+				let errorMessage: string = "An unknown error occurred while processing the reset password.";
 				if (error instanceof AuthError) {
 					errorMessage = error.message;
 				} else if (error instanceof Error) {
 					errorMessage = error.message;
 				}
 				Burnt.toast({
-					title: "Error",
+					title: upperFirst(t('common.messages.error')),
 					message: errorMessage,
 					preset: "error",
 					haptic: "error",

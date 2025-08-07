@@ -1,20 +1,21 @@
 import { useTheme } from "@/providers/ThemeProvider";
-import { CoreBridge, PlaceholderBridge, TenTapStartKit, useEditorBridge } from "@10play/tentap-editor";
+import { CoreBridge, EditorBridge, PlaceholderBridge, TenTapStartKit, useEditorBridge } from "@10play/tentap-editor";
 import { useMemo } from "react";
 
-interface useEditorProps {
-	initialContent?: string | object;
-	editable?: boolean;
-}
-
 const useEditor = ({
+	theme,
+	avoidIosKeyboard = true,
+	dynamicHeight = true,
 	...props
-} : useEditorProps) => {
+}: Partial<EditorBridge> = {}) => {
 	const { colors } = useTheme();
 	const customCodeBlockCSS = useMemo(() => `
 		* {
 			background-color: ${colors.background};
 			color: ${colors.foreground};
+			padding: 0;
+			margin: 0;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 		}
 		blockquote {
 			border-left: 3px solid #babaca;
@@ -29,7 +30,7 @@ const useEditor = ({
 		}
 	`, [colors]);
 	return useEditorBridge({
-			avoidIosKeyboard: true,
+			avoidIosKeyboard: avoidIosKeyboard,
 			theme: {
 				toolbar: {
 					toolbarBody: {
@@ -46,7 +47,8 @@ const useEditor = ({
 				},
 				webview: {
 					backgroundColor: colors.background,
-				}
+				},
+				...(theme || {}) 
 			},
 			bridgeExtensions: [
 				...TenTapStartKit,
@@ -55,7 +57,7 @@ const useEditor = ({
 				}),
 				CoreBridge.configureCSS(customCodeBlockCSS),
 			],
-			dynamicHeight: true,
+			dynamicHeight: dynamicHeight,
 			...props,
 		});
 };

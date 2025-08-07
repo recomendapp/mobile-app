@@ -4,11 +4,10 @@ import { useUserReviewInsertMutation, useUserReviewUpdateMutation } from "@/feat
 import tw from "@/lib/tw";
 import { Media, UserReview } from "@/types/type.db";
 import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, Text, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { RichText, Toolbar } from "@10play/tentap-editor";
 import { CardMedia } from "@/components/cards/CardMedia";
-import { ThemedText } from "@/components/ui/ThemedText";
-import { upperFirst } from "lodash";
+import { upperCase, upperFirst } from "lodash";
 import { useUserActivityQuery } from "@/features/user/userQueries";
 import * as Burnt from "burnt";
 import useEditor from "@/lib/10tap/editor";
@@ -16,6 +15,10 @@ import { useSharedValue } from "react-native-reanimated";
 import { BetterInput } from "@/components/ui/BetterInput";
 import isPostgrestError from "@/utils/isPostgrestError";
 import { useTranslations } from "use-intl";
+import { Stack } from "expo-router";
+import { Button } from "@/components/ui/Button";
+import { useHeaderHeight } from '@react-navigation/elements';
+import { ScrollView } from "react-native-gesture-handler";
 
 const MAX_TITLE_LENGTH = 50;
 const MAX_BODY_LENGTH = 5000;
@@ -31,7 +34,7 @@ const ReviewForm = ({
 	review,
 	onSave,
 } : ReviewFormProps) => {
-	const { colors, inset, bottomTabHeight } = useTheme();
+	const { colors, bottomTabHeight } = useTheme();
 	const t = useTranslations();
 	const { user } = useAuth();
 	const [title, setTitle] = useState(review?.title ?? '');
@@ -46,17 +49,16 @@ const ReviewForm = ({
 		userId: user?.id,
 		mediaId: media.media_id!,
 	});
-	// const [headerHeight, setHeaderHeight] = useState(0);
+	const navigationHeaderHeight = useHeaderHeight();
 	const headerHeight = useSharedValue(0);
 	const [isEditorFocused, setIsEditorFocused] = useState(false);
 	// EDITOR
 	const editor = useEditor({
-		initialContent: review?.body,
+		initialContent: review?.body as any,
 	});
 
 	// HANDLER
 	const handleSave = async () => {
-		console.log('handleSave called', review?.id);
 		try {
 			const content = await editor.getJSON();
 			if (review) {
@@ -90,23 +92,18 @@ const ReviewForm = ({
 				});
 			}
 		} catch (error) {
+			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof Error) {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: error.message,
-					preset: 'error',
-					haptic: 'error',
-				});
+				errorMessage = error.message;
 			} else if (isPostgrestError(error)) {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: error.details,
-					preset: 'error',
-					haptic: 'error',
-				});
-			} else {
-				console.log('error', error);
+				errorMessage = error.message;
 			}
+			Burnt.toast({
+				title: upperFirst(t('common.messages.error')),
+				message: errorMessage,
+				preset: 'error',
+				haptic: 'error',
+			});
 		}
 	}
 	
@@ -125,89 +122,103 @@ const ReviewForm = ({
 	}, [review]);
 
 	return (
-	<View
-	style={[
-		{
-			paddingTop: inset.top,
-			paddingBottom: bottomTabHeight,
-		},
-		tw`flex-1 gap-2`
-	]}
-	>
-		<View
-		style={tw`px-2 gap-2`}
-		onLayout={(e) => {
-			headerHeight.value = e.nativeEvent.layout.height + 8;
+	<>
+		<Stack.Screen
+		options={{
+			headerRight: () => (
+				isEditorFocused ? (
+					<Button
+					variant="ghost"
+					size="fit"
+					onPress={() => setIsEditorFocused(false)}
+					>
+						{upperCase(t('common.messages.ok'))}
+					</Button>
+				) : review ?(
+					<Button
+					variant="ghost"
+					size="fit"
+					onPress={handleSave}
+					textStyle={{ color: colors.accentYellow }}
+					>
+						{upperFirst(t('common.messages.save'))}
+					</Button>
+				) : (
+					<Button
+					variant="ghost"
+					size="fit"
+					onPress={handleSave}
+					textStyle={{ color: colors.accentYellow }}
+					>
+						{upperFirst(t('common.messages.publish'))}
+					</Button>
+				)
+			)
 		}}
+		/>
+		<ScrollView
+		contentContainerStyle={[
+			{ paddingBottom: bottomTabHeight + 8 },
+			tw`gap-2`
+		]}
 		>
-			<View style={tw`flex-row justify-between items-center gap-2`}>
-				<ThemedText style={tw`text-2xl font-bold`}>
-					{review
-						? 'Modifier la critique'
-						: 'Nouvelle critique'}
-				</ThemedText>
-				<View style={tw`flex-row items-center gap-2`}>
-					{isEditorFocused ? (
-						<TouchableOpacity onPress={() => setIsEditorFocused(false)}>
-							<Text style={[{ color: colors.accentYellow }, tw`text-lg`]}>OK</Text>
-						</TouchableOpacity>
-					) : (
-						<TouchableOpacity onPress={handleSave}>
-							<Text style={[{ color: colors.accentYellow }, tw`text-lg`]}>{upperFirst(t('common.messages.save'))}</Text>
-						</TouchableOpacity>
-					)}
-				</View>
-			</View>
-			{/* TITLE */}
-			<BetterInput
-			value={title}
-			onChangeText={(text) => setTitle(text.replace(/\s+/g, ' ').trimStart())}
-			placeholder={upperFirst(t('common.messages.title'))}
-			maxLength={MAX_TITLE_LENGTH}
-			containerStyle={tw`bg-transparent p-0`}
-			style={[
-				tw`h-auto font-bold`,
-				{
-					fontSize: 24,
-					color: colors.accentYellow,
-				}
-			]}
-			textAlign="center"
-			multiline
-			/>
-			{/* MEDIA */}
-			<CardMedia
-			media={media}
-			linked={false}
-			showActionRating
-			/>
-		</View>
-		<View style={tw`flex-1`}>
-			<RichText
-			editor={editor}
-			exclusivelyUseCustomOnMessage={false}
-			onMessage={(e) => {
-				const data = JSON.parse(e.nativeEvent.data);
-				if (data.type === 'stateUpdate') {
-					if (data.payload.isFocused !== isEditorFocused) {
-						setIsEditorFocused(data.payload.isFocused);
-					}
-				}
+			<View
+			style={tw`px-2 gap-2`}
+			onLayout={(e) => {
+				headerHeight.value = e.nativeEvent.layout.height + 8;
 			}}
-			style={[
-				tw`px-2`,
-				{ backgroundColor: colors.background,}
-			]}
-			/>
-			<KeyboardAvoidingView
-				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-				style={tw`absolute bottom-0`}
-				keyboardVerticalOffset={headerHeight.get() + inset.top}
 			>
-				<Toolbar editor={editor} hidden={false} />
-			</KeyboardAvoidingView>
-		</View>
-	</View>
+				<BetterInput
+				value={title}
+				onChangeText={(text) => setTitle(text.replace(/\s+/g, ' ').trimStart())}
+				placeholder={upperFirst(t('common.messages.title'))}
+				maxLength={MAX_TITLE_LENGTH}
+				containerStyle={tw`bg-transparent p-0`}
+				style={[
+					tw`h-auto font-bold`,
+					{
+						fontSize: 24,
+						color: colors.accentYellow,
+					}
+				]}
+				textAlign="center"
+				multiline
+				/>
+				{/* MEDIA */}
+				<CardMedia
+				media={media}
+				linked={false}
+				showActionRating
+				/>
+			</View>
+			<View style={tw`flex-1`}>
+				<RichText
+				scrollEnabled={false}
+				editor={editor}
+				exclusivelyUseCustomOnMessage={false}
+				onMessage={(e) => {
+					const data = JSON.parse(e.nativeEvent.data);
+					if (data.type === 'stateUpdate') {
+						if (data.payload.isFocused !== isEditorFocused) {
+							setIsEditorFocused(data.payload.isFocused);
+						}
+					}
+				}}
+				style={[
+					tw`px-2`,
+					{ backgroundColor: colors.background,}
+				]}
+				/>
+				<KeyboardAvoidingView
+					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+					style={tw`absolute bottom-0`}
+					keyboardVerticalOffset={headerHeight.get() + navigationHeaderHeight}
+				>
+					<Toolbar editor={editor} hidden={false} />
+				</KeyboardAvoidingView>
+			</View>
+		</ScrollView>
+	</>
 	);
 };
 
