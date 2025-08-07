@@ -7,14 +7,16 @@ interface GridViewProps<T> extends React.ComponentProps<typeof View> {
 	renderItem: (item: T, index: number) => React.ReactNode;
 	columns?: number;
 	columnStyle?: StyleProp<ViewStyle>;
+	gap?: number;
 }
 
 // Fonction interne qui gère les génériques
 function GridViewInner<T>({ 
 	data, 
 	renderItem, 
-	columns = 2, 
-	columnStyle, 
+	columns = 2,
+	columnStyle,
+	gap = 0, 
 	style, 
 	...props 
 }: GridViewProps<T>, ref: React.Ref<React.ComponentRef<typeof View>>) {

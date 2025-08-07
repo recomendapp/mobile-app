@@ -39,6 +39,9 @@ type AuthContextProps = {
 		redirectTo?: string;
 	}) => Promise<void>;
 	resetPasswordForEmail: (email: string) => Promise<void>;
+	updateEmail: (email: string) => Promise<void>;
+	verifyEmailChange: (email: string, token: string) => Promise<void>;
+	cancelPendingEmailChange: () => Promise<void>;
 	createSessionFromUrl: (url: string) => Promise<Session | null>;
 };
 
@@ -156,6 +159,31 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		if (error) throw error;
 	};
 
+	const updateEmail = async (email: string) => {
+		const { error } = await supabase.auth.updateUser({
+			email: email,
+		});
+		if (error) throw error;
+	};
+
+	const verifyEmailChange = async (email: string, token: string) => {
+		const { error } = await supabase.auth.verifyOtp({
+			type: 'email_change',
+			token: token,
+			email: email,
+		});
+		if (error) throw error;
+		const { error: refreshError } = await supabase.auth.refreshSession();
+		if (refreshError) throw refreshError;
+	};
+
+	const cancelPendingEmailChange = async () => {
+		const { error } = await supabase.rpc('utils_cancel_email_change');
+		if (error) throw error;
+		const { error: refreshError } = await supabase.auth.refreshSession();
+    	if (refreshError) throw refreshError;
+	};
+
 	const createSessionFromUrl = async (url: string) => {
 		const { params, errorCode } = QueryParams.getQueryParams(url);
 		if (errorCode) throw new Error(errorCode);
@@ -179,6 +207,9 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			logout: logout,
 			signup: signup,
 			resetPasswordForEmail: resetPasswordForEmail,
+			updateEmail: updateEmail,
+			verifyEmailChange: verifyEmailChange,
+			cancelPendingEmailChange: cancelPendingEmailChange,
 			createSessionFromUrl: createSessionFromUrl,
 		}}
 		>

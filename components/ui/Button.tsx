@@ -31,7 +31,7 @@ export type ButtonVariant =
   | 'link'
   | 'accent-yellow';
 
-export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon';
+export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon' | 'fit';
 
 export interface ButtonProps extends Omit<TouchableOpacityProps, 'style'> {
   label?: string;
@@ -47,7 +47,7 @@ export interface ButtonProps extends Omit<TouchableOpacityProps, 'style'> {
   loading?: boolean;
   loadingVariant?: SpinnerVariant;
   style?: ViewStyle | ViewStyle[];
-  textStyle?: TextStyle;
+  textStyle?: TextStyle | TextStyle[];
 }
 
 export const Button = forwardRef<View, ButtonProps>(
@@ -107,6 +107,9 @@ export const Button = forwardRef<View, ButtonProps>(
             width: HEIGHT,
             paddingHorizontal: 0,
           });
+          break;
+        case 'fit':
+          Object.assign(baseStyle, { height: 'auto', paddingHorizontal: 0 });
           break;
         default:
           Object.assign(baseStyle, { height: HEIGHT, ...tw`px-4` });

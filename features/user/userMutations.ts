@@ -856,3 +856,54 @@ export const useUserPlaylistSavedDeleteMutation = () => {
 	});
 };
 /* -------------------------------------------------------------------------- */
+
+/* --------------------------------- ACCOUNT -------------------------------- */
+export const useUserDeleteRequestInsertMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			userId,
+		} : {
+			userId: string;
+		}) => {
+			const { data, error } = await supabase
+				.from('user_deletion_requests')
+				.insert({
+					user_id: userId,
+				})
+				.select()
+				.single();
+			if (error) throw error;
+			return data;
+		},
+		onSuccess: (data) => {
+			queryClient.setQueryData(userKeys.deleteRequest({ userId: data.user_id }), data);
+		}
+	});
+};
+
+export const useUserDeleteRequestDeleteMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			userId,
+		} : {
+			userId: string;
+		}) => {
+			const { data, error } = await supabase
+				.from('user_deletion_requests')
+				.delete()
+				.eq('user_id', userId)
+				.select()
+				.single();
+			if (error) throw error;
+			return data;
+		},
+		onSuccess: (data) => {
+			queryClient.setQueryData(userKeys.deleteRequest({ userId: data.user_id }), null);
+		}
+	});
+};
+/* -------------------------------------------------------------------------- */
