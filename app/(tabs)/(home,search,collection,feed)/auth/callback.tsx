@@ -7,9 +7,12 @@ import { useLinkingURL } from "expo-linking";
 import { useEffect, useState } from "react";
 import * as Burnt from "burnt";
 import { Redirect } from "expo-router";
+import { useTranslations } from "use-intl";
+import { upperFirst } from "lodash";
 
 const AuthCallbackScreen = () => {
 	const url = useLinkingURL();
+	const t = useTranslations();
 	const { createSessionFromUrl } = useAuth();
 	const [error, setError] = useState<string | null>(null);
 
@@ -17,14 +20,14 @@ const AuthCallbackScreen = () => {
 		if (url) {
 			createSessionFromUrl(url)
 				.catch((error) => {
-					let errorMessage = "An unknown error occurred while processing the reset password.";
+					let errorMessage: string = "An unknown error occurred while processing the reset password.";
 					if (error instanceof AuthError) {
 						errorMessage = error.message;
 					} else if (error instanceof Error) {
 						errorMessage = error.message;
 					}
 					Burnt.toast({
-						title: "Error",
+						title: upperFirst(t('common.messages.error')),
 						message: errorMessage,
 						preset: "error",
 						haptic: "error",

@@ -109,14 +109,15 @@ const SettingsAccountScreen = () => {
 				preset: 'done',
 			})
 		} catch (error) {
-			let errorMessage = t('common.messages.an_error_occurred');
+			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof Error) {
 				errorMessage = error.message;
 			} else if (typeof error === 'string') {
 				errorMessage = error;
 			}
 			Burnt.toast({
-				title: errorMessage,
+				title: upperFirst(t('common.messages.error')),
+				message: errorMessage,
 				preset: 'error',
 				haptic: 'error',
 			});
@@ -133,14 +134,15 @@ const SettingsAccountScreen = () => {
 				preset: 'done',
 			});
 		} catch (error) {
-			let errorMessage = t('common.messages.an_error_occurred');
+			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof Error) {
 				errorMessage = error.message;
 			} else if (typeof error === 'string') {
 				errorMessage = error;
 			}
 			Burnt.toast({
-				title: errorMessage,
+				title: upperFirst(t('common.messages.an_error_occurred')),
+				message: errorMessage,
 				preset: 'error',
 				haptic: 'error',
 			});
@@ -200,14 +202,15 @@ const SettingsAccountScreen = () => {
 				preset: 'done',
 			});
 		} catch (error) {
-			let errorMessage = t('common.messages.an_error_occurred');
+			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof Error) {
 				errorMessage = error.message;
 			} else if (typeof error === 'string') {
 				errorMessage = error;
 			}
 			Burnt.toast({
-				title: errorMessage,
+				title: upperFirst(t('common.messages.error')),
+				message: errorMessage,
 				preset: 'error',
 				haptic: 'error',
 			});

@@ -8,7 +8,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { ThemedText } from "../ui/ThemedText";
 import { IconMediaRating } from "../medias/IconMediaRating";
 import { CardUser } from "./CardUser";
-import ActionReviewLike from "../reviews/actions/ActionReviewLike";
+import ActionReviewLike from "../reviews/actions/ReviewActionLike";
 import { Skeleton } from "../ui/Skeleton";
 import { FixedOmit } from "@/types";
 
