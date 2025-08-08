@@ -3,7 +3,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useUserDeleteRequestDeleteMutation, useUserDeleteRequestInsertMutation, useUserUpdateMutation } from "@/features/user/userMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {  useEffect, useState } from "react";
+import {  useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
@@ -74,11 +74,11 @@ const SettingsAccountScreen = () => {
 		email: z.email({ error: t('common.form.email.error.invalid') })
 	});
 	type AccountFormValues = z.infer<typeof accountFormSchema>;
-	const defaultValues: Partial<AccountFormValues> = {
+	const defaultValues = useMemo((): Partial<AccountFormValues> => ({
 		username: user?.username,
 		private: user?.private,
 		email: session?.user.email,
-	};
+	}), [user, session]);
 	const form = useForm<AccountFormValues>({
 		resolver: zodResolver(accountFormSchema),
 		defaultValues,
@@ -295,7 +295,7 @@ const SettingsAccountScreen = () => {
 					onBlur={onBlur}
 					onChangeText={onChange}
 					leftSectionStyle={tw`w-auto`}
-					rightComponent={(!form.formState.errors.username && hasUnsavedChanges && !usernameDisabled) ? (
+					rightComponent={(!form.formState.errors.username && value !== defaultValues.username) ? (
 						usernameAvailability.isLoading ? <Icons.Loader />
 						: (
 							<View style={[{ backgroundColor: usernameAvailability.isAvailable ? colors.success : colors.destructive }, tw`rounded-full h-6 w-6 items-center justify-center`]}>

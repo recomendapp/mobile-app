@@ -30,8 +30,6 @@ const ReviewScreen = () => {
 	});
 	const loading = reviewLoading || review === undefined;
 
-	console.log('review Render');
-
 	if (loading) {
 		return (
 			<View style={tw`flex-1 items-center justify-center`}>

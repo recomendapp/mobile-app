@@ -1,24 +1,27 @@
 import { Button } from '@/components/ui/Button';
-import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
 import { ThemedText } from '@/components/ui/ThemedText';
+import { View } from '@/components/ui/view';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
-import { useNavigation } from '@react-navigation/native';
+import { Stack, useRouter } from 'expo-router';
 
 const NotFoundScreen = () => {
+  const router = useRouter();
   const { tabBarHeight } = useTheme();
-  const navigation = useNavigation();
   return (
-      <ThemedSafeAreaView
-      style={[
-        tw.style("flex-1 justify-center items-center gap-2"),
-        { paddingBottom: tabBarHeight },
-      ]}
-      >
-        <ThemedText style={tw.style("text-3xl font-bold")}>This screen doesn't exist.</ThemedText>
+  <>
+    <Stack.Screen options={{ title: 'Oops!' }} /> 
+    <View
+    style={[
+      tw.style("flex-1 justify-center items-center gap-2"),
+      { paddingBottom: tabBarHeight },
+    ]}
+    >
+      <ThemedText style={tw.style("text-3xl font-bold")}>This screen doesn't exist.</ThemedText>
 
-        <Button onPress={() => navigation.goBack()}>Go back!</Button>
-      </ThemedSafeAreaView>
+      <Button onPress={() => router.back()}>Go back!</Button>
+    </View>
+  </>
   );
 };
 
