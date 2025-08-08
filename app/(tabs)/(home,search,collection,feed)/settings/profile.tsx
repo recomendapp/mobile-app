@@ -276,7 +276,7 @@ const SettingsProfileScreen = () => {
 					leftSectionStyle={tw`w-auto`}
 					error={form.formState.errors.full_name?.message}
 					/>
-					<Text variant='muted' style={tw`text-xs text-justify`}>
+					<Text textColor='muted' style={tw`text-xs text-justify`}>
 						{t('pages.settings.profile.full_name.description')}
 					</Text>
 				</View>
@@ -299,7 +299,7 @@ const SettingsProfileScreen = () => {
 					disabled={isLoading}
 					error={form.formState.errors.bio?.message}
 					/>
-					<Text variant='muted' style={tw`text-xs text-justify`}>
+					<Text textColor='muted' style={tw`text-xs text-justify`}>
 						{t('pages.settings.profile.bio.description')}
 					</Text>
 				</View>
@@ -324,7 +324,7 @@ const SettingsProfileScreen = () => {
 					disabled={isLoading}
 					error={form.formState.errors.website?.message}
 					/>
-					<Text variant='muted' style={tw`text-xs text-justify`}>
+					<Text textColor='muted' style={tw`text-xs text-justify`}>
 						{t('pages.settings.profile.url.description')}
 					</Text>
 				</View>

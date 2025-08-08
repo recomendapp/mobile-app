@@ -163,10 +163,10 @@ const BottomSheetAddToPlaylist = React.forwardRef<
             style={tw`h-12`}
             contentContainerStyle={tw`w-full items-center justify-center gap-2`}
             ListEmptyComponent={() => (
-              <Text variant='muted' style={tw`text-center`}>
+              <Text textColor='muted' style={tw`text-center`}>
                 {t.rich('common.messages.add_to_one_or_more_playlists', {
                   title: media.title!,
-                  strong: (chunks) => <Text variant='muted' style={tw`font-bold`}>{chunks}</Text>
+                  strong: (chunks) => <Text textColor='muted' style={tw`font-bold`}>{chunks}</Text>
                 })}
               </Text>
             )}

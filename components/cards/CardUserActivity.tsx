@@ -72,7 +72,7 @@ const CardUserActivityDefault = React.forwardRef<
 					) : (
 						!skeleton ? (
 							<Text
-							variant={!activity?.media?.extra_data.overview || !activity?.media?.extra_data.overview.length ? "muted" : undefined}
+							textColor={!activity?.media?.extra_data.overview || !activity?.media?.extra_data.overview.length ? "muted" : undefined}
 							numberOfLines={2}
 							style={tw`text-xs text-justify`}
 							>

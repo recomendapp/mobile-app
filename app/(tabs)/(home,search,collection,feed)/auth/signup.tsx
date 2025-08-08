@@ -419,7 +419,7 @@ const SignupScreen = () => {
 							<Text variant='title'>
 								{t('pages.auth.signup.confirm_form.label')}
 							</Text>
-							<Text variant='muted'>
+							<Text textColor='muted'>
 								{t('pages.auth.signup.confirm_form.description', { email: form.getValues('email') })}
 							</Text>
 						</View>
@@ -430,7 +430,7 @@ const SignupScreen = () => {
 						onComplete={handleVerifyOtp}
 						/>
 						<View style={tw`items-center`}>
-							<Text variant='muted'>
+							<Text textColor='muted'>
 								{t('common.form.error.not_received_code')}{' '}
 							</Text>
 							<Button

@@ -1,6 +1,6 @@
 import { useTheme } from '@/providers/ThemeProvider';
 import { FONT_SIZE } from '@/theme/globals';
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useMemo } from 'react'; // Importer useMemo
 import {
   Text as RNText,
   TextProps as RNTextProps,
@@ -11,72 +11,78 @@ type TextVariant =
   | 'body'
   | 'title'
   | 'subtitle'
-  | 'muted'
+  | 'caption'
   | 'heading'
   | 'link';
 
 interface TextProps extends RNTextProps {
   variant?: TextVariant;
-  lightColor?: string;
-  darkColor?: string;
+  textColor?: 'default' | 'foreground' | 'muted' | 'destructive';
   children: React.ReactNode;
 }
 
+/**
+ * Component for displaying text with different styles.
+ * It supports various variants and text colors.
+ * @param {TextProps["textColor"]} textColor - The color variant of the text. Set to 'foreground' if not specified.
+ * @returns {JSX.Element} The rendered component.
+ *
+ */
 export const Text = forwardRef<RNText, TextProps>(
   (
-    { variant = 'body', lightColor, darkColor, style, children, ...props },
+    { variant = 'body', textColor, style, children, ...props },
     ref
   ) => {
     const { colors } = useTheme();
-    const getTextStyle = (): TextStyle => {
-      const baseStyle: TextStyle = {
-        color: colors.foreground,
-      };
 
-      switch (variant) {
-        case 'heading':
-          return {
-            ...baseStyle,
-            fontSize: 28,
-            fontWeight: '800',
-          };
-        case 'title':
-          return {
-            ...baseStyle,
-            fontSize: 24,
-            fontWeight: '700',
-          };
-        case 'subtitle':
-          return {
-            ...baseStyle,
-            fontSize: 19,
-            fontWeight: '600',
-          };
-        case 'muted':
-          return {
-            ...baseStyle,
-            fontSize: FONT_SIZE,
-            fontWeight: '400',
-            color: colors.mutedForeground,
-          };
-        case 'link':
-          return {
-            ...baseStyle,
-            fontSize: FONT_SIZE,
-            fontWeight: '500',
-            textDecorationLine: 'underline',
-          };
-        default: // 'body'
-          return {
-            ...baseStyle,
-            fontSize: FONT_SIZE,
-            fontWeight: '400',
-          };
+    const textStyle = useMemo((): TextStyle => {
+      const variantStyles: TextStyle = (() => {
+        switch (variant) {
+          case 'heading':
+            return { fontSize: 28, fontWeight: '800' };
+          case 'title':
+            return { fontSize: 24, fontWeight: '700' };
+          case 'subtitle':
+            return { fontSize: 19, fontWeight: '600' };
+          case 'caption':
+            return { fontSize: FONT_SIZE, fontWeight: '400' };
+          case 'link':
+            return { fontSize: FONT_SIZE, fontWeight: '500', textDecorationLine: 'underline' };
+          default: // 'body'
+            return { fontSize: FONT_SIZE, fontWeight: '400' };
+        }
+      })();
+      
+      const colorStyle: { color?: string } = {};
+
+      if (textColor && textColor !== 'default') {
+        switch (textColor) {
+          case 'foreground':
+            colorStyle.color = colors.foreground;
+            break;
+          case 'muted':
+            colorStyle.color = colors.mutedForeground;
+            break;
+          case 'destructive':
+            colorStyle.color = colors.destructive;
+            break;
+        }
+      } else if (!textColor) {
+        switch (variant) {
+          case 'caption':
+            colorStyle.color = colors.mutedForeground;
+            break;
+          default:
+            colorStyle.color = colors.foreground;
+            break;
+        }
       }
-    };
+      return { ...variantStyles, ...colorStyle };
+
+    }, [variant, textColor, colors]);
 
     return (
-      <RNText ref={ref} style={[getTextStyle(), style]} {...props}>
+      <RNText ref={ref} style={[textStyle, style]} {...props}>
         {children}
       </RNText>
     );

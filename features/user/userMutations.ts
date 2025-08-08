@@ -22,6 +22,7 @@ export const useUserUpdateMutation = ({
 			website,
 			avatarUrl,
 			privateAccount,
+			language,
 		} : {
 			fullName?: string;
 			username?: string;
@@ -30,6 +31,7 @@ export const useUserUpdateMutation = ({
 			website?: string | null;
 			avatarUrl?: string | null;
 			privateAccount?: boolean;
+			language?: string;
 		}) => {
 			if (!userId) throw Error('Missing user id');
 			const { data, error } = await supabase
@@ -42,6 +44,7 @@ export const useUserUpdateMutation = ({
 					website: website,
 					avatar_url: avatarUrl,
 					private: privateAccount,
+					language: language,
 				})
 				.eq('id', userId)
 				.select('*')

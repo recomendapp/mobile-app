@@ -7,7 +7,7 @@ import tw from "@/lib/tw";
 import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
@@ -19,23 +19,28 @@ import { supportedLocales } from "@/translations/locales";
 import { useLocaleContext } from "@/providers/LocaleProvider";
 import { Picker } from '@react-native-picker/picker';
 import useLocalizedLanguageName from "@/hooks/useLocalizedLanguageName";
+import { useUserUpdateMutation } from "@/features/user/userMutations";
+import { useAuth } from "@/providers/AuthProvider";
 
 const SettingsAppearanceScreen = () => {
-	const { locale } = useLocaleContext();
+	const { locale, setLocale } = useLocaleContext();
+	const { session } = useAuth();
 	const { bottomTabHeight } = useTheme();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locales = useLocalizedLanguageName(locale);
+	const updateUser = useUserUpdateMutation({
+		userId: session?.user.id
+	})
+
+	// Form
 	const profileFormSchema = z.object({
 		locale: z.enum(supportedLocales)
 	});
-
 	type ProfileFormValues = z.infer<typeof profileFormSchema>;
-
 	const defaultValues: Partial<ProfileFormValues> = {
 		locale: locale,
 	};
-
 	const form = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues,
@@ -47,6 +52,12 @@ const SettingsAppearanceScreen = () => {
 		try {
 			setIsLoading(true);
 			// 
+			if (session) {
+				await updateUser.mutateAsync({
+					language: data.locale,
+				});
+			}
+			setLocale(data.locale);
 			Burnt.toast({
 				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
 				preset: 'done',
@@ -68,11 +79,19 @@ const SettingsAppearanceScreen = () => {
 		}
 	};
 
+	// useEffects
+	useEffect(() => {
+		console.log('locale', locale)
+		form.reset({
+			locale: locale,
+		});
+	}, [locale]);
+
 	return (
 		<>
 			<Stack.Screen
 				options={{
-					headerTitle: upperFirst(t('pages.settings.appearance.language.label')),
+					headerTitle: upperFirst(t('pages.settings.appearance.label')),
 					headerRight: () => (
 						<Button
 						variant="ghost"
@@ -96,7 +115,7 @@ const SettingsAppearanceScreen = () => {
 				name="locale"
 				control={form.control}
 				render={({ field: { onChange, onBlur, value } }) => (
-				<View style={tw`flex-row items-center gap-2`}>
+				<View>
 					<Label>{upperFirst(t('pages.settings.appearance.language.label'))}</Label>
 					<Picker
 					selectedValue={value}
@@ -105,26 +124,12 @@ const SettingsAppearanceScreen = () => {
 						{locales.map((locale, index) => (
 							<Picker.Item
 								key={index}
-								label={upperFirst(String(locale))}
-								value={locale}
+								label={`${locale.flag} ${locale.iso_639_1} (${locale.iso_3166_1})`}
+								value={locale.language}
 								style={{ fontSize: 16 }}
 							/>
 						))}
 					</Picker>
-					{/* <Input
-					label={null}
-					placeholder={t('pages.settings.security.new_password.placeholder')}
-					value={value ?? ''}
-					onChangeText={onChange}
-					onBlur={onBlur}
-					nativeID="newpassword"
-					autoComplete="new-password"
-					autoCapitalize="none"
-					disabled={isLoading}
-					leftSectionStyle={tw`w-auto`}
-					error={form.formState.errors.newpassword?.message}
-					type="password"
-					/> */}
 				</View>
 				)}
 				/>

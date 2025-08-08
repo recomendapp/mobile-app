@@ -100,7 +100,7 @@ const LoginScreen = () => {
 						</GroupedInput>
 						{/* FORGOT PASSWORD */}
 						<Link href="/auth/forgot-password" asChild>
-							<Text variant="muted" style={tw`text-right`}>{t('pages.auth.login.form.forgot_password')}</Text>
+							<Text textColor='muted' style={tw`text-right`}>{t('pages.auth.login.form.forgot_password')}</Text>
 						</Link>
 						{/* SUBMIT BUTTON */}
 						<Button loading={isLoading} onPress={handleSubmit} style={tw`w-full rounded-xl`}>{t('pages.auth.login.form.submit')}</Button>
