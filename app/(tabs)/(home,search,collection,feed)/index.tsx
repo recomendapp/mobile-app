@@ -3,7 +3,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { ScrollView, View } from 'react-native';
 import { UserNav } from '@/components/user/UserNav';
 import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
-import { Link, Stack } from 'expo-router';
+import { Link, Stack, useRouter } from 'expo-router';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 import tw from '@/lib/tw';
 import { Button } from '@/components/ui/Button';
@@ -16,8 +16,10 @@ import { WidgetUserDiscovery } from '@/components/widgets/WidgetUserDiscovery';
 import { useTranslations } from 'use-intl';
 import Header from '@/components/header/Header';
 import { useTheme } from '@/providers/ThemeProvider';
+import { Icons } from '@/constants/Icons';
 
 const HomeScreen = () => {
+  const router = useRouter();
   const t = useTranslations();
   const { session, user } = useAuth();
   const { bottomTabHeight } = useTheme();
@@ -27,7 +29,16 @@ const HomeScreen = () => {
         <View style={tw.style("flex-1 gap-2")}>
           <Header
           right={session ? `Welcome, ${user?.full_name}` : `Welcome on Recomend.`}
-          left={<UserNav />}
+          left={session ? (
+            <UserNav />
+          ) : (
+            <Button
+            variant="ghost"
+            size="icon"
+            icon={Icons.settings}
+            onPress={() => router.push('/settings')}
+            />
+          )}
           backButton={false}
           />
           <ScrollView

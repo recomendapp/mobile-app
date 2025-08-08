@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import tw from "@/lib/tw";
+import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import { LegendList } from "@legendapp/list";
 import { Href, useRouter } from "expo-router";
@@ -11,22 +12,23 @@ import { Pressable } from "react-native-gesture-handler";
 import { useTranslations } from "use-intl";
 
 const SettingsScreen = () => {
+	const { session } = useAuth();
 	const { colors, bottomTabHeight } = useTheme();
 	const router = useRouter();
 	const t = useTranslations();
-	const routes = useMemo((): { label: string, route: Href, icon: LucideIcon }[] => [
-		{ label: upperFirst(t('pages.settings.profile.label')), route: '/settings/profile', icon: Icons.User  },
-		{ label: upperFirst(t('pages.settings.account.label')), route: '/settings/account', icon: Icons.Lock  },
-		{ label: upperFirst(t('pages.settings.subscription.label')), route: '/settings/subscription', icon: Icons.CreditCard  },
-		{ label: upperFirst(t('pages.settings.security.label')), route: '/settings/security', icon: Icons.Shield  },
-		{ label: upperFirst(t('pages.settings.notifications.label')), route: '/settings/notifications', icon: Icons.Bell  },
-		{ label: upperFirst(t('pages.settings.appearance.label')), route: '/settings/appearance', icon: Icons.Eye  },
+	const routes = useMemo((): { label: string, route: Href, icon: LucideIcon, needsAuth?: boolean }[] => [
+		{ label: upperFirst(t('pages.settings.profile.label')), route: '/settings/profile', icon: Icons.User, needsAuth: true },
+		{ label: upperFirst(t('pages.settings.account.label')), route: '/settings/account', icon: Icons.Lock, needsAuth: true },
+		{ label: upperFirst(t('pages.settings.subscription.label')), route: '/settings/subscription', icon: Icons.CreditCard, needsAuth: true },
+		{ label: upperFirst(t('pages.settings.security.label')), route: '/settings/security', icon: Icons.Shield, needsAuth: true },
+		{ label: upperFirst(t('pages.settings.notifications.label')), route: '/settings/notifications', icon: Icons.Bell, needsAuth: true },
+		{ label: upperFirst(t('pages.settings.appearance.label')), route: '/settings/appearance', icon: Icons.Eye },
 	], [t]);
 
 	return (
 	<>
 		<LegendList
-		data={routes}
+		data={routes.filter(route => !route.needsAuth || session)}
 		renderItem={({ item, index }) => (
 			<Pressable
 			onPress={() => router.push(item.route)}
