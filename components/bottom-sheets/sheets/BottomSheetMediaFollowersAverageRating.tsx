@@ -95,7 +95,7 @@ const BottomSheetMediaFollowersAverageRating = React.forwardRef<
         loading ? <Icons.Loader />
         : (
           <View style={tw`flex-1 items-center justify-center p-4`}>
-            <Text variant="muted" style={tw`text-center`}>
+            <Text textColor='muted' style={tw`text-center`}>
               {upperFirst(t('common.messages.no_results'))}
             </Text>
           </View>

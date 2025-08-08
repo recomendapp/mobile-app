@@ -15,6 +15,7 @@ const TabsLayout = () => {
 	const router = useRouter();
 	return (
 	<Tabs
+		initialRouteName='(home)'
 		screenOptions={{
 			tabBarActiveTintColor: colors.tint,
 			headerShown: false,

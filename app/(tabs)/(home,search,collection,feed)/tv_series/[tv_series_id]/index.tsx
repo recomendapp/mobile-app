@@ -98,7 +98,7 @@ const TvSeriesScreen = () => {
 				onPress={() => setShowFullSynopsis((prev) => !prev)}
 				>
 					<Text style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.overview'))}</Text>
-					<Text variant="muted" numberOfLines={showFullSynopsis ? undefined : 5} style={tw.style('text-justify')}>
+					<Text textColor='muted' numberOfLines={showFullSynopsis ? undefined : 5} style={tw.style('text-justify')}>
 						{series.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
 					</Text>
 				</Pressable>
@@ -106,7 +106,7 @@ const TvSeriesScreen = () => {
 				{/* CASTING */}
 				<View style={tw.style('gap-1')}> 
 					<Text style={tw.style('px-4 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</Text>
-					{series.cast?.length ? <TvSeriesCast cast={series.cast} /> : <Text variant="muted" style={tw`px-4`}>{upperFirst(t('common.messages.no_cast'))}</Text>}
+					{series.cast?.length ? <TvSeriesCast cast={series.cast} /> : <Text textColor='muted' style={tw`px-4`}>{upperFirst(t('common.messages.no_cast'))}</Text>}
 				</View>
 				<MediaWidgetPlaylists mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
 				<MediaWidgetReviews mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />

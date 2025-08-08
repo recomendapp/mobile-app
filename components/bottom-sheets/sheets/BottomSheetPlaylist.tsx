@@ -220,7 +220,7 @@ const BottomSheetPlaylist = React.forwardRef<
           />
           <View style={tw`shrink`}>
             <Text numberOfLines={2} style={tw`shrink`}>{playlist.title}</Text>
-            <Text variant="muted" numberOfLines={1} style={tw`shrink`}>
+            <Text textColor='muted' numberOfLines={1} style={tw`shrink`}>
               {t('common.messages.by_name', { name: playlist.user?.username! })}
             </Text>
           </View>

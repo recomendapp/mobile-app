@@ -211,7 +211,7 @@ const LoginOtpScreen = () => {
 								{/* SUBMIT BUTTON */}
 								<Button loading={isLoading} onPress={form.handleSubmit(handleSubmit)} style={tw`w-full rounded-xl`}>{t('pages.auth.login.otp.form.submit')}</Button>
 							</KeyboardAvoidingView>
-							<Text variant="muted" style={tw`text-center`}>{t('pages.auth.login.otp.password_login')} <Link href={prevRoute?.name === 'login/index' ? '../' : '/auth/login'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.login'))}</Link></Text>
+							<Text textColor='muted' style={tw`text-center`}>{t('pages.auth.login.otp.password_login')} <Link href={prevRoute?.name === 'login/index' ? '../' : '/auth/login'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.login'))}</Link></Text>
 						</>
 					) : (
 						<>
@@ -219,7 +219,7 @@ const LoginOtpScreen = () => {
 							<Text variant='title'>
 								{t('pages.auth.login.otp.confirm_form.label')}
 							</Text>
-							<Text variant='muted'>
+							<Text textColor='muted'>
 								{t('pages.auth.login.otp.confirm_form.description', { email: form.getValues('email') })}
 							</Text>
 						</View>
@@ -230,7 +230,7 @@ const LoginOtpScreen = () => {
 						onComplete={handleVerifyOtp}
 						/>
 						<View style={tw`items-center`}>
-							<Text variant='muted'>
+							<Text textColor='muted'>
 								{t('common.form.error.not_received_code')}{' '}
 							</Text>
 							<Button

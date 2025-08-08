@@ -277,7 +277,7 @@ const SettingsAccountScreen = () => {
 				{ paddingBottom: bottomTabHeight + 8 }
 			]}
 			>
-				{/* <Text variant="muted" style={tw`text-sm text-justify`}>{t(`pages.settings.account.description`)}</Text> */}
+				{/* <Text textColor='muted' style={tw`text-sm text-justify`}>{t(`pages.settings.account.description`)}</Text> */}
 				<Controller
 				name='username'
 				control={form.control}
@@ -314,7 +314,7 @@ const SettingsAccountScreen = () => {
 							}))}
 						</Text>
 					)}
-					<Text variant='muted' style={tw`text-xs text-justify`}>
+					<Text textColor='muted' style={tw`text-xs text-justify`}>
 						{t('pages.settings.account.username.description')}
 					</Text>
 				</View>
@@ -332,7 +332,7 @@ const SettingsAccountScreen = () => {
 						onValueChange={onChange}
 						/>
 					</View>
-					<Text variant='muted' style={tw`text-xs text-justify`}>
+					<Text textColor='muted' style={tw`text-xs text-justify`}>
 						{t('pages.settings.account.private.description')}
 					</Text>
 				</View>
@@ -389,7 +389,7 @@ const SettingsAccountScreen = () => {
 						/>
 					</>
 					)}
-					<Text variant='muted' style={tw`text-xs text-justify`}>
+					<Text textColor='muted' style={tw`text-xs text-justify`}>
 						{t('pages.settings.account.email.description')}
 					</Text>
 				</View>

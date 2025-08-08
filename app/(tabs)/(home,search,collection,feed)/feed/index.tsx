@@ -34,7 +34,7 @@ const FeedScreen = () => {
 		)}
 		ListEmptyComponent={() => !loading ? (
 			<View style={tw`flex-1 items-center justify-center`}>
-				<Text variant="muted">{upperFirst(t('common.messages.no_results'))}</Text>
+				<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
 			</View>
 		) : null}
 		contentContainerStyle={[

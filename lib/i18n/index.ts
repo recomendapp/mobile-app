@@ -1,15 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Localization from "expo-localization";
 import deepmerge from "deepmerge";
-import defaultMessages from "@/translations/en-US.json";
-
-export const DEFAULT_LOCALE = "en-US";
+import { defaultLocale, SupportedLocale } from "@/translations/locales";
+import { getFallbackLocale } from "@/translations/utils/getFallbackLocale";
 
 export const getLocale = async (): Promise<string> => {
   let saved = await AsyncStorage.getItem("language");
 
   if (!saved) {
-    const deviceLocale = Localization.getLocales()[0]?.languageTag ?? DEFAULT_LOCALE;
+    const deviceLocale = Localization.getLocales()[0]?.languageTag ?? defaultLocale;
     saved = deviceLocale;
     await AsyncStorage.setItem("language", saved);
   }
@@ -21,25 +20,20 @@ export const setLocale = async (locale: string): Promise<void> => {
   await AsyncStorage.setItem("language", locale);
 };
 
-export const loadMessages = async (locale: string) => {
-  const fallback = defaultMessages;
-  let userMessages;
-  try {
-    switch (locale) {
-      case "fr":
-      case "fr-FR":
-        userMessages = (await import("@/translations/fr-FR.json")).default;
-        break;
-      case "en":
-      case "en-US":
-        userMessages = fallback;
-        break;
+export const loadMessages = async (locale: SupportedLocale): Promise<Record<string, any>> => {
+  const getMessagesForLocale = (loc: SupportedLocale) => {
+    switch (loc) {
+      case 'fr-FR':
+        return require('@/translations/fr-FR.json');
       default:
-        userMessages = {};
-        break;
+        return require('@/translations/en-US.json');
     }
-  } catch {
-    userMessages = {};
+  };
+  const fallback = getFallbackLocale({ locale });
+  if (!fallback) {
+    return getMessagesForLocale(locale);
   }
-  return deepmerge(fallback, userMessages as Record<string, string>);
+  const fallbackMessages = await loadMessages(fallback); // Recursive call
+  const userMessages = getMessagesForLocale(locale);
+  return deepmerge(fallbackMessages, userMessages);
 };

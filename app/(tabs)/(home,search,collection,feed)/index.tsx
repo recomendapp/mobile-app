@@ -17,6 +17,7 @@ import { useTranslations } from 'use-intl';
 import Header from '@/components/header/Header';
 import { useTheme } from '@/providers/ThemeProvider';
 import { Icons } from '@/constants/Icons';
+import { Text } from '@/components/ui/text';
 
 const HomeScreen = () => {
   const router = useRouter();

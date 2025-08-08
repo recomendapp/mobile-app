@@ -116,7 +116,7 @@ const SettingsSecurityScreen = () => {
 				{ paddingBottom: bottomTabHeight + 8 }
 			]}
 			>
-				<Text variant="muted" style={tw`text-sm text-justify`}>{t(`pages.settings.security.description`)}</Text>
+				<Text textColor='muted' style={tw`text-sm text-justify`}>{t(`pages.settings.security.description`)}</Text>
 				<Controller
 				name="newpassword"
 				control={form.control}
