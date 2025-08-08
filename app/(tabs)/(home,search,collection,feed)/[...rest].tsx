@@ -1,16 +1,16 @@
 import { Redirect, RelativePathString, useLocalSearchParams } from "expo-router";
 import NotFoundScreen from "./+not-found";
-import { supportedLocales } from "@/translations/locales";
+import { SupportedLocale, supportedLocales } from "@/translations/locales";
 
 const RestScreen = () => {
   	const { rest, ...params } = useLocalSearchParams<{ rest: string[] }>();
 
 	const shouldRedirect = (routes: string[]) => {
-		const firstIsLocale = supportedLocales.includes(routes[0]);
+		const firstIsLocale = supportedLocales.includes(routes[0] as SupportedLocale);
 		if (!firstIsLocale) return null;
 		let lastLocaleIndex = -1;
 		for (let i = 0; i < routes.length; i++) {
-			if (supportedLocales.includes(routes[i])) {
+			if (supportedLocales.includes(routes[i] as SupportedLocale)) {
 				lastLocaleIndex = i;
 			} else {
 				break;
