@@ -5,11 +5,11 @@ import { useSupabaseClient } from "./SupabaseProvider";
 import { useUserQuery } from "@/features/user/userQueries";
 import { AppState } from "react-native";
 import { supabase } from "@/lib/supabase/client";
-import app from "@/constants/app";
 import { useSplashScreen } from "./SplashScreenProvider";
 import { useLocaleContext } from "./LocaleProvider";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import { makeRedirectUri } from "expo-auth-session";
+import { defaultLocale, SupportedLocale, supportedLocales } from "@/translations/locales";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -75,7 +75,11 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 	useEffect(() => {
 		const syncLanguage = async () => {
 			if (user?.language) {
-				setLocale(user.language);
+				if (supportedLocales.includes(user.language as SupportedLocale)) {
+					setLocale(user.language);
+				} else {
+					setLocale(defaultLocale);
+				}
 			}
 		};
 		if (user) {

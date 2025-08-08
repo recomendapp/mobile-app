@@ -9,6 +9,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SplashScreenProvider } from "./SplashScreenProvider";
 import { LocaleProvider } from "./LocaleProvider";
 import { NotificationsProvider } from "./NotificationsProvider";
+import { ToastProvider } from "@/components/ui/toast";
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -21,20 +22,21 @@ const Providers = ({ children } : ProvidersProps) => {
 			<SplashScreenProvider>
 				<LocaleProvider>
 					<ThemeProvider>
-						<ActionSheetProvider>
-							<SupabaseProvider>
-								<ReactQueryProvider>
-									<AuthProvider>
-										<NotificationsProvider>
-											{children}
-											<BottomSheetManager />
-										</NotificationsProvider>
-									</AuthProvider>
-								</ReactQueryProvider>
-							</SupabaseProvider>
-						</ActionSheetProvider>
+						<ToastProvider>
+							<ActionSheetProvider>
+								<SupabaseProvider>
+									<ReactQueryProvider>
+										<AuthProvider>
+											<NotificationsProvider>
+												{children}
+												<BottomSheetManager />
+											</NotificationsProvider>
+										</AuthProvider>
+									</ReactQueryProvider>
+								</SupabaseProvider>
+							</ActionSheetProvider>
+						</ToastProvider>
 					</ThemeProvider>
-
 				</LocaleProvider>
 			</SplashScreenProvider>
 		</SafeAreaProvider>
