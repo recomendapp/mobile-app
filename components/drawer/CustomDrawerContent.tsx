@@ -1,25 +1,38 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
+import { DrawerContentComponentProps, DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { Link, useRouter } from "expo-router";
-import { Pressable, View, Text } from "react-native";
+import { Alert, Pressable } from "react-native";
 import { Icons } from "@/constants/Icons";
 import { useMemo } from "react";
 import UserAvatar from "@/components/user/UserAvatar";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
+import { AuthError } from "@supabase/supabase-js";
+import * as Burnt from "burnt";
+import { Text } from "../ui/text";
+import { View } from "../ui/view";
+import { Skeleton } from "../ui/Skeleton";
 
-const CustomDrawerContent = (props: any) => {
+const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     const router = useRouter();
     const t = useTranslations();
     const { colors } = useTheme();
-    const { user, logout } = useAuth();
+    const { session, user, logout } = useAuth();
 
-    const routes = useMemo(() => {
+    const routes = useMemo((): { name: string; icon: React.ElementType; onPress: () => void }[] => {
         return [
+            ...(!session ? [
+                {
+                    name: upperFirst(t('common.messages.login')),
+                    icon: Icons.User,
+                    onPress: async () => {
+                        router.push('/auth/login');
+                    }
+                }
+            ] : []),
             {
                 name: upperFirst(t('pages.settings.label')),
                 icon: Icons.settings,
@@ -35,13 +48,45 @@ const CustomDrawerContent = (props: any) => {
                 }
             }
         ];
-    }, [t, router]);
+    }, [t, router, session]);
 
     const closeDrawer = () => {
         props.navigation.closeDrawer();
-    }
-
-    if (!user) return null;
+    };
+    const handleLogout = async () => {
+        try {
+            await logout();
+            closeDrawer();
+        } catch (error) {
+            let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
+            if (error instanceof AuthError) {
+                errorMessage = upperFirst(t('common.messages.error'));
+            }
+            Burnt.toast({
+                title: upperFirst(t('common.messages.error')),
+                message: errorMessage,
+                preset: 'error',
+                haptic: 'error',
+            });
+        }
+    };
+    const handleLogoutButtonPress = () => {
+        Alert.alert(
+            upperFirst(t('common.messages.are_u_sure')),
+            undefined,
+            [
+                {
+                    text: upperFirst(t('common.messages.cancel')),
+                    style: 'cancel',
+                },
+                {
+                    text: upperFirst(t('common.messages.logout')),
+                    style: 'destructive',
+                    onPress: handleLogout,
+                },
+            ]
+        );
+    };
 
     return (
         <SafeAreaView
@@ -52,17 +97,24 @@ const CustomDrawerContent = (props: any) => {
         >
             {/* MAIN ROUTES */}
             <DrawerContentScrollView>
-                {/* <DrawerItemList {...props} /> */}
-                {/* PROFILE */}
-                <Link href={`/user/${user.username}`} asChild>
-                    <Pressable style={tw.style("flex-row items-center p-4 gap-2")}>
-                        <UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} style={tw.style("w-16 h-16")} />
-                        <View>
-                            <ThemedText style={tw.style("text-xl font-semibold")}>{user.full_name}</ThemedText>
-                            <ThemedText style={{ color: colors.mutedForeground }}>@{user.username}</ThemedText>
-                        </View>
-                    </Pressable>
-                </Link>
+                {session && (
+                    <DrawerItem
+                        label={() => (
+                            <View>
+                                {user ? <Text style={tw`text-xl font-semibold`}>{user.full_name}</Text> : <Skeleton style={tw`w-32 h-8`} />}
+                                {user ? <Text style={{ color: colors.mutedForeground }}>@{user.username}</Text> : <Skeleton style={tw`w-24 h-5`} />}
+                            </View>
+                        )}
+                        icon={({ color, size }) => (
+                            user ? <UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} style={tw`w-16 h-16`} /> : <UserAvatar skeleton style={tw`w-16 h-16`} />
+                        )}
+                        onPress={() => {
+                            if (!user) return;
+                            router.push(`/user/${user.username}`);
+                            closeDrawer();
+                        }}
+                    />
+                )}
                 {routes.map((route, index) => (
                     <DrawerItem
                     key={index}
@@ -79,17 +131,13 @@ const CustomDrawerContent = (props: any) => {
                 ))}
             </DrawerContentScrollView>
             {/* FOOTER */}
-            <SafeAreaView>
-                <Pressable
-                onPress={async () => {
-                    await logout();
-                    closeDrawer();
-                }}
-                style={tw.style("px-4")}
-                >
-                    <Text style={{ color: colors.destructive }}>{upperFirst(t('common.messages.logout'))}</Text>
-                </Pressable>
-            </SafeAreaView>
+            <DrawerItem
+            label={upperFirst(t('common.messages.logout'))}
+            activeTintColor={colors.destructive}
+            inactiveTintColor={colors.destructive}
+            icon={() => <Icons.logout color={colors.destructive} />}
+            onPress={handleLogoutButtonPress}
+            />
         </SafeAreaView>
     );
 }

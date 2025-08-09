@@ -2,28 +2,41 @@ import { Redirect, RelativePathString, useLocalSearchParams } from "expo-router"
 import NotFoundScreen from "./+not-found";
 import { SupportedLocale, supportedLocales } from "@/translations/locales";
 
+const handleLocalePrefix = (segments: string[]): string[] => {
+    let firstNonLocaleIndex = 0;
+    while (
+        firstNonLocaleIndex < segments.length &&
+        supportedLocales.includes(segments[firstNonLocaleIndex] as SupportedLocale)
+    ) {
+        firstNonLocaleIndex++;
+    }
+
+    if (firstNonLocaleIndex > 0) {
+        return segments.slice(firstNonLocaleIndex);
+    }
+    return segments;
+};
+
+const handleUsernameRewrite = (segments: string[]): string[] => {
+    if (segments.length > 0 && segments[0].startsWith('@')) {
+        const username = segments[0].substring(1);
+        const remainingSegments = segments.slice(1);
+        return ['user', username, ...remainingSegments];
+    }
+    return segments;
+};
+
 const RestScreen = () => {
   	const { rest, ...params } = useLocalSearchParams<{ rest: string[] }>();
+	const initialSegments = rest || [];
 
-	const shouldRedirect = (routes: string[]) => {
-		const firstIsLocale = supportedLocales.includes(routes[0] as SupportedLocale);
-		if (!firstIsLocale) return null;
-		let lastLocaleIndex = -1;
-		for (let i = 0; i < routes.length; i++) {
-			if (supportedLocales.includes(routes[i] as SupportedLocale)) {
-				lastLocaleIndex = i;
-			} else {
-				break;
-			}
-		}
-		const newPath = routes.slice(lastLocaleIndex + 1).join('/');
-		if (newPath === '') return '/';
-		return `/${newPath}` as RelativePathString;
-	};
-	const redirect = shouldRedirect(rest);
+    const processedSegments = handleUsernameRewrite(handleLocalePrefix(initialSegments));
 
-	if (redirect) {
-		return <Redirect href={{ pathname: redirect, params: params }} />;
+	const hasChanged = initialSegments.join('/') !== processedSegments.join('/');
+
+	if (hasChanged) {
+        const newPath = processedSegments.length > 0 ? '/' + processedSegments.join('/') : '/';
+		return <Redirect href={{ pathname: newPath as RelativePathString, params }} />;
 	}
 	
 	return <NotFoundScreen />;

@@ -67,6 +67,7 @@ const SettingsSecurityScreen = () => {
 				password: data.newpassword,
 			});
 			if (error) throw error;
+			await supabase.auth.signOut({ scope: "others" });
 			Burnt.toast({
 				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
 				preset: 'done',
