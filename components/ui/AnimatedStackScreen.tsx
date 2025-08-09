@@ -8,7 +8,7 @@ import { Icons } from "@/constants/Icons";
 import { HeaderTitle, useHeaderHeight } from '@react-navigation/elements';
 import { useTheme } from "@/providers/ThemeProvider";
 
-interface AnimatedStackScreenProps extends React.ComponentProps<typeof Stack.Screen> {
+export interface AnimatedStackScreenProps extends React.ComponentProps<typeof Stack.Screen> {
 	scrollY: SharedValue<number>;
 	triggerHeight: SharedValue<number>;
 	onMenuPress?: () => void;

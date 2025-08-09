@@ -1151,6 +1151,38 @@ export const useUserDeleteRequestQuery = ({
 		enabled: !!userId,
 	});
 };
+
+/* ------------------------------ SUBSCRIPTION ------------------------------ */
+export const useUserSubscriptionsQuery = ({
+	userId,
+} : {
+	userId?: string;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: userKeys.subscriptions({
+			userId: userId!
+		}),
+		queryFn: async () => {
+			if (!userId) throw Error('Missing user id');
+			const { data, error } = await supabase
+				.from('user_subscriptions')
+				.select(`
+					*,
+					price:prices(
+						*,
+						product:products(*)
+					)
+				`)
+				.eq('user_id', userId)
+				.in('status', ['active', 'trialing'])
+				.single();
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!userId,
+	});
+};
 /* -------------------------------------------------------------------------- */
 
 export const useUserDiscoveryInfinite = ({
@@ -1209,7 +1241,7 @@ export const useUserDiscoveryInfinite = ({
 			return lastPage?.length == mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
 		},
 	});
-}
+};
 
 export const useUserFollowProfile = ({
 	userId,
@@ -1234,4 +1266,4 @@ export const useUserFollowProfile = ({
 		},
 		enabled: !!userId && !!followeeId && userId !== followeeId,
 	});
-}
+};

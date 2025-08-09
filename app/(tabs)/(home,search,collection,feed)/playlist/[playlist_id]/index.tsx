@@ -1,55 +1,232 @@
-import BottomSheetPlaylist from "@/components/bottom-sheets/sheets/BottomSheetPlaylist";
-import Playlist from "@/components/screens/playlist/Playlist";
-import HeaderOverlay from "@/components/ui/HeaderOverlay";
-import { ThemedView } from "@/components/ui/ThemedView";
-import { usePlaylistFull } from "@/features/playlist/playlistQueries";
-import tw from "@/lib/tw";
+import { useAuth } from "@/providers/AuthProvider";
+import { upperFirst } from "lodash";
+import { useTranslations } from "use-intl";
+import { PlaylistItem } from "@/types/type.db";
+import CollectionScreen, { CollectionAction, SortByOption } from "@/components/screens/collection/CollectionScreen";
+import { Icons } from "@/constants/Icons";
+import { Alert } from "react-native";
+import richTextToPlainString from "@/utils/richTextToPlainString";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useLocalSearchParams } from "expo-router";
-import React from "react";
-import { useSharedValue } from "react-native-reanimated";
+import { usePlaylistFull, usePlaylistItems, usePlaylistIsAllowedToEdit, usePlaylistGuests } from "@/features/playlist/playlistQueries";
+import BottomSheetPlaylist from "@/components/bottom-sheets/sheets/BottomSheetPlaylist";
+import { RealtimeChannel } from "@supabase/supabase-js";
+import useDebounce from "@/hooks/useDebounce";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSupabaseClient } from "@/providers/SupabaseProvider";
+import { usePlaylistItemDeleteMutation, usePlaylistItemsRealtimeMutation } from "@/features/playlist/playlistMutations";
+import * as Burnt from "burnt";
 
 const PlaylistScreen = () => {
+	const t = useTranslations();
+	const supabase = useSupabaseClient();
+	const { session } = useAuth();
 	const { playlist_id } = useLocalSearchParams();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
-	const {
-		data: playlist,
-		isLoading,
-		isRefetching,
-		refetch,
-	} = usePlaylistFull(Number(playlist_id));
-	const loading = isLoading || playlist === undefined;
-	const scrollY = useSharedValue(0);
-	const headerHeight = useSharedValue(0);
-	const headerOverlayHeight = useSharedValue(0);
-	return (
-		<ThemedView style={tw`flex-1`}>
-			<HeaderOverlay
-			triggerHeight={headerHeight}
-			headerHeight={headerOverlayHeight}
-			onHeaderHeight={(height) => {
-				'worklet';
-				headerOverlayHeight.value = height;
-			}}
-			scrollY={scrollY}
-			title={playlist?.title ?? ''}
-			onMenuPress={playlist ? () => {
-				openSheet(BottomSheetPlaylist, {
-					playlist: playlist,
+	const [shouldRefresh, setShouldRefresh] = useState(false);
+  	const debouncedRefresh = useDebounce(shouldRefresh, 200);
+	const { data: playlist } = usePlaylistFull(Number(playlist_id));
+	const { data: guest } = usePlaylistGuests({
+		playlistId: playlist?.id,
+		initialData: playlist?.guests,
+	});
+	const { data: isAllowedToEdit } = usePlaylistIsAllowedToEdit({
+		playlist: playlist || undefined,
+		guests: guest,
+	})
+	const playlistItems = usePlaylistItems({
+		playlistId: playlist?.id,
+		initialData: playlist?.items,
+	});
+	const deletePlaylistItemMutation = usePlaylistItemDeleteMutation();
+	const { mutate: updatePlaylistItemChanges } = usePlaylistItemsRealtimeMutation({
+		playlistId: playlist?.id,
+	});
+
+	// Handlers
+	const handleDeletePlaylistItem = useCallback((data: PlaylistItem) => {
+		Alert.alert(
+			upperFirst(t('common.messages.are_u_sure')),
+			upperFirst(richTextToPlainString(t.rich('pages.playlist.modal.delete_confirm.description', { title: data.media!.title!, important: (chunk) => `"${chunk}"` }))),
+			[
+				{
+					text: upperFirst(t('common.messages.cancel')),
+					style: 'cancel',
+				},
+				{
+					text: upperFirst(t('common.messages.delete')),
+					onPress: async () => {
+						await deletePlaylistItemMutation.mutateAsync({
+							id: data.id,
+						}, {
+							onSuccess: () => {
+								Burnt.toast({
+									title: upperFirst(t('common.messages.deleted', { count: 1, gender: 'male' })),
+									preset: 'error',
+									haptic: 'success',
+								});
+							},
+							onError: () => {
+								Burnt.toast({
+									title: upperFirst(t('common.messages.error')),
+									message: upperFirst(t('common.messages.an_error_occurred')),
+									preset: 'error',
+									haptic: 'error',
+								});
+							}
+						});
+					},
+					style: 'destructive',
+				}
+			]
+		)
+	}, [t]);
+	const handlePlaylistItemComment = useCallback((data: PlaylistItem) => {
+		// openSheet(BottomSheetPlaylistComm, {
+		// 	playlistItem: data,
+		// });
+	}, [openSheet]);
+
+    const sortByOptions = useMemo((): SortByOption<PlaylistItem>[] => ([
+		{
+			label: upperFirst(t('common.messages.custom_sort')),
+			value: 'rank',
+			defaultOrder: 'asc',
+			sortFn: (a, b, order) => {
+				const rankA = a.rank ?? 0;
+				const rankB = b.rank ?? 0;
+				return order === 'asc' ? rankA - rankB : rankB - rankA;
+			}
+		},
+        {
+            label: upperFirst(t('common.messages.date_updated')),
+            value: 'created_at',
+            defaultOrder: 'desc',
+            sortFn: (a, b, order) => {
+                const aTime = new Date(a.created_at!).getTime();
+                const bTime = new Date(b.created_at!).getTime();
+                return order === 'asc' ? aTime - bTime : bTime - aTime;
+            },
+        },
+        {
+            label: upperFirst(t('common.messages.alphabetical')),
+            value: 'alphabetical',
+            defaultOrder: 'asc',
+            sortFn: (a, b, order) => {
+                const titleA = a.media?.title ?? '';
+                const titleB = b.media?.title ?? '';
+                const result = titleA.localeCompare(titleB);
+                return order === 'asc' ? result : -result;
+            },
+        },
+    ]), [t]);
+	const bottomSheetActions = useMemo((): CollectionAction<PlaylistItem>[] => {
+        return [
+            {
+                icon: Icons.Delete,
+                label: upperFirst(t('common.messages.delete')),
+                variant: 'destructive',
+                onPress: handleDeletePlaylistItem,
+				position: 'bottom',
+            },
+			{
+				icon: Icons.Comment,
+				label: upperFirst(t('common.messages.view_comment', { count: 1})),
+				onPress: handlePlaylistItemComment,
+				position: 'top',
+			}
+        ];
+    }, [handleDeletePlaylistItem, handlePlaylistItemComment, t]);
+	const swipeActions = useMemo((): CollectionAction<PlaylistItem>[] => [
+		{
+			icon: Icons.Comment,
+			label: upperFirst(t('common.messages.comment', { count: 1 })),
+			onPress: handlePlaylistItemComment,
+			variant: 'accent-yellow',
+			position: 'left',
+		},
+		{
+			icon: Icons.Delete,
+			label: upperFirst(t('common.messages.delete')),
+			onPress: handleDeletePlaylistItem,
+			variant: 'destructive',
+			position: 'right',
+		}
+	], [handlePlaylistItemComment, handleDeletePlaylistItem, t]);
+
+	// useEffects
+	useEffect(() => {
+		let playlistItemsChanges: RealtimeChannel;
+		const setupRealtime = async () => {
+			await supabase.realtime.setAuth(session?.access_token);
+			playlistItemsChanges = supabase
+				.channel(`playlist:${playlist?.id}`, {
+					config: { private: true },
 				})
-			} : undefined}
-			/>
-			<Playlist
-			playlist={playlist}
-			loading={loading}
-			isRefetching={isRefetching}
-			refetch={refetch}
-			scrollY={scrollY}
-			headerHeight={headerHeight}
-			headerOverlayHeight={headerOverlayHeight}
-			/>
-		</ThemedView>
-	);
+				.on('broadcast', { event: '*' }, ({ event, payload } : { event: string, payload: { old: PlaylistItem, new: PlaylistItem } }) => {
+					updatePlaylistItemChanges({
+						playlistId: playlist?.id!,
+						event,
+						payload,
+					});
+				})
+				.subscribe();
+		}
+		if (isAllowedToEdit) {
+			setupRealtime().catch(console.error);
+		}
+		return () => {
+			if (playlistItemsChanges) {
+				supabase.removeChannel(playlistItemsChanges);
+			}
+		}
+	}, [isAllowedToEdit, playlist?.id]);
+
+
+	useEffect(() => {
+		if (debouncedRefresh) {
+			playlistItems.refetch();
+			setShouldRefresh(false);
+		}
+	}, [debouncedRefresh, playlistItems.refetch]);
+
+	return (
+	<CollectionScreen
+	// Query
+	queryData={playlistItems}
+	screenTitle={playlist?.title ?? ''}
+	// Search
+	searchPlaceholder={upperFirst(t('pages.playlist.search.placeholder'))}
+	fuseKeys={[
+		{
+			name: 'title',
+			getFn: (item) => item.media?.title || '',
+		},
+	]}
+	// Sort
+	sortByOptions={sortByOptions}
+	// Getters
+	getItemId={(item) => item.id!}
+	getItemMedia={(item) => item.media!}
+	getItemTitle={(item) => item.media?.title || ''}
+	getItemSubtitle={(item) => item.media?.main_credit?.map((director) => director.title).join(', ') || ''}
+	getItemImageUrl={(item) => item.media?.avatar_url || ''}
+	getItemUrl={(item) => item.media?.url || ''}
+	getItemBackdropUrl={(item) => item.media?.backdrop_url || ''}
+	getCreatedAt={(item) => item.created_at!}
+	// Actions
+	bottomSheetActions={bottomSheetActions}
+	swipeActions={swipeActions}
+	// Menu
+	stackScreenProps={{
+		onMenuPress: playlist ? () => {
+			openSheet(BottomSheetPlaylist, {
+				playlist: playlist,
+			})
+		} : undefined
+	}}
+	/>
+	)
 };
 
 export default PlaylistScreen;
