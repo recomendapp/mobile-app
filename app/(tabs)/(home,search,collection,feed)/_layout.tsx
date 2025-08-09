@@ -27,7 +27,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
       },
     }}
     >
-      <Stack.Screen name="index" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.home')) }} />
+      {/* <Stack.Screen name="index" options={{ title: upperFirst(t('common.messages.home')) }} /> */}
       <Stack.Screen name="feed" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.feed')) }} />
       <Stack.Screen name="search/index" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.search')) }} />
       {/* REVIEWS */}

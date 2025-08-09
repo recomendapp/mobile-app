@@ -16,7 +16,7 @@ import { useFormatter, useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { Stack } from "expo-router";
 import { ScrollView } from "react-native-gesture-handler";
-import { Alert, Text as RNText } from "react-native";
+import { ActivityIndicator, Alert, Text as RNText } from "react-native";
 import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
 import { Label } from "@/components/ui/Label";
@@ -296,7 +296,7 @@ const SettingsAccountScreen = () => {
 					onChangeText={onChange}
 					leftSectionStyle={tw`w-auto`}
 					rightComponent={(!form.formState.errors.username && value !== defaultValues.username) ? (
-						usernameAvailability.isLoading ? <Icons.Loader />
+						usernameAvailability.isLoading ? <ActivityIndicator />
 						: (
 							<View style={[{ backgroundColor: usernameAvailability.isAvailable ? colors.success : colors.destructive }, tw`rounded-full h-6 w-6 items-center justify-center`]}>
 								{usernameAvailability.isAvailable ? (

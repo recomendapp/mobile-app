@@ -120,6 +120,7 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 	const logout = async () => {
 		const { error } = await supabase.auth.signOut();
 		if (error) throw error;
+		setSession(null);
 	};
 
 	const signup = async (
@@ -177,15 +178,13 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			email: email,
 		});
 		if (error) throw error;
-		const { error: refreshError } = await supabase.auth.refreshSession();
+		const { error: refreshError } = await supabase.auth.refreshSession(session ? { refresh_token: session.refresh_token } : undefined);
 		if (refreshError) throw refreshError;
 	};
 
 	const cancelPendingEmailChange = async () => {
 		const { error } = await supabase.rpc('utils_cancel_email_change');
 		if (error) throw error;
-		const { error: refreshError } = await supabase.auth.refreshSession();
-    	if (refreshError) throw refreshError;
 	};
 
 	const createSessionFromUrl = async (url: string) => {

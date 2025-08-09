@@ -41,6 +41,7 @@
     "base64-arraybuffer": "^1.0.2",
     "burnt": "^0.13.0",
     "class-variance-authority": "^0.7.0",
+    "color": "^5.0.0",
     "country-flag-icons": "^1.5.19",
     "d3-interpolate": "^3.0.1",
     "deepmerge": "^4.3.1",
@@ -92,6 +93,7 @@
   "devDependencies": {
     "@babel/core": "^7.28.0",
     "@types/aes-js": "^3.1.4",
+    "@types/color": "^4.2.0",
     "@types/d3-interpolate": "^3.0.4",
     "@types/lodash": "^4.17.20",
     "@types/react": "~19.0.10",
