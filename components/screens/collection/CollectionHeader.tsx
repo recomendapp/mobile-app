@@ -9,12 +9,14 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useHeaderHeight } from '@react-navigation/elements';
 import { Skeleton } from "@/components/ui/Skeleton";
+import { View } from "@/components/ui/view";
 
 interface CollectionHeaderProps
 	extends React.ComponentPropsWithoutRef<typeof Animated.View> {
 		headerHeight: SharedValue<number>;
 		scrollY: SharedValue<number>;
 		title: string;
+		bottomText?: string | React.ReactNode | (() => React.ReactNode);
 		numberOfItems: number;
 		backdrops: (string | null | undefined)[];
 		loading: boolean;
@@ -23,7 +25,7 @@ interface CollectionHeaderProps
 const CollectionHeader = forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CollectionHeaderProps
->(({ loading, headerHeight, scrollY, title, numberOfItems, backdrops, ...props }, ref) => {
+>(({ loading, headerHeight, scrollY, title, bottomText, numberOfItems, backdrops, ...props }, ref) => {
 	const { colors, inset } = useTheme();
 	const { hslToRgb } = useColorConverter();
 	const bgBackdrop = useRandomBackdrop(backdrops);
@@ -92,23 +94,35 @@ const CollectionHeader = forwardRef<
 			</Animated.View>
 			<Animated.View
 			style={[
-				tw`items-center justify-center px-4 pb-4 h-40`,
+				tw`items-center justify-center px-4 pb-4 min-h-40 gap-2`,
 				{
 					marginTop: navigationHeaderHeight > 0 ? navigationHeaderHeight : inset.top,
 				}
 			]}
 			>
-				<Text
-				style={[
-					{ color: colors.accentYellow },
-					tw`text-4xl font-bold`,
-				]}
-				>
-					{title}
-				</Text>
-				{!loading ? <Text style={[{ color: colors.mutedForeground }]}>
-					{numberOfItems} items
-				</Text> : <Skeleton style={tw`h-4 w-10`} />}
+				<View style={tw`flex-1 items-center justify-center`}>
+					<Text
+					numberOfLines={2}
+					style={[
+						{ color: colors.accentYellow },
+						tw`text-4xl font-bold text-center`,
+					]}
+					>
+						{title}
+					</Text>
+					{!loading ? <Text numberOfLines={1} style={[{ color: colors.mutedForeground }]}>
+						{numberOfItems} items
+					</Text> : <Skeleton style={tw`h-4 w-10`} />}
+				</View>
+				{bottomText ? (
+					typeof bottomText === 'function' ? (
+						bottomText()
+					) : (
+						<Text numberOfLines={1}>
+							{bottomText}
+						</Text>
+					)
+				) : null}
 			</Animated.View>
 		</Animated.View>
 	)

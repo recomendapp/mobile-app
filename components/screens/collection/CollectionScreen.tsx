@@ -14,7 +14,7 @@ import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
 import { LinkProps, useRouter } from "expo-router";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { Pressable } from "react-native-gesture-handler";
+import { FlatList, Pressable } from "react-native-gesture-handler";
 import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import BottomSheetMedia from "@/components/bottom-sheets/sheets/BottomSheetMedia";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
@@ -24,8 +24,15 @@ import * as Burnt from "burnt";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { Media } from "@/types/type.db";
 import { UseQueryResult } from "@tanstack/react-query";
+import { LucideIcon } from "lucide-react-native";
 
 const PADDING_BOTTOM = 8;
+
+interface ToolbarItem {
+    label?: string;
+    icon: LucideIcon;
+    onPress: () => void;
+}
 
 export interface SortByOption<T> {
     label: string;
@@ -52,6 +59,7 @@ export interface CollectionAction<T> {
 interface CollectionScreenConfig<T> extends Omit<React.ComponentProps<typeof AnimatedLegendList<T>>, 'data'> {
 	queryData: UseQueryResult<T[] | undefined>;
     screenTitle: string;
+    screenSubtitle?: string | React.ReactNode | (() => React.ReactNode);
     searchPlaceholder: string;
     emptyStateMessage?: string;
     sortByOptions: SortByOption<T>[];
@@ -59,6 +67,7 @@ interface CollectionScreenConfig<T> extends Omit<React.ComponentProps<typeof Ani
     bottomSheetActions?: CollectionAction<T>[];
     renderCustomItem?: (item: T) => React.ReactNode;
     customFilters?: React.ReactNode;
+    additionalToolbarItems?: ToolbarItem[];
     getItemId: (item: T) => string | number;
 	getItemMedia: (item: T) => Media;
     getItemTitle: (item: T) => string;
@@ -250,6 +259,7 @@ CollectionItem.displayName = "CollectionItem";
 const CollectionScreen = <T extends {}>({
     queryData,
     screenTitle,
+    screenSubtitle,
     searchPlaceholder,
     emptyStateMessage,
     sortByOptions,
@@ -257,6 +267,7 @@ const CollectionScreen = <T extends {}>({
     bottomSheetActions,
     renderCustomItem,
     customFilters,
+    additionalToolbarItems,
     getItemId,
 	getItemMedia,
     getItemTitle,
@@ -332,6 +343,41 @@ const CollectionScreen = <T extends {}>({
         });
     }, [sortByOptions, showActionSheetWithOptions, sortBy.value, t]);
 
+    const renderToolbar = () => {
+        const toolbarItems: ToolbarItem[] = [
+            ...(additionalToolbarItems || []),
+            {
+                // label: upperFirst(t('common.messages.order')),
+                icon: sortOrder === 'asc' ? Icons.ArrowUpNarrowWide : Icons.ArrowDownNarrowWide,
+                onPress: () => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'),
+            },
+            {
+                label: sortBy.label,
+                icon: Icons.Filter,
+                onPress: handleSortBy,
+            },
+        ];
+
+        return (
+            <FlatList
+            data={toolbarItems}
+            horizontal
+            renderItem={({ item }) => (
+                <Button
+                variant="muted"
+                icon={item.icon}
+                onPress={item.onPress}
+                >
+                    {item.label}
+                </Button>
+            )}
+            contentContainerStyle={tw`px-4`}
+            showsHorizontalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={tw`w-2`} />}
+            />
+        );
+    };
+
     React.useEffect(() => {
         if (data) {
             handleSearch(search);
@@ -363,6 +409,7 @@ const CollectionScreen = <T extends {}>({
 				<>
 					<CollectionHeader
 						title={screenTitle}
+                        bottomText={screenSubtitle}
 						numberOfItems={data?.length || 0}
 						scrollY={scrollY}
 						headerHeight={headerHeight}
@@ -370,25 +417,16 @@ const CollectionScreen = <T extends {}>({
 						backdrops={backdrops}
 					/>
 					{!loading && (
-						<View style={tw`gap-2 mx-4`}>
+						<View style={tw`gap-2`}>
 							<SearchBar
-								value={search}
-								onChangeText={setSearch}
-								onSearch={handleSearch}
-								debounceMs={200}
-								placeholder={searchPlaceholder}
+                            value={search}
+                            onChangeText={setSearch}
+                            onSearch={handleSearch}
+                            debounceMs={200}
+                            placeholder={searchPlaceholder}
+                            containerStyle={tw`mx-4`}
 							/>
-							<View style={tw`flex-row justify-end items-center gap-2`}>
-								<Button
-									icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
-									variant="muted"
-									size='icon'
-									onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}
-								/>
-								<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>
-									{sortBy.label}
-								</Button>
-							</View>
+                            {renderToolbar()}
 							{customFilters}
 						</View>
 					)}

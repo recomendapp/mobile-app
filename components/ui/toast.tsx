@@ -478,7 +478,6 @@ export function ToastProvider({ children, maxToasts = 3 }: ToastProviderProps) {
 
   return (
     <ToastContext.Provider value={contextValue}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
         {children}
         <View style={containerStyle} pointerEvents='box-none'>
           {toasts.map((toast, index) => (
@@ -490,7 +489,6 @@ export function ToastProvider({ children, maxToasts = 3 }: ToastProviderProps) {
             />
           ))}
         </View>
-      </GestureHandlerRootView>
     </ToastContext.Provider>
   );
 }
