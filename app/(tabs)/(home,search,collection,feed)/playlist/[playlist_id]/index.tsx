@@ -16,6 +16,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { usePlaylistItemDeleteMutation, usePlaylistItemsRealtimeMutation } from "@/features/playlist/playlistMutations";
 import * as Burnt from "burnt";
+import { Button } from "@/components/ui/Button";
+import { CardUser } from "@/components/cards/CardUser";
 
 const PlaylistScreen = () => {
 	const t = useTranslations();
@@ -195,6 +197,7 @@ const PlaylistScreen = () => {
 	// Query
 	queryData={playlistItems}
 	screenTitle={playlist?.title ?? ''}
+	screenSubtitle={playlist?.user ? <CardUser variant="inline" user={playlist?.user} /> : <CardUser variant="inline" skeleton />}
 	// Search
 	searchPlaceholder={upperFirst(t('pages.playlist.search.placeholder'))}
 	fuseKeys={[
@@ -225,6 +228,14 @@ const PlaylistScreen = () => {
 			})
 		} : undefined
 	}}
+	// Button
+	additionalToolbarItems={isAllowedToEdit ? [
+		{
+			label: upperFirst(t('common.messages.edit_order')),
+			icon: Icons.ListOrdered,
+			onPress: () => console.log('Modifier l\'ordre'),
+		}
+	] : undefined}
 	/>
 	)
 };
