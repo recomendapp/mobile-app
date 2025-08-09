@@ -1,7 +1,7 @@
 import { upperFirst } from "lodash";
 import Animated, { SharedValue, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
-import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
+import AnimatedStackScreen, { AnimatedStackScreenProps } from "@/components/ui/AnimatedStackScreen";
 import { useTheme } from "@/providers/ThemeProvider";
 import React, { useCallback } from "react";
 import Fuse, { FuseOptionKey } from "fuse.js";
@@ -69,6 +69,8 @@ interface CollectionScreenConfig<T> extends Omit<React.ComponentProps<typeof Ani
     getCreatedAt?: (item: T) => string;
 	fuseKeys?: FuseOptionKey<T>[];
 	fuseThreshold?: number;
+
+    stackScreenProps?: Omit<AnimatedStackScreenProps, 'scrollY' | 'triggerHeight' | 'options'>;
 }
 
 interface CollectionItemProps<T> extends React.ComponentProps<typeof Animated.View> {
@@ -265,6 +267,7 @@ const CollectionScreen = <T extends {}>({
     getCreatedAt,
 	fuseKeys,
 	fuseThreshold = 0.5,
+    stackScreenProps,
 	// Props for the AnimatedLegendList
 	...props
 }: CollectionScreenConfig<T>) => {
@@ -352,6 +355,7 @@ const CollectionScreen = <T extends {}>({
                 }}
                 scrollY={scrollY}
                 triggerHeight={headerHeight}
+                {...stackScreenProps}
             />
             <AnimatedLegendList
 			onScroll={scrollHandler}

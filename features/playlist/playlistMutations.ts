@@ -1,10 +1,11 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { userKeys } from "../user/userKeys";
 import { matchQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Playlist } from "@/types/type.db";
+import { Playlist, PlaylistItem } from "@/types/type.db";
 import { playlistKeys } from "./playlistKeys";
 import { mediaKeys } from "../media/mediaKeys";
 
+/* -------------------------------- PLAYLIST -------------------------------- */
 /**
  * Creates a new playlist
  * @param userId The user id
@@ -120,6 +121,7 @@ export const usePlaylistUpdateMutation = () => {
 		},
 	})
 };
+/* -------------------------------------------------------------------------- */
 
 export const useAddMediaToPlaylists = ({
 	mediaId,
@@ -180,3 +182,132 @@ export const useAddMediaToPlaylists = ({
 		}
 	});
 };
+
+/* ---------------------------------- ITEMS --------------------------------- */
+export const usePlaylistItemsRealtimeMutation = ({
+	playlistId
+} : {
+	playlistId?: number;
+}) => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			playlistId,
+			event,
+			payload,
+		} : {
+			playlistId: number;
+			event: string;
+			payload: {
+				old: PlaylistItem;
+				new: PlaylistItem;
+			}
+		}) => {
+			const newPlaylistItems = [...queryClient.getQueryData<PlaylistItem[]>(playlistKeys.items(playlistId)) || []];
+			if (!newPlaylistItems.length) throw new Error('playlist items is undefined');
+			switch (event) {
+			case 'INSERT':
+				if (payload.new.playlist_id !== playlistId) throw new Error('Invalid playlist id');
+				newPlaylistItems.forEach(item => {
+					if (item.rank >= payload.new.rank) {
+						item.rank++;
+					}
+				});
+				newPlaylistItems.push(payload.new);
+				break;
+			case 'UPDATE':
+				if (!payload.new.playlist_id) throw new Error('Invalid playlist id');
+				const itemIndex = newPlaylistItems.findIndex((item) => item.id === payload.new.id);
+				if (itemIndex === -1) throw new Error('Missing item');
+
+				if (payload.old.rank !== payload.new.rank) {
+				if (payload.old.rank < payload.new.rank) {
+					newPlaylistItems.forEach(item => {
+					if (item.rank > payload.old.rank && item.rank <= payload.new.rank) {
+						item.rank--;
+					}
+					});
+				}
+				if (payload.old.rank > payload.new.rank) {
+					newPlaylistItems.forEach(item => {
+					if (item.rank < payload.old.rank && item.rank >= payload.new.rank) {
+						item.rank++;
+					}
+					});
+				}
+				}
+				newPlaylistItems[itemIndex] = payload.new;
+				break;
+			case 'DELETE':
+				if (!payload.old.playlist_id) throw new Error('Invalid playlist id');
+				const deleteIndex = newPlaylistItems.findIndex((item) => item.id === payload.old.id);
+				if (deleteIndex === -1) throw new Error('Missing item');
+				newPlaylistItems.splice(deleteIndex, 1);
+
+				newPlaylistItems.forEach(item => {
+					if (item.rank > payload.old.rank) {
+						item.rank--;
+					}
+				});
+				break;
+			default:
+				break;
+			};
+			newPlaylistItems.sort((a, b) => a.rank - b.rank);
+			return {
+				id: playlistId,
+				items: newPlaylistItems,
+			};
+		},
+		onSuccess: (data) => {
+			data && queryClient.setQueryData(playlistKeys.items(data.id), [...data.items]);
+		},
+		onError: (error) => {
+			if (playlistId) {
+				queryClient.invalidateQueries({
+					queryKey: playlistKeys.items(playlistId),
+				});
+			}
+		}
+	});
+};
+
+export const usePlaylistItemDeleteMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			id,
+		} : {
+			id: number;
+		}) => {
+			const { data, error } = await supabase
+				.from('playlist_items')
+				.delete()
+				.eq('id', id)
+				.select('*')
+				.single();
+			if (error) throw error;
+			return data;
+		},
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({
+				queryKey: playlistKeys.addTo({ mediaId: data.media_id }),
+			});
+			queryClient.invalidateQueries({
+				queryKey: mediaKeys.playlists({
+					id: data.media_id,
+				}),
+			});
+			queryClient.setQueryData(playlistKeys.detail(data.playlist_id), (data: Playlist) => {
+				if (!data) return null;
+				return {
+					...data,
+					items_count: data.items_count - 1,
+				};
+			});
+		},
+	});
+};
+
+/* -------------------------------------------------------------------------- */

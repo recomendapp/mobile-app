@@ -5,9 +5,7 @@ import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { useAuth } from "@/providers/AuthProvider";
 
 export const usePlaylistFull = (playlistId: number) => {
-	const queryClient = useQueryClient();
 	const supabase = useSupabaseClient();
-	const { user } = useAuth();
 	return useQuery({
 		queryKey: playlistKeys.detail(playlistId),
 		queryFn: async () => {
@@ -27,29 +25,19 @@ export const usePlaylistFull = (playlistId: number) => {
 				.order('rank', { ascending: true, referencedTable: 'playlist_items' })
 				.maybeSingle();
 			if (error) throw error;
-			if (!data) return data;
-			
-			// Set the playlist items and guests in the queryClient
-			queryClient.setQueryData(playlistKeys.items(playlistId), data.items);
-			queryClient.setQueryData(playlistKeys.guests(playlistId), data.guests);
-			// queryClient.setQueryData(playlistKeys.allowedToEdit(playlistId), Boolean(
-			// 	user?.id === data.user_id ||
-			// 	(
-			// 		data.guests?.some(
-			// 			(guest) => guest?.user_id === user?.id && guest?.edit
-			// 		) &&
-			// 		data.user?.premium
-			// 	)
-			// ));
-			const { items, guests, ...playlistData } = data;
-			return playlistData;	
-			// return data;
+			return data;	
 		},
 		enabled: !!playlistId,
 	});
 }
 
-export const usePlaylistItems = (playlistId?: number) => {
+export const usePlaylistItems = ({
+	playlistId,
+	initialData
+}: {
+	playlistId?: number,
+	initialData?: PlaylistItem[]
+}) => {
 	const supabase = useSupabaseClient();
 	return useQuery({
 		queryKey: playlistKeys.items(playlistId as number),
@@ -60,19 +48,25 @@ export const usePlaylistItems = (playlistId?: number) => {
 				.select(`*, media(*)`)
 				.eq('playlist_id', playlistId)
 				.order('rank', { ascending: true })
-				.returns<PlaylistItem[]>()
+				.overrideTypes<PlaylistItem[], { merge: false }>()
 			if (error) throw error;
 			return data;
 		},
 		enabled: !!playlistId,
-		structuralSharing: false,
+		initialData: initialData,
 	});
 }
 
-export const usePlaylistGuests = (playlistId?: number) => {
+export const usePlaylistGuests = ({
+	playlistId,
+	initialData
+}: {
+	playlistId?: number,
+	initialData?: PlaylistGuest[]
+}) => {
 	const supabase = useSupabaseClient();
 	return useQuery({
-		queryKey: playlistKeys.guests(playlistId as number),
+		queryKey: playlistKeys.guests(playlistId!),
 		queryFn: async () => {
 			if (!playlistId) throw Error('Missing playlist id');
 			const { data, error } = await supabase
@@ -82,35 +76,38 @@ export const usePlaylistGuests = (playlistId?: number) => {
 					user:user(*)
 				`)
 				.eq('playlist_id', playlistId)
+				.overrideTypes<PlaylistGuest[], { merge: false }>();
 			if (error) throw error;
 			return data;
 		},
 		enabled: !!playlistId,
-		structuralSharing: false,
+		initialData: initialData,
 	});
 }
 
-export const usePlaylistIsAllowedToEdit = (playlistId?: number) => {
+export const usePlaylistIsAllowedToEdit = ({
+	playlist,
+	guests,
+}: {
+	playlist?: Playlist;
+	guests?: PlaylistGuest[];
+}) => {
 	const { user } = useAuth();
-	const queryClient = useQueryClient();
 	return useQuery({
-		queryKey: playlistKeys.allowedToEdit(playlistId as number),
+		queryKey: playlistKeys.allowedToEdit(playlist?.id!),
 		queryFn: async () => {
-			if (!playlistId) throw Error('Missing playlist id');
-			const playlist = queryClient.getQueryData<Playlist>(playlistKeys.detail(playlistId));
-			const playlistGuests = queryClient.getQueryData<PlaylistGuest[]>(playlistKeys.guests(playlistId));
 			if (!playlist) throw Error('No playlist data');
 			return Boolean(
 				user?.id === playlist.user_id ||
 				(
-					playlistGuests?.some(
+					guests?.some(
 						(guest) => guest?.user_id === user?.id && guest?.edit
 					) &&
 					playlist.user?.premium
 				)
 			);
 		},
-		enabled: !!playlistId,
+		enabled: !!playlist,
 	});
 }
 

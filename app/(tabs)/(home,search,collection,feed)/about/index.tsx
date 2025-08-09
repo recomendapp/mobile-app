@@ -1,5 +1,5 @@
-import { ThemedSafeAreaView } from '@/components/ui/ThemedSafeAreaView';
-import { ThemedText } from '@/components/ui/ThemedText';
+import { Text } from '@/components/ui/text';
+import { View } from '@/components/ui/view';
 import tw from '@/lib/tw';
 
 
@@ -72,9 +72,9 @@ const AboutScreen = () => {
 	];
 
   return (
-    <ThemedSafeAreaView style={tw`flex-1 items-center justify-center`}>
-		  <ThemedText>made by @lxup</ThemedText>
-    </ThemedSafeAreaView>
+    <View style={tw`flex-1 items-center justify-center`}>
+		  <Text>made by @lxup</Text>
+    </View>
   );
 };
     //   {/* ABOUT */}

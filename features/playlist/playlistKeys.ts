@@ -1,3 +1,5 @@
+import { PlaylistType } from "@/types/type.db";
+
 export const playlistKeys = {
 	all: ['playlist'] as const,
 	details: () => [...playlistKeys.all, 'details'] as const,
@@ -22,4 +24,17 @@ export const playlistKeys = {
 	} : {
 		filters?: any;
 	}) => filters ? [...playlistKeys.all, 'featured', filters] : [...playlistKeys.all, 'featured'] as const,
+
+	addTo: ({
+		mediaId,
+	} : {
+		mediaId: number;
+	}) => [...playlistKeys.all, 'addTo', mediaId] as const,
+	addToType: ({
+		mediaId,
+		type,
+	} : {
+		mediaId: number;
+		type: PlaylistType;
+	}) => [...playlistKeys.addTo({ mediaId }), type] as const,
 };
