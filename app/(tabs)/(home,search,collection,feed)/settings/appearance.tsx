@@ -95,10 +95,10 @@ const SettingsAppearanceScreen = () => {
 					headerRight: () => (
 						<Button
 						variant="ghost"
-						style={tw`p-0`}
+						size="fit"
 						loading={isLoading}
 						onPress={form.handleSubmit(handleSubmit)}
-						disabled={!form.formState.isValid}
+						disabled={!form.formState.isValid || isLoading}
 						>
 							{upperFirst(t('common.messages.save'))}
 						</Button>

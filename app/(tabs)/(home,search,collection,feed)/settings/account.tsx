@@ -264,7 +264,7 @@ const SettingsAccountScreen = () => {
 						size="fit"
 						loading={isLoading}
 						onPress={form.handleSubmit(handleOnSubmit)}
-						disabled={!hasUnsavedChanges || !form.formState.isValid}
+						disabled={!hasUnsavedChanges || !form.formState.isValid || isLoading}
 						>
 							{upperFirst(t('common.messages.save'))}
 						</Button>

@@ -1,7 +1,7 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { userKeys } from "../user/userKeys";
 import { matchQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Playlist, PlaylistItem } from "@/types/type.db";
+import { Playlist, PlaylistGuest, PlaylistItem } from "@/types/type.db";
 import { playlistKeys } from "./playlistKeys";
 import { mediaKeys } from "../media/mediaKeys";
 
@@ -69,17 +69,17 @@ export const usePlaylistDeleteMutation = ({
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({
-			playlistId,
+			id,
 		} : {
-			playlistId: number;
+			id: number;
 		}) => {
 			if (!userId) throw Error('User id is missing');
 			const { error } = await supabase
 				.from('playlists')
 				.delete()
-				.eq('id', playlistId)
+				.eq('id', id)
 			if (error) throw error;
-			return playlistId;
+			return id;
 		},
 		onSuccess: (playlistId) => {
 			queryClient.invalidateQueries({
@@ -99,21 +99,19 @@ export const usePlaylistUpdateMutation = () => {
 	const supabase = useSupabaseClient();
 	return useMutation({
 		mutationFn: async ({
-			playlistId,
-			payload,
+			id,
+			...payload
 		} : {
-			playlistId: number;
-			payload: {
-				title: string;
-				description?: string | null;
-				private?: boolean;
-				poster_url?: string | null;
-			}
+			id: number;
+			title: string;
+			description?: string | null;
+			private?: boolean;
+			poster_url?: string | null;
 		}) => {
 			const { data, error } = await supabase
 				.from('playlists')
 				.update(payload)
-				.eq('id', playlistId)
+				.eq('id', id)
 				.select(`*`)
 				.single();
 			if (error) throw error;
@@ -184,7 +182,7 @@ export const useAddMediaToPlaylists = ({
 };
 
 /* ---------------------------------- ITEMS --------------------------------- */
-export const usePlaylistItemsRealtimeMutation = ({
+export const usePlaylistItemsQueryRealtimeMutation = ({
 	playlistId
 } : {
 	playlistId?: number;
@@ -309,5 +307,74 @@ export const usePlaylistItemDeleteMutation = () => {
 		},
 	});
 };
+
+/* -------------------------------------------------------------------------- */
+
+/* --------------------------------- GUESTS --------------------------------- */
+
+export const usePlaylistGuestsUpsertMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			playlistId,
+			guests,
+		} : {
+			playlistId: number;
+			guests: { user_id: string; edit: boolean }[];
+		}) => {
+			const { data, error } = await supabase
+				.from('playlist_guests')
+				.upsert(
+					guests.map(({ user_id, edit }) => ({
+						playlist_id: playlistId,
+						user_id,
+						edit,
+					})), {
+						onConflict: "playlist_id, user_id"
+					}
+				)
+				.select(`
+					*,
+					user(*)
+				`)
+			if (error) throw error;
+			return { playlistId, data };
+		},
+		onSuccess: ({ playlistId, data }) => {
+			queryClient.setQueryData(playlistKeys.guests(playlistId), (oldData: PlaylistGuest[]) => {
+				return [...oldData.filter(g => !data.some(d => d.user_id === g.user_id)), ...data];
+			});
+		}
+	});
+};
+
+export const usePlaylistGuestsDeleteMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			ids,
+			playlistId,
+		} : {
+			ids: number[];
+			playlistId: number;
+		}) => {
+			const { error } = await supabase
+				.from('playlist_guests')
+				.delete()
+				.in('id', ids)
+			if (error) throw error;
+			return { ids, playlistId };
+		},
+		onSuccess: ({ ids, playlistId }) => {
+			queryClient.setQueryData(playlistKeys.guests(playlistId), (data: PlaylistGuest[]) => {
+				if (!data) return null;
+				return data.filter((guest) => !ids.includes(guest?.id));
+			});
+		}
+	});
+}
+
 
 /* -------------------------------------------------------------------------- */

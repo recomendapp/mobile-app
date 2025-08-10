@@ -13,12 +13,13 @@ const duration = 1000;
 interface SkeletonProps
   extends React.ComponentPropsWithoutRef<typeof Animated.View> {
     borderRadius?: number;
+    color?: string;
   }
 
 const Skeleton = React.forwardRef<
   React.ComponentRef<typeof Animated.View>,
   SkeletonProps
->(({ style, borderRadius = 6, ...props }, ref) => {
+>(({ style, borderRadius = 6, color, ...props }, ref) => {
   const { colors } = useTheme();
   const sv = useSharedValue(1);
 
@@ -32,8 +33,7 @@ const Skeleton = React.forwardRef<
   const styleDefault = useAnimatedStyle(() => ({
     opacity: sv.value,
     borderRadius: borderRadius,
-    backgroundColor: colors.muted,
-    
+    backgroundColor: color || colors.muted,
   }));
 
   return (

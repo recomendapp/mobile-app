@@ -1,6 +1,7 @@
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import Colors, { TColors } from "@/constants/Colors";
 import { DefaultTheme } from "@react-navigation/native";
+import { Stack } from "expo-router";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -11,6 +12,7 @@ type ThemeContextType = {
 	tabBarHeight: number;
 	setTabBarHeight: (height: number) => void;
 	bottomTabHeight: number;
+	defaultScreenOptions: React.ComponentProps<typeof Stack.Screen>['options'];
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -31,6 +33,17 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 		return tabBarHeight + inset.bottom;
 	}, [tabBarHeight, inset.bottom]);
 
+	const defaultScreenOptions: React.ComponentProps<typeof Stack.Screen>['options'] = {
+		animation: 'ios_from_right',
+		headerShown: true,
+		headerTintColor: colors.foreground,
+		headerStyle: {
+			backgroundColor: colors.background,
+		},
+		gestureEnabled: true,
+		gestureDirection: "vertical",
+	};
+
 	DefaultTheme.colors.background = colors.background;
 
 	return (
@@ -42,6 +55,7 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 			tabBarHeight,
 			setTabBarHeight,
 			bottomTabHeight,
+			defaultScreenOptions,
 		}}
 		>
 			{children}

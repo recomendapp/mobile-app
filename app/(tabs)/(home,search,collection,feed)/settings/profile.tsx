@@ -229,10 +229,10 @@ const SettingsProfileScreen = () => {
 				headerRight: () => (
 					<Button
 					variant="ghost"
-					style={tw`p-0`}
+					size="fit"
 					loading={isLoading}
 					onPress={form.handleSubmit(handleSubmit)}
-					disabled={!canSave}
+					disabled={!canSave || isLoading}
 					>
 						{upperFirst(t('common.messages.save'))}
 					</Button>
@@ -319,6 +319,7 @@ const SettingsProfileScreen = () => {
 					icon={Icons.link}
 					nativeID="website"
 					autoCapitalize="none"
+					keyboardType="url"
 					autoCorrect={false}
 					leftSectionStyle={tw`w-auto`}
 					disabled={isLoading}

@@ -30,6 +30,7 @@ export interface InputProps extends Omit<TextInputProps, 'style'> {
   labelStyle?: TextStyle;
   errorStyle?: TextStyle;
   leftSectionStyle?: ViewStyle;
+  inputContainerStyle?: ViewStyle | ViewStyle[];
   variant?: 'filled' | 'outline';
   disabled?: boolean;
   type?: 'input' | 'textarea' | 'password';
@@ -50,6 +51,7 @@ export const Input = forwardRef<TextInput, InputProps>(
       labelStyle,
       errorStyle,
       leftSectionStyle,
+      inputContainerStyle,
       variant = 'filled',
       disabled = false,
       type = 'input',
@@ -164,7 +166,7 @@ export const Input = forwardRef<TextInput, InputProps>(
       <View style={containerStyle}>
         {/* Input Container */}
         <Pressable
-          style={[getVariantStyle(), disabled && { opacity: 0.6 }]}
+          style={[getVariantStyle(), disabled && { opacity: 0.6 }, inputContainerStyle]}
           onPress={() => {
             if (!disabled && ref && 'current' in ref && ref.current) {
               ref.current.focus();
