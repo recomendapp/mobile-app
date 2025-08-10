@@ -39,6 +39,16 @@ const AppLayout = ({ segment } : { segment: string }) => {
         <Stack.Screen name="settings/security" options={{ headerTitle: upperFirst(t('pages.settings.security.label')) }} />
         <Stack.Screen name="settings/notifications" options={{ headerTitle: upperFirst(t('pages.settings.notifications.label')) }} />
       </Stack.Protected>
+      {/* PLAYLIST */}
+      <Stack.Protected guard={!!session}>
+        <Stack.Screen
+        name='playlist/[playlist_id]/edit'
+        options={{
+          headerShown: false,
+          presentation: 'modal',
+        }}
+        />
+      </Stack.Protected>
 
       {/* AUTH */}
       <Stack.Protected guard={!session}>
@@ -59,17 +69,6 @@ const AppLayout = ({ segment } : { segment: string }) => {
         sheetGrabberVisible: true,
       }}
       />
-      {/* ------------------------------- PLAYLIST ------------------------------- */}
-      <Stack.Protected guard={!!session}>
-        <Stack.Screen
-        name='modals/playlist/[playlist_id]/edit'
-        options={{
-          headerShown: false,
-          presentation: 'modal',
-        }}
-        />
-      </Stack.Protected>
-      {/* -------------------------------------------------------------------------- */}
     </Stack>
   </>
   );

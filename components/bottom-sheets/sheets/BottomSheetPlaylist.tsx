@@ -14,7 +14,6 @@ import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations
 import * as Burnt from 'burnt';
 import { useUserPlaylistSavedQuery } from '@/features/user/userQueries';
 import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation } from '@/features/user/userMutations';
-import BottomSheetPlaylistGuests from './BottomSheetPlaylistGuests';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -125,20 +124,13 @@ const BottomSheetPlaylist = React.forwardRef<
         ...(user?.id === playlist.user?.id ? [
           {
             icon: Icons.Users,
-            onPress: () => router.push(`/modals/playlist/${playlist.id}/edit/guests`),
+            onPress: () => router.push(`/playlist/${playlist.id}/edit/guests`),
             label: upperFirst(t('common.messages.guest', { gender: 'male', count: 2 })),
           },
           {
             icon: Icons.settings,
-            onPress: () => router.push(`/modals/playlist/${playlist.id}/edit`),
+            onPress: () => router.push(`/playlist/${playlist.id}/edit`),
             label: upperFirst(t('common.messages.setting', { count: 2 })),
-          },
-          {
-            icon: Icons.Users,
-            onPress: () => openSheet(BottomSheetPlaylistGuests, {
-              playlist: playlist,
-            }),
-            label: 'OLD GUEST PANEL',
           },
           {
             icon: Icons.Delete,

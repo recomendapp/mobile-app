@@ -321,7 +321,7 @@ export const usePlaylistGuestsUpsertMutation = () => {
 			guests,
 		} : {
 			playlistId: number;
-			guests: { user_id: string; edit: boolean }[];
+			guests: { user_id: string; edit?: boolean }[];
 		}) => {
 			const { data, error } = await supabase
 				.from('playlist_guests')
@@ -329,9 +329,10 @@ export const usePlaylistGuestsUpsertMutation = () => {
 					guests.map(({ user_id, edit }) => ({
 						playlist_id: playlistId,
 						user_id,
-						edit,
+						edit: edit,
 					})), {
-						onConflict: "playlist_id, user_id"
+						onConflict: "playlist_id, user_id",
+						defaultToNull: false,
 					}
 				)
 				.select(`
