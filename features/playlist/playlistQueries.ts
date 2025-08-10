@@ -115,7 +115,7 @@ export const usePlaylistIsAllowedToEditQuery = ({
 	guests,
 }: {
 	playlist?: Playlist;
-	guests?: PlaylistGuest[];
+	guests?: PlaylistGuest[] | null;
 }) => {
 	const { user } = useAuth();
 	return useQuery({
@@ -132,7 +132,7 @@ export const usePlaylistIsAllowedToEditQuery = ({
 				)
 			);
 		},
-		enabled: !!playlist,
+		enabled: !!playlist && guests !== undefined,
 	});
 }
 
