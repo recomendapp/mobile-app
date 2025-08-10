@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useAuth } from '@/providers/AuthProvider';
-import { ScrollView, StyleSheet } from 'react-native';
-import { Link, Stack, useNavigation } from 'expo-router';
+import { Link, useNavigation } from 'expo-router';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 import tw from '@/lib/tw';
 import { Button } from '@/components/ui/Button';
@@ -18,10 +17,8 @@ import { DrawerActions } from '@react-navigation/native';
 import { Text } from '@/components/ui/text';
 import app from '@/constants/app';
 import { UserNav } from '@/components/user/UserNav';
-import { LinearGradient } from 'expo-linear-gradient';
-import Color from 'color';
 import { Skeleton } from '@/components/ui/Skeleton';
-import Animated, { SharedValue, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import AnimatedStackScreen from '@/components/ui/AnimatedStackScreen';
 
 const HomeScreen = () => {
@@ -73,21 +70,6 @@ const HomeScreen = () => {
             onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
             />
           )
-        ),
-        headerBackground: () => (
-          <LinearGradient
-          colors={[
-            Color.hsl(colors.background).alpha(0.8).string(),
-            Color.hsl(colors.background).alpha(0.6).string(),
-            'transparent'
-          ]}
-          locations={[
-            0,
-            0.5,
-            1
-          ]}
-          style={StyleSheet.absoluteFill}
-          />
         )
       }}
       />

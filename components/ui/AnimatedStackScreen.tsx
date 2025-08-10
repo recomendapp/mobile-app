@@ -7,6 +7,8 @@ import { Button } from "./Button";
 import { Icons } from "@/constants/Icons";
 import { HeaderTitle, useHeaderHeight } from '@react-navigation/elements';
 import { useTheme } from "@/providers/ThemeProvider";
+import { LinearGradient } from "expo-linear-gradient";
+import Color from "color";
 
 export interface AnimatedStackScreenProps extends React.ComponentProps<typeof Stack.Screen> {
 	scrollY: SharedValue<number>;
@@ -121,14 +123,31 @@ const AnimatedStackScreen = React.forwardRef<
 		],
 		headerBackground: () => (
 		<>
-			{!headerReplaceBackground && <Animated.View
-			style={[
-				StyleSheet.absoluteFillObject,
-				{ backgroundColor: headerBackgroundColor || colors.background },
-				backgroundAnimatedStyle,
-			]}
-			>
-			</Animated.View>}
+			{!headerReplaceBackground && (
+				<>
+				<Animated.View
+				style={[
+					StyleSheet.absoluteFillObject,
+					{ backgroundColor: headerBackgroundColor || colors.background },
+					backgroundAnimatedStyle,
+				]}
+				>
+				</Animated.View>
+				<LinearGradient
+				colors={[
+					Color.hsl(headerBackgroundColor || colors.background).alpha(0.8).string(),
+					Color.hsl(headerBackgroundColor || colors.background).alpha(0.6).string(),
+					'transparent'
+				]}
+				locations={[
+					0,
+					0.5,
+					1
+				]}
+				style={StyleSheet.absoluteFill}
+				/>
+				</>
+			)}
 			{headerBackground?.()}
 		</>
 		),
