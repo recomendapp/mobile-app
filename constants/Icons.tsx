@@ -60,4 +60,5 @@ export const Icons = {
 	OTP: RectangleEllipsisIcon,
 	Menu: MenuIcon,
 	ListOrdered: ListOrderedIcon,
+	X: XIcon,
 };

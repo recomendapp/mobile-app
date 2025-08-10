@@ -5,7 +5,7 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { User } from '@/types/type.db';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { upperCase, upperFirst } from 'lodash';
-import { usePlaylistGuestsSearchInfinite } from '@/features/playlist/playlistQueries';
+import { usePlaylistGuestsQuerySearchInfiniteQuery } from '@/features/playlist/playlistQueries';
 import { Icons } from '@/constants/Icons';
 import { CardUser } from '@/components/cards/CardUser';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
@@ -44,7 +44,7 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
 		hasNextPage,
     refetch,
     isRefetching,
-	} = usePlaylistGuestsSearchInfinite({
+	} = usePlaylistGuestsQuerySearchInfiniteQuery({
     playlistId,
     filters: {
       search: searchQuery,
@@ -63,7 +63,7 @@ const BottomSheetPlaylistGuestsAdd = React.forwardRef<
       <View style={tw`flex-row items-center justify-between w-full`}>
         <View style={tw`flex-1`}/>
         <ThemedText style={tw`flex-1 text-center font-bold`}>
-          {upperFirst(t('pages.playlist.actions.add_guests'))}
+          {upperFirst(t('common.messages.add_guest', { count: 2 }))}
         </ThemedText>
         <TouchableOpacity
         style={tw`flex-1`}

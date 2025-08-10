@@ -69,7 +69,7 @@ export const useUserUpdateMutation = ({
  * Accepts a follower request
  * @returns The mutation
  */
-export const useUserAcceptFollowerRequest = ({
+export const useUserAcceptFollowerRequestMutation = ({
 	userId,
 } : {
 	userId?: string;
@@ -107,7 +107,7 @@ export const useUserAcceptFollowerRequest = ({
  * Declines a follower request
  * @returns The mutation
  */
-export const useUserDeclineFollowerRequest = ({
+export const useUserDeclineFollowerRequestMutation = ({
 	userId,
 } : {
 	userId?: string;
@@ -137,7 +137,7 @@ export const useUserDeclineFollowerRequest = ({
 	});
 };
 
-export const useUserFollowProfileInsert = () => {
+export const useUserFollowProfileInsertMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
 	return useMutation({
@@ -173,7 +173,7 @@ export const useUserFollowProfileInsert = () => {
 	});
 };
 
-export const useUserUnfollowProfileDelete = () => {
+export const useUserFollowProfileDeleteMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
 	return useMutation({

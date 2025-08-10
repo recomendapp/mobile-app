@@ -38,6 +38,7 @@ export function SearchBar({
   inputStyle,
   debounceMs = 300,
   placeholder = 'Search...',
+  returnKeyType = 'search',
   value,
   onChangeText,
   ...props
@@ -117,6 +118,7 @@ export function SearchBar({
         placeholderTextColor={muted}
         value={displayValue}
         onChangeText={handleTextChange}
+        returnKeyType={returnKeyType}
         {...props}
       />
 

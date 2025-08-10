@@ -8,13 +8,13 @@ import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useLocalSearchParams } from "expo-router";
-import { usePlaylistFull, usePlaylistItems, usePlaylistIsAllowedToEdit, usePlaylistGuests } from "@/features/playlist/playlistQueries";
+import { usePlaylistFullQuery, usePlaylistItemsQuery, usePlaylistIsAllowedToEditQuery, usePlaylistGuestsQuery } from "@/features/playlist/playlistQueries";
 import BottomSheetPlaylist from "@/components/bottom-sheets/sheets/BottomSheetPlaylist";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import useDebounce from "@/hooks/useDebounce";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { usePlaylistItemDeleteMutation, usePlaylistItemsRealtimeMutation } from "@/features/playlist/playlistMutations";
+import { usePlaylistItemDeleteMutation, usePlaylistItemsQueryRealtimeMutation } from "@/features/playlist/playlistMutations";
 import * as Burnt from "burnt";
 import { Button } from "@/components/ui/Button";
 import { CardUser } from "@/components/cards/CardUser";
@@ -27,21 +27,21 @@ const PlaylistScreen = () => {
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const [shouldRefresh, setShouldRefresh] = useState(false);
   	const debouncedRefresh = useDebounce(shouldRefresh, 200);
-	const { data: playlist } = usePlaylistFull(Number(playlist_id));
-	const { data: guest } = usePlaylistGuests({
+	const { data: playlist } = usePlaylistFullQuery(Number(playlist_id));
+	const { data: guest } = usePlaylistGuestsQuery({
 		playlistId: playlist?.id,
 		initialData: playlist?.guests,
 	});
-	const { data: isAllowedToEdit } = usePlaylistIsAllowedToEdit({
+	const { data: isAllowedToEdit } = usePlaylistIsAllowedToEditQuery({
 		playlist: playlist || undefined,
 		guests: guest,
 	})
-	const playlistItems = usePlaylistItems({
+	const playlistItems = usePlaylistItemsQuery({
 		playlistId: playlist?.id,
 		initialData: playlist?.items,
 	});
 	const deletePlaylistItemMutation = usePlaylistItemDeleteMutation();
-	const { mutate: updatePlaylistItemChanges } = usePlaylistItemsRealtimeMutation({
+	const { mutate: updatePlaylistItemChanges } = usePlaylistItemsQueryRealtimeMutation({
 		playlistId: playlist?.id,
 	});
 

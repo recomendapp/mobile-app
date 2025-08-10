@@ -146,11 +146,9 @@ const BottomSheetPlaylistEdit = React.forwardRef<
         poster_url = null;
       }
       await updatePlaylistMutation.mutateAsync({
-        playlistId: playlist.id,
-        payload: {
-          ...values,
-          poster_url: poster_url,
-        },
+        id: playlist.id,
+        ...values,
+        poster_url: poster_url,
       }, {
         onSuccess: async (playlist) => {
           Burnt.toast({

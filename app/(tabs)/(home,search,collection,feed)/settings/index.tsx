@@ -50,7 +50,7 @@ const SettingsScreen = () => {
 			>
 				<Button
 				variant="ghost"
-				style={tw`p-0`}
+				size="fit"
 				icon={item.icon}
 				>
 					{item.label}

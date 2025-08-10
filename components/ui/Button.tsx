@@ -48,6 +48,7 @@ export interface ButtonProps extends Omit<TouchableOpacityProps, 'style'> {
   loadingVariant?: SpinnerVariant;
   style?: ViewStyle | ViewStyle[];
   textStyle?: TextStyle | TextStyle[];
+  containerStyle?: ViewStyle | ViewStyle[];
 }
 
 export const Button = forwardRef<View, ButtonProps>(
@@ -65,6 +66,7 @@ export const Button = forwardRef<View, ButtonProps>(
       haptic = true,
       loadingVariant = 'default',
       style,
+      containerStyle,
       textStyle,
       ...props
     },
@@ -227,7 +229,7 @@ export const Button = forwardRef<View, ButtonProps>(
     const handlePressIn = (ev?: any) => {
       'worklet';
       // Trigger haptic feedback
-      triggerHapticFeedback();
+      // triggerHapticFeedback();
 
       // Scale up with bouncy spring animation
       scale.value = withSpring(1.05, {
@@ -268,6 +270,7 @@ export const Button = forwardRef<View, ButtonProps>(
 
     // Handle actual press action
     const handlePress = () => {
+      triggerHapticFeedback();
       if (onPress && !disabled && !loading) {
         onPress();
       }
@@ -275,7 +278,6 @@ export const Button = forwardRef<View, ButtonProps>(
 
     // Handle press for TouchableOpacity (non-animated version)
     const handleTouchablePress = () => {
-      triggerHapticFeedback();
       handlePress();
     };
 
@@ -347,7 +349,7 @@ export const Button = forwardRef<View, ButtonProps>(
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         disabled={disabled || loading}
-        style={getPressableStyle()}
+        style={[getPressableStyle(), containerStyle]}
         {...props}
       >
         <Animated.View style={[animatedStyle, buttonStyle, styleWithoutFlex]}>

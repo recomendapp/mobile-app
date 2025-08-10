@@ -5,7 +5,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import upperFirst from 'lodash/upperFirst';
 import { useUserFollowProfile } from '@/features/user/userQueries';
 import { Alert, ViewStyle } from 'react-native';
-import { useUserFollowProfileInsert, useUserUnfollowProfileDelete } from '@/features/user/userMutations';
+import { useUserFollowProfileInsertMutation, useUserFollowProfileDeleteMutation } from '@/features/user/userMutations';
 import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
 import * as Burnt from "burnt";
@@ -44,8 +44,8 @@ const ButtonUserFollow = React.forwardRef<
   });
   const loading = skeleton || !profileId || isLoading || isFollow === undefined;
 
-  const insertFollow = useUserFollowProfileInsert();
-  const deleteFollowerMutation = useUserUnfollowProfileDelete();
+  const insertFollow = useUserFollowProfileInsertMutation();
+  const deleteFollowerMutation = useUserFollowProfileDeleteMutation();
 
   const followUser = async () => {
     if (!user || !profileId) return;

@@ -5,7 +5,7 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { Json, Playlist, User } from '@/types/type.db';
 import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { upperFirst } from 'lodash';
-import { usePlaylistGuests } from '@/features/playlist/playlistQueries';
+import { usePlaylistGuestsQuery } from '@/features/playlist/playlistQueries';
 import Fuse from 'fuse.js';
 import { Button } from '@/components/ui/Button';
 import { MinusCircleIcon } from 'lucide-react-native';
@@ -44,13 +44,16 @@ const BottomSheetPlaylistGuests = React.forwardRef<
     isLoading,
     isRefetching,
     refetch,
-  } = usePlaylistGuests(playlist.id);
+  } = usePlaylistGuestsQuery({
+    playlistId: playlist.id,
+    initialData: playlist.guests,
+  });
   const loading = isLoading || guestsRequest === undefined;
 
   const [guests, setGuests] = React.useState<{ user: User, edit: boolean }[] | undefined>(undefined);
     React.useEffect(() => {
       setGuests(guestsRequest?.map((guest) => ({
-        user: guest.user,
+        user: guest.user!,
         edit: guest.edit,
       })));
   }, [guestsRequest]);
@@ -63,7 +66,7 @@ const BottomSheetPlaylistGuests = React.forwardRef<
     return guestsRequest.some((initial, index) => {
       const current = guests[index];
       return (
-        initial.user.id !== current.user.id ||
+        initial.user!.id !== current.user.id ||
         initial.edit !== current.edit
       );
     });

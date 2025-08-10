@@ -22,33 +22,43 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     const { colors } = useTheme();
     const { session, user, logout } = useAuth();
 
-    const routes = useMemo((): { name: string; icon: React.ElementType; onPress: () => void }[] => {
+    const routes = useMemo((): { name: string; icon: React.ElementType; onPress: () => void, visible: boolean, color?: string }[] => {
         return [
-            ...(!session ? [
-                {
-                    name: upperFirst(t('common.messages.login')),
-                    icon: Icons.User,
-                    onPress: async () => {
-                        router.push('/auth/login');
-                    }
-                }
-            ] : []),
+            {
+                name: upperFirst(t('common.messages.login')),
+                icon: Icons.User,
+                onPress: async () => {
+                    router.push('/auth/login');
+                },
+                visible: !session,
+            },
+            {
+                name: upperFirst(t('common.messages.upgrade_to_plan', { plan: 'Premium' })),
+                icon: Icons.premium,
+                onPress: async () => {
+                    router.push('/upgrade');
+                },
+                visible: !!session && !user?.premium,
+                color: colors.accentBlue,
+            },
             {
                 name: upperFirst(t('pages.settings.label')),
                 icon: Icons.settings,
                 onPress: async () => {
                     router.push('/settings');
-                }
+                },
+                visible: true,
             },
             {
                 name: upperFirst(t('common.messages.about')),
                 icon: Icons.info,
                 onPress: () => {
                     router.push('/about');
-                }
+                },
+                visible: true,
             }
         ];
-    }, [t, router, session]);
+    }, [t, router, session, user, colors]);
 
     const closeDrawer = () => {
         props.navigation.closeDrawer();
@@ -115,13 +125,13 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                         }}
                     />
                 )}
-                {routes.map((route, index) => (
+                {routes.filter(route => route.visible).map((route, index) => (
                     <DrawerItem
                     key={index}
                     label={route.name}
-                    labelStyle={{ color: colors.foreground }}
+                    labelStyle={{ color: route.color || colors.foreground }}
                     icon={({ color, size }) => (
-                        <route.icon color={colors.foreground} size={size} />
+                        <route.icon color={route.color ||colors.foreground} size={size} />
                     )}
                     onPress={() => {
                         route.onPress();

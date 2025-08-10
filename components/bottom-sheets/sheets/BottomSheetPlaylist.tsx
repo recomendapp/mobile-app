@@ -12,7 +12,6 @@ import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAuth } from '@/providers/AuthProvider';
 import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
 import * as Burnt from 'burnt';
-import BottomSheetPlaylistEdit from './BottomSheetPlaylistEdit';
 import { useUserPlaylistSavedQuery } from '@/features/user/userQueries';
 import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation } from '@/features/user/userMutations';
 import BottomSheetPlaylistGuests from './BottomSheetPlaylistGuests';
@@ -33,7 +32,7 @@ interface BottomSheetPlaylistProps extends BottomSheetProps {
 interface Item {
 	icon: LucideIcon;
 	label: string;
-	onPress: () => void | Promise<void>;
+	onPress: () => void;
 	submenu?: Item[];
   closeSheet?: boolean;
   disabled?: boolean;
@@ -125,20 +124,21 @@ const BottomSheetPlaylist = React.forwardRef<
         },
         ...(user?.id === playlist.user?.id ? [
           {
-            icon: Icons.Edit,
-            onPress: () => {
-              openSheet(BottomSheetPlaylistEdit, {
-                playlist: playlist,
-              })
-            },
-            label: upperFirst(t('common.messages.edit')),
+            icon: Icons.Users,
+            onPress: () => router.push(`/modals/playlist/${playlist.id}/edit/guests`),
+            label: upperFirst(t('common.messages.guest', { gender: 'male', count: 2 })),
+          },
+          {
+            icon: Icons.settings,
+            onPress: () => router.push(`/modals/playlist/${playlist.id}/edit`),
+            label: upperFirst(t('common.messages.setting', { count: 2 })),
           },
           {
             icon: Icons.Users,
             onPress: () => openSheet(BottomSheetPlaylistGuests, {
               playlist: playlist,
             }),
-            label: upperFirst(t('common.messages.guest', { gender: 'male', count: 2 })),
+            label: 'OLD GUEST PANEL',
           },
           {
             icon: Icons.Delete,
@@ -155,7 +155,7 @@ const BottomSheetPlaylist = React.forwardRef<
                     text: upperFirst(t('common.messages.delete')),
                     onPress: async () => {
                       await playlistDeleteMutation.mutateAsync(
-                        { playlistId: playlist.id },
+                        { id: playlist.id },
                         {
                           onSuccess: () => {
                             Burnt.toast({
