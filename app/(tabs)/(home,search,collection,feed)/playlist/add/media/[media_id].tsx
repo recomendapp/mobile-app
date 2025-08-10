@@ -2,7 +2,6 @@ import BottomSheetPlaylistCreate from "@/components/bottom-sheets/sheets/BottomS
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { useMediaDetailsQuery } from "@/features/media/mediaQueries";
 import { usePlaylistAddMediaMutation } from "@/features/playlist/playlistMutations";
 import { useAuth } from "@/providers/AuthProvider";
 import { Playlist, PlaylistType } from "@/types/type.db";
@@ -231,17 +230,6 @@ const PlaylistAddMedia = () => {
 						{upperFirst(t('common.messages.cancel'))}
 					</Button>
 				) : undefined,
-				headerRight: () => (
-					<Button
-					variant="ghost"
-					size="fit"
-					loading={addToPlaylistMutation.isPending}
-					onPress={form.handleSubmit(handleSubmit)}
-					disabled={!canSave || addToPlaylistMutation.isPending}
-					>
-						{upperFirst(t('common.messages.save'))}
-					</Button>
-				),
 				headerStyle: {
 					backgroundColor: colors.muted,
 				},
@@ -325,6 +313,7 @@ const PlaylistAddMedia = () => {
 			name="comment"
 			control={form.control}
 			render={({ field: { onChange, onBlur, value } }) => (
+			<>
 				<Input
 				icon={Icons.Comment}
 				placeholder={upperFirst(t('common.messages.add_comment', { count: 1 }))}
@@ -335,6 +324,14 @@ const PlaylistAddMedia = () => {
 				disabled={addToPlaylistMutation.isPending}
 				error={form.formState.errors.comment?.message}
 				/>
+				<Button
+				variant="accent-yellow"
+				onPress={form.handleSubmit(handleSubmit)}
+				disabled={addToPlaylistMutation.isPending}
+				>
+					{upperFirst(t('common.messages.add'))}
+				</Button>
+			</>
 			)}
 			/>
 		</SelectionFooter>
