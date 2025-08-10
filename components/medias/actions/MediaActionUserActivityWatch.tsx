@@ -1,5 +1,5 @@
 import React from "react"
-import { Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
@@ -59,17 +59,33 @@ const MediaActionUserActivityWatch = React.forwardRef<
 
 	const handleUnwatch = async () => {
 		if (!activity) return;
-		await deleteActivity.mutateAsync({
-			activityId: activity.id,
-		}), {
-			onError: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
-			}
-		};
+		Alert.alert(
+			upperFirst(t('common.messages.are_u_sure')),
+			upperFirst(t('components.media.actions.watch.remove_from_watched.description')),
+			[
+				{
+					text: upperFirst(t('common.messages.cancel')),
+					style: 'cancel',
+				},
+				{
+					text: upperFirst(t('common.messages.confirm')),
+					onPress: async () => {
+						await deleteActivity.mutateAsync({
+							activityId: activity.id,
+						}, {
+							onError: () => {
+								Burnt.toast({
+									title: upperFirst(t('common.messages.an_error_occurred')),
+									preset: 'error',
+									haptic: 'error',
+								});
+							}
+						});
+					},
+					style: 'destructive',
+				},
+			]
+		);
 	};
 
 	return (

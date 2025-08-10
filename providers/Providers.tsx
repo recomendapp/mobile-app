@@ -10,6 +10,7 @@ import { SplashScreenProvider } from "./SplashScreenProvider";
 import { LocaleProvider } from "./LocaleProvider";
 import { NotificationsProvider } from "./NotificationsProvider";
 import { ToastProvider } from "@/components/ui/toast";
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -17,30 +18,32 @@ type ProvidersProps = {
 
 const Providers = ({ children } : ProvidersProps) => {
 	return (
-	<GestureHandlerRootView style={{ flex: 1 }}>	
-		<SafeAreaProvider>
-			<SplashScreenProvider>
-				<LocaleProvider>
-					<ThemeProvider>
-						<ToastProvider>
-							<ActionSheetProvider>
-								<SupabaseProvider>
-									<ReactQueryProvider>
-										<AuthProvider>
-											<NotificationsProvider>
-												{children}
-												<BottomSheetManager />
-											</NotificationsProvider>
-										</AuthProvider>
-									</ReactQueryProvider>
-								</SupabaseProvider>
-							</ActionSheetProvider>
-						</ToastProvider>
-					</ThemeProvider>
-				</LocaleProvider>
-			</SplashScreenProvider>
-		</SafeAreaProvider>
-	</GestureHandlerRootView>
+	<KeyboardProvider>
+		{/* <GestureHandlerRootView style={{ flex: 1 }}>	 */}
+			{/* <SafeAreaProvider> */}
+				<SplashScreenProvider>
+					<LocaleProvider>
+						<ThemeProvider>
+							<ToastProvider>
+								<ActionSheetProvider>
+									<SupabaseProvider>
+										<ReactQueryProvider>
+											<AuthProvider>
+												<NotificationsProvider>
+													{children}
+													<BottomSheetManager />
+												</NotificationsProvider>
+											</AuthProvider>
+										</ReactQueryProvider>
+									</SupabaseProvider>
+								</ActionSheetProvider>
+							</ToastProvider>
+						</ThemeProvider>
+					</LocaleProvider>
+				</SplashScreenProvider>
+			{/* </SafeAreaProvider> */}
+		{/* </GestureHandlerRootView> */}
+	</KeyboardProvider>
 	)
 };
 

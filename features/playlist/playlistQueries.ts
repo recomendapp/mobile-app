@@ -136,14 +136,16 @@ export const usePlaylistIsAllowedToEditQuery = ({
 	});
 }
 
-export const usePlaylistGuestsQuerySearchInfiniteQuery = ({
+export const usePlaylistGuestsSearchInfiniteQuery = ({
 	playlistId,
+	enabled = true,
 	filters
 } : {
 	playlistId?: number;
+	enabled?: boolean;
 	filters?: {
 		search?: string;
-		alreadyAdded?: string[];
+		exclude?: string[];
 		resultsPerPage?: number;
 	};
 }) => {
@@ -167,11 +169,10 @@ export const usePlaylistGuestsQuerySearchInfiniteQuery = ({
 				if (mergedFilters.search) {
 					query = query
 						.or(`username.ilike.${mergedFilters.search}%,full_name.ilike.${mergedFilters.search}%`)
-						// .ilike('username', `%${mergedFilters.search}%`)
 				}
-				if (mergedFilters.alreadyAdded) {
+				if (mergedFilters.exclude) {
 					query = query
-						.not('id', 'in', `(${mergedFilters.alreadyAdded.join(',')})`)
+						.not('id', 'in', `(${mergedFilters.exclude.join(',')})`)
 				}
 			}
 			const { data, error } = await query;
@@ -183,7 +184,7 @@ export const usePlaylistGuestsQuerySearchInfiniteQuery = ({
 			return lastPage?.length === mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
 		},
 		throwOnError: true,
-		enabled: !!playlistId,
+		enabled: !!playlistId && !!mergedFilters.search?.length && !!enabled,
 	});
 }
 

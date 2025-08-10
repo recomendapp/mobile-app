@@ -23,13 +23,16 @@ import { PostgrestError } from "@supabase/supabase-js";
 import app from "@/constants/app";
 import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
+import { FlashList } from "@shopify/flash-list";
+import { FlatList, RefreshControl } from "react-native-gesture-handler";
+import { PADDING_VERTICAL } from "@/theme/globals";
 
 const PADDING = 16;
 
 const ModalPlaylistEditGuests = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
     const playlistId = Number(playlist_id);
-	const { inset } = useTheme();
+	const { inset, colors } = useTheme();
 	const router = useRouter();
 	const { user } = useAuth();
 	const t = useTranslations();
@@ -263,7 +266,7 @@ const ModalPlaylistEditGuests = () => {
 				<Button
 				variant="muted"
 				icon={Icons.Add}
-				onPress={() => router.push(`/modals/playlist/${playlistId}/edit/guests/add`)}
+				onPress={() => router.push(`/playlist/${playlistId}/edit/guests/add`)}
 				>
 					{upperFirst(t('common.messages.add_guest', { count: 2 }))}
 				</Button>
@@ -300,19 +303,19 @@ const ModalPlaylistEditGuests = () => {
 				),
 			}}
 		/>
-		<LegendList
-		data={filteredGuests || []}
-		renderItem={renderItems}
-		ListHeaderComponent={
-		<View style={[tw`gap-2 mb-2`, { paddingHorizontal: PADDING }]}>
+		<View style={[tw`gap-2`, { paddingHorizontal: PADDING, paddingVertical: PADDING_VERTICAL }]}>
 			<SearchBar
-			value={search}
-			onChangeText={setSearch}
-			placeholder={upperFirst(t('common.messages.search_user'))}
+			onSearch={setSearch}
+			autoCorrect={false}
+			autoComplete="off"
+			autoCapitalize="none"
+			placeholder={upperFirst(t('common.messages.search_user', { count: 1 }))}
 			/>
 			{renderToolbar()}
 		</View>
-		}
+		<LegendList
+		data={filteredGuests || []}
+		renderItem={renderItems}
 		ListEmptyComponent={
 			loading ? <Icons.Loader />
 			: (
@@ -324,11 +327,12 @@ const ModalPlaylistEditGuests = () => {
 			) 
 		}
 		keyExtractor={(item) => item.user.id.toString()}
+		nestedScrollEnabled
 		refreshing={isGuestsRequestRefetching}
 		onRefresh={refetchGuests}
 		contentContainerStyle={[
 			tw`gap-2`,
-			{ paddingTop: PADDING, paddingBottom: inset.bottom + PADDING / 2 }
+			{ paddingBottom: inset.bottom + PADDING_VERTICAL }
 		]}
 		/>
 	</>

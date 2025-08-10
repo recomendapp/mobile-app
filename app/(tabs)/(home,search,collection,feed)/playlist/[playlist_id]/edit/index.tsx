@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { Input } from "@/components/ui/Input";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { Href, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Pressable, ScrollView } from "react-native-gesture-handler";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
@@ -26,6 +26,10 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import Switch from "@/components/ui/Switch";
 import { Alert } from "react-native";
 import { usePlaylistUpdateMutation } from "@/features/playlist/playlistMutations";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { LucideIcon } from "lucide-react-native";
+import { Icons } from "@/constants/Icons";
 
 const TITLE_MIN_LENGTH = 1;
 const TITLE_MAX_LENGTH = 100;
@@ -39,6 +43,7 @@ const ModalPlaylistEdit = () => {
 	const router = useRouter();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const t = useTranslations();
+	const headerHeight = useHeaderHeight();
 	const {
 		data: playlist,
 	} = usePlaylistQuery({
@@ -80,6 +85,15 @@ const ModalPlaylistEdit = () => {
 	const canSave = useMemo(() => {
 		return (hasFormChanged || newPoster !== undefined) && form.formState.isValid;
 	}, [hasFormChanged, newPoster, form.formState.isValid]);
+
+	// Routes
+	const routes = useMemo((): { label: string, icon: LucideIcon, route: Href }[] => ([
+		{
+			label: upperFirst(t('common.messages.manage_guests', { count: 2 })),
+			icon: Icons.Users,
+			route: `/playlist/${playlistId}/edit/guests`,
+		}
+	]), [t, playlistId]);
 
 	// Poster
 	const posterOptions = useMemo(() => [
@@ -268,13 +282,14 @@ const ModalPlaylistEdit = () => {
 				),
 			}}
 		/>
-		<ScrollView
+		<KeyboardAwareScrollView
 		bounces={false}
 		contentContainerStyle={[
 			tw`gap-2 p-4`,
 		]}
 		nestedScrollEnabled
 		contentInset={{ bottom: inset.bottom }}
+		bottomOffset={headerHeight}
 		>
 			<Pressable onPress={handlePosterOptions} style={tw`relative items-center justify-center gap-2`}>
 				{playlist ? (
@@ -345,7 +360,36 @@ const ModalPlaylistEdit = () => {
 				</View>
 			)}
 			/>
-		</ScrollView>
+			{routes.length > 0 && (
+				<>
+					<Separator />
+					{routes.map((item, index) => (
+						<Pressable
+						key={index}
+						onPress={() => router.push(item.route)}
+						style={[
+							{ borderColor: colors.muted },
+							tw`flex-1 flex-row justify-between items-center gap-2`,
+							index < routes.length - 1 ? tw`border-b` : null,
+						]}
+						>
+							<Button
+							variant="ghost"
+							size="fit"
+							icon={item.icon}
+							>
+								{item.label}
+							</Button>
+							<Button
+							variant="ghost"
+							icon={Icons.ChevronRight}
+							size="icon"
+							/>
+						</Pressable>
+					))}
+				</>
+			)}
+		</KeyboardAwareScrollView>
 	</>
 	)
 };

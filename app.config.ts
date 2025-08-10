@@ -102,6 +102,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				ios: {
 					deploymentTarget: '15.1',
 				},
+				android: {
+					kotlinVersion: "1.6.21"
+				}
 			},
 		],
 		[

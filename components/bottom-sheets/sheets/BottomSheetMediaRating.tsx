@@ -20,6 +20,7 @@ import * as Burnt from 'burnt';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
+import { PADDING_HORIZONTAL } from '@/theme/globals';
 
 const { width } = Dimensions.get('screen');
 const ITEM_WIDTH = width * 0.2;
@@ -218,26 +219,26 @@ const BottomSheetMediaRating = React.forwardRef<
 		ref={ref}
 		sizes={['auto']}
 		FooterComponent={() => (
-			<View style={[{ paddingBottom: inset.bottom }, tw`flex-1 flex-row gap-2 justify-between px-4`]}>
+			<View style={{ paddingBottom: inset.bottom, paddingHorizontal: PADDING_HORIZONTAL }}>
 				{activity?.rating ? (
-					<>
-						<Button variant="outline" onPress={handleDeleteRating} style={{ flex: 1 }}>
-							Delete
+					<View style={tw`flex-row gap-2 justify-between`}>
+						<Button variant="destructive" onPress={handleDeleteRating} style={{ flex: 1 }}>
+							{upperFirst(t('common.messages.delete'))}
 						</Button>
 						<Button variant="accent-yellow" onPress={handleSaveRating} style={{ flex: 1 }}>
 							{upperFirst(t('common.messages.save'))}
 						</Button>
-					</>
+					</View>
 				) : (
-					<Button variant="accent-yellow" onPress={handleSaveRating} style={{ flex: 1 }}>
-						Ajouter une note
+					<Button variant="accent-yellow" onPress={handleSaveRating}>
+						{upperFirst(t('common.messages.add_rating'))}
 					</Button>
 				)}
 			</View>
 		)}
 		{...props}
 		>
-			<View style={tw`flex-row items-center justify-center px-4`}>
+			<View style={[tw`flex-row items-center justify-center`, { paddingHorizontal: PADDING_HORIZONTAL }]}>
 				<AnimatedTouchableOpacity
 				style={[
 					{ backgroundColor: colors.background },
