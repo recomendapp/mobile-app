@@ -121,25 +121,21 @@ export const usePlaylistUpdateMutation = () => {
 };
 /* -------------------------------------------------------------------------- */
 
-export const useAddMediaToPlaylists = ({
-	mediaId,
-	userId,
-} : {
-	mediaId: number;
-	userId?: string;
-}) => {
+export const usePlaylistAddMediaMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({
+			userId,
+			mediaId,
 			playlists,
 			comment,
 		} : {
+			userId: string;
+			mediaId: number;
 			playlists: Playlist[];
 			comment?: string;
 		}) => {
-			if (!userId) throw Error('Vous devez être connecté pour effectuer cette action');
-			if (!playlists || playlists.length === 0) throw Error('Vous devez sélectionner au moins une playlist');
 			const { error } = await supabase
 				.from('playlist_items')
 				.insert(
@@ -157,11 +153,18 @@ export const useAddMediaToPlaylists = ({
 				...playlist,
 				items_count: (playlist?.items_count ?? 0) + 1,
 			}));
-			return updatedPlaylists;
+			return { userId, mediaId, playlists: updatedPlaylists };
 		},
-		onSuccess: (playlists) => {
+		onSuccess: ({ userId, mediaId, playlists }) => {
 			queryClient.invalidateQueries({
 				predicate: (query) => playlists.some((playlist) => matchQuery({ queryKey: playlistKeys.items(playlist?.id as number) }, query)) ?? false,
+			});
+			// Invalidate add media to playlist
+			queryClient.invalidateQueries({
+				queryKey: userKeys.addMediaToPlaylist({
+					userId: userId,
+					mediaId: mediaId,
+				}),
 			});
 			// Invalidate playlists for the media
 			queryClient.invalidateQueries({
@@ -170,14 +173,6 @@ export const useAddMediaToPlaylists = ({
 				}),
 			});
 		},
-		meta: {
-			invalidates: [
-				userKeys.addMediaToPlaylist({
-					userId: userId!,
-					mediaId: mediaId,
-				}),
-			]
-		}
 	});
 };
 
@@ -308,6 +303,43 @@ export const usePlaylistItemDeleteMutation = () => {
 	});
 };
 
+export const usePlaylistItemsUpsertMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			playlistId,
+			items,
+		} : {
+			playlistId: number;
+			items: PlaylistItem[];
+		}) => {
+			const { data, error } = await supabase
+				.from('playlist_items')
+				.upsert(
+					items.map(({ id, ...rest }) => ({
+						...rest,
+						playlist_id: playlistId,
+					})), {
+						onConflict: "id",
+						defaultToNull: false,
+					}
+				)
+				.select(`
+					*,
+					media(*)
+				`)
+			if (error) throw error;
+			return { playlistId, data };
+		},
+		onSuccess: ({ playlistId, data }) => {
+			queryClient.setQueryData(playlistKeys.items(playlistId), (oldData: PlaylistItem[]) => {
+				return [...oldData.filter(item => !data.some(d => d.id === item.id)), ...data].sort((a, b) => a.rank - b.rank);
+			});
+		}
+	});
+};
+
 /* -------------------------------------------------------------------------- */
 
 /* --------------------------------- GUESTS --------------------------------- */
@@ -375,7 +407,5 @@ export const usePlaylistGuestsDeleteMutation = () => {
 			});
 		}
 	});
-}
-
-
+};
 /* -------------------------------------------------------------------------- */

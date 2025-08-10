@@ -41,6 +41,8 @@ const AppLayout = ({ segment } : { segment: string }) => {
       </Stack.Protected>
       {/* PLAYLIST */}
       <Stack.Protected guard={!!session}>
+        <Stack.Screen name="playlist/[playlist_id]/sort" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="playlist/add/media/[media_id]" options={{ presentation: 'modal' }} />
         <Stack.Screen
         name='playlist/[playlist_id]/edit'
         options={{

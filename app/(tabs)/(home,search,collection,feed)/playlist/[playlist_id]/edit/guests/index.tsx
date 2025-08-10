@@ -23,8 +23,6 @@ import { PostgrestError } from "@supabase/supabase-js";
 import app from "@/constants/app";
 import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
-import { FlashList } from "@shopify/flash-list";
-import { FlatList, RefreshControl } from "react-native-gesture-handler";
 import { PADDING_VERTICAL } from "@/theme/globals";
 
 const PADDING = 16;
@@ -116,23 +114,6 @@ const ModalPlaylistEditGuests = () => {
 			return prev.filter((guest) => guest.user.id !== userId);
 		});
 	}, []);
-	const handleDeleteGuestConfirm = useCallback((userId: string) => {
-		Alert.alert(
-			upperFirst(t('common.messages.are_u_sure')),
-			undefined,
-			[
-				{
-					text: upperFirst(t('common.messages.cancel')),
-					style: 'cancel',
-				},
-				{
-					text: upperFirst(t('common.messages.remove')),
-					onPress: () => handleDeleteGuest(userId),
-					style: 'destructive',
-				},
-			]
-		);
-	}, []);
 	const handleSubmit = async () => {
 		try {
 			if (!playlist) return;
@@ -207,7 +188,7 @@ const ModalPlaylistEditGuests = () => {
 		const swipeActions = [
 			{
 				icon: Icons.X,
-				onPress: () => handleDeleteGuestConfirm(item.user.id),
+				onPress: () => handleDeleteGuest(item.user.id),
 			},
 		];
 		const styleAnimation = useAnimatedStyle(() => {

@@ -7,7 +7,7 @@ import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { usePlaylistFullQuery, usePlaylistItemsQuery, usePlaylistIsAllowedToEditQuery, usePlaylistGuestsQuery } from "@/features/playlist/playlistQueries";
 import BottomSheetPlaylist from "@/components/bottom-sheets/sheets/BottomSheetPlaylist";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -21,6 +21,7 @@ import { CardUser } from "@/components/cards/CardUser";
 
 const PlaylistScreen = () => {
 	const t = useTranslations();
+	const router = useRouter();
 	const supabase = useSupabaseClient();
 	const { session } = useAuth();
 	const { playlist_id } = useLocalSearchParams();
@@ -28,13 +29,13 @@ const PlaylistScreen = () => {
 	const [shouldRefresh, setShouldRefresh] = useState(false);
   	const debouncedRefresh = useDebounce(shouldRefresh, 200);
 	const { data: playlist } = usePlaylistFullQuery(Number(playlist_id));
-	const { data: guest } = usePlaylistGuestsQuery({
+	const { data: guests } = usePlaylistGuestsQuery({
 		playlistId: playlist?.id,
 		initialData: playlist?.guests,
 	});
 	const { data: isAllowedToEdit } = usePlaylistIsAllowedToEditQuery({
 		playlist: playlist || undefined,
-		guests: guest,
+		guests: guests,
 	})
 	const playlistItems = usePlaylistItemsQuery({
 		playlistId: playlist?.id,
@@ -233,7 +234,7 @@ const PlaylistScreen = () => {
 		{
 			label: upperFirst(t('common.messages.edit_order')),
 			icon: Icons.ListOrdered,
-			onPress: () => console.log('Modifier l\'ordre'),
+			onPress: () => router.push(`/playlist/${playlist?.id}/sort`),
 		}
 	] : undefined}
 	/>

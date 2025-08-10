@@ -103,8 +103,12 @@ const BottomSheetMedia = React.forwardRef<
       ...(session ? [
         {
           icon: Icons.AddPlaylist,
-          onPress: () => openSheet(BottomSheetAddToPlaylist, {
-            media: media!,
+          onPress: () => media?.media_id && router.push({
+            pathname: `/playlist/add/media/[media_id]`,
+            params: {
+              media_id: media?.media_id,
+              media_title: media?.title,
+            }
           }),
           label: upperFirst(t('common.messages.add_to_playlist')),
         },

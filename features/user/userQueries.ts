@@ -894,15 +894,15 @@ export const useUserAddMediaToPlaylistQuery = ({
 	userId,
 	type = 'personal',
 } : {
-	mediaId: number;
+	mediaId?: number | null;
 	userId?: string;
 	type: PlaylistType;
 }) => {
 	const supabase = useSupabaseClient();
 	return useQuery({
 		queryKey: userKeys.addMediaToPlaylist({
-			userId: userId as string	,
-			mediaId: mediaId,
+			userId: userId!,
+			mediaId: mediaId!,
 			type: type,
 		}),
 		queryFn: async () => {

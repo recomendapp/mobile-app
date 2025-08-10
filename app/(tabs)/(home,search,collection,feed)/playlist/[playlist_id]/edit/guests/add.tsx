@@ -1,6 +1,5 @@
 import { CardUser } from "@/components/cards/CardUser";
 import AnimatedContentContainer from "@/components/ui/AnimatedContentContainer";
-import AnimatedFlashList from "@/components/ui/AnimatedFlashList";
 import { Button } from "@/components/ui/Button";
 import { SearchBar } from "@/components/ui/searchbar";
 import { SelectionFooter } from "@/components/ui/SelectionFooter";
@@ -12,17 +11,14 @@ import { usePlaylistGuestsQuery, usePlaylistGuestsSearchInfiniteQuery } from "@/
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-import { PADDING, PADDING_VERTICAL } from "@/theme/globals";
+import { PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { User } from "@/types/type.db";
-import { LegendList } from "@legendapp/list";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
-import {  FlashList } from "@shopify/flash-list";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import {  useCallback, useMemo, useState } from "react";
 import { Alert, ScrollViewProps } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import * as Burnt from 'burnt';
 import { PostgrestError } from "@supabase/supabase-js";
@@ -133,7 +129,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 	// Render
 	const renderItems = useCallback(({ item }: { item: { user: User, isSelected: boolean } }) => {
 		return (
-		<CardUser user={item.user} containerStyle={{ paddingHorizontal: PADDING }}>
+		<CardUser user={item.user} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}>
 			<Button
 			variant="ghost"
 			size="icon"
@@ -165,7 +161,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 					<Button
 					variant="ghost"
 					size="fit"
-					disabled={isLoading}
+					disabled={upsertGuestsMutation.isPending}
 					onPress={handleCancel}
 					>
 						{upperFirst(t('common.messages.cancel'))}
@@ -175,9 +171,9 @@ const ModalPlaylistEditGuestsAdd = () => {
 					<Button
 					variant="ghost"
 					size="fit"
-					loading={isLoading}
+					loading={upsertGuestsMutation.isPending}
 					onPress={handleSubmit}
-					disabled={!canSave || isLoading}
+					disabled={!canSave || upsertGuestsMutation.isPending}
 					>
 						{upperFirst(t('common.messages.save'))}
 					</Button>
@@ -186,7 +182,6 @@ const ModalPlaylistEditGuestsAdd = () => {
 		/>
 		<View style={[tw`gap-2`, { paddingHorizontal: PADDING, paddingVertical: PADDING_VERTICAL }]}>
 			<SearchBar
-			debounceMs={1000}
 			autoCorrect={false}
 			autoComplete="off"
 			autoCapitalize="none"
@@ -199,7 +194,6 @@ const ModalPlaylistEditGuestsAdd = () => {
 			user,
 			isSelected: selectedUsers.some((u) => u.id === user.id),
 		})) || []}
-		extraData={selectedUsers}
 		renderItem={renderItems}
 		ListEmptyComponent={
 			isLoading ? <Icons.Loader />
@@ -236,8 +230,6 @@ const ModalPlaylistEditGuestsAdd = () => {
 		)}
 		keyExtractor={(user) => user.id}
 		/>
-		
-
 	</>
 	)
 };
