@@ -9,8 +9,6 @@ import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
-import BottomSheetSendReco from './BottomSheetSendReco';
-import BottomSheetAddToPlaylist from './BottomSheetAddToPlaylist';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import BottomSheetDefaultView from '../templates/BottomSheetDefaultView';
@@ -104,7 +102,7 @@ const BottomSheetMedia = React.forwardRef<
         {
           icon: Icons.AddPlaylist,
           onPress: () => media?.media_id && router.push({
-            pathname: `/playlist/add/media/[media_id]`,
+            pathname: '/playlist/add/media/[media_id]',
             params: {
               media_id: media?.media_id,
               media_title: media?.title,
@@ -114,8 +112,12 @@ const BottomSheetMedia = React.forwardRef<
         },
         {
           icon: Icons.Reco,
-          onPress: () => openSheet(BottomSheetSendReco, {
-            media: media!,
+          onPress: () => media?.media_id && router.push({
+            pathname: '/media/[media_id]/reco/send',
+            params: {
+              media_id: media?.media_id,
+              media_title: media?.title,
+            }
           }),
           label: upperFirst(t('common.messages.send_to_friend')),
         }

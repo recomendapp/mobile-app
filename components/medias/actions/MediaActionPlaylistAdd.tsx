@@ -3,8 +3,6 @@ import { Pressable } from "react-native";
 import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Media } from "@/types/type.db";
-import BottomSheetAddToPlaylist from "@/components/bottom-sheets/sheets/BottomSheetAddToPlaylist";
-import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useAuth } from "@/providers/AuthProvider";
 import { usePathname, useRouter } from "expo-router";
 
@@ -23,14 +21,17 @@ const MediaActionPlaylistAdd = React.forwardRef<
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
-	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	return (
 		<Pressable
 		ref={ref}
 		onPress={() => {
 			if (session) {
-				openSheet(BottomSheetAddToPlaylist, {
-					media: media,
+				media.media_id && router.push({
+					pathname: '/playlist/add/media/[media_id]',
+					params: {
+						media_id: media.media_id,
+						media_title: media?.title,
+					},
 				});
 			} else {
 				router.push({

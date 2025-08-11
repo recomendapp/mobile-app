@@ -382,7 +382,6 @@ export function useOnboarding() {
     try {
       // In a real app, you'd save this to AsyncStorage or similar
       setHasCompletedOnboarding(true);
-      console.log('Onboarding completed and saved');
     } catch (error) {
       console.error('Failed to save onboarding completion:', error);
     }

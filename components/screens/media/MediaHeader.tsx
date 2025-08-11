@@ -278,7 +278,7 @@ const Genres = ({
 			{genres.map((genre, index) => (
 				<React.Fragment key={index}>
 					{index !== 0 ? ", " : null}
-					<Link href={`/genre/${genre.id}`} onPress={() => console.log('link pressed')}>{genre.name}</Link>
+					<Link href={`/genre/${genre.id}`}>{genre.name}</Link>
 				</React.Fragment>
 			))}
 		</>
