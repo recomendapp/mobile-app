@@ -65,6 +65,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
           title: upperFirst(t('common.messages.added', { gender: 'female', count: 1 })),
           preset: 'done',
         });
+        form.reset();
         onCreate && onCreate(playlist);
         closeSheet(id);
       },

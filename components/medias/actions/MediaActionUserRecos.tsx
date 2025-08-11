@@ -3,8 +3,6 @@ import { Pressable } from "react-native";
 import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Media } from "@/types/type.db";
-import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import BottomSheetSendReco from "@/components/bottom-sheets/sheets/BottomSheetSendReco";
 import { useAuth } from "@/providers/AuthProvider";
 import { usePathname, useRouter } from "expo-router";
 
@@ -23,15 +21,18 @@ const MediaActionUserRecos = React.forwardRef<
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
-	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	return (
 		<Pressable
 		ref={ref}
 		onPress={() => {
 			if (session) {
-				openSheet(BottomSheetSendReco, {
-					media: media,
-				});
+				media.media_id && router.push({
+					pathname: '/media/[media_id]/reco/send',
+					params: {
+						media_id: media.media_id,
+						media_title: media.title,
+					}
+				})
 			} else {
 				router.push({
 					pathname: '/auth',

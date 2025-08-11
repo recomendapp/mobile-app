@@ -548,7 +548,7 @@ export const useUserRecosInsertMutation = () => {
 			senderId: string;
 			mediaId: number;
 			receivers: User[];
-			comment: string;
+			comment?: string;
 		}) => {
 			if (receivers.length === 0) throw Error('Missing receivers');
 			const { error } = await supabase

@@ -51,6 +51,10 @@ const AppLayout = ({ segment } : { segment: string }) => {
         }}
         />
       </Stack.Protected>
+      {/* MEDIA */}
+      <Stack.Protected guard={!!session}>
+        <Stack.Screen name="media/[media_id]/reco/send" options={{ presentation: 'modal' }} />
+      </Stack.Protected>
 
       {/* AUTH */}
       <Stack.Protected guard={!session}>

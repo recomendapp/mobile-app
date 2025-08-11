@@ -65,7 +65,7 @@ const PlaylistScreen = () => {
 							onSuccess: () => {
 								Burnt.toast({
 									title: upperFirst(t('common.messages.deleted', { count: 1, gender: 'male' })),
-									preset: 'error',
+									preset: 'done',
 									haptic: 'success',
 								});
 							},

@@ -22,6 +22,7 @@ import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reani
 import { useTranslations } from "use-intl";
 import * as Burnt from 'burnt';
 import { PostgrestError } from "@supabase/supabase-js";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const ModalPlaylistEditGuestsAdd = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
@@ -130,11 +131,9 @@ const ModalPlaylistEditGuestsAdd = () => {
 	const renderItems = useCallback(({ item }: { item: { user: User, isSelected: boolean } }) => {
 		return (
 		<CardUser user={item.user} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}>
-			<Button
-			variant="ghost"
-			size="icon"
-			icon={item.isSelected ? Icons.Check : Icons.Add}
-			onPress={() => handleToggleUser(item.user)}
+			<Checkbox
+			checked={item.isSelected}
+			onCheckedChange={() => handleToggleUser(item.user)}
 			/>
 		</CardUser>
 		);

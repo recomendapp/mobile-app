@@ -81,7 +81,6 @@ const SettingsAppearanceScreen = () => {
 
 	// useEffects
 	useEffect(() => {
-		console.log('locale', locale)
 		form.reset({
 			locale: locale,
 		});

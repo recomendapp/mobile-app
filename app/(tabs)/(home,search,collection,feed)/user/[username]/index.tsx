@@ -156,7 +156,7 @@ const ProfileScreen = () => {
 					variant="ghost"
 					size="icon"
 					icon={Icons.EllipsisVertical}
-					onPress={() => console.log('More options')}
+					onPress={() => console.log('open sheet user')}
 					/>
 				)
 			}}
