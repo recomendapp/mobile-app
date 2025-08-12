@@ -254,7 +254,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 				<MediaActionUserActivityWatch media={media} />
 				<MediaActionUserWatchlist media={media} />
 			</View>
-			<View style={tw`flex-row items-center gap-4`}>
+			<View style={tw`flex-row items-center gap-1`}>
 				<MediaActionPlaylistAdd media={media} />
 				<MediaActionUserRecos media={media} />
 			</View>

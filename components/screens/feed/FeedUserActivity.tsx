@@ -8,14 +8,14 @@ import { View } from "react-native";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 
-interface FeedActivityProps
+interface FeedUserActivityProps
   extends React.ComponentProps<typeof View> {
 	activity: UserActivity | null;
 }
 
-const FeedActivity = forwardRef<
+const FeedUserActivity = forwardRef<
 	React.ComponentRef<typeof View>,
-	FeedActivityProps
+	FeedUserActivityProps
 >(({ activity, style, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
@@ -101,6 +101,6 @@ const FeedActivity = forwardRef<
 	  </View>
 	);
 });
-FeedActivity.displayName = "FeedActivity";
+FeedUserActivity.displayName = "FeedUserActivity";
 
-export default FeedActivity;
+export default FeedUserActivity;

@@ -1,25 +1,22 @@
-import { Button } from "@/components/ui/Button";
 import { usePlaylistFullQuery, usePlaylistGuestsQuery, usePlaylistIsAllowedToEditQuery, usePlaylistItemsQuery } from "@/features/playlist/playlistQueries";
 import { PlaylistItem } from "@/types/type.db";
 import { Redirect, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert } from "react-native";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "use-intl";
 import * as Burnt from "burnt";
 import { PostgrestError } from "@supabase/supabase-js";
-import { usePlaylistItemsUpsertMutation } from "@/features/playlist/playlistMutations";
-import { GestureHandlerRootView, Pressable } from "react-native-gesture-handler";
+import { usePlaylistItemUpdateMutation } from "@/features/playlist/playlistMutations";
+import { Pressable } from "react-native-gesture-handler";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Text } from "@/components/ui/text";
 import tw from "@/lib/tw";
-import {
-  Sortable,
-  SortableItem,
-  SortableRenderItemProps,
-} from "react-native-reanimated-dnd";
+import DraggableFlatList, { DragEndParams, RenderItemParams, ScaleDecorator } from "react-native-draggable-flatlist";
 import { View } from "@/components/ui/view";
+import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
+import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Icons } from "@/constants/Icons";
+import { Button } from "@/components/ui/Button";
 
 interface Task {
   id: string;
@@ -48,38 +45,19 @@ const PlaylistSortScreen = () => {
 		playlist: playlist || undefined,
 		guests: guests,
 	});
-	const upsertPlaylistItems = usePlaylistItemsUpsertMutation();
+	const updatePlaylistItem = usePlaylistItemUpdateMutation();
 
 	// States
-	const [ playlistItems, setPlaylistItems ] = useState<PlaylistItem[] | undefined>(undefined);
+	const [playlistItems, setPlaylistItems] = useState<PlaylistItem[] | undefined>(undefined);
 	const loading = playlistItems === undefined || playlistItemsRequestIsLoading;
-	const canSave = useMemo(() => {
-		return false;
-	}, [playlistItemsRequest, playlistItems]);
-
-	// TESTING
-	// const [tasks, setTasks] = useState<Task[]>([
-	// 	{ id: "1", title: "Learn React Native", completed: false },
-	// 	{ id: "2", title: "Build an app", completed: false },
-	// 	{ id: "3", title: "Deploy to store", completed: true },
-	// 	{ id: "4", title: "Celebrate success", completed: false },
-	// ]);
-	// generate random tasks
-	const [tasks, setTasks] = useState<Task[]>(Array.from({ length: 200 }, (_, i) => ({
-		id: `${i + 1}`,
-		title: `Task ${i + 1}`,
-		completed: Math.random() < 0.5,
-	})));
 
 	// Handlers
-	const handleSubmit = useCallback(() => {
+	const handleSaveItem = async (item: PlaylistItem) => {
 		try {
-			// LOGIC HERE
-			Burnt.toast({
-				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
-				preset: 'done',
+			await updatePlaylistItem.mutateAsync({
+				id: item.id,
+				rank: item.rank,
 			});
-			router.dismiss();
 		} catch (error) {
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof Error) {
@@ -96,68 +74,56 @@ const PlaylistSortScreen = () => {
 				haptic: 'error',
 			});
 		}
-	}, []);
-	const handleCancel = useCallback(() => {
-		if (canSave) {
-			Alert.alert(
-				upperFirst(t('common.messages.are_u_sure')),
-				upperFirst(t('common.messages.do_you_really_want_to_cancel_change', { count: 2 })),
-				[
-					{
-						text: upperFirst(t('common.messages.continue_editing')),
-					},
-					{
-						text: upperFirst(t('common.messages.ignore')),
-						onPress: () => router.dismiss(),
-						style: 'destructive',
-					},
-				]
-			);
-		} else {
-			router.dismiss();
-		}
-	}, [canSave, router, t]);
+	};
+	const handleOnDragEnd = ({ from, to, data }: DragEndParams<PlaylistItem>) => {
+		if (from === to) return;
+		const updatedItem = data.at(to);
+		updatedItem && handleSaveItem({
+			...updatedItem,
+			rank: to + 1,
+		});
+	};
+	const handleQuickMove = (item: PlaylistItem) => {
+
+	};
 
 	// Render
-	const renderItem = useCallback((props: SortableRenderItemProps<Task>) => {
-		const {
-			item,
-			id,
-			positions,
-			lowerBound,
-			autoScrollDirection,
-			itemsCount,
-			itemHeight,
-		} = props;
-		console.log('renderItem', id);
+	const renderItem = useCallback(({ item, drag, isActive }: RenderItemParams<PlaylistItem>) => {
+		const subtitle = item.media?.main_credit?.map((director) => director.title).join(', ') || '';
 		return (
-		<SortableItem
-          key={id}
-          data={item}
-          id={id}
-          positions={positions}
-          lowerBound={lowerBound}
-          autoScrollDirection={autoScrollDirection}
-          itemsCount={itemsCount}
-          itemHeight={itemHeight}
-          onMove={(itemId, from, to) => {
-            // const newTasks = [...tasks];
-            // const [movedTask] = newTasks.splice(from, 1);
-            // newTasks.splice(to, 0, movedTask);
-            // setTasks(newTasks);
-			console.log('onMove', itemId, from, to);
-          }}
-          style={{
-			height: 80,
-		  }}
-        >
-			<View style={tw`flex-row items-center justify-between gap-2`}>
-				<Text>{item.title}</Text>
-				<SortableItem.Handle style={tw`p-2`}>
-					<Icons.Menu color={colors.mutedForeground} />
-				</SortableItem.Handle>
-			</View>
-		</SortableItem>
+			<ScaleDecorator activeScale={1.05}>
+				<View
+				style={[
+					tw`flex-row items-center justify-between gap-2 rounded-md my-0.5`,
+					{ backgroundColor: isActive ? colors.muted : colors.background }
+				]}
+				>
+					<View style={tw`flex-row items-center gap-2`}>
+						<ImageWithFallback
+						alt={item.media?.title ?? ''}
+						source={{ uri: item.media?.avatar_url || '' }}
+						style={[{ aspectRatio: 2 / 3, height: 'fit-content' }, tw`rounded-md w-16`]}
+						/>
+						<View style={tw`shrink`}>
+							<Text numberOfLines={1}>
+								{item.media?.title ?? ''}
+							</Text>
+							{subtitle && <Text style={{ color: colors.mutedForeground }} numberOfLines={1}>
+								{subtitle}
+							</Text>}
+						</View>
+					</View>
+					<Button
+					variant="ghost"
+					icon={Icons.Menu}
+					iconProps={{ color: colors.mutedForeground }}
+					size="icon"
+					onPress={() => handleQuickMove(item)}
+					onLongPress={drag}
+					disabled={isActive}
+					/>
+				</View>
+			</ScaleDecorator>
 		);
 	}, [colors]);
 
@@ -171,8 +137,6 @@ const PlaylistSortScreen = () => {
 		return <Redirect href={'..'} />;
 	}
 
-	console.log('re-render', loading)
-
 	return (
 	<>
 		<Stack.Screen
@@ -182,61 +146,32 @@ const PlaylistSortScreen = () => {
 				<Button
 				variant="ghost"
 				size="fit"
-				disabled={upsertPlaylistItems.isPending}
-				onPress={handleCancel}
+				onPress={router.dismiss}
 				>
-					{upperFirst(t('common.messages.cancel'))}
+					{upperFirst(t('common.messages.close'))}
 				</Button>
 			) : undefined,
-			headerRight: () => (
-				<Button
-				variant="ghost"
-				size="fit"
-				loading={upsertPlaylistItems.isPending}
-				onPress={handleSubmit}
-				disabled={!canSave || upsertPlaylistItems.isPending}
-				>
-					{upperFirst(t('common.messages.save'))}
-				</Button>
-			),
 		}}
 		/>
 		{!loading && playlistItems?.length > 0 ? (
-			<GestureHandlerRootView style={tw`flex-1`}>
-
-				<Sortable
-				data={tasks}
-				renderItem={renderItem}
-				itemKeyExtractor={(item) => item.id.toString()}
-				itemHeight={80}
-				contentContainerStyle={{
-					backgroundColor: colors.background,
-				}}
-				style={{
-					marginBottom: inset.bottom,
-				}}
-				
-				/>
-			</GestureHandlerRootView>
+			<DraggableFlatList
+			data={playlistItems}
+			onDragEnd={handleOnDragEnd}
+			renderItem={renderItem}
+			keyExtractor={(item) => item.id.toString()}
+			contentContainerStyle={[
+				{ backgroundColor: colors.background },
+				{ paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL },
+			]}
+			style={{
+				marginBottom: inset.bottom,
+			}}
+			/>
 		) : (
 			<View style={tw`flex-1 items-center justify-center p-4`}>
 				<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
 			</View>
 		)}
-		{/* <DraggableFlatList
-		data={playlistItems}
-		onDragEnd={({ data }) => console.log('onDragEnd', data)}
-		keyExtractor={(item) => item.id.toString()}
-		renderItem={renderItem}
-		// containerStyle={{
-		// 	paddingBottom: inset.bottom,
-		// }}
-		autoscrollSpeed={50}
-		autoscrollThreshold={5}
-		// autoscrollSpeed={100}
-		// autoscrollThreshold={0}
-		style={{ backgroundColor: colors.background, paddingBottom: inset.bottom }}
-		/> */}
 	</>
 	)
 };

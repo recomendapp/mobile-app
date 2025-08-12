@@ -21,7 +21,9 @@ const AppLayout = ({ segment } : { segment: string }) => {
     screenOptions={defaultScreenOptions}
     >
       {/* <Stack.Screen name="index" options={{ title: upperFirst(t('common.messages.home')) }} /> */}
-      <Stack.Screen name="feed" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.feed')) }} />
+      <Stack.Protected guard={!!session}>
+        <Stack.Screen name="feed" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.feed')) }} />
+      </Stack.Protected>
       <Stack.Screen name="search/index" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.search')) }} />
       {/* REVIEWS */}
       <Stack.Screen name="review/[review_id]/index" options={{ headerTitle: upperFirst(t('common.messages.review', { count: 1 })) }} />

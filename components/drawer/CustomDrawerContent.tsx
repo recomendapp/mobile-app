@@ -112,7 +112,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                         label={() => (
                             <View>
                                 {user ? <Text style={tw`text-xl font-semibold`}>{user.full_name}</Text> : <Skeleton style={tw`w-32 h-8`} />}
-                                {user ? <Text style={{ color: colors.mutedForeground }}>@{user.username}</Text> : <Skeleton style={tw`w-24 h-5`} />}
+                                {user ? <Text style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.view_profile'))}</Text> : <Skeleton style={tw`w-24 h-5`} />}
                             </View>
                         )}
                         icon={({ color, size }) => (

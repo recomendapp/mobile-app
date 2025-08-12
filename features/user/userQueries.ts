@@ -583,12 +583,14 @@ export const useUserFeedInfiniteQuery = ({
 export const useUserFeedCastCrewInfiniteQuery = ({
 	userId,
 	filters,
+	enabled = true,
 } : {
 	userId?: string;
 	filters?: {
 		resultsPerPage?: number;
 		order?: 'release_date-desc';
 	};
+	enabled?: boolean;
 }) => {
 	const mergedFilters = {
 		resultsPerPage: 20,
@@ -597,7 +599,7 @@ export const useUserFeedCastCrewInfiniteQuery = ({
 	};
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
-		queryKey: userKeys.feedCastCrew(userId as string, mergedFilters),
+		queryKey: userKeys.feedCastCrew(userId!, mergedFilters),
 		queryFn: async ({ pageParam = 1 }) => {
 			let from = (pageParam - 1) * mergedFilters.resultsPerPage;
 	  		let to = from - 1 + mergedFilters.resultsPerPage;
@@ -605,9 +607,10 @@ export const useUserFeedCastCrewInfiniteQuery = ({
 				.from('user_feed_cast_crew')
 				.select(`
 					*,
-					media:media_movie(title,avatar_url,extra_data,url,date),
+					media:media_movie!inner(id, media_id, title,avatar_url,extra_data,url,date, media_type, main_credit),
 					person:media_person(title,avatar_url,url)
 				`)
+				.not('media.date', 'is', null)
 				.range(from, to);
 			
 			if (mergedFilters) {
@@ -622,7 +625,7 @@ export const useUserFeedCastCrewInfiniteQuery = ({
 				}
 			}
 			const { data, error } = await request
-				.returns<UserFeedCastCrew[]>();
+				.overrideTypes<UserFeedCastCrew[], { merge: false }>();
 			if (error) throw error;
 			return data;
 		},
@@ -630,7 +633,7 @@ export const useUserFeedCastCrewInfiniteQuery = ({
 		getNextPageParam: (lastPage, pages) => {
 			return lastPage?.length == mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
 		},
-		enabled: !!userId,
+		enabled: !!userId && enabled,
 	});
 };
 /* -------------------------------------------------------------------------- */

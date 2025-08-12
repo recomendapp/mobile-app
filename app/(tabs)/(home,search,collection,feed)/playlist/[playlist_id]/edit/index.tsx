@@ -258,7 +258,7 @@ const ModalPlaylistEdit = () => {
 	<>
 		<Stack.Screen
 			options={{
-				headerTitle: upperFirst(t('common.messages.setting', { count: 2 })),
+				headerTitle: upperFirst(t('pages.playlist.actions.edit', { count: 2 })),
 				headerLeft: router.canDismiss() ? () => (
 					<Button
 					variant="ghost"

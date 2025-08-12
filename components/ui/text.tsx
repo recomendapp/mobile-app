@@ -17,6 +17,10 @@ type TextVariant =
 
 interface TextProps extends RNTextProps {
   variant?: TextVariant;
+  /**
+   * The color variant of the text.
+   * @default 'foreground'
+   */
   textColor?: 'default' | 'foreground' | 'muted' | 'destructive';
   children: React.ReactNode;
 }
@@ -36,6 +40,9 @@ export const Text = forwardRef<RNText, TextProps>(
     const { colors } = useTheme();
 
     const textStyle = useMemo((): TextStyle => {
+      const sharedStyles: TextStyle = {
+        flexShrink: 1
+      };
       const variantStyles: TextStyle = (() => {
         switch (variant) {
           case 'heading':
@@ -77,7 +84,7 @@ export const Text = forwardRef<RNText, TextProps>(
             break;
         }
       }
-      return { ...variantStyles, ...colorStyle };
+      return { ...sharedStyles, ...variantStyles, ...colorStyle };
 
     }, [variant, textColor, colors]);
 
