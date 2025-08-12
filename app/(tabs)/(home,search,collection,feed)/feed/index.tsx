@@ -46,13 +46,10 @@ const FeedScreen = () => {
 			onPosterPress={() => router.push(item.media?.url as Href)}
 			description={item.media?.extra_data.overview ?? ''}
 			content={
-				<Pressable
-				onPress={() => router.push(`/user/${item.user?.username}`)}
-				style={tw`flex-row items-center gap-1`}
-				>
+				<View style={tw`flex-row items-center gap-1`}>
 					<UserAvatar avatar_url={item.user?.avatar_url} full_name={item.user?.full_name!} style={tw`w-6 h-6`} />
 					<FeedUserActivity activity={item} style={[{ color: colors.mutedForeground }, tw`text-sm`]} />
-				</Pressable>
+				</View>
 			}
 			footer={item.review ? (
 				<CardReview activity={item} review={item?.review} author={item?.user!} style={{ backgroundColor: colors.background }} />

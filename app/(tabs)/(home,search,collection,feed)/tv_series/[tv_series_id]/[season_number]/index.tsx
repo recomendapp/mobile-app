@@ -7,7 +7,7 @@ import { MediaTvSeriesSeason } from "@/types/type.db";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
-import { getIdFromSlug } from "@/hooks/getIdFromSlug";
+import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import HeaderOverlay from "@/components/ui/HeaderOverlay";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Skeleton } from "@/components/ui/Skeleton";

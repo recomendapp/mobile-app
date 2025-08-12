@@ -17,7 +17,7 @@ import Animated, {
 import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
-import { title } from '@/hooks/custom-lodash';
+import { title } from '@/utils/custom-lodash';
 import { useTranslations } from 'use-intl';
 
 const { width: screenWidth } = Dimensions.get('window');

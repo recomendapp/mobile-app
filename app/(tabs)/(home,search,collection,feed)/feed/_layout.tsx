@@ -5,7 +5,7 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Pressable } from "react-native-gesture-handler";
 import { upperFirst } from "lodash";
-import { title } from "@/hooks/custom-lodash";
+import { title } from "@/utils/custom-lodash";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { Icons } from "@/constants/Icons";

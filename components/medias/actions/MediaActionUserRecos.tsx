@@ -1,11 +1,11 @@
 import React from "react"
 import { Pressable } from "react-native";
 import { Icons } from "@/constants/Icons";
-import { useTheme } from "@/providers/ThemeProvider";
 import { Media } from "@/types/type.db";
 import { useAuth } from "@/providers/AuthProvider";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
+import { ICON_ACTION_SIZE } from "@/theme/globals";
 
 interface MediaActionUserRecosProps
 	extends React.ComponentProps<typeof Button> {
@@ -15,8 +15,7 @@ interface MediaActionUserRecosProps
 const MediaActionUserRecos = React.forwardRef<
 	React.ComponentRef<typeof Pressable>,
 	MediaActionUserRecosProps
->(({ media, icon = Icons.Reco, variant = "ghost", size = "icon", onPress: onPressProps, ...props }, ref) => {
-	const { colors } = useTheme();
+>(({ media, icon = Icons.Reco, variant = "ghost", size = "icon", onPress: onPressProps, iconProps, ...props }, ref) => {
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -44,6 +43,10 @@ const MediaActionUserRecos = React.forwardRef<
 				});
 			}
 			onPressProps?.();
+		}}
+		iconProps={{
+			size: ICON_ACTION_SIZE,
+			...iconProps,
 		}}
 		{...props}
 		/>
