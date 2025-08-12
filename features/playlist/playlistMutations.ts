@@ -303,39 +303,27 @@ export const usePlaylistItemDeleteMutation = () => {
 	});
 };
 
-export const usePlaylistItemsUpsertMutation = () => {
+export const usePlaylistItemUpdateMutation = () => {
 	const supabase = useSupabaseClient();
-	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({
-			playlistId,
-			items,
+			id,
+			rank,
+			comment,
 		} : {
-			playlistId: number;
-			items: PlaylistItem[];
+			id: number;
+			rank?: number;
+			comment?: string;
 		}) => {
 			const { data, error } = await supabase
 				.from('playlist_items')
-				.upsert(
-					items.map(({ id, ...rest }) => ({
-						...rest,
-						playlist_id: playlistId,
-					})), {
-						onConflict: "id",
-						defaultToNull: false,
-					}
-				)
-				.select(`
-					*,
-					media(*)
-				`)
+				.update({
+					rank,
+					comment,
+				})
+				.eq('id', id)
 			if (error) throw error;
-			return { playlistId, data };
-		},
-		onSuccess: ({ playlistId, data }) => {
-			queryClient.setQueryData(playlistKeys.items(playlistId), (oldData: PlaylistItem[]) => {
-				return [...oldData.filter(item => !data.some(d => d.id === item.id)), ...data].sort((a, b) => a.rank - b.rank);
-			});
+			return { id, data };
 		}
 	});
 };

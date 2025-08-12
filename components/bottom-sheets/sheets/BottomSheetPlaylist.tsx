@@ -125,12 +125,12 @@ const BottomSheetPlaylist = React.forwardRef<
           {
             icon: Icons.Users,
             onPress: () => router.push(`/playlist/${playlist.id}/edit/guests`),
-            label: upperFirst(t('common.messages.guest', { gender: 'male', count: 2 })),
+            label: upperFirst(t('common.messages.manage_guests', { gender: 'male', count: 2 })),
           },
           {
             icon: Icons.settings,
             onPress: () => router.push(`/playlist/${playlist.id}/edit`),
-            label: upperFirst(t('common.messages.setting', { count: 2 })),
+            label: upperFirst(t('pages.playlist.actions.edit', { count: 2 })),
           },
           {
             icon: Icons.Delete,

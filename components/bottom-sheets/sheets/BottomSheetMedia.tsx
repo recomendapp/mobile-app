@@ -127,7 +127,7 @@ const BottomSheetMedia = React.forwardRef<
       ...additionalItemsBottom,
     ],
   ]), [media, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, activity, session]);
-
+  
   return (
     <ThemedTrueSheet
     ref={ref}

@@ -95,7 +95,7 @@ const ModalPlaylistEditGuests = () => {
 	// Handlers
 	const handleToggleEdit = useCallback((userId: string) => {
 		if (!user?.premium) {
-			router.push({ pathname: '/upgrade', params: { features: app.features.playlist_collaborators } });
+			router.push({ pathname: '/upgrade', params: { feature: app.features.playlist_collaborators } });
 			return;
 		}
 		setGuests((prev) => {
@@ -260,7 +260,7 @@ const ModalPlaylistEditGuests = () => {
 	<>
 		<Stack.Screen
 			options={{
-				headerTitle: upperFirst(t('common.messages.guest', { gender: 'male', count: 2 })),
+				headerTitle: upperFirst(t('common.messages.manage_guests', { gender: 'male', count: 2 })),
 				headerLeft: router.canDismiss() ? () => (
 					<Button
 					variant="ghost"

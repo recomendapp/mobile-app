@@ -5,25 +5,27 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { Media } from "@/types/type.db";
 import { useAuth } from "@/providers/AuthProvider";
 import { usePathname, useRouter } from "expo-router";
-
-const ICON_SIZE = 24;
+import { Button } from "@/components/ui/Button";
 
 interface MediaActionPlaylistAddProps
-	extends React.ComponentProps<typeof Pressable> {
+	extends React.ComponentProps<typeof Button> {
 		media: Media;
 	}
 
 const MediaActionPlaylistAdd = React.forwardRef<
 	React.ComponentRef<typeof Pressable>,
 	MediaActionPlaylistAddProps
->(({ media, style, ...props }, ref) => {
+>(({ media, icon = Icons.AddPlaylist, variant = "ghost", size = "icon", onPress: onPressProps, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
 	return (
-		<Pressable
+		<Button
 		ref={ref}
+		variant={variant}
+		icon={icon}
+		size={size}
 		onPress={() => {
 			if (session) {
 				media.media_id && router.push({
@@ -41,11 +43,10 @@ const MediaActionPlaylistAdd = React.forwardRef<
 					},
 				});
 			}
+			onPressProps?.();
 		}}
 		{...props}
-		>
-			<Icons.AddPlaylist color={colors.foreground} size={ICON_SIZE} />
-		</Pressable>
+		/>
 	);
 });
 MediaActionPlaylistAdd.displayName = 'MediaActionPlaylistAdd';
