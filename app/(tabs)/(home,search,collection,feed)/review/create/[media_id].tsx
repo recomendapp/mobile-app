@@ -3,7 +3,7 @@ import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
 import { useMediaDetailsQuery } from "@/features/media/mediaQueries";
 import { useUserActivityQuery } from "@/features/user/userQueries";
-import { getIdFromSlug } from "@/hooks/getIdFromSlug";
+import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import tw from "@/lib/tw";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native"

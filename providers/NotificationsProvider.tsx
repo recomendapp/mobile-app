@@ -7,10 +7,11 @@ import * as Device from 'expo-device';
 import { useRouter } from "expo-router";
 import * as Burnt from 'burnt';
 import { NotificationPayload } from "@/types";
+// import { NovuProvider } from "@novu/react-native";
 
 type NotificationsContextType = {
   permissionStatus: Notifications.PermissionStatus | null;
-  expoPushToken: string | null;
+  pushToken: string | null;
   notifications: Notifications.Notification[] | null;
   error?: Error | null;
 };
@@ -26,9 +27,8 @@ export const useNotifications = () => {
 export const NotificationsProvider = ({ children }: { children: React.ReactNode }) => {
   const supabase = useSupabaseClient();
   const router = useRouter();
-  const { session } = useAuth();
+  const { session, pushToken, setPushToken } = useAuth();
   const [permissionStatus, setPermissionStatus] = useState<Notifications.PermissionStatus | null>(null);
-  const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<Notifications.Notification[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
@@ -81,7 +81,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
           device_type: Platform.OS,
           provider: provider,
           updated_at: new Date().toISOString(),
-        }, { onConflict: "user_id, device_type, provider, token" });
+        }, { onConflict: "user_id, provider, token" });
       if (error) throw error;
     } catch (err) {
       console.error("Error saving push token:", err);
@@ -127,7 +127,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     // Register token
     handleRegisterForPushNotificationsAsync().then(
       async (token) => {
-        setExpoPushToken(token);
+        setPushToken(token);
         await handleSaveToken(token);
       },
       (err) => {
@@ -168,12 +168,11 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     };
   }, [session]);
 
-
-  return (
+  const defaultProvider = (
     <NotificationsContext.Provider
     value={{
       permissionStatus: permissionStatus,
-      expoPushToken: expoPushToken,
+      pushToken: pushToken,
       notifications: notifications,
       error: error,
     }}
@@ -181,4 +180,14 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
       {children}
     </NotificationsContext.Provider>
   );
+
+  if (!session) return defaultProvider;
+
+  return (
+    <>
+    {/* <NovuProvider subscriberId={session.user.id} applicationIdentifier={process.env.EXPO_PUBLIC_NOVU_APPLICATION_IDENTIFIER!}> */}
+      {defaultProvider}
+    {/* </NovuProvider> */}
+    </>
+  )
 };

@@ -43,6 +43,8 @@ type AuthContextProps = {
 	verifyEmailChange: (email: string, token: string) => Promise<void>;
 	cancelPendingEmailChange: () => Promise<void>;
 	createSessionFromUrl: (url: string) => Promise<Session | null>;
+	pushToken: string | null;
+	setPushToken: (token: string | null) => void;
 };
 
 type AuthProviderProps = {
@@ -56,6 +58,7 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 	const { setLocale } = useLocaleContext();
 	const supabase = useSupabaseClient();
 	const [session, setSession] = useState<Session | null | undefined>(undefined);
+	const [pushToken, setPushToken] = useState<string | null>(null);
 	const {
 		data: user,
 	} = useUserQuery({
@@ -118,6 +121,9 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 	};
 
 	const logout = async () => {
+		if (pushToken) {
+			await supabase.from("user_notification_tokens").delete().match({ token: pushToken });
+		}
 		const { error } = await supabase.auth.signOut();
 		if (error) throw error;
 		setSession(null);
@@ -214,6 +220,8 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			verifyEmailChange: verifyEmailChange,
 			cancelPendingEmailChange: cancelPendingEmailChange,
 			createSessionFromUrl: createSessionFromUrl,
+			pushToken: pushToken,
+			setPushToken: setPushToken,
 		}}
 		>
 			{children}

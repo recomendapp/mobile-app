@@ -1,6 +1,6 @@
 import MediaReviews from "@/components/screens/media/MediaReviews";
 import { useMediaTvSeriesDetailsQuery } from "@/features/media/mediaQueries";
-import { getIdFromSlug } from "@/hooks/getIdFromSlug";
+import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
 import { useLocale, useTranslations } from "use-intl";

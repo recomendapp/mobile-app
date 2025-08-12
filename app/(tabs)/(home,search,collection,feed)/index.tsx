@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useAuth } from '@/providers/AuthProvider';
-import { Link, useNavigation } from 'expo-router';
+import { Link, useNavigation, useRouter } from 'expo-router';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 import tw from '@/lib/tw';
 import { Button } from '@/components/ui/Button';
@@ -20,9 +20,11 @@ import { UserNav } from '@/components/user/UserNav';
 import { Skeleton } from '@/components/ui/Skeleton';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import AnimatedStackScreen from '@/components/ui/AnimatedStackScreen';
+import { View } from '@/components/ui/view';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const router = useRouter();
   const t = useTranslations();
   const { session, user } = useAuth();
   const { bottomTabHeight, colors } = useTheme();
@@ -60,8 +62,17 @@ const HomeScreen = () => {
           )
         ),
         headerRight: () => (
-          session ? (
-            <UserNav />
+          <View style={tw`flex-row items-center gap-2`}>
+          {session ? (
+            <>
+              <Button
+              variant='ghost'
+              icon={Icons.Bell}
+              size='icon'
+              onPress={() => router.push('/notifications')}
+              />
+              <UserNav />
+            </>
           ) : (
             <Button
             variant="ghost"
@@ -69,7 +80,8 @@ const HomeScreen = () => {
             icon={Icons.Menu}
             onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
             />
-          )
+          )}
+          </View>
         )
       }}
       />

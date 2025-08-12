@@ -33,6 +33,8 @@ import BottomSheetMediaFollowersAverageRating from '@/components/bottom-sheets/s
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useTranslations } from 'use-intl';
 import { Text } from '@/components/ui/text';
+import { useHeaderHeight } from '@react-navigation/elements';
+import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 
 interface MediaHeaderProps {
 	media?: Media | null;
@@ -49,9 +51,10 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 	headerOverlayHeight,
 }) => {
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
+	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const { hslToRgb } = useColorConverter();
-	const { colors, inset } = useTheme();
+	const { colors } = useTheme();
 	const bgColor = hslToRgb(colors.background);
 	const {
 		data: followersAvgRating,
@@ -78,7 +81,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + inset.top) / 0.8],
+				[0, headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight) / 0.8],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -92,7 +95,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + inset.top) / 0.8],
+				[0, headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight) / 0.8],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -100,7 +103,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 				{
 					scale: interpolate(
 					scrollY.get(),
-					[0, (headerHeight.get() - (headerOverlayHeight.get() + inset.top)) / 2],
+					[0, (headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight)) / 2],
 					[1, 0.95],
 					'clamp',
 					),
@@ -128,6 +131,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 	<Animated.View
 	style={[
 		tw.style('w-full'),
+		{ paddingTop: navigationHeaderHeight }
 	]}
 	onLayout={(event: LayoutChangeEvent) => {
 		'worklet';
@@ -156,8 +160,8 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 		</Animated.View>
 		<Animated.View
 		style={[
-			tw.style('items-center gap-4 py-2 px-4'),
-			{ paddingTop: inset.top === 0 ? 8 : inset.top }
+			tw.style('items-center gap-4'),
+			{ paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }
 		]}
 		>
 			{!loading ? (
@@ -247,8 +251,8 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 			</Animated.View>
 		</Animated.View>
 		{media ? (
-		<View style={tw`flex-row items-center justify-between gap-4 py-2 px-4`}>
-			<View style={tw`flex-row items-center gap-4`}>
+		<View style={[tw`flex-row items-center justify-between gap-4`, { paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }]}>
+			<View style={tw`flex-row items-center gap-1`}>
 				<MediaActionUserActivityRating media={media} />
 				<MediaActionUserActivityLike media={media} />
 				<MediaActionUserActivityWatch media={media} />

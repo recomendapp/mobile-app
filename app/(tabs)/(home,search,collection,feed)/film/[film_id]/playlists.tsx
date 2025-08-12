@@ -1,6 +1,6 @@
 import MediaPlaylists from "@/components/screens/media/MediaPlaylists";
 import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
-import { getIdFromSlug } from "@/hooks/getIdFromSlug";
+import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useLocale, useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";

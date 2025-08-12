@@ -1,6 +1,7 @@
 
 import ButtonCreatePlaylist from "@/components/buttons/ButtonCreatePlaylist";
 import { Button } from "@/components/ui/Button";
+import { Text } from "@/components/ui/text";
 import { UserNav } from "@/components/user/UserNav";
 import tw from "@/lib/tw";
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
@@ -12,6 +13,8 @@ import { View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { useTranslations } from "use-intl";
+import { HeaderTitle } from "@react-navigation/elements";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -87,17 +90,26 @@ const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => 
 
 const CollectionLayout = () => {
 	const t = useTranslations();
+	const { colors } = useTheme();
 	return (
 	<>
 		<Stack.Screen
 		options={{
-			headerTitle: upperFirst(t('common.messages.library')),
-			headerRight: () => (
-			<View style={tw`flex-row items-center gap-2`}>
+			headerTitle: () => <></>,
+			title: upperFirst(t('common.messages.library')),
+			headerLeft: () => (
+			<View style={tw`flex-row items-center gap-1`}>
+				<HeaderTitle tintColor={colors.foreground}>{upperFirst(t('common.messages.library'))}</HeaderTitle>
 				<ButtonCreatePlaylist redirectAfterCreate={false} />
-				<UserNav />
 			</View>
 			),
+			// headerRight: () => (
+			// <View style={tw`flex-row items-center gap-2`}>
+			// 	{/* <ButtonCreatePlaylist redirectAfterCreate={false} /> */}
+			// 	<UserNav />
+			// </View>
+			// ),
+			headerRight: () => <UserNav />,
 		}}
 		/>
 		<MaterialTopTabs

@@ -8,7 +8,7 @@ import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { LegendList } from "@legendapp/list";
-import { getIdFromSlug } from "@/hooks/getIdFromSlug";
+import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import BottomSheetMedia from "@/components/bottom-sheets/sheets/BottomSheetMedia";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useState } from "react";

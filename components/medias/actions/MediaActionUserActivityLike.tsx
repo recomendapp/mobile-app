@@ -15,18 +15,18 @@ import * as Haptics from "expo-haptics";
 import { interpolateColor, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
-
-const ICON_SIZE = 24;
+import { Button } from "@/components/ui/Button";
+import { ICON_ACTION_SIZE } from "@/theme/globals";
 
 interface MediaActionUserActivityLikeProps
-	extends React.ComponentProps<typeof Pressable> {
+	extends React.ComponentProps<typeof Button> {
 		media: Media;
 	}
 
 const MediaActionUserActivityLike = React.forwardRef<
-	React.ComponentRef<typeof Pressable>,
+	React.ComponentRef<typeof Button>,
 	MediaActionUserActivityLikeProps
->(({ media, style, ...props }, ref) => {
+>(({ media, icon = Icons.like, variant = "ghost", size = "icon", onPress: onPressProps, iconProps, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session, user } = useAuth();
 	const router = useRouter();
@@ -112,41 +112,14 @@ const MediaActionUserActivityLike = React.forwardRef<
 		});
 	};
 
-	const anim = useAnimatedProps(() => {
-		const color = interpolateColor(
-			isLiked.get(),
-			[0, 1],
-			[
-				colors.foreground,
-				colors.accentPink,
-			]
-		);
-		const fill = interpolateColor(
-			isLiked.get(),
-			[0, 1],
-			[
-				'transparent',
-				colors.accentPink,
-			]
-		);
-		return {
-			color,
-			fill,
-		}
-	});
-
-	React.useEffect(() => {
-		isLiked.value = withTiming(activity?.is_liked ? 1 : 0)
-	}, [activity?.is_liked]);
-
 	return (
-		<Pressable
+		<Button
 		ref={ref}
+		variant={variant}
+		icon={icon}
+		size={size}
 		onPress={() => {
 			if (session) {
-				if (process.env.EXPO_OS === 'ios') {
-					Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-				}
 				activity?.is_liked ? handleUnlike() : handleLike();
 			} else {
 				router.push({
@@ -156,20 +129,16 @@ const MediaActionUserActivityLike = React.forwardRef<
 					},
 				});
 			}
+			onPressProps?.();
 		}}
-		disabled={
-			session ? (
-				isLoading || isError || activity === undefined || insertActivity.isPending || updateActivity.isPending
-			) : false
-		}
+		iconProps={{
+			color: activity?.is_liked ? colors.accentPink : colors.foreground,
+			fill: activity?.is_liked ? colors.accentPink : undefined,
+			size: ICON_ACTION_SIZE,
+			...iconProps,
+		}}
 		{...props}
-		>
-		{isError ? (
-			<AlertCircleIcon size={ICON_SIZE} />
-		) : (
-			<Icons.like color={activity?.is_liked ? colors.accentPink : colors.foreground} fill={activity?.is_liked ? colors.accentPink : undefined} size={ICON_SIZE} />
-		)}
-		</Pressable>
+		/>
 	);
 });
 MediaActionUserActivityLike.displayName = 'MediaActionUserActivityLike';

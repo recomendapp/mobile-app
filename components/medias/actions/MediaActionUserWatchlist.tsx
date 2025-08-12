@@ -12,18 +12,20 @@ import { upperFirst } from "lodash";
 import * as Haptics from "expo-haptics";
 import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
+import { Button } from "@/components/ui/Button";
+import { ICON_ACTION_SIZE } from "@/theme/globals";
 
 const ICON_SIZE = 24;
 
 interface MediaActionUserWatchlistProps
-	extends React.ComponentProps<typeof Pressable> {
+	extends React.ComponentProps<typeof Button> {
 		media: Media;
 	}
 
 const MediaActionUserWatchlist = React.forwardRef<
-	React.ComponentRef<typeof Pressable>,
+	React.ComponentRef<typeof Button>,
 	MediaActionUserWatchlistProps
->(({ media, style, ...props }, ref) => {
+>(({ media, icon = Icons.Watchlist, variant = "ghost", size = "icon", onPress: onPressProps, iconProps, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session, user } = useAuth();
 	const router = useRouter();
@@ -92,6 +94,34 @@ const MediaActionUserWatchlist = React.forwardRef<
 		  }
 		});
 	};
+
+	return (
+		<Button
+		ref={ref}
+		variant={variant}
+		icon={icon}
+		size={size}
+		onPress={() => {
+			if (session) {
+				watchlist ? handleUnwatchlist() : handleWatchlist();
+			} else {
+				router.push({
+					pathname: '/auth',
+					params: {
+						redirect: pathname,
+					},
+				});
+			}
+			onPressProps?.();
+		}}
+		iconProps={{
+			fill: watchlist ? colors.foreground : undefined,
+			size: ICON_ACTION_SIZE,
+			...iconProps
+		}}
+		{...props}
+		/>
+	)
 
 	return (
 		<Pressable

@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import BottomSheetPlaylistCreate from "../bottom-sheets/sheets/BottomSheetPlaylistCreate";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { Button } from "../ui/Button";
+import tw from "@/lib/tw";
 
 interface ButtonCreatePlaylistProps extends React.ComponentPropsWithoutRef<typeof Button> {
 	redirectAfterCreate?: boolean;
@@ -13,7 +14,7 @@ interface ButtonCreatePlaylistProps extends React.ComponentPropsWithoutRef<typeo
 const ButtonCreatePlaylist = forwardRef<
   React.ComponentRef<typeof Button>,
   ButtonCreatePlaylistProps
->(({ variant = "ghost", icon = Icons.Add, size = "icon", onPress, redirectAfterCreate = true, ...props }, ref) => {
+>(({ variant = "muted", icon = Icons.Add, size = "icon", onPress, redirectAfterCreate = true, ...props }, ref) => {
 	const { colors } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const router = useRouter();
@@ -32,6 +33,7 @@ const ButtonCreatePlaylist = forwardRef<
 		icon={icon}
 		size={size}
 		onPress={handlePress}
+		style={tw`rounded-full`}
 		{...props}
 		/>
 	)
