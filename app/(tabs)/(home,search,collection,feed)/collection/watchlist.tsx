@@ -66,7 +66,7 @@ const WatchlistScreen = () => {
 
     const sortByOptions = React.useMemo((): SortByOption<UserWatchlist>[] => ([
         {
-            label: upperFirst(t('common.messages.date_updated')),
+            label: upperFirst(t('common.messages.date_added')),
             value: 'created_at',
             defaultOrder: 'desc',
             sortFn: (a, b, order) => {
@@ -75,6 +75,18 @@ const WatchlistScreen = () => {
                 return order === 'asc' ? aTime - bTime : bTime - aTime;
             },
         },
+		{
+			label: upperFirst(t('common.messages.release_date')),
+			value: 'release_date',
+			defaultOrder: 'desc',
+			sortFn: (a, b, order) => {
+				if (!a.media?.date) return 1;
+				if (!b.media?.date) return -1;
+				const aTime = new Date(a.media.date).getTime();
+				const bTime = new Date(b.media.date).getTime();
+				return order === 'asc' ? aTime - bTime : bTime - aTime;
+			}
+		},
         {
             label: upperFirst(t('common.messages.alphabetical')),
             value: 'alphabetical',

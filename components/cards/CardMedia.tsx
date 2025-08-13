@@ -13,6 +13,7 @@ import { IconMediaRating } from "../medias/IconMediaRating";
 import MediaActionUserActivityRating from "../medias/actions/MediaActionUserActivityRating";
 import { FixedOmit } from "@/types";
 import { Skeleton } from "../ui/Skeleton";
+import app from "@/constants/app";
 
 interface CardMediaBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -91,6 +92,7 @@ const CardMediaPoster = React.forwardRef<
 React.ComponentRef<typeof Animated.View>,
 	FixedOmit<CardMediaProps, "variant" | "linked" | "onPress" | "onLongPress">
 >(({ style, media, skeleton, activity, profileActivity, disableActions, showRating, children, ...props }, ref) => {
+	const voteAverage = media?.vote_count! > app.ratings.countThreshold ? media?.vote_average : media?.tmdb_vote_average;
 	return (
 		<Animated.View
 			ref={ref}
@@ -106,16 +108,15 @@ React.ComponentRef<typeof Animated.View>,
 				alt={media.title ?? ''}
 				type={media.media_type}
 			/> : <Skeleton style={tw.style('w-full h-full')} />}
-			{!skeleton && (media.vote_average
-			|| media.tmdb_vote_average
+			{!skeleton && (voteAverage
 			|| profileActivity?.rating
 			|| profileActivity?.is_liked
 			|| profileActivity?.review
 			) ? (
 				<View style={tw`absolute top-1 right-1 flex-col gap-1`}>
-					{(media.vote_average || media.tmdb_vote_average) ?
+					{voteAverage ?
 					<IconMediaRating
-					rating={media.vote_average ?? media.tmdb_vote_average}
+					rating={voteAverage}
 					/> : null}
 					{(profileActivity?.is_liked
 					|| profileActivity?.rating

@@ -15,7 +15,7 @@ interface MediaActionPlaylistAddProps
 const MediaActionPlaylistAdd = React.forwardRef<
 	React.ComponentRef<typeof Pressable>,
 	MediaActionPlaylistAddProps
->(({ media, icon = Icons.AddPlaylist, variant = "ghost", size = "icon", onPress: onPressProps, iconProps, ...props }, ref) => {
+>(({ media, icon = Icons.AddPlaylist, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
