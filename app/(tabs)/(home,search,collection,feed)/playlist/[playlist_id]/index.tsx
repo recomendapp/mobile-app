@@ -16,8 +16,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { usePlaylistItemDeleteMutation, usePlaylistItemsQueryRealtimeMutation } from "@/features/playlist/playlistMutations";
 import * as Burnt from "burnt";
-import { Button } from "@/components/ui/Button";
 import { CardUser } from "@/components/cards/CardUser";
+import { Text } from "@/components/ui/text";
+import { View } from "@/components/ui/view";
+import tw from "@/lib/tw";
+import { Button } from "@/components/ui/Button";
+import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
+import { useSharedValue } from "react-native-reanimated";
+import ButtonActionPlaylistLike from "@/components/buttons/ButtonActionPlaylistLike";
+import ButtonActionPlaylistSaved from "@/components/buttons/ButtonActionPlaylistSaved";
 
 const PlaylistScreen = () => {
 	const t = useTranslations();
@@ -45,6 +52,10 @@ const PlaylistScreen = () => {
 	const { mutate: updatePlaylistItemChanges } = usePlaylistItemsQueryRealtimeMutation({
 		playlistId: playlist?.id,
 	});
+
+	// SharedValues
+	const scrollY = useSharedValue(0);
+	const headerHeight = useSharedValue(0);
 
 	// Handlers
 	const handleDeletePlaylistItem = useCallback((data: PlaylistItem) => {
@@ -206,50 +217,80 @@ const PlaylistScreen = () => {
 	}, [debouncedRefresh, playlistItems.refetch]);
 
 	return (
-	<CollectionScreen
-	// Query
-	queryData={playlistItems}
-	screenTitle={playlist?.title ?? ''}
-	screenSubtitle={playlist?.user ? <CardUser variant="inline" user={playlist?.user} /> : <CardUser variant="inline" skeleton />}
-	// Search
-	searchPlaceholder={upperFirst(t('pages.playlist.search.placeholder'))}
-	fuseKeys={[
-		{
-			name: 'title',
-			getFn: (item) => item.media?.title || '',
-		},
-	]}
-	// Sort
-	sortByOptions={sortByOptions}
-	// Getters
-	getItemId={(item) => item.id!}
-	getItemMedia={(item) => item.media!}
-	getItemTitle={(item) => item.media?.title || ''}
-	getItemSubtitle={(item) => item.media?.main_credit?.map((director) => director.title).join(', ') || ''}
-	getItemImageUrl={(item) => item.media?.avatar_url || ''}
-	getItemUrl={(item) => item.media?.url || ''}
-	getItemBackdropUrl={(item) => item.media?.backdrop_url || ''}
-	getCreatedAt={(item) => item.created_at!}
-	// Actions
-	bottomSheetActions={bottomSheetActions}
-	swipeActions={swipeActions}
-	// Menu
-	stackScreenProps={{
-		onMenuPress: playlist ? () => {
-			openSheet(BottomSheetPlaylist, {
-				playlist: playlist,
-			})
-		} : undefined
-	}}
-	// Button
-	additionalToolbarItems={isAllowedToEdit ? [
-		{
-			label: upperFirst(t('common.messages.edit_order')),
-			icon: Icons.ListOrdered,
-			onPress: () => router.push(`/playlist/${playlist?.id}/sort`),
-		}
-	] : undefined}
-	/>
+	<>
+		<AnimatedStackScreen
+		options={{
+			headerTitle: playlist?.title ?? '',
+			headerRight: playlist ? () => (
+				<View style={tw`flex-row items-center`}>
+					{session && playlist && session.user.id !== playlist.user_id && (
+						<>
+						<ButtonActionPlaylistLike playlistId={playlist.id} />
+						<ButtonActionPlaylistSaved playlistId={playlist.id} />
+						</>
+					)}
+					<Button
+					variant="ghost"
+					size="icon"
+					icon={Icons.EllipsisVertical}
+					onPress={() => openSheet(BottomSheetPlaylist, {
+						playlist: playlist
+					})}
+					/>
+				</View>
+			) : undefined
+		}}
+		scrollY={scrollY}
+		triggerHeight={headerHeight}
+		/>
+		<CollectionScreen
+		// Query
+		queryData={playlistItems}
+		screenTitle={playlist?.title ?? ''}
+		screenSubtitle={playlist?.user ? (
+			<View style={tw`items-center gap-1`}>
+				<CardUser variant="inline" user={playlist?.user} />
+				{playlist.description && <Text textColor="muted">{playlist.description}</Text>}
+			</View>
+		) : <CardUser variant="inline" skeleton />}
+		showPoster={true}
+		poster={playlist?.poster_url || undefined}
+		posterType={"playlist"}
+		// Search
+		searchPlaceholder={upperFirst(t('pages.playlist.search.placeholder'))}
+		fuseKeys={[
+			{
+				name: 'title',
+				getFn: (item) => item.media?.title || '',
+			},
+		]}
+		// Sort
+		sortByOptions={sortByOptions}
+		// Getters
+		getItemId={(item) => item.id!}
+		getItemMedia={(item) => item.media!}
+		getItemTitle={(item) => item.media?.title || ''}
+		getItemSubtitle={(item) => item.media?.main_credit?.map((director) => director.title).join(', ') || ''}
+		getItemImageUrl={(item) => item.media?.avatar_url || ''}
+		getItemUrl={(item) => item.media?.url || ''}
+		getItemBackdropUrl={(item) => item.media?.backdrop_url || ''}
+		getCreatedAt={(item) => item.created_at!}
+		// Actions
+		bottomSheetActions={bottomSheetActions}
+		swipeActions={swipeActions}
+		// Button
+		additionalToolbarItems={isAllowedToEdit ? [
+			{
+				label: upperFirst(t('common.messages.edit_order')),
+				icon: Icons.ListOrdered,
+				onPress: () => router.push(`/playlist/${playlist?.id}/sort`),
+			}
+		] : undefined}
+		// SharedValues
+		scrollY={scrollY}
+		headerHeight={headerHeight}
+		/>
+	</>
 	)
 };
 

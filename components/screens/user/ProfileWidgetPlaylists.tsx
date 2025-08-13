@@ -53,6 +53,8 @@ const ProfileWidgetPlaylists = ({
 			key={item.id}
 			playlist={item}
 			style={tw`w-32`}
+			showItemsCount
+			showPlaylistAuthor={false}
 			/>
 		)}
 		snapToInterval={136}

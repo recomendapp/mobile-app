@@ -4,14 +4,13 @@ import { Icons } from "@/constants/Icons";
 import { useMediaReviewsInfiniteQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
+import { PADDING_VERTICAL } from "@/theme/globals";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useCallback, useState } from "react";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
-
-const PADDING_BOTTOM = 8;
 
 interface sortBy {
 	label: string;
@@ -101,7 +100,7 @@ const MediaReviews = ({
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			},
 			tw`px-4`,
 		]}

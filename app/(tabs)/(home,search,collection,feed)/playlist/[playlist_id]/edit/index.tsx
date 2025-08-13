@@ -10,7 +10,7 @@ import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { Input } from "@/components/ui/Input";
 import { Href, Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { Pressable, ScrollView } from "react-native-gesture-handler";
+import { Pressable } from "react-native-gesture-handler";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { Label } from "@/components/ui/Label";
@@ -258,7 +258,7 @@ const ModalPlaylistEdit = () => {
 	<>
 		<Stack.Screen
 			options={{
-				headerTitle: upperFirst(t('pages.playlist.actions.edit', { count: 2 })),
+				headerTitle: upperFirst(t('common.messages.edit_playlist')),
 				headerLeft: router.canDismiss() ? () => (
 					<Button
 					variant="ghost"

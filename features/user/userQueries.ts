@@ -701,6 +701,37 @@ export const useUserPlaylistsInfiniteQuery = ({
 	});
 };
 
+// Likes
+export const useUserPlaylistLikeQuery = ({
+	userId,
+	playlistId,
+} : {
+	userId?: string;
+	playlistId: number;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: userKeys.playlistLike({
+			userId: userId!,
+			playlistId: playlistId!,
+		}),
+		queryFn: async () => {
+			if (!userId) throw Error('Missing user id');
+			if (!playlistId) throw Error('Missing playlist id');
+			const { data, error } = await supabase
+				.from('playlists_likes')
+				.select('*')
+				.eq('user_id', userId)
+				.eq('playlist_id', playlistId)
+				.maybeSingle();
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!userId && !!playlistId,
+	});
+};
+
+// Saved
 export const useUserPlaylistsSavedInfiniteQuery = ({
 	userId,
 	filters,

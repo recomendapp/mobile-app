@@ -789,21 +789,82 @@ export const useUserWatchlistUpdateMutation = () => {
 /* -------------------------------------------------------------------------- */
 
 /* -------------------------------- PLAYLIST -------------------------------- */
+// Likes
+export const useUserPlaylistLikeInsertMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			userId,
+			playlistId,
+		} : {
+			userId: string;
+			playlistId: number;
+		}) => {
+			const { data, error } = await supabase
+				.from('playlists_likes')
+				.insert({
+					user_id: userId,
+					playlist_id: playlistId,
+				})
+				.select()
+				.single()
+			if (error) throw error;
+			return data;
+		},
+		onSuccess: (data) => {
+			queryClient.setQueryData(userKeys.playlistLike({
+				userId: data.user_id,
+				playlistId: data.playlist_id,
+			}), data);
+		}
+	});
+};
+
+export const useUserPlaylistLikeDeleteMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			likeId,
+		} : {
+			likeId: number;
+		}) => {
+			const { data, error } = await supabase
+				.from('playlists_likes')
+				.delete()
+				.eq('id', likeId)
+				.select()
+				.single();
+			if (error) throw error;
+			return data;
+		},
+		onSuccess: (data) => {
+			queryClient.setQueryData(userKeys.playlistLike({
+				userId: data.user_id,
+				playlistId: data.playlist_id,
+			}), null);
+		}
+	});
+};
+
+// Saved
 export const useUserPlaylistSavedInsertMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const { user } = useAuth();
 	return useMutation({
 		mutationFn: async ({
+			userId,
 			playlistId,
 		} : {
+			userId: string;
 			playlistId: number;
 		}) => {
-			if (!user) throw Error('Missing user');
+			if (!userId) throw Error('Missing user');
 			const { data, error } = await supabase
 				.from('playlists_saved')
 				.insert({
-					user_id: user.id,
+					user_id: userId,
 					playlist_id: playlistId,
 				})
 				.select()

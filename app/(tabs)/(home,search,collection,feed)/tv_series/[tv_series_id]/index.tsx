@@ -20,8 +20,7 @@ import { RefreshControl } from "react-native-gesture-handler";
 import { useLocale, useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
-
-const PADDING_BOTTOM = 8;
+import { PADDING_VERTICAL } from "@/theme/globals";
 
 const TvSeriesScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
@@ -74,7 +73,7 @@ const TvSeriesScreen = () => {
 		scrollToOverflowEnabled
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			},
 		]}
 		refreshControl={

@@ -41,8 +41,7 @@ const BottomSheetPlaylist = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetPlaylistProps
 >(({ id, playlist, additionalItemsTop = [], ...props }, ref) => {
-  const { user } = useAuth();
-  const openSheet = useBottomSheetStore((state) => state.openSheet);
+  const { session } = useAuth();
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors, inset } = useTheme();
   const router = useRouter();
@@ -54,14 +53,14 @@ const BottomSheetPlaylist = React.forwardRef<
 		data: saved,
 		isLoading: isLoadingSaved,
 	} = useUserPlaylistSavedQuery({
-		userId: user?.id,
+		userId: session?.user.id,
 		playlistId: playlist.id,
 	});
 	const insertPlaylistSaved = useUserPlaylistSavedInsertMutation();
 	const deletePlaylistSaved = useUserPlaylistSavedDeleteMutation();
 
   const playlistDeleteMutation = usePlaylistDeleteMutation({
-    userId: user?.id,
+    userId: session?.user.id,
   });
 
   const items: Item[][] = React.useMemo(() => {
@@ -70,7 +69,7 @@ const BottomSheetPlaylist = React.forwardRef<
         ...additionalItemsTop,
       ],
       [
-        ...(user?.id && playlist.user?.id !== user.id ? [
+        ...(session?.user.id && playlist.user?.id !== session.user.id ? [
           {
             icon: saved
               ? Icons.Check
@@ -91,6 +90,7 @@ const BottomSheetPlaylist = React.forwardRef<
                 });
               } else {
                 await insertPlaylistSaved.mutateAsync({
+                  userId: session.user.id,
                   playlistId: playlist.id,
                 }, {
                   onError: () => {
@@ -121,7 +121,7 @@ const BottomSheetPlaylist = React.forwardRef<
           onPress: () => router.push(`/user/${playlist.user?.username}`),
           label: upperFirst(t('common.messages.go_to_user')),
         },
-        ...(user?.id === playlist.user?.id ? [
+        ...(session?.user.id === playlist.user?.id ? [
           {
             icon: Icons.Users,
             onPress: () => router.push(`/playlist/${playlist.id}/edit/guests`),
@@ -130,7 +130,7 @@ const BottomSheetPlaylist = React.forwardRef<
           {
             icon: Icons.settings,
             onPress: () => router.push(`/playlist/${playlist.id}/edit`),
-            label: upperFirst(t('pages.playlist.actions.edit', { count: 2 })),
+            label: upperFirst(t('common.messages.edit_playlist')),
           },
           {
             icon: Icons.Delete,
@@ -180,7 +180,7 @@ const BottomSheetPlaylist = React.forwardRef<
         ] : []),
       ]
     ]
-  }, [playlist, user, saved, additionalItemsTop, colors, t, router, closeSheet, id, playlistDeleteMutation, insertPlaylistSaved, deletePlaylistSaved]);
+  }, [playlist, session, saved, additionalItemsTop, colors, t, router, closeSheet, id, playlistDeleteMutation, insertPlaylistSaved, deletePlaylistSaved]);
   return (
   <ThemedTrueSheet
   ref={ref}

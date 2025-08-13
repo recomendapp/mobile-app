@@ -12,6 +12,8 @@ import { useUserRecosCompleteMutation, useUserRecosDeleteMutation } from "@/feat
 import * as Burnt from "burnt";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMyRecosSenders from "@/components/bottom-sheets/sheets/BottomSheetMyRecosSenders";
+import { useSharedValue } from "react-native-reanimated";
+import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 
 const MyRecosScreen = () => {
 	const t = useTranslations();
@@ -22,6 +24,11 @@ const MyRecosScreen = () => {
     const queryData = useUserRecosQuery({
         userId: user?.id,
     });
+	const screenTitle = upperFirst(t('common.messages.my_recos'));
+
+	// SharedValues
+	const scrollY = useSharedValue(0);
+	const headerHeight = useSharedValue(0);
 
 	// Handlers
 	const handleDeleteReco = React.useCallback((data: UserRecosAggregated) => {
@@ -177,9 +184,17 @@ const MyRecosScreen = () => {
 	], [handleDeleteReco, handleCompleteReco, t]);
 
     return (
+	<>
+		<AnimatedStackScreen
+		options={{
+			headerTitle: screenTitle,
+		}}
+		scrollY={scrollY}
+		triggerHeight={headerHeight}
+		/>
         <CollectionScreen
 		queryData={queryData}
-		screenTitle={upperFirst(t('common.messages.my_recos'))}
+		screenTitle={screenTitle}
 		// Search
 		searchPlaceholder={upperFirst(t('pages.collection.my_recos.search.placeholder'))}
 		fuseKeys={[
@@ -202,7 +217,11 @@ const MyRecosScreen = () => {
 		// Actions
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
-        />
+		// SharedValues
+		scrollY={scrollY}
+		headerHeight={headerHeight}
+		/>
+	</>
     );
 };
 

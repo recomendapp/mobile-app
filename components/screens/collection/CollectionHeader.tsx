@@ -10,12 +10,17 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useHeaderHeight } from '@react-navigation/elements';
 import { Skeleton } from "@/components/ui/Skeleton";
 import { View } from "@/components/ui/view";
+import { AnimatedImageWithFallback } from "@/components/ui/AnimatedImageWithFallback";
+import { ImageType } from "@/components/utils/ImageWithFallback";
 
 interface CollectionHeaderProps
 	extends React.ComponentPropsWithoutRef<typeof Animated.View> {
 		headerHeight: SharedValue<number>;
 		scrollY: SharedValue<number>;
 		title: string;
+		showPoster?: boolean;
+		poster?: string;
+		posterType?: ImageType;
 		bottomText?: string | React.ReactNode | (() => React.ReactNode);
 		numberOfItems: number;
 		backdrops: (string | null | undefined)[];
@@ -25,14 +30,15 @@ interface CollectionHeaderProps
 const CollectionHeader = forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CollectionHeaderProps
->(({ loading, headerHeight, scrollY, title, bottomText, numberOfItems, backdrops, ...props }, ref) => {
+>(({ loading, headerHeight, scrollY, title, showPoster = false, poster, posterType, bottomText, numberOfItems, backdrops, ...props }, ref) => {
 	const { colors, inset } = useTheme();
 	const { hslToRgb } = useColorConverter();
 	const bgBackdrop = useRandomBackdrop(backdrops);
 	const bgColor = hslToRgb(colors.background);
 	const navigationHeaderHeight = useHeaderHeight();
 
-	const layoutY = useSharedValue(0);
+	const posterHeight = useSharedValue(0);
+
 	const opacityAnim = useAnimatedStyle(() => {
 		return {
 			opacity: interpolate(
@@ -59,6 +65,34 @@ const CollectionHeader = forwardRef<
 		};
 	});
 
+	const posterAnim = useAnimatedStyle(() => {
+		const scaleValue = interpolate(
+			scrollY.get(),
+			[-headerHeight.get(), 0],
+			[3, 1],
+			Extrapolation.CLAMP,
+		);
+		const scaleOffset = (posterHeight.get() * (scaleValue - 1)) / 2;
+		const freezeScroll = interpolate(
+			scrollY.get(),
+			[-headerHeight.get(), 0],
+			[-headerHeight.get(), 1],
+			Extrapolation.CLAMP,
+		);
+		return {
+			opacity: interpolate(
+				scrollY.get(),
+				[0, headerHeight.get() - (navigationHeaderHeight) / 0.8],
+				[1, 0],
+				Extrapolation.CLAMP,
+			),
+			transform: [
+				{ scale: scaleValue },
+				{ translateY: freezeScroll + scaleOffset },
+			],
+		};
+	});
+
 	return (
 		<Animated.View
 		ref={ref}
@@ -68,7 +102,6 @@ const CollectionHeader = forwardRef<
 		onLayout={(event) => {
 			'worklet';
 			headerHeight.value = event.nativeEvent.layout.height;
-			layoutY.value = event.nativeEvent.layout.y;
 		}}
 		{...props}
 		>
@@ -100,7 +133,22 @@ const CollectionHeader = forwardRef<
 				}
 			]}
 			>
-				<View style={tw`flex-1 items-center justify-center`}>
+				<View style={tw`items-center justify-center`}>
+					{showPoster && (
+						<AnimatedImageWithFallback
+						onLayout={(e) => {
+							posterHeight.value = e.nativeEvent.layout.height;
+						}}
+						alt={title}
+						source={{ uri : poster }}
+						style={[
+							{ aspectRatio: 1 / 1 },
+							tw`rounded-md w-48 h-auto mb-2`,
+							posterAnim
+						]}
+						type={posterType}
+						/>
+					)}
 					<Text
 					numberOfLines={2}
 					style={[

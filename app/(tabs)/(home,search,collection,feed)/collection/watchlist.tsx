@@ -12,6 +12,8 @@ import { useUserWatchlistDeleteMutation } from "@/features/user/userMutations";
 import * as Burnt from "burnt";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetWatchlistComment from "@/components/bottom-sheets/sheets/BottomSheetWatchlistComment";
+import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
+import { useSharedValue } from "react-native-reanimated";
 
 const WatchlistScreen = () => {
 	const t = useTranslations();
@@ -21,6 +23,12 @@ const WatchlistScreen = () => {
 	const queryData = useUserWatchlistQuery({
 		userId: user?.id,
 	});
+	const screenTitle = upperFirst(t('common.messages.watchlist'));
+
+	// SharedValues
+	const scrollY = useSharedValue(0);
+	const headerHeight = useSharedValue(0);
+
 	// Handlers
 	const handleDeleteWatchlist = React.useCallback((data: UserWatchlist) => {
 		Alert.alert(
@@ -134,33 +142,45 @@ const WatchlistScreen = () => {
 	], [handleDeleteWatchlist, handleOpenSheet, t]);
 
 	return (
-	<CollectionScreen
-	// Query
-	queryData={queryData}
-	screenTitle={upperFirst(t('common.messages.watchlist'))}
-	// Search
-	searchPlaceholder={upperFirst(t('pages.collection.watchlist.search.placeholder'))}
-	fuseKeys={[
-		{
-			name: 'title',
-			getFn: (item) => item.media?.title || '',
-		},
-	]}
-	// Sort
-	sortByOptions={sortByOptions}
-	// Getters
-	getItemId={(item) => item.media_id!}
-	getItemMedia={(item) => item.media!}
-	getItemTitle={(item) => item.media?.title || ''}
-	getItemSubtitle={(item) => item.media?.main_credit?.map((director) => director.title).join(', ') || ''}
-	getItemImageUrl={(item) => item.media?.avatar_url || ''}
-	getItemUrl={(item) => item.media?.url || ''}
-	getItemBackdropUrl={(item) => item.media?.backdrop_url || ''}
-	getCreatedAt={(item) => item.created_at!}
-	// Actions
-	bottomSheetActions={bottomSheetActions}
-	swipeActions={swipeActions}
-	/>
+	<>
+		<AnimatedStackScreen
+		options={{
+			headerTitle: screenTitle,
+		}}
+		scrollY={scrollY}
+		triggerHeight={headerHeight}
+		/>
+		<CollectionScreen
+		// Query
+		queryData={queryData}
+		screenTitle={screenTitle}
+		// Search
+		searchPlaceholder={upperFirst(t('pages.collection.watchlist.search.placeholder'))}
+		fuseKeys={[
+			{
+				name: 'title',
+				getFn: (item) => item.media?.title || '',
+			},
+		]}
+		// Sort
+		sortByOptions={sortByOptions}
+		// Getters
+		getItemId={(item) => item.media_id!}
+		getItemMedia={(item) => item.media!}
+		getItemTitle={(item) => item.media?.title || ''}
+		getItemSubtitle={(item) => item.media?.main_credit?.map((director) => director.title).join(', ') || ''}
+		getItemImageUrl={(item) => item.media?.avatar_url || ''}
+		getItemUrl={(item) => item.media?.url || ''}
+		getItemBackdropUrl={(item) => item.media?.backdrop_url || ''}
+		getCreatedAt={(item) => item.created_at!}
+		// Actions
+		bottomSheetActions={bottomSheetActions}
+		swipeActions={swipeActions}
+		// SharedValues
+		scrollY={scrollY}
+		headerHeight={headerHeight}
+		/>
+	</>
 	)
 };
 
