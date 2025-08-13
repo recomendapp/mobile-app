@@ -10,6 +10,8 @@ import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
 import { useUserActivityUpdateMutation } from "@/features/user/userMutations";
 import * as Burnt from "burnt";
+import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
+import { useSharedValue } from "react-native-reanimated";
 
 const LikesScreen = () => {
     const t = useTranslations();
@@ -18,6 +20,11 @@ const LikesScreen = () => {
     const queryData = useUserLikesQuery({
         userId: user?.id,
     });
+	const screenTitle = upperFirst(t('common.messages.heart_pick', { count: 2 }));
+
+	// SharedValues
+	const scrollY = useSharedValue(0);
+	const headerHeight = useSharedValue(0);
 
 	// Handlers
 	const handleUnlike = React.useCallback((data: UserActivity) => {
@@ -115,9 +122,17 @@ const LikesScreen = () => {
 	], [handleUnlike, t]);
 
     return (
+	<>
+		<AnimatedStackScreen
+		options={{
+			headerTitle: screenTitle,
+		}}
+		scrollY={scrollY}
+		triggerHeight={headerHeight}
+		/>
         <CollectionScreen
 		queryData={queryData}
-		screenTitle={upperFirst(t('common.messages.heart_pick', { count: 2 }))}
+		screenTitle={screenTitle}
 		// Search
 		searchPlaceholder={upperFirst(t('pages.collection.heart_picks.search.placeholder'))}
 		fuseKeys={[
@@ -140,7 +155,11 @@ const LikesScreen = () => {
 		// Actions
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
+		// Shared Values
+		scrollY={scrollY}
+		headerHeight={headerHeight}
         />
+	</>
     );
 };
 

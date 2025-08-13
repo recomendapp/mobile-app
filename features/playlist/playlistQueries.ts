@@ -193,14 +193,14 @@ export const usePlaylistFeaturedInfiniteQuery = ({
 	filters
 } : {
 	filters?: {
-		sortBy?: 'created_at' | 'updated_at';
+		sortBy?: 'created_at';
 		sortOrder?: 'asc' | 'desc';
 		resultsPerPage?: number;
 	};
 } = {}) => {
 	const mergedFilters = {
 		resultsPerPage: 20,
-		sortBy: 'updated_at',
+		sortBy: 'created_at',
 		sortOrder: 'desc',
 		...filters,
 	};
@@ -212,17 +212,17 @@ export const usePlaylistFeaturedInfiniteQuery = ({
 			let to = from - 1 + mergedFilters.resultsPerPage;
 			let query = supabase
 				.from('playlists_featured')
-				.select('*, playlist:playlists(*, user(*))')
+				.select('*, playlist:playlists!inner(*, user(*))')
 				.range(from, to)
 			
 			if (mergedFilters) {
 				if (mergedFilters.sortBy) {
 					switch (mergedFilters.sortBy) {
 						case 'created_at':
-							query = query.order('created_at', { referencedTable: 'playlist', ascending: mergedFilters.sortOrder === 'asc', nullsFirst: false });
+							query = query.order('playlist(created_at)', { ascending: mergedFilters.sortOrder === 'asc' });
 							break;
 						case 'updated_at':
-							query = query.order('updated_at', { referencedTable: 'playlist', ascending: mergedFilters.sortOrder === 'asc', nullsFirst: false });
+							query = query.order('playlist(updated_at)', { ascending: mergedFilters.sortOrder === 'asc' });
 							break;
 						default:
 							break;

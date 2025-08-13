@@ -20,8 +20,7 @@ import { View } from "@/components/ui/view";
 import { GridView } from "@/components/ui/GridView";
 import ProfileWidgetPlaylists from "@/components/screens/user/ProfileWidgetPlaylists";
 import { Skeleton } from "@/components/ui/Skeleton";
-
-const PADDING_BOTTOM = 8;
+import { PADDING_VERTICAL } from "@/theme/globals";
 
 const ProfileHeader = ({
 	profile,
@@ -166,7 +165,7 @@ const ProfileScreen = () => {
 		contentContainerStyle={[
 			tw`gap-2`,
 			{
-				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			}
 		]}>
 			<ProfileHeader profile={profile} skeleton={loading} />

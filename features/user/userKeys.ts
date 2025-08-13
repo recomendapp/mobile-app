@@ -202,6 +202,14 @@ export const userKeys = {
 		filters?: any;
 	}) => filters ? [...userKeys.detail(userId), 'playlists', filters] as const : [...userKeys.detail(userId), 'playlists'] as const,
 
+	playlistLike: ({
+		userId,
+		playlistId,
+	} : {
+		userId: string;
+		playlistId: number;
+	}) => [...userKeys.detail(userId), 'playlist-like', playlistId] as const,
+
 	playlistSaved: ({
 		userId,
 		playlistId,

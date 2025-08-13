@@ -64,15 +64,14 @@ const AppLayout = ({ segment } : { segment: string }) => {
 
       {/* AUTH */}
       <Stack.Protected guard={!session}>
-        <Stack.Screen
-        name='auth'
-        options={{
-          headerShown: false,
-          presentation: 'modal',
-        }}
-        />
+        <Stack.Screen name='auth' options={{ headerShown: false, presentation: 'modal' }} />
       </Stack.Protected>
       <Stack.Screen name="upgrade" options={{ headerTitle: upperFirst(t('common.messages.upgrade')), presentation: 'modal' }} />
+      
+      {/* ABOUT */}
+      <Stack.Screen name="about/index" options={{ headerTitle: upperFirst(t('common.messages.about')) }} />
+
+      {/* MODALS */}
       <Stack.Screen
       name='modals/media/index'
       options={{

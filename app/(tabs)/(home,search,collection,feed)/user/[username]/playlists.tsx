@@ -12,8 +12,7 @@ import { useCallback, useState } from "react";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
-
-const PADDING_BOTTOM = 8;
+import { PADDING_VERTICAL } from "@/theme/globals";
 
 interface sortBy {
 	label: string;
@@ -78,7 +77,7 @@ const UserPlaylistsScreen = () => {
 		<LegendList
 		data={playlists?.pages.flatMap((page) => page) ?? []}
 		renderItem={({ item }) => (
-			<CardPlaylist key={item.id} playlist={item} />
+			<CardPlaylist key={item.id} playlist={item} showItemsCount showPlaylistAuthor={false} />
 		)}
 		ListHeaderComponent={
 			<>
@@ -110,7 +109,7 @@ const UserPlaylistsScreen = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			},
 			tw`px-4`,
 		]}

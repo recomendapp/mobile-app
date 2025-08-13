@@ -1,7 +1,6 @@
 import { upperFirst } from "lodash";
-import Animated, { SharedValue, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import { SharedValue, useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
-import AnimatedStackScreen, { AnimatedStackScreenProps } from "@/components/ui/AnimatedStackScreen";
 import { useTheme } from "@/providers/ThemeProvider";
 import React, { useCallback } from "react";
 import Fuse, { FuseOptionKey } from "fuse.js";
@@ -12,22 +11,15 @@ import tw from "@/lib/tw";
 import { Icons } from "@/constants/Icons";
 import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
-import { LinkProps, useRouter } from "expo-router";
-import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { FlatList, Pressable } from "react-native-gesture-handler";
-import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
-import BottomSheetMedia from "@/components/bottom-sheets/sheets/BottomSheetMedia";
-import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
-import { Alert } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 import { Button, ButtonProps } from "@/components/ui/Button";
-import * as Burnt from "burnt";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { Media } from "@/types/type.db";
 import { UseQueryResult } from "@tanstack/react-query";
 import { LucideIcon } from "lucide-react-native";
 import { CollectionItem } from "./CollectionItem";
-
-const PADDING_BOTTOM = 8;
+import { ImageType } from "@/components/utils/ImageWithFallback";
+import { PADDING_VERTICAL } from "@/theme/globals";
 
 interface ToolbarItem {
     label?: string;
@@ -59,8 +51,13 @@ export interface CollectionAction<T> {
 
 interface CollectionScreenConfig<T> extends Omit<React.ComponentProps<typeof AnimatedLegendList<T>>, 'data'> {
 	queryData: UseQueryResult<T[] | undefined>;
+    scrollY?: SharedValue<number>;
+    headerHeight?: SharedValue<number>;
     screenTitle: string;
     screenSubtitle?: string | React.ReactNode | (() => React.ReactNode);
+    showPoster?: boolean;
+    poster?: string;
+    posterType?: ImageType;
     searchPlaceholder: string;
     emptyStateMessage?: string;
     sortByOptions: SortByOption<T>[];
@@ -79,14 +76,17 @@ interface CollectionScreenConfig<T> extends Omit<React.ComponentProps<typeof Ani
     getCreatedAt?: (item: T) => string;
 	fuseKeys?: FuseOptionKey<T>[];
 	fuseThreshold?: number;
-
-    stackScreenProps?: Omit<AnimatedStackScreenProps, 'scrollY' | 'triggerHeight' | 'options'>;
 }
 
 const CollectionScreen = <T extends {}>({
     queryData,
+    scrollY = useSharedValue(0),
+    headerHeight = useSharedValue(0),
     screenTitle,
     screenSubtitle,
+    showPoster,
+    poster,
+    posterType,
     searchPlaceholder,
     emptyStateMessage,
     sortByOptions,
@@ -105,7 +105,6 @@ const CollectionScreen = <T extends {}>({
     getCreatedAt,
 	fuseKeys,
 	fuseThreshold = 0.5,
-    stackScreenProps,
 	// Props for the AnimatedLegendList
 	...props
 }: CollectionScreenConfig<T>) => {
@@ -131,9 +130,6 @@ const CollectionScreen = <T extends {}>({
     const backdrops = React.useMemo(() => {
         return data?.map((item) => getItemBackdropUrl?.(item)).filter(Boolean) || [];
     }, [data, getItemBackdropUrl]);
-
-    const scrollY = useSharedValue(0);
-    const headerHeight = useSharedValue(0);
 
     const scrollHandler = useAnimatedScrollHandler({
         onScroll: event => {
@@ -221,21 +217,15 @@ const CollectionScreen = <T extends {}>({
 
     return (
         <>
-            <AnimatedStackScreen
-                options={{
-                    headerTitle: screenTitle,
-                    headerTransparent: true,
-                }}
-                scrollY={scrollY}
-                triggerHeight={headerHeight}
-                {...stackScreenProps}
-            />
             <AnimatedLegendList
 			onScroll={scrollHandler}
 			ListHeaderComponent={
 				<>
 					<CollectionHeader
 						title={screenTitle}
+                        showPoster={showPoster}
+                        poster={poster}
+                        posterType={posterType}
                         bottomText={screenSubtitle}
 						numberOfItems={data?.length || 0}
 						scrollY={scrollY}
@@ -290,7 +280,7 @@ const CollectionScreen = <T extends {}>({
 			refreshing={isRefetching}
 			onRefresh={refetch}
 			contentContainerStyle={{
-				paddingBottom: bottomTabHeight + PADDING_BOTTOM,
+				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			}}
 			{...props}
             />
