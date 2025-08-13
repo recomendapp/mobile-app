@@ -1,30 +1,28 @@
 import React from "react"
-import { Alert, Pressable, View } from "react-native";
+import { Alert, View } from "react-native";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
-import { AlertCircleIcon } from "lucide-react-native";
 import { useUserActivityDeleteMutation, useUserActivityInsertMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Media } from "@/types/type.db";
 import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
-import * as Haptics from "expo-haptics";
 import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
-
-const ICON_SIZE = 24;
+import { Button } from "@/components/ui/Button";
+import { ICON_ACTION_SIZE } from "@/theme/globals";
 
 interface MediaActionUserActivityWatchProps
-	extends React.ComponentProps<typeof Pressable> {
+	extends React.ComponentProps<typeof Button> {
 		media: Media;
 	}
 
 const MediaActionUserActivityWatch = React.forwardRef<
-	React.ComponentRef<typeof Pressable>,
+	React.ComponentRef<typeof Button>,
 	MediaActionUserActivityWatchProps
->(({ media, style, ...props }, ref) => {
+>(({ media, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, style, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session, user } = useAuth();
 	const router = useRouter();
@@ -89,13 +87,11 @@ const MediaActionUserActivityWatch = React.forwardRef<
 	};
 
 	return (
-		<Pressable
-		ref={ref}
+		<Button
+		variant={variant}
+		size={size}
 		onPress={() => {
 			if (session) {
-				if (process.env.EXPO_OS === 'ios') {
-					Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-				}
 				activity ? handleUnwatch() : handleWatch();
 			} else {
 				router.push({
@@ -105,22 +101,13 @@ const MediaActionUserActivityWatch = React.forwardRef<
 					},
 				});
 			}
+			onPressProps?.();
 		}}
-		disabled={
-			session ? (
-				isLoading || isError || activity === undefined || insertActivity.isPending || deleteActivity.isPending
-			) : false
-		}
-		{...props}
 		>
-		{isError ? (
-			<AlertCircleIcon size={ICON_SIZE} />
-		) : (
-			<View style={[{ backgroundColor: activity ? colors.accentBlue : undefined, borderColor: activity ? colors.accentBlue : colors.foreground, width: ICON_SIZE, height: ICON_SIZE }, tw`rounded-full border-2 items-center justify-center`]}>
-				<Icons.Check color={colors.foreground} size={ICON_SIZE * 0.7}/>
+			<View style={[{ backgroundColor: activity ? colors.accentBlue : undefined, borderColor: activity ? colors.accentBlue : colors.foreground, width: ICON_ACTION_SIZE, height: ICON_ACTION_SIZE }, tw`rounded-full border-2 items-center justify-center`]}>
+				<Icons.Check color={colors.foreground} size={ICON_ACTION_SIZE * 0.7}/>
 			</View>
-		)}
-		</Pressable>
+		</Button>
 	);
 });
 MediaActionUserActivityWatch.displayName = 'MediaActionUserActivityWatch';

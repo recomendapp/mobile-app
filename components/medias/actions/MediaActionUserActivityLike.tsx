@@ -1,9 +1,7 @@
 import React from "react"
-import { Pressable } from "react-native";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
-import { AlertCircleIcon } from "lucide-react-native";
 import { useUserActivityInsertMutation, useUserActivityUpdateMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Media } from "@/types/type.db";
@@ -11,8 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { userKeys } from "@/features/user/userKeys";
 import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
-import * as Haptics from "expo-haptics";
-import { interpolateColor, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
+import { useSharedValue } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
@@ -26,7 +23,7 @@ interface MediaActionUserActivityLikeProps
 const MediaActionUserActivityLike = React.forwardRef<
 	React.ComponentRef<typeof Button>,
 	MediaActionUserActivityLikeProps
->(({ media, icon = Icons.like, variant = "ghost", size = "icon", onPress: onPressProps, iconProps, ...props }, ref) => {
+>(({ media, icon = Icons.like, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session, user } = useAuth();
 	const router = useRouter();

@@ -15,7 +15,7 @@ interface MediaActionUserRecosProps
 const MediaActionUserRecos = React.forwardRef<
 	React.ComponentRef<typeof Pressable>,
 	MediaActionUserRecosProps
->(({ media, icon = Icons.Reco, variant = "ghost", size = "icon", onPress: onPressProps, iconProps, ...props }, ref) => {
+>(({ media, icon = Icons.Reco, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
