@@ -1,44 +1,18 @@
+import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { playlistKeys } from "./playlistKeys";
-import { Playlist, PlaylistGuest, PlaylistItem } from "@/types/type.db";
-import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { useAuth } from "@/providers/AuthProvider";
-
-export const usePlaylistFullQuery = (playlistId: number) => {
-	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: playlistKeys.detail(playlistId),
-		queryFn: async () => {
-			if (!playlistId) throw Error('Missing playlist id');
-			const { data, error } = await supabase
-				.from('playlists')
-				.select(`
-					*,
-					user(*),
-					items:playlist_items(*, media(*)),
-					guests:playlist_guests(
-						*,
-						user:user(*)
-					)
-				`)
-				.eq('id', playlistId)
-				.order('rank', { ascending: true, referencedTable: 'playlist_items' })
-				.maybeSingle();
-			if (error) throw error;
-			return data;	
-		},
-		enabled: !!playlistId,
-	});
-}
+import { Playlist, PlaylistGuest, PlaylistItemMovie, PlaylistItemTvSeries, PlaylistSource } from "@/types/type.db";
 
 export const usePlaylistQuery = ({
-	playlistId
-}: {
-	playlistId: number;
+	playlistId,
+	initialData
+} : {
+	playlistId?: number;
+	initialData?: Playlist;
 }) => {
 	const supabase = useSupabaseClient();
 	return useQuery({
-		queryKey: playlistKeys.detail(playlistId),
+		queryKey: playlistKeys.detail(playlistId!),
 		queryFn: async () => {
 			if (!playlistId) throw Error('Missing playlist id');
 			const { data, error } = await supabase
@@ -48,20 +22,21 @@ export const usePlaylistQuery = ({
 					user(*)
 				`)
 				.eq('id', playlistId)
-				.maybeSingle();
-			if (error) throw error;
+				.maybeSingle()
+				.overrideTypes<Playlist, { merge: false }>();
+			if (error || !data) throw error;
 			return data;
 		},
+		initialData: initialData,
+		structuralSharing: false,
 		enabled: !!playlistId,
 	});
-}
-
-export const usePlaylistItemsQuery = ({
+};
+// Items
+export const usePlaylistItemsMovieQuery = ({
 	playlistId,
-	initialData
-}: {
-	playlistId?: number,
-	initialData?: PlaylistItem[]
+} : {
+	playlistId?: number;
 }) => {
 	const supabase = useSupabaseClient();
 	return useQuery({
@@ -69,29 +44,51 @@ export const usePlaylistItemsQuery = ({
 		queryFn: async () => {
 			if (!playlistId) throw Error('Missing playlist id');
 			const { data, error } = await supabase
-				.from('playlist_items')
-				.select(`*, media(*)`)
+				.from('playlist_items_movie')
+				.select(`*, movie:media_movie(*)`)
 				.eq('playlist_id', playlistId)
 				.order('rank', { ascending: true })
-				.overrideTypes<PlaylistItem[], { merge: false }>()
+				.overrideTypes<PlaylistItemMovie[]>();
 			if (error) throw error;
 			return data;
 		},
 		enabled: !!playlistId,
-		initialData: initialData,
+		structuralSharing: false,
 	});
-}
-
-export const usePlaylistGuestsQuery = ({
+};
+export const usePlaylistItemsTvSeriesQuery = ({
 	playlistId,
-	initialData
-}: {
-	playlistId?: number,
-	initialData?: PlaylistGuest[]
+} : {
+	playlistId?: number;
 }) => {
 	const supabase = useSupabaseClient();
 	return useQuery({
-		queryKey: playlistKeys.guests(playlistId!),
+		queryKey: playlistKeys.items(playlistId as number),
+		queryFn: async () => {
+			if (!playlistId) throw Error('Missing playlist id');
+			const { data, error } = await supabase
+				.from('playlist_items_tv_series')
+				.select(`*, tv_series:media_tv_series(*)`)
+				.eq('playlist_id', playlistId)
+				.order('rank', { ascending: true })
+				.overrideTypes<PlaylistItemTvSeries[]>();
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!playlistId,
+		structuralSharing: false,
+	});
+};
+
+/* --------------------------------- GUESTS --------------------------------- */
+export const usePlaylistGuestsQuery = ({
+	playlistId
+}: {
+	playlistId?: number
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: playlistKeys.guests(playlistId as number),
 		queryFn: async () => {
 			if (!playlistId) throw Error('Missing playlist id');
 			const { data, error } = await supabase
@@ -101,56 +98,62 @@ export const usePlaylistGuestsQuery = ({
 					user:user(*)
 				`)
 				.eq('playlist_id', playlistId)
-				.overrideTypes<PlaylistGuest[], { merge: false }>();
 			if (error) throw error;
 			return data;
 		},
 		enabled: !!playlistId,
-		initialData: initialData,
+		structuralSharing: false,
 	});
-}
+};
 
 export const usePlaylistIsAllowedToEditQuery = ({
-	playlist,
-	guests,
-}: {
-	playlist?: Playlist;
-	guests?: PlaylistGuest[] | null;
+	playlistId,
+	userId,
+} : {
+	playlistId: number;
+	userId?: string;
 }) => {
-	const { user } = useAuth();
+	const supabase = useSupabaseClient();
 	return useQuery({
-		queryKey: playlistKeys.allowedToEdit(playlist?.id!),
+		queryKey: playlistKeys.allowedToEdit({
+			playlistId,
+			userId: userId!,
+		}),
 		queryFn: async () => {
-			if (!playlist) throw Error('No playlist data');
+			if (!userId) throw Error('Missing user id');
+			if (!playlistId) throw Error('Missing playlist id');
+			const { data, error } = await supabase
+				.from('playlists')
+				.select(`
+					user_id,
+					playlist_guests(user_id, edit)
+				`)
+				.eq('id', playlistId)
+				.eq('playlist_guests.user_id', userId)
+				.eq('playlist_guests.edit', true)
+				.maybeSingle();
+			if (error) throw error;
 			return Boolean(
-				user?.id === playlist.user_id ||
-				(
-					guests?.some(
-						(guest) => guest?.user_id === user?.id && guest?.edit
-					) &&
-					playlist.user?.premium
-				)
-			);
+				data?.user_id === userId || data?.playlist_guests.length
+			)
 		},
-		enabled: !!playlist && guests !== undefined,
+		enabled: !!playlistId && !!userId,
 	});
-}
+};
 
 export const usePlaylistGuestsSearchInfiniteQuery = ({
 	playlistId,
-	enabled = true,
-	filters
+	filters,
 } : {
 	playlistId?: number;
-	enabled?: boolean;
 	filters?: {
 		search?: string;
+		perPage?: number;
 		exclude?: string[];
-		resultsPerPage?: number;
 	};
 }) => {
 	const mergedFilters = {
-		resultsPerPage: 20,
+		perPage: 20,
 		...filters,
 	};
 	const supabase = useSupabaseClient();
@@ -158,8 +161,8 @@ export const usePlaylistGuestsSearchInfiniteQuery = ({
 		queryKey: playlistKeys.guestsAdd({ playlistId: playlistId as number, filters: mergedFilters }),
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!playlistId) throw Error('Missing playlist id');
-			let from = (pageParam - 1) * mergedFilters.resultsPerPage;
-			let to = from - 1 + mergedFilters.resultsPerPage;
+			let from = (pageParam - 1) * mergedFilters.perPage;
+			let to = from - 1 + mergedFilters.perPage;
 			let query = supabase
 				.from('user')
 				.select('*')
@@ -181,26 +184,27 @@ export const usePlaylistGuestsSearchInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length === mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		throwOnError: true,
-		enabled: !!playlistId && !!mergedFilters.search?.length && !!enabled,
+		enabled: !!playlistId,
 	});
-}
+};
+/* -------------------------------------------------------------------------- */
 
 /* -------------------------------- FEATURED -------------------------------- */
 export const usePlaylistFeaturedInfiniteQuery = ({
 	filters
 } : {
 	filters?: {
-		sortBy?: 'created_at';
+		sortBy?: 'created_at' | 'updated_at';
 		sortOrder?: 'asc' | 'desc';
 		resultsPerPage?: number;
 	};
 } = {}) => {
 	const mergedFilters = {
 		resultsPerPage: 20,
-		sortBy: 'created_at',
+		sortBy: 'updated_at',
 		sortOrder: 'desc',
 		...filters,
 	};
@@ -212,17 +216,17 @@ export const usePlaylistFeaturedInfiniteQuery = ({
 			let to = from - 1 + mergedFilters.resultsPerPage;
 			let query = supabase
 				.from('playlists_featured')
-				.select('*, playlist:playlists!inner(*, user(*))')
+				.select('*, playlist:playlists(*)')
 				.range(from, to)
 			
 			if (mergedFilters) {
 				if (mergedFilters.sortBy) {
 					switch (mergedFilters.sortBy) {
 						case 'created_at':
-							query = query.order('playlist(created_at)', { ascending: mergedFilters.sortOrder === 'asc' });
+							query = query.order('created_at', { referencedTable: 'playlist', ascending: mergedFilters.sortOrder === 'asc' });
 							break;
 						case 'updated_at':
-							query = query.order('playlist(updated_at)', { ascending: mergedFilters.sortOrder === 'asc' });
+							query = query.order('updated_at', { referencedTable: 'playlist', ascending: mergedFilters.sortOrder === 'asc' });
 							break;
 						default:
 							break;
@@ -239,6 +243,141 @@ export const usePlaylistFeaturedInfiniteQuery = ({
 		},
 		throwOnError: true,
 	});
-}
+};
+/* -------------------------------------------------------------------------- */
+
+/* --------------------------------- ADD TO --------------------------------- */
+export const usePlaylistMovieAddToQuery = ({
+	movieId,
+	userId,
+	source = 'personal',
+} : {
+	movieId: number;
+	userId?: string;
+	source: PlaylistSource;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: playlistKeys.addToSource({ id: movieId, type: 'movie', source }),
+		queryFn: async () => {
+			if (!userId) throw Error('Missing user id');
+			if (!source) throw Error('Missing source');
+			if (source === 'personal') { // personal
+				const { data, error } = await supabase
+					.from('playlists')
+					.select('*, playlist_items_movie(count)')
+					.match({
+						'user_id': userId,
+						'playlist_items_movie.movie_id': movieId,
+						'type': 'movie'
+					})
+					.order('updated_at', { ascending: false })
+				if (error) throw error;
+				const output = data?.map(({ playlist_items_movie, ...playlist }) => ({
+					playlist: playlist,
+					already_added: playlist_items_movie[0]?.count > 0,
+				}));
+				return output;
+			} else { // shared
+				const { data, error } = await supabase
+					.from('playlists_saved')
+					.select(`
+						id,
+						playlist:playlists!inner(
+							*,
+							playlist_guests!inner(*),
+							user!inner(*),
+							playlist_items_movie(count)
+						)
+					`)
+					.match({
+						'user_id': userId,
+						'playlist.playlist_guests.user_id': userId,
+						'playlist.playlist_guests.edit': true,
+						'playlist.user.premium': true,
+						'playlist.playlist_items_movie.movie_id': movieId,
+						'playlist.type': 'movie'
+					})
+					.order('updated_at', {
+						referencedTable: 'playlist',
+						ascending: false 
+					})
+				if (error) throw error;
+				const output = data?.map(({ playlist: { playlist_items_movie, playlist_guests, user, ...playlist }, ...playlists_saved }) => ({
+					playlist: playlist,
+					already_added: playlist_items_movie[0]?.count > 0,
+				}));
+				return output;
+			}
+		},
+		enabled: !!userId && !!movieId,
+	});
+};
+export const usePlaylistTvSeriesAddToQuery = ({
+	tvSeriesId,
+	userId,
+	source = 'personal',
+} : {
+	tvSeriesId: number;
+	userId?: string;
+	source: PlaylistSource;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: playlistKeys.addToSource({ id: tvSeriesId, type: 'tv_series', source }),
+		queryFn: async () => {
+			if (!userId) throw Error('Missing user id');
+			if (!source) throw Error('Missing source');
+			if (source === 'personal') { // personal
+				const { data, error } = await supabase
+					.from('playlists')
+					.select('*, playlist_items_tv_series(count)')
+					.match({
+						'user_id': userId,
+						'playlist_items_tv_series.tv_series_id': tvSeriesId,
+						'type': 'tv_series'
+					})
+					.order('updated_at', { ascending: false })
+				if (error) throw error;
+				const output = data?.map(({ playlist_items_tv_series, ...playlist }) => ({
+					playlist: playlist,
+					already_added: playlist_items_tv_series[0]?.count > 0,
+				}));
+				return output;
+			} else { // shared
+				const { data, error } = await supabase
+					.from('playlists_saved')
+					.select(`
+						id,
+						playlist:playlists!inner(
+							*,
+							playlist_guests!inner(*),
+							user!inner(*),
+							playlist_items_tv_series(count)
+						)
+					`)
+					.match({
+						'user_id': userId,
+						'playlist.playlist_guests.user_id': userId,
+						'playlist.playlist_guests.edit': true,
+						'playlist.user.premium': true,
+						'playlist.playlist_items_tv_series.tv_series_id': tvSeriesId,
+						'playlist.type': 'tv_series'
+					})
+					.order('updated_at', {
+						referencedTable: 'playlist',
+						ascending: false
+					})
+				if (error) throw error;
+				const output = data?.map(({ playlist: { playlist_items_tv_series, playlist_guests, user, ...playlist }, ...playlists_saved }) => ({
+					playlist: playlist,
+					already_added: playlist_items_tv_series[0]?.count > 0,
+				}));
+				return output;
+			}
+		},
+		enabled: !!userId && !!tvSeriesId,
+	});
+};
 /* -------------------------------------------------------------------------- */
 

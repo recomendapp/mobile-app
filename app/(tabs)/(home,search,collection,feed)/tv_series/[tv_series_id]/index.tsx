@@ -2,25 +2,25 @@ import { useMediaTvSeriesDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, Stack, useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { Pressable, View } from "react-native";
-import { Media, MediaTvSeriesPerson } from "@/types/type.db";
-import { CardMedia } from "@/components/cards/CardMedia";
+import { MediaTvSeriesPerson } from "@/types/type.db";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { LegendList } from "@legendapp/list";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
-import BottomSheetMedia from "@/components/bottom-sheets/sheets/BottomSheetMedia";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useState } from "react";
-import MediaWidgetPlaylists from "@/components/screens/media/MediaWidgetPlaylists";
-import MediaWidgetReviews from "@/components/screens/media/MediaWidgetReviews";
-import MediaHeader from "@/components/screens/media/MediaHeader";
 import TvSeriesWidgetSeasons from "@/components/screens/media/TvSeries/TvSeriesWidgetSeasons";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useLocale, useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { PADDING_VERTICAL } from "@/theme/globals";
+import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
+import { CardPerson } from "@/components/cards/CardPerson";
+import TvSeriesHeader from "@/components/screens/tv_series/TvSeriesHeader";
+import TvSeriesWidgetPlaylists from "@/components/screens/tv_series/TvSeriesWidgetPlaylists";
+import TvSeriesWidgetReviews from "@/components/screens/tv_series/TvSeriesWidgetReviews";
 
 const TvSeriesScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
@@ -57,14 +57,14 @@ const TvSeriesScreen = () => {
 	<>
 		<AnimatedStackScreen
 		options={{
-			headerTitle: series?.title || '',
+			headerTitle: series?.name || '',
 			headerTransparent: true,
 		}}
 		scrollY={scrollY}
 		triggerHeight={headerHeight}
 		onMenuPress={series ? () => {
-			openSheet(BottomSheetMedia, {
-				media: series as Media,
+			openSheet(BottomSheetTvSeries, {
+				tvSeries: series,
 			})
 		} : undefined}
 		/>
@@ -83,8 +83,8 @@ const TvSeriesScreen = () => {
 			/>
 		}
 		>
-			<MediaHeader
-			media={series as Media}
+			<TvSeriesHeader
+			tvSeries={series}
 			loading={loading}
 			scrollY={scrollY}
 			headerHeight={headerHeight}
@@ -98,7 +98,7 @@ const TvSeriesScreen = () => {
 				>
 					<Text style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.overview'))}</Text>
 					<Text textColor='muted' numberOfLines={showFullSynopsis ? undefined : 5} style={tw.style('text-justify')}>
-						{series.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
+						{series.overview || upperFirst(t('common.messages.no_overview'))}
 					</Text>
 				</Pressable>
 				<TvSeriesWidgetSeasons seasons={series.seasons || []} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
@@ -107,8 +107,8 @@ const TvSeriesScreen = () => {
 					<Text style={tw.style('px-4 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</Text>
 					{series.cast?.length ? <TvSeriesCast cast={series.cast} /> : <Text textColor='muted' style={tw`px-4`}>{upperFirst(t('common.messages.no_cast'))}</Text>}
 				</View>
-				<MediaWidgetPlaylists mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
-				<MediaWidgetReviews mediaId={series.media_id!} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
+				<TvSeriesWidgetPlaylists tvSeriesId={series.id} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
+				<TvSeriesWidgetReviews tvSeries={series} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
 			</View>}
 		</Animated.ScrollView>
 	</>
@@ -129,14 +129,14 @@ const TvSeriesCast = ({
 			return (
 			<Link key={index} href={`/person/${item.person?.id}`} asChild>
 				<View style={tw.style('gap-2 w-24')}>
-					<CardMedia
+					<CardPerson
 					key={item.id}
 					variant='poster'
-					media={item.person as Media}
+					person={item.person}
 					style={tw.style('w-full')}
 					/>
 					<View style={tw.style('flex-col gap-1 items-center')}>
-						<Text numberOfLines={2}>{item.person?.title}</Text>
+						<Text numberOfLines={2}>{item.person?.name}</Text>
 						{item.character ? <Text numberOfLines={2} style={[{ color: colors.accentYellow }, tw.style('italic text-sm')]}>{item.character}</Text> : null}
 					</View>
 				</View>

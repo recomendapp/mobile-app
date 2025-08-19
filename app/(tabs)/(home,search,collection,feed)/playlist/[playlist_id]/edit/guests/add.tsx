@@ -51,8 +51,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 		hasNextPage,
 		refetch,
 	} = usePlaylistGuestsSearchInfiniteQuery({
-		playlistId,
-		enabled: !!session,
+		playlistId: (!!session && guests) ? playlistId : undefined,
 		filters: {
 			search: search,
 			exclude: [

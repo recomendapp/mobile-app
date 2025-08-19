@@ -12,7 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
 import { lowerCase, upperFirst } from 'lodash';
-import { Media, MediaPerson } from '@/types/type.db';
+import { MediaPerson, MediaTvSeries } from '@/types/type.db';
 import useColorConverter from '@/hooks/useColorConverter';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -27,24 +27,24 @@ import MediaActionUserWatchlist from '@/components/medias/actions/MediaActionUse
 import MediaActionPlaylistAdd from '@/components/medias/actions/MediaActionPlaylistAdd';
 import MediaActionUserRecos from '@/components/medias/actions/MediaActionUserRecos';
 import { IconMediaRating } from '@/components/medias/IconMediaRating';
-import { useMediaFollowersAverageRatingQuery } from '@/features/media/mediaQueries';
+import { useMediaTvSeriesFollowersAverageRatingQuery } from '@/features/media/mediaQueries';
 import { Pressable } from 'react-native-gesture-handler';
-import BottomSheetMediaFollowersAverageRating from '@/components/bottom-sheets/sheets/BottomSheetMediaFollowersAverageRating';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useTranslations } from 'use-intl';
 import { Text } from '@/components/ui/text';
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
-import app from '@/constants/app';
+import BottomSheetUserActivityTvSeriesFollowersRating from '@/components/bottom-sheets/sheets/BottomSheetUserActivityTvSeriesFollowersRating';
+import { ButtonPlaylistTvSeriesAdd } from '@/components/buttons/ButtonPlaylistTvSeriesAdd';
 
-interface MediaHeaderProps {
-	media?: Media | null;
+interface TvSeriesHeaderProps {
+	tvSeries?: MediaTvSeries | null;
 	loading: boolean;
 	scrollY: SharedValue<number>;
 	headerHeight: SharedValue<number>;
 	headerOverlayHeight: SharedValue<number>;
 }
-const MediaHeader: React.FC<MediaHeaderProps> = ({
-	media,
+const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
+	tvSeries,
 	loading,
 	scrollY,
 	headerHeight,
@@ -57,8 +57,8 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 	const bgColor = hslToRgb(colors.background);
 	const {
 		data: followersAvgRating,
-	} = useMediaFollowersAverageRatingQuery({
-		id: media?.media_id,
+	} = useMediaTvSeriesFollowersAverageRatingQuery({
+		tvSeriesId: tvSeries?.id,
 	});
 	// SharedValue
 	const posterHeight = useSharedValue(0);
@@ -125,9 +125,6 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 			],
 		};
 	});
-
-	const voteAverage = media?.vote_count! > app.ratings.countThreshold ? media?.vote_average : media?.tmdb_vote_average;
-
 	return (
 	<Animated.View
 	style={[
@@ -145,7 +142,7 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 			bgAnim,
 		]}
 		>
-			{(media && media.backdrop_url) && <Image style={tw`absolute inset-0`} source={media.backdrop_url} />}
+			{(tvSeries && tvSeries.backdrop_url) && <Image style={tw`absolute inset-0`} source={tvSeries.backdrop_url} />}
 			<LinearGradient
 			style={tw`absolute inset-0`}
 			colors={[
@@ -171,24 +168,24 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 					'worklet';
 					posterHeight.value = e.nativeEvent.layout.height;
 				}}
-				alt={media?.title ?? ''}
-				source={{ uri: media?.avatar_url ?? '' }}
+				alt={tvSeries?.name ?? ''}
+				source={{ uri: tvSeries?.poster_url ?? '' }}
 				style={[
 					{ aspectRatio: 2 / 3 },
 					tw.style('rounded-md w-48 h-auto'),
 					posterAnim
 				]}
-				type={media?.media_type}
+				type={'tv_series'}
 				>
 					<View style={tw`absolute gap-2 top-2 right-2`}>
-						{voteAverage ? (
+						{tvSeries?.vote_average ? (
 							<IconMediaRating
-							rating={voteAverage}
+							rating={tvSeries.vote_average}
 							variant="general"
 							/>
 						) : null}
 						{followersAvgRating && (
-							<Pressable onPress={() => openSheet(BottomSheetMediaFollowersAverageRating, { mediaId: media?.media_id! })}>
+							<Pressable onPress={() => openSheet(BottomSheetUserActivityTvSeriesFollowersRating, { tvSeriesId: tvSeries?.id! })}>
 								<IconMediaRating
 								rating={followersAvgRating.follower_avg_rating}
 								variant="follower"
@@ -205,18 +202,11 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 			]}
 			>
 				{/* GENRES */}
-				{media ? <Text>
+				{tvSeries ? <Text>
 					<Text style={{ color: colors.accentYellow }}>
-						{
-							media.media_type === 'tv_series' ? upperFirst(t('common.messages.tv_series', { count: 1 }))
-							: media.media_type === 'tv_season' ? upperFirst(t('common.messages.tv_season', { count: 1 }))
-							: media.media_type === 'tv_episode' ? upperFirst(t('common.messages.tv_episode', { count: 1 }))
-							: media.media_type === 'movie' ? upperFirst(t('common.messages.film', { count: 1 }))
-							: media.media_type === 'person' ? upperFirst(t('common.messages.person', { count: 1 }))
-							: upperFirst(t('common.messages.media', { count: 1 }))
-						}
+						{upperFirst(t('common.messages.tv_series', { count: 1 }))}
 					</Text>
-					{media?.genres ? <Genres genres={media.genres} /> : null}
+					{tvSeries?.genres ? <Genres genres={tvSeries.genres} /> : null}
 				</Text> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
 				{/* TITLE */}
 				{!loading ? (
@@ -224,47 +214,40 @@ const MediaHeader: React.FC<MediaHeaderProps> = ({
 					variant="title"
 					numberOfLines={2}
 					style={[
-						(!media && !loading) && { textAlign: 'center', color: colors.mutedForeground }
+						(!tvSeries && !loading) && { textAlign: 'center', color: colors.mutedForeground }
 					]}
 					>
-						{media?.title ?? (
-							media?.media_type === 'tv_series' ? upperFirst(t('common.messages.tv_series_not_found')) :
-							media?.media_type === 'person' ? upperFirst(t('common.messages.person_not_found')) :
-							media?.media_type === 'movie' ? upperFirst(t('common.messages.film_not_found')) :
-							media?.media_type === 'tv_episode' ? upperFirst(t('common.messages.tv_episode_not_found')) :
-							media?.media_type === 'tv_season' ? upperFirst(t('common.messages.tv_season_not_found')) :
-							upperFirst(t('common.messages.media_not_found'))
-						)}
+						{tvSeries?.name || upperFirst(t('common.messages.tv_series_not_found'))}
 					</Text>
 				) : <Skeleton style={tw.style('w-64 h-12')} />}
-				{(media?.extra_data.original_title && lowerCase(media.extra_data.original_title) !== lowerCase(media.title!)) ? (
+				{(tvSeries?.original_name && lowerCase(tvSeries.original_name) !== lowerCase(tvSeries.name!)) ? (
 					<Text numberOfLines={1} style={[ { color: colors.mutedForeground }, tw.style('text-lg font-semibold')]}>
-						{media.extra_data.original_title}
+						{tvSeries.original_name}
 					</Text>
 				) : null}
 				{/* DIRECTORS & DURATION */}
-				{media?.main_credit || media?.extra_data.runtime ? (
+				{tvSeries?.created_by ? (
 					<Text>
-						{media.main_credit ? <Directors directors={media.main_credit} /> : null}
+						{tvSeries.created_by && <Directors directors={tvSeries.created_by} />}
 					</Text>
 				) : null}
 
 			</Animated.View>
 		</Animated.View>
-		{media ? (
+		{tvSeries && (
 		<View style={[tw`flex-row items-center justify-between gap-4`, { paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }]}>
 			<View style={tw`flex-row items-center gap-4`}>
-				<MediaActionUserActivityRating media={media} />
+				{/* <MediaActionUserActivityRating media={media} />
 				<MediaActionUserActivityLike media={media} />
 				<MediaActionUserActivityWatch media={media} />
-				<MediaActionUserWatchlist media={media} />
+				<MediaActionUserWatchlist media={media} /> */}
 			</View>
 			<View style={tw`flex-row items-center gap-4`}>
-				<MediaActionPlaylistAdd media={media} />
-				<MediaActionUserRecos media={media} />
+				<ButtonPlaylistTvSeriesAdd tvSeries={tvSeries} />
+				{/* <MediaActionUserRecos media={media} /> */}
 			</View>
 		</View>
-		) : null}
+		)}
 	</Animated.View>
 	);
 };
@@ -300,10 +283,10 @@ const Directors = ({
 			{directors.map((director, index) => (
 				<React.Fragment key={index}>
 					{index !== 0 ? ", " : null}
-					<Link href={`/person/${director.id}`}>{director.title}</Link>
+					<Link href={`/person/${director.id}`}>{director.name}</Link>
 				</React.Fragment>
 			))}
 		</>
 	)
 };
-export default MediaHeader;
+export default TvSeriesHeader;

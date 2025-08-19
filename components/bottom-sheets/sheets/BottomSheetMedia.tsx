@@ -18,6 +18,7 @@ import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
+import BottomSheetShare from './BottomSheetShare';
 
 interface BottomSheetMediaProps extends BottomSheetProps {
   media?: Media,
@@ -122,6 +123,15 @@ const BottomSheetMedia = React.forwardRef<
           label: upperFirst(t('common.messages.send_to_friend')),
         }
       ] : []),
+      {
+        icon: Icons.Share,
+        onPress: () => openSheet(BottomSheetShare, {
+          type: media?.media_type!,
+          path: media?.url!,
+          media: media,
+        }),
+        label: upperFirst(t('common.messages.share')),
+      }
     ],
     [
       ...additionalItemsBottom,

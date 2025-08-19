@@ -127,6 +127,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		typedRoutes: true,
 	},
 	extra: {
+		webDomain: getWebDomain(),
 		router: {
 			origin: false,
 		},

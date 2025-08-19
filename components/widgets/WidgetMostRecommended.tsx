@@ -1,12 +1,15 @@
 import { View, Dimensions, ViewProps } from "react-native";
 import { useWidgetMostRecommended } from "@/features/widget/widgetQueries";
 import { Skeleton } from "../ui/Skeleton";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
 import { useSharedValue } from "react-native-reanimated";
 import { ThemedText } from "../ui/ThemedText";
 import tw from "@/lib/tw";
 import { ImageBackground } from "expo-image";
+import { Database } from "@/types";
+import { getMediaDetails } from "../utils/getMediaDetails";
+import { MediaMovie, MediaTvSeries } from "@/types/type.db";
 
 const width = Dimensions.get("window").width;
 
@@ -28,6 +31,11 @@ const WidgetMostRecommended = ({
 		});
 	};
 
+	// Render
+	const renderItem = ({ item }: { item: Database['public']['Views']['widget_most_recommended']['Row'] }) => (
+		<WidgetMostRecommendedItem item={item} />
+	);
+
 	if (data === undefined || isLoading) {
 		return <Skeleton style={[tw.style('w-full h-80'), style]} />
 	}
@@ -40,16 +48,8 @@ const WidgetMostRecommended = ({
 				height={width / 2}
 				data={data}
 				onProgressChange={progress}
-				renderItem={({ index, item }) => (
-					<ImageBackground
-					source={{ uri: item.media?.backdrop_url ?? ''}}
-					style={tw.style('h-80 rounded-md overflow-hidden')}
-					>
-						<ThemedText style={{ textAlign: "center", fontSize: 30 }}>{item.media?.title}</ThemedText>
-					</ImageBackground>
-				)}
+				renderItem={renderItem}
 			/>
-		
 			<Pagination.Basic
 				progress={progress}
 				data={data}
@@ -59,6 +59,31 @@ const WidgetMostRecommended = ({
 			/>
 		</View>
 	)
+};
+
+const WidgetMostRecommendedItem = ({
+	item,
+} : {
+	item: Database['public']['Views']['widget_most_recommended']['Row']
+}) => {
+	const details = useMemo(() => {
+		switch (item.type) {
+			case 'movie':
+				return getMediaDetails({ type: 'movie', media: item.media as MediaMovie });
+			case 'tv_series':
+				return getMediaDetails({ type: 'tv_series', media: item.media as MediaTvSeries });
+			default:
+				return null;
+		}
+	}, [item]);
+	return (
+		<ImageBackground
+			source={{ uri: item.media?.backdrop_url ?? ''}}
+			style={tw.style('h-80 rounded-md overflow-hidden')}
+		>
+			<ThemedText style={{ textAlign: "center", fontSize: 30 }}>{details?.title}</ThemedText>
+		</ImageBackground>
+	);
 };
 
 export default WidgetMostRecommended;

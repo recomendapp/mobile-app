@@ -29,11 +29,11 @@ const AppLayout = ({ segment } : { segment: string }) => {
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="notifications" options={{ headerShown: false, presentation: "modal", headerTitle: upperFirst(t('common.messages.notification', { count: 2 })) }} />
       </Stack.Protected>
-      {/* REVIEWS */}
-      <Stack.Screen name="review/[review_id]/index" options={{ headerTitle: upperFirst(t('common.messages.review', { count: 1 })) }} />
+      {/* MOVIES */}
+      <Stack.Screen name="film/[film_id]/review/[review_id]/index" options={{ headerTitle: upperFirst(t('common.messages.review', { count: 1 })) }} />
       <Stack.Protected guard={!!session}>
-        <Stack.Screen name="review/create/[media_id]" options={{ headerTitle: upperFirst(t('common.messages.new_review')) }} />
-        <Stack.Screen name="review/[review_id]/edit" options={{ headerTitle: upperFirst(t('common.messages.edit_review')) }} />
+        <Stack.Screen name="film/[film_id]/review/create" options={{ headerTitle: upperFirst(t('common.messages.new_review')) }} />
+        <Stack.Screen name="film/[film_id]/review/[review_id]/edit" options={{ headerTitle: upperFirst(t('common.messages.edit_review')) }} />
       </Stack.Protected>
       {/* SETTINGS */}
       <Stack.Screen name="settings/index" options={{ headerTitle: upperFirst(t('pages.settings.label')) }} />
@@ -48,7 +48,9 @@ const AppLayout = ({ segment } : { segment: string }) => {
       {/* PLAYLIST */}
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="playlist/[playlist_id]/sort" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="playlist/add/media/[media_id]" options={{ presentation: 'modal' }} />
+        {/* ADD */}
+        <Stack.Screen name="playlist/add/movie/[movie_id]" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="playlist/add/tv_series/[tv_series_id]" options={{ presentation: 'modal' }} />
         <Stack.Screen
         name='playlist/[playlist_id]/edit'
         options={{

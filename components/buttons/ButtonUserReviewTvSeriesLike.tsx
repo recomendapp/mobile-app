@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserReviewLikeQuery } from "@/features/user/userQueries";
-import { useUserReviewLikeDeleteMutation, useUserReviewLikeInsertMutation } from "@/features/user/userMutations";
+import { useUserReviewTvSeriesLikeQuery } from "@/features/user/userQueries";
+import { useUserReviewTvSeriesLikeInsertMutation, useUserReviewTvSeriesLikeDeleteMutation } from "@/features/user/userMutations";
 import { usePathname, useRouter } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Icons } from "@/constants/Icons";
@@ -11,15 +11,15 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 
-interface ReviewActionLikeProps
+interface ButtonUserReviewTvSeriesLikeProps
 	extends React.ComponentProps<typeof Button> {
 		reviewId: number;
 		reviewLikesCount?: number;
 	}
 
-const ReviewActionLike = React.forwardRef<
+const ButtonUserReviewTvSeriesLike = React.forwardRef<
 	React.ComponentRef<typeof Button>,
-	ReviewActionLikeProps
+	ButtonUserReviewTvSeriesLikeProps
 >(({ reviewId, reviewLikesCount, variant = "ghost", size, icon = Icons.like, onPress, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session } = useAuth();
@@ -30,13 +30,13 @@ const ReviewActionLike = React.forwardRef<
 		data: like,
 		isLoading,
 		isError,
-	} = useUserReviewLikeQuery({
+	} = useUserReviewTvSeriesLikeQuery({
 		reviewId: reviewId,
 		userId: session?.user.id,
 	});
 	const [likeCount, setLikeCount] = React.useState<number | undefined>(reviewLikesCount);
-	const insertLike = useUserReviewLikeInsertMutation();
-	const deleteLike = useUserReviewLikeDeleteMutation();
+	const insertLike = useUserReviewTvSeriesLikeInsertMutation();
+	const deleteLike = useUserReviewTvSeriesLikeDeleteMutation();
 
 	const handleLike = async () => {
 		if (!session?.user.id || !reviewId) return;
@@ -77,8 +77,8 @@ const ReviewActionLike = React.forwardRef<
 	};
 
 	React.useEffect(() => {
-        setLikeCount(reviewLikesCount);
-    }, [reviewLikesCount]);
+		setLikeCount(reviewLikesCount);
+	}, [reviewLikesCount]);
 
 	if (!session) return null;
 
@@ -106,6 +106,6 @@ const ReviewActionLike = React.forwardRef<
 		</Button>
 	);
 });
-ReviewActionLike.displayName = 'ReviewActionLike';
+ButtonUserReviewTvSeriesLike.displayName = 'ButtonUserReviewTvSeriesLike';
 
-export default ReviewActionLike;
+export default ButtonUserReviewTvSeriesLike;

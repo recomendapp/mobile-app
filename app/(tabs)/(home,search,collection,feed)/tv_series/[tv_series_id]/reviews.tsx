@@ -1,4 +1,3 @@
-import MediaReviews from "@/components/screens/media/MediaReviews";
 import { useMediaTvSeriesDetailsQuery } from "@/features/media/mediaQueries";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import { Stack, useLocalSearchParams } from "expo-router";
@@ -26,7 +25,7 @@ const TvSeriesReviews = () => {
 			) : undefined,
 		}}
 		/>
-		<MediaReviews mediaId={series?.media_id} />
+		{/* <MediaReviews mediaId={series?.media_id} /> */}
 	</>
 	)
 };

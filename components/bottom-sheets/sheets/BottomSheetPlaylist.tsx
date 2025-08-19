@@ -59,9 +59,7 @@ const BottomSheetPlaylist = React.forwardRef<
 	const insertPlaylistSaved = useUserPlaylistSavedInsertMutation();
 	const deletePlaylistSaved = useUserPlaylistSavedDeleteMutation();
 
-  const playlistDeleteMutation = usePlaylistDeleteMutation({
-    userId: session?.user.id,
-  });
+  const playlistDeleteMutation = usePlaylistDeleteMutation();
 
   const items: Item[][] = React.useMemo(() => {
     return [
@@ -121,7 +119,7 @@ const BottomSheetPlaylist = React.forwardRef<
           onPress: () => router.push(`/user/${playlist.user?.username}`),
           label: upperFirst(t('common.messages.go_to_user')),
         },
-        ...(session?.user.id === playlist.user?.id ? [
+        ...(session?.user.id === playlist.user_id ? [
           {
             icon: Icons.Users,
             onPress: () => router.push(`/playlist/${playlist.id}/edit/guests`),
@@ -147,7 +145,7 @@ const BottomSheetPlaylist = React.forwardRef<
                     text: upperFirst(t('common.messages.delete')),
                     onPress: async () => {
                       await playlistDeleteMutation.mutateAsync(
-                        { id: playlist.id },
+                        { playlistId: playlist.id, userId: session.user.id },
                         {
                           onSuccess: () => {
                             Burnt.toast({

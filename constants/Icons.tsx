@@ -62,4 +62,5 @@ export const Icons = {
 	Menu: MenuIcon,
 	ListOrdered: ListOrderedIcon,
 	X: XIcon,
+	Share: LinkIcon,
 };

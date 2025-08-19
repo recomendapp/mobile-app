@@ -44,8 +44,8 @@ const CardTvSeriesSeasonDefault = React.forwardRef<
 		{...props}
 		>
 			<ImageWithFallback
-				source={{uri: season.avatar_url ?? ''}}
-				alt={season.title ?? ''}
+				source={{uri: season.poster_url ?? ''}}
+				alt={season.name ?? ''}
 				type={'tv_season'}
 				style={[
 					{ aspectRatio: 2 / 3 },
@@ -54,7 +54,7 @@ const CardTvSeriesSeasonDefault = React.forwardRef<
 			>
 				{showRating && (
 					<IconMediaRating
-					rating={season.tmdb_vote_average}
+					rating={season.vote_average}
 					variant="general"
 					style={tw`absolute top-1 right-1`}
 					/>

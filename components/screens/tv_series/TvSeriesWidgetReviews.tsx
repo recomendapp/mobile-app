@@ -1,73 +1,75 @@
 import tw from "@/lib/tw";
-import { ActivityIndicator, StyleProp, TextStyle, View, ViewStyle } from "react-native";
+import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
+import { ThemedText } from "@/components/ui/ThemedText";
 import { LegendList } from "@legendapp/list";
-import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { upperFirst } from "lodash";
 import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useMediaPlaylistsInfiniteQuery } from "@/features/media/mediaQueries";
-import { ThemedText } from "@/components/ui/ThemedText";
+import { useMediaReviewsTvSeriesInfiniteQuery } from "@/features/media/mediaQueries";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
-import { Playlist } from "@/types/type.db";
+import { MediaTvSeries, UserReviewTvSeries } from "@/types/type.db";
+import { CardReviewTvSeries } from "@/components/cards/reviews/CardReviewTvSeries";
 
-interface MediaWidgetPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
-	mediaId: number;
+interface TvSeriesWidgetReviewsProps extends React.ComponentPropsWithoutRef<typeof View> {
+	tvSeries: MediaTvSeries;
 	url: Href;
 	labelStyle?: StyleProp<TextStyle>;
 	containerStyle?: StyleProp<ViewStyle>;
 }
 
-const MediaWidgetPlaylists = ({
-	mediaId,
+const TvSeriesWidgetReviews = ({
+	tvSeries,
 	url,
 	style,
 	labelStyle,
 	containerStyle,
-} : MediaWidgetPlaylistsProps) => {
+} : TvSeriesWidgetReviewsProps) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
-	const urlPlaylists = `${url}/playlists` as Href;
+	const urlReviews = `${url}/reviews` as Href;
 	const {
-		data: playlists,
+		data: reviews,
 		isLoading,
 		fetchNextPage,
 		hasNextPage,
-	} = useMediaPlaylistsInfiniteQuery({
-		id: mediaId,
-		filters: {
-			perPage: 2,
-		}
+	} = useMediaReviewsTvSeriesInfiniteQuery({
+		tvSeriesId: tvSeries.id,
 	});
-	const loading = playlists === undefined || isLoading;
+	const loading = reviews === undefined || isLoading;
 
 	return (
 	<View style={[tw`gap-1`, style]}>
-		<Link href={urlPlaylists} style={labelStyle}>
+		<Link href={urlReviews} style={labelStyle}>
 			<View style={tw`flex-row items-center`}>
 				<ThemedText style={tw`font-medium text-lg`} numberOfLines={1}>
-					{upperFirst(t('common.messages.playlist', { count: 2 }))}
+					{upperFirst(t('common.messages.review', { count: 2 }))}
 				</ThemedText>
 				<Icons.ChevronRight color={colors.mutedForeground} />
 			</View>
 		</Link>
-		<LegendList<Playlist>
-		key={loading ? 'loading' : 'playlists'}
-		data={loading ? new Array(3).fill(null) : playlists?.pages.flat()}
+		<LegendList<UserReviewTvSeries>
+		key={loading ? 'loading' : 'reviews'}
+		data={loading ? new Array(3).fill(null) : reviews?.pages.flat()}
 		renderItem={({ item }) => (
 			!loading ? (
-				<CardPlaylist playlist={item} style={tw`w-36`} />
+				<CardReviewTvSeries
+				review={item}
+				activity={item.activity!}
+				author={item.activity?.user!} style={tw`w-86`}
+				url={`/tv_series/${tvSeries?.slug || tvSeries?.id}/review/${item.id}`}
+				/>
 			) : (
-				<CardPlaylist skeleton style={tw`w-36`} />
+				<CardReviewTvSeries skeleton style={tw`w-86`} />
 			)
 		)}
 		ListEmptyComponent={
 			<Text style={[tw``, { color: colors.mutedForeground }]}>
-				{upperFirst(t('common.messages.no_playlists'))}
+				{upperFirst(t('common.messages.no_reviews'))}
 			</Text>
 		}
-		snapToInterval={152}
+		snapToInterval={352}
 		decelerationRate="fast"
 		keyExtractor={(item, index) => loading ? index.toString() : item.id.toString()}
 		horizontal
@@ -82,4 +84,4 @@ const MediaWidgetPlaylists = ({
 	);
 };
 
-export default MediaWidgetPlaylists;
+export default TvSeriesWidgetReviews;

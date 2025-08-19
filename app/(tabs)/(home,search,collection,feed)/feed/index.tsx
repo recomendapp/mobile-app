@@ -17,6 +17,9 @@ import UserAvatar from "@/components/user/UserAvatar";
 import FeedUserActivity from "@/components/screens/feed/FeedUserActivity";
 import { PADDING_VERTICAL } from "@/theme/globals";
 import { Pressable } from "react-native-gesture-handler";
+import { CardFeedMovie } from "@/components/cards/feed/CardFeedMovie";
+import { MediaMovie, MediaTvSeries, UserActivity, UserActivityMovie, UserActivityTvSeries } from "@/types/type.db";
+import { CardFeedTvSeries } from "@/components/cards/feed/CardFeedTvSeries";
 
 const FeedScreen = () => {
 	const { user } = useAuth();
@@ -35,32 +38,24 @@ const FeedScreen = () => {
 		userId: user?.id,
 	});
 	const loading = isLoading || feed === undefined;
+
+	// Render 
+	const renderItem = ({ item, index } : { item: UserActivity, index: number }) => {
+		const { media, media_id, ...activity } = item;
+		switch (item.type) {
+			case 'movie':
+				return <CardFeedMovie activity={{ movie_id: media_id!, ...activity } as UserActivityMovie} movie={item.media as MediaMovie} />
+			case 'tv_series':
+				return <CardFeedTvSeries activity={{ tv_series_id: media_id!, ...activity } as UserActivityTvSeries} tvSeries={item.media as MediaTvSeries} />
+			default:
+				return null;
+		}
+	};
+
 	return (
 		<LegendList
 		data={feed?.pages.flat() || []}
-		renderItem={({ item, index }) => (
-			<CardFeedItem
-			title={item.media?.title ?? ''}
-			posterUrl={item.media?.avatar_url ?? ''}
-			posterType={item.media?.media_type}
-			onPosterPress={() => router.push(item.media?.url as Href)}
-			description={item.media?.extra_data.overview ?? ''}
-			content={
-				<View style={tw`flex-row items-center gap-1`}>
-					<UserAvatar avatar_url={item.user?.avatar_url} full_name={item.user?.full_name!} style={tw`w-6 h-6`} />
-					<FeedUserActivity activity={item} style={[{ color: colors.mutedForeground }, tw`text-sm`]} />
-				</View>
-			}
-			footer={item.review ? (
-				<CardReview activity={item} review={item?.review} author={item?.user!} style={{ backgroundColor: colors.background }} />
-			) : undefined}
-			onPress={() => router.push(`/user/${item.user?.username}`)}
-			onLongPress={() => openSheet(BottomSheetMedia, {
-				media: item.media,
-				activity: item,
-			})}
-			/>
-		)}
+		renderItem={renderItem}
 		ListEmptyComponent={() => !loading ? (
 			<View style={tw`flex-1 items-center justify-center`}>
 				<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>

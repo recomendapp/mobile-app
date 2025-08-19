@@ -2,9 +2,9 @@ import BottomSheetPlaylistCreate from "@/components/bottom-sheets/sheets/BottomS
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { usePlaylistAddMediaMutation } from "@/features/playlist/playlistMutations";
+import { usePlaylistMovieInsertMutation } from "@/features/playlist/playlistMutations";
 import { useAuth } from "@/providers/AuthProvider";
-import { Playlist, PlaylistType } from "@/types/type.db";
+import { Playlist, PlaylistSource } from "@/types/type.db";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -23,49 +23,51 @@ import Animated, { FadeInRight, FadeOutRight, useAnimatedStyle, useSharedValue, 
 import { SearchBar } from "@/components/ui/searchbar";
 import { PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
-import { useUserAddMediaToPlaylistQuery } from "@/features/user/userQueries";
 import { useTheme } from "@/providers/ThemeProvider";
 import AnimatedContentContainer from "@/components/ui/AnimatedContentContainer";
 import Fuse from "fuse.js";
 import { Icons } from "@/constants/Icons";
 import { Badge } from "@/components/ui/Badge";
 import { useQueryClient } from "@tanstack/react-query";
-import { userKeys } from "@/features/user/userKeys";
 import { Input } from "@/components/ui/Input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { usePlaylistMovieAddToQuery } from "@/features/playlist/playlistQueries";
+import { playlistKeys } from "@/features/playlist/playlistKeys";
 
 const COMMENT_MAX_LENGTH = 180;
 
-const PlaylistAddMedia = () => {
+const PlaylistMovieAdd = () => {
 	const t = useTranslations();
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const { colors, inset } = useTheme();
 	const { session } = useAuth();
-	const { media_id, media_title } = useLocalSearchParams();
-	const mediaId = Number(media_id);
-	const mediaTitle = media_title;
+	const { movie_id, movie_title } = useLocalSearchParams();
+	const movieId = Number(movie_id);
+	const movieTitle = movie_title;
 
 	// Form
-	const addMediaToPlaylistFormSchema = z.object({
+	const addMovieToPlaylistFormSchema = z.object({
 		comment: z.string()
 			.max(COMMENT_MAX_LENGTH, { message: upperFirst(t('common.form.length.char_max', { count: COMMENT_MAX_LENGTH }))})
 			.regex(/^(?!\s+$)(?!.*\n\s*\n)[\s\S]*$/)
 			.optional()
 			.nullable(),
 	});
-	type AddMediaToPlaylistFormValues = z.infer<typeof addMediaToPlaylistFormSchema>;
-	const defaultValues: Partial<AddMediaToPlaylistFormValues> = {
+	type AddMovieToPlaylistFormValues = z.infer<typeof addMovieToPlaylistFormSchema>;
+	const defaultValues: Partial<AddMovieToPlaylistFormValues> = {
 		comment: '',
 	};
-	const form = useForm<AddMediaToPlaylistFormValues>({
-		resolver: zodResolver(addMediaToPlaylistFormSchema),
+	const form = useForm<AddMovieToPlaylistFormValues>({
+		resolver: zodResolver(addMovieToPlaylistFormSchema),
 		defaultValues,
 		mode: 'onChange',
 	});
 
 	// Mutations
-	const addToPlaylistMutation = usePlaylistAddMediaMutation();
+	const addToPlaylistMutation = usePlaylistMovieInsertMutation({
+		movieId: movieId,
+	});
 
 	// REFs
 	const BottomSheetPlaylistCreateRef = useRef<TrueSheet>(null);
@@ -74,7 +76,7 @@ const PlaylistAddMedia = () => {
 	const footerHeight = useSharedValue(0);
 
 	// States
-	const [view, setView] = useState<PlaylistType>('personal');
+	const [source, setSource] = useState<PlaylistSource>('personal');
 	const [search, setSearch] = useState('');
 	const [results, setResults] = useState<typeof playlists>([]);
 	const [selected, setSelected] = useState<Playlist[]>([]);
@@ -87,10 +89,10 @@ const PlaylistAddMedia = () => {
 		data: playlists,
 		isRefetching,
 		refetch,
-	} = useUserAddMediaToPlaylistQuery({
+	} = usePlaylistMovieAddToQuery({
 		userId: session?.user?.id,
-		mediaId: mediaId,
-		type: view,
+		movieId: movieId,
+		source: source,
 	});
 
 	// Search
@@ -118,37 +120,31 @@ const PlaylistAddMedia = () => {
 			return [...prev, playlist];
 		});
 	}, []);
-	const handleSubmit = async (values: AddMediaToPlaylistFormValues) => {
-		try {
-			if (selected.length === 0) return;
-			await addToPlaylistMutation.mutateAsync({
-				userId: session?.user.id!,
-				mediaId: mediaId,
-				playlists: selected,
-				comment: values.comment || undefined,
-			}, {
-				onError: (error) => {
-					throw error;
-				}
-			})
-			Burnt.toast({
-				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
-				preset: 'done',
-			});
-			router.dismiss();
-		} catch (error) {
-			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
-			if (error instanceof Error) {
-				errorMessage = error.message;
-			} else if (typeof error === 'string') {
-				errorMessage = error;
+	const handleSubmit = async (values: AddMovieToPlaylistFormValues) => {
+		if (!session) return;
+		if (selected.length === 0) return;
+		await addToPlaylistMutation.mutateAsync({
+			userId: session?.user.id,
+			movieId: movieId,
+			playlists: selected,
+			comment: values.comment || undefined,
+		}, {
+			onSuccess: () => {
+				Burnt.toast({
+					title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
+					preset: 'done',
+				});
+				router.dismiss();
+			},
+			onError: (error) => {
+				Burnt.toast({
+					title: upperFirst(t('common.messages.error')),
+					message: upperFirst(t('common.messages.an_error_occurred')),
+					preset: 'error',
+					haptic: 'error',
+				});
 			}
-			Burnt.toast({
-				title: errorMessage,
-				preset: 'error',
-				haptic: 'error',
-			});
-		}
+		});
 	};
 	const handleCancel = () => {
 		if (canSave) {
@@ -244,7 +240,7 @@ const PlaylistAddMedia = () => {
 				placeholder={upperFirst(t('common.messages.search_playlist', { count: 1 }))}
 				containerStyle={tw`flex-1`}
 				/>
-				{view === 'personal' && (
+				{source === 'personal' && (
                     <Animated.View 
 					entering={FadeInRight.duration(200)} 
 					exiting={FadeOutRight.duration(200)}
@@ -259,10 +255,10 @@ const PlaylistAddMedia = () => {
 			<Button
 			variant="muted"
 			onPress={() => {
-				setView((prev) => prev === 'personal' ? 'saved' : 'personal')
+				setSource((prev) => prev === 'personal' ? 'saved' : 'personal')
 			}}
 			>
-				{view === 'saved' ? upperFirst(t('common.messages.my_playlist', { count: 2 })) : upperFirst(t('common.messages.saved', { gender: 'female', count: 2 }))}
+				{source === 'saved' ? upperFirst(t('common.messages.my_playlist', { count: 2 })) : upperFirst(t('common.messages.saved', { gender: 'female', count: 2 }))}
 			</Button>
 		</View>
 		<AnimatedLegendList
@@ -340,13 +336,13 @@ const PlaylistAddMedia = () => {
 
 		<BottomSheetPlaylistCreate
 		ref={BottomSheetPlaylistCreateRef}
-		id={`${mediaId}-create-playlist`}
+		id={`${movieId}-create-playlist`}
 		onCreate={(playlist) => {
 			BottomSheetPlaylistCreateRef.current?.dismiss();
-			queryClient.setQueryData(userKeys.addMediaToPlaylist({
-				userId: session?.user?.id!,
-				mediaId: mediaId,
-				type: 'personal',
+			queryClient.setQueryData(playlistKeys.addToSource({
+				id: movieId,
+				type: 'movie',
+				source: 'personal',
 			}), (prev: { playlist: Playlist; already_added: boolean }[] | undefined) => {
 				if (!prev) return [{ playlist, already_added: false }];
 				return [
@@ -356,10 +352,11 @@ const PlaylistAddMedia = () => {
 			});
 			setSelected((prev) => [...prev, playlist]);
 		}}
-		placeholder={String(mediaTitle)}
+		placeholder={String(movieTitle)}
+		playlistType='movie'
 		/>
 	</>
 	)
 };
 
-export default PlaylistAddMedia;
+export default PlaylistMovieAdd;

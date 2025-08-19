@@ -1,18 +1,19 @@
 import * as React from "react"
-import { JSONContent, User, UserActivity, UserReview } from "@/types/type.db";
+import { JSONContent, User, UserActivityTvSeries, UserReviewTvSeries } from "@/types/type.db";
 import Animated from "react-native-reanimated";
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
-import { ThemedText } from "../ui/ThemedText";
-import { IconMediaRating } from "../medias/IconMediaRating";
-import { CardUser } from "./CardUser";
-import ActionReviewLike from "../reviews/actions/ReviewActionLike";
-import { Skeleton } from "../ui/Skeleton";
 import { FixedOmit } from "@/types";
+import { IconMediaRating } from "@/components/medias/IconMediaRating";
+import { CardUser } from "../CardUser";
+import { Text } from "@/components/ui/text";
+import { Skeleton } from "@/components/ui/Skeleton";
+import ButtonUserReviewTvSeriesLike from "@/components/buttons/ButtonUserReviewTvSeriesLike";
+import { Href } from "expo-router";
 
-interface CardReviewBaseProps
+interface CardReviewTvSeriesBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
 		variant?: "default";
 		onPress?: () => void;
@@ -20,26 +21,28 @@ interface CardReviewBaseProps
 		linked?: boolean;
 	}
 
-type CardReviewSkeletonProps = {
+type CardReviewTvSeriesSkeletonProps = {
   skeleton: true;
   review?: never;
   activity?: never;
   author?: never;
+  url?: never;
 };
 
-type CardReviewDataProps = {
+type CardReviewTvSeriesDataProps = {
   skeleton?: false;
-  review: UserReview;
-  activity: UserActivity;
+  review: UserReviewTvSeries;
+  activity: UserActivityTvSeries;
   author: User;
+  url: Href;
 };
 
-export type CardReviewProps = CardReviewBaseProps &
-  (CardReviewSkeletonProps | CardReviewDataProps);
+export type CardReviewTvSeriesProps = CardReviewTvSeriesBaseProps &
+  (CardReviewTvSeriesSkeletonProps | CardReviewTvSeriesDataProps);
 
-const CardReviewDefault = React.forwardRef<
+const CardReviewTvSeriesDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	FixedOmit<CardReviewProps, "variant" | "linked" | "onPress" | "onLongPress">
+	FixedOmit<CardReviewTvSeriesProps, "variant" | "linked" | "onPress" | "onLongPress" | "url">
 >(({ review, skeleton, activity, author, children, style, ...props }, ref) => {
 	const { colors } = useTheme();
 	return (
@@ -59,39 +62,35 @@ const CardReviewDefault = React.forwardRef<
 				{!skeleton ? <CardUser variant="inline" user={author} /> : <CardUser variant="inline" skeleton={skeleton} />}
 				{review?.title && (
 					!skeleton ? (
-						<ThemedText numberOfLines={1} style={tw.style("font-semibold")}>
+						<Text numberOfLines={1} style={tw.style("font-semibold")}>
 							{review?.title}
-						</ThemedText>
-					) : (
-						<Skeleton style={tw.style("h-4 w-1/3")} />
-					)
+						</Text>
+					) : <Skeleton style={tw.style("h-4 w-1/3")} />
 				)}
 				{!skeleton ? (
 					<Overview data={review?.body} />
-				) : (
-					<Skeleton style={tw.style("h-12 w-full")} />
-				)}
+				) : <Skeleton style={tw.style("h-12 w-full")} />}
 				{!skeleton && (
 					<View style={tw.style("flex-row items-center justify-end m-1")}>
-						<ActionReviewLike reviewId={review?.id} reviewLikesCount={review.likes_count} />
+						<ButtonUserReviewTvSeriesLike reviewId={review?.id} reviewLikesCount={review.likes_count} />
 					</View>
 				)}
 			</View>
 		</Animated.View>
 	);
 });
-CardReviewDefault.displayName = "CardReviewDefault";
+CardReviewTvSeriesDefault.displayName = "CardReviewTvSeriesDefault";
 
 
-const CardReview = React.forwardRef<
+const CardReviewTvSeries = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	CardReviewProps
->(({ linked = true, variant = "default", onPress, onLongPress, ...props }, ref) => {
+	CardReviewTvSeriesProps
+>(({ linked = true, variant = "default", url, onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
 
 	const content = (
 		variant === "default" ? (
-			<CardReviewDefault ref={ref} {...props} />
+			<CardReviewTvSeriesDefault ref={ref} {...props} />
 		) : null
 	);
 
@@ -100,7 +99,7 @@ const CardReview = React.forwardRef<
 	return (
 		<Pressable
 		onPress={() => {
-			if (linked) router.push(`/review/${props.review?.id}`);
+			if (linked) router.push(url as Href);
 			onPress?.();
 		}}
 		onLongPress={() => {
@@ -111,7 +110,7 @@ const CardReview = React.forwardRef<
 		</Pressable>
 	);
 });
-CardReview.displayName = "CardReview";
+CardReviewTvSeries.displayName = "CardReviewTvSeries";
 
 const Overview = ({ data }: { data: JSONContent }) => {
 	const text = data?.content
@@ -121,14 +120,14 @@ const Overview = ({ data }: { data: JSONContent }) => {
 		)
 		.join('\n');
 	return (
-	<ThemedText numberOfLines={3} style={tw.style("text-justify")}>
+	<Text numberOfLines={3} style={tw.style("text-justify")}>
 		{text}
-	</ThemedText>
+	</Text>
 	);
 };
 
 export {
-	CardReview,
-	CardReviewDefault,
+	CardReviewTvSeries,
+	CardReviewTvSeriesDefault,
 	Overview,
 }

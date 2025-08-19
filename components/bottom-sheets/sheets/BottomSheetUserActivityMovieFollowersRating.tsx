@@ -6,7 +6,7 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { FlatList } from 'react-native-gesture-handler';
-import { useUserFollowersRatingQuery } from '@/features/user/userQueries';
+import { useUserActivityMovieFollowersRatingQuery } from '@/features/user/userQueries';
 import { useAuth } from '@/providers/AuthProvider';
 import { CardUser } from '@/components/cards/CardUser';
 import { BarChart } from '@/components/charts/bar-chart';
@@ -17,23 +17,23 @@ import { useTranslations } from 'use-intl';
 import { interpolateRgb } from 'd3-interpolate'; 
 import { Text } from '@/components/ui/text';
 
-interface BottomSheetMediaFollowersAverageRatingProps extends BottomSheetProps {
-  mediaId: number;
+interface BottomSheetUserActivityMovieFollowersRatingProps extends BottomSheetProps {
+  movieId: number;
 }
 
-const BottomSheetMediaFollowersAverageRating = React.forwardRef<
+const BottomSheetUserActivityMovieFollowersRating = React.forwardRef<
 	React.ComponentRef<typeof TrueSheet>,
-	BottomSheetMediaFollowersAverageRatingProps
->(({ id, mediaId, sizes = ['medium', 'large'], ...props }, ref) => {
+	BottomSheetUserActivityMovieFollowersRatingProps
+>(({ id, movieId, sizes = ['medium', 'large'], ...props }, ref) => {
   const { user } = useAuth();
-  const { colors, inset } = useTheme();
+  const { inset } = useTheme();
   const t = useTranslations();
   const {
     data: followersRating,
 		isLoading,
-	} = useUserFollowersRatingQuery({
+	} = useUserActivityMovieFollowersRatingQuery({
     userId: user?.id,
-		mediaId: mediaId,
+		movieId: movieId,
 	});
   const loading = followersRating === undefined || isLoading;
   const refFlatList = React.useRef<FlatList<NonNullable<typeof followersRating>[number]>>(null);
@@ -115,6 +115,6 @@ const BottomSheetMediaFollowersAverageRating = React.forwardRef<
     </ThemedTrueSheet>
   );
 });
-BottomSheetMediaFollowersAverageRating.displayName = 'BottomSheetMediaFollowersAverageRating';
+BottomSheetUserActivityMovieFollowersRating.displayName = 'BottomSheetUserActivityMovieFollowersRating';
 
-export default BottomSheetMediaFollowersAverageRating;
+export default BottomSheetUserActivityMovieFollowersRating;

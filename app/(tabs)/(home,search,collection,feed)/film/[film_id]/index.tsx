@@ -2,24 +2,24 @@ import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { Pressable, View } from "react-native";
-import { Media, MediaMoviePerson } from "@/types/type.db";
-import { CardMedia } from "@/components/cards/CardMedia";
+import { MediaMoviePerson } from "@/types/type.db";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { LegendList } from "@legendapp/list";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
-import BottomSheetMedia from "@/components/bottom-sheets/sheets/BottomSheetMedia";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useState } from "react";
-import MediaWidgetPlaylists from "@/components/screens/media/MediaWidgetPlaylists";
-import MediaWidgetReviews from "@/components/screens/media/MediaWidgetReviews";
-import MediaHeader from "@/components/screens/media/MediaHeader";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useLocale, useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { PADDING_VERTICAL } from "@/theme/globals";
+import MovieHeader from "@/components/screens/film/MovieHeader";
+import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
+import MovieWidgetReviews from "@/components/screens/film/MovieWidgetReviews";
+import MovieWidgetPlaylists from "@/components/screens/film/MovieWidgetPlaylists";
+import { CardPerson } from "@/components/cards/CardPerson";
 
 const FilmScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
@@ -62,8 +62,8 @@ const FilmScreen = () => {
 		scrollY={scrollY}
 		triggerHeight={headerHeight}
 		onMenuPress={movie ? () => {
-			openSheet(BottomSheetMedia, {
-				media: movie as Media,
+			openSheet(BottomSheetMovie, {
+				movie: movie,
 			})
 		} : undefined}
 		/>
@@ -82,8 +82,8 @@ const FilmScreen = () => {
 			/>
 		}
 		>
-			<MediaHeader
-			media={movie as Media}
+			<MovieHeader
+			movie={movie}
 			loading={loading}
 			scrollY={scrollY}
 			headerHeight={headerHeight}
@@ -97,7 +97,7 @@ const FilmScreen = () => {
 				>
 					<Text style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.overview'))}</Text>
 					<Text textColor='muted' numberOfLines={showFullSynopsis ? undefined : 5} style={tw.style('text-justify')}>
-						{movie.extra_data.overview ?? upperFirst(t('common.messages.no_overview'))}
+						{movie.overview ?? upperFirst(t('common.messages.no_overview'))}
 					</Text>
 				</Pressable>
 				{/* CASTING */}
@@ -105,8 +105,8 @@ const FilmScreen = () => {
 					<Text style={tw.style('px-4 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</Text>
 					{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <Text textColor='muted' style={tw`px-4`}>{upperFirst(t('common.messages.no_cast'))}</Text>}
 				</View>
-				<MediaWidgetPlaylists mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`}/>
-				<MediaWidgetReviews mediaId={movie.media_id!} url={movie.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`}/>
+				<MovieWidgetPlaylists movieId={movie.id!} url={movie.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`}/>
+				<MovieWidgetReviews movie={movie} url={movie.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`}/>
 			</View>}
 		</Animated.ScrollView>
 	</>
@@ -127,14 +127,14 @@ const FilmCast = ({
 			return (
 			<Link key={index} href={`/person/${item.person?.id}`} asChild>
 				<View style={tw.style('gap-2 w-24')}>
-					<CardMedia
+					<CardPerson
 					key={item.id}
 					variant='poster'
-					media={item.person as Media}
+					person={item.person}
 					style={tw.style('w-full')}
 					/>
 					<View style={tw.style('flex-col gap-1 items-center')}>
-						<Text numberOfLines={2}>{item.person?.title}</Text>
+						<Text numberOfLines={2}>{item.person?.name}</Text>
 						{item.role?.character ? <Text numberOfLines={2} style={[{ color: colors.accentYellow }, tw.style('italic text-sm')]}>{item.role?.character}</Text> : null}
 					</View>
 				</View>

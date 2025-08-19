@@ -6,15 +6,11 @@ export const useWidgetMostRecommended = ({
 	filters,
 } : {
 	filters?: {
-		order?: 'recommendation_count-desc' | 'recommendation_count-asc',
+		sortBy?: 'recommendation_count',
+		sortOrder?: 'asc' | 'desc',
 		limit?: number,
 	}
 } = {}) => {
-	const mergedFilters = {
-		order: 'created_at-asc',
-		limit: 10,
-		...filters
-	} as typeof filters;
 	const supabase = useSupabaseClient();
 	return useQuery({
 		queryKey: widgetKeys.widget({
@@ -24,20 +20,22 @@ export const useWidgetMostRecommended = ({
 		queryFn: async () => {
 			let request = supabase
 				.from('widget_most_recommended')
-				.select(`
-					*,
-					media(*)
-				`)
+				.select('*')
 				.limit(10);
-			
+
+			const mergedFilters = {
+				sortBy: 'recommendation_count',
+				sortOrder: 'desc',
+				limit: 10,
+				...filters
+			};
 			if (mergedFilters) {
-				if (mergedFilters.order) {
-					switch (mergedFilters.order) {
-						case 'recommendation_count-desc':
-							request = request.order('recommendation_count', { ascending: false });
+				if (mergedFilters.sortBy) {
+					switch (mergedFilters.sortBy) {
+						case 'recommendation_count':
+							request = request.order('recommendation_count', { ascending: mergedFilters.sortOrder === 'asc' });
 							break;
-						case 'recommendation_count-asc':
-							request = request.order('recommendation_count', { ascending: true });
+						default:
 							break;
 					}
 				}

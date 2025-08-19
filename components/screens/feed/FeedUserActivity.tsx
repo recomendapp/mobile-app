@@ -2,7 +2,7 @@ import { IconMediaRating } from "@/components/medias/IconMediaRating";
 import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { UserActivity } from "@/types/type.db";
+import { UserActivity, UserActivityMovie, UserActivityTvSeries } from "@/types/type.db";
 import { forwardRef } from "react";
 import { View } from "react-native";
 import { useTranslations } from "use-intl";
@@ -10,7 +10,7 @@ import { Text } from "@/components/ui/text";
 
 interface FeedUserActivityProps
   extends React.ComponentProps<typeof View> {
-	activity: UserActivity | null;
+	activity: UserActivityMovie | UserActivityTvSeries | null;
 }
 
 const FeedUserActivity = forwardRef<

@@ -44,7 +44,7 @@ export const WidgetUserFeed = ({
         <Icons.ChevronRight color={colors.mutedForeground} />
       </View>
     </Link>
-    <LegendList
+    {/* <LegendList
     data={feed.pages.flat()}
     renderItem={({ item }) => (
       <CardUserActivity key={item.media_id} activity={item} style={tw`max-h-36 w-86`}/>
@@ -59,7 +59,7 @@ export const WidgetUserFeed = ({
     ItemSeparatorComponent={() => <View style={tw`w-2`} />}
     contentContainerStyle={containerStyle}
     nestedScrollEnabled
-    />
+    /> */}
   </View>
   )
 };

@@ -1,4 +1,4 @@
-import { MediaType } from "@/types/type.db"
+import { MediaType, PlaylistType, UserActivityType, UserReviewType } from "@/types/type.db"
 
 export const mediaKeys = {
 	all: ['media'] as const,
@@ -12,13 +12,13 @@ export const mediaKeys = {
 	detail: ({
 		id,
 		type,
+		full,
 	} : {
 		id: number;
-		type?: MediaType;
-	}) => type
-		? [...mediaKeys.specify({ type }), String(id)] as const
-		: [...mediaKeys.all, id] as const,
-
+		type: MediaType;
+		full?: boolean;
+	}) => [...mediaKeys.specify({ type }), String(id), full] as const,
+	
 	seasonDetail: ({
 		id,
 		seasonNumber,
@@ -30,30 +30,42 @@ export const mediaKeys = {
 	/* --------------------------------- REVIEWS -------------------------------- */
 	reviews: ({
 		id,
+		type,
 		filters,
 	} : {
 		id: number;
+		type: UserReviewType;
 		filters?: any;
-	}) => filters ? [...mediaKeys.detail({ id }), 'reviews', filters] as const : [...mediaKeys.detail({ id }), 'reviews'] as const,
+	}) => {
+		const sub = [...(filters ? [filters] : [])];
+		return [...mediaKeys.detail({ id, type }), 'reviews', ...sub] as const;
+	},
 	/* -------------------------------------------------------------------------- */
 
 	/* -------------------------------- PLAYLISTS ------------------------------- */
 	playlists: ({
 		id,
+		type,
 		filters,
 	} : {
 		id: number;
+		type: PlaylistType;
 		filters?: any;
-	}) => filters ? [...mediaKeys.detail({ id }), 'playlists', filters] as const : [...mediaKeys.detail({ id }), 'playlists'] as const,
+	}) => {
+		const sub = [...(filters ? [filters] : [])];
+		return [...mediaKeys.detail({ id, type }), 'playlists', ...sub] as const;
+	},
 	/* -------------------------------------------------------------------------- */
 
 	/* -------------------------------- FOLLOWERS ------------------------------- */
 
 	followersAverageRating: ({
 		id,
+		type,
 	} : {
 		id: number;
-	}) => [...mediaKeys.detail({ id }), 'followersAverageRating'] as const,
+		type: UserActivityType;
+	}) => [...mediaKeys.detail({ id, type }), 'followersAverageRating'] as const,
 
 	/* -------------------------------------------------------------------------- */
 

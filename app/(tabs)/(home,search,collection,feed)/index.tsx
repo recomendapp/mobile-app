@@ -58,7 +58,7 @@ const HomeScreen = () => {
           session ? (
             user ? <Text style={tw`text-lg font-semibold`}>{upperFirst(t('common.messages.greeting_with_name', { timeOfDay: getTimeOfDay, name: user?.full_name! }))}</Text> : <Skeleton style={tw`w-28 h-6`} />
           ) : (
-            <Text style={tw`text-lg font-semibold`}>{upperFirst(t('common.messages.welcome_on_app', { app: app.name }))}</Text>
+            <Text style={tw`text-lg font-semibold`}>{upperFirst(t('common.messages.welcome_to_app', { app: app.name }))}</Text>
           )
         ),
         headerRight: () => (

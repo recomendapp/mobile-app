@@ -1,11 +1,15 @@
-import { PlaylistType } from "@/types/type.db";
+import { PlaylistSource, PlaylistType } from "@/types/type.db";
 
 export const playlistKeys = {
 	all: ['playlist'] as const,
 	details: () => [...playlistKeys.all, 'details'] as const,
 	detail: (playlistId: number) => [...playlistKeys.all, playlistId] as const,
+
+	// Items
 	items: (playlistId: number) => [...playlistKeys.detail(playlistId), 'items'] as const,
 	item: (playlistId: number, itemId: number) => [...playlistKeys.items(playlistId), itemId] as const,
+	
+	// Guests
 	guests: (playlistId: number) => [...playlistKeys.detail(playlistId), 'guests'] as const,
 	guestsAdd: ({
 		playlistId,
@@ -17,7 +21,13 @@ export const playlistKeys = {
 	guest: (playlistId: number, guestId: number) => [...playlistKeys.guests(playlistId), guestId] as const,
 	
 	
-	allowedToEdit: (playlistId: number) => [...playlistKeys.detail(playlistId), 'allowedToEdit'] as const,
+	allowedToEdit: ({
+		playlistId,
+		userId
+	} : {
+		playlistId: number;
+		userId: string;
+	}) => [...playlistKeys.detail(playlistId), 'allowedToEdit', userId] as const,
 
 	featured: ({
 		filters,
@@ -26,15 +36,19 @@ export const playlistKeys = {
 	}) => filters ? [...playlistKeys.all, 'featured', filters] : [...playlistKeys.all, 'featured'] as const,
 
 	addTo: ({
-		mediaId,
-	} : {
-		mediaId: number;
-	}) => [...playlistKeys.all, 'addTo', mediaId] as const,
-	addToType: ({
-		mediaId,
+		id,
 		type,
 	} : {
-		mediaId: number;
+		id: number;
 		type: PlaylistType;
-	}) => [...playlistKeys.addTo({ mediaId }), type] as const,
+	}) => [...playlistKeys.all, 'addTo', type, id] as const,
+	addToSource: ({
+		id,
+		type,
+		source,
+	} : {
+		id: number;
+		type: PlaylistType;
+		source: PlaylistSource;
+	}) => [...playlistKeys.addTo({ id, type }), source] as const,
 };
