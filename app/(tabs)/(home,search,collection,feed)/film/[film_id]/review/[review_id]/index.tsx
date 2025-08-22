@@ -15,7 +15,7 @@ import { CardUser } from "@/components/cards/CardUser";
 import ButtonUserReviewMovieLike from "@/components/buttons/ButtonUserReviewMovieLike";
 import { CardMovie } from "@/components/cards/CardMovie";
 
-const ReviewScreen = () => {
+const ReviewMovieScreen = () => {
 	const { session, user } = useAuth();
 	const { bottomTabHeight, inset, colors } = useTheme();
 	const t = useTranslations();
@@ -81,4 +81,4 @@ const ReviewScreen = () => {
 	)
 };
 
-export default ReviewScreen;
+export default ReviewMovieScreen;

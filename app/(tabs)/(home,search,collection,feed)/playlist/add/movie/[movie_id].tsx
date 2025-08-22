@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/Input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { usePlaylistMovieAddToQuery } from "@/features/playlist/playlistQueries";
 import { playlistKeys } from "@/features/playlist/playlistKeys";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 
 const COMMENT_MAX_LENGTH = 180;
 
@@ -83,6 +84,16 @@ const PlaylistMovieAdd = () => {
 	const canSave = useMemo(() => {
 		return selected.length > 0 && form.formState.isValid;
 	}, [selected, form.formState.isValid]);
+	const segmentedOptions = useMemo((): { label: string, value: PlaylistSource }[] => [
+		{
+			label: upperFirst(t('common.messages.my_playlist', { count: 2 })),
+			value: 'personal',
+		},
+		{
+			label: upperFirst(t('common.messages.saved', { gender: 'female', count: 2 })),
+			value: 'saved',
+		},
+	], [t]);
 
 	// Queries
 	const {
@@ -252,14 +263,13 @@ const PlaylistMovieAdd = () => {
                     </Animated.View>
                 )}
 			</View>
-			<Button
-			variant="muted"
-			onPress={() => {
-				setSource((prev) => prev === 'personal' ? 'saved' : 'personal')
+			<SegmentedControl
+			values={segmentedOptions.map((option) => option.label)}
+			selectedIndex={segmentedOptions.findIndex((option) => option.value === source)}
+			onChange={(event) => {
+				setSource(segmentedOptions[event.nativeEvent.selectedSegmentIndex].value);
 			}}
-			>
-				{source === 'saved' ? upperFirst(t('common.messages.my_playlist', { count: 2 })) : upperFirst(t('common.messages.saved', { gender: 'female', count: 2 }))}
-			</Button>
+			/>
 		</View>
 		<AnimatedLegendList
 		data={results?.map((item) => ({

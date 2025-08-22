@@ -28,10 +28,10 @@ export const ButtonPlaylistTvSeriesAdd = React.forwardRef<
 		onPress={() => {
 			if (session) {
 				tvSeries.id && router.push({
-					pathname: '/playlist/add/tv_series/[tv_series_id]',
+					pathname: '/playlist/add/tv-series/[tv_series_id]',
 					params: {
 						tv_series_id: tvSeries.id,
-						tv_series_title: tvSeries.name,
+						tv_series_name: tvSeries.name,
 					},
 				});
 			} else {

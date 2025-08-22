@@ -12,6 +12,7 @@ import { FixedOmit } from "@/types";
 import { Skeleton } from "../ui/Skeleton";
 import BottomSheetTvSeries from "../bottom-sheets/sheets/BottomSheetTvSeries";
 import { Text } from "../ui/text";
+import ButtonUserActivityTvSeriesRating from "../buttons/tv-series/ButtonUserActivityTvSeriesRating";
 
 interface CardTvSeriesBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -74,7 +75,7 @@ const CardTvSeriesDefault = React.forwardRef<
 			{!skeleton && (
 				(showActionRating || showRating) && (
 					<View style={tw`flex-row items-center gap-2`}>
-						{/* {showActionRating && <MediaActionUserActivityRating media={media} />} */}
+						{showActionRating && <ButtonUserActivityTvSeriesRating tvSeries={tvSeries} />}
 						{showRating && <IconMediaRating rating={activity?.rating} />}
 					</View>
 				)

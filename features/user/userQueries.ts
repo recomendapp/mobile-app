@@ -158,6 +158,130 @@ export const useUserActivitiesInfiniteQuery = ({
 		enabled: !!userId,
 	});
 };
+export const useUserActivitiesMovieInfiniteQuery = ({
+	userId,
+	filters,
+} : {
+	userId?: string
+	filters?: {
+		sortBy?: 'watched_date' | 'rating';
+		sortOrder?: 'asc' | 'desc';
+		perPage?: number;
+	};
+}) => {
+	const mergedFilters = {
+		sortBy: 'watched_date',
+		sortOrder: 'desc',
+		perPage: 20,
+		...filters,
+	};
+	const supabase = useSupabaseClient();
+	return useInfiniteQuery({
+		queryKey: userKeys.activities({
+			userId: userId as string,
+			filters: mergedFilters,
+			type: 'movie',
+		}),
+		queryFn: async ({ pageParam = 1 }) => {
+			if (!userId) throw Error('Missing user id');
+			let from = (pageParam - 1) * mergedFilters.perPage;
+	  		let to = from - 1 + mergedFilters.perPage;
+			let request = supabase
+				.from('user_activities_movie')
+				.select(`*, movie:media_movie(*)`)
+				.eq('user_id', userId)
+				.range(from, to)
+			
+			if (mergedFilters) {
+				if (mergedFilters.sortBy && mergedFilters?.sortOrder) {
+					switch (mergedFilters.sortBy) {
+						case 'watched_date':
+							request = request.order('watched_date', { ascending: mergedFilters.sortOrder === 'asc' });
+							break;
+						case 'rating':
+							request = request
+								.not('rating', 'is', null)
+								.order('rating', { ascending: mergedFilters.sortOrder === 'asc' });
+							break;
+						default:
+							break;
+					}
+				}
+			}
+			const { data, error } = await request
+				.overrideTypes<UserActivityMovie[], { merge: false }>();
+			if (error) throw error;
+			return data;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+		},
+		enabled: !!userId,
+	});
+};
+export const useUserActivitiesTvSeriesInfiniteQuery = ({
+	userId,
+	filters,
+} : {
+	userId?: string
+	filters?: {
+		sortBy?: 'watched_date' | 'rating';
+		sortOrder?: 'asc' | 'desc';
+		perPage?: number;
+	};
+}) => {
+	const mergedFilters = {
+		sortBy: 'watched_date',
+		sortOrder: 'desc',
+		perPage: 20,
+		...filters,
+	};
+	const supabase = useSupabaseClient();
+	return useInfiniteQuery({
+		queryKey: userKeys.activities({
+			userId: userId as string,
+			filters: mergedFilters,
+			type: 'tv_series',
+		}),
+		queryFn: async ({ pageParam = 1 }) => {
+			if (!userId) throw Error('Missing user id');
+			let from = (pageParam - 1) * mergedFilters.perPage;
+	  		let to = from - 1 + mergedFilters.perPage;
+			let request = supabase
+				.from('user_activities_tv_series')
+				.select(`*, tv_series:media_tv_series(*)`)
+				.eq('user_id', userId)
+				.range(from, to)
+			
+			if (mergedFilters) {
+				if (mergedFilters.sortBy && mergedFilters?.sortOrder) {
+					switch (mergedFilters.sortBy) {
+						case 'watched_date':
+							request = request.order('watched_date', { ascending: mergedFilters.sortOrder === 'asc' });
+							break;
+						case 'rating':
+							request = request
+								.not('rating', 'is', null)
+								.order('rating', { ascending: mergedFilters.sortOrder === 'asc' });
+							break;
+						default:
+							break;
+					}
+				}
+			}
+			const { data, error } = await request
+				.overrideTypes<UserActivityTvSeries[], { merge: false }>();
+			if (error) throw error;
+			return data;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+		},
+		enabled: !!userId,
+	});
+};
 
 // Movies
 export const useUserActivityMovieQuery = ({
@@ -786,16 +910,17 @@ export const useUserWatchlistMovieItemQuery = ({
 	movieId,
 } : {
 	userId?: string;
-	movieId: number;
+	movieId?: number;
 }) => {
 	const supabase = useSupabaseClient();
 	return useQuery({
 		queryKey: userKeys.watchlistItem({
-			id: movieId,
+			id: movieId!,
 			type: 'movie',
 			userId: userId!,
 		}),
 		queryFn: async () => {
+			if (!movieId) throw Error('Missing movie id');
 			if (!userId) throw Error('Missing user id');
 			const { data, error } = await supabase
 				.from('user_watchlists_movie')
@@ -818,16 +943,17 @@ export const useUserWatchlistTvSeriesItemQuery = ({
 	tvSeriesId,
 } : {
 	userId?: string;
-	tvSeriesId: number;
+	tvSeriesId?: number;
 }) => {
 	const supabase = useSupabaseClient();
 	return useQuery({
 		queryKey: userKeys.watchlistItem({
-			id: tvSeriesId,
+			id: tvSeriesId!,
 			type: 'tv_series',
 			userId: userId!,
 		}),
 		queryFn: async () => {
+			if (!tvSeriesId) throw Error('Missing tv series id');
 			if (!userId) throw Error('Missing user id');
 			const { data, error } = await supabase
 				.from('user_watchlists_tv_series')

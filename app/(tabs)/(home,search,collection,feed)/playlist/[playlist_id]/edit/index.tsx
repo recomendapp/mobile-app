@@ -183,7 +183,7 @@ const ModalPlaylistEdit = () => {
 				poster_url = null; // Delete poster
 			}
 			await updatePlaylistMutation.mutateAsync({
-				id: playlist.id,
+				playlistId: playlist.id,
 				title: values.title.trim(),
 				description: values.description?.trim() || null,
 				private: values.private,

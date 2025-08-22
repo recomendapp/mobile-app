@@ -10,7 +10,6 @@ import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMedia from "../bottom-sheets/sheets/BottomSheetMedia";
 import { IconMediaRating } from "../medias/IconMediaRating";
-import MediaActionUserActivityRating from "../medias/actions/MediaActionUserActivityRating";
 import { FixedOmit } from "@/types";
 import { Skeleton } from "../ui/Skeleton";
 import app from "@/constants/app";
@@ -78,7 +77,6 @@ const CardMediaDefault = React.forwardRef<
 			{!skeleton && (
 				(showActionRating || showRating) && (
 					<View style={tw`flex-row items-center gap-2`}>
-						{showActionRating && <MediaActionUserActivityRating media={media} />}
 						{showRating && <IconMediaRating rating={activity?.rating} />}
 					</View>
 				)

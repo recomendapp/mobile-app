@@ -45,7 +45,7 @@ const useCollectionStaticRoutes = () => {
 				</CollectionIcon>
 			),
 			label: capitalize(t('common.messages.heart_pick', { count: 2 })),
-			href: '/collection/likes',
+			href: '/collection/heart-picks',
 		},
 	], [t]);
 	return routes;

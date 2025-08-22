@@ -40,6 +40,7 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 		headerStyle: {
 			backgroundColor: colors.background,
 		},
+		headerShadowVisible: false,
 		gestureEnabled: true,
 		gestureDirection: "vertical",
 	};

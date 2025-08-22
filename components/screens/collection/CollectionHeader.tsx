@@ -2,7 +2,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import useColorConverter from "@/hooks/useColorConverter";
 import tw from "@/lib/tw";
 import React, { forwardRef } from "react";
-import { Text } from "react-native";
+import { Dimensions, Text } from "react-native";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import useRandomBackdrop from "@/hooks/useRandomBackdrop";
 import { Image } from "expo-image";
@@ -12,30 +12,47 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { View } from "@/components/ui/view";
 import { AnimatedImageWithFallback } from "@/components/ui/AnimatedImageWithFallback";
 import { ImageType } from "@/components/utils/ImageWithFallback";
+import { MediaType } from "@/types/type.db";
+import { useTranslations } from "use-intl";
+import { PADDING_HORIZONTAL } from "@/theme/globals";
 
-interface CollectionHeaderProps
+interface CollectionHeaderBaseProps
 	extends React.ComponentPropsWithoutRef<typeof Animated.View> {
 		headerHeight: SharedValue<number>;
+		navigationHeaderHeight?: number;
 		scrollY: SharedValue<number>;
-		title: string;
-		showPoster?: boolean;
 		poster?: string;
 		posterType?: ImageType;
-		bottomText?: string | React.ReactNode | (() => React.ReactNode);
-		numberOfItems: number;
-		backdrops: (string | null | undefined)[];
-		loading: boolean;
+		type?: MediaType;
 	}
+
+type CollectionHeaderLoadingProps = {
+	loading: true;
+	title?: never;
+	bottomText?: never;
+	numberOfItems?: never;
+	backdrops?: never;
+};
+
+type CollectionHeaderLoadedProps = {
+	loading?: boolean;
+	title: string;
+	bottomText: string | React.ReactNode | (() => React.ReactNode);
+	numberOfItems: number;
+	backdrops: (string | null | undefined)[];
+}
+
+type CollectionHeaderProps = CollectionHeaderBaseProps & (CollectionHeaderLoadedProps | CollectionHeaderLoadingProps);
 
 const CollectionHeader = forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CollectionHeaderProps
->(({ loading, headerHeight, scrollY, title, showPoster = false, poster, posterType, bottomText, numberOfItems, backdrops, ...props }, ref) => {
+>(({ loading, headerHeight, navigationHeaderHeight = useHeaderHeight(), scrollY, title, poster, posterType, bottomText, numberOfItems, backdrops, type, ...props }, ref) => {
 	const { colors, inset } = useTheme();
 	const { hslToRgb } = useColorConverter();
-	const bgBackdrop = useRandomBackdrop(backdrops);
+	const t = useTranslations();
+	const bgBackdrop = useRandomBackdrop(backdrops || []);
 	const bgColor = hslToRgb(colors.background);
-	const navigationHeaderHeight = useHeaderHeight();
 
 	const posterHeight = useSharedValue(0);
 
@@ -93,6 +110,18 @@ const CollectionHeader = forwardRef<
 		};
 	});
 
+	const renderItemsCount = () => {
+		if (numberOfItems === undefined) return null;
+		switch (type) {
+			case 'movie':
+				return t('common.messages.film_count', { count: numberOfItems });
+			case 'tv_series':
+				return t('common.messages.tv_series_count', { count: numberOfItems });
+			default:
+				return t('common.messages.item_count', { count: numberOfItems });
+		}
+	}
+
 	return (
 		<Animated.View
 		ref={ref}
@@ -108,6 +137,7 @@ const CollectionHeader = forwardRef<
 			<Animated.View
 			style={[
 				tw`absolute inset-0`,
+				{ left: -PADDING_HORIZONTAL, width: Dimensions.get('window').width },
 				scaleAnim,
 			]}
 			>
@@ -134,22 +164,24 @@ const CollectionHeader = forwardRef<
 			]}
 			>
 				<View style={tw`items-center justify-center`}>
-					{showPoster && (
-						<AnimatedImageWithFallback
-						onLayout={(e) => {
-							posterHeight.value = e.nativeEvent.layout.height;
-						}}
-						alt={title}
-						source={{ uri : poster }}
-						style={[
-							{ aspectRatio: 1 / 1 },
-							tw`rounded-md w-48 h-auto mb-2`,
-							posterAnim
-						]}
-						type={posterType}
-						/>
+					{poster && (
+						!loading ? (
+							<AnimatedImageWithFallback
+							onLayout={(e) => {
+								posterHeight.value = e.nativeEvent.layout.height;
+							}}
+							alt={title}
+							source={{ uri : poster }}
+							style={[
+								{ aspectRatio: 1 / 1 },
+								tw`rounded-md w-48 h-auto mb-2`,
+								posterAnim
+							]}
+							type={posterType}
+							/>
+						) : <Skeleton style={tw`w-48 h-48 rounded-md mb-2`} />
 					)}
-					<Text
+					{!loading ? <Text
 					numberOfLines={2}
 					style={[
 						{ color: colors.accentYellow },
@@ -157,9 +189,9 @@ const CollectionHeader = forwardRef<
 					]}
 					>
 						{title}
-					</Text>
+					</Text> : <Skeleton style={tw`h-10 w-48`} />}
 					{!loading ? <Text numberOfLines={1} style={[{ color: colors.mutedForeground }]}>
-						{numberOfItems} items
+						{renderItemsCount()}
 					</Text> : <Skeleton style={tw`h-4 w-10`} />}
 				</View>
 				{bottomText ? (

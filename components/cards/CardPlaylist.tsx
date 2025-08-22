@@ -42,6 +42,17 @@ const CardPlaylistDefault = React.forwardRef<
 >(({ style, playlist, skeleton, showPlaylistAuthor = true, showItemsCount = false, children, ...props }, ref) => {
 	const t = useTranslations();
 	const { colors } = useTheme();
+	const renderItemsCount = () => {
+		if (!playlist) return null;
+		switch (playlist.type) {
+			case 'movie':
+				return t('common.messages.film_count', { count: playlist.items_count ?? 0 });
+			case 'tv_series':
+				return t('common.messages.tv_series_count', { count: playlist.items_count ?? 0 });
+			default:
+				return t('common.messages.item_count', { count: playlist.items_count ?? 0 });
+		}
+	}
 	return (
 		<Animated.View
 			ref={ref}
@@ -71,7 +82,7 @@ const CardPlaylistDefault = React.forwardRef<
 				{showItemsCount && (
 					!skeleton ? (
 						<Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
-							{t('common.messages.item_count', { count: playlist?.items_count! })}
+							{renderItemsCount()}
 						</Text>
 					) : (
 						<Skeleton style={tw`w-10 h-5`} />
@@ -89,7 +100,7 @@ const CardPlaylist = React.forwardRef<
 >(({ variant = "default", linked = true, onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
-
+	
 	const content = (
 		variant === "default" ? (
 			<CardPlaylistDefault ref={ref} {...props} />

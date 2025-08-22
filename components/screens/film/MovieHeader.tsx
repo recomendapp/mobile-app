@@ -19,13 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
-import MediaActionUserActivityRating from '@/components/medias/actions/MediaActionUserActivityRating';
 import { Image } from 'expo-image';
-import MediaActionUserActivityLike from '@/components/medias/actions/MediaActionUserActivityLike';
-import MediaActionUserActivityWatch from '@/components/medias/actions/MediaActionUserActivityWatch';
-import MediaActionUserWatchlist from '@/components/medias/actions/MediaActionUserWatchlist';
-import MediaActionPlaylistAdd from '@/components/medias/actions/MediaActionPlaylistAdd';
-import MediaActionUserRecos from '@/components/medias/actions/MediaActionUserRecos';
 import { IconMediaRating } from '@/components/medias/IconMediaRating';
 import { useMediaMovieFollowersAverageRatingQuery } from '@/features/media/mediaQueries';
 import { Pressable } from 'react-native-gesture-handler';
@@ -35,6 +29,11 @@ import { Text } from '@/components/ui/text';
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import BottomSheetUserActivityMovieFollowersRating from '@/components/bottom-sheets/sheets/BottomSheetUserActivityMovieFollowersRating';
 import { ButtonPlaylistMovieAdd } from '@/components/buttons/ButtonPlaylistMovieAdd';
+import ButtonUserActivityMovieLike from '@/components/buttons/movies/ButtonUserActivityMovieLike';
+import ButtonUserWatchlistMovie from '@/components/buttons/movies/ButtonUserWatchlistMovie';
+import ButtonUserActivityMovieWatch from '@/components/buttons/movies/ButtonUserActivityMovieWatch';
+import ButtonUserActivityMovieRating from '@/components/buttons/movies/ButtonUserActivityMovieRating';
+import ButtonUserRecoMovieSend from '@/components/buttons/movies/ButtonUserRecoMovieSend';
 
 interface MovieHeaderProps {
 	movie?: MediaMovie | null;
@@ -237,14 +236,14 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 		{movie && (
 		<View style={[tw`flex-row items-center justify-between gap-4`, { paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }]}>
 			<View style={tw`flex-row items-center gap-4`}>
-				{/* <MediaActionUserActivityRating media={media} />
-				<MediaActionUserActivityLike media={media} />
-				<MediaActionUserActivityWatch media={media} />
-				<MediaActionUserWatchlist media={media} /> */}
+				<ButtonUserActivityMovieRating movie={movie} />
+				<ButtonUserActivityMovieLike movie={movie} />
+				<ButtonUserActivityMovieWatch movie={movie} />
+				<ButtonUserWatchlistMovie movie={movie} />
 			</View>
 			<View style={tw`flex-row items-center gap-4`}>
 				<ButtonPlaylistMovieAdd movie={movie} />
-				{/* <MediaActionUserRecos media={media} /> */}
+				<ButtonUserRecoMovieSend movie={movie} />
 			</View>
 		</View>
 		)}

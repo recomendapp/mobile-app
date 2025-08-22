@@ -158,7 +158,7 @@ export const useMediaTvSeriesSeasonDetailsQuery = ({
 					),
 					serie:media_tv_series(
 						id,
-						title
+						name
 					)
 				`)
 				.match({

@@ -8,11 +8,11 @@ import { Pressable, View } from "react-native";
 import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { IconMediaRating } from "../medias/IconMediaRating";
-import MediaActionUserActivityRating from "../medias/actions/MediaActionUserActivityRating";
 import { FixedOmit } from "@/types";
 import { Skeleton } from "../ui/Skeleton";
 import BottomSheetMovie from "../bottom-sheets/sheets/BottomSheetMovie";
 import { Text } from "../ui/text";
+import ButtonUserActivityMovieRating from "../buttons/movies/ButtonUserActivityMovieRating";
 
 interface CardMovieBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -75,7 +75,7 @@ const CardMovieDefault = React.forwardRef<
 			{!skeleton && (
 				(showActionRating || showRating) && (
 					<View style={tw`flex-row items-center gap-2`}>
-						{/* {showActionRating && <MediaActionUserActivityRating media={media} />} */}
+						{showActionRating && <ButtonUserActivityMovieRating movie={movie} />}
 						{showRating && <IconMediaRating rating={activity?.rating} />}
 					</View>
 				)

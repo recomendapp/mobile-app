@@ -43,7 +43,7 @@ const ButtonMyReviewTvSeries = React.forwardRef<
   
 	return (
 	<Link
-	href={`/tv_series/${tvSeries.slug || tvSeries.id}/review/${activity?.review ? activity.review.id : `create`}`}
+	href={`/tv-series/${tvSeries.slug || tvSeries.id}/review/${activity?.review ? activity.review.id : `create`}`}
 	asChild
 	>
 		<Button

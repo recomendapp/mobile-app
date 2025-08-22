@@ -85,7 +85,7 @@ const BottomSheetTvSeries = React.forwardRef<
         {
           icon: Icons.AddPlaylist,
           onPress: () => tvSeries?.id && router.push({
-            pathname: '/playlist/add/tv_series/[tv_series_id]',
+            pathname: '/playlist/add/tv-series/[tv_series_id]',
             params: {
               tv_series_id: tvSeries?.id,
               tv_series_name: tvSeries?.name,
@@ -96,7 +96,7 @@ const BottomSheetTvSeries = React.forwardRef<
         {
           icon: Icons.Reco,
           onPress: () => tvSeries?.id && router.push({
-            pathname: '/reco/send/tv_series/[tv_series_id]',
+            pathname: '/reco/send/tv-series/[tv_series_id]',
             params: {
               tv_series_id: tvSeries?.id,
               tv_series_name: tvSeries?.name,

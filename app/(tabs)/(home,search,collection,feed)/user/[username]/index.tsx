@@ -21,6 +21,8 @@ import { GridView } from "@/components/ui/GridView";
 import ProfileWidgetPlaylists from "@/components/screens/user/ProfileWidgetPlaylists";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { PADDING_VERTICAL } from "@/theme/globals";
+import ProfileWidgetActivitiesMovie from "@/components/screens/user/ProfileWidgetActivitiesMovie";
+import ProfileWidgetActivitiesTvSeries from "@/components/screens/user/ProfileWidgetActivitiesTvSeries";
 
 const ProfileHeader = ({
 	profile,
@@ -172,7 +174,9 @@ const ProfileScreen = () => {
 			{!loading ? (
 				profile?.visible ? (
 					<>
-					<ProfileWidgetActivities profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+					<ProfileWidgetActivitiesMovie profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+					<ProfileWidgetActivitiesTvSeries profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+					{/* <ProfileWidgetActivities profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} /> */}
 					<ProfileWidgetPlaylists profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
 					</>
 				) : <ProfilePrivateAccountCard />

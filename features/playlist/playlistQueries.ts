@@ -1,7 +1,7 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { playlistKeys } from "./playlistKeys";
-import { Playlist, PlaylistGuest, PlaylistItemMovie, PlaylistItemTvSeries, PlaylistSource } from "@/types/type.db";
+import { Playlist, PlaylistItemMovie, PlaylistItemTvSeries, PlaylistSource } from "@/types/type.db";
 
 export const usePlaylistQuery = ({
 	playlistId,
@@ -110,13 +110,13 @@ export const usePlaylistIsAllowedToEditQuery = ({
 	playlistId,
 	userId,
 } : {
-	playlistId: number;
+	playlistId?: number;
 	userId?: string;
 }) => {
 	const supabase = useSupabaseClient();
 	return useQuery({
 		queryKey: playlistKeys.allowedToEdit({
-			playlistId,
+			playlistId: playlistId!,
 			userId: userId!,
 		}),
 		queryFn: async () => {
@@ -126,6 +126,7 @@ export const usePlaylistIsAllowedToEditQuery = ({
 				.from('playlists')
 				.select(`
 					user_id,
+					user(premium),
 					playlist_guests(user_id, edit)
 				`)
 				.eq('id', playlistId)
@@ -134,7 +135,7 @@ export const usePlaylistIsAllowedToEditQuery = ({
 				.maybeSingle();
 			if (error) throw error;
 			return Boolean(
-				data?.user_id === userId || data?.playlist_guests.length
+				data?.user_id === userId || (data?.playlist_guests.length && data.user.premium)
 			)
 		},
 		enabled: !!playlistId && !!userId,
@@ -216,17 +217,17 @@ export const usePlaylistFeaturedInfiniteQuery = ({
 			let to = from - 1 + mergedFilters.resultsPerPage;
 			let query = supabase
 				.from('playlists_featured')
-				.select('*, playlist:playlists(*)')
+				.select('*, playlist:playlists(*, user(*))')
 				.range(from, to)
 			
 			if (mergedFilters) {
 				if (mergedFilters.sortBy) {
 					switch (mergedFilters.sortBy) {
 						case 'created_at':
-							query = query.order('created_at', { referencedTable: 'playlist', ascending: mergedFilters.sortOrder === 'asc' });
+							query = query.order('playlist(created_at)', { ascending: mergedFilters.sortOrder === 'asc' });
 							break;
 						case 'updated_at':
-							query = query.order('updated_at', { referencedTable: 'playlist', ascending: mergedFilters.sortOrder === 'asc' });
+							query = query.order('playlist(updated_at)', { ascending: mergedFilters.sortOrder === 'asc' });
 							break;
 						default:
 							break;

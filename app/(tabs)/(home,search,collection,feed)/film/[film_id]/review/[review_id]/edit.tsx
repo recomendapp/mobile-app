@@ -10,7 +10,7 @@ import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 
-const ReviewEditScreen = () => {
+const ReviewMovieEditScreen = () => {
 	const { session }	= useAuth();
 	const router = useRouter();
 	const t = useTranslations();
@@ -69,4 +69,4 @@ const ReviewEditScreen = () => {
 	)
 };
 
-export default ReviewEditScreen;
+export default ReviewMovieEditScreen;

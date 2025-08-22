@@ -104,7 +104,7 @@ const getMediaUrlPrefix = (type: MediaType) => {
 		case 'movie':
 			return '/film';
 		case 'tv_series':
-			return '/tv_series';
+			return '/tv-series';
 		case 'person':
 			return '/person';
 		default:
