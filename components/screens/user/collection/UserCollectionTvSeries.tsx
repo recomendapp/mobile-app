@@ -13,6 +13,7 @@ import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
+import { FadeInDown } from "react-native-reanimated";
 
 interface sortBy {
 	label: string;
@@ -69,13 +70,14 @@ const UserCollectionTvSeries = () => {
 	<>
 		<LegendList
 		data={medias?.pages.flatMap((page) => page) ?? []}
-		renderItem={({ item }) => (
+		renderItem={({ item, index }) => (
 			<CardTvSeries
 			key={item.id}
 			variant="poster"
 			tvSeries={item.tv_series!}
 			profileActivity={item}
 			style={tw`w-full`}
+			entering={FadeInDown.delay(index * 50)}
 			/>
 		)}
 		ListHeaderComponent={

@@ -2,7 +2,7 @@ import { IconMediaRating } from "@/components/medias/IconMediaRating";
 import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { UserActivity, UserActivityMovie, UserActivityTvSeries } from "@/types/type.db";
+import { User, UserActivity, UserActivityMovie, UserActivityTvSeries } from "@/types/type.db";
 import { forwardRef } from "react";
 import { View } from "react-native";
 import { useTranslations } from "use-intl";
@@ -10,13 +10,14 @@ import { Text } from "@/components/ui/text";
 
 interface FeedUserActivityProps
   extends React.ComponentProps<typeof View> {
+	author: User;
 	activity: UserActivityMovie | UserActivityTvSeries | null;
 }
 
 const FeedUserActivity = forwardRef<
 	React.ComponentRef<typeof View>,
 	FeedUserActivityProps
->(({ activity, style, ...props }, ref) => {
+>(({ author, activity, style, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
 	return (
@@ -34,7 +35,7 @@ const FeedUserActivity = forwardRef<
 			  {t.rich('pages.feed.actions.reviewed', {
 				name: () => (
 				  <Text style={tw`font-semibold`}>
-					{activity.user?.username}
+					{author.username}
 				  </Text>
 				),
 			  })}
@@ -47,7 +48,7 @@ const FeedUserActivity = forwardRef<
 				{t.rich('pages.feed.actions.rated_liked', {
 				  name: () => (
 					<Text style={tw`font-semibold`}>
-					  {activity.user?.username}
+					  {author.username}
 					</Text>
 				  ),
 				})}
@@ -57,7 +58,7 @@ const FeedUserActivity = forwardRef<
 				{t.rich('pages.feed.actions.liked', {
 					name: () => (
 					  <Text style={tw`font-semibold`}>
-						{activity.user?.username}
+						{author.username}
 					  </Text>
 					),
 				})}
@@ -67,7 +68,7 @@ const FeedUserActivity = forwardRef<
 				{t.rich('pages.feed.actions.rated', {
 				  name: () => (
 					<Text style={tw`font-semibold`}>
-					  {activity.user?.username}
+					  {author.username}
 					</Text>
 				  ),
 				})}
@@ -77,7 +78,7 @@ const FeedUserActivity = forwardRef<
 				{t.rich('pages.feed.actions.watched', {
 				  name: () => (
 					<Text style={tw`font-semibold`}>
-					  {activity?.user?.username}
+					  {author.username}
 					</Text>
 				  ),
 				})}

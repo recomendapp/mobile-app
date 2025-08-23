@@ -27,12 +27,13 @@ interface CollectionItemProps<T> extends React.ComponentProps<typeof Animated.Vi
     onItemAction?: (item: T) => void;
     view?: ViewType;
     type?: MediaType;
+    index: number;
 }
 
 const CollectionItem = forwardRef<
     React.ComponentRef<typeof Animated.View>,
     CollectionItemProps<any>
->(({ style, item, swipeActions, bottomSheetActions, renderCustom, getItemId, getItemTitle, getItemSubtitle, getItemImageUrl, getItemUrl, onItemAction, view = 'list', type, ...props }, ref) => {
+>(({ style, item, swipeActions, bottomSheetActions, renderCustom, getItemId, getItemTitle, getItemSubtitle, getItemImageUrl, getItemUrl, onItemAction, view = 'list', type, index, ...props }, ref) => {
     const t = useTranslations();
     const router = useRouter();
     const { colors } = useTheme();
@@ -130,7 +131,7 @@ const CollectionItem = forwardRef<
         </Pressable>
     ), [getItemUrl, item, onItemAction, router]);
 	const itemWithContainer = useCallback(() => (
-		<Animated.View style={tw`flex-row items-center justify-between gap-2`} entering={FadeInDown}>
+		<Animated.View style={tw`flex-row items-center justify-between gap-2`} entering={FadeInDown.delay(index * 50)}>
 			{pressableContent()}
 			{view === 'list' && (
                 <Button

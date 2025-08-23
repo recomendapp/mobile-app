@@ -3,7 +3,6 @@ import { useUserRecosQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Link } from "expo-router";
 import { StyleProp, Text, TextStyle, View, ViewStyle } from "react-native";
-import { CardMedia } from "@/components/cards/CardMedia";
 import UserAvatar from "@/components/user/UserAvatar";
 import { useTheme } from "@/providers/ThemeProvider";
 import { ThemedView } from "@/components/ui/ThemedView";
@@ -12,6 +11,10 @@ import { Icons } from "@/constants/Icons";
 import { ThemedText } from "../ui/ThemedText";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
+import { useCallback } from "react";
+import { MediaMovie, MediaTvSeries, UserRecosAggregated } from "@/types/type.db";
+import { CardMovie } from "../cards/CardMovie";
+import { CardTvSeries } from "../cards/CardTvSeries";
 
 interface WidgetUserRecosProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -29,12 +32,33 @@ export const WidgetUserRecos = ({
   const { data: recos } = useUserRecosQuery({
     userId: user?.id,
     filters: {
-      order: 'random',
+      sortBy: 'random',
       limit: 6,
     }
   })
 
   const sendersShow = 3;
+
+  // Renders
+  const renderContent = useCallback((item: UserRecosAggregated) => {
+    return (
+      <View style={tw`flex-row -gap-2 overflow-hidden`}>
+          {item.senders?.slice(0, sendersShow).map(({ user: sender }, index) => (
+            <UserAvatar
+              key={index}
+              full_name={sender?.full_name ?? ''}
+              avatar_url={sender?.avatar_url ?? ''}
+              style={tw`w-4 h-4`}
+            />
+          ))}
+          {item.senders?.length! > sendersShow ? (
+            <ThemedView style={tw`h-4 flex items-center justify-center rounded-full`}>
+              <Text style={[{ color: colors.mutedForeground }, tw`text-xs`]}>+{item.senders?.length! - sendersShow}</Text>
+            </ThemedView>
+          ) : null}
+        </View>
+    )
+  }, [colors.mutedForeground, sendersShow, t])
 
   if (!user) return null;
 
@@ -53,25 +77,15 @@ export const WidgetUserRecos = ({
     <LegendList
     data={recos}
     renderItem={({ item }) => (
-      <View key={item.media_id} style={tw`flex-0.5`}>
-        <CardMedia media={item.media!}>
-          <View style={tw`flex-row -gap-2 overflow-hidden`}>
-            {item.senders?.slice(0, sendersShow).map(({ user }, index) => (
-            <UserAvatar
-              key={index}
-              full_name={user?.full_name ?? ''}
-              avatar_url={user?.avatar_url ?? ''}
-              style={tw`w-4 h-4`}
-            />
-            ))}
-            {item.senders?.length! > sendersShow ? (
-              <ThemedView style={tw`h-4 flex items-center justify-center rounded-full`}>
-                <Text style={[{ color: colors.mutedForeground }, tw`text-xs`]}>+{item.senders?.length! - sendersShow}</Text>
-              </ThemedView>
-            ) : null}
-          </View>
-        </CardMedia>
-      </View>
+      item.type === 'movie' ? (
+        <CardMovie movie={item.media as MediaMovie}>
+          {renderContent(item)}
+        </CardMovie>
+      ) : item.type === 'tv_series' && (
+        <CardTvSeries tvSeries={item.media as MediaTvSeries}>
+          {renderContent(item)}
+        </CardTvSeries>
+      )
     )}
     keyExtractor={(item) => item.media_id!.toString()}
     numColumns={2}

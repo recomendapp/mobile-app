@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { userKeys } from "./userKeys"
-import { UserFeedCastCrew, Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserReview, UserWatchlist, PlaylistType, Profile, UserWatchlistTvSeries, UserWatchlistMovie, UserReviewMovie, UserReviewTvSeries, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserActivityMovie, UserActivityTvSeries } from "@/types/type.db";
+import { UserFeedCastCrew, Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserWatchlist, Profile, UserWatchlistTvSeries, UserWatchlistMovie, UserReviewMovie, UserReviewTvSeries, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserActivityMovie, UserActivityTvSeries, UserFeedItem } from "@/types/type.db";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 
 /* ---------------------------------- USER ---------------------------------- */
@@ -1092,13 +1092,13 @@ export const useUserFeedInfiniteQuery = ({
 	userId?: string;
 	filters?: {
 		perPage?: number;
-		sortBy?: 'created_at' | 'watched_date' | 'updated_at';
+		sortBy?: 'created_at';
 		sortOrder?: 'asc' | 'desc';
 	};
 }) => {
 	const mergedFilters = {
 		perPage: 20,
-		sortBy: 'updated_at',
+		sortBy: 'created_at',
 		sortOrder: 'desc',
 		...filters,
 	};
@@ -1110,27 +1110,11 @@ export const useUserFeedInfiniteQuery = ({
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
 			let from = (pageParam - 1) * mergedFilters.perPage;
-	  		let to = from - 1 + mergedFilters.perPage;
-			let request = supabase
-				.from('user_feed')
-				.select('*')
-				.range(from, to)
-			
-			
-			if (mergedFilters) {
-				switch (mergedFilters.sortBy) {
-					case 'watched_date':
-						request = request.order('watched_date', { ascending: mergedFilters.sortOrder === 'asc' });
-						break;
-					case 'updated_at':
-						request = request.order('updated_at', { ascending: mergedFilters.sortOrder === 'asc' });
-						break;
-					default:
-						request = request.order('created_at', { ascending: mergedFilters.sortOrder === 'asc' });
-				}
-			}
-			const { data, error } = await request
-				.overrideTypes<UserActivity[]>();
+			const { data, error } = await  supabase
+				.rpc('get_feed', {
+					page_limit: mergedFilters.perPage,
+					page_offset: from
+				})
 			if (error) throw error;
 			return data;
 		},

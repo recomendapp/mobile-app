@@ -2,21 +2,21 @@ import { useAuth } from "@/providers/AuthProvider";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import React from "react";
-import { UserActivityMovie } from "@/types/type.db";
+import { UserRecosMovieAggregated } from "@/types/type.db";
 import CollectionScreen, { CollectionAction, SortByOption } from "@/components/screens/collection/CollectionScreen";
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
 import * as Burnt from "burnt";
 import { useSharedValue } from "react-native-reanimated";
-import { useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
-import { useUserHeartPicksMovieQuery } from "@/features/user/userQueries";
+import { useUserRecosMovieCompleteMutation, useUserRecosMovieDeleteMutation } from "@/features/user/userMutations";
+import { useUserRecosMovieQuery } from "@/features/user/userQueries";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { useUIStore } from "@/stores/useUIStore";
-import { Text } from "@/components/ui/text";
+import BottomSheetMyRecosSenders from "@/components/bottom-sheets/sheets/BottomSheetMyRecosSenders";
 
-export const CollectionHeartPicksMovie = ({
+export const CollectionMyRecosMovie = ({
 	navigationHeaderHeight,
 } : {
 	navigationHeaderHeight: number;
@@ -24,22 +24,23 @@ export const CollectionHeartPicksMovie = ({
 	const t = useTranslations();
     const { user } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
-	const view = useUIStore((state) => state.heartPicks.view);
-    const queryData = useUserHeartPicksMovieQuery({
+	const view = useUIStore((state) => state.myRecosTab.view);
+    const queryData = useUserRecosMovieQuery({
 		userId: user?.id,
     });
-	const screenTitle = upperFirst(t('common.messages.heart_pick', { count: 2 }));
+	const screenTitle = upperFirst(t('common.messages.my_recos', { count: 2 }));
 	// Mutations
-	const updateActivity = useUserActivityMovieUpdateMutation();
+	const deleteReco = useUserRecosMovieDeleteMutation();
+	const completeReco = useUserRecosMovieCompleteMutation();
 	// SharedValues
 	const scrollY = useSharedValue(0);
 	const headerHeight = useSharedValue(0);
 
 	// Handlers
-	const handleUnlike = React.useCallback((data: UserActivityMovie) => {
+	const handleDeleteReco = React.useCallback((data: UserRecosMovieAggregated) => {
 		Alert.alert(
 			upperFirst(t('common.messages.are_u_sure')),
-			upperFirst(richTextToPlainString(t.rich('pages.collection.heart_picks.modal.delete_confirm.description', { title: data.movie!.title!, important: (chunk) => `"${chunk}"` }))),
+			upperFirst(richTextToPlainString(t.rich('pages.collection.my_recos.modal.delete_confirm.description', { title: data.movie!.title!, important: (chunk) => `"${chunk}"` }))),
 			[
 				{
 					text: upperFirst(t('common.messages.cancel')),
@@ -48,9 +49,9 @@ export const CollectionHeartPicksMovie = ({
 				{
 					text: upperFirst(t('common.messages.delete')),
 					onPress: async () => {
-						await updateActivity.mutateAsync({
-							activityId: data.id,
-							isLiked: false,
+						await deleteReco.mutateAsync({
+							userId: user!.id,
+							movieId: data.movie!.id,
 						}, {
 							onSuccess: () => {
 								Burnt.toast({
@@ -72,16 +73,53 @@ export const CollectionHeartPicksMovie = ({
 				}
 			]
 		)
-	}, [updateActivity, t]);
+	}, [deleteReco, t, user]);
+	const handleCompleteReco = React.useCallback((data: UserRecosMovieAggregated) => {
+		Alert.alert(
+			upperFirst(t('common.messages.are_u_sure')),
+			upperFirst(richTextToPlainString(t.rich('pages.collection.my_recos.modal.complete_confirm.description', { title: data.movie!.title!, important: (chunk) => `"${chunk}"` }))),
+			[
+				{
+					text: upperFirst(t('common.messages.cancel')),
+					style: 'cancel',
+				},
+				{
+					text: upperFirst(t('common.messages.complete')),
+					onPress: async () => {
+						await completeReco.mutateAsync({
+							userId: user!.id,
+							movieId: data.movie!.id,
+						}, {
+							onSuccess: () => {
+								Burnt.toast({
+									title: upperFirst(t('common.messages.completed', { count: 1, gender: 'female' })),
+									preset: 'done',
+								});
+							},
+							onError: () => {
+								Burnt.toast({
+									title: upperFirst(t('common.messages.error')),
+									message: upperFirst(t('common.messages.an_error_occurred')),
+									preset: 'error',
+									haptic: 'error',
+								});
+							}
+						});
+					},
+					style: 'destructive',
+				}
+			]
+		)
+	}, [completeReco, deleteReco, t, user]);
 
-    const sortByOptions = React.useMemo((): SortByOption<UserActivityMovie>[] => ([
+    const sortByOptions = React.useMemo((): SortByOption<UserRecosMovieAggregated>[] => ([
         {
             label: upperFirst(t('common.messages.date_added')),
             value: 'created_at',
             defaultOrder: 'desc',
             sortFn: (a, b, order) => {
-                const aTime = new Date(a.created_at).getTime();
-                const bTime = new Date(b.created_at).getTime();
+                const aTime = new Date(a.created_at!).getTime();
+                const bTime = new Date(b.created_at!).getTime();
                 return order === 'asc' ? aTime - bTime : bTime - aTime;
             },
         },
@@ -109,28 +147,49 @@ export const CollectionHeartPicksMovie = ({
             },
         },
     ]), [t]);
-	const bottomSheetActions = React.useMemo((): CollectionAction<UserActivityMovie>[] => {
+	const bottomSheetActions = React.useMemo((): CollectionAction<UserRecosMovieAggregated>[] => {
         return [
             {
                 icon: Icons.Delete,
                 label: upperFirst(t('common.messages.delete')),
                 variant: 'destructive',
-                onPress: handleUnlike,
+                onPress: handleDeleteReco,
 				position: 'bottom',
-            }
+            },
+			{
+				icon: Icons.Check,
+				label: upperFirst(t('common.messages.complete')),
+				onPress: handleCompleteReco,
+				position: 'top',
+			},
+			{
+				icon: Icons.Comment,
+				label: upperFirst(t('common.messages.view_recommendation', { count: 1})),
+				onPress: (item) => openSheet(BottomSheetMyRecosSenders, {
+					comments: item.senders,
+				}),
+				position: 'top',
+			}
         ];
-    }, [handleUnlike, t]);
-	const swipeActions = React.useMemo((): CollectionAction<UserActivityMovie>[] => [
-		{
-			icon: Icons.Delete,
-			label: upperFirst(t('common.messages.delete')),
-			onPress: handleUnlike,
-			variant: 'destructive',
-			position: 'right',
-		}
-	], [handleUnlike, t]);
+    }, [handleDeleteReco, handleCompleteReco, openSheet, t]);
+	const swipeActions = React.useMemo((): CollectionAction<UserRecosMovieAggregated>[] => [
+			{
+				icon: Icons.Check,
+				label: upperFirst(t('common.messages.complete')),
+				onPress: handleCompleteReco,
+				variant: 'accent-yellow',
+				position: 'left',
+			},
+			{
+				icon: Icons.Delete,
+				label: upperFirst(t('common.messages.delete')),
+				onPress: handleDeleteReco,
+				variant: 'destructive',
+				position: 'right',
+			}
+		], [handleDeleteReco, handleCompleteReco, t]);
 
-	const onItemAction = React.useCallback((data: UserActivityMovie) => {
+	const onItemAction = React.useCallback((data: UserRecosMovieAggregated) => {
 		if (!bottomSheetActions?.length) return;
 		const additionalItems = bottomSheetActions.map(action => ({
 			icon: action.icon,
@@ -162,13 +221,13 @@ export const CollectionHeartPicksMovie = ({
 		// Sort
 		sortByOptions={sortByOptions}
 		// Getters
-		getItemId={(item) => item.id}
+		getItemId={(item) => item.movie_id!}
 		getItemTitle={(item) => item.movie?.title || ''}
 		getItemSubtitle={(item) => item.movie?.directors?.map((director) => director.name).join(', ') || ''}
 		getItemImageUrl={(item) => item.movie?.poster_url || ''}
 		getItemUrl={(item) => item.movie?.url || ''}
 		getItemBackdropUrl={(item) => item.movie?.backdrop_url || ''}
-		getCreatedAt={(item) => item.created_at}
+		getCreatedAt={(item) => item.created_at!}
 		// Actions
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}

@@ -1,228 +1,109 @@
-import { useAuth } from "@/providers/AuthProvider";
-import { useUserRecosQuery } from "@/features/user/userQueries";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
-import React from "react";
-import { UserRecosAggregated } from "@/types/type.db";
-import CollectionScreen, { CollectionAction, SortByOption } from "@/components/screens/collection/CollectionScreen";
+import React, { useCallback, useMemo } from "react";
+import { UserActivityType } from "@/types/type.db";
 import { Icons } from "@/constants/Icons";
-import { Alert } from "react-native";
-import richTextToPlainString from "@/utils/richTextToPlainString";
-import { useUserRecosCompleteMutation, useUserRecosDeleteMutation } from "@/features/user/userMutations";
-import * as Burnt from "burnt";
-import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import BottomSheetMyRecosSenders from "@/components/bottom-sheets/sheets/BottomSheetMyRecosSenders";
-import { useSharedValue } from "react-native-reanimated";
-import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
+import Animated, { FadeIn, FadeOut, useSharedValue } from "react-native-reanimated";
+import { View } from "@/components/ui/view";
+import { Stack } from "expo-router";
+import { useHeaderHeight } from "@react-navigation/elements";
+import tw from "@/lib/tw";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { useUIStore } from "@/stores/useUIStore";
+import { Button } from "@/components/ui/Button";
+import { BlurView } from 'expo-blur';
+import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { CollectionMyRecosMovie } from "@/components/screens/collection/my-recos/CollectionMyRecosMovie";
+import { CollectionMyRecosTvSeries } from "@/components/screens/collection/my-recos/CollectionMyRecosTvSeries";
 
 const MyRecosScreen = () => {
-	const t = useTranslations();
-    const { user } = useAuth();
-	const openSheet = useBottomSheetStore((state) => state.openSheet);
-	const deleteReco = useUserRecosDeleteMutation();
-	const completeReco = useUserRecosCompleteMutation();
-    const queryData = useUserRecosQuery({
-        userId: user?.id,
-    });
-	const screenTitle = upperFirst(t('common.messages.my_recos'));
+    const t = useTranslations();
+    const { tab, view } = useUIStore((state) => state.myRecosTab);
+    const setTab = useUIStore((state) => state.setMyRecosTab);
+    const setView = useUIStore((state) => state.setMyRecosView);
 
 	// SharedValues
-	const scrollY = useSharedValue(0);
-	const headerHeight = useSharedValue(0);
+    const tabsHeight = useSharedValue(0);
 
-	// Handlers
-	const handleDeleteReco = React.useCallback((data: UserRecosAggregated) => {
-		Alert.alert(
-			upperFirst(t('common.messages.are_u_sure')),
-			upperFirst(richTextToPlainString(t.rich('pages.collection.my_recos.modal.delete_confirm.description', { title: data.media!.title!, important: (chunk) => `"${chunk}"` }))),
-			[
-				{
-					text: upperFirst(t('common.messages.cancel')),
-					style: 'cancel',
-				},
-				{
-					text: upperFirst(t('common.messages.delete')),
-					onPress: async () => {
-						await deleteReco.mutateAsync({
-							userId: user!.id,
-							mediaId: data.media!.id,
-						}, {
-							onSuccess: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.deleted', { count: 1, gender: 'male' })),
-									preset: 'done',
-								});
-							},
-							onError: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.error')),
-									message: upperFirst(t('common.messages.an_error_occurred')),
-									preset: 'error',
-									haptic: 'error',
-								});
-							}
-						});
-					},
-					style: 'destructive',
-				}
-			]
-		)
-	}, [deleteReco, t, user]);
-	const handleCompleteReco = React.useCallback((data: UserRecosAggregated) => {
-		Alert.alert(
-			upperFirst(t('common.messages.are_u_sure')),
-			upperFirst(richTextToPlainString(t.rich('pages.collection.my_recos.modal.complete_confirm.description', { title: data.media!.title!, important: (chunk) => `"${chunk}"` }))),
-			[
-				{
-					text: upperFirst(t('common.messages.cancel')),
-					style: 'cancel',
-				},
-				{
-					text: upperFirst(t('common.messages.complete')),
-					onPress: async () => {
-						await completeReco.mutateAsync({
-							userId: user!.id,
-							mediaId: data.media!.id,
-						}, {
-							onSuccess: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.completed', { count: 1, gender: 'female' })),
-									preset: 'done',
-								});
-							},
-							onError: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.error')),
-									message: upperFirst(t('common.messages.an_error_occurred')),
-									preset: 'error',
-									haptic: 'error',
-								});
-							}
-						});
-					},
-					style: 'destructive',
-				}
-			]
-		)
-	}, [completeReco, deleteReco, t, user]);
-
-    const sortByOptions = React.useMemo((): SortByOption<UserRecosAggregated>[] => ([
+    // States
+    const navigationHeaderHeight = useHeaderHeight();
+    const segmentedOptions = useMemo((): { label: string, value: UserActivityType }[] => [
         {
-            label: upperFirst(t('common.messages.date_added')),
-            value: 'created_at',
-            defaultOrder: 'desc',
-            sortFn: (a, b, order) => {
-                const aTime = new Date(a.created_at!).getTime();
-                const bTime = new Date(b.created_at!).getTime();
-                return order === 'asc' ? aTime - bTime : bTime - aTime;
-            },
+            label: upperFirst(t('common.messages.film', { count: 2 })),
+            value: 'movie',
         },
-		{
-			label: upperFirst(t('common.messages.release_date')),
-			value: 'release_date',
-			defaultOrder: 'desc',
-			sortFn: (a, b, order) => {
-				if (!a.media?.date) return 1;
-				if (!b.media?.date) return -1;
-				const aTime = new Date(a.media.date).getTime();
-				const bTime = new Date(b.media.date).getTime();
-				return order === 'asc' ? aTime - bTime : bTime - aTime;
-			}
-		},
         {
-            label: upperFirst(t('common.messages.alphabetical')),
-            value: 'alphabetical',
-            defaultOrder: 'asc',
-            sortFn: (a, b, order) => {
-                const titleA = a.media?.title ?? '';
-                const titleB = b.media?.title ?? '';
-                const result = titleA.localeCompare(titleB);
-                return order === 'asc' ? result : -result;
-            },
+            label: upperFirst(t('common.messages.tv_series', { count: 2 })),
+            value: 'tv_series',
         },
-    ]), [t]);
-	const bottomSheetActions = React.useMemo((): CollectionAction<UserRecosAggregated>[] => {
-        return [
-            {
-                icon: Icons.Delete,
-                label: upperFirst(t('common.messages.delete')),
-                variant: 'destructive',
-                onPress: handleDeleteReco,
-				position: 'bottom',
-            },
-			{
-				icon: Icons.Check,
-				label: upperFirst(t('common.messages.complete')),
-				onPress: handleCompleteReco,
-				position: 'top',
-			},
-			{
-				icon: Icons.Comment,
-				label: upperFirst(t('common.messages.view_recommendation', { count: 1})),
-				onPress: (item) => openSheet(BottomSheetMyRecosSenders, {
-					comments: item.senders,
-				}),
-				position: 'top',
-			}
-        ];
-    }, [handleDeleteReco, handleCompleteReco, openSheet, t]);
-	const swipeActions = React.useMemo((): CollectionAction<UserRecosAggregated>[] => [
-		{
-			icon: Icons.Check,
-			label: upperFirst(t('common.messages.complete')),
-			onPress: handleCompleteReco,
-			variant: 'accent-yellow',
-			position: 'left',
-		},
-		{
-			icon: Icons.Delete,
-			label: upperFirst(t('common.messages.delete')),
-			onPress: handleDeleteReco,
-			variant: 'destructive',
-			position: 'right',
-		}
-	], [handleDeleteReco, handleCompleteReco, t]);
-
+    ], [t]);
+	const components = useCallback(() => {
+		return (
+			<>
+				{tab === 'movie' && (
+					<CollectionMyRecosMovie navigationHeaderHeight={navigationHeaderHeight + tabsHeight.value} />
+				)}
+				{tab === 'tv_series' && (
+					<CollectionMyRecosTvSeries navigationHeaderHeight={navigationHeaderHeight + tabsHeight.value} />
+				)}
+			</>
+		);
+	}, [tab, navigationHeaderHeight, tabsHeight.value]);
     return (
-	<>
-		<AnimatedStackScreen
-		options={{
-			headerTitle: screenTitle,
-		}}
-		scrollY={scrollY}
-		triggerHeight={headerHeight}
-		/>
-        <CollectionScreen
-		queryData={queryData}
-		screenTitle={screenTitle}
-		// Search
-		searchPlaceholder={upperFirst(t('pages.collection.my_recos.search.placeholder'))}
-		fuseKeys={[
-			{
-				name: 'title',
-				getFn: (item) => item.media?.title || '',
-			},
-		]}
-		// Sort
-		sortByOptions={sortByOptions}
-		// Getters
-		getItemId={(item) => item.media_id!}
-		getItemMedia={(item) => item.media!}
-		getItemTitle={(item) => item.media?.title || ''}
-		getItemSubtitle={(item) => item.media?.main_credit?.map((director) => director.title).join(', ') || ''}
-		getItemImageUrl={(item) => item.media?.avatar_url || ''}
-		getItemUrl={(item) => item.media?.url || ''}
-		getItemBackdropUrl={(item) => item.media?.backdrop_url || ''}
-		getCreatedAt={(item) => item.created_at!}
-		// Actions
-		bottomSheetActions={bottomSheetActions}
-		swipeActions={swipeActions}
-		// SharedValues
-		scrollY={scrollY}
-		headerHeight={headerHeight}
-		/>
-	</>
-    );
+    <>
+        <Stack.Screen
+        options={{
+            headerTransparent: true,
+            headerStyle: {
+                backgroundColor: 'transparent',
+            },
+            headerBlurEffect: 'dark',
+			headerRight: () => (
+				<View style={tw`flex-row items-center gap-2`}>
+					<Button
+					variant="ghost"
+					icon={view === 'grid' ? Icons.Grid : Icons.List}
+					size="icon"
+					onPress={() => setView(view === 'grid' ? 'list' : 'grid')}
+					/>
+				</View>
+			)
+        }}
+        />
+        <BlurView
+        onLayout={(event) => {
+            tabsHeight.value = event.nativeEvent.layout.height;
+        }}
+        tint="dark"
+        intensity={100}
+        style={[
+            tw`z-10`,
+            {
+                top: navigationHeaderHeight,
+                paddingHorizontal: PADDING_HORIZONTAL,
+                paddingBottom: PADDING_VERTICAL
+            }
+        ]}
+        >
+            <SegmentedControl
+                backgroundColor="transparent"
+                values={segmentedOptions.map((option) => option.label)}
+                selectedIndex={segmentedOptions.findIndex((option) => option.value === tab)}
+                onChange={(event) => {
+                    setTab(segmentedOptions[event.nativeEvent.selectedSegmentIndex].value);
+                }}
+            />
+        </BlurView>
+		<Animated.View
+			key={`selected_tab_${tab}`}
+			entering={FadeIn}
+			exiting={FadeOut}
+			style={tw`flex-1`}
+		>
+			{components()}
+		</Animated.View>
+    </>
+    )
 };
 
 export default MyRecosScreen;

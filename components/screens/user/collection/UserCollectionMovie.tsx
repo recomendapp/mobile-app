@@ -13,6 +13,7 @@ import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { PADDING_VERTICAL } from "@/theme/globals";
 import { CardMovie } from "@/components/cards/CardMovie";
+import { FadeInDown } from "react-native-reanimated";
 
 interface sortBy {
 	label: string;
@@ -69,13 +70,14 @@ const UserCollectionMovie = () => {
 	<>
 		<LegendList
 		data={medias?.pages.flatMap((page) => page) ?? []}
-		renderItem={({ item }) => (
+		renderItem={({ item, index }) => (
 			<CardMovie
 			key={item.id}
 			variant="poster"
 			movie={item.movie!}
 			profileActivity={item}
 			style={tw`w-full`}
+			entering={FadeInDown.delay(index * 50)}
 			/>
 		)}
 		ListHeaderComponent={

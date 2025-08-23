@@ -1,6 +1,6 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaMovie, UserActivityMovie } from "@/types/type.db";
+import { MediaMovie, User, UserActivityMovie } from "@/types/type.db";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
@@ -15,34 +15,36 @@ import { useTranslations } from "use-intl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 
-interface CardFeedMovieBaseProps
+interface CardFeedActivityMovieBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
 		variant?: "default";
 		onPress?: () => void;
 		onLongPress?: () => void;
 	}
 
-type CardFeedMovieSkeletonProps = {
+type CardFeedActivityMovieSkeletonProps = {
 	skeleton: true;
+	author?: never;
 	activity?: never;
 	movie?: never;
 	footer?: never;
 };
 
-type CardFeedMovieDataProps = {
+type CardFeedActivityMovieDataProps = {
 	skeleton?: false;
+	author: User;
 	activity: UserActivityMovie;
 	movie: MediaMovie;
 	footer?: React.ReactNode;
 };
 
-export type CardFeedMovieProps = CardFeedMovieBaseProps &
-	(CardFeedMovieSkeletonProps | CardFeedMovieDataProps);
+export type CardFeedActivityMovieProps = CardFeedActivityMovieBaseProps &
+	(CardFeedActivityMovieSkeletonProps | CardFeedActivityMovieDataProps);
 
-const CardFeedMovieDefault = React.forwardRef<
+const CardFeedActivityMovieDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	FixedOmit<CardFeedMovieProps, "variant" | "onPress" | "onLongPress">
->(({ style, children, activity, movie, footer, skeleton, ...props }, ref) => {
+	FixedOmit<CardFeedActivityMovieProps, "variant" | "onPress" | "onLongPress">
+>(({ style, children, author, activity, movie, footer, skeleton, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
 	const router = useRouter();
@@ -68,8 +70,8 @@ const CardFeedMovieDefault = React.forwardRef<
 			)}
 			<View style={tw`flex-1 gap-2 p-2`}>
 				{!skeleton ? <View style={tw`flex-row items-center gap-1`}>
-					<UserAvatar avatar_url={activity.user?.avatar_url} full_name={activity.user?.full_name!} style={tw`w-6 h-6`} />
-					<FeedUserActivity activity={activity} style={[{ color: colors.mutedForeground }, tw`text-sm`]} />
+					<UserAvatar avatar_url={author.avatar_url} full_name={author.full_name!} style={tw`w-6 h-6`} />
+					<FeedUserActivity author={author} activity={activity} style={[{ color: colors.mutedForeground }, tw`text-sm`]} />
 				</View> : <Skeleton style={tw`w-full h-6`} />}
 				<View style={tw`gap-2`}>
 					{!skeleton ? (
@@ -93,17 +95,17 @@ const CardFeedMovieDefault = React.forwardRef<
 		</Animated.View>
 	);
 });
-CardFeedMovieDefault.displayName = "CardFeedMovieDefault";
+CardFeedActivityMovieDefault.displayName = "CardFeedActivityMovieDefault";
 
-const CardFeedMovie = React.forwardRef<
+const CardFeedActivityMovie = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	CardFeedMovieProps
+	CardFeedActivityMovieProps
 >(({ variant = "default", onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const content = (
 		variant === "default" ? (
-			<CardFeedMovieDefault ref={ref} {...props} />
+			<CardFeedActivityMovieDefault ref={ref} {...props} />
 		) : null
 	);
 
@@ -124,9 +126,9 @@ const CardFeedMovie = React.forwardRef<
 		</Pressable>
 	)
 });
-CardFeedMovie.displayName = "CardFeedMovie";
+CardFeedActivityMovie.displayName = "CardFeedActivityMovie";
 
 export {
-	CardFeedMovie,
-	CardFeedMovieDefault,
+	CardFeedActivityMovie,
+	CardFeedActivityMovieDefault,
 }

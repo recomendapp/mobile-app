@@ -3,13 +3,15 @@ import { useUserWatchlistQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Link } from "expo-router";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
-import { CardMedia } from "@/components/cards/CardMedia";
 import { useTheme } from "@/providers/ThemeProvider";
 import { LegendList } from "@legendapp/list";
 import { ThemedText } from "../ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
+import { CardMovie } from "../cards/CardMovie";
+import { MediaMovie, MediaTvSeries } from "@/types/type.db";
+import { CardTvSeries } from "../cards/CardTvSeries";
 
 interface WidgetUserWatchlistProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -27,7 +29,7 @@ export const WidgetUserWatchlist = ({
   const { data: watchlist } = useUserWatchlistQuery({
     userId: user?.id,
     filters: {
-      order: 'random',
+      sortBy: 'random',
       limit: 6,
     }
   })
@@ -49,9 +51,11 @@ export const WidgetUserWatchlist = ({
     <LegendList
     data={watchlist}
     renderItem={({ item }) => (
-      <View key={item.media_id} style={tw`flex-0.5`}>
-        <CardMedia media={item.media!} />
-      </View>
+      item.type === 'movie' ? (
+        <CardMovie movie={item.media as MediaMovie} />
+      ) : item.type === 'tv_series' && (
+        <CardTvSeries tvSeries={item.media as MediaTvSeries} />
+      )
     )}
     keyExtractor={(item) => item.media_id!.toString()}
     numColumns={2}

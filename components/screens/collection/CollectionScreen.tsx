@@ -21,6 +21,7 @@ import { ImageType } from "@/components/utils/ImageWithFallback";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { MediaType, ViewType } from "@/types/type.db";
 import { LegendListRenderItemProps } from "@legendapp/list";
+import { useHeaderHeight } from '@react-navigation/elements';
 
 interface ToolbarItem {
     label?: string;
@@ -48,6 +49,9 @@ interface CollectionScreenConfig<T> extends Omit<React.ComponentProps<typeof Ani
     scrollY?: SharedValue<number>;
     headerHeight?: SharedValue<number>;
     screenTitle: string;
+    hideHeader?: boolean;
+    hideTitle?: boolean;
+    hideNumberOfItems?: boolean;
     screenSubtitle?: string | React.ReactNode | (() => React.ReactNode);
     poster?: string;
     posterType?: ImageType;
@@ -79,6 +83,9 @@ const CollectionScreen = <T extends {}>({
     scrollY = useSharedValue(0),
     headerHeight = useSharedValue(0),
     screenTitle,
+    hideHeader,
+    hideTitle,
+    hideNumberOfItems,
     screenSubtitle,
     poster,
     posterType,
@@ -98,7 +105,7 @@ const CollectionScreen = <T extends {}>({
     getItemBackdropUrl,
     getCreatedAt,
     onItemAction,
-    navigationHeaderHeight,
+    navigationHeaderHeight = useHeaderHeight(),
     view = 'list',
     numColumns = 4,
     type,
@@ -215,6 +222,7 @@ const CollectionScreen = <T extends {}>({
             onItemAction={onItemAction}
             view={view}
             type={type}
+            index={index}
             />
         )
     }
@@ -239,18 +247,20 @@ const CollectionScreen = <T extends {}>({
 			onScroll={scrollHandler}
 			ListHeaderComponent={
 				<>
-					<CollectionHeader
+					{!hideHeader && <CollectionHeader
 						title={screenTitle}
+                        hideTitle={hideTitle}
                         poster={poster}
                         posterType={posterType}
                         bottomText={screenSubtitle}
 						numberOfItems={data?.length || 0}
+                        hideNumberOfItems={hideNumberOfItems}
 						scrollY={scrollY}
 						headerHeight={headerHeight}
 						backdrops={backdrops}
                         type={type}
                         navigationHeaderHeight={navigationHeaderHeight}
-					/>
+					/>}
 					{!loading && (
 						<View style={tw`gap-2`}>
 							<SearchBar
@@ -285,6 +295,7 @@ const CollectionScreen = <T extends {}>({
 			refreshing={isRefetching}
 			onRefresh={refetch}
 			contentContainerStyle={{
+                paddingTop: hideHeader ? navigationHeaderHeight : undefined,
                 paddingHorizontal: PADDING_HORIZONTAL,
                 paddingBottom: bottomTabHeight + PADDING_VERTICAL,
                 gap: GAP,

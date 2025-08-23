@@ -1,4 +1,3 @@
-import { CardUserActivity } from "@/components/cards/CardUserActivity";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserFeedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
@@ -8,24 +7,14 @@ import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
 import { useTranslations } from "use-intl";
 import { useTheme } from "@/providers/ThemeProvider";
-import { CardFeedItem } from "@/components/cards/CardFeedItem";
-import { CardReview } from "@/components/cards/CardReview";
-import { Href, useRouter } from "expo-router";
-import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import BottomSheetMedia from "@/components/bottom-sheets/sheets/BottomSheetMedia";
-import UserAvatar from "@/components/user/UserAvatar";
-import FeedUserActivity from "@/components/screens/feed/FeedUserActivity";
 import { PADDING_VERTICAL } from "@/theme/globals";
-import { Pressable } from "react-native-gesture-handler";
-import { CardFeedMovie } from "@/components/cards/feed/CardFeedMovie";
-import { MediaMovie, MediaTvSeries, UserActivity, UserActivityMovie, UserActivityTvSeries } from "@/types/type.db";
-import { CardFeedTvSeries } from "@/components/cards/feed/CardFeedTvSeries";
+import { CardFeedActivityMovie } from "@/components/cards/feed/CardFeedActivityMovie";
+import { UserFeedItem } from "@/types/type.db";
+import { CardFeedActivityTvSeries } from "@/components/cards/feed/CardFeedActivityTvSeries";
 
 const FeedScreen = () => {
 	const { user } = useAuth();
-	const router = useRouter();
 	const t = useTranslations();
-	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const { bottomTabHeight, colors } = useTheme();
 	const {
 		data: feed,
@@ -40,15 +29,16 @@ const FeedScreen = () => {
 	const loading = isLoading || feed === undefined;
 
 	// Render 
-	const renderItem = ({ item, index } : { item: UserActivity, index: number }) => {
-		const { media, media_id, ...activity } = item;
-		switch (item.type) {
-			case 'movie':
-				return <CardFeedMovie activity={{ movie_id: media_id!, ...activity } as UserActivityMovie} movie={item.media as MediaMovie} />
-			case 'tv_series':
-				return <CardFeedTvSeries activity={{ tv_series_id: media_id!, ...activity } as UserActivityTvSeries} tvSeries={item.media as MediaTvSeries} />
+	const renderItem = ({ item, index } : { item: UserFeedItem, index: number }) => {
+		switch (item.activity_type) {
+			case 'activity_movie':
+				const { movie, ...activityMovie } = item.content;
+				return <CardFeedActivityMovie author={item.author} activity={activityMovie} movie={movie!} />;
+			case 'activity_tv_series':
+				const { tv_series, ...activityTvSeries } = item.content;
+				return <CardFeedActivityTvSeries author={item.author} activity={activityTvSeries} tvSeries={tv_series!} />;
 			default:
-				return null;
+				return <View style={[{ backgroundColor: colors.muted}, tw`p-4 rounded-md`]}><Text textColor="muted" style={tw`text-center`}>Unsupported activity type</Text></View>;
 		}
 	};
 

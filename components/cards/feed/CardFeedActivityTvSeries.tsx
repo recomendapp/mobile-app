@@ -1,6 +1,6 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaTvSeries, UserActivityTvSeries } from "@/types/type.db";
+import { MediaTvSeries, User, UserActivityTvSeries } from "@/types/type.db";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
@@ -15,34 +15,36 @@ import { useTranslations } from "use-intl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 
-interface CardFeedTvSeriesBaseProps
+interface CardFeedActivityTvSeriesBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
 		variant?: "default";
 		onPress?: () => void;
 		onLongPress?: () => void;
 	}
 
-type CardFeedTvSeriesSkeletonProps = {
+type CardFeedActivityTvSeriesSkeletonProps = {
 	skeleton: true;
+	author?: never;
 	activity?: never;
 	tvSeries?: never;
 	footer?: never;
 };
 
-type CardFeedTvSeriesDataProps = {
+type CardFeedActivityTvSeriesDataProps = {
 	skeleton?: false;
+	author: User;
 	activity: UserActivityTvSeries;
 	tvSeries: MediaTvSeries;
 	footer?: React.ReactNode;
 };
 
-export type CardFeedTvSeriesProps = CardFeedTvSeriesBaseProps &
-	(CardFeedTvSeriesSkeletonProps | CardFeedTvSeriesDataProps);
+export type CardFeedActivityTvSeriesProps = CardFeedActivityTvSeriesBaseProps &
+	(CardFeedActivityTvSeriesSkeletonProps | CardFeedActivityTvSeriesDataProps);
 
-const CardFeedTvSeriesDefault = React.forwardRef<
+const CardFeedActivityTvSeriesDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	FixedOmit<CardFeedTvSeriesProps, "variant" | "onPress" | "onLongPress">
->(({ style, children, activity, tvSeries, footer, skeleton, ...props }, ref) => {
+	FixedOmit<CardFeedActivityTvSeriesProps, "variant" | "onPress" | "onLongPress">
+>(({ style, children, author, activity, tvSeries, footer, skeleton, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
 	const router = useRouter();
@@ -68,8 +70,8 @@ const CardFeedTvSeriesDefault = React.forwardRef<
 			)}
 			<View style={tw`flex-1 gap-2 p-2`}>
 				{!skeleton ? <View style={tw`flex-row items-center gap-1`}>
-					<UserAvatar avatar_url={activity.user?.avatar_url} full_name={activity.user?.full_name!} style={tw`w-6 h-6`} />
-					<FeedUserActivity activity={activity} style={[{ color: colors.mutedForeground }, tw`text-sm`]} />
+					<UserAvatar avatar_url={author.avatar_url} full_name={author.full_name!} style={tw`w-6 h-6`} />
+					<FeedUserActivity author={author} activity={activity} style={[{ color: colors.mutedForeground }, tw`text-sm`]} />
 				</View> : <Skeleton style={tw`w-full h-6`} />}
 				<View style={tw`gap-2`}>
 					{!skeleton ? (
@@ -93,17 +95,17 @@ const CardFeedTvSeriesDefault = React.forwardRef<
 		</Animated.View>
 	);
 });
-CardFeedTvSeriesDefault.displayName = "CardFeedTvSeriesDefault";
+CardFeedActivityTvSeriesDefault.displayName = "CardFeedActivityTvSeriesDefault";
 
-const CardFeedTvSeries = React.forwardRef<
+const CardFeedActivityTvSeries = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	CardFeedTvSeriesProps
+	CardFeedActivityTvSeriesProps
 >(({ variant = "default", onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const content = (
 		variant === "default" ? (
-			<CardFeedTvSeriesDefault ref={ref} {...props} />
+			<CardFeedActivityTvSeriesDefault ref={ref} {...props} />
 		) : null
 	);
 
@@ -124,9 +126,9 @@ const CardFeedTvSeries = React.forwardRef<
 		</Pressable>
 	)
 });
-CardFeedTvSeries.displayName = "CardFeedTvSeries";
+CardFeedActivityTvSeries.displayName = "CardFeedActivityTvSeries";
 
 export {
-	CardFeedTvSeries,
-	CardFeedTvSeriesDefault,
+	CardFeedActivityTvSeries,
+	CardFeedActivityTvSeriesDefault,
 }

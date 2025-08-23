@@ -17,6 +17,9 @@ interface UIStore {
   myRecosTab: { tab: UserRecosType; view: ViewType };
   setMyRecosTab: (tab: UserRecosType) => void;
   setMyRecosView: (view: ViewType) => void;
+
+  playlistView: ViewType;
+  setPlaylistView: (view: ViewType) => void;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -55,6 +58,9 @@ export const useUIStore = create<UIStore>()(
 			setMyRecosView: (view) => set(state => ({
 				myRecosTab: { ...state.myRecosTab, view },
 			})),
+			// Playlist
+			playlistView: 'list',
+			setPlaylistView: (view) => set({ playlistView: view }),
 		}),
 		{
 			name: 'ui-storage',

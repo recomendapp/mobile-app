@@ -1,9 +1,9 @@
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { UserActivityType } from "@/types/type.db";
 import { Icons } from "@/constants/Icons";
-import Animated, { FadeInLeft, FadeInRight, FadeOutLeft, FadeOutRight, useSharedValue } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, useSharedValue } from "react-native-reanimated";
 import { View } from "@/components/ui/view";
 import { Stack } from "expo-router";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -21,8 +21,6 @@ const WatchlistScreen = () => {
     const { tab, view } = useUIStore((state) => state.watchlistTab);
     const setTab = useUIStore((state) => state.setWatchlistTab);
     const setView = useUIStore((state) => state.setWatchlistView);
-
-    const [previousTabIndex, setPreviousTabIndex] = useState(0);
 
 	// SharedValues
     const tabsHeight = useSharedValue(0);
@@ -51,13 +49,6 @@ const WatchlistScreen = () => {
 			</>
 		);
 	}, [tab, navigationHeaderHeight, tabsHeight.value]);
-
-	// Animation
-    const currentIndex = segmentedOptions.findIndex((option) => option.value === tab);
-    const direction = currentIndex > previousTabIndex ? 'right' : 'left';
-    const enteringAnimation = direction === 'right' ? FadeInRight.springify().damping(80).stiffness(200) : FadeInLeft.springify().damping(80).stiffness(200);
-    const exitingAnimation = direction === 'right' ? FadeOutLeft.springify().damping(80).stiffness(200) : FadeOutRight.springify().damping(80).stiffness(200);
-
     return (
     <>
         <Stack.Screen
@@ -97,17 +88,16 @@ const WatchlistScreen = () => {
             <SegmentedControl
                 backgroundColor="transparent"
                 values={segmentedOptions.map((option) => option.label)}
-                selectedIndex={currentIndex}
+                selectedIndex={segmentedOptions.findIndex((option) => option.value === tab)}
                 onChange={(event) => {
-                    setPreviousTabIndex(currentIndex);
                     setTab(segmentedOptions[event.nativeEvent.selectedSegmentIndex].value);
                 }}
             />
         </BlurView>
 		<Animated.View
 			key={`selected_tab_${tab}`}
-			entering={enteringAnimation}
-			exiting={exitingAnimation}
+			entering={FadeIn}
+			exiting={FadeOut}
 			style={tw`flex-1`}
 		>
 			{components()}

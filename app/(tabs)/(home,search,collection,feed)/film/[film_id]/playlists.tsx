@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { ButtonPlaylistMovieAdd } from "@/components/buttons/ButtonPlaylistMovieAdd";
+import { FadeInDown } from "react-native-reanimated";
 
 interface sortBy {
 	label: string;
@@ -85,8 +86,12 @@ const FilmPlaylists = () => {
 		/>
 		<LegendList
 		data={playlists?.pages.flatMap((page) => page) ?? []}
-		renderItem={({ item }) => (
-			<CardPlaylist key={item.id} playlist={item} />
+		renderItem={({ item, index }) => (
+			<CardPlaylist
+			key={item.id}
+			playlist={item}
+			entering={FadeInDown.delay(index * 50)}
+			/>
 		)}
 		ListHeaderComponent={
 			<>

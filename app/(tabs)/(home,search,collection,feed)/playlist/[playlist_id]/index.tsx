@@ -14,11 +14,14 @@ import ButtonActionPlaylistSaved from "@/components/buttons/ButtonActionPlaylist
 import CollectionHeader from "@/components/screens/collection/CollectionHeader";
 import { PlaylistMovie } from "@/components/screens/playlist/PlaylistMovie";
 import { PlaylistTvSeries } from "@/components/screens/playlist/PlaylistTvSeries";
+import { useUIStore } from "@/stores/useUIStore";
 
 const PlaylistScreen = () => {
 	const { session } = useAuth();
 	const { playlist_id } = useLocalSearchParams();
 	const playlistId = Number(playlist_id) || undefined;
+	const view = useUIStore((state) => state.playlistView);
+	const setView = useUIStore((state) => state.setPlaylistView);
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const { data: playlist } = usePlaylistQuery({
 		playlistId: playlistId,
@@ -41,6 +44,12 @@ const PlaylistScreen = () => {
 						<ButtonActionPlaylistSaved playlistId={playlist.id} />
 						</>
 					)}
+					<Button
+					variant="ghost"
+					size="icon"
+					icon={view === 'grid' ? Icons.Grid : Icons.List}
+					onPress={() => setView(view === 'grid' ? 'list' : 'grid')}
+					/>
 					<Button
 					variant="ghost"
 					size="icon"

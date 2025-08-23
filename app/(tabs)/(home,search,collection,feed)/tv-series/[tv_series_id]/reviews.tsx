@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import ButtonMyReviewTvSeries from "@/components/buttons/ButtonMyReviewTvSeries";
 import { CardReviewTvSeries } from "@/components/cards/reviews/CardReviewTvSeries";
+import { FadeInDown } from "react-native-reanimated";
 
 interface sortBy {
 	label: string;
@@ -84,12 +85,13 @@ const TvSeriesReviews = () => {
 		/>
 		<LegendList
 		data={reviews?.pages.flatMap((page) => page) ?? []}
-		renderItem={({ item }) => (
+		renderItem={({ item, index }) => (
 			<CardReviewTvSeries
 			review={item}
 			activity={item.activity}
 			author={item.activity.user}
 			url={`/tv-series/${tvSeries?.slug || tvSeries?.id}/review/${item.id}`}
+			entering={FadeInDown.delay(index * 50)}
 			/>
 		)}
 		ListHeaderComponent={

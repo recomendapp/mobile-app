@@ -29,16 +29,20 @@ interface CollectionHeaderBaseProps
 type CollectionHeaderLoadingProps = {
 	loading: true;
 	title?: never;
+	hideTitle?: never;
 	bottomText?: never;
 	numberOfItems?: never;
+	hideNumberOfItems?: never;
 	backdrops?: never;
 };
 
 type CollectionHeaderLoadedProps = {
 	loading?: boolean;
 	title: string;
+	hideTitle?: boolean;
 	bottomText: string | React.ReactNode | (() => React.ReactNode);
 	numberOfItems: number;
+	hideNumberOfItems?: boolean;
 	backdrops: (string | null | undefined)[];
 }
 
@@ -47,7 +51,7 @@ type CollectionHeaderProps = CollectionHeaderBaseProps & (CollectionHeaderLoaded
 const CollectionHeader = forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CollectionHeaderProps
->(({ loading, headerHeight, navigationHeaderHeight = useHeaderHeight(), scrollY, title, poster, posterType, bottomText, numberOfItems, backdrops, type, ...props }, ref) => {
+>(({ loading, headerHeight, navigationHeaderHeight = useHeaderHeight(), scrollY, title, hideTitle, poster, posterType, bottomText, numberOfItems, hideNumberOfItems, backdrops, type, ...props }, ref) => {
 	const { colors, inset } = useTheme();
 	const { hslToRgb } = useColorConverter();
 	const t = useTranslations();
@@ -181,18 +185,22 @@ const CollectionHeader = forwardRef<
 							/>
 						) : <Skeleton style={tw`w-48 h-48 rounded-md mb-2`} />
 					)}
-					{!loading ? <Text
-					numberOfLines={2}
-					style={[
-						{ color: colors.accentYellow },
-						tw`text-4xl font-bold text-center`,
-					]}
-					>
-						{title}
-					</Text> : <Skeleton style={tw`h-10 w-48`} />}
-					{!loading ? <Text numberOfLines={1} style={[{ color: colors.mutedForeground }]}>
-						{renderItemsCount()}
-					</Text> : <Skeleton style={tw`h-4 w-10`} />}
+					{!hideTitle && (
+						!loading ? <Text
+						numberOfLines={2}
+						style={[
+							{ color: colors.accentYellow },
+							tw`text-4xl font-bold text-center`,
+						]}
+						>
+							{title}
+						</Text> : <Skeleton style={tw`h-10 w-48`} />
+					)}
+					{!hideNumberOfItems && (
+						!loading ? <Text numberOfLines={1} style={[{ color: colors.mutedForeground }]}>
+							{renderItemsCount()}
+						</Text> : <Skeleton style={tw`h-4 w-10`} />
+					)}
 				</View>
 				{bottomText ? (
 					typeof bottomText === 'function' ? (

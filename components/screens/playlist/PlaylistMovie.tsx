@@ -9,7 +9,6 @@ import richTextToPlainString from "@/utils/richTextToPlainString";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useRouter } from "expo-router";
 import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsMovieQuery } from "@/features/playlist/playlistQueries";
-import BottomSheetPlaylist from "@/components/bottom-sheets/sheets/BottomSheetPlaylist";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import useDebounce from "@/hooks/useDebounce";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -20,12 +19,9 @@ import { CardUser } from "@/components/cards/CardUser";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import tw from "@/lib/tw";
-import { Button } from "@/components/ui/Button";
-import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { SharedValue, useSharedValue } from "react-native-reanimated";
-import ButtonActionPlaylistLike from "@/components/buttons/ButtonActionPlaylistLike";
-import ButtonActionPlaylistSaved from "@/components/buttons/ButtonActionPlaylistSaved";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
+import { useUIStore } from "@/stores/useUIStore";
 
 interface PlaylistMovieProps {
 	playlist: Playlist;
@@ -42,6 +38,7 @@ export const PlaylistMovie = ({
 	const router = useRouter();
 	const supabase = useSupabaseClient();
 	const { session } = useAuth();
+	const view = useUIStore((state) => state.playlistView);
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const [shouldRefresh, setShouldRefresh] = useState(false);
   	const debouncedRefresh = useDebounce(shouldRefresh, 200);
@@ -225,31 +222,6 @@ export const PlaylistMovie = ({
 
 	return (
 	<>
-		<AnimatedStackScreen
-		options={{
-			headerTitle: playlist?.title ?? '',
-			headerRight: playlist ? () => (
-				<View style={tw`flex-row items-center`}>
-					{session && playlist && session.user.id !== playlist.user_id && (
-						<>
-						<ButtonActionPlaylistLike playlistId={playlist.id} />
-						<ButtonActionPlaylistSaved playlistId={playlist.id} />
-						</>
-					)}
-					<Button
-					variant="ghost"
-					size="icon"
-					icon={Icons.EllipsisVertical}
-					onPress={() => openSheet(BottomSheetPlaylist, {
-						playlist: playlist
-					})}
-					/>
-				</View>
-			) : undefined
-		}}
-		scrollY={scrollY}
-		triggerHeight={headerHeight}
-		/>
 		<CollectionScreen
 		// Query
 		queryData={playlistItems}
@@ -296,6 +268,8 @@ export const PlaylistMovie = ({
 		// SharedValues
 		scrollY={scrollY}
 		headerHeight={headerHeight}
+		// View
+		view={view}
 		/>
 	</>
 	);
