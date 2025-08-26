@@ -9,7 +9,7 @@ import React from "react";
 import { ViewStyle } from "react-native";
 import { Link } from "expo-router";
 import { Icons } from "@/constants/Icons";
-import { MediaTvSeries } from "@/types/type.db";
+import { MediaTvSeries } from "@recomendapp/types";
 
 interface ButtonMyReviewTvSeriesProps
   extends React.ComponentProps<typeof Button> {

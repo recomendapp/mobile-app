@@ -5,7 +5,7 @@ import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import { useUserActivityMovieDeleteMutation, useUserActivityMovieInsertMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
-import { MediaMovie } from "@/types/type.db";
+import { MediaMovie } from "@recomendapp/types";
 import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import tw from "@/lib/tw";

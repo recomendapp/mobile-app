@@ -1,7 +1,7 @@
 import React from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
-import { Playlist } from '@/types/type.db';
+import { Playlist } from '@recomendapp/types';
 import { usePathname, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';

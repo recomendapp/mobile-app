@@ -2,7 +2,7 @@ import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { Pressable, View } from "react-native";
-import { MediaMoviePerson } from "@/types/type.db";
+import { MediaMoviePerson } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";

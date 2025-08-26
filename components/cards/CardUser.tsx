@@ -2,14 +2,14 @@ import * as React from "react"
 import { useRouter } from "expo-router";
 import { Pressable, View, StyleProp, ViewStyle } from "react-native";
 import Animated from "react-native-reanimated";
-import { User } from "@/types/type.db";
+import { User } from "@recomendapp/types";
 import UserAvatar from "../user/UserAvatar";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Icons } from "@/constants/Icons";
 import { Skeleton } from "../ui/Skeleton";
 import { Text } from "../ui/text";
-import { FixedOmit } from "@/types";
+import { FixedOmit } from "@recomendapp/types";
 
 interface CardUserBaseProps
   extends React.ComponentPropsWithoutRef<typeof Animated.View> {

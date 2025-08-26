@@ -5,7 +5,7 @@ import { useUserActivityMovieQuery, useUserActivityTvSeriesQuery } from "@/featu
 import { Icons } from "@/constants/Icons";
 import { useUserActivityMovieDeleteMutation, useUserActivityMovieInsertMutation, useUserActivityTvSeriesDeleteMutation, useUserActivityTvSeriesInsertMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
-import { MediaMovie, MediaTvSeries } from "@/types/type.db";
+import { MediaMovie, MediaTvSeries } from "@recomendapp/types";
 import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import tw from "@/lib/tw";

@@ -3,7 +3,7 @@ import { useMediaTvSeriesSeasonDetailsQuery } from "@/features/media/mediaQuerie
 import { Stack, useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { LayoutChangeEvent, Text, View } from "react-native";
-import { MediaTvSeriesSeason } from "@/types/type.db";
+import { MediaTvSeriesSeason } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";

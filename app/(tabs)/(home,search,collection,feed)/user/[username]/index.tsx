@@ -8,7 +8,7 @@ import { useUserProfileQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-import { Profile } from "@/types/type.db";
+import { Profile } from "@recomendapp/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { ExternalPathString, Link, Stack, useLocalSearchParams, useRouter } from "expo-router"
 import { upperFirst } from "lodash";

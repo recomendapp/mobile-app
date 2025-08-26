@@ -8,7 +8,7 @@ import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsTvSeriesQuery, usePlay
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-import { PlaylistItemTvSeries } from "@/types/type.db";
+import { PlaylistItemTvSeries } from "@recomendapp/types";
 import { PostgrestError } from "@supabase/supabase-js";
 import { Redirect, useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";

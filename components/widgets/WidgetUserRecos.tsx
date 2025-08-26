@@ -12,7 +12,7 @@ import { ThemedText } from "../ui/ThemedText";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { useCallback } from "react";
-import { MediaMovie, MediaTvSeries, UserRecosAggregated } from "@/types/type.db";
+import { MediaMovie, MediaTvSeries, UserRecosAggregated } from "@recomendapp/types";
 import { CardMovie } from "../cards/CardMovie";
 import { CardTvSeries } from "../cards/CardTvSeries";
 

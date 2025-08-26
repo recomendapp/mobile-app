@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { useAuth } from "@/providers/AuthProvider";
-import { User } from "@/types/type.db";
+import { User } from "@recomendapp/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";

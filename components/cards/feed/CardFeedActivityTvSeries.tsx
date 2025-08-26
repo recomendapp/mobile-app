@@ -1,6 +1,6 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaTvSeries, User, UserActivityTvSeries } from "@/types/type.db";
+import { MediaTvSeries, User, UserActivityTvSeries } from "@recomendapp/types";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
@@ -8,7 +8,7 @@ import { Pressable, View } from "react-native";
 import FeedUserActivity from "@/components/screens/feed/FeedUserActivity";
 import { Href, useRouter } from "expo-router";
 import { Text } from "@/components/ui/text";
-import { FixedOmit } from "@/types";
+import { FixedOmit } from "@recomendapp/types";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { Skeleton } from "@/components/ui/Skeleton";

@@ -12,7 +12,7 @@ import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Button } from "@/components/ui/Button";
 import { CollectionAction } from "./CollectionScreen";
 import { forwardRef, useCallback } from "react";
-import { MediaType, ViewType } from "@/types/type.db";
+import { MediaType, ViewType } from "@recomendapp/types";
 
 interface CollectionItemProps<T> extends React.ComponentProps<typeof Animated.View> {
     item: T;

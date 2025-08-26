@@ -1,7 +1,7 @@
 import React from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
-import { MediaTvSeries, UserActivityTvSeries } from '@/types/type.db';
+import { MediaTvSeries, UserActivityTvSeries } from '@recomendapp/types';
 import { LinkProps, usePathname, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';

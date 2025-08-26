@@ -2,7 +2,7 @@ import { useMediaTvSeriesDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { Pressable, View } from "react-native";
-import { MediaTvSeriesPerson } from "@/types/type.db";
+import { MediaTvSeriesPerson } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";

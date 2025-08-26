@@ -12,7 +12,7 @@ import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import { PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { User } from "@/types/type.db";
+import { User } from "@recomendapp/types";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";

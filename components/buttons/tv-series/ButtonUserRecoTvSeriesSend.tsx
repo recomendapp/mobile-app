@@ -1,7 +1,7 @@
 import React from "react"
 import { Pressable } from "react-native";
 import { Icons } from "@/constants/Icons";
-import { MediaTvSeries } from "@/types/type.db";
+import { MediaTvSeries } from "@recomendapp/types";
 import { useAuth } from "@/providers/AuthProvider";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";

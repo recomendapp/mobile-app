@@ -4,7 +4,7 @@ import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import { useUserActivityMovieInsertMutation, useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
-import { MediaMovie } from "@/types/type.db";
+import { MediaMovie } from "@recomendapp/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { userKeys } from "@/features/user/userKeys";
 import * as Burnt from "burnt";

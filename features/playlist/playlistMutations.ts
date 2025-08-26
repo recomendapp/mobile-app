@@ -1,7 +1,7 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { userKeys } from "../user/userKeys";
 import { matchQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Playlist, PlaylistGuest, PlaylistItemMovie, PlaylistItemTvSeries, PlaylistType } from "@/types/type.db";
+import { Playlist, PlaylistGuest, PlaylistItemMovie, PlaylistItemTvSeries, PlaylistType } from "@recomendapp/types";
 import { playlistKeys } from "./playlistKeys";
 import { mediaKeys } from "../media/mediaKeys";
 

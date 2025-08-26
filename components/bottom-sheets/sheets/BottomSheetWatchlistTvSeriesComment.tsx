@@ -1,6 +1,6 @@
 import React from 'react';
 import tw from '@/lib/tw';
-import { UserWatchlistTvSeries } from '@/types/type.db';
+import { UserWatchlistTvSeries } from '@recomendapp/types';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';

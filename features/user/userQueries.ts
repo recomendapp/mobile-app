@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { userKeys } from "./userKeys"
-import { UserFeedCastCrew, Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserWatchlist, Profile, UserWatchlistTvSeries, UserWatchlistMovie, UserReviewMovie, UserReviewTvSeries, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserActivityMovie, UserActivityTvSeries, UserFeedItem } from "@/types/type.db";
+import { UserFeedCastCrew, Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserWatchlist, Profile, UserWatchlistTvSeries, UserWatchlistMovie, UserReviewMovie, UserReviewTvSeries, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserActivityMovie, UserActivityTvSeries, UserFeedItem } from "@recomendapp/types";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 
 /* ---------------------------------- USER ---------------------------------- */

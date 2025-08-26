@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ComponentProps, useEffect, useState } from 'react';
-import { MediaType } from '@/types/type.db';
+import { MediaType } from '@recomendapp/types';
 import { Text, View } from 'react-native';
 import { ImageIcon, ListVideoIcon } from 'lucide-react-native';
 import { Icons } from '@/constants/Icons';

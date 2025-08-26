@@ -4,7 +4,7 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { usePlaylistMovieInsertMutation } from "@/features/playlist/playlistMutations";
 import { useAuth } from "@/providers/AuthProvider";
-import { Playlist, PlaylistSource } from "@/types/type.db";
+import { Playlist, PlaylistSource } from "@recomendapp/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";

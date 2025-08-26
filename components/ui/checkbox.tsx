@@ -1,7 +1,7 @@
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import { useTheme } from '@/providers/ThemeProvider';
-import { BORDER_RADIUS } from '@/theme/globals';
+import { HEIGHT } from '@/theme/globals';
 import { Check } from 'lucide-react-native';
 import React from 'react';
 import { TextStyle, TouchableOpacity } from 'react-native';
@@ -61,9 +61,9 @@ export function Checkbox({
     >
       <View
         style={{
-          width: BORDER_RADIUS,
-          height: BORDER_RADIUS,
-          borderRadius: BORDER_RADIUS,
+          width: HEIGHT / 2,
+          height: HEIGHT / 2,
+          borderRadius: HEIGHT / 2,
           borderWidth: 1.5,
           borderColor: checked ? primary : borderColor,
           backgroundColor: checked ? primary : 'transparent',
@@ -74,7 +74,7 @@ export function Checkbox({
       >
         {checked && (
           <Check
-            size={16}
+            size={HEIGHT / 3}
             color={primaryForegroundColor}
             strokeWidth={3}
             strokeLinecap='round'

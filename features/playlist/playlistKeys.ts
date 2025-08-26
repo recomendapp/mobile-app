@@ -1,4 +1,4 @@
-import { PlaylistSource, PlaylistType } from "@/types/type.db";
+import { PlaylistSource, PlaylistType } from "@recomendapp/types";
 
 export const playlistKeys = {
 	all: ['playlist'] as const,

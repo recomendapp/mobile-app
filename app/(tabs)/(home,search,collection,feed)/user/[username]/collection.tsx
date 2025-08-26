@@ -7,7 +7,7 @@ import { View } from "react-native";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { UserActivityType } from "@/types/type.db";
+import { UserActivityType } from "@recomendapp/types";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import UserCollectionMovie from "@/components/screens/user/collection/UserCollectionMovie";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";

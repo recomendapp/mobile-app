@@ -7,9 +7,9 @@ import { useSharedValue } from "react-native-reanimated";
 import { ThemedText } from "../ui/ThemedText";
 import tw from "@/lib/tw";
 import { ImageBackground } from "expo-image";
-import { Database } from "@/types";
+import { Database } from "@recomendapp/types";
 import { getMediaDetails } from "../utils/getMediaDetails";
-import { MediaMovie, MediaTvSeries } from "@/types/type.db";
+import { MediaMovie, MediaTvSeries } from "@recomendapp/types";
 
 const width = Dimensions.get("window").width;
 

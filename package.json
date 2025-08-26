@@ -34,6 +34,7 @@
     "@react-navigation/drawer": "^7.3.9",
     "@react-navigation/material-top-tabs": "^7.3.5",
     "@react-navigation/native": "^7.1.6",
+    "@recomendapp/types": "^1.0.0",
     "@shopify/flash-list": "^2.0.1",
     "@supabase/supabase-js": "^2.53.0",
     "@tanstack/react-query": "^5.84.1",

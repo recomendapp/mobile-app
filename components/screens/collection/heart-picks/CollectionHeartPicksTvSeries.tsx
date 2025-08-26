@@ -2,7 +2,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import React from "react";
-import { UserActivityTvSeries } from "@/types/type.db";
+import { UserActivityTvSeries } from "@recomendapp/types";
 import CollectionScreen, { CollectionAction, SortByOption } from "@/components/screens/collection/CollectionScreen";
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";

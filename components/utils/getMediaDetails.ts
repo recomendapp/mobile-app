@@ -1,4 +1,4 @@
-import { MediaMovie, MediaPerson, MediaTvSeries, MediaTvSeriesEpisode, MediaTvSeriesSeason, MediaType } from "@/types/type.db";
+import { MediaMovie, MediaPerson, MediaTvSeries, MediaTvSeriesEpisode, MediaTvSeriesSeason, MediaType } from "@recomendapp/types";
 
 interface MediaBaseProps {
 	type: MediaType;

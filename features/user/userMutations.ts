@@ -1,5 +1,5 @@
 
-import { JSONContent, User, UserActivity, UserActivityMovie, UserActivityTvSeries, UserFollower, UserRecosAggregated, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserWatchlist, UserWatchlistMovie, UserWatchlistTvSeries } from '@/types/type.db';
+import { JSONContent, User, UserActivity, UserActivityMovie, UserActivityTvSeries, UserFollower, UserRecosAggregated, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserWatchlist, UserWatchlistMovie, UserWatchlistTvSeries } from '@recomendapp/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { userKeys } from './userKeys';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';

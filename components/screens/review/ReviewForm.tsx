@@ -1,6 +1,6 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import {  MediaMovie, MediaTvSeries, UserActivityMovie, UserActivityTvSeries, UserReview, UserReviewMovie, UserReviewTvSeries } from "@/types/type.db";
+import {  MediaMovie, MediaTvSeries, UserActivityMovie, UserActivityTvSeries, UserReview, UserReviewMovie, UserReviewTvSeries } from "@recomendapp/types";
 import { useEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { RichText, Toolbar } from "@10play/tentap-editor";

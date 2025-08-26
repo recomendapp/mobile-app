@@ -6,7 +6,7 @@ import { Platform } from "react-native";
 import * as Device from 'expo-device';
 import { useRouter } from "expo-router";
 import * as Burnt from 'burnt';
-import { NotificationPayload } from "@/types";
+import { NotificationPayload } from "@recomendapp/types";
 // import { NovuProvider } from "@novu/react-native";
 
 type NotificationsContextType = {

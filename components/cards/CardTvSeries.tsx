@@ -1,5 +1,5 @@
 import * as React from "react"
-import { MediaTvSeries, UserActivityTvSeries } from "@/types/type.db";
+import { MediaTvSeries, UserActivityTvSeries } from "@recomendapp/types";
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "../utils/ImageWithFallback";
 import { Href, useRouter } from "expo-router";
@@ -8,7 +8,7 @@ import { Pressable, View } from "react-native";
 import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { IconMediaRating } from "../medias/IconMediaRating";
-import { FixedOmit } from "@/types";
+import { FixedOmit } from "@recomendapp/types";
 import { Skeleton } from "../ui/Skeleton";
 import BottomSheetTvSeries from "../bottom-sheets/sheets/BottomSheetTvSeries";
 import { Text } from "../ui/text";

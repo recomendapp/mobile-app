@@ -14,7 +14,7 @@ import { usePlaylistGuestsQuery, usePlaylistQuery } from "@/features/playlist/pl
 import Switch from "@/components/ui/Switch";
 import { Alert } from "react-native";
 import { usePlaylistGuestsDeleteMutation, usePlaylistGuestsUpsertMutation, usePlaylistUpdateMutation } from "@/features/playlist/playlistMutations";
-import { User } from "@/types/type.db";
+import { User } from "@recomendapp/types";
 import Fuse from "fuse.js";
 import { SearchBar } from "@/components/ui/searchbar";
 import { LegendList } from "@legendapp/list";

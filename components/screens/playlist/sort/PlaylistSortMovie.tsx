@@ -8,7 +8,7 @@ import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsMovieQuery, usePlaylis
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-import { PlaylistItemMovie } from "@/types/type.db";
+import { PlaylistItemMovie } from "@recomendapp/types";
 import { PostgrestError } from "@supabase/supabase-js";
 import { Redirect, useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";

@@ -9,7 +9,7 @@ import { useMediaReviewsTvSeriesInfiniteQuery } from "@/features/media/mediaQuer
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
-import { MediaTvSeries, UserReviewTvSeries } from "@/types/type.db";
+import { MediaTvSeries, UserReviewTvSeries } from "@recomendapp/types";
 import { CardReviewTvSeries } from "@/components/cards/reviews/CardReviewTvSeries";
 
 interface TvSeriesWidgetReviewsProps extends React.ComponentPropsWithoutRef<typeof View> {

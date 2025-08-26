@@ -1,7 +1,7 @@
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import React, { useCallback, useMemo } from "react";
-import { UserActivityType } from "@/types/type.db";
+import { UserActivityType } from "@recomendapp/types";
 import { Icons } from "@/constants/Icons";
 import Animated, { FadeIn, FadeOut, useSharedValue } from "react-native-reanimated";
 import { View } from "@/components/ui/view";

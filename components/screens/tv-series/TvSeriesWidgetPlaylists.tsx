@@ -10,7 +10,7 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
-import { Playlist } from "@/types/type.db";
+import { Playlist } from "@recomendapp/types";
 
 interface TvSeriesWidgetPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	tvSeriesId: number;

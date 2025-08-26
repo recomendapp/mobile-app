@@ -3,7 +3,7 @@ import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useTheme } from "@/providers/ThemeProvider";
-import { MediaTvSeriesSeason } from "@/types/type.db";
+import { MediaTvSeriesSeason } from "@recomendapp/types";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { CardTvSeriesSeason } from "@/components/cards/CardTvSeriesSeason";
 import { useTranslations } from "use-intl";

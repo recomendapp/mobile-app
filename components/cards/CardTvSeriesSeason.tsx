@@ -1,5 +1,5 @@
 import * as React from "react"
-import { MediaTvSeriesSeason } from "@/types/type.db";
+import { MediaTvSeriesSeason } from "@recomendapp/types";
 import { ThemedText } from "../ui/ThemedText";
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "../utils/ImageWithFallback";

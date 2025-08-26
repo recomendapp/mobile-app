@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { View } from "../ui/view";
-import { MediaMovie } from "@/types/type.db";
+import { MediaMovie } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { ImageWithFallback } from "../utils/ImageWithFallback";
 import ViewShot from "react-native-view-shot";
@@ -23,12 +23,15 @@ import { ColorPair, useImageColorPairs } from "@/hooks/useImageColorPairs";
 import { useRouter } from "expo-router";
 import { ScaledCapture } from "../ui/ScaledCapture";
 import app from "@/constants/app";
+import { Dimensions } from "react-native";
 
 interface ShareMovieProps extends React.ComponentProps<typeof ViewShot> {
 	movie: MediaMovie;
 	variant?: 'default';
 };
 
+
+const { height: screenHeight } = Dimensions.get('screen');
 const ITEM_WIDTH = 64;
 const ITEM_SPACING = 8;
 
@@ -72,7 +75,7 @@ const ShareMovieCustomPoster = ({
 		hasNextPage,
 		fetchNextPage,
 	} = useMediaMoviePosterInfiniteQuery({
-		movieId: movie.id,
+		movieId: poster ? movie.id : undefined,
 	})
 	return (
 		<WheelSelector
@@ -123,7 +126,7 @@ const ShareMovieCustomBackdrop = ({
 		hasNextPage,
 		fetchNextPage,
 	} = useMediaMovieBackdropInfiniteQuery({
-		movieId: movie.id,
+		movieId: bgType === 'image' ? movie.id : undefined,
 	});
 	return (
 		<View style={tw`absolute bottom-0`}>
@@ -230,7 +233,7 @@ export const ShareMovie = forwardRef<
 			default:
 				return null;
 		}
-	}, [editing, activeEditingOption, movie, bgType, bgColor]);
+	}, [editing, activeEditingOption, movie, bgType]);
 	const renderEditingButtons = useCallback(() => (
 		<View style={tw`absolute top-2 right-2 flex-row items-center gap-2`}>
 			{editing && backdrop && activeEditingOption === 'background' && (
@@ -286,7 +289,7 @@ export const ShareMovie = forwardRef<
 	return (
 		<View style={{ gap: GAP }} {...props}>
 			<View style={tw`items-center`}>
-				<View style={[{ aspectRatio: 9/16, paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL, borderRadius: BORDER_RADIUS },tw`relative h-96 items-center justify-center overflow-hidden`]}>
+				<View style={[{ aspectRatio: 9/16, paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL, borderRadius: BORDER_RADIUS, height: screenHeight / 2 },tw`relative items-center justify-center overflow-hidden`]}>
 					{bgType === 'image' && backdrop ? (
 						<Image source={backdrop} style={tw`absolute inset-0`} />
 					) : bgType === 'color' && bgColor && (

@@ -19,7 +19,7 @@ import { LucideIcon } from "lucide-react-native";
 import { CollectionItem } from "./CollectionItem";
 import { ImageType } from "@/components/utils/ImageWithFallback";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { MediaType, ViewType } from "@/types/type.db";
+import { MediaType, ViewType } from "@recomendapp/types";
 import { LegendListRenderItemProps } from "@legendapp/list";
 import { useHeaderHeight } from '@react-navigation/elements';
 

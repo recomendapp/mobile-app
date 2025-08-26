@@ -5,7 +5,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { ICON_ACTION_SIZE } from "@/theme/globals";
-import { MediaMovie } from "@/types/type.db";
+import { MediaMovie } from "@recomendapp/types";
 
 interface ButtonPlaylistMovieAddProps
 	extends React.ComponentProps<typeof Button> {

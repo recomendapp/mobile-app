@@ -1,4 +1,4 @@
-import { User } from "@/types/type.db";
+import { User } from "@recomendapp/types";
 import { Session } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";

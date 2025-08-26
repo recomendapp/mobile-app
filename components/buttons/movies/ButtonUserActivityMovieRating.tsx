@@ -3,7 +3,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { MediaMovie } from "@/types/type.db";
+import { MediaMovie } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";

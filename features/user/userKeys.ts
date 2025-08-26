@@ -1,4 +1,4 @@
-import { MediaType, PlaylistType, UserActivityType, UserRecosType, UserReviewType, UserWatchlistType } from "@/types/type.db"
+import { MediaType, PlaylistType, UserActivityType, UserRecosType, UserReviewType, UserWatchlistType } from "@recomendapp/types"
 
 export const userKeys = {
 	all: ['user'] as const,

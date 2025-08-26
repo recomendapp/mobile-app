@@ -1,13 +1,13 @@
 import * as React from "react"
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { PlaylistLike, User } from "@/types/type.db";
+import { PlaylistLike, User } from "@recomendapp/types";
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Text } from "@/components/ui/text";
-import { FixedOmit } from "@/types";
+import { FixedOmit } from "@recomendapp/types";
 import { useTranslations } from "use-intl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";

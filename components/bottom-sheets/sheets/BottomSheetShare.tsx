@@ -1,11 +1,11 @@
-import { forwardRef, useRef } from "react";
+import { forwardRef, useRef, useState } from "react";
 import { BottomSheetProps } from "../BottomSheetManager";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import ThemedTrueSheet from "@/components/ui/ThemedTrueSheet";
 import tw from "@/lib/tw";
 import { View } from "react-native";
 import ViewShot from 'react-native-view-shot'
-import { MediaMovie, MediaPerson, MediaTvSeries, MediaType, Playlist, User } from "@/types/type.db";
+import { MediaMovie, MediaPerson, MediaTvSeries, MediaType, Playlist, User } from "@recomendapp/types";
 import Share, { Social } from "react-native-share"
 import Constants from 'expo-constants';
 import { ShareMovie } from "@/components/share/ShareMovie";
@@ -99,6 +99,8 @@ const BottomSheetShare = forwardRef<
 	// REFs
 	const scrollRef = useRef<ScrollView>(null);
 	const captureRef = useRef<ShareViewRef>(null);
+	// States
+	const [loadingPlatform, setLoadingPlatform] = useState<number | null>(null);
 
 	const renderContent = () => {
 		switch (type) {
@@ -129,7 +131,6 @@ const BottomSheetShare = forwardRef<
 			onPress: async () => {
 				const data = await captureRef.current?.capture();
 				if (!data) return;
-				console.log("DATA SHARE", data.backgroundTopColor)
 				await Share.shareSingle({
 					social: Social.InstagramStories,
 					appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
@@ -141,8 +142,27 @@ const BottomSheetShare = forwardRef<
 					backgroundVideo: data.backgroundVideo,
 				});
 			}
+		},
+		{
+			label: "More",
+			icon: Icons.EllipsisHorizontal,
+			onPress: async () => {
+				await Share.open({
+					url: url,
+				})
+			}
 		}
-	]
+	];
+
+	// Handlers
+	const handlePlatformPress = (item: typeof sharePlatform[number], index: number) => async () => {
+		setLoadingPlatform(index);
+		try {
+			await item.onPress();
+		} finally {
+			setLoadingPlatform(null);
+		}
+	};
 
 	return (
 		<ThemedTrueSheet
@@ -168,7 +188,8 @@ const BottomSheetShare = forwardRef<
 					icon={item.icon}
 					size="lg"
 					style={tw`rounded-full`}
-					onPress={item.onPress}
+					loading={loadingPlatform === index}
+					onPress={handlePlatformPress(item, index)}
 					>
 						{item.label}
 					</Button>

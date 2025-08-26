@@ -8,7 +8,7 @@ import * as Burnt from 'burnt';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { usePlaylistInsertMutation } from '@/features/playlist/playlistMutations';
 import { useAuth } from '@/providers/AuthProvider';
-import { Playlist, PlaylistType } from '@/types/type.db';
+import { Playlist, PlaylistType } from '@recomendapp/types';
 import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

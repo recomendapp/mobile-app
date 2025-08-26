@@ -9,7 +9,7 @@ import { useMediaReviewsMovieInfiniteQuery } from "@/features/media/mediaQueries
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
-import { MediaMovie, UserReviewMovie } from "@/types/type.db";
+import { MediaMovie, UserReviewMovie } from "@recomendapp/types";
 import { CardReviewMovie } from "@/components/cards/reviews/CardReviewMovie";
 
 interface MovieWidgetReviewsProps extends React.ComponentPropsWithoutRef<typeof View> {

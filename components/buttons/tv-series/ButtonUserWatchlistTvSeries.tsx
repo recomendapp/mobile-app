@@ -4,7 +4,7 @@ import { useUserWatchlistTvSeriesItemQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import { useUserWatchlistTvSeriesDeleteMutation, useUserWatchlistTvSeriesInsertMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
-import { MediaTvSeries } from "@/types/type.db";
+import { MediaTvSeries } from "@recomendapp/types";
 import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";

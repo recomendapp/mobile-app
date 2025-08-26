@@ -1,7 +1,7 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { playlistKeys } from "./playlistKeys";
-import { Playlist, PlaylistItemMovie, PlaylistItemTvSeries, PlaylistSource } from "@/types/type.db";
+import { Playlist, PlaylistItemMovie, PlaylistItemTvSeries, PlaylistSource } from "@recomendapp/types";
 
 export const usePlaylistQuery = ({
 	playlistId,

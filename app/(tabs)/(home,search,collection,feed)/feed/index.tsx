@@ -9,7 +9,7 @@ import { useTranslations } from "use-intl";
 import { useTheme } from "@/providers/ThemeProvider";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardFeedActivityMovie } from "@/components/cards/feed/CardFeedActivityMovie";
-import { UserFeedItem } from "@/types/type.db";
+import { UserFeedItem } from "@recomendapp/types";
 import { CardFeedActivityTvSeries } from "@/components/cards/feed/CardFeedActivityTvSeries";
 import { CardFeedPlaylistLike } from "@/components/cards/feed/CardFeedPlaylistLike";
 import { CardFeedReviewMovieLike } from "@/components/cards/feed/CardFeedReviewMovieLike";

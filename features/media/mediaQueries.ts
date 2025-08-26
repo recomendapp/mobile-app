@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { mediaKeys } from "./mediaKeys";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { MediaMovie, MediaTvSeries, MediaTvSeriesSeason } from "@/types/type.db";
+import { MediaMovie, MediaTvSeries, MediaTvSeriesSeason } from "@recomendapp/types";
 
 export const useMediaMovieQuery = ({
 	movieId,
@@ -478,7 +478,7 @@ export const useMediaMoviePosterInfiniteQuery = ({
 	movieId,
 	filters,
 } : {
-	movieId: number;
+	movieId?: number;
 	filters?: {
 		perPage?: number;
 	};
@@ -490,11 +490,12 @@ export const useMediaMoviePosterInfiniteQuery = ({
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
 		queryKey: mediaKeys.posters({
-			id: movieId,
+			id: movieId!,
 			type: 'movie',
 			filters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
+			if (!movieId) throw new Error('No movieId provided');
 			let from = (pageParam - 1) * mergedFilters.perPage;
 	  		let to = from - 1 + mergedFilters.perPage;
 			let request = supabase
@@ -517,7 +518,7 @@ export const useMediaMovieBackdropInfiniteQuery = ({
 	movieId,
 	filters,
 } : {
-	movieId: number;
+	movieId?: number;
 	filters?: {
 		perPage?: number;
 	};
@@ -529,11 +530,12 @@ export const useMediaMovieBackdropInfiniteQuery = ({
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
 		queryKey: mediaKeys.backdrops({
-			id: movieId,
+			id: movieId!,
 			type: 'movie',
 			filters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
+			if (!movieId) throw new Error('No movieId provided');
 			let from = (pageParam - 1) * mergedFilters.perPage;
 	  		let to = from - 1 + mergedFilters.perPage;
 			let request = supabase

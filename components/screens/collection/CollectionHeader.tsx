@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { View } from "@/components/ui/view";
 import { AnimatedImageWithFallback } from "@/components/ui/AnimatedImageWithFallback";
 import { ImageType } from "@/components/utils/ImageWithFallback";
-import { MediaType } from "@/types/type.db";
+import { MediaType } from "@recomendapp/types";
 import { useTranslations } from "use-intl";
 import { PADDING_HORIZONTAL } from "@/theme/globals";
 

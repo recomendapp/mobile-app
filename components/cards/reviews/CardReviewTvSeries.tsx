@@ -1,11 +1,11 @@
 import * as React from "react"
-import { JSONContent, User, UserActivityTvSeries, UserReviewTvSeries } from "@/types/type.db";
+import { JSONContent, User, UserActivityTvSeries, UserReviewTvSeries } from "@recomendapp/types";
 import Animated from "react-native-reanimated";
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
-import { FixedOmit } from "@/types";
+import { FixedOmit } from "@recomendapp/types";
 import { IconMediaRating } from "@/components/medias/IconMediaRating";
 import { CardUser } from "../CardUser";
 import { Text } from "@/components/ui/text";

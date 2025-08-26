@@ -4,7 +4,7 @@ import { useUserWatchlistMovieItemQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import { useUserWatchlistMovieDeleteMutation, useUserWatchlistMovieInsertMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
-import { MediaMovie } from "@/types/type.db";
+import { MediaMovie } from "@recomendapp/types";
 import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";

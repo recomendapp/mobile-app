@@ -10,7 +10,7 @@ import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { CardMovie } from "../cards/CardMovie";
-import { MediaMovie, MediaTvSeries } from "@/types/type.db";
+import { MediaMovie, MediaTvSeries } from "@recomendapp/types";
 import { CardTvSeries } from "../cards/CardTvSeries";
 
 interface WidgetUserWatchlistProps extends React.ComponentPropsWithoutRef<typeof View> {

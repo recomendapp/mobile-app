@@ -4,7 +4,7 @@ import { useUserActivityTvSeriesQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import { useUserActivityTvSeriesInsertMutation, useUserActivityTvSeriesUpdateMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
-import { MediaTvSeries } from "@/types/type.db";
+import { MediaTvSeries } from "@recomendapp/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { userKeys } from "@/features/user/userKeys";
 import * as Burnt from "burnt";

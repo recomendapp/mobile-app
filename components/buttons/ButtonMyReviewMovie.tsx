@@ -9,7 +9,7 @@ import React from "react";
 import { ViewStyle } from "react-native";
 import { Link } from "expo-router";
 import { Icons } from "@/constants/Icons";
-import { MediaMovie } from "@/types/type.db";
+import { MediaMovie } from "@recomendapp/types";
 
 interface ButtonMyReviewMovieProps
   extends React.ComponentProps<typeof Button> {

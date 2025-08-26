@@ -12,7 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
 import { lowerCase, upperFirst } from 'lodash';
-import { MediaMovie, MediaPerson } from '@/types/type.db';
+import { MediaMovie, MediaPerson } from '@recomendapp/types';
 import useColorConverter from '@/hooks/useColorConverter';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { LinearGradient } from 'expo-linear-gradient';
