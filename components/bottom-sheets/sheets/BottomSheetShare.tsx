@@ -4,12 +4,26 @@ import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import ThemedTrueSheet from "@/components/ui/ThemedTrueSheet";
 import tw from "@/lib/tw";
 import { View } from "react-native";
-import { captureRef } from 'react-native-view-shot'
+import ViewShot from 'react-native-view-shot'
 import { MediaMovie, MediaPerson, MediaTvSeries, MediaType, Playlist, User } from "@/types/type.db";
 import Share, { Social } from "react-native-share"
 import Constants from 'expo-constants';
-import ShareMovie from "@/components/share/ShareMovie";
+import { ShareMovie } from "@/components/share/ShareMovie";
 import ShareTvSeries from "@/components/share/ShareTvSeries";
+import { ScrollView } from "react-native-gesture-handler";
+import { useTheme } from "@/providers/ThemeProvider";
+import { Text } from "@/components/ui/text";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { Button } from "@/components/ui/Button";
+import { Separator } from "@/components/ui/separator";
+import { Icons } from "@/constants/Icons";
+import * as Clipboard from 'expo-clipboard';
+import { LegendList } from "@legendapp/list";
+import * as Burnt from 'burnt';
+import { upperFirst } from "lodash";
+import { useTranslations } from "use-intl";
+import { ShareViewRef } from "@/components/share/type";
+import { cropImageRatio } from "@/utils/imageManipulator";
 
 interface BottomSheetShareBaseProps extends BottomSheetProps {
 	type: MediaType | "user" | "playlist" | "review";
@@ -79,25 +93,19 @@ const BottomSheetShare = forwardRef<
 	playlist,
 	...props
 }, ref) => {
-	const url = Constants.expoConfig?.extra?.webDomain + path;
-	const imgRef = useRef<View>(null);
-
-	const capture = async () => {
-		if (imgRef.current) {
-			 const uri = await captureRef(imgRef.current, {
-				result: 'data-uri',
-			});
-			return uri;
-		}
-		return null;
-	};
+	const t = useTranslations();
+	const { inset } = useTheme();
+	const url = `https://${Constants.expoConfig?.extra?.webDomain}${path}`;
+	// REFs
+	const scrollRef = useRef<ScrollView>(null);
+	const captureRef = useRef<ShareViewRef>(null);
 
 	const renderContent = () => {
 		switch (type) {
 			case "movie":
-				return <ShareMovie movie={movie} />;
+				return <ShareMovie ref={captureRef} movie={movie} />;
 			case "tv_series":
-				return <ShareTvSeries tvSeries={tvSeries} />;
+				return <ShareTvSeries ref={captureRef} tvSeries={tvSeries} />;
 			default:
 				return null;
 		}
@@ -105,14 +113,33 @@ const BottomSheetShare = forwardRef<
 
 	const sharePlatform = [
 		{
+			label: "Copier le lien",
+			icon: Icons.link,
+			onPress: async () => {
+				await Clipboard.setStringAsync(url);
+				Burnt.toast({
+					title: upperFirst(t('common.messages.copied', { count: 1, gender: 'male' })),
+					preset: 'done',
+				});
+			}
+		},
+		{
 			label: "Stories",
-			onPress: async (uri: string) => {
-				console.log("Share to Stories");
+			icon: Icons.shop,
+			onPress: async () => {
+				const data = await captureRef.current?.capture();
+				if (!data) return;
+				console.log("DATA SHARE", data.backgroundTopColor)
 				await Share.shareSingle({
 					social: Social.InstagramStories,
 					appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
-					stickerImage: uri,
-				})
+					title: "Recomend",
+					stickerImage: data.sticker,
+					backgroundImage: data.backgroundImage,
+					backgroundTopColor: data.backgroundTopColor,
+					backgroundBottomColor: data.backgroundBottomColor,
+					backgroundVideo: data.backgroundVideo,
+				});
 			}
 		}
 	]
@@ -120,11 +147,55 @@ const BottomSheetShare = forwardRef<
 	return (
 		<ThemedTrueSheet
 		ref={ref}
+		scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
 		contentContainerStyle={tw`p-0`}
 		{...props}
 		>
-
-
+			<ScrollView
+			ref={scrollRef}
+			bounces={false}
+			contentContainerStyle={{ paddingTop: PADDING_VERTICAL, paddingBottom: inset.bottom, gap: GAP }}
+			stickyHeaderIndices={[0]}
+			>
+				<Text variant="title" style={tw`text-center`}>Share</Text>
+				{renderContent()}
+				<Separator />
+				<LegendList
+				data={sharePlatform}
+				renderItem={({ item, index }) => (
+					<Button
+					variant="outline"
+					icon={item.icon}
+					size="lg"
+					style={tw`rounded-full`}
+					onPress={item.onPress}
+					>
+						{item.label}
+					</Button>
+				)}
+				contentContainerStyle={{
+					paddingHorizontal: PADDING_HORIZONTAL,
+					gap: GAP,
+				}}
+				keyExtractor={item => item.label}
+				horizontal
+				showsHorizontalScrollIndicator={false}
+				/>
+				{/* <Button
+				onPress={async () => {
+					console.log("SHARE");
+					const uri = await capture();
+					console.log(uri);
+					if (uri) {
+						await Share.shareSingle({
+							social: Social.InstagramStories,
+							appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
+							stickerImage: uri,
+						})
+					}
+				}}
+				>Share</Button> */}
+			</ScrollView>
 		</ThemedTrueSheet>
 	);
 });

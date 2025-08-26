@@ -131,7 +131,7 @@ const CollectionItem = forwardRef<
         </Pressable>
     ), [getItemUrl, item, onItemAction, router]);
 	const itemWithContainer = useCallback(() => (
-		<Animated.View style={tw`flex-row items-center justify-between gap-2`} entering={FadeInDown.delay(index * 50)}>
+		<Animated.View style={tw`flex-row items-center justify-between gap-2`} entering={FadeInDown}>
 			{pressableContent()}
 			{view === 'list' && (
                 <Button

@@ -10,7 +10,7 @@ import { LegendList } from "@legendapp/list";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useState } from "react";
-import TvSeriesWidgetSeasons from "@/components/screens/media/TvSeries/TvSeriesWidgetSeasons";
+import TvSeriesWidgetSeasons from "@/components/screens/tv-series/TvSeriesWidgetSeasons";
 import { RefreshControl } from "react-native-gesture-handler";
 import { useLocale, useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";

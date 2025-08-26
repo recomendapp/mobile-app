@@ -69,6 +69,27 @@ export const mediaKeys = {
 
 	/* -------------------------------------------------------------------------- */
 
+	/* --------------------------------- IMAGES --------------------------------- */
+	posters: ({
+		id,
+		type,
+		filters,
+	} : {
+		id: number;
+		type: 'movie' | 'tv_series';
+		filters?: any;
+	}) => [...mediaKeys.detail({ id, type }), 'posters', filters] as const,
+	backdrops: ({
+		id,
+		type,
+		filters,
+	} : {
+		id: number;
+		type: 'movie' | 'tv_series';
+		filters?: any;
+	}) => [...mediaKeys.detail({ id, type }), 'backdrops', filters] as const,
+	/* -------------------------------------------------------------------------- */
+
 	/* -------------------------------------------------------------------------- */
 	/*                                   PERSON                                   */
 	/* -------------------------------------------------------------------------- */

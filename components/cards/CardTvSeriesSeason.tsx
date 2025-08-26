@@ -83,9 +83,6 @@ const CardTvSeriesSeason = React.forwardRef<
 		}
 	};
 	const onLongPress = () => {
-		// openSheet(BottomSheetMedia, {
-		// 	media: props.media,
-		// });
 	};
 	return (
 	<Pressable

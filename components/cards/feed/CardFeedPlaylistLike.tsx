@@ -1,54 +1,49 @@
+import * as React from "react"
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaMovie, User, UserActivityMovie } from "@/types/type.db";
-import * as React from "react"
+import { PlaylistLike, User } from "@/types/type.db";
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Pressable, View } from "react-native";
-import FeedUserActivity from "@/components/screens/feed/FeedUserActivity";
-import { Href, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { Text } from "@/components/ui/text";
 import { FixedOmit } from "@/types";
-import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
+import BottomSheetPlaylist from "@/components/bottom-sheets/sheets/BottomSheetPlaylist";
 import { CardUser } from "../CardUser";
 
-interface CardFeedActivityMovieBaseProps
+interface CardFeedPlaylistLikeBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
 		variant?: "default";
 		onPress?: () => void;
 		onLongPress?: () => void;
 	}
 
-type CardFeedActivityMovieSkeletonProps = {
+type CardFeedPlaylistLikeSkeletonProps = {
 	skeleton: true;
 	author?: never;
-	activity?: never;
-	movie?: never;
+	playlistLike?: never;
 	footer?: never;
 };
 
-type CardFeedActivityMovieDataProps = {
+type CardFeedPlaylistLikeDataProps = {
 	skeleton?: false;
 	author: User;
-	activity: UserActivityMovie;
-	movie: MediaMovie;
+	playlistLike: PlaylistLike;
 	footer?: React.ReactNode;
 };
 
-export type CardFeedActivityMovieProps = CardFeedActivityMovieBaseProps &
-	(CardFeedActivityMovieSkeletonProps | CardFeedActivityMovieDataProps);
+export type CardFeedPlaylistLikeProps = CardFeedPlaylistLikeBaseProps &
+	(CardFeedPlaylistLikeSkeletonProps | CardFeedPlaylistLikeDataProps);
 
-const CardFeedActivityMovieDefault = React.forwardRef<
+const CardFeedPlaylistLikeDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	FixedOmit<CardFeedActivityMovieProps, "variant" | "onPress" | "onLongPress">
->(({ style, children, author, activity, movie, footer, skeleton, ...props }, ref) => {
+	FixedOmit<CardFeedPlaylistLikeProps, "variant" | "onPress" | "onLongPress">
+>(({ style, children, author, playlistLike, footer, skeleton, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
-	const router = useRouter();
 	return (
 		<Animated.View
 			ref={ref}
@@ -61,34 +56,41 @@ const CardFeedActivityMovieDefault = React.forwardRef<
 		>
 			{!skeleton ? (
 				<ImageWithFallback
-				source={{ uri: movie.poster_url ?? '' }}
-				alt={movie.title ?? ''}
-				type={'movie'}
-				style={tw`w-20 h-full`}
+				source={{ uri: playlistLike.playlist?.poster_url ?? '' }}
+				alt={playlistLike.playlist?.title ?? ''}
+				type={'playlist'}
+				style={tw`w-20 min-h-20 h-full`}
 				/>
 			) : (
-				<Skeleton style={tw`w-20 h-full`} />
+				<Skeleton style={tw`w-20 aspect-square h-full`} />
 			)}
 			<View style={tw`flex-1 gap-2 p-2`}>
-				{!skeleton ? <View style={tw`flex-row items-center gap-1`}>
+				{!skeleton ? <View style={tw`flex-row gap-1`}>
 					<CardUser user={author} variant="icon" />
-					<FeedUserActivity author={author} activity={activity} style={[{ color: colors.mutedForeground }, tw`text-sm`]} />
+					<Text style={[{ color: colors.mutedForeground }, tw`text-sm`]} numberOfLines={2}>
+						{t.rich('common.messages.user_liked_playlist', {
+							name: () => (
+								<Text style={tw`font-semibold`}>{author.full_name}</Text>
+							)
+						})}
+					</Text>
 				</View> : <Skeleton style={tw`w-full h-6`} />}
 				<View style={tw`gap-2`}>
 					{!skeleton ? (
 						<Text numberOfLines={2} style={tw`font-bold`}>
-						{movie.title}
+						{playlistLike.playlist?.title}
 						</Text>
  					) : <Skeleton style={tw`w-full h-5`} />}
 					{footer || (
 						!skeleton ? (
-							<Text
-							textColor={!movie.overview ? "muted" : undefined}
-							numberOfLines={2}
-							style={tw`text-xs text-justify`}
-							>
-								{movie.overview || upperFirst(t('common.messages.no_description'))}
-							</Text>
+							playlistLike.playlist?.description && (
+								<Text
+								numberOfLines={2}
+								style={tw`text-xs text-justify`}
+								>
+									{playlistLike.playlist?.description}
+								</Text>
+							)
 						) : <Skeleton style={tw`w-full h-12`} />
 					)}
 				</View>
@@ -96,17 +98,17 @@ const CardFeedActivityMovieDefault = React.forwardRef<
 		</Animated.View>
 	);
 });
-CardFeedActivityMovieDefault.displayName = "CardFeedActivityMovieDefault";
+CardFeedPlaylistLikeDefault.displayName = "CardFeedPlaylistLikeDefault";
 
-const CardFeedActivityMovie = React.forwardRef<
+const CardFeedPlaylistLike = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	CardFeedActivityMovieProps
+	CardFeedPlaylistLikeProps
 >(({ variant = "default", onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const content = (
 		variant === "default" ? (
-			<CardFeedActivityMovieDefault ref={ref} {...props} />
+			<CardFeedPlaylistLikeDefault ref={ref} {...props} />
 		) : null
 	);
 
@@ -115,12 +117,12 @@ const CardFeedActivityMovie = React.forwardRef<
 	return (
 		<Pressable
 		onPress={() => {
-			router.push(props.movie.url as Href);
+			router.push(`/playlist/${props.playlistLike.playlist_id}`);
 			onPress?.();
 		}}
 		onLongPress={() => {
-			openSheet(BottomSheetMovie, {
-				movie: props.movie
+			openSheet(BottomSheetPlaylist, {
+				playlist: props.playlistLike.playlist!
 			})
 			onLongPress?.();
 		}}
@@ -129,9 +131,9 @@ const CardFeedActivityMovie = React.forwardRef<
 		</Pressable>
 	)
 });
-CardFeedActivityMovie.displayName = "CardFeedActivityMovie";
+CardFeedPlaylistLike.displayName = "CardFeedPlaylistLike";
 
 export {
-	CardFeedActivityMovie,
-	CardFeedActivityMovieDefault,
+	CardFeedPlaylistLike,
+	CardFeedPlaylistLikeDefault,
 }

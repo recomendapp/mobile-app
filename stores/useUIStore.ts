@@ -20,6 +20,9 @@ interface UIStore {
 
   playlistView: ViewType;
   setPlaylistView: (view: ViewType) => void;
+
+  feedView: 'community' | 'cast_and_crew';
+  setFeedView: (view: 'community' | 'cast_and_crew') => void;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -61,6 +64,9 @@ export const useUIStore = create<UIStore>()(
 			// Playlist
 			playlistView: 'list',
 			setPlaylistView: (view) => set({ playlistView: view }),
+			// Feed
+			feedView: 'community',
+			setFeedView: (view) => set({ feedView: view }),
 		}),
 		{
 			name: 'ui-storage',

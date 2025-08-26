@@ -114,11 +114,13 @@ const BottomSheetPlaylist = React.forwardRef<
           label: upperFirst(t('common.messages.go_to_playlist')),
           disabled: pathname.startsWith(`/playlist/${playlist.id}`),
         },
-        {
-          icon: Icons.User,
-          onPress: () => router.push(`/user/${playlist.user?.username}`),
-          label: upperFirst(t('common.messages.go_to_user')),
-        },
+        ...(playlist.user ? [
+          {
+            icon: Icons.User,
+            onPress: () => router.push(`/user/${playlist.user?.username}`),
+            label: upperFirst(t('common.messages.go_to_user')),
+          }
+        ] : []),
         ...(session?.user.id === playlist.user_id ? [
           {
             icon: Icons.Users,
@@ -210,9 +212,9 @@ const BottomSheetPlaylist = React.forwardRef<
           />
           <View style={tw`shrink`}>
             <Text numberOfLines={2} style={tw`shrink`}>{playlist.title}</Text>
-            <Text textColor='muted' numberOfLines={1} style={tw`shrink`}>
+            {playlist.user && <Text textColor='muted' numberOfLines={1} style={tw`shrink`}>
               {t('common.messages.by_name', { name: playlist.user?.username! })}
-            </Text>
+            </Text>}
           </View>
         </View>
       </View>

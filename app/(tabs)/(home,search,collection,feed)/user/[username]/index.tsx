@@ -1,5 +1,4 @@
 import ButtonUserFollow from "@/components/buttons/ButtonUserFollow";
-import ProfileWidgetActivities from "@/components/screens/user/ProfileWidgetActivities";
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import UserAvatar from "@/components/user/UserAvatar";
@@ -31,6 +30,7 @@ const ProfileHeader = ({
 	profile?: Profile | null;
 	skeleton: boolean;
 }) => {
+	const router = useRouter();
 	const { user } = useAuth();
 	const { colors } = useTheme();
 	const t = useTranslations();
@@ -45,43 +45,41 @@ const ProfileHeader = ({
 			<View style={tw`flex-row gap-4 shrink-0 items-start justify-between`}>
 				{!skeleton ? <UserAvatar style={tw`w-24 h-24`} full_name={profile?.full_name!} avatar_url={profile?.avatar_url} /> : <UserAvatar skeleton style={tw`w-24 h-24`} />}
 				<View style={tw`flex-1 gap-2`}>
-					{!skeleton ? <Text style={tw`font-medium`}>
-						{profile?.full_name}
-					</Text> : <Skeleton style={tw`w-12 h-5`} />}
-					<GridView
-					data={[
-						{
-							label: t('common.messages.follower', { count: 2 }),
-							value: profile?.followers_count,
-						},
-						{
-							label: t('common.messages.followee', { count: 2 }),
-							value: profile?.following_count,
-						},
-					]}
-					renderItem={(item) => (
-						<Pressable style={tw`gap-0.5`}>
-							{!skeleton ? <Text style={tw`font-semibold`}>
-								{item.value}
-							</Text> : <Skeleton style={tw`w-8 h-5`} />}
-							{!skeleton ? <Text style={[{ color: colors.mutedForeground }, tw.style('text-sm')]}>
-								{item.label}
-							</Text> : <Skeleton style={tw`w-20 h-5`} />}
-						</Pressable>
-					)}
-					/>
+					<View style={tw`flex-row items-center justify-between gap-4`}>
+						{!skeleton ? <Text style={tw`font-semibold`} numberOfLines={3}>
+							{profile?.full_name}
+						</Text> : <Skeleton style={tw`w-12 h-5`} />}
+						<View style={tw`flex-row items-center gap-4`}>
+							{[
+								{
+									label: t('common.messages.follower', { count: 2 }),
+									onPress: () => router.push(`/user/${profile?.username}/followers`),
+								},
+								{
+									label: t('common.messages.followee', { count: 2 }),
+									onPress: () => router.push(`/user/${profile?.username}/followees`),
+								},
+							].map((item, index) => (
+								<Pressable key={index} style={tw`gap-0.5`} onPress={item.onPress}>
+									{!skeleton ? <Text style={tw`text-sm`}>
+										{item.label}
+									</Text> : <Skeleton style={tw`w-20 h-5`} />}
+								</Pressable>
+							))}
+						</View>
+					</View>
+					<View>
+						{profile?.bio && <Text style={tw`text-sm`} numberOfLines={3}>{profile.bio}</Text>}
+						{profile?.website && (
+							<Link href={profile.website as ExternalPathString} target="_blank" asChild>
+								<Pressable style={tw.style('flex-row gap-2 items-center')}>
+									<Icons.link color={colors.accentPink} width={15}/>
+									<Text numberOfLines={1} style={[{ color: colors.accentPink}, tw`m-w-1/2`]}>{profile.website.replace(/(^\w+:|^)\/\//, '')}</Text>
+								</Pressable>
+							</Link>
+						)}
+					</View>
 				</View>
-			</View>
-			<View>
-				{profile?.bio && <Text style={tw`text-sm`}>{profile.bio}</Text>}
-				{profile?.website && (
-					<Link href={profile.website as ExternalPathString} target="_blank" asChild>
-						<Pressable style={tw.style('flex-row gap-2 items-center')}>
-							<Icons.link color={colors.accentPink} width={15}/>
-							<Text numberOfLines={1} style={[{ color: colors.accentPink}, tw`m-w-1/2`]}>{profile.website.replace(/(^\w+:|^)\/\//, '')}</Text>
-						</Pressable>
-					</Link>
-				)}
 			</View>
 			{/* ACTION BUTTON */}
 			{profile?.id && profile.id !== user?.id && (

@@ -7,15 +7,20 @@ import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
 import { useTranslations } from "use-intl";
 import { useTheme } from "@/providers/ThemeProvider";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardFeedActivityMovie } from "@/components/cards/feed/CardFeedActivityMovie";
 import { UserFeedItem } from "@/types/type.db";
 import { CardFeedActivityTvSeries } from "@/components/cards/feed/CardFeedActivityTvSeries";
+import { CardFeedPlaylistLike } from "@/components/cards/feed/CardFeedPlaylistLike";
+import { CardFeedReviewMovieLike } from "@/components/cards/feed/CardFeedReviewMovieLike";
+import { CardFeedReviewTvSeriesLike } from "@/components/cards/feed/CardFeedReviewTvSeriesLike";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const FeedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
 	const { bottomTabHeight, colors } = useTheme();
+	const navigationHeaderHeight = useHeaderHeight();
 	const {
 		data: feed,
 		isLoading,
@@ -37,6 +42,12 @@ const FeedScreen = () => {
 			case 'activity_tv_series':
 				const { tv_series, ...activityTvSeries } = item.content;
 				return <CardFeedActivityTvSeries author={item.author} activity={activityTvSeries} tvSeries={tv_series!} />;
+			case 'playlist_like':
+				return <CardFeedPlaylistLike author={item.author} playlistLike={item.content} />;
+			case 'review_movie_like':
+				return <CardFeedReviewMovieLike author={item.author} reviewLike={item.content} movie={item.content.review?.activity?.movie!} />;
+			case 'review_tv_series_like':
+				return <CardFeedReviewTvSeriesLike author={item.author} reviewLike={item.content} tvSeries={item.content.review?.activity?.tv_series!} />;
 			default:
 				return <View style={[{ backgroundColor: colors.muted}, tw`p-4 rounded-md`]}><Text textColor="muted" style={tw`text-center`}>Unsupported activity type</Text></View>;
 		}
@@ -52,13 +63,14 @@ const FeedScreen = () => {
 			</View>
 		) : null}
 		contentContainerStyle={[
-			tw`px-4 gap-1`,
+			tw`gap-1`,
 			{
+				paddingHorizontal: PADDING_HORIZONTAL,
+				paddingTop: navigationHeaderHeight + PADDING_VERTICAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL
 			}
 		]}
 		keyExtractor={(_, index) => index.toString()}
-		estimatedItemSize={feed?.pages.flatMap((page) => page).length}
 		showsVerticalScrollIndicator={false}
 		refreshing={isFetching}
 		onEndReached={() => hasNextPage && fetchNextPage()}

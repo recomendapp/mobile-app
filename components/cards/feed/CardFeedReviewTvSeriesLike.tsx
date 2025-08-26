@@ -1,51 +1,50 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaMovie, User, UserActivityMovie } from "@/types/type.db";
+import { MediaTvSeries, User, UserReviewTvSeriesLike } from "@/types/type.db";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Pressable, View } from "react-native";
-import FeedUserActivity from "@/components/screens/feed/FeedUserActivity";
 import { Href, useRouter } from "expo-router";
 import { Text } from "@/components/ui/text";
 import { FixedOmit } from "@/types";
-import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { CardUser } from "../CardUser";
+import { CardReviewTvSeries } from "../reviews/CardReviewTvSeries";
+import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 
-interface CardFeedActivityMovieBaseProps
+interface CardFeedReviewTvSeriesLikeBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
 		variant?: "default";
 		onPress?: () => void;
 		onLongPress?: () => void;
 	}
 
-type CardFeedActivityMovieSkeletonProps = {
+type CardFeedReviewTvSeriesLikeSkeletonProps = {
 	skeleton: true;
 	author?: never;
-	activity?: never;
-	movie?: never;
+	reviewLike?: never;
+	tvSeries?: never;
 	footer?: never;
 };
 
-type CardFeedActivityMovieDataProps = {
+type CardFeedReviewTvSeriesLikeDataProps = {
 	skeleton?: false;
 	author: User;
-	activity: UserActivityMovie;
-	movie: MediaMovie;
+	reviewLike: UserReviewTvSeriesLike;
+	tvSeries: MediaTvSeries;
 	footer?: React.ReactNode;
 };
 
-export type CardFeedActivityMovieProps = CardFeedActivityMovieBaseProps &
-	(CardFeedActivityMovieSkeletonProps | CardFeedActivityMovieDataProps);
+export type CardFeedReviewTvSeriesLikeProps = CardFeedReviewTvSeriesLikeBaseProps &
+	(CardFeedReviewTvSeriesLikeSkeletonProps | CardFeedReviewTvSeriesLikeDataProps);
 
-const CardFeedActivityMovieDefault = React.forwardRef<
+const CardFeedReviewTvSeriesLikeDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	FixedOmit<CardFeedActivityMovieProps, "variant" | "onPress" | "onLongPress">
->(({ style, children, author, activity, movie, footer, skeleton, ...props }, ref) => {
+	FixedOmit<CardFeedReviewTvSeriesLikeProps, "variant" | "onPress" | "onLongPress">
+>(({ style, children, author, reviewLike, tvSeries, footer, skeleton, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
 	const router = useRouter();
@@ -61,9 +60,9 @@ const CardFeedActivityMovieDefault = React.forwardRef<
 		>
 			{!skeleton ? (
 				<ImageWithFallback
-				source={{ uri: movie.poster_url ?? '' }}
-				alt={movie.title ?? ''}
-				type={'movie'}
+				source={{ uri: tvSeries.poster_url ?? '' }}
+				alt={tvSeries.name ?? ''}
+				type={'tv_series'}
 				style={tw`w-20 h-full`}
 				/>
 			) : (
@@ -72,23 +71,29 @@ const CardFeedActivityMovieDefault = React.forwardRef<
 			<View style={tw`flex-1 gap-2 p-2`}>
 				{!skeleton ? <View style={tw`flex-row items-center gap-1`}>
 					<CardUser user={author} variant="icon" />
-					<FeedUserActivity author={author} activity={activity} style={[{ color: colors.mutedForeground }, tw`text-sm`]} />
+					<Text style={[{ color: colors.mutedForeground }, tw`text-sm`]} numberOfLines={2}>
+						{t.rich('common.messages.user_liked_review', {
+							name: () => (
+								<Text style={tw`font-semibold`}>{author.full_name}</Text>
+							)
+						})}
+					</Text>
 				</View> : <Skeleton style={tw`w-full h-6`} />}
 				<View style={tw`gap-2`}>
 					{!skeleton ? (
 						<Text numberOfLines={2} style={tw`font-bold`}>
-						{movie.title}
+						{tvSeries.name}
 						</Text>
  					) : <Skeleton style={tw`w-full h-5`} />}
 					{footer || (
 						!skeleton ? (
-							<Text
-							textColor={!movie.overview ? "muted" : undefined}
-							numberOfLines={2}
-							style={tw`text-xs text-justify`}
-							>
-								{movie.overview || upperFirst(t('common.messages.no_description'))}
-							</Text>
+							<CardReviewTvSeries
+							author={reviewLike.review?.activity?.user!}
+							activity={reviewLike.review?.activity!}
+							review={reviewLike.review!}
+							url={`${tvSeries.url}/review/${reviewLike.review_id}` as Href}
+							style={{ backgroundColor: colors.background }}
+							/>
 						) : <Skeleton style={tw`w-full h-12`} />
 					)}
 				</View>
@@ -96,17 +101,17 @@ const CardFeedActivityMovieDefault = React.forwardRef<
 		</Animated.View>
 	);
 });
-CardFeedActivityMovieDefault.displayName = "CardFeedActivityMovieDefault";
+CardFeedReviewTvSeriesLikeDefault.displayName = "CardFeedReviewTvSeriesLikeDefault";
 
-const CardFeedActivityMovie = React.forwardRef<
+const CardFeedReviewTvSeriesLike = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	CardFeedActivityMovieProps
+	CardFeedReviewTvSeriesLikeProps
 >(({ variant = "default", onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const content = (
 		variant === "default" ? (
-			<CardFeedActivityMovieDefault ref={ref} {...props} />
+			<CardFeedReviewTvSeriesLikeDefault ref={ref} {...props} />
 		) : null
 	);
 
@@ -115,12 +120,12 @@ const CardFeedActivityMovie = React.forwardRef<
 	return (
 		<Pressable
 		onPress={() => {
-			router.push(props.movie.url as Href);
+			router.push(props.tvSeries.url as Href);
 			onPress?.();
 		}}
 		onLongPress={() => {
-			openSheet(BottomSheetMovie, {
-				movie: props.movie
+			openSheet(BottomSheetTvSeries, {
+				tvSeries: props.tvSeries
 			})
 			onLongPress?.();
 		}}
@@ -129,9 +134,9 @@ const CardFeedActivityMovie = React.forwardRef<
 		</Pressable>
 	)
 });
-CardFeedActivityMovie.displayName = "CardFeedActivityMovie";
+CardFeedReviewTvSeriesLike.displayName = "CardFeedReviewTvSeriesLike";
 
 export {
-	CardFeedActivityMovie,
-	CardFeedActivityMovieDefault,
+	CardFeedReviewTvSeriesLike,
+	CardFeedReviewTvSeriesLikeDefault,
 }

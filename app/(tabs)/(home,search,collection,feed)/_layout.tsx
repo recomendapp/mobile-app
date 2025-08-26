@@ -22,7 +22,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
     >
       {/* <Stack.Screen name="index" options={{ title: upperFirst(t('common.messages.home')) }} /> */}
       <Stack.Protected guard={!!session}>
-        <Stack.Screen name="feed" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.feed')) }} />
+        <Stack.Screen name="feed" options={{ headerTitle: upperFirst(t('common.messages.feed')) }} />
       </Stack.Protected>
       <Stack.Screen name="search/index" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.search')) }} />
       {/* NOTIFICATIONS */}
@@ -53,6 +53,9 @@ const AppLayout = ({ segment } : { segment: string }) => {
         <Stack.Screen name="reco/send/movie/[movie_id]" options={{ presentation: 'modal' }} />
         <Stack.Screen name="reco/send/tv-series/[tv_series_id]" options={{ presentation: 'modal' }} />
       </Stack.Protected>
+      {/* USERS */}
+      <Stack.Screen name="user/[username]/followers" options={{ presentation: 'modal', headerTitle: upperFirst(t('common.messages.follower', { count: 2 })) }} />
+      <Stack.Screen name="user/[username]/followees" options={{ presentation: 'modal', headerTitle: upperFirst(t('common.messages.followee', { count: 2 })) }} />
       {/* SETTINGS */}
       <Stack.Screen name="settings/index" options={{ headerTitle: upperFirst(t('pages.settings.label')) }} />
       <Stack.Screen name="settings/appearance" options={{ headerTitle: upperFirst(t('pages.settings.appearance.label')) }} />

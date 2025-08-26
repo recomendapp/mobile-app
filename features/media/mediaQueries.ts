@@ -472,3 +472,84 @@ export const useMediaTvSeriesFollowersAverageRatingQuery = ({
 	});
 };
 /* -------------------------------------------------------------------------- */
+
+/* --------------------------------- IMAGES --------------------------------- */
+export const useMediaMoviePosterInfiniteQuery = ({
+	movieId,
+	filters,
+} : {
+	movieId: number;
+	filters?: {
+		perPage?: number;
+	};
+}) => {
+	const mergedFilters = {
+		perPage: 20,
+		...filters,
+	};
+	const supabase = useSupabaseClient();
+	return useInfiniteQuery({
+		queryKey: mediaKeys.posters({
+			id: movieId,
+			type: 'movie',
+			filters,
+		}),
+		queryFn: async ({ pageParam = 1 }) => {
+			let from = (pageParam - 1) * mergedFilters.perPage;
+	  		let to = from - 1 + mergedFilters.perPage;
+			let request = supabase
+				.from('media_movie_posters')
+				.select('*')
+				.eq('movie_id', movieId)
+				.range(from, to)
+			const { data, error } = await request;
+			if (error) throw error;
+			return data;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+		},
+		enabled: !!movieId,
+	});
+};
+export const useMediaMovieBackdropInfiniteQuery = ({
+	movieId,
+	filters,
+} : {
+	movieId: number;
+	filters?: {
+		perPage?: number;
+	};
+}) => {
+	const mergedFilters = {
+		perPage: 20,
+		...filters,
+	};
+	const supabase = useSupabaseClient();
+	return useInfiniteQuery({
+		queryKey: mediaKeys.backdrops({
+			id: movieId,
+			type: 'movie',
+			filters,
+		}),
+		queryFn: async ({ pageParam = 1 }) => {
+			let from = (pageParam - 1) * mergedFilters.perPage;
+	  		let to = from - 1 + mergedFilters.perPage;
+			let request = supabase
+				.from('media_movie_backdrops')
+				.select('*')
+				.eq('movie_id', movieId)
+				.range(from, to)
+			const { data, error } = await request;
+			if (error) throw error;
+			return data;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+		},
+		enabled: !!movieId,
+	});
+};
+/* -------------------------------------------------------------------------- */
