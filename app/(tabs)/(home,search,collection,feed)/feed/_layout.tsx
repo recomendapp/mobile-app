@@ -48,6 +48,7 @@ const FeedLayout = () => {
           style={[
             { paddingTop: inset.top, paddingLeft: inset.left + PADDING_HORIZONTAL, paddingRight: inset.right + PADDING_HORIZONTAL, paddingBottom: PADDING_VERTICAL },
           ]}
+          experimentalBlurMethod="dimezisBlurView"
           >
             <SegmentedControl
             values={segmentedOptions.map(option => option.label)}

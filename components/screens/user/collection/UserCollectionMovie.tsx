@@ -77,7 +77,7 @@ const UserCollectionMovie = () => {
 			movie={item.movie!}
 			profileActivity={item}
 			style={tw`w-full`}
-			entering={FadeInDown.delay(index * 50)}
+			entering={FadeInDown}
 			/>
 		)}
 		ListHeaderComponent={

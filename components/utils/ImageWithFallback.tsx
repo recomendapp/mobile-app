@@ -9,7 +9,7 @@ import Animated from 'react-native-reanimated';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
 
-export type ImageType = 'default' | 'playlist' | 'service' | 'watch-provider' | MediaType | null;
+export type ImageType = 'default' | 'playlist' | 'service' | 'watch-provider' | 'user' | MediaType | null;
 
 interface ImageWithFallbackProps extends ComponentProps<typeof Animated.View> {
   source: ImageSource;

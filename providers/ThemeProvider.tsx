@@ -41,6 +41,7 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 			backgroundColor: colors.background,
 		},
 		headerShadowVisible: false,
+		headerTitleAlign: 'center',
 		gestureEnabled: true,
 		gestureDirection: "vertical",
 	};

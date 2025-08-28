@@ -84,6 +84,7 @@ const MyRecosScreen = () => {
                 paddingBottom: PADDING_VERTICAL
             }
         ]}
+        experimentalBlurMethod="dimezisBlurView"
         >
             <SegmentedControl
                 backgroundColor="transparent"

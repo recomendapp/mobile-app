@@ -2,6 +2,8 @@ import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { playlistKeys } from "./playlistKeys";
 import { Playlist, PlaylistItemMovie, PlaylistItemTvSeries, PlaylistSource } from "@recomendapp/types";
+import { searchClient } from "@/lib/search";
+import { useLocale } from "use-intl";
 
 export const usePlaylistQuery = ({
 	playlistId,
@@ -144,11 +146,12 @@ export const usePlaylistIsAllowedToEditQuery = ({
 
 export const usePlaylistGuestsSearchInfiniteQuery = ({
 	playlistId,
+	query,
 	filters,
 } : {
 	playlistId?: number;
+	query?: string;
 	filters?: {
-		search?: string;
 		perPage?: number;
 		exclude?: string[];
 	};
@@ -157,38 +160,38 @@ export const usePlaylistGuestsSearchInfiniteQuery = ({
 		perPage: 20,
 		...filters,
 	};
+	const locale = useLocale();
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
-		queryKey: playlistKeys.guestsAdd({ playlistId: playlistId as number, filters: mergedFilters }),
+		queryKey: playlistKeys.guestsAdd({
+			playlistId: playlistId as number,
+			filters: {
+				...mergedFilters,
+				query: query,
+			}
+		}),
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!playlistId) throw Error('Missing playlist id');
-			let from = (pageParam - 1) * mergedFilters.perPage;
-			let to = from - 1 + mergedFilters.perPage;
-			let query = supabase
-				.from('user')
-				.select('*')
-				.range(from, to)
-			
-			if (mergedFilters) {
-				if (mergedFilters.search) {
-					query = query
-						.or(`username.ilike.${mergedFilters.search}%,full_name.ilike.${mergedFilters.search}%`)
-				}
-				if (mergedFilters.exclude) {
-					query = query
-						.not('id', 'in', `(${mergedFilters.exclude.join(',')})`)
-				}
-			}
-			const { data, error } = await query;
-			if (error) throw error;
-			return data;
+			if (!query) throw Error('Missing search query');
+			const token = (await supabase.auth.getSession()).data.session?.access_token;
+			return await searchClient.searchUsers({
+				query: query,
+				page: pageParam,
+				per_page: mergedFilters.perPage,
+				exclude_ids: mergedFilters.exclude?.join(','),
+			}, {
+				accessToken: token,
+				locale: locale,
+			});
 		},
 		initialPageParam: 1,
-		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
+		getNextPageParam: (lastPage) => {
+			return lastPage.pagination.current_page < lastPage.pagination.total_pages
+				? lastPage.pagination.current_page + 1
+				: undefined;
 		},
 		throwOnError: true,
-		enabled: !!playlistId,
+		enabled: !!playlistId && !!query && !!query.length,
 	});
 };
 /* -------------------------------------------------------------------------- */

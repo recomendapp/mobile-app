@@ -84,6 +84,7 @@ const HeartPicksScreen = () => {
                 paddingBottom: PADDING_VERTICAL
             }
         ]}
+        experimentalBlurMethod="dimezisBlurView"
         >
             <SegmentedControl
                 backgroundColor="transparent"

@@ -77,7 +77,7 @@ const UserCollectionTvSeries = () => {
 			tvSeries={item.tv_series!}
 			profileActivity={item}
 			style={tw`w-full`}
-			entering={FadeInDown.delay(index * 50)}
+			entering={FadeInDown}
 			/>
 		)}
 		ListHeaderComponent={

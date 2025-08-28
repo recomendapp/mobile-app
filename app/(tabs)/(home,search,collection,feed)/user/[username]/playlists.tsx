@@ -83,7 +83,7 @@ const UserPlaylistsScreen = () => {
 			playlist={item}
 			showItemsCount
 			showPlaylistAuthor={false}
-			entering={FadeInDown.delay(index * 50)}
+			entering={FadeInDown}
 			/>
 		)}
 		ListHeaderComponent={

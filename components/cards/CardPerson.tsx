@@ -7,16 +7,15 @@ import tw from "@/lib/tw";
 import { Pressable, View } from "react-native";
 import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { IconMediaRating } from "../medias/IconMediaRating";
 import { FixedOmit } from "@recomendapp/types";
 import { Skeleton } from "../ui/Skeleton";
-import BottomSheetMovie from "../bottom-sheets/sheets/BottomSheetMovie";
 import { Text } from "../ui/text";
 import BottomSheetPerson from "../bottom-sheets/sheets/BottomSheetPerson";
+import { GAP } from "@/theme/globals";
 
 interface CardPersonBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
-		variant?: "default" | "poster" | "row";
+		variant?: "default" | "poster" | "list" | "vertical";
 		linked?: boolean;
 		children?: React.ReactNode;
 		onPress?: () => void;
@@ -95,6 +94,82 @@ React.ComponentRef<typeof Animated.View>,
 });
 CardPersonPoster.displayName = "CardPersonPoster";
 
+
+const CardPersonList = React.forwardRef<
+	React.ComponentRef<typeof Animated.View>,
+	FixedOmit<CardPersonProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ style, person, skeleton, children, ...props }, ref) => {
+	return (
+		<Animated.View
+		ref={ref}
+		style={[
+			tw`flex-row justify-between items-center p-1 h-20 gap-2`,
+			style,
+		]}
+		{...props}
+		>
+			<View style={tw`flex-1 flex-row items-center gap-2`}>
+				{!skeleton ? <ImageWithFallback
+					source={{uri: person.profile_url ?? ''}}
+					alt={person.name ?? ''}
+					type={'person'}
+					style={[
+						{
+						aspectRatio: 2 / 3,
+						width: 'auto',
+						}
+					]}
+				/> : <Skeleton style={{ aspectRatio: 2 / 3, width: 'auto' }} />}
+				<View style={tw`shrink px-2 py-1 gap-1`}>
+					{!skeleton ? <Text numberOfLines={2}>{person.name}</Text> : <Skeleton style={tw.style('w-full h-5')} />}
+					{children}
+				</View>
+			</View>
+			<View style={[tw`flex-row items-center`, { gap: GAP }]}>
+				{skeleton ? <Skeleton style={tw`h-5 w-12`} /> : person.known_for_department && (
+					<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
+						{person.known_for_department}
+					</Text>
+				)}
+			</View>
+		</Animated.View>
+	);
+});
+CardPersonList.displayName = "CardPersonList";
+
+const CardPersonVertical = React.forwardRef<
+React.ComponentRef<typeof Animated.View>,
+	FixedOmit<CardPersonProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ style, person, skeleton, children, ...props }, ref) => {
+	return (
+		<Animated.View
+		ref={ref}
+		style={[
+			tw`items-center p-1 gap-2 overflow-hidden`,
+			style,
+		]}
+		{...props}
+		>
+			{!skeleton ? <Skeleton style={{ aspectRatio: 2 / 3, width: '100%' }} />
+			: <Skeleton style={{ aspectRatio: 2 / 3, width: '100%' }} />}
+			{/* {!skeleton ? <ImageWithFallback
+				source={{uri: person.profile_url ?? ''}}
+				alt={person.name ?? ''}
+				type={'person'}
+				style={{
+					aspectRatio: 2 / 3,
+					width: '100%',
+				}}
+			/> : <Skeleton style={{ aspectRatio: 2 / 3, width: 'auto' }} />} */}
+			<View style={tw`px-2 py-1 gap-1`}>
+				{!skeleton ? <Text numberOfLines={2} style={tw`text-center`}>{person.name}</Text> : <Skeleton style={tw.style('w-full h-5')} />}
+				{children}
+			</View>
+		</Animated.View>
+	);
+});
+CardPersonVertical.displayName = "CardPersonVertical";
+
 const CardPerson = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CardPersonProps
@@ -107,6 +182,10 @@ const CardPerson = React.forwardRef<
 			<CardPersonDefault ref={ref} {...props} />
 		) : variant == "poster" ? (
 			<CardPersonPoster ref={ref} {...props} />
+		) : variant == "list" ? (
+			<CardPersonList ref={ref} {...props} />
+		) : variant == "vertical" ? (
+			<CardPersonVertical ref={ref} {...props} />
 		) : null
 	)
 

@@ -13,10 +13,11 @@ import { Skeleton } from "../ui/Skeleton";
 import BottomSheetTvSeries from "../bottom-sheets/sheets/BottomSheetTvSeries";
 import { Text } from "../ui/text";
 import ButtonUserActivityTvSeriesRating from "../buttons/tv-series/ButtonUserActivityTvSeriesRating";
+import { GAP } from "@/theme/globals";
 
 interface CardTvSeriesBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
-		variant?: "default" | "poster" | "row";
+		variant?: "default" | "poster" | "list";
 		activity?: UserActivityTvSeries;
 		profileActivity?: UserActivityTvSeries;
 		linked?: boolean;
@@ -128,6 +129,53 @@ React.ComponentRef<typeof Animated.View>,
 });
 CardTvSeriesPoster.displayName = "CardTvSeriesPoster";
 
+const CardTvSeriesList = React.forwardRef<
+	React.ComponentRef<typeof Animated.View>,
+	FixedOmit<CardTvSeriesProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ style, tvSeries, skeleton, activity, showActionRating, profileActivity, children, showRating, ...props }, ref) => {
+	return (
+		<Animated.View
+		ref={ref}
+		style={[
+			tw`flex-row justify-between items-center p-1 h-20 gap-2`,
+			style,
+		]}
+		{...props}
+		>
+			<View style={tw`flex-1 flex-row items-center gap-2`}>
+				{!skeleton ? <ImageWithFallback
+					source={{uri: tvSeries.poster_url ?? ''}}
+					alt={tvSeries.name ?? ''}
+					type={'tv_series'}
+					style={[
+						{
+						aspectRatio: 2 / 3,
+						width: 'auto',
+						}
+					]}
+				/> : <Skeleton style={{ aspectRatio: 2 / 3, width: 'auto' }} />}
+				<View style={tw`shrink px-2 py-1 gap-1`}>
+					{!skeleton ? <Text numberOfLines={2}>{tvSeries.name}</Text> : <Skeleton style={tw.style('w-full h-5')} />}
+					{skeleton ? <Skeleton style={tw`w-20 h-5`} /> : tvSeries.created_by?.length && (
+						<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
+							{tvSeries.created_by.map((creator) => creator.name).join(', ')}
+						</Text>
+					)}
+					{children}
+				</View>
+			</View>
+			<View style={[tw`flex-row items-center`, { gap: GAP }]}>
+				{skeleton ? <Skeleton style={tw`h-5 w-12`} /> : tvSeries.first_air_date && (
+					<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
+						{new Date(tvSeries.first_air_date).getFullYear()}
+					</Text>
+				)}
+			</View>
+		</Animated.View>
+	);
+});
+CardTvSeriesList.displayName = "CardTvSeriesList";
+
 const CardTvSeries = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CardTvSeriesProps
@@ -140,6 +188,8 @@ const CardTvSeries = React.forwardRef<
 			<CardTvSeriesDefault ref={ref} {...props} />
 		) : variant == "poster" ? (
 			<CardTvSeriesPoster ref={ref} {...props} />
+		) : variant === "list" ? (
+			<CardTvSeriesList ref={ref} {...props} />
 		) : null
 	)
 

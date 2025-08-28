@@ -91,7 +91,7 @@ const TvSeriesReviews = () => {
 			activity={item.activity}
 			author={item.activity.user}
 			url={`/tv-series/${tvSeries?.slug || tvSeries?.id}/review/${item.id}`}
-			entering={FadeInDown.delay(index * 50)}
+			entering={FadeInDown}
 			/>
 		)}
 		ListHeaderComponent={

@@ -176,13 +176,12 @@ const CollectionScreen = <T extends {}>({
         const toolbarItems: ToolbarItem[] = [
             ...(additionalToolbarItems || []),
             {
-                // label: upperFirst(t('common.messages.order')),
                 icon: sortOrder === 'asc' ? Icons.ArrowUpNarrowWide : Icons.ArrowDownNarrowWide,
                 onPress: () => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'),
             },
             {
                 label: sortBy.label,
-                icon: Icons.Filter,
+                icon: Icons.Filters,
                 onPress: handleSortBy,
             },
         ];

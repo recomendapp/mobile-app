@@ -133,7 +133,7 @@ const AnimatedStackScreen = React.forwardRef<
 					backgroundAnimatedStyle,
 				]}
 				>
-					{!headerBackgroundColor && <BlurView style={StyleSheet.absoluteFill} tint="dark" intensity={100} />}
+					{!headerBackgroundColor && <BlurView style={StyleSheet.absoluteFill} tint="dark" intensity={100} experimentalBlurMethod="dimezisBlurView" />}
 				</Animated.View>
 				<LinearGradient
 				colors={[

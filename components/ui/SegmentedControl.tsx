@@ -1,6 +1,7 @@
 import { useTheme } from '@/providers/ThemeProvider';
 import RNSegmentedControl, { FontStyle } from '@react-native-segmented-control/segmented-control';
 import { forwardRef } from 'react';
+import { Platform } from 'react-native';
 
 export type SegmentedControlVariant = 
   | 'default'
@@ -44,6 +45,12 @@ const SegmentedControl = forwardRef<
         };
     }
   };
+  const getBackgroundColor = (): string  => {
+    switch (variant) {
+      default:
+        return colors.muted;
+    }
+  };
 
   return (
     <RNSegmentedControl
@@ -57,6 +64,11 @@ const SegmentedControl = forwardRef<
       ...getActiveFontStyle(),
       ...activeFontStyle,
     }}
+    backgroundColor={Platform.select({
+      ios: undefined,
+      android: getBackgroundColor(),
+      default: getBackgroundColor()
+    })}
     {...props}
     />
   )

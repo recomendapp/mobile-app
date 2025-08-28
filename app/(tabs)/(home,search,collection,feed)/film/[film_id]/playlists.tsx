@@ -90,7 +90,7 @@ const FilmPlaylists = () => {
 			<CardPlaylist
 			key={item.id}
 			playlist={item}
-			entering={FadeInDown.delay(index * 50)}
+			entering={FadeInDown}
 			/>
 		)}
 		ListHeaderComponent={

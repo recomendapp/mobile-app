@@ -2,6 +2,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { TabBarHeightUpdater, useTheme } from '@/providers/ThemeProvider';
 import { Stack } from 'expo-router';
 import { upperFirst } from 'lodash';
+import { Platform } from 'react-native';
 import { useTranslations } from 'use-intl';
 
 const AppLayout = ({ segment } : { segment: string }) => {
@@ -13,7 +14,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
     <TabBarHeightUpdater />
     <Stack
     initialRouteName={
-      segment === '(search)' ? 'search/index' :
+      segment === '(search)' ? 'search' :
       segment === '(feed)' ? 'feed' :
       segment === '(collection)' ? 'collection/(tabs)' :
       'index'
@@ -24,7 +25,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="feed" options={{ headerTitle: upperFirst(t('common.messages.feed')) }} />
       </Stack.Protected>
-      <Stack.Screen name="search/index" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.search')) }} />
+      {/* <Stack.Screen name="search/index" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.search')) }} /> */}
       {/* NOTIFICATIONS */}
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="notifications" options={{ headerShown: false, presentation: "modal", headerTitle: upperFirst(t('common.messages.notification', { count: 2 })) }} />
@@ -83,22 +84,21 @@ const AppLayout = ({ segment } : { segment: string }) => {
 
       {/* AUTH */}
       <Stack.Protected guard={!session}>
-        <Stack.Screen name='auth' options={{ headerShown: false, presentation: 'modal' }} />
+        <Stack.Screen
+        name='auth'
+        options={{
+          headerShown: false,
+          presentation: Platform.select({
+            ios: 'modal',
+            android: 'formSheet',
+            default: 'modal',
+          })
+        }} />
       </Stack.Protected>
       <Stack.Screen name="upgrade" options={{ headerTitle: upperFirst(t('common.messages.upgrade')), presentation: 'modal' }} />
       
       {/* ABOUT */}
       <Stack.Screen name="about/index" options={{ headerTitle: upperFirst(t('common.messages.about')) }} />
-
-      {/* MODALS */}
-      <Stack.Screen
-      name='modals/media/index'
-      options={{
-        presentation: 'formSheet',
-        sheetAllowedDetents: [0.4, 1],
-        sheetGrabberVisible: true,
-      }}
-      />
     </Stack>
   </>
   );

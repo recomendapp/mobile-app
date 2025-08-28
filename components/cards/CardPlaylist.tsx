@@ -15,7 +15,7 @@ import { FixedOmit } from '@recomendapp/types';
 
 interface CardPlaylistBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
-		variant?: "default";
+		variant?: "default" | "list";
 		linked?: boolean;
 		onPress?: () => void;
 		onLongPress?: () => void;
@@ -94,6 +94,64 @@ const CardPlaylistDefault = React.forwardRef<
 });
 CardPlaylistDefault.displayName = "CardPlaylistDefault";
 
+const CardPlaylistList = React.forwardRef<
+	React.ComponentRef<typeof Animated.View>,
+	FixedOmit<CardPlaylistProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ style, playlist, skeleton, showPlaylistAuthor = true, showItemsCount, children, ...props }, ref) => {
+	const { colors } = useTheme();
+	const t = useTranslations();
+	const renderItemsCount = () => {
+		if (!playlist) return null;
+		switch (playlist.type) {
+			case 'movie':
+				return t('common.messages.film_count', { count: playlist.items_count ?? 0 });
+			case 'tv_series':
+				return t('common.messages.tv_series_count', { count: playlist.items_count ?? 0 });
+			default:
+				return t('common.messages.item_count', { count: playlist.items_count ?? 0 });
+		}
+	}
+	return (
+		<Animated.View
+		ref={ref}
+		style={[
+			tw`flex-row justify-between items-center p-1 h-20 gap-2`,
+			style,
+		]}
+		{...props}
+		>
+			<View style={tw`flex-1 flex-row items-center gap-2`}>
+				{!skeleton ? <ImageWithFallback
+					source={{uri: playlist?.poster_url ?? ''}}
+					alt={playlist?.title ?? ''}
+					type="playlist"
+					style={tw`aspect-square w-auto`}
+				/> : <Skeleton style={tw`aspect-square w-auto h-auto`} />}
+				<View style={skeleton ? tw`gap-1` : undefined}>
+					{!skeleton ? <Text numberOfLines={2} style={tw`font-medium`}>{playlist?.title}</Text> : <Skeleton style={tw`w-24 h-5`} />}
+					{showPlaylistAuthor && (
+						skeleton ? <Skeleton style={tw`w-24 h-5`} /> : playlist.user && (
+							<Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
+								{t('common.messages.by_name', { name: playlist?.user?.username! })}
+							</Text>
+						)
+					)}
+					{showItemsCount && (
+						!skeleton ? (
+							<Text style={{ color: colors.mutedForeground }} numberOfLines={1} className="text-sm italic">
+								{renderItemsCount()}
+							</Text>
+						) : (
+							<Skeleton style={tw`w-10 h-5`} />
+						)
+					)}
+				</View>
+			</View>
+		</Animated.View>
+	);
+});
+CardPlaylistList.displayName = "CardPlaylistList";
+
 const CardPlaylist = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CardPlaylistProps
@@ -104,6 +162,8 @@ const CardPlaylist = React.forwardRef<
 	const content = (
 		variant === "default" ? (
 			<CardPlaylistDefault ref={ref} {...props} />
+		) : variant == "list" ? (
+			<CardPlaylistList ref={ref} {...props} />
 		) : null
 	);
 
