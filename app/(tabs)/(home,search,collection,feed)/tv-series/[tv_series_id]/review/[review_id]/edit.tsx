@@ -37,7 +37,8 @@ const ReviewTvSeriesEditScreen = () => {
 			body: data.body,
 		}, {
 			onSuccess: () => {
-				router.replace(`/tv-series/${review.activity?.tv_series?.slug || review.activity?.tv_series?.id}/review/${review.id}`);
+				router.back();
+				// router.replace(`/tv-series/${review.activity?.tv_series?.slug || review.activity?.tv_series?.id}/review/${review.id}`);
 			},
 			onError: (error) => {
 				Burnt.toast({
@@ -62,6 +63,7 @@ const ReviewTvSeriesEditScreen = () => {
 	return (
 	<ReviewForm
 	type='tv_series'
+	activity={review?.activity}
 	tvSeries={review?.activity?.tv_series!}
 	review={review}
 	onSave={handleSave}

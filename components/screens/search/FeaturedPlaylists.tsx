@@ -3,7 +3,9 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { usePlaylistFeaturedInfiniteQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { StyleProp, View, ViewStyle } from "react-native";
-import { LegendList } from "@legendapp/list";
+import { LegendList, LegendListRef } from "@legendapp/list";
+import { useRef } from "react";
+import { useScrollToTop } from "@react-navigation/native";
 
 const GRID_COLUMNS = 3;
 
@@ -22,11 +24,15 @@ const FeaturedPlaylists = ({
 		isRefetching,
 		refetch,
 	} = usePlaylistFeaturedInfiniteQuery();
+	// REFs
+	const scrollRef = useRef<LegendListRef>(null);
+	useScrollToTop(scrollRef);
 
 	if (!playlists) return null;
 
 	return (
 		<LegendList
+		ref={scrollRef}
 		data={playlists?.pages.flat()}
 		renderItem={({ item: { playlist } }) => (
 			<View key={playlist.id} style={{ flex: 1 / GRID_COLUMNS }}>

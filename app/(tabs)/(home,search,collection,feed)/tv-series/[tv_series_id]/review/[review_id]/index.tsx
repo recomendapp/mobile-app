@@ -9,7 +9,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { View } from "react-native"
 import { useTranslations } from "use-intl";
-import { ScrollView } from "react-native-gesture-handler";
+import { RefreshControl, ScrollView } from "react-native-gesture-handler";
 import { Text } from "@/components/ui/text";
 import { CardUser } from "@/components/cards/CardUser";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
@@ -24,6 +24,8 @@ const ReviewTvSeriesScreen = () => {
 	const {
 		data: review,
 		isLoading: reviewLoading,
+		isRefetching,
+		refetch
 	} = useUserReviewTvSeriesQuery({
 		reviewId: Number(review_id),
 	});
@@ -61,6 +63,12 @@ const ReviewTvSeriesScreen = () => {
 			{ paddingBottom: bottomTabHeight + 8 },
 			tw`gap-2 px-4`
 		]}
+		refreshControl={
+			<RefreshControl
+			refreshing={isRefetching}
+			onRefresh={refetch}
+			/>
+		}
 		>
 			<View style={tw`justify-center items-center`}>
 				<Text variant="heading" style={[{ color: colors.accentYellow }, tw`text-center my-2`]}>

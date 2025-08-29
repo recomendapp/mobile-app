@@ -2,7 +2,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useUserFeedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { upperFirst } from "lodash";
-import { LegendList } from "@legendapp/list";
+import { LegendList, LegendListRef } from "@legendapp/list";
 import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
 import { useTranslations } from "use-intl";
@@ -15,12 +15,13 @@ import { CardFeedPlaylistLike } from "@/components/cards/feed/CardFeedPlaylistLi
 import { CardFeedReviewMovieLike } from "@/components/cards/feed/CardFeedReviewMovieLike";
 import { CardFeedReviewTvSeriesLike } from "@/components/cards/feed/CardFeedReviewTvSeriesLike";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { useScrollToTop } from "@react-navigation/native";
+import { useEffect, useRef } from "react";
 
 const FeedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
 	const { bottomTabHeight, colors } = useTheme();
-	const navigationHeaderHeight = useHeaderHeight();
 	const {
 		data: feed,
 		isLoading,
@@ -32,6 +33,9 @@ const FeedScreen = () => {
 		userId: user?.id,
 	});
 	const loading = isLoading || feed === undefined;
+	// REFs
+	const scrollRef = useRef<LegendListRef>(null);
+	useScrollToTop(scrollRef);
 
 	// Render 
 	const renderItem = ({ item, index } : { item: UserFeedItem, index: number }) => {
@@ -55,6 +59,7 @@ const FeedScreen = () => {
 
 	return (
 		<LegendList
+		ref={scrollRef}
 		data={feed?.pages.flat() || []}
 		renderItem={renderItem}
 		ListEmptyComponent={() => !loading ? (
@@ -66,7 +71,6 @@ const FeedScreen = () => {
 			tw`gap-1`,
 			{
 				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingTop: navigationHeaderHeight + PADDING_VERTICAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL
 			}
 		]}

@@ -4,7 +4,7 @@ import { Text } from "@/components/ui/text";
 import UserAvatar from "@/components/user/UserAvatar";
 import { Icons } from "@/constants/Icons";
 import { userKeys } from "@/features/user/userKeys";
-import { useUserProfileQuery } from "@/features/user/userQueries"
+import { useUserActivitiesMovieInfiniteQuery, useUserActivitiesTvSeriesInfiniteQuery, useUserPlaylistsInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -22,6 +22,9 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { PADDING_VERTICAL } from "@/theme/globals";
 import ProfileWidgetActivitiesMovie from "@/components/screens/user/ProfileWidgetActivitiesMovie";
 import ProfileWidgetActivitiesTvSeries from "@/components/screens/user/ProfileWidgetActivitiesTvSeries";
+import { ActivityIndicator } from "react-native";
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
+import BottomSheetUser from "@/components/bottom-sheets/sheets/BottomSheetUser";
 
 const ProfileHeader = ({
 	profile,
@@ -104,11 +107,13 @@ const ProfilePrivateAccountCard = () => {
 };
 
 const ProfileScreen = () => {
+	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { session } = useAuth();
 	const { colors, bottomTabHeight } = useTheme();
 	const router = useRouter();
 	const queryClient = useQueryClient();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 
 	const {
 		data: profile,
@@ -119,14 +124,51 @@ const ProfileScreen = () => {
 	} = useUserProfileQuery({
 		username: username,
 	});
-
 	const loading = isLoading || profile === undefined;
+
+	// Hooks
+	const { data: widgetActivitiesMovie, isLoading: widgetActivitiesMovieLoading } = useUserActivitiesMovieInfiniteQuery({ userId: profile?.id || undefined });
+	const { data: widgetActivitiesTvSeries, isLoading: widgetActivitiesTvSeriesLoading } = useUserActivitiesTvSeriesInfiniteQuery({ userId: profile?.id || undefined });
+	const { data: widgetPlaylists, isLoading: widgetPlaylistsLoading } = useUserPlaylistsInfiniteQuery({ userId: profile?.id || undefined });
+	const areWidgetsLoading = widgetActivitiesMovieLoading || widgetActivitiesTvSeriesLoading || widgetPlaylistsLoading;
+	const hasActivity = !areWidgetsLoading && (widgetActivitiesMovie?.pages.flat().length || widgetActivitiesTvSeries?.pages.flat().length || widgetPlaylists?.pages.flat().length);
 
 	const refresh = () => {
 		refetch();
 		profile?.id && queryClient.invalidateQueries({
 			queryKey: userKeys.detail(profile?.id)
 		});
+	};
+
+	// Render
+	const renderContent = () => {
+		if (loading) return null;
+
+        if (!profile?.visible) {
+            return <ProfilePrivateAccountCard />;
+        }
+
+        if (areWidgetsLoading) {
+            return <ActivityIndicator />;
+        }
+
+        if (!hasActivity) {
+            return (
+                <View style={tw`items-center justify-center p-8 gap-2`}>
+                    <Text style={[{ color: colors.mutedForeground }]}>
+                        {upperFirst(t('common.messages.this_user_has_no_activity'))}
+                    </Text>
+                </View>
+            );
+        }
+
+		return (
+		<>
+		<ProfileWidgetActivitiesMovie profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+		<ProfileWidgetActivitiesTvSeries profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+		<ProfileWidgetPlaylists profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+		</>
+		)
 	};
 
 	return (
@@ -155,7 +197,9 @@ const ProfileScreen = () => {
 					variant="ghost"
 					size="icon"
 					icon={Icons.EllipsisVertical}
-					onPress={() => console.log('open sheet user')}
+					onPress={() => openSheet(BottomSheetUser, {
+						user: profile!
+					})}
 					/>
 				)
 			}}
@@ -169,16 +213,7 @@ const ProfileScreen = () => {
 			}
 		]}>
 			<ProfileHeader profile={profile} skeleton={loading} />
-			{!loading ? (
-				profile?.visible ? (
-					<>
-					<ProfileWidgetActivitiesMovie profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
-					<ProfileWidgetActivitiesTvSeries profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
-					{/* <ProfileWidgetActivities profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} /> */}
-					<ProfileWidgetPlaylists profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
-					</>
-				) : <ProfilePrivateAccountCard />
-			) : null}
+			{renderContent()}
 		</ScrollView>
 	</>
 	)

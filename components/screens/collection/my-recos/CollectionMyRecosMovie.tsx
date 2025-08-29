@@ -16,11 +16,7 @@ import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie
 import { useUIStore } from "@/stores/useUIStore";
 import BottomSheetMyRecosSenders from "@/components/bottom-sheets/sheets/BottomSheetMyRecosSenders";
 
-export const CollectionMyRecosMovie = ({
-	navigationHeaderHeight,
-} : {
-	navigationHeaderHeight: number;
-}) => {
+export const CollectionMyRecosMovie = () => {
 	const t = useTranslations();
     const { user } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -235,7 +231,6 @@ export const CollectionMyRecosMovie = ({
 		// Shared Values
 		scrollY={scrollY}
 		headerHeight={headerHeight}
-		navigationHeaderHeight={navigationHeaderHeight}
 		// View
 		view={view}
         />

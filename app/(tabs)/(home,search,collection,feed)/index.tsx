@@ -13,7 +13,7 @@ import { WidgetUserDiscovery } from '@/components/widgets/WidgetUserDiscovery';
 import { useNow, useTranslations } from 'use-intl';
 import { useTheme } from '@/providers/ThemeProvider';
 import { Icons } from '@/constants/Icons';
-import { DrawerActions } from '@react-navigation/native';
+import { DrawerActions, useScrollToTop } from '@react-navigation/native';
 import { Text } from '@/components/ui/text';
 import app from '@/constants/app';
 import { UserNav } from '@/components/user/UserNav';
@@ -21,6 +21,8 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import AnimatedStackScreen from '@/components/ui/AnimatedStackScreen';
 import { View } from '@/components/ui/view';
+import { ScrollView } from 'react-native-gesture-handler';
+import { AnimatedScrollView } from 'react-native-reanimated/lib/typescript/component/ScrollView';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -29,6 +31,8 @@ const HomeScreen = () => {
   const { session, user } = useAuth();
   const { bottomTabHeight, colors } = useTheme();
   const now = useNow();
+  // REFs
+  const scrollRef = React.useRef<AnimatedScrollView>(null);
   // SharedValues
   const scrollY = useSharedValue(0);
   const triggerHeight = useSharedValue(500);
@@ -46,6 +50,8 @@ const HomeScreen = () => {
     if (hour < 18) return 'afternoon';
     return 'evening';
   }, [now]);
+
+  useScrollToTop(scrollRef);
 
   return (
     <>
@@ -86,6 +92,7 @@ const HomeScreen = () => {
       }}
       />
       <Animated.ScrollView
+      ref={scrollRef}
       onScroll={scrollHandler}
       contentContainerStyle={[
         tw`gap-2`,

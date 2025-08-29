@@ -55,8 +55,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
         <Stack.Screen name="reco/send/tv-series/[tv_series_id]" options={{ presentation: 'modal' }} />
       </Stack.Protected>
       {/* USERS */}
-      <Stack.Screen name="user/[username]/followers" options={{ presentation: 'modal', headerTitle: upperFirst(t('common.messages.follower', { count: 2 })) }} />
-      <Stack.Screen name="user/[username]/followees" options={{ presentation: 'modal', headerTitle: upperFirst(t('common.messages.followee', { count: 2 })) }} />
+      {/* <Stack.Screen name="user/[username]/(follow)" options={{ presentation: 'modal', headerShown: false }} /> */}
       {/* SETTINGS */}
       <Stack.Screen name="settings/index" options={{ headerTitle: upperFirst(t('pages.settings.label')) }} />
       <Stack.Screen name="settings/appearance" options={{ headerTitle: upperFirst(t('pages.settings.appearance.label')) }} />

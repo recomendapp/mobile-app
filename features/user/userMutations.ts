@@ -1,5 +1,5 @@
 
-import { JSONContent, User, UserActivity, UserActivityMovie, UserActivityTvSeries, UserFollower, UserRecosAggregated, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserWatchlist, UserWatchlistMovie, UserWatchlistTvSeries } from '@recomendapp/types';
+import { JSONContent, User, UserActivity, UserActivityMovie, UserActivityTvSeries, UserFollower, UserRecosAggregated, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserReviewMovie, UserReviewTvSeries, UserWatchlist, UserWatchlistMovie, UserWatchlistTvSeries } from '@recomendapp/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { userKeys } from './userKeys';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
@@ -592,6 +592,14 @@ export const useUserReviewMovieUpsertMutation = ({
 			return data;
 		},
 		onSuccess: (data) => {
+			queryClient.setQueryData(userKeys.review({ id: data.id, type: 'movie' }), (oldData: UserReviewMovie | undefined) => {
+				if (!oldData) return oldData;
+				return {
+					...oldData,
+					...data,
+				};
+			});
+
 			// Invalidate reviews queries
 			movieId && queryClient.invalidateQueries({
 				queryKey: mediaKeys.reviews({ id: movieId, type: 'movie' }),
@@ -728,6 +736,14 @@ export const useUserReviewTvSeriesUpsertMutation = ({
 			return data;
 		},
 		onSuccess: (data) => {
+			queryClient.setQueryData(userKeys.review({ id: data.id, type: 'tv_series' }), (oldData: UserReviewTvSeries | undefined) => {
+				if (!oldData) return oldData;
+				return {
+					...oldData,
+					...data,
+				};
+			});
+
 			// Invalidate reviews queries
 			tvSeriesId && queryClient.invalidateQueries({
 				queryKey: mediaKeys.reviews({ id: tvSeriesId, type: 'tv_series' }),

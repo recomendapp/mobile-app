@@ -8,24 +8,28 @@ import { useUserSubscriptionsQuery } from "@/features/user/userQueries";
 import { useAuth } from "@/providers/AuthProvider";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
 const SettingsSubscriptionScreen = () => {
-	const { user } = useAuth();
-	const { colors, bottomTabHeight } = useTheme();
+	const { session } = useAuth();
+	const { colors, bottomTabHeight, inset } = useTheme();
 	const {
 		data: subscription,
 		isLoading,
 	} = useUserSubscriptionsQuery({
-		userId: user?.id,
+		userId: session?.user.id,
 	});
 	const loading = subscription === undefined || isLoading;
 	return (
 	<>
 		<ScrollView
-		contentContainerStyle={[
-			tw`flex-1 gap-2 p-4`,
-			{ paddingBottom: bottomTabHeight + 8 }
-		]}
+		contentContainerStyle={{
+			gap: GAP,
+			paddingTop: PADDING_VERTICAL,
+			paddingLeft: inset.left + PADDING_HORIZONTAL,
+			paddingRight: inset.right + PADDING_HORIZONTAL,
+			paddingBottom: bottomTabHeight + PADDING_VERTICAL
+		}}
 		>
 			{loading ? (
 				<View style={tw`flex-1 items-center justify-center	`}>

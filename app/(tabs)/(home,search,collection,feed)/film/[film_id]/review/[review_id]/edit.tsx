@@ -37,7 +37,8 @@ const ReviewMovieEditScreen = () => {
 			body: data.body,
 		}, {
 			onSuccess: () => {
-				router.replace(`/film/${review.activity?.movie?.slug || review.activity?.movie?.id}/review/${review.id}`);
+				router.back();
+				// router.replace(`/film/${review.activity?.movie?.slug || review.activity?.movie?.id}/review/${review.id}`);
 			},
 			onError: (error) => {
 				Burnt.toast({
@@ -62,6 +63,7 @@ const ReviewMovieEditScreen = () => {
 	return (
 	<ReviewForm
 	type='movie'
+	activity={review?.activity}
 	movie={review?.activity?.movie!}
 	review={review}
 	onSave={handleSave}

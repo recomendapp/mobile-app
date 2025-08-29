@@ -2,14 +2,12 @@ import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import {  MediaMovie, MediaTvSeries, UserActivityMovie, UserActivityTvSeries, UserReview, UserReviewMovie, UserReviewTvSeries } from "@recomendapp/types";
 import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { RichText, Toolbar } from "@10play/tentap-editor";
 import { upperCase, upperFirst } from "lodash";
 import * as Burnt from "burnt";
 import useEditor from "@/lib/10tap/editor";
 import { useSharedValue } from "react-native-reanimated";
 import { BetterInput } from "@/components/ui/BetterInput";
-import isPostgrestError from "@/utils/isPostgrestError";
 import { useTranslations } from "use-intl";
 import { Stack } from "expo-router";
 import { Button } from "@/components/ui/Button";
@@ -17,6 +15,10 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import { ScrollView } from "react-native-gesture-handler";
 import { CardMovie } from "@/components/cards/CardMovie";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
+import { View } from "@/components/ui/view";
+import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
+import { Text } from "@/components/ui/text";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
 const MAX_TITLE_LENGTH = 50;
 const MAX_BODY_LENGTH = 5000;
@@ -52,7 +54,7 @@ const ReviewForm = ({
 	review,
 	onSave,
 } : ReviewFormProps) => {
-	const { colors, bottomTabHeight } = useTheme();
+	const { colors, bottomTabHeight, inset } = useTheme();
 	const t = useTranslations();
 	const [title, setTitle] = useState(review?.title ?? '');
 	const navigationHeaderHeight = useHeaderHeight();
@@ -129,14 +131,20 @@ const ReviewForm = ({
 			)
 		}}
 		/>
-		<ScrollView
+		<KeyboardAwareScrollView
 		contentContainerStyle={[
-			{ paddingBottom: bottomTabHeight + 8 },
-			tw`gap-2`
+			{
+				gap: GAP,
+				paddingTop: PADDING_VERTICAL,
+				paddingLeft: inset.left + PADDING_HORIZONTAL,
+				paddingRight: inset.right + PADDING_HORIZONTAL,
+				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			}
 		]}
+		bottomOffset={navigationHeaderHeight}
 		>
 			<View
-			style={tw`px-2 gap-2`}
+			style={{ gap: GAP }}
 			onLayout={(e) => {
 				headerHeight.value = e.nativeEvent.layout.height + 8;
 			}}
@@ -182,15 +190,23 @@ const ReviewForm = ({
 					{ backgroundColor: colors.background,}
 				]}
 				/>
-				<KeyboardAvoidingView
+				{/* <KeyboardAvoidingView
 					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 					style={tw`absolute bottom-0`}
 					keyboardVerticalOffset={headerHeight.get() + navigationHeaderHeight}
 				>
 					<Toolbar editor={editor} hidden={false} />
-				</KeyboardAvoidingView>
+				</KeyboardAvoidingView> */}
 			</View>
-		</ScrollView>
+		</KeyboardAwareScrollView>
+		<KeyboardToolbar
+		showArrows={false}
+		content={
+			<View>
+				<Text>test</Text>
+			</View>
+		}
+		/>
 	</>
 	);
 };

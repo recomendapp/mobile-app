@@ -9,7 +9,6 @@ import { HeaderTitle, useHeaderHeight } from '@react-navigation/elements';
 import { useTheme } from "@/providers/ThemeProvider";
 import { LinearGradient } from "expo-linear-gradient";
 import Color from "color";
-import { BlurView } from "expo-blur";
 
 export interface AnimatedStackScreenProps extends React.ComponentProps<typeof Stack.Screen> {
 	scrollY: SharedValue<number>;
@@ -129,11 +128,10 @@ const AnimatedStackScreen = React.forwardRef<
 				<Animated.View
 				style={[
 					StyleSheet.absoluteFillObject,
-					{ backgroundColor: headerBackgroundColor || 'transparent' },
+					{ backgroundColor: headerBackgroundColor || colors.background },
 					backgroundAnimatedStyle,
 				]}
 				>
-					{!headerBackgroundColor && <BlurView style={StyleSheet.absoluteFill} tint="dark" intensity={100} experimentalBlurMethod="dimezisBlurView" />}
 				</Animated.View>
 				<LinearGradient
 				colors={[

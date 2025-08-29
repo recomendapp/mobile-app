@@ -16,13 +16,11 @@ import { Href, Link, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { Pressable } from "react-native-gesture-handler";
 import { useTranslations } from "use-intl";
-import { useHeaderHeight } from "@react-navigation/elements";
 
 const CastCrewFeedScreen = () => {
 	const t = useTranslations();
 	const router = useRouter();
 	const { bottomTabHeight, colors } = useTheme();
-	const navigationHeaderHeight = useHeaderHeight();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const { user } = useAuth();
 	const {
@@ -40,14 +38,14 @@ const CastCrewFeedScreen = () => {
 
 	if (user === undefined) {
 		return (
-			<View style={[tw`flex-1 items-center justify-center`, { paddingTop: navigationHeaderHeight + PADDING_VERTICAL, paddingBottom: bottomTabHeight + PADDING_VERTICAL }]}>
+			<View style={[tw`flex-1 items-center justify-center`, { paddingTop: PADDING_VERTICAL, paddingBottom: bottomTabHeight + PADDING_VERTICAL }]}>
 				<Icons.Loader />
 			</View>
 		)
 	}
 	if (!user?.premium) {
 		return (
-			<View style={[tw`flex-1 items-center justify-center gap-2`, { paddingTop: navigationHeaderHeight + PADDING_VERTICAL, paddingBottom: bottomTabHeight + PADDING_VERTICAL }]}>
+			<View style={[tw`flex-1 items-center justify-center gap-2`, { paddingTop: PADDING_VERTICAL, paddingBottom: bottomTabHeight + PADDING_VERTICAL }]}>
 				<Button
 				onPress={() => router.push({
 					pathname: '/upgrade',
@@ -98,7 +96,7 @@ const CastCrewFeedScreen = () => {
 		contentContainerStyle={[
 			tw`px-4 gap-1`,
 			{
-				paddingTop: navigationHeaderHeight + PADDING_VERTICAL,
+				paddingTop: PADDING_VERTICAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL
 			}
 		]}

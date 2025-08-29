@@ -7,8 +7,10 @@ import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import useSearchStore from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { LegendList } from "@legendapp/list";
+import { LegendList, LegendListRef } from "@legendapp/list";
+import { useScrollToTop } from "@react-navigation/native";
 import { upperFirst } from "lodash";
+import { useRef } from "react";
 import { useTranslations } from "use-intl";
 
 const SearchUsersScreen = () => {
@@ -24,10 +26,15 @@ const SearchUsersScreen = () => {
 	} = useSearchUsersInfiniteQuery({
 		query: debouncedSearch,
 	});
+	// REFs
+	const scrollRef = useRef<LegendListRef>(null);
+	useScrollToTop(scrollRef);
 
 	return (
 	<>
 		<LegendList
+		key={debouncedSearch}
+		ref={scrollRef}
 		data={data?.pages.flatMap(page => page.data) || []}
 		renderItem={({ item }) => (
 			<CardUser variant="list" user={item} />

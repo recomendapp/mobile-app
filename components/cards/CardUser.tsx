@@ -10,10 +10,13 @@ import { Icons } from "@/constants/Icons";
 import { Skeleton } from "../ui/Skeleton";
 import { Text } from "../ui/text";
 import { FixedOmit } from "@recomendapp/types";
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
+import BottomSheetUser from "../bottom-sheets/sheets/BottomSheetUser";
 
 interface CardUserBaseProps
   extends React.ComponentPropsWithoutRef<typeof Animated.View> {
   onPress?: () => void;
+  onLongPress?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
   variant?: "default" | "icon" | "username" | "inline" | "list";
   linked?: boolean;
@@ -171,8 +174,9 @@ CardUserList.displayName = "CardUserList";
 const CardUser = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CardUserProps
->(({ variant = "default", linked = true, onPress, containerStyle, ...props }, ref) => {
+>(({ variant = "default", linked = true, onPress, onLongPress, containerStyle, ...props }, ref) => {
 	const router = useRouter();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 
 	const content = (
 		variant === "default" ? (
@@ -195,6 +199,12 @@ const CardUser = React.forwardRef<
 		onPress={() => {
 			if (linked) router.push(`/user/${props.user.username}`);
 			onPress?.();
+		}}
+		onLongPress={() => {
+			openSheet(BottomSheetUser, {
+				user: props.user,
+			});
+			onLongPress?.();
 		}}
 		style={containerStyle}
 		>

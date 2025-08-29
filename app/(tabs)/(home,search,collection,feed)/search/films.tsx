@@ -9,8 +9,9 @@ import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import useSearchStore from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { LegendList } from "@legendapp/list";
+import { LegendList, LegendListRef } from "@legendapp/list";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
+import { useScrollToTop } from "@react-navigation/native";
 import { MediaMovie } from "@recomendapp/types";
 import { useNavigation } from "expo-router";
 import { upperFirst } from "lodash";
@@ -35,9 +36,11 @@ const SearchFilmsScreen = () => {
 		query: debouncedSearch,
 	});
 	// REFs
+	const scrollRef = useRef<LegendListRef>(null);
 	const filtersRef = useRef<TrueSheet>(null);
 	const filtersScrollViewRef = useRef<ScrollView>(null);
-
+	
+	useScrollToTop(scrollRef);
 	useLayoutEffect(() => {
 		navigation.getParent()?.setOptions({
 			headerRight: () => (
@@ -62,6 +65,8 @@ const SearchFilmsScreen = () => {
 	return (
 	<>
 		<LegendList
+		key={debouncedSearch}
+		ref={scrollRef}
 		data={data?.pages.flatMap(page => page.data) || []}
 		renderItem={({ item }) => (
 			<CardMovie variant="list" movie={item as MediaMovie} />

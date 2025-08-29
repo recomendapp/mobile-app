@@ -5,7 +5,7 @@ import ThemedTrueSheet from "@/components/ui/ThemedTrueSheet";
 import tw from "@/lib/tw";
 import { View } from "react-native";
 import ViewShot from 'react-native-view-shot'
-import { MediaMovie, MediaPerson, MediaTvSeries, MediaType, Playlist, User } from "@recomendapp/types";
+import { MediaMovie, MediaPerson, MediaTvSeries, MediaType, Playlist, Profile, User } from "@recomendapp/types";
 import Share, { Social } from "react-native-share"
 import Constants from 'expo-constants';
 import { ShareMovie } from "@/components/share/ShareMovie";
@@ -59,7 +59,7 @@ type BottomSheetSharePersonProps = {
 
 type BottomSheetShareUserProps = {
 	type: "user";
-	user: User;
+	user: User | Profile;
 	movie?: never;
 	tvSeries?: never;
 	person?: never;

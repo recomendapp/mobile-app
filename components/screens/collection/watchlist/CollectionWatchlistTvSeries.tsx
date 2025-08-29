@@ -16,11 +16,7 @@ import { useUIStore } from "@/stores/useUIStore";
 import BottomSheetWatchlistTvSeriesComment from "@/components/bottom-sheets/sheets/BottomSheetWatchlistTvSeriesComment";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 
-export const CollectionWatchlistTvSeries = ({
-	navigationHeaderHeight,
-} : {
-	navigationHeaderHeight: number;
-}) => {
+export const CollectionWatchlistTvSeries = () => {
 	const t = useTranslations();
     const { user } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -191,7 +187,6 @@ export const CollectionWatchlistTvSeries = ({
 		// Shared Values
 		scrollY={scrollY}
 		headerHeight={headerHeight}
-		navigationHeaderHeight={navigationHeaderHeight}
 		// View
 		view={view}
         />

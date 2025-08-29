@@ -14,13 +14,8 @@ import { useUserHeartPicksMovieQuery } from "@/features/user/userQueries";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { useUIStore } from "@/stores/useUIStore";
-import { Text } from "@/components/ui/text";
 
-export const CollectionHeartPicksMovie = ({
-	navigationHeaderHeight,
-} : {
-	navigationHeaderHeight: number;
-}) => {
+export const CollectionHeartPicksMovie = () => {
 	const t = useTranslations();
     const { user } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -176,7 +171,6 @@ export const CollectionHeartPicksMovie = ({
 		// Shared Values
 		scrollY={scrollY}
 		headerHeight={headerHeight}
-		navigationHeaderHeight={navigationHeaderHeight}
 		// View
 		view={view}
         />

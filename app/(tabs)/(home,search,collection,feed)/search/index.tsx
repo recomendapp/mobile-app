@@ -14,10 +14,11 @@ import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import useSearchStore from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { useScrollToTop } from "@react-navigation/native";
 import { BestResultsSearchResponse, MediaMovie, MediaPerson, MediaTvSeries, Playlist, User } from "@recomendapp/types";
 import { Link } from "expo-router";
 import { upperFirst } from "lodash";
-import { forwardRef, useCallback } from "react";
+import { forwardRef, useCallback, useRef } from "react";
 import { Dimensions } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useTranslations } from "use-intl";
@@ -41,10 +42,7 @@ interface SearchResultsProps extends React.ComponentPropsWithoutRef<typeof Scrol
 	search: string;
 };
 
-export const SearchResults = forwardRef<
-	React.ComponentRef<typeof ScrollView>,
-	SearchResultsProps
->(({ search, ...props }, ref) => {
+export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
 	const { inset, tabBarHeight } = useTheme();
 	const {
 		data,
@@ -55,10 +53,13 @@ export const SearchResults = forwardRef<
 		query: search,
 	});
 	const loading = data === undefined || isLoading;
+	// REFs
+	const scrollRef = useRef<ScrollView>(null);
+	useScrollToTop(scrollRef);
 	if (loading) return null;
 	return (
 		<ScrollView
-		ref={ref}
+		ref={scrollRef}
 		contentContainerStyle={{
 			gap: GAP,
 			paddingBottom: tabBarHeight + inset.bottom + PADDING_VERTICAL,
@@ -85,10 +86,7 @@ export const SearchResults = forwardRef<
 			)}
 		</ScrollView>
 	)
-});
-SearchResults.displayName = 'SearchResults';
-
-
+};
 /* --------------------------------- WIDGETS -------------------------------- */
 const SearchBestResult = ({
 	best,

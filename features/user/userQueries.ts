@@ -1501,7 +1501,7 @@ export const useUserFollowersInfiniteQuery = ({
 
 			let query = supabase
 				.from('user_follower')
-				.select('id, follower:user_id!inner(*)')
+				.select('id, follower:user!user_follower_user_id_fkey!inner(*)')
 				.eq('followee_id', userId)
 				.eq('is_pending', false)
 				.range(from, to);
@@ -1541,10 +1541,10 @@ export const useUserFollowersRequestsQuery = ({
 			if (!userId) throw Error('Missing user id');
 			const { data, error } = await supabase
 				.from('user_follower')
-				.select('id, user:user_id!inner(*)')
+				.select('id, user!user_follower_user_id_fkey!inner(*)')
 				.eq('followee_id', userId)
 				.eq('is_pending', true)
-				.returns<UserFollower[]>();
+				.overrideTypes<UserFollower[]>();
 			if (error) throw error;
 			return data;
 		},
@@ -1580,7 +1580,7 @@ export const useUserFolloweesInfiniteQuery = ({
 
 			let query = supabase
 				.from('user_follower')
-				.select('id, followee:followee_id!inner(*)')
+				.select('id, followee:user!user_follower_followee_id_fkey!inner(*)')
 				.eq('user_id', userId)
 				.eq('is_pending', false)
 				.range(from, to)
@@ -1591,8 +1591,7 @@ export const useUserFolloweesInfiniteQuery = ({
 						.ilike(`followee.username`, `${filters.search}%`)
 				}
 			}
-			const { data, error } = await query
-				.returns<UserFollower[]>();
+			const { data, error } = await query;
 			if (error) throw error;
 			return data;
 		},
@@ -1620,7 +1619,7 @@ export const useUserFolloweesQuery = ({
 			if (!userId) throw Error('Missing user id');
 			let query = supabase
 				.from('user_follower')
-				.select('id, followee:followee_id!inner(*)')
+				.select('id, followee:user!user_follower_followee_id_fkey!inner(*)')
 				.eq('user_id', userId)
 				.eq('is_pending', false);
 			
@@ -1631,7 +1630,7 @@ export const useUserFolloweesQuery = ({
 				}
 			}
 			const { data, error } = await query
-				.returns<UserFollower[]>();
+				.overrideTypes<UserFollower[]>();
 			if (error) throw error;
 			return data;
 		},
@@ -1687,7 +1686,7 @@ export const useUserSubscriptionsQuery = ({
 				`)
 				.eq('user_id', userId)
 				.in('status', ['active', 'trialing'])
-				.single();
+				.maybeSingle();
 			if (error) throw error;
 			return data;
 		},

@@ -16,11 +16,7 @@ import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie
 import { useUIStore } from "@/stores/useUIStore";
 import BottomSheetWatchlistMovieComment from "@/components/bottom-sheets/sheets/BottomSheetWatchlistMovieComment";
 
-export const CollectionWatchlistMovie = ({
-	navigationHeaderHeight,
-} : {
-	navigationHeaderHeight: number;
-}) => {
+export const CollectionWatchlistMovie = () => {
 	const t = useTranslations();
     const { user } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -193,7 +189,6 @@ export const CollectionWatchlistMovie = ({
 		// Shared Values
 		scrollY={scrollY}
 		headerHeight={headerHeight}
-		navigationHeaderHeight={navigationHeaderHeight}
 		// View
 		view={view}
         />

@@ -19,7 +19,6 @@ import { PADDING_HORIZONTAL } from "@/theme/globals";
 interface CollectionHeaderBaseProps
 	extends React.ComponentPropsWithoutRef<typeof Animated.View> {
 		headerHeight: SharedValue<number>;
-		navigationHeaderHeight?: number;
 		scrollY: SharedValue<number>;
 		poster?: string;
 		posterType?: ImageType;
@@ -51,7 +50,7 @@ type CollectionHeaderProps = CollectionHeaderBaseProps & (CollectionHeaderLoaded
 const CollectionHeader = forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CollectionHeaderProps
->(({ loading, headerHeight, navigationHeaderHeight = useHeaderHeight(), scrollY, title, hideTitle, poster, posterType, bottomText, numberOfItems, hideNumberOfItems, backdrops, type, ...props }, ref) => {
+>(({ loading, headerHeight, scrollY, title, hideTitle, poster, posterType, bottomText, numberOfItems, hideNumberOfItems, backdrops, type, ...props }, ref) => {
 	const { colors, inset } = useTheme();
 	const { hslToRgb } = useColorConverter();
 	const t = useTranslations();
@@ -103,7 +102,7 @@ const CollectionHeader = forwardRef<
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - (navigationHeaderHeight) / 0.8],
+				[0, headerHeight.get() / 0.8],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -163,7 +162,7 @@ const CollectionHeader = forwardRef<
 			style={[
 				tw`items-center justify-center px-4 pb-4 min-h-40 gap-2`,
 				{
-					marginTop: navigationHeaderHeight > 0 ? navigationHeaderHeight : inset.top,
+					marginTop: inset.top,
 				}
 			]}
 			>

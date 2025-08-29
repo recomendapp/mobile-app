@@ -25,6 +25,9 @@ import UserAvatar from "@/components/user/UserAvatar";
 import { Separator } from "@/components/ui/separator";
 import { randomUUID } from 'expo-crypto';
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
 const FULL_NAME_MIN_LENGTH = 1;
 const FULL_NAME_MAX_LENGTH = 30;
@@ -33,7 +36,8 @@ const BIO_MAX_LENGTH = 150;
 const SettingsProfileScreen = () => {
 	const supabase = useSupabaseClient();
 	const { user } = useAuth();
-	const { colors, bottomTabHeight } = useTheme();
+	const { bottomTabHeight } = useTheme();
+	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const updateProfileMutation = useUserUpdateMutation({
@@ -250,11 +254,14 @@ const SettingsProfileScreen = () => {
 				),
 			}}
 		/>
-		<ScrollView
-		contentContainerStyle={[
-			tw`gap-2 p-4`,
-			{ paddingBottom: bottomTabHeight + 8 }
-		]}
+		<KeyboardAwareScrollView
+		contentContainerStyle={{
+			gap: GAP,
+			paddingTop: PADDING_VERTICAL,
+			paddingHorizontal: PADDING_HORIZONTAL,
+			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+		}}
+		bottomOffset={navigationHeaderHeight}
 		>
 			<Pressable onPress={handleAvatarOptions} style={tw`items-center justify-center gap-2`}>
 				{user ? (
@@ -342,7 +349,8 @@ const SettingsProfileScreen = () => {
 				</View>
 			)}
 			/>
-		</ScrollView>
+		</KeyboardAwareScrollView>
+		<KeyboardToolbar />
 	</>
 	)
 };

@@ -1,28 +1,27 @@
-import { KeyboardAvoidingView, Platform} from 'react-native';
 import { useAuth } from '@/providers/AuthProvider';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button } from '@/components/ui/Button';
-import { Link, Stack } from 'expo-router';
+import { Link } from 'expo-router';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
-import { GroupedInput, GroupedInputItem, Input } from '@/components/ui/Input';
+import { GroupedInput, GroupedInputItem } from '@/components/ui/Input';
 import { upperCase, upperFirst } from 'lodash';
 import { Icons } from '@/constants/Icons';
 import * as Burnt from 'burnt';
 import app from '@/constants/app';
 import { useRandomImage } from '@/hooks/useRandomImage';
 import { ImageBackground } from 'expo-image';
-import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslations } from 'use-intl';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
+import { useHeaderHeight } from "@react-navigation/elements";
+import { KeyboardAwareScrollView, KeyboardToolbar } from 'react-native-keyboard-controller';
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
 ]
-
-const PADDING = 16;
 
 const LoginScreen = () => {
 	const { login } = useAuth();
@@ -32,6 +31,7 @@ const LoginScreen = () => {
 	const [ password, setPassword ] = useState('');
 	const [ isLoading, setIsLoading ] = useState(false);
 	const bgImage = useRandomImage(backgroundImages);
+	const navigationHeaderHeight = useHeaderHeight();
 
 	const handleSubmit = async () => {
 		try {
@@ -63,17 +63,20 @@ const LoginScreen = () => {
 			}}
 			style={tw`flex-1`}
 			>
-				<ScrollView
+				<KeyboardAwareScrollView
 				contentContainerStyle={[
-					tw`flex-1 gap-6 justify-end items-center`,
+					tw`flex-1 justify-end items-center`,
 					{
-						paddingBottom: inset.bottom + PADDING,
-						paddingLeft: inset.left + PADDING,
-						paddingRight: inset.right + PADDING,
+						gap: GAP,
+						paddingTop: PADDING_VERTICAL,
+						paddingLeft: inset.left + PADDING_HORIZONTAL,
+						paddingRight: inset.right + PADDING_HORIZONTAL,
+						paddingBottom: inset.bottom + PADDING_VERTICAL,
 					}
 				]}
+				bottomOffset={navigationHeaderHeight}
 				>
-					<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={tw`w-full gap-4`}>
+					<View style={[tw`w-full`, { gap: GAP }]}>
 						<GroupedInput title={t('pages.auth.login.label', { app: app.name })} titleStyle={tw`text-center text-xl font-bold`}>
 							<GroupedInputItem
 							icon={Icons.Mail}
@@ -104,7 +107,7 @@ const LoginScreen = () => {
 						</Link>
 						{/* SUBMIT BUTTON */}
 						<Button loading={isLoading} onPress={handleSubmit} style={tw`w-full rounded-xl`}>{t('pages.auth.login.form.submit')}</Button>
-					</KeyboardAvoidingView>
+					</View>
 					<View style={tw`gap-2 w-full`}>
 						<Link href={'/auth/login/otp'} asChild>
 							<Button variant="outline" icon={Icons.OTP}>
@@ -115,7 +118,8 @@ const LoginScreen = () => {
 					</View>
 					{/* SIGNUP */}
 					<Text style={[{ color: colors.mutedForeground }, tw`text-right`]}>{t('pages.auth.login.no_account_yet')} <Link href={'/auth/signup'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.signup'))}</Link></Text>
-				</ScrollView>
+				</KeyboardAwareScrollView>
+				<KeyboardToolbar />
 			</LinearGradient>
 		</ImageBackground>
 	</>

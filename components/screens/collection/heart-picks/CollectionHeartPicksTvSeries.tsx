@@ -15,11 +15,7 @@ import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTv
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useUIStore } from "@/stores/useUIStore";
 
-export const CollectionHeartPicksTvSeries = ({
-	navigationHeaderHeight
-} : {
-	navigationHeaderHeight: number;
-}) => {
+export const CollectionHeartPicksTvSeries = () => {
 	const t = useTranslations();
     const { user } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -173,7 +169,6 @@ export const CollectionHeartPicksTvSeries = ({
 		// Shared Values
 		scrollY={scrollY}
 		headerHeight={headerHeight}
-		navigationHeaderHeight={navigationHeaderHeight}
 		// View
 		view={view}
         />

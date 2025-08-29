@@ -39,13 +39,7 @@ const ProfileWidgetActivitiesTvSeries = ({
 	return (
 	  <View style={[tw`gap-2`, style]}>
 		<Link
-		href={{
-			pathname: `/user/[username]/collection`,
-			params: {
-				username: profile.username!,
-				type: 'tv_series',
-			},
-		}}
+		href={`/user/${profile.username!}/collection/tv-series`}
 		style={labelStyle}
 		>
 			<View style={tw`flex-row items-center`}>

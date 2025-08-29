@@ -21,7 +21,6 @@ import { ImageType } from "@/components/utils/ImageWithFallback";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { MediaType, ViewType } from "@recomendapp/types";
 import { LegendListRenderItemProps } from "@legendapp/list";
-import { useHeaderHeight } from '@react-navigation/elements';
 
 interface ToolbarItem {
     label?: string;
@@ -71,7 +70,6 @@ interface CollectionScreenConfig<T> extends Omit<React.ComponentProps<typeof Ani
     getItemBackdropUrl?: (item: T) => string;
     getCreatedAt?: (item: T) => string;
     onItemAction?: (item: T) => void;
-    navigationHeaderHeight?: number;
     view?: ViewType;
     type?: MediaType;
 	fuseKeys?: FuseOptionKey<T>[];
@@ -105,7 +103,6 @@ const CollectionScreen = <T extends {}>({
     getItemBackdropUrl,
     getCreatedAt,
     onItemAction,
-    navigationHeaderHeight = useHeaderHeight(),
     view = 'list',
     numColumns = 4,
     type,
@@ -199,7 +196,6 @@ const CollectionScreen = <T extends {}>({
                     {item.label}
                 </Button>
             )}
-            // contentContainerStyle={tw`px-4`}
             showsHorizontalScrollIndicator={false}
             ItemSeparatorComponent={() => <View style={tw`w-2`} />}
             />
@@ -258,7 +254,6 @@ const CollectionScreen = <T extends {}>({
 						headerHeight={headerHeight}
 						backdrops={backdrops}
                         type={type}
-                        navigationHeaderHeight={navigationHeaderHeight}
 					/>}
 					{!loading && (
 						<View style={tw`gap-2`}>
@@ -294,7 +289,6 @@ const CollectionScreen = <T extends {}>({
 			refreshing={isRefetching}
 			onRefresh={refetch}
 			contentContainerStyle={{
-                paddingTop: hideHeader ? navigationHeaderHeight : undefined,
                 paddingHorizontal: PADDING_HORIZONTAL,
                 paddingBottom: bottomTabHeight + PADDING_VERTICAL,
                 gap: GAP,

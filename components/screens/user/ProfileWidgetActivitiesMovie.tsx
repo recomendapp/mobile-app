@@ -39,13 +39,7 @@ const ProfileWidgetActivitiesMovie = ({
 	return (
 	  <View style={[tw`gap-2`, style]}>
 		<Link
-		href={{
-			pathname: `/user/[username]/collection`,
-			params: {
-				username: profile.username!,
-				type: 'movie',
-			},
-		}}
+		href={`/user/${profile.username!}/collection`}
 		style={labelStyle}
 		>
 			<View style={tw`flex-row items-center`}>

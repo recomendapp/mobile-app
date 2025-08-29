@@ -1,7 +1,7 @@
 import React from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
-import { MediaMovie, UserActivityMovie } from '@recomendapp/types';
+import { MediaMovie, MediaPerson, UserActivityMovie } from '@recomendapp/types';
 import { LinkProps, usePathname, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -12,13 +12,14 @@ import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import BottomSheetDefaultView from '../templates/BottomSheetDefaultView';
-import { ScrollView } from 'react-native-gesture-handler';
+import { FlatList, Pressable, ScrollView } from 'react-native-gesture-handler';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
 import BottomSheetShare from './BottomSheetShare';
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 
 interface BottomSheetMovieProps extends BottomSheetProps {
   movie?: MediaMovie,
@@ -50,6 +51,7 @@ const BottomSheetMovie = React.forwardRef<
   // REFs
   const scrollRef = React.useRef<ScrollView>(null);
   const BottomSheetMainCreditsRef = React.useRef<TrueSheet>(null);
+  const creditsScrollRef = React.useRef<FlatList<MediaPerson>>(null);
   // States
   const items: Item[][] = React.useMemo(() => ([
     [
@@ -182,15 +184,47 @@ const BottomSheetMovie = React.forwardRef<
           </React.Fragment>
         ))}
       </ScrollView>
-      <BottomSheetDefaultView
-      ref={BottomSheetMainCreditsRef}
-      id={`${id}-credits`}
-      content={
-        <View>
-          <Text>ok</Text>
-        </View>
-      }
-      />
+      {movie?.directors && (
+        <BottomSheetDefaultView
+        ref={BottomSheetMainCreditsRef}
+        id={`${id}-credits`}
+        scrollRef={creditsScrollRef as React.RefObject<React.Component<unknown, {}, any>>}
+        >
+          <FlatList
+          ref={creditsScrollRef}
+          data={movie?.directors || []}
+          renderItem={({ item }) => (
+            <Pressable
+            onPress={() => {
+              BottomSheetMainCreditsRef.current?.dismiss();
+              closeSheet(id);
+              router.push(item.url as LinkProps['href']);
+            }}
+            style={[
+              {
+                paddingHorizontal: PADDING_HORIZONTAL,
+                paddingVertical: PADDING_VERTICAL,
+                gap: GAP
+              },
+              tw`flex-row justify-between items-center`,
+            ]}
+            >
+              <Text>
+                {item.name}
+              </Text>
+              <Button
+              variant="ghost"
+              icon={Icons.ChevronRight}
+              size="icon"
+              />
+            </Pressable>
+          )}
+          contentContainerStyle={{
+            paddingTop: PADDING_VERTICAL,
+          }}
+          />
+        </BottomSheetDefaultView>
+      )}
     </ThemedTrueSheet>
   );
 });

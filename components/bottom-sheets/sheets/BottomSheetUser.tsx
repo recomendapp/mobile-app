@@ -1,14 +1,13 @@
 import React from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
-import { MediaPerson } from '@recomendapp/types';
-import { LinkProps, usePathname, useRouter } from 'expo-router';
+import { Profile, User } from '@recomendapp/types';
+import { usePathname, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { View } from 'react-native';
-import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -18,9 +17,10 @@ import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
 import BottomSheetShare from './BottomSheetShare';
+import UserAvatar from '@/components/user/UserAvatar';
 
-interface BottomSheetPersonProps extends BottomSheetProps {
-  person?: MediaPerson,
+interface BottomSheetUserProps extends BottomSheetProps {
+  user: User | Profile,
   additionalItemsTop?: Item[];
   additionalItemsBottom?: Item[];
 };
@@ -34,10 +34,10 @@ interface Item {
   disabled?: boolean;
 }
 
-const BottomSheetPerson = React.forwardRef<
+const BottomSheetUser = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
-  BottomSheetPersonProps
->(({ id, person, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
+  BottomSheetUserProps
+>(({ id, user, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors, inset } = useTheme();
@@ -55,16 +55,16 @@ const BottomSheetPerson = React.forwardRef<
     [
       {
         icon: Icons.User,
-        onPress: () => router.push(person?.url as LinkProps['href']),
-        label: upperFirst(t('common.messages.go_to_person')),
-        disabled: person?.url ? pathname.startsWith(person.url) : false
+        onPress: () => router.push(`/user/${user.username}`),
+        label: upperFirst(t('common.messages.go_to_user')),
+        disabled: pathname.startsWith(`/user/${user.username}`)
       },
       {
         icon: Icons.Share,
         onPress: () => openSheet(BottomSheetShare, {
-          type: 'person',
-          path: person?.url!,
-          person: person,
+          type: 'user',
+          path: `/user/${user.username}`,
+          user: user,
         }),
         label: upperFirst(t('common.messages.share')),
       }
@@ -72,7 +72,7 @@ const BottomSheetPerson = React.forwardRef<
     [
       ...additionalItemsBottom,
     ],
-  ]), [person, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, session]);
+  ]), [user, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, session]);
   
   return (
     <ThemedTrueSheet
@@ -94,22 +94,16 @@ const BottomSheetPerson = React.forwardRef<
         ]}
         >
           <View style={tw`flex-row items-center gap-2 `}>
-            <ImageWithFallback
-            alt={person?.name ?? ''}
-            source={{ uri: person?.profile_url ?? '' }}
-            style={[
-              { aspectRatio: 2 / 3, height: 'fit-content' },
-              tw.style('rounded-md w-12'),
-            ]}
-            type={'person'}
+            <UserAvatar
+            full_name={user.full_name!}
+            avatar_url={user.avatar_url}
+            style={tw`w-12 h-12`}
             />
             <View style={tw`shrink`}>
-              <Text numberOfLines={2} style={tw`shrink`}>{person?.name}</Text>
-              {person?.known_for_department && (
-                <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
-                  {person.known_for_department}
-                </Text>
-              )}
+              <Text numberOfLines={2} style={tw`shrink`}>{user?.full_name}</Text>
+              <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
+                @{user.username}
+              </Text>
             </View>
           </View>
         </View>
@@ -139,6 +133,6 @@ const BottomSheetPerson = React.forwardRef<
     </ThemedTrueSheet>
   );
 });
-BottomSheetPerson.displayName = 'BottomSheetPerson';
+BottomSheetUser.displayName = 'BottomSheetUser';
 
-export default BottomSheetPerson;
+export default BottomSheetUser;

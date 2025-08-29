@@ -1,9 +1,11 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { userKeys } from "../user/userKeys";
-import { matchQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { InfiniteData, matchQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Playlist, PlaylistGuest, PlaylistItemMovie, PlaylistItemTvSeries, PlaylistType } from "@recomendapp/types";
 import { playlistKeys } from "./playlistKeys";
 import { mediaKeys } from "../media/mediaKeys";
+import { useAuth } from "@/providers/AuthProvider";
+import { clamp } from "lodash";
 
 /**
  * Creates a new playlist
@@ -61,6 +63,8 @@ export const usePlaylistInsertMutation = () => {
  */
 export const usePlaylistUpdateMutation = () => {
 	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	const { session } = useAuth();
 	return useMutation({
 		mutationFn: async ({
 			playlistId,
@@ -89,7 +93,48 @@ export const usePlaylistUpdateMutation = () => {
 			if (error) throw error;
 			return data;
 		},
-	})
+		onSuccess: (data) => {
+			queryClient.setQueryData(playlistKeys.detail(data.id), (oldData: Playlist | undefined) => {
+				if (!oldData) return oldData;
+				return {
+					...oldData,
+					...data,
+				};
+			});
+
+			// Update playlists users
+			if (session) {
+				const baseKey = userKeys.playlists({ userId: session?.user.id });
+				const playlistsQueries = queryClient.getQueriesData<InfiniteData<Playlist[] | undefined>>({
+					predicate: (query) => {
+						const key = query.queryKey
+						return Array.isArray(key) && baseKey.every((v, i) => v === key[i]);
+					}
+				});
+				playlistsQueries.forEach(([key, oldData]) => {
+					if (!oldData) return;
+					queryClient.setQueryData(key, (currentData: InfiniteData<Playlist[] | undefined>) => {
+						if (!currentData) return currentData;
+						return {
+							...currentData,
+							pages: currentData.pages.map(page => {
+								if (!page) return page;
+								return page?.map(playlist => {
+									if (playlist.id === data.id) {
+										return {
+											...playlist,
+											...data,
+										}
+									}
+									return playlist;
+								});
+							})
+						};
+					});
+				});
+			}
+		}
+	});
 };
 
 /**
@@ -100,6 +145,7 @@ export const usePlaylistUpdateMutation = () => {
 export const usePlaylistDeleteMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
+	const { session } = useAuth();
 	return useMutation({
 		mutationFn: async ({
 			playlistId,
@@ -119,12 +165,30 @@ export const usePlaylistDeleteMutation = () => {
 				userId,
 			};
 		},
-		onSuccess: ({ userId }) => {
-			queryClient.invalidateQueries({
-				queryKey: userKeys.playlists({
-					userId: userId,
-				}),
-			});
+		onSuccess: ({ playlistId }) => {
+			// Update playlists users
+			if (session) {
+				const baseKey = userKeys.playlists({ userId: session?.user.id });
+				const playlistsQueries = queryClient.getQueriesData<InfiniteData<Playlist[] | undefined>>({
+					predicate: (query) => {
+						const key = query.queryKey
+						return Array.isArray(key) && baseKey.every((v, i) => v === key[i]);
+					}
+				});
+				playlistsQueries.forEach(([key, oldData]) => {
+					if (!oldData) return;
+					queryClient.setQueryData(key, (currentData: InfiniteData<Playlist[] | undefined>) => {
+						if (!currentData) return currentData;
+						return {
+							...currentData,
+							pages: currentData.pages.map(page => {
+								if (!page) return page;
+								return page.filter(playlist => playlist.id !== playlistId);
+							})
+						};
+					});
+				});
+			}
 		}
 	});
 };
@@ -327,6 +391,7 @@ export const usePlaylistMovieInsertMutation = ({
 }) => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
+	const { session } = useAuth();
 	return useMutation({
 		mutationFn: async ({
 			playlists,
@@ -341,7 +406,7 @@ export const usePlaylistMovieInsertMutation = ({
 		}) => {
 			if (!userId) throw Error('User id is missing');
 			if (playlists.length === 0) throw Error('You must select at least one playlist');
-			const { data, error } = await supabase
+			const { error } = await supabase
 				.from('playlist_items_movie')
 				.insert(
 					playlists.map((playlist) => ({
@@ -353,23 +418,56 @@ export const usePlaylistMovieInsertMutation = ({
 					}))
 				);
 			if (error) throw error;
-			const updatedPlaylists = playlists.map((playlist) => ({
-				...playlist,
-				items_count: (playlist?.items_count ?? 0) + 1,
-			}));
-			return updatedPlaylists; // Normalized cache
+			return playlists;
 		},
 		onSuccess: (data) => {
-			// queryClient.invalidateQueries({
-			// 	queryKey: playlistKeys.detail(data.playlist_id),
-			// });
-
 			queryClient.invalidateQueries({
 				queryKey: mediaKeys.playlists({
 					id: movieId,
 					type: 'movie',
 				}),
 			});
+			// Update each playlists
+			data.forEach((playlist) => {
+				queryClient.setQueryData(playlistKeys.detail(playlist.id), (oldData: Playlist) => {
+					if (!oldData) return oldData;
+					return {
+						...oldData,
+						items_count: (oldData.items_count ?? 0) + 1,
+					};
+				});
+			});
+			// Update playlists users
+			if (session) {
+				const baseKey = userKeys.playlists({ userId: session?.user.id });
+				const playlistsQueries = queryClient.getQueriesData<InfiniteData<Playlist[] | undefined>>({
+					predicate: (query) => {
+						const key = query.queryKey
+						return Array.isArray(key) && baseKey.every((v, i) => v === key[i]);
+					}
+				});
+				playlistsQueries.forEach(([key, oldData]) => {
+					if (!oldData) return;
+					queryClient.setQueryData(key, (currentData: InfiniteData<Playlist[] | undefined>) => {
+						if (!currentData) return currentData;
+						return {
+							...currentData,
+							pages: currentData.pages.map(page => {
+								if (!page) return page;
+								return page?.map(playlist => {
+									if (playlist.id === data.find(p => p.id === playlist.id)?.id) {
+										return {
+											...playlist,
+											items_count: (playlist.items_count ?? 0) + 1,
+										}
+									}
+									return playlist;
+								});
+							})
+						};
+					});
+				});
+			}
 		},
 		meta: {
 			invalidates: [
@@ -381,6 +479,7 @@ export const usePlaylistMovieInsertMutation = ({
 export const usePlaylistMovieDeleteMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
+	const { session } = useAuth();
 	return useMutation({
 		mutationFn: async ({
 			itemId,
@@ -406,13 +505,45 @@ export const usePlaylistMovieDeleteMutation = () => {
 					type: 'movie',
 				}),
 			});
+			// Update playlist
 			queryClient.setQueryData(playlistKeys.detail(data.playlist_id), (data: Playlist) => {
 				if (!data) return null;
 				return {
 					...data,
-					items_count: data.items_count - 1,
+					items_count: clamp(data.items_count - 1, 0, Infinity),
 				};
 			});
+			// Update user playlists
+			if (session) {
+				const baseKey = userKeys.playlists({ userId: session?.user.id });
+				const playlistsQueries = queryClient.getQueriesData<InfiniteData<Playlist[] | undefined>>({
+					predicate: (query) => {
+						const key = query.queryKey
+						return Array.isArray(key) && baseKey.every((v, i) => v === key[i]);
+					}
+				});
+				playlistsQueries.forEach(([key, oldData]) => {
+					if (!oldData) return;
+					queryClient.setQueryData(key, (currentData: InfiniteData<Playlist[] | undefined>) => {
+						if (!currentData) return currentData;
+						return {
+							...currentData,
+							pages: currentData.pages.map(page => {
+								if (!page) return page;
+								return page?.map(playlist => {
+									if (playlist.id === data.playlist_id) {
+										return {
+											...playlist,
+											items_count: clamp((playlist.items_count ?? 0) - 1, 0, Infinity),
+										}
+									}
+									return playlist;
+								});
+							})
+						};
+					});
+				});
+			}
 		},
 	});
 };
@@ -450,6 +581,7 @@ export const usePlaylistTvSeriesInsertMutation = ({
 }) => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
+	const { session } = useAuth();
 	return useMutation({
 		mutationFn: async ({
 			playlists,
@@ -476,11 +608,7 @@ export const usePlaylistTvSeriesInsertMutation = ({
 					}))
 				);
 			if (error) throw error;
-			const updatedPlaylists = playlists.map((playlist) => ({
-				...playlist,
-				items_count: (playlist?.items_count ?? 0) + 1,
-			}));
-			return updatedPlaylists; // Normalized cache
+			return playlists;
 		},
 		onSuccess: (data) => {
 			queryClient.invalidateQueries({
@@ -489,6 +617,48 @@ export const usePlaylistTvSeriesInsertMutation = ({
 					type: 'tv_series',
 				}),
 			});
+
+			// Update each playlists
+			data.forEach((playlist) => {
+				queryClient.setQueryData(playlistKeys.detail(playlist.id), (oldData: Playlist) => {
+					if (!oldData) return oldData;
+					return {
+						...oldData,
+						items_count: (oldData.items_count ?? 0) + 1,
+					};
+				});
+			});
+			// Update playlists users
+			if (session) {
+				const baseKey = userKeys.playlists({ userId: session?.user.id });
+				const playlistsQueries = queryClient.getQueriesData<InfiniteData<Playlist[] | undefined>>({
+					predicate: (query) => {
+						const key = query.queryKey
+						return Array.isArray(key) && baseKey.every((v, i) => v === key[i]);
+					}
+				});
+				playlistsQueries.forEach(([key, oldData]) => {
+					if (!oldData) return;
+					queryClient.setQueryData(key, (currentData: InfiniteData<Playlist[] | undefined>) => {
+						if (!currentData) return currentData;
+						return {
+							...currentData,
+							pages: currentData.pages.map(page => {
+								if (!page) return page;
+								return page?.map(playlist => {
+									if (playlist.id === data.find(p => p.id === playlist.id)?.id) {
+										return {
+											...playlist,
+											items_count: (playlist.items_count ?? 0) + 1,
+										}
+									}
+									return playlist;
+								});
+							})
+						};
+					});
+				});
+			}
 		},
 		meta: {
 			invalidates: [
@@ -500,6 +670,7 @@ export const usePlaylistTvSeriesInsertMutation = ({
 export const usePlaylistTvSeriesDeleteMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
+	const { session } = useAuth();
 	return useMutation({
 		mutationFn: async ({
 			itemId,
@@ -525,13 +696,45 @@ export const usePlaylistTvSeriesDeleteMutation = () => {
 					type: 'tv_series',
 				}),
 			});
+			// Update playlist
 			queryClient.setQueryData(playlistKeys.detail(data.playlist_id), (data: Playlist) => {
 				if (!data) return null;
 				return {
 					...data,
-					items_count: data.items_count - 1,
+					items_count: clamp(data.items_count - 1, 0, Infinity),
 				};
 			});
+			// Update user playlists
+			if (session) {
+				const baseKey = userKeys.playlists({ userId: session?.user.id });
+				const playlistsQueries = queryClient.getQueriesData<InfiniteData<Playlist[] | undefined>>({
+					predicate: (query) => {
+						const key = query.queryKey
+						return Array.isArray(key) && baseKey.every((v, i) => v === key[i]);
+					}
+				});
+				playlistsQueries.forEach(([key, oldData]) => {
+					if (!oldData) return;
+					queryClient.setQueryData(key, (currentData: InfiniteData<Playlist[] | undefined>) => {
+						if (!currentData) return currentData;
+						return {
+							...currentData,
+							pages: currentData.pages.map(page => {
+								if (!page) return page;
+								return page?.map(playlist => {
+									if (playlist.id === data.playlist_id) {
+										return {
+											...playlist,
+											items_count: clamp((playlist.items_count ?? 0) - 1, 0, Infinity),
+										}
+									}
+									return playlist;
+								});
+							})
+						};
+					});
+				});
+			}
 		},
 	});
 };

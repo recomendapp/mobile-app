@@ -1,14 +1,13 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { Href, Redirect, Stack, useRouter } from "expo-router";
-import tw from "@/lib/tw";
 import { upperFirst } from "lodash";
 import { useMemo } from "react";
 import { useTranslations } from "use-intl";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useUIStore } from "@/stores/useUIStore";
-import { BlurView } from "expo-blur";
 import { useTheme } from "@/providers/ThemeProvider";
-import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { View } from "@/components/ui/view";
 
 const FeedLayout = () => {
   const t = useTranslations();
@@ -42,25 +41,21 @@ const FeedLayout = () => {
       <Stack.Screen
       options={{
         header: () => (
-          <BlurView
-          tint="dark"
-          intensity={100}
-          style={[
-            { paddingTop: inset.top, paddingLeft: inset.left + PADDING_HORIZONTAL, paddingRight: inset.right + PADDING_HORIZONTAL, paddingBottom: PADDING_VERTICAL },
-          ]}
-          experimentalBlurMethod="dimezisBlurView"
-          >
-            <SegmentedControl
-            values={segmentedOptions.map(option => option.label)}
-            selectedIndex={segmentedOptions.findIndex(option => option.value === feedView)}
-            onValueChange={(value) => {
-              setFeedView(segmentedOptions.find(option => option.label === value)!.value);
-              router.replace(segmentedOptions.find(option => option.label === value)!.href);
-            }}
-            />
-          </BlurView>
-        ),
-        headerTransparent: true,
+        <View
+        style={[
+          { paddingTop: inset.top, paddingLeft: inset.left + PADDING_HORIZONTAL, paddingRight: inset.right + PADDING_HORIZONTAL, paddingBottom: PADDING_VERTICAL },
+        ]}
+        >
+          <SegmentedControl
+          values={segmentedOptions.map(option => option.label)}
+          selectedIndex={segmentedOptions.findIndex(option => option.value === feedView)}
+          onValueChange={(value) => {
+            setFeedView(segmentedOptions.find(option => option.label === value)!.value);
+            router.replace(segmentedOptions.find(option => option.label === value)!.href);
+          }}
+          />
+        </View>
+        )
       }}
       />
       <Stack

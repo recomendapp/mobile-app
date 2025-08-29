@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 const useEditor = ({
 	theme,
-	avoidIosKeyboard = true,
+	avoidIosKeyboard = false,
 	dynamicHeight = true,
 	...props
 }: Partial<EditorBridge> = {}) => {
