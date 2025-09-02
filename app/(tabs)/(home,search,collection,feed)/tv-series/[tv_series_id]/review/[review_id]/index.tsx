@@ -14,10 +14,13 @@ import { Text } from "@/components/ui/text";
 import { CardUser } from "@/components/cards/CardUser";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import ButtonUserReviewTvSeriesLike from "@/components/buttons/ButtonUserReviewTvSeriesLike";
+import { BottomSheetReviewTvSeries } from "@/components/bottom-sheets/sheets/BottomSheetReviewTvSeries";
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
 
 const ReviewTvSeriesScreen = () => {
-	const { session, user } = useAuth();
-	const { bottomTabHeight, inset, colors } = useTheme();
+	const { session } = useAuth();
+	const { bottomTabHeight, colors } = useTheme();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
 	const router = useRouter();
 	const { review_id } = useLocalSearchParams();
@@ -43,19 +46,19 @@ const ReviewTvSeriesScreen = () => {
 	<>
 		<Stack.Screen
 		options={{
-			headerRight: session ? () => (
-			<View style={tw`flex-row items-center gap-2`}>
-				<ButtonUserReviewTvSeriesLike reviewId={review?.id} />
-				{review.activity?.user_id === user?.id &&<Button
+			headerRight: () => (
+			<>
+				{session && <ButtonUserReviewTvSeriesLike reviewId={review?.id} />}
+				<Button
 				variant="ghost"
-				size="fit"
-				onPress={() => router.push(`/tv-series/${review.activity?.tv_series}/review/${review.id}/edit`)}
-				textStyle={{ color: colors.accentYellow }}
-				>
-					{upperFirst(t('common.messages.edit'))}
-				</Button>}
-			</View>
-			) : undefined,
+				size="icon"
+				icon={Icons.EllipsisVertical}
+				onPress={() => openSheet(BottomSheetReviewTvSeries, {
+					review: review,
+				})}
+				/>
+			</>
+			),
 		}}
 		/>
 		<ScrollView

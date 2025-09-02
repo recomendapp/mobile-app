@@ -12,6 +12,8 @@ import { Text } from "@/components/ui/text";
 import { Skeleton } from "@/components/ui/Skeleton";
 import ButtonUserReviewTvSeriesLike from "@/components/buttons/ButtonUserReviewTvSeriesLike";
 import { Href } from "expo-router";
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
+import { BottomSheetReviewTvSeries } from "@/components/bottom-sheets/sheets/BottomSheetReviewTvSeries";
 
 interface CardReviewTvSeriesBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -87,6 +89,7 @@ const CardReviewTvSeries = React.forwardRef<
 	CardReviewTvSeriesProps
 >(({ linked = true, variant = "default", url, onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 
 	const content = (
 		variant === "default" ? (
@@ -103,6 +106,9 @@ const CardReviewTvSeries = React.forwardRef<
 			onPress?.();
 		}}
 		onLongPress={() => {
+			openSheet(BottomSheetReviewTvSeries, {
+				review: props.review,
+			});
 			onLongPress?.();
 		}}
 		>

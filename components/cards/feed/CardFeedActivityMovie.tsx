@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { CardUser } from "../CardUser";
+import { CardReviewMovie } from "../reviews/CardReviewMovie";
 
 interface CardFeedActivityMovieBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -81,15 +82,31 @@ const CardFeedActivityMovieDefault = React.forwardRef<
 						</Text>
  					) : <Skeleton style={tw`w-full h-5`} />}
 					{footer || (
-						!skeleton ? (
-							<Text
-							textColor={!movie.overview ? "muted" : undefined}
-							numberOfLines={2}
-							style={tw`text-xs text-justify`}
-							>
-								{movie.overview || upperFirst(t('common.messages.no_description'))}
-							</Text>
-						) : <Skeleton style={tw`w-full h-12`} />
+						skeleton
+							? <Skeleton style={tw`w-full h-12`} />
+							: activity.review ? (
+								<CardReviewMovie
+								author={author}
+								activity={activity!}
+								review={activity.review!}
+								url={{
+									pathname: '/film/[film_id]/review/[review_id]',
+									params: {
+										film_id: movie.slug || movie.id,
+										review_id: activity.review.id
+									}
+								}}
+								style={{ backgroundColor: colors.background }}
+								/>
+							) : (
+								<Text
+								textColor={!movie.overview ? "muted" : undefined}
+								numberOfLines={2}
+								style={tw`text-xs text-justify`}
+								>
+									{movie.overview || upperFirst(t('common.messages.no_description'))}
+								</Text>
+							)
 					)}
 				</View>
 			</View>

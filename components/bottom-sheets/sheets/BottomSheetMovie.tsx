@@ -18,8 +18,8 @@ import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
-import BottomSheetShare from './BottomSheetShare';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
+import BottomSheetShareMovie from './share/BottomSheetShareMovie';
 
 interface BottomSheetMovieProps extends BottomSheetProps {
   movie?: MediaMovie,
@@ -109,10 +109,8 @@ const BottomSheetMovie = React.forwardRef<
       ] : []),
       {
         icon: Icons.Share,
-        onPress: () => openSheet(BottomSheetShare, {
-          type: 'movie',
-          path: movie?.url!,
-          movie: movie,
+        onPress: () => openSheet(BottomSheetShareMovie, {
+          movie: movie!,
         }),
         label: upperFirst(t('common.messages.share')),
       }

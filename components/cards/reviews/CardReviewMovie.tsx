@@ -11,6 +11,8 @@ import { CardUser } from "../CardUser";
 import { Text } from "@/components/ui/text";
 import { Skeleton } from "@/components/ui/Skeleton";
 import ButtonUserReviewMovieLike from "@/components/buttons/ButtonUserReviewMovieLike";
+import { BottomSheetReviewMovie } from "@/components/bottom-sheets/sheets/BottomSheetReviewMovie";
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
 
 interface CardReviewMovieBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -86,6 +88,7 @@ const CardReviewMovie = React.forwardRef<
 	CardReviewMovieProps
 >(({ linked = true, variant = "default", url, onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 
 	const content = (
 		variant === "default" ? (
@@ -102,6 +105,9 @@ const CardReviewMovie = React.forwardRef<
 			onPress?.();
 		}}
 		onLongPress={() => {
+			openSheet(BottomSheetReviewMovie, {
+				review: props.review,
+			});
 			onLongPress?.();
 		}}
 		>

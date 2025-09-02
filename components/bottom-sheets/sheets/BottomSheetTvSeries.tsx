@@ -18,7 +18,7 @@ import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
-import BottomSheetShare from './BottomSheetShare';
+import BottomSheetShare from './share/BottomSheetShare';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 
 interface BottomSheetTvSeriesProps extends BottomSheetProps {

@@ -185,14 +185,16 @@ const ProfileScreen = () => {
 					</View>
 				),
 				headerTitleAlign: 'center',
-				headerRight: () => profile?.id === session?.user.id ? (
+				headerRight: () => (
+				<>
+					{profile?.id === session?.user.id && (
 					<Button
 					variant="ghost"
 					size="icon"
 					icon={Icons.settings}
 					onPress={() => router.push('/settings')}
 					/>
-				) : (
+					)}
 					<Button
 					variant="ghost"
 					size="icon"
@@ -201,6 +203,7 @@ const ProfileScreen = () => {
 						user: profile!
 					})}
 					/>
+				</>
 				)
 			}}
 		/>

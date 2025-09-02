@@ -14,10 +14,13 @@ import { Text } from "@/components/ui/text";
 import { CardUser } from "@/components/cards/CardUser";
 import ButtonUserReviewMovieLike from "@/components/buttons/ButtonUserReviewMovieLike";
 import { CardMovie } from "@/components/cards/CardMovie";
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
+import { BottomSheetReviewMovie } from "@/components/bottom-sheets/sheets/BottomSheetReviewMovie";
 
 const ReviewMovieScreen = () => {
-	const { session, user } = useAuth();
-	const { bottomTabHeight, inset, colors } = useTheme();
+	const { session } = useAuth();
+	const { bottomTabHeight, colors } = useTheme();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
 	const router = useRouter();
 	const { review_id } = useLocalSearchParams();
@@ -43,19 +46,19 @@ const ReviewMovieScreen = () => {
 	<>
 		<Stack.Screen
 		options={{
-			headerRight: session ? () => (
-			<View style={tw`flex-row items-center gap-2`}>
-				<ButtonUserReviewMovieLike reviewId={review?.id} />
-				{review.activity?.user_id === user?.id &&<Button
+			headerRight: () => (
+			<>
+				{session && <ButtonUserReviewMovieLike reviewId={review?.id} />}
+				<Button
 				variant="ghost"
-				size="fit"
-				onPress={() => router.push(`/film/${review.activity?.movie}/review/${review.id}/edit`)}
-				textStyle={{ color: colors.accentYellow }}
-				>
-					{upperFirst(t('common.messages.edit'))}
-				</Button>}
-			</View>
-			) : undefined,
+				size="icon"
+				icon={Icons.EllipsisVertical}
+				onPress={() => openSheet(BottomSheetReviewMovie, {
+					review: review,
+				})}
+				/>
+			</>
+			),
 		}}
 		/>
 		<ScrollView

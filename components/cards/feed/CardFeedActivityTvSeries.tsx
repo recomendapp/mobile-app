@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 import { CardUser } from "../CardUser";
+import { CardReviewTvSeries } from "../reviews/CardReviewTvSeries";
 
 interface CardFeedActivityTvSeriesBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -81,15 +82,31 @@ const CardFeedActivityTvSeriesDefault = React.forwardRef<
 						</Text>
  					) : <Skeleton style={tw`w-full h-5`} />}
 					{footer || (
-						!skeleton ? (
-							<Text
-							textColor={!tvSeries.overview ? "muted" : undefined}
-							numberOfLines={2}
-							style={tw`text-xs text-justify`}
-							>
-								{tvSeries.overview || upperFirst(t('common.messages.no_description'))}
-							</Text>
-						) : <Skeleton style={tw`w-full h-12`} />
+						skeleton
+							? <Skeleton style={tw`w-full h-12`} />
+							: activity.review ? (
+								<CardReviewTvSeries
+								author={author}
+								activity={activity!}
+								review={activity.review!}
+								url={{
+									pathname: '/tv-series/[tv_series_id]/review/[review_id]',
+									params: {
+										tv_series_id: tvSeries.slug || tvSeries.id,
+										review_id: activity.review.id
+									}
+								}}
+								style={{ backgroundColor: colors.background }}
+								/>
+							) : (
+								<Text
+								textColor={!tvSeries.overview ? "muted" : undefined}
+								numberOfLines={2}
+								style={tw`text-xs text-justify`}
+								>
+									{tvSeries.overview || upperFirst(t('common.messages.no_description'))}
+								</Text>
+							) 
 					)}
 				</View>
 			</View>

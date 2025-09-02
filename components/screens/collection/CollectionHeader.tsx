@@ -56,6 +56,7 @@ const CollectionHeader = forwardRef<
 	const t = useTranslations();
 	const bgBackdrop = useRandomBackdrop(backdrops || []);
 	const bgColor = hslToRgb(colors.background);
+	const navigationHeaderHeight = useHeaderHeight();
 
 	const posterHeight = useSharedValue(0);
 
@@ -63,7 +64,7 @@ const CollectionHeader = forwardRef<
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - inset.top / 0.9],
+				[0, headerHeight.get() - navigationHeaderHeight / 0.9],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -162,7 +163,7 @@ const CollectionHeader = forwardRef<
 			style={[
 				tw`items-center justify-center px-4 pb-4 min-h-40 gap-2`,
 				{
-					marginTop: inset.top,
+					marginTop: navigationHeaderHeight,
 				}
 			]}
 			>

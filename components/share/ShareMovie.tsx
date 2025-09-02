@@ -11,7 +11,6 @@ import { BORDER_RADIUS, GAP, HEIGHT, PADDING, PADDING_HORIZONTAL, PADDING_VERTIC
 import WheelSelector from "../ui/WheelSelector";
 import Animated, { FadeInDown, FadeInRight, FadeOutDown, FadeOutRight } from "react-native-reanimated";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useFormatter } from "use-intl";
 import { useMediaMovieBackdropInfiniteQuery, useMediaMoviePosterInfiniteQuery } from "@/features/media/mediaQueries";
 import { Image } from "expo-image";
 import { CaptureResult, ShareViewRef } from "./type";
@@ -23,7 +22,8 @@ import { ColorPair, useImageColorPairs } from "@/hooks/useImageColorPairs";
 import { useRouter } from "expo-router";
 import { ScaledCapture } from "../ui/ScaledCapture";
 import app from "@/constants/app";
-import { Dimensions } from "react-native";
+import { useWindowDimensions } from "react-native";
+import { clamp } from "lodash";
 
 interface ShareMovieProps extends React.ComponentProps<typeof ViewShot> {
 	movie: MediaMovie;
@@ -31,14 +31,12 @@ interface ShareMovieProps extends React.ComponentProps<typeof ViewShot> {
 };
 
 
-const { height: screenHeight } = Dimensions.get('screen');
 const ITEM_WIDTH = 64;
 const ITEM_SPACING = 8;
 
 /* -------------------------------- VARIANTS -------------------------------- */
 const ShareMovieDefault = ({ movie, poster, scale = 1 } : { movie: MediaMovie, poster: string | undefined, scale?: number }) => {
 	const { colors } = useTheme();
-	const format = useFormatter();
 	return (
 		<View style={[{ borderRadius: BORDER_RADIUS * scale, backgroundColor: colors.muted, gap: GAP * scale, padding: PADDING / 2 * scale }]}>
 			<ImageWithFallback
@@ -52,7 +50,7 @@ const ShareMovieDefault = ({ movie, poster, scale = 1 } : { movie: MediaMovie, p
 			/>
 			<View>
 			<Text style={[tw`font-bold`, { fontSize: 16 * scale }]}>{movie.title}</Text>
-			{movie.directors && <Text textColor="muted" style={{ fontSize: 12 * scale }}>{format.list(movie.directors.map(d => d.name!), {style: 'short',type: 'unit'})}</Text>}
+			{movie.directors && <Text textColor="muted" style={{ fontSize: 12 * scale }}>{movie.directors.map(d => d.name!).join(', ')}</Text>}
 			</View>
 			<Icons.site.logo color={colors.accentYellow} height={10 * scale}/>
 		</View>
@@ -187,6 +185,7 @@ export const ShareMovie = forwardRef<
 	const { user } = useAuth();
 	const router = useRouter();
 	const viewShotRef = useRef<ViewShot>(null);
+	const { height: screenHeight } = useWindowDimensions();
 
 	// States
 	const [poster, setPoster] = useState<string | undefined>(movie.poster_url ?? undefined);
@@ -289,7 +288,7 @@ export const ShareMovie = forwardRef<
 	return (
 		<View style={{ gap: GAP }} {...props}>
 			<View style={tw`items-center`}>
-				<View style={[{ aspectRatio: 9/16, paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL, borderRadius: BORDER_RADIUS, height: screenHeight / 2 },tw`relative items-center justify-center overflow-hidden`]}>
+				<View style={[{ aspectRatio: 9/16, paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL, borderRadius: BORDER_RADIUS, height: clamp(screenHeight / 2, 400) },tw`relative items-center justify-center overflow-hidden`]}>
 					{bgType === 'image' && backdrop ? (
 						<Image source={backdrop} style={tw`absolute inset-0`} />
 					) : bgType === 'color' && bgColor && (

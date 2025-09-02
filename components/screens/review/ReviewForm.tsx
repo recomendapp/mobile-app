@@ -1,9 +1,9 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import {  MediaMovie, MediaTvSeries, UserActivityMovie, UserActivityTvSeries, UserReview, UserReviewMovie, UserReviewTvSeries } from "@recomendapp/types";
+import {  MediaMovie, MediaTvSeries, UserActivityMovie, UserActivityTvSeries, UserReviewMovie, UserReviewTvSeries } from "@recomendapp/types";
 import { useEffect, useState } from "react";
 import { RichText, Toolbar } from "@10play/tentap-editor";
-import { upperCase, upperFirst } from "lodash";
+import { upperFirst } from "lodash";
 import * as Burnt from "burnt";
 import useEditor from "@/lib/10tap/editor";
 import { useSharedValue } from "react-native-reanimated";
@@ -12,13 +12,12 @@ import { useTranslations } from "use-intl";
 import { Stack } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { useHeaderHeight } from '@react-navigation/elements';
-import { ScrollView } from "react-native-gesture-handler";
 import { CardMovie } from "@/components/cards/CardMovie";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { View } from "@/components/ui/view";
-import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
-import { Text } from "@/components/ui/text";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 
 const MAX_TITLE_LENGTH = 50;
 const MAX_BODY_LENGTH = 5000;
@@ -59,7 +58,6 @@ const ReviewForm = ({
 	const [title, setTitle] = useState(review?.title ?? '');
 	const navigationHeaderHeight = useHeaderHeight();
 	const headerHeight = useSharedValue(0);
-	const [isEditorFocused, setIsEditorFocused] = useState(false);
 	// EDITOR
 	const editor = useEditor({
 		initialContent: review?.body as any,
@@ -71,7 +69,7 @@ const ReviewForm = ({
 		if (!activity?.rating) {
 			return Burnt.toast({
 				title: upperFirst(t('common.messages.error')),
-				message: upperFirst(t('common.messages.rating_required')),
+				message: upperFirst(t('common.messages.a_rating_is_required_to_add_a_review')),
 				preset: 'error',
 				haptic: 'error',
 			});
@@ -81,14 +79,6 @@ const ReviewForm = ({
 			body: content,
 		})
 	}
-	
-	useEffect(() => {
-		if (isEditorFocused) {
-			editor.focus();
-		} else {
-			editor.blur();
-		}
-	}, [isEditorFocused]);
 
 	useEffect(() => {
 		if (review) {
@@ -101,15 +91,7 @@ const ReviewForm = ({
 		<Stack.Screen
 		options={{
 			headerRight: () => (
-				isEditorFocused ? (
-					<Button
-					variant="ghost"
-					size="fit"
-					onPress={() => setIsEditorFocused(false)}
-					>
-						{upperCase(t('common.messages.ok'))}
-					</Button>
-				) : review ?(
+				review ?(
 					<Button
 					variant="ghost"
 					size="fit"
@@ -139,7 +121,8 @@ const ReviewForm = ({
 				paddingLeft: inset.left + PADDING_HORIZONTAL,
 				paddingRight: inset.right + PADDING_HORIZONTAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
-			}
+			},
+			tw`flex-1`
 		]}
 		bottomOffset={navigationHeaderHeight}
 		>
@@ -177,17 +160,9 @@ const ReviewForm = ({
 				scrollEnabled={false}
 				editor={editor}
 				exclusivelyUseCustomOnMessage={false}
-				onMessage={(e) => {
-					const data = JSON.parse(e.nativeEvent.data);
-					if (data.type === 'stateUpdate') {
-						if (data.payload.isFocused !== isEditorFocused) {
-							setIsEditorFocused(data.payload.isFocused);
-						}
-					}
-				}}
 				style={[
 					tw`px-2`,
-					{ backgroundColor: colors.background,}
+					{ backgroundColor: colors.background }
 				]}
 				/>
 				{/* <KeyboardAvoidingView
@@ -202,9 +177,7 @@ const ReviewForm = ({
 		<KeyboardToolbar
 		showArrows={false}
 		content={
-			<View>
-				<Text>test</Text>
-			</View>
+			<Toolbar editor={editor} hidden={false} />
 		}
 		/>
 	</>

@@ -30,10 +30,11 @@ import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import BottomSheetUserActivityMovieFollowersRating from '@/components/bottom-sheets/sheets/BottomSheetUserActivityMovieFollowersRating';
 import { ButtonPlaylistMovieAdd } from '@/components/buttons/ButtonPlaylistMovieAdd';
 import ButtonUserActivityMovieLike from '@/components/buttons/movies/ButtonUserActivityMovieLike';
-import ButtonUserWatchlistMovie from '@/components/buttons/movies/ButtonUserWatchlistMovie';
+import { ButtonUserWatchlistMovie } from '@/components/buttons/movies/ButtonUserWatchlistMovie';
 import ButtonUserActivityMovieWatch from '@/components/buttons/movies/ButtonUserActivityMovieWatch';
 import ButtonUserActivityMovieRating from '@/components/buttons/movies/ButtonUserActivityMovieRating';
 import ButtonUserRecoMovieSend from '@/components/buttons/movies/ButtonUserRecoMovieSend';
+import { useHeaderHeight } from '@react-navigation/elements';
 
 interface MovieHeaderProps {
 	movie?: MediaMovie | null;
@@ -52,7 +53,8 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
 	const { hslToRgb } = useColorConverter();
-	const { inset, colors } = useTheme();
+	const { colors } = useTheme();
+	const navigationHeaderHeight = useHeaderHeight();
 	const bgColor = hslToRgb(colors.background);
 	const {
 		data: followersAvgRating,
@@ -79,7 +81,7 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + inset.top) / 0.8],
+				[0, headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight) / 0.8],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -93,7 +95,7 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + inset.top) / 0.8],
+				[0, headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight) / 0.8],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -101,7 +103,7 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 				{
 					scale: interpolate(
 					scrollY.get(),
-					[0, (headerHeight.get() - (headerOverlayHeight.get() + inset.top)) / 2],
+					[0, (headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight)) / 2],
 					[1, 0.95],
 					'clamp',
 					),
@@ -128,7 +130,7 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 	<Animated.View
 	style={[
 		tw.style('w-full'),
-		{ paddingTop: inset.top }
+		{ paddingTop: navigationHeaderHeight }
 	]}
 	onLayout={(event: LayoutChangeEvent) => {
 		'worklet';

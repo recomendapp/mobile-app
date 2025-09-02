@@ -13,7 +13,7 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 import useDebounce from "@/hooks/useDebounce";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { usePlaylistItemsMovieRealtimeMutation, usePlaylistMovieDeleteMutation } from "@/features/playlist/playlistMutations";
+import { usePlaylistItemsMovieRealtimeMutation, usePlaylistMovieDeleteMutation, usePlaylistMovieUpdateMutation } from "@/features/playlist/playlistMutations";
 import * as Burnt from "burnt";
 import { CardUser } from "@/components/cards/CardUser";
 import { Text } from "@/components/ui/text";
@@ -22,6 +22,7 @@ import tw from "@/lib/tw";
 import { SharedValue, useSharedValue } from "react-native-reanimated";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { useUIStore } from "@/stores/useUIStore";
+import { BottomSheetComment } from "@/components/bottom-sheets/sheets/BottomSheetComment";
 
 interface PlaylistMovieProps {
 	playlist: Playlist;
@@ -50,6 +51,7 @@ export const PlaylistMovie = ({
 		playlistId: playlist.id,
 	});
 	const deletePlaylistItemMutation = usePlaylistMovieDeleteMutation();
+	const updatePlaylistItemMutation = usePlaylistMovieUpdateMutation();
 	const { mutate: updatePlaylistItemChanges } = usePlaylistItemsMovieRealtimeMutation({
 		playlistId: playlist?.id,
 	});
@@ -93,10 +95,26 @@ export const PlaylistMovie = ({
 		)
 	}, [t]);
 	const handlePlaylistItemComment = useCallback((data: PlaylistItemMovie) => {
-		// openSheet(BottomSheetPlaylistComm, {
-		// 	playlistItem: data,
-		// });
-	}, [openSheet]);
+		openSheet(BottomSheetComment, {
+			comment: data.comment || '',
+			isAllowedToEdit: isAllowedToEdit,
+			onSave: async (newComment) => {
+				await updatePlaylistItemMutation.mutateAsync({
+					itemId: data.id,
+					comment: newComment?.replace(/\s+/g, ' ').trimStart() || null,
+				}, {
+					onError: () => {
+						Burnt.toast({
+							title: upperFirst(t('common.messages.error')),
+							message: upperFirst(t('common.messages.an_error_occurred')),
+							preset: 'error',
+							haptic: 'error',
+						});
+					}
+				})
+			}
+		});
+	}, [openSheet, isAllowedToEdit]);
 
     const sortByOptions = useMemo((): SortByOption<PlaylistItemMovie>[] => ([
 		{

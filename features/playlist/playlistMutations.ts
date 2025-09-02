@@ -402,7 +402,7 @@ export const usePlaylistMovieInsertMutation = ({
 			playlists: Playlist[];
 			movieId: number;
 			userId: string;
-			comment?: string;
+			comment?: string | null;
 		}) => {
 			if (!userId) throw Error('User id is missing');
 			if (playlists.length === 0) throw Error('You must select at least one playlist');
@@ -557,7 +557,7 @@ export const usePlaylistMovieUpdateMutation = () => {
 		} : {
 			itemId: number;
 			rank?: number;
-			comment?: string;
+			comment?: string | null;
 		}) => {
 			const { data, error } = await supabase
 				.from('playlist_items_movie')
@@ -592,7 +592,7 @@ export const usePlaylistTvSeriesInsertMutation = ({
 			playlists: Playlist[];
 			tvSeriesId: number;
 			userId: string;
-			comment?: string;
+			comment?: string | null;
 		}) => {
 			if (!userId) throw Error('User id is missing');
 			if (playlists.length === 0) throw Error('You must select at least one playlist');
@@ -748,7 +748,7 @@ export const usePlaylistTvSeriesUpdateMutation = () => {
 		} : {
 			itemId: number;
 			rank?: number;
-			comment?: string;
+			comment?: string | null;
 		}) => {
 			const { data, error } = await supabase
 				.from('playlist_items_tv_series')

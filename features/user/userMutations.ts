@@ -592,13 +592,19 @@ export const useUserReviewMovieUpsertMutation = ({
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(userKeys.review({ id: data.id, type: 'movie' }), (oldData: UserReviewMovie | undefined) => {
-				if (!oldData) return oldData;
-				return {
-					...oldData,
-					...data,
-				};
-			});
+			const oldReview = queryClient.getQueryData<UserReviewMovie | null | undefined>(userKeys.review({ id: data.id, type: 'movie' }));
+			if (oldReview === null) {
+				queryClient.removeQueries({
+					queryKey: userKeys.review({ id: data.id, type: 'movie' }),
+				});
+			} else if (oldReview) {
+				queryClient.setQueryData(userKeys.review({ id: data.id, type: 'movie' }), (oldData: UserReviewMovie) => {
+					return {
+						...oldData,
+						...data,
+					};
+				});
+			}
 
 			// Invalidate reviews queries
 			movieId && queryClient.invalidateQueries({
@@ -606,26 +612,30 @@ export const useUserReviewMovieUpsertMutation = ({
 			});
 
 			// Invalidate the review activity
-			movieId && userId && queryClient.invalidateQueries({
-				queryKey: userKeys.activity({ id: movieId, type: 'movie', userId: userId }),
+			movieId && userId && queryClient.setQueryData(userKeys.activity({ id: movieId, type: 'movie', userId: userId }), (oldData: UserActivityMovie | null): UserActivityMovie | null => {
+				if (!oldData) return oldData;
+				return {
+					...oldData,
+					review: {
+						...oldData.review,
+						...data,
+					},
+				};
 			});
 		}
 	});
 };
-export const useUserReviewMovieDeleteMutation = ({
-	userId,
-	movieId
-}: {
-	userId?: string;
-	movieId: number;
-}) => {
+export const useUserReviewMovieDeleteMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
+	const { session } = useAuth();
 	return useMutation({
 		mutationFn: async ({
 			id,
+			movieId,
 		} : {
 			id: number;
+			movieId: number;
 		}) => {
 			const { error } = await supabase
 				.from('user_reviews_movie')
@@ -640,13 +650,17 @@ export const useUserReviewMovieDeleteMutation = ({
 		onSuccess: (data) => {
 			queryClient.setQueryData(userKeys.review({ id: data.id, type: 'movie' }), null);
 
-			queryClient.invalidateQueries({
+			data.movieId && queryClient.invalidateQueries({
 				queryKey: mediaKeys.reviews({ id: data.movieId, type: 'movie' }),
 			});
 
 			// Invalidate the review activity
-			userId && queryClient.invalidateQueries({
-				queryKey: userKeys.activity({ id: data.movieId, type: 'movie', userId: userId }),
+			session?.user.id && queryClient.setQueryData(userKeys.activity({ id: data.movieId, type: 'movie', userId: session.user.id }), (oldData: UserActivityMovie | null): UserActivityMovie | null => {
+				if (!oldData) return oldData;
+				return {
+					...oldData,
+					review: null,
+				};
 			});
 		}
 	});
@@ -736,13 +750,19 @@ export const useUserReviewTvSeriesUpsertMutation = ({
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(userKeys.review({ id: data.id, type: 'tv_series' }), (oldData: UserReviewTvSeries | undefined) => {
-				if (!oldData) return oldData;
-				return {
-					...oldData,
-					...data,
-				};
-			});
+			const oldReview = queryClient.getQueryData<UserReviewTvSeries | null | undefined>(userKeys.review({ id: data.id, type: 'tv_series' }));
+			if (oldReview === null) {
+				queryClient.removeQueries({
+					queryKey: userKeys.review({ id: data.id, type: 'tv_series' }),
+				});
+			} else if (oldReview) {
+				queryClient.setQueryData(userKeys.review({ id: data.id, type: 'tv_series' }), (oldData: UserReviewTvSeries) => {
+					return {
+						...oldData,
+						...data,
+					};
+				});
+			}
 
 			// Invalidate reviews queries
 			tvSeriesId && queryClient.invalidateQueries({
@@ -750,26 +770,30 @@ export const useUserReviewTvSeriesUpsertMutation = ({
 			});
 
 			// Invalidate the review activity
-			tvSeriesId && userId && queryClient.invalidateQueries({
-				queryKey: userKeys.activity({ id: tvSeriesId, type: 'tv_series', userId: userId }),
+			tvSeriesId && userId && queryClient.setQueryData(userKeys.activity({ id: tvSeriesId, type: 'tv_series', userId: userId }), (oldData: UserActivityTvSeries | null): UserActivityTvSeries | null => {
+				if (!oldData) return oldData;
+				return {
+					...oldData,
+					review: {
+						...oldData.review,
+						...data,
+					},
+				};
 			});
 		}
 	});
 };
-export const useUserReviewTvSeriesDeleteMutation = ({
-	userId,
-	tvSeriesId
-}: {
-	userId?: string;
-	tvSeriesId: number;
-}) => {
+export const useUserReviewTvSeriesDeleteMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
+	const { session } = useAuth();
 	return useMutation({
 		mutationFn: async ({
 			id,
+			tvSeriesId
 		} : {
 			id: number;
+			tvSeriesId: number;
 		}) => {
 			const { error } = await supabase
 				.from('user_reviews_tv_series')
@@ -784,13 +808,17 @@ export const useUserReviewTvSeriesDeleteMutation = ({
 		onSuccess: (data) => {
 			queryClient.setQueryData(userKeys.review({ id: data.id, type: 'tv_series' }), null);
 
-			queryClient.invalidateQueries({
+			data.tvSeriesId && queryClient.invalidateQueries({
 				queryKey: mediaKeys.reviews({ id: data.tvSeriesId, type: 'tv_series' }),
 			});
 
 			// Invalidate the review activity
-			userId && queryClient.invalidateQueries({
-				queryKey: userKeys.activity({ id: data.tvSeriesId, type: 'tv_series', userId: userId }),
+			session?.user.id && queryClient.setQueryData(userKeys.activity({ id: data.tvSeriesId, type: 'tv_series', userId: session.user.id }), (oldData: UserActivityTvSeries | null): UserActivityTvSeries | null => {
+				if (!oldData) return oldData;
+				return {
+					...oldData,
+					review: null,
+				};
 			});
 		}
 	});

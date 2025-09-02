@@ -14,7 +14,7 @@ import { useUserWatchlistMoviesQuery } from "@/features/user/userQueries";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { useUIStore } from "@/stores/useUIStore";
-import BottomSheetWatchlistMovieComment from "@/components/bottom-sheets/sheets/BottomSheetWatchlistMovieComment";
+import { BottomSheetWatchlistMovieComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistMovieComment";
 
 export const CollectionWatchlistMovie = () => {
 	const t = useTranslations();

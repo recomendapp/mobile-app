@@ -42,7 +42,8 @@ const ReviewTvSeriesCreateScreen = () => {
 	// Handlers
 	const handleSave = async (data: { title: string; body: object }) => {
 		await insertReview.mutateAsync({
-			title: data.title,
+			activityId: activity?.id,
+			title: data.title || null,
 			body: data.body,
 		}, {
 			onSuccess: (review) => {

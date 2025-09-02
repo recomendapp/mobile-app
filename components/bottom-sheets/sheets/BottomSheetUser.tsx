@@ -16,7 +16,7 @@ import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
-import BottomSheetShare from './BottomSheetShare';
+import BottomSheetShare from './share/BottomSheetShare';
 import UserAvatar from '@/components/user/UserAvatar';
 
 interface BottomSheetUserProps extends BottomSheetProps {

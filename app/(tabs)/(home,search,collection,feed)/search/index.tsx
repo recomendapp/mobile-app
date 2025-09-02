@@ -18,12 +18,10 @@ import { useScrollToTop } from "@react-navigation/native";
 import { BestResultsSearchResponse, MediaMovie, MediaPerson, MediaTvSeries, Playlist, User } from "@recomendapp/types";
 import { Link } from "expo-router";
 import { upperFirst } from "lodash";
-import { forwardRef, useCallback, useRef } from "react";
-import { Dimensions } from "react-native";
+import { useCallback, useRef } from "react";
+import { useWindowDimensions } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useTranslations } from "use-intl";
-
-const { width } = Dimensions.get('window');
 
 const SearchScreen = () => {
 	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
@@ -128,6 +126,7 @@ const SearchResultsMovies = ({
 }) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
+	const { width } = useWindowDimensions();
 	return (
 	<View style={{ gap: GAP }}>
 		<Link
@@ -160,10 +159,10 @@ const SearchResultsMovies = ({
 			gap: GAP,
 		}}
 		columnStyle={{
-			width: width - (PADDING_HORIZONTAL * 2),
+			width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2),
 			gap: GAP,
 		}}
-		snapToInterval={width - (PADDING_HORIZONTAL * 2) + GAP}
+		snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
 		decelerationRate={"fast"}
 		/>
 	</View>
@@ -179,6 +178,7 @@ const SearchResultsTvSeries = ({
 }) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
+	const { width } = useWindowDimensions();
 	return (
 	<View style={{ gap: GAP }}>
 		<Link
@@ -211,10 +211,10 @@ const SearchResultsTvSeries = ({
 			gap: GAP,
 		}}
 		columnStyle={{
-			width: width - (PADDING_HORIZONTAL * 2),
+			width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2),
 			gap: GAP,
 		}}
-		snapToInterval={width - (PADDING_HORIZONTAL * 2) + GAP}
+		snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
 		decelerationRate={"fast"}
 		/>
 	</View>
@@ -230,6 +230,7 @@ const SearchResultsPersons = ({
 }) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
+	const { width } = useWindowDimensions();
 	return (
 	<View style={{ gap: GAP }}>
 		<Link
@@ -262,10 +263,10 @@ const SearchResultsPersons = ({
 			gap: GAP,
 		}}
 		columnStyle={{
-			width: width - (PADDING_HORIZONTAL * 2),
+			width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2),
 			gap: GAP,
 		}}
-		snapToInterval={width - (PADDING_HORIZONTAL * 2) + GAP}
+		snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
 		decelerationRate={"fast"}
 		/>
 	</View>
@@ -281,6 +282,7 @@ const SearchResultsPlaylists = ({
 }) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
+	const { width } = useWindowDimensions();
 	return (
 	<View style={{ gap: GAP }}>
 		<Link
@@ -313,10 +315,10 @@ const SearchResultsPlaylists = ({
 			gap: GAP,
 		}}
 		columnStyle={{
-			width: width - (PADDING_HORIZONTAL * 2),
+			width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2),
 			gap: GAP,
 		}}
-		snapToInterval={width - (PADDING_HORIZONTAL * 2) + GAP}
+		snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
 		decelerationRate={"fast"}
 		/>
 	</View>
@@ -332,6 +334,7 @@ const SearchResultsUsers = ({
 }) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
+	const { width } = useWindowDimensions();
 	return (
 	<View style={{ gap: GAP }}>
 		<Link
@@ -364,10 +367,10 @@ const SearchResultsUsers = ({
 			gap: GAP,
 		}}
 		columnStyle={{
-			width: width - (PADDING_HORIZONTAL * 2),
+			width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2),
 			gap: GAP,
 		}}
-		snapToInterval={width - (PADDING_HORIZONTAL * 2) + GAP}
+		snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
 		decelerationRate={"fast"}
 		/>
 	</View>

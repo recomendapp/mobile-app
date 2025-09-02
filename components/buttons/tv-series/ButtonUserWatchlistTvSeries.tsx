@@ -11,21 +11,24 @@ import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { ICON_ACTION_SIZE } from "@/theme/globals";
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
+import { BottomSheetWatchlistTvSeriesComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistTvSeriesComment";
 
 interface ButtonUserWatchlistTvSeriesProps
 	extends React.ComponentProps<typeof Button> {
 		tvSeries: MediaTvSeries;
 	}
 
-const ButtonUserWatchlistTvSeries = React.forwardRef<
+export const ButtonUserWatchlistTvSeries = React.forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserWatchlistTvSeriesProps
->(({ tvSeries, icon = Icons.Watchlist, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
+>(({ tvSeries, icon = Icons.Watchlist, variant = "ghost", size = "fit", onPress: onPressProps, onLongPress: onLongPressProps, iconProps, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const {
 		data: watchlist,
 		isLoading,
@@ -101,6 +104,12 @@ const ButtonUserWatchlistTvSeries = React.forwardRef<
 			}
 			onPressProps?.();
 		}}
+		onLongPress={(e) => {
+			watchlist?.id && openSheet(BottomSheetWatchlistTvSeriesComment, {
+				watchlistItem: watchlist
+			});
+			onLongPressProps?.(e);
+		}}
 		iconProps={{
 			fill: watchlist ? colors.foreground : undefined,
 			size: ICON_ACTION_SIZE,
@@ -111,5 +120,3 @@ const ButtonUserWatchlistTvSeries = React.forwardRef<
 	)
 });
 ButtonUserWatchlistTvSeries.displayName = 'ButtonUserWatchlistTvSeries';
-
-export default ButtonUserWatchlistTvSeries;

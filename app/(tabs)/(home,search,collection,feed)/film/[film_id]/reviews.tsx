@@ -69,7 +69,6 @@ const FilmReviews = () => {
 			setSortBy(sortByOptionsWithCancel[selectedIndex] as sortBy);
 		});
 	}, [sortByOptions, showActionSheetWithOptions]);
-
 	return (
 	<>
 		<Stack.Screen
@@ -103,7 +102,7 @@ const FilmReviews = () => {
 					size='icon'
 					onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}
 					/>
-					<Button icon={Icons.ChevronDown} variant="muted" style={tw`h-10 rounded-full`} onPress={handleSortBy}>{sortBy.label}</Button>
+					<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>{sortBy.label}</Button>
 				</View>
 			</>
 		}

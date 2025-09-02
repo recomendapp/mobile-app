@@ -33,7 +33,7 @@ const ReviewTvSeriesEditScreen = () => {
 		if (!review) return;
 		await updateReview.mutateAsync({
 			activityId: review?.id,
-			title: data.title,
+			title: data.title || null,
 			body: data.body,
 		}, {
 			onSuccess: () => {

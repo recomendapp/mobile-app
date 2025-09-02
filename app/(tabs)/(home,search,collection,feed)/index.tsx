@@ -8,7 +8,6 @@ import { upperFirst } from 'lodash';
 import { WidgetUserRecos } from '@/components/widgets/WidgetUserRecos';
 import { WidgetUserWatchlist } from '@/components/widgets/WidgetUserWatchlist';
 import { WidgetUserFriendsPlaylists } from '@/components/widgets/WidgetUserFriendsPlaylists';
-import { WidgetUserFeed } from '@/components/widgets/WidgetUserFeed';
 import { WidgetUserDiscovery } from '@/components/widgets/WidgetUserDiscovery';
 import { useNow, useTranslations } from 'use-intl';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -107,7 +106,6 @@ const HomeScreen = () => {
           <WidgetUserRecos labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
           <WidgetUserWatchlist labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
           <WidgetUserFriendsPlaylists labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
-          <WidgetUserFeed labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
           <WidgetUserDiscovery labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
           </>
         ) : (

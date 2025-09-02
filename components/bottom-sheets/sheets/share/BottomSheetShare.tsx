@@ -1,10 +1,8 @@
 import { forwardRef, useRef, useState } from "react";
-import { BottomSheetProps } from "../BottomSheetManager";
+import { BottomSheetProps } from "../../BottomSheetManager";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import ThemedTrueSheet from "@/components/ui/ThemedTrueSheet";
 import tw from "@/lib/tw";
-import { View } from "react-native";
-import ViewShot from 'react-native-view-shot'
 import { MediaMovie, MediaPerson, MediaTvSeries, MediaType, Playlist, Profile, User } from "@recomendapp/types";
 import Share, { Social } from "react-native-share"
 import Constants from 'expo-constants';
@@ -23,7 +21,6 @@ import * as Burnt from 'burnt';
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { ShareViewRef } from "@/components/share/type";
-import { cropImageRatio } from "@/utils/imageManipulator";
 
 interface BottomSheetShareBaseProps extends BottomSheetProps {
 	type: MediaType | "user" | "playlist" | "review";

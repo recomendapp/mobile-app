@@ -42,13 +42,15 @@ const ReviewMovieCreateScreen = () => {
 	// Handlers
 	const handleSave = async (data: { title: string; body: object }) => {
 		await insertReview.mutateAsync({
-			title: data.title,
+			activityId: activity?.id,
+			title: data.title || null,
 			body: data.body,
 		}, {
 			onSuccess: (review) => {
 				router.replace(`/film/${movie?.slug || movie?.id}/review/${review.id}`);
 			},
 			onError: (error) => {
+				console.error(error);
 				Burnt.toast({
 					title: upperFirst(t('common.messages.error')),
 					preset: 'error',

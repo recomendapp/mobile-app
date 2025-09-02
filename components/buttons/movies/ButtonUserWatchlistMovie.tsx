@@ -2,7 +2,7 @@ import React from "react"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserWatchlistMovieItemQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
-import { useUserWatchlistMovieDeleteMutation, useUserWatchlistMovieInsertMutation } from "@/features/user/userMutations";
+import { useUserWatchlistMovieDeleteMutation, useUserWatchlistMovieInsertMutation, useUserWatchlistMovieUpdateMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaMovie } from "@recomendapp/types";
 import * as Burnt from "burnt";
@@ -11,21 +11,23 @@ import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { ICON_ACTION_SIZE } from "@/theme/globals";
-
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
+import { BottomSheetWatchlistMovieComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistMovieComment";
 interface ButtonUserWatchlistMovieProps
 	extends React.ComponentProps<typeof Button> {
 		movie: MediaMovie;
 	}
 
-const ButtonUserWatchlistMovie = React.forwardRef<
+export const ButtonUserWatchlistMovie = React.forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserWatchlistMovieProps
->(({ movie, icon = Icons.Watchlist, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
+>(({ movie, icon = Icons.Watchlist, variant = "ghost", size = "fit", onPress: onPressProps, onLongPress: onLongPressProps, iconProps, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const {
 		data: watchlist,
 		isLoading,
@@ -34,7 +36,7 @@ const ButtonUserWatchlistMovie = React.forwardRef<
 		userId: session?.user.id,
 		movieId: movie.id,
 	});
-
+	// Mutations
 	const insertWatchlist = useUserWatchlistMovieInsertMutation();
 	const deleteWatchlist = useUserWatchlistMovieDeleteMutation();
 
@@ -83,33 +85,38 @@ const ButtonUserWatchlistMovie = React.forwardRef<
 	};
 
 	return (
-		<Button
-		ref={ref}
-		variant={variant}
-		icon={icon}
-		size={size}
-		onPress={() => {
-			if (session) {
-				watchlist ? handleUnwatchlist() : handleWatchlist();
-			} else {
-				router.push({
-					pathname: '/auth',
-					params: {
-						redirect: pathname,
-					},
-				});
-			}
-			onPressProps?.();
-		}}
-		iconProps={{
-			fill: watchlist ? colors.foreground : undefined,
-			size: ICON_ACTION_SIZE,
-			...iconProps
-		}}
-		{...props}
-		/>
+	<Button
+	ref={ref}
+	variant={variant}
+	icon={icon}
+	size={size}
+	onPress={() => {
+		if (session) {
+			watchlist ? handleUnwatchlist() : handleWatchlist();
+		} else {
+			router.push({
+				pathname: '/auth',
+				params: {
+					redirect: pathname,
+				},
+			});
+		}
+		onPressProps?.();
+	}}
+	onLongPress={(e) => {
+		watchlist?.id && openSheet(BottomSheetWatchlistMovieComment, {
+			watchlistItem: watchlist
+		});
+		onLongPressProps?.(e);
+	}}
+	iconProps={{
+		fill: watchlist ? colors.foreground : undefined,
+		size: ICON_ACTION_SIZE,
+		...iconProps
+	}}
+	{...props}
+	/>
 	)
 });
 ButtonUserWatchlistMovie.displayName = 'ButtonUserWatchlistMovie';
 
-export default ButtonUserWatchlistMovie;

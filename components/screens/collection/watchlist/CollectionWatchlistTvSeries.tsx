@@ -13,7 +13,7 @@ import { useUserWatchlistTvSeriesDeleteMutation } from "@/features/user/userMuta
 import { useUserWatchlistTvSeriesQuery } from "@/features/user/userQueries";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useUIStore } from "@/stores/useUIStore";
-import BottomSheetWatchlistTvSeriesComment from "@/components/bottom-sheets/sheets/BottomSheetWatchlistTvSeriesComment";
+import { BottomSheetWatchlistTvSeriesComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistTvSeriesComment";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 
 export const CollectionWatchlistTvSeries = () => {

@@ -30,10 +30,11 @@ import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import BottomSheetUserActivityTvSeriesFollowersRating from '@/components/bottom-sheets/sheets/BottomSheetUserActivityTvSeriesFollowersRating';
 import { ButtonPlaylistTvSeriesAdd } from '@/components/buttons/ButtonPlaylistTvSeriesAdd';
 import ButtonUserActivityTvSeriesLike from '@/components/buttons/tv-series/ButtonUserActivityTvSeriesLike';
-import ButtonUserWatchlistTvSeries from '@/components/buttons/tv-series/ButtonUserWatchlistTvSeries';
+import { ButtonUserWatchlistTvSeries } from '@/components/buttons/tv-series/ButtonUserWatchlistTvSeries';
 import ButtonUserActivityTvSeriesWatch from '@/components/buttons/tv-series/ButtonUserActivityTvSeriesWatch';
 import ButtonUserActivityTvSeriesRating from '@/components/buttons/tv-series/ButtonUserActivityTvSeriesRating';
 import ButtonUserRecoTvSeriesSend from '@/components/buttons/tv-series/ButtonUserRecoTvSeriesSend';
+import { useHeaderHeight } from '@react-navigation/elements';
 
 interface TvSeriesHeaderProps {
 	tvSeries?: MediaTvSeries | null;
@@ -52,7 +53,8 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
 	const { hslToRgb } = useColorConverter();
-	const { inset, colors } = useTheme();
+	const { colors } = useTheme();
+	const navigationHeaderHeight = useHeaderHeight();
 	const bgColor = hslToRgb(colors.background);
 	const {
 		data: followersAvgRating,
@@ -79,7 +81,7 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + inset.top) / 0.8],
+				[0, headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight) / 0.8],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -93,7 +95,7 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + inset.top) / 0.8],
+				[0, headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight) / 0.8],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -101,7 +103,7 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 				{
 					scale: interpolate(
 					scrollY.get(),
-					[0, (headerHeight.get() - (headerOverlayHeight.get() + inset.top)) / 2],
+					[0, (headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight)) / 2],
 					[1, 0.95],
 					'clamp',
 					),
@@ -128,7 +130,7 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 	<Animated.View
 	style={[
 		tw.style('w-full'),
-		{ paddingTop: inset.top }
+		{ paddingTop: navigationHeaderHeight }
 	]}
 	onLayout={(event: LayoutChangeEvent) => {
 		'worklet';
