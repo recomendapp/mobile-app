@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { mediaKeys } from "./mediaKeys";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { MediaMovie, MediaTvSeries, MediaTvSeriesSeason } from "@recomendapp/types";
+import { MediaMovie, MediaPerson, MediaTvSeries, MediaTvSeriesSeason } from "@recomendapp/types";
 
 export const useMediaMovieQuery = ({
 	movieId,
@@ -46,6 +46,29 @@ export const useMediaTvSeriesQuery = ({
 			return data;
 		},
 		enabled: !!tvSeriesId,
+	});
+};
+
+export const useMediaPersonQuery = ({
+	personId
+} : {
+	personId?: number | null;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: mediaKeys.detail({ id: personId as number, type: 'person' }),
+		queryFn: async () => {
+			if (!personId) throw Error('No personId or type provided');
+			const { data, error } = await supabase
+				.from('media_person')
+				.select('*')
+				.eq('id', personId)
+				.maybeSingle()
+				.overrideTypes<MediaPerson>();
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!personId,
 	});
 };
 
@@ -128,8 +151,8 @@ export const useMediaTvSeriesDetailsQuery = ({
 			const regularSeasons = data?.seasons?.filter(season => season.season_number !== 0) || [];
 			const tvSeries: MediaTvSeries = {
 				...data!,
-				seasons: regularSeasons,
-				specials: specials,
+				seasons: regularSeasons.sort((a, b) => a.season_number! - b.season_number!),
+				specials: specials.sort((a, b) => a.season_number! - b.season_number!)
 			};
 			return tvSeries;
 		},
@@ -172,6 +195,184 @@ export const useMediaTvSeriesSeasonDetailsQuery = ({
 			return data;
 		},
 		enabled: !!id && !!seasonNumber,
+	});
+};
+/* -------------------------------------------------------------------------- */
+
+/* --------------------------------- PERSONS -------------------------------- */
+export const useMediaPersonFilmsInfiniteQuery = ({
+	personId,
+	filters,
+} : {
+	personId: number;
+	filters?: {
+		perPage?: number;
+		sortBy?: 'release_date' | 'vote_average';
+		sortOrder?: 'asc' | 'desc';
+		department?: string;
+		job?: string;
+	};
+}) => {
+	const mergedFilters = {
+		perPage: 20,
+		sortBy: 'release_date',
+		sortOrder: 'desc',
+		...filters,
+	};
+	const supabase = useSupabaseClient();
+	return useInfiniteQuery({
+		queryKey: mediaKeys.personFilms({ id: personId, filters}),
+		queryFn: async ({ pageParam = 1 }) => {
+			let from = (pageParam - 1) * mergedFilters.perPage;
+	  		let to = from - 1 + mergedFilters.perPage;
+			let request;
+			if (mergedFilters.department || mergedFilters.job) {
+				request = supabase
+					.from('tmdb_movie_credits')
+					.select(`
+						*,
+						movie:media_movie!inner(*)
+					`, {
+						count: 'exact',
+					})
+					.match({ 'person_id': personId })
+					.range(from, to);
+			} else {
+				request = supabase
+					.from('media_movie_aggregate_credits')
+					.select(`
+						*,
+						movie:media_movie!inner(*)
+					`, {
+						count: 'exact',
+					})
+					.match({ 'person_id': personId })
+					.range(from, to);
+			}
+
+			if (mergedFilters) {
+				if (mergedFilters.sortBy && mergedFilters.sortOrder) {
+					switch (mergedFilters.sortBy) {
+						case 'release_date':
+							request = request.order(`movie(release_date)`, { ascending: mergedFilters.sortOrder === 'asc' });
+							break;
+						case 'vote_average':
+							request = request.order(`movie(vote_average)`, { ascending: false });
+							break;
+						default:
+							break;
+					}
+				}
+				if (mergedFilters.department) {
+					request = request.eq('department', mergedFilters.department);
+				}
+				if (mergedFilters.job) {
+					request = request.eq('job', mergedFilters.job);
+				}
+			}
+			const { data, error } = await request
+				.filter('movie.release_date', 'not.is', null)
+				.overrideTypes<Array<{
+					movie: MediaMovie;
+				}>, { merge: true }>()
+			if (error) throw error;
+			return data;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+		},
+		enabled: !!personId,
+	});
+};
+export const useMediaPersonTvSeriesInfiniteQuery = ({
+	personId,
+	filters,
+} : {
+	personId: number;
+	filters?: {
+		perPage?: number;
+		sortBy: 'last_appearance_date' | 'release_date' | 'vote_average';
+		sortOrder?: 'asc' | 'desc';
+		department?: string;
+		job?: string;
+	};
+}) => {
+	const mergedFilters = {
+		perPage: 20,
+		sortBy: 'last_appearance_date',
+		sortOrder: 'desc',
+		...filters,
+	};
+	const supabase = useSupabaseClient();
+	return useInfiniteQuery({
+		queryKey: mediaKeys.personTvSeries({ id: personId, filters}),
+		queryFn: async ({ pageParam = 1 }) => {
+			let from = (pageParam - 1) * mergedFilters.perPage;
+	  		let to = from - 1 + mergedFilters.perPage;
+			let request;
+			if (mergedFilters.department || mergedFilters.job) {
+				request = supabase
+					.from('tmdb_tv_series_credits')
+					.select(`
+						*,
+						tv_series:media_tv_series!inner(*)
+					`, {
+						count: 'exact',
+					})
+					.match({ 'person_id': personId })
+					.range(from, to);
+			} else {
+				request = supabase
+					.from('media_tv_series_aggregate_credits')
+					.select(`
+						*,
+						tv_series:media_tv_series!inner(*)
+					`, {
+						count: 'exact',
+					})
+					.match({ 'person_id': personId })
+					.range(from, to);
+			}
+
+			if (mergedFilters) {
+				if (mergedFilters.sortBy && mergedFilters.sortOrder) {
+					switch (mergedFilters.sortBy) {
+						case 'release_date':
+							request = request.order(`tv_series(first_air_date)`, { ascending: mergedFilters.sortOrder === 'asc' });
+							break;
+						case 'vote_average':
+							request = request.order(`tv_series(vote_average)`, { ascending: false });
+							break;
+						default:
+							if (!mergedFilters.department && !mergedFilters.job) {
+								request = request.order(`last_appearance_date`, { ascending: mergedFilters.sortOrder === 'asc' });
+							}
+							break;
+					}
+				}
+				if (mergedFilters.department) {
+					request = request.eq('department', mergedFilters.department);
+				}
+				if (mergedFilters.job) {
+					request = request.eq('job', mergedFilters.job);
+				}
+			}
+			if (!mergedFilters.department && !mergedFilters.job) {
+				request = request.filter('last_appearance_date', 'not.is', null);
+			}
+			const { data, error } = await request
+				// .overrideTypes<Array<{
+				// tv_series: MediaTvSeries;
+				// }>, { merge: true }>()
+			if (error) throw error;
+			return data;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+		},
+		enabled: !!personId,
 	});
 };
 /* -------------------------------------------------------------------------- */

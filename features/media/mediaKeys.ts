@@ -94,6 +94,21 @@ export const mediaKeys = {
 	/*                                   PERSON                                   */
 	/* -------------------------------------------------------------------------- */
 
+	personFilms: ({
+		id,
+		filters,
+	} : {
+		id: number;
+		filters?: any;
+	}) => [...mediaKeys.detail({ id, type: 'person' }), 'movies', filters] as const,
+
+	personTvSeries: ({
+		id,
+		filters,
+	} : {
+		id: number;
+		filters?: any;
+	}) => [...mediaKeys.detail({ id, type: 'person' }), 'tvSeries', filters] as const,
 	/* ------------------------------- FILMOGRAPHY ------------------------------ */
 	mostRated: ({
 		personId,

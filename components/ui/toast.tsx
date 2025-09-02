@@ -1,15 +1,14 @@
 import { Text } from '@/components/ui/text';
+import { useTheme } from '@/providers/ThemeProvider';
 import { AlertCircle, Check, Info, X } from 'lucide-react-native';
 import React, {
   createContext,
   useCallback,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 import {
-  Animated,
   Dimensions,
   Platform,
   TouchableOpacity,
@@ -21,6 +20,15 @@ import {
   GestureDetector,
   GestureHandlerRootView,
 } from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  runOnJS,
+  interpolate,
+  Extrapolation,
+} from 'react-native-reanimated';
 
 export type ToastVariant = 'default' | 'success' | 'error' | 'warning' | 'info';
 
@@ -39,6 +47,7 @@ export interface ToastData {
 interface ToastProps extends ToastData {
   onDismiss: (id: string) => void;
   index: number;
+  duration?: number;
 }
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -56,91 +65,27 @@ export function Toast({
   onDismiss,
   index,
   action,
+  duration = 4000,
 }: ToastProps) {
+  const { colors, inset } = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasContent, setHasContent] = useState(false);
+  const [shouldDismiss, setShouldDismiss] = useState(false);
 
-  const translateY = useRef(new Animated.Value(-100)).current;
-  const translateX = useRef(new Animated.Value(0)).current;
-  const opacity = useRef(new Animated.Value(0)).current;
-  const scale = useRef(new Animated.Value(0.8)).current;
-  const width = useRef(new Animated.Value(DYNAMIC_ISLAND_WIDTH)).current;
-  const height = useRef(new Animated.Value(DYNAMIC_ISLAND_HEIGHT)).current;
-  const borderRadius = useRef(new Animated.Value(18.5)).current;
-  const contentOpacity = useRef(new Animated.Value(0)).current;
+  // Reanimated shared values
+  const translateY = useSharedValue(-100);
+  const translateX = useSharedValue(0);
+  const opacity = useSharedValue(0);
+  const scale = useSharedValue(0.8);
+  const width = useSharedValue(DYNAMIC_ISLAND_WIDTH);
+  const height = useSharedValue(DYNAMIC_ISLAND_HEIGHT);
+  const borderRadius = useSharedValue(18.5);
+  const contentOpacity = useSharedValue(0);
+  
+  const stackPosition = useSharedValue(0);
 
-  // Dynamic Island colors (dark theme optimized)
-  const backgroundColor = '#1C1C1E'; // iOS Dynamic Island background
-  const mutedTextColor = '#8E8E93'; // iOS secondary text color
-
-  useEffect(() => {
-    const hasContentToShow = Boolean(title || description || action);
-    setHasContent(hasContentToShow);
-
-    if (hasContentToShow) {
-      // If there's content, start directly with expanded state
-      width.setValue(EXPANDED_WIDTH);
-      height.setValue(EXPANDED_HEIGHT);
-      borderRadius.setValue(20);
-      setIsExpanded(true);
-
-      // Single smooth animation for expanded toast
-      Animated.parallel([
-        Animated.spring(translateY, {
-          toValue: 0,
-          tension: 120,
-          friction: 8,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.spring(scale, {
-          toValue: 1,
-          tension: 120,
-          friction: 8,
-          useNativeDriver: true,
-        }),
-        Animated.timing(contentOpacity, {
-          toValue: 1,
-          duration: 300,
-          delay: 100, // Slight delay for content to appear after container
-          useNativeDriver: true,
-        }),
-      ]).start();
-    } else {
-      // If no content, show compact Dynamic Island with icon only
-      setIsExpanded(false);
-
-      Animated.parallel([
-        Animated.spring(translateY, {
-          toValue: 0,
-          tension: 120,
-          friction: 8,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.spring(scale, {
-          toValue: 1,
-          tension: 120,
-          friction: 8,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }
-
-    return () => {
-      translateY.setValue(-100);
-      opacity.setValue(0);
-      scale.setValue(0.8);
-    };
-  }, [title, description, action]); // Added dependencies to handle content changes
+  const backgroundColor = colors.background;
+  const mutedTextColor = colors.mutedForeground;
 
   const getVariantColor = () => {
     switch (variant) {
@@ -174,77 +119,69 @@ export function Toast({
     }
   };
 
-  const dismiss = () => {
-    Animated.parallel([
-      Animated.spring(translateY, {
-        toValue: -100,
-        tension: 120,
-        friction: 8,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scale, {
-        toValue: 0.8,
-        tension: 120,
-        friction: 8,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      // Defer the state update to avoid useInsertionEffect timing issues
-      setTimeout(() => onDismiss(id), 0);
-    });
-  };
+  const actuallyRemoveToast = useCallback(() => {
+    onDismiss(id);
+  }, [id, onDismiss]);
+
+  const dismiss = useCallback(() => {
+    setShouldDismiss(true);
+  }, []);
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
-      translateX.setValue(event.translationX);
+      if (event.translationY <= 0) {
+        translateY.value = event.translationY;
+      }
+      translateX.value = 0;
     })
     .onEnd((event) => {
-      const { translationX, velocityX } = event;
+      const { translationY, velocityY } = event;
 
       if (
-        Math.abs(translationX) > screenWidth * 0.25 ||
-        Math.abs(velocityX) > 800
+        translationY < -50 ||
+        velocityY < -800
       ) {
-        // Dismiss the toast
-        Animated.parallel([
-          Animated.timing(translateX, {
-            toValue: translationX > 0 ? screenWidth : -screenWidth,
-            duration: 250,
-            useNativeDriver: true,
-          }),
-          Animated.timing(opacity, {
-            toValue: 0,
-            duration: 250,
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
-          // Defer the state update to avoid useInsertionEffect timing issues
-          setTimeout(() => onDismiss(id), 0);
-        });
+        runOnJS(setShouldDismiss)(true);
       } else {
-        // Snap back with spring animation
-        Animated.spring(translateX, {
-          toValue: 0,
-          tension: 120,
-          friction: 8,
-          useNativeDriver: true,
-        }).start();
+        // Snap back to original position
+        translateY.value = withSpring(0, { damping: 15, stiffness: 120 });
       }
     });
 
-  const getTopPosition = () => {
-    const statusBarHeight = Platform.OS === 'ios' ? 59 : 20;
-    return statusBarHeight + index * (EXPANDED_HEIGHT + TOAST_MARGIN);
-  };
+  const toastAnimatedStyle = useAnimatedStyle(() => {
+    const stackScale = interpolate(
+      index,
+      [0, 1, 2, 3],
+      [1, 0.95, 0.9, 0.85],
+      Extrapolation.CLAMP
+    );
+
+    return {
+      transform: [
+        { translateY: translateY.value + stackPosition.value },
+        { translateX: translateX.value },
+        { scale: scale.value * stackScale },
+      ],
+    };
+  });
+
+  const dynamicIslandAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      width: width.value,
+      height: height.value,
+      borderRadius: borderRadius.value,
+    };
+  });
+
+  const contentAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: contentOpacity.value,
+    };
+  });
 
   const toastStyle: ViewStyle = {
     position: 'absolute',
-    top: getTopPosition(),
+    top: inset.top,
     alignSelf: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -254,7 +191,7 @@ export function Toast({
     shadowOpacity: 0.25,
     shadowRadius: 20,
     elevation: 10,
-    zIndex: 1000 + index,
+    zIndex: 1000 - index, // Lower index = higher z-index = in front
   };
 
   const dynamicIslandStyle = {
@@ -264,26 +201,71 @@ export function Toast({
     overflow: 'hidden' as const,
   };
 
+  // useEffects
+  useEffect(() => {
+    if (duration > 0) {
+      const timer = setTimeout(() => {
+        dismiss();
+      }, duration);
+
+      return () => clearTimeout(timer);
+    }
+  }, [duration, dismiss]);
+
+  useEffect(() => {
+    stackPosition.value = withSpring(index * 8, { 
+      damping: 20, 
+      stiffness: 150,
+      mass: 0.8
+    });
+  }, [index]);
+
+  useEffect(() => {
+    const hasContentToShow = Boolean(title || description || action);
+    setHasContent(hasContentToShow);
+
+    if (hasContentToShow) {
+      width.value = EXPANDED_WIDTH;
+      height.value = EXPANDED_HEIGHT;
+      borderRadius.value = 20;
+      setIsExpanded(true);
+
+      translateY.value = withSpring(0, { damping: 15, stiffness: 120 });
+      opacity.value = withTiming(1, { duration: 300 });
+      scale.value = withSpring(1, { damping: 15, stiffness: 120 });
+      contentOpacity.value = withTiming(1, { duration: 300 });
+    } else {
+      setIsExpanded(false);
+
+      translateY.value = withSpring(0, { damping: 15, stiffness: 120 });
+      opacity.value = withTiming(1, { duration: 200 });
+      scale.value = withSpring(1, { damping: 15, stiffness: 120 });
+    }
+
+    return () => {
+      translateY.value = -150;
+      opacity.value = 0;
+      scale.value = 0.9;
+    };
+  }, [title, description, action]);
+
+  useEffect(() => {
+    if (shouldDismiss) {
+      translateY.value = withSpring(-150, { damping: 15, stiffness: 120 });
+      opacity.value = withTiming(0, { duration: 300 });
+      scale.value = withSpring(0.9, { damping: 15, stiffness: 120 }, (finished) => {
+        if (finished) {
+          runOnJS(actuallyRemoveToast)();
+        }
+      });
+    }
+  }, [shouldDismiss, actuallyRemoveToast]);
+
   return (
     <GestureDetector gesture={panGesture}>
-      <Animated.View
-        style={[
-          toastStyle,
-          {
-            transform: [{ translateY }, { translateX }, { scale }],
-            opacity,
-          },
-        ]}
-      >
+      <Animated.View style={[toastStyle, toastAnimatedStyle]}>
         <Animated.View
-          style={[
-            dynamicIslandStyle,
-            {
-              width,
-              height,
-              borderRadius,
-            },
-          ]}
+          style={[dynamicIslandStyle, dynamicIslandAnimatedStyle]}
         >
           {/* Compact state - just icon or indicator */}
           {!isExpanded && (
@@ -297,7 +279,6 @@ export function Toast({
             <Animated.View
               style={[
                 {
-                  opacity: contentOpacity,
                   position: 'absolute',
                   top: 0,
                   left: 0,
@@ -308,6 +289,7 @@ export function Toast({
                   flexDirection: 'row',
                   alignItems: 'center',
                 },
+                contentAnimatedStyle,
               ]}
             >
               {getIcon() && (
@@ -402,10 +384,9 @@ const ToastContext = createContext<ToastContextType | null>(null);
 
 interface ToastProviderProps {
   children: React.ReactNode;
-  maxToasts?: number;
 }
 
-export function ToastProvider({ children, maxToasts = 3 }: ToastProviderProps) {
+export function ToastProvider({ children }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -419,23 +400,14 @@ export function ToastProvider({ children, maxToasts = 3 }: ToastProviderProps) {
         duration: toastData.duration ?? 4000,
       };
 
-      setToasts((prev) => {
-        const updated = [newToast, ...prev];
-        return updated.slice(0, maxToasts);
-      });
-
-      // Auto dismiss after duration
-      if (newToast.duration && newToast.duration > 0) {
-        setTimeout(() => {
-          dismissToast(id);
-        }, newToast.duration);
-      }
+      // Add new toast at the end (newest toast goes behind)
+      setToasts((prevToasts) => [...prevToasts, newToast]);
     },
-    [maxToasts]
+    []
   );
 
   const dismissToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
   }, []);
 
   const dismissAll = useCallback(() => {
@@ -481,12 +453,13 @@ export function ToastProvider({ children, maxToasts = 3 }: ToastProviderProps) {
       <GestureHandlerRootView style={{ flex: 1 }}>
         {children}
         <View style={containerStyle} pointerEvents='box-none'>
-          {toasts.map((toast, index) => (
+          {toasts.slice(0, 4).map((toast, index) => (
             <Toast
               key={toast.id}
               {...toast}
               index={index}
               onDismiss={dismissToast}
+              duration={toast.duration}
             />
           ))}
         </View>

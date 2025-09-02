@@ -4,7 +4,7 @@ import { View } from "@/components/ui/view";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Icons } from "@/constants/Icons";
 import { usePlaylistTvSeriesUpdateMutation } from "@/features/playlist/playlistMutations";
-import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsTvSeriesQuery, usePlaylistQuery } from "@/features/playlist/playlistQueries";
+import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsTvSeriesQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -24,9 +24,6 @@ export const PlaylistSortTvSeries = () => {
 	const t = useTranslations();
 	const { playlist_id } = useLocalSearchParams();
 	const playlistId = Number(playlist_id);
-	const { data: playlist } = usePlaylistQuery({
-		playlistId: playlistId,
-	});
 	const { data: playlistItemsRequest, isLoading: playlistItemsRequestIsLoading } = usePlaylistItemsTvSeriesQuery({
 		playlistId: playlistId,
 	});

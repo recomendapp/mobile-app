@@ -4,7 +4,7 @@ import { View } from "@/components/ui/view";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Icons } from "@/constants/Icons";
 import { usePlaylistMovieUpdateMutation } from "@/features/playlist/playlistMutations";
-import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsMovieQuery, usePlaylistQuery } from "@/features/playlist/playlistQueries";
+import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsMovieQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -24,9 +24,6 @@ export const PlaylistSortMovie = () => {
 	const t = useTranslations();
 	const { playlist_id } = useLocalSearchParams();
 	const playlistId = Number(playlist_id);
-	const { data: playlist } = usePlaylistQuery({
-		playlistId: playlistId,
-	});
 	const { data: playlistItemsRequest, isLoading: playlistItemsRequestIsLoading } = usePlaylistItemsMovieQuery({
 		playlistId: playlistId,
 	});
@@ -87,7 +84,7 @@ export const PlaylistSortMovie = () => {
 					{ backgroundColor: isActive ? colors.muted : colors.background }
 				]}
 				>
-					<View style={tw`flex-row items-center gap-2`}>
+					<View style={tw`flex-row items-center gap-2 shrink`}>
 						<ImageWithFallback
 						alt={item.movie?.title ?? ''}
 						source={{ uri: item.movie?.poster_url || '' }}
