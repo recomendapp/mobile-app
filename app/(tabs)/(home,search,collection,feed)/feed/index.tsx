@@ -14,16 +14,15 @@ import { CardFeedActivityTvSeries } from "@/components/cards/feed/CardFeedActivi
 import { CardFeedPlaylistLike } from "@/components/cards/feed/CardFeedPlaylistLike";
 import { CardFeedReviewMovieLike } from "@/components/cards/feed/CardFeedReviewMovieLike";
 import { CardFeedReviewTvSeriesLike } from "@/components/cards/feed/CardFeedReviewTvSeriesLike";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { useScrollToTop } from "@react-navigation/native";
-import { useEffect, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 const FeedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
 	const { bottomTabHeight, colors } = useTheme();
 	const {
-		data: feed,
+		data,
 		isLoading,
 		isFetching,
 		fetchNextPage,
@@ -32,13 +31,24 @@ const FeedScreen = () => {
 	} = useUserFeedInfiniteQuery({
 		userId: user?.id,
 	});
-	const loading = isLoading || feed === undefined;
+	const loading = isLoading || data === undefined;
+	const feed = useMemo(() => data?.pages.flat() || [], [data]);
 	// REFs
 	const scrollRef = useRef<LegendListRef>(null);
 	useScrollToTop(scrollRef);
 
+	// useCallback
+	const keyExtractor = useCallback((item: UserFeedItem) => (
+		item.feed_id.toString()
+	), []);
+	const onEndReached = useCallback(() => {
+		if (hasNextPage) {
+			fetchNextPage();
+		}
+	}, [hasNextPage, fetchNextPage]);
+
 	// Render 
-	const renderItem = ({ item, index } : { item: UserFeedItem, index: number }) => {
+	const renderItem = useCallback(({ item } : { item: UserFeedItem, index: number }) => {
 		switch (item.activity_type) {
 			case 'activity_movie':
 				const { movie, ...activityMovie } = item.content;
@@ -55,18 +65,21 @@ const FeedScreen = () => {
 			default:
 				return <View style={[{ backgroundColor: colors.muted}, tw`p-4 rounded-md`]}><Text textColor="muted" style={tw`text-center`}>Unsupported activity type</Text></View>;
 		}
-	};
+	}, []);
+	const renderEmpty = useCallback(() => (
+		!loading ? (
+			<View style={tw`flex-1 items-center justify-center`}>
+				<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
+			</View>
+		) : null
+	), [t]);
 
 	return (
 		<LegendList
 		ref={scrollRef}
-		data={feed?.pages.flat() || []}
+		data={feed}
 		renderItem={renderItem}
-		ListEmptyComponent={() => !loading ? (
-			<View style={tw`flex-1 items-center justify-center`}>
-				<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
-			</View>
-		) : null}
+		ListEmptyComponent={renderEmpty}
 		contentContainerStyle={[
 			tw`gap-1`,
 			{
@@ -74,10 +87,10 @@ const FeedScreen = () => {
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL
 			}
 		]}
-		keyExtractor={(_, index) => index.toString()}
+		keyExtractor={keyExtractor}
 		showsVerticalScrollIndicator={false}
 		refreshing={isFetching}
-		onEndReached={() => hasNextPage && fetchNextPage()}
+		onEndReached={onEndReached}
 		onEndReachedThreshold={0.3}
 		nestedScrollEnabled
 		onRefresh={refetch}

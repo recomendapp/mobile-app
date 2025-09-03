@@ -1473,62 +1473,47 @@ export const useUserPlaylistsFriendsInfinite = ({
 
 /* -------------------------------- FOLLOWER -------------------------------- */
 
-/**
- * Fetches the user followers
- * @param userId The user id
- * @param filters The filters
- * @param numPerPage The number of items per page
- * @returns The user followers
-*/
 export const useUserFollowersInfiniteQuery = ({
 	userId,
 	filters,
-	numPerPage = 20,
 } : {
 	userId?: string;
 	filters?: {
-		search?: string | null;
+		perPage?: number;
 	};
-	numPerPage?: number;
 }) => {
+	const mergedFilters = {
+		perPage: 20,
+		...filters,
+	};
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
 		queryKey: userKeys.followers(userId as string, filters),
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!userId) throw Error('Missing user id');
-			let from = (pageParam - 1) * numPerPage;
-			let to = from - 1 + numPerPage;
+			let from = (pageParam - 1) * mergedFilters.perPage;
+			let to = from - 1 + mergedFilters.perPage;
 
 			let query = supabase
 				.from('user_follower')
 				.select('id, follower:user!user_follower_user_id_fkey!inner(*)')
 				.eq('followee_id', userId)
 				.eq('is_pending', false)
+				.order('created_at', { ascending: false })
 				.range(from, to);
 			
-			if (filters) {
-				if (filters.search) {
-					query = query
-						.ilike(`follower.username`, `${filters.search}%`)
-				}
-			}
 			const { data, error } = await query;
 			if (error) throw error;
 			return data;
 		},
 		initialPageParam: 1,
 		getNextPageParam: (data, pages) => {
-			return data?.length == numPerPage ? pages.length + 1 : undefined;
+			return data?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});
 };
 
-/**
- * Fetches the user followers requests
- * @param userId The user id
- * @returns The user followers requests
-*/
 export const useUserFollowersRequestsQuery = ({
 	userId,
 } : {
@@ -1552,87 +1537,42 @@ export const useUserFollowersRequestsQuery = ({
 	});
 };
 
-/**
- * Fetches the user followees
- * @param userId The user id
- * @param filters The filters
- * @param numPerPage The number of items per page
- * @returns The user followees
-*/
 export const useUserFolloweesInfiniteQuery = ({
 	userId,
 	filters,
-	numPerPage = 20,
 } : {
 	userId?: string;
 	filters?: {
-		search?: string | null;
+		perPage?: number;
 	};
-	numPerPage?: number;
 }) => {
+	const mergedFilters = {
+		perPage: 20,
+		...filters,
+	};
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
-		queryKey: userKeys.followees(userId as string, { ...filters, infinite: true }),
+		queryKey: userKeys.followees(userId as string, filters),
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!userId) throw Error('Missing user id');
-			let from = (pageParam - 1) * numPerPage;
-			let to = from - 1 + numPerPage;
+			let from = (pageParam - 1) * mergedFilters.perPage;
+			let to = from - 1 + mergedFilters.perPage;
 
 			let query = supabase
 				.from('user_follower')
 				.select('id, followee:user!user_follower_followee_id_fkey!inner(*)')
 				.eq('user_id', userId)
 				.eq('is_pending', false)
+				.order('created_at', { ascending: false })
 				.range(from, to)
 			
-			if (filters) {
-				if (filters.search) {
-					query = query
-						.ilike(`followee.username`, `${filters.search}%`)
-				}
-			}
 			const { data, error } = await query;
 			if (error) throw error;
 			return data;
 		},
 		initialPageParam: 1,
 		getNextPageParam: (data, pages) => {
-			return data?.length == numPerPage ? pages.length + 1 : undefined;
-		},
-		enabled: !!userId,
-	});
-};
-
-export const useUserFolloweesQuery = ({
-	userId,
-	filters,
-} : {
-	userId?: string;
-	filters?: {
-		search?: string | null;
-	};
-}) => {
-	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: userKeys.followees(userId as string, filters),
-		queryFn: async () => {
-			if (!userId) throw Error('Missing user id');
-			let query = supabase
-				.from('user_follower')
-				.select('id, followee:user!user_follower_followee_id_fkey!inner(*)')
-				.eq('user_id', userId)
-				.eq('is_pending', false);
-			
-			if (filters) {
-				if (filters.search) {
-					query = query
-						.ilike(`followee.username`, `${filters.search}%`)
-				}
-			}
-			const { data, error } = await query
-				.overrideTypes<UserFollower[]>();
-			if (error) throw error;
-			return data;
+			return data?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});

@@ -3,8 +3,8 @@ import { useTheme } from '@/providers/ThemeProvider';
 import { AlertCircle, Check, Info, X } from 'lucide-react-native';
 import React, {
   createContext,
+  use,
   useCallback,
-  useContext,
   useEffect,
   useState,
 } from 'react';
@@ -470,7 +470,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
 
 // Hook to use toast
 export function useToast() {
-  const context = useContext(ToastContext);
+  const context = use(ToastContext);
 
   if (!context) {
     throw new Error('useToast must be used within a ToastProvider');

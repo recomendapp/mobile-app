@@ -18,29 +18,31 @@ import { useScrollToTop } from "@react-navigation/native";
 import { BestResultsSearchResponse, MediaMovie, MediaPerson, MediaTvSeries, Playlist, User } from "@recomendapp/types";
 import { Link } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, memo } from "react";
 import { useWindowDimensions } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useTranslations } from "use-intl";
 
-const SearchScreen = () => {
+const SearchScreen = memo(() => {
 	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
+	
 	const renderSearch = useCallback(() => {
 		if (debouncedSearch) {
 			return <SearchResults search={debouncedSearch} />
 		} else {
-			return <FeaturedPlaylists contentContainerStyle={tw`px-4`}/>
+			return <FeaturedPlaylists contentContainerStyle={tw`px-4`} />
 		}
 	}, [debouncedSearch]);
 
 	return renderSearch();
-};
+});
+SearchScreen.displayName = 'SearchScreen';
 
 interface SearchResultsProps extends React.ComponentPropsWithoutRef<typeof ScrollView> {
 	search: string;
 };
 
-export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
+export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => {
 	const { inset, tabBarHeight } = useTheme();
 	const {
 		data,
@@ -50,19 +52,19 @@ export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
 	} = useSearchMultiQuery({
 		query: search,
 	});
+	
 	const loading = data === undefined || isLoading;
-	// REFs
 	const scrollRef = useRef<ScrollView>(null);
+	
 	useScrollToTop(scrollRef);
+	
 	if (loading) return null;
+	
 	return (
 		<ScrollView
-		ref={scrollRef}
-		contentContainerStyle={{
-			gap: GAP,
-			paddingBottom: tabBarHeight + inset.bottom + PADDING_VERTICAL,
-		}}
-		{...props}
+			ref={scrollRef}
+			contentContainerStyle={{ gap: GAP, paddingBottom: tabBarHeight + inset.bottom + PADDING_VERTICAL }}
+			{...props}
 		>
 			{data.bestResult && (
 				<SearchBestResult best={data.bestResult} />
@@ -83,15 +85,17 @@ export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
 				<SearchResultsUsers users={data.users.data as User[]} search={search} />
 			)}
 		</ScrollView>
-	)
-};
+	);
+});
+SearchResults.displayName = 'SearchResults';
 /* --------------------------------- WIDGETS -------------------------------- */
-const SearchBestResult = ({
+const SearchBestResult = memo(({
 	best,
 } : {
 	best: BestResultsSearchResponse['bestResult']
 }) => {
 	const t = useTranslations();
+
 	const renderBestResult = useCallback(() => {
 		if (!best) return null;
 		switch (best?.type) {
@@ -109,273 +113,217 @@ const SearchBestResult = ({
 				return null;
 		}
 	}, [best]);
+
 	return (
-	<View style={{ marginHorizontal: PADDING_HORIZONTAL, gap: GAP }}>
-		<Text style={tw`font-semibold text-xl`}>{upperFirst(t('common.messages.top_result'))}</Text>
-		{renderBestResult()}
-	</View>
-	)
+		<View style={{ marginHorizontal: PADDING_HORIZONTAL, gap: GAP }}>
+			<Text style={tw`font-semibold text-xl`}>
+				{upperFirst(t('common.messages.top_result'))}
+			</Text>
+			{renderBestResult()}
+		</View>
+	);
+});
+SearchBestResult.displayName = 'SearchBestResult';
+
+const SearchResultSection = <T,>({
+	title,
+	data,
+	search,
+	pathname,
+	renderItem,
+	keyExtractor
+}: {
+	title: string;
+	data: T[];
+	search: string;
+	pathname: string;
+	renderItem: (item: T) => React.ReactElement;
+	keyExtractor: (item: T) => string;
+}) => {
+	const { colors } = useTheme();
+	const { width } = useWindowDimensions();
+
+	return (
+		<View style={{ gap: GAP }}>
+			<Link
+				href={{
+					pathname: pathname as any,
+					params: { query: search },
+				}}
+				style={{ paddingHorizontal: PADDING_HORIZONTAL  }}
+			>
+				<View style={tw`flex-row items-center`}>
+					<Text style={tw`font-semibold text-xl`} numberOfLines={1}>
+						{title}
+					</Text>
+					<Icons.ChevronRight color={colors.mutedForeground} />
+				</View>
+			</Link>
+			<MultiRowHorizontalList
+				data={data}
+				renderItem={renderItem}
+				keyExtractor={keyExtractor}
+				contentContainerStyle={{
+					paddingHorizontal: PADDING_HORIZONTAL,
+					gap: GAP,
+				}}
+				columnStyle={{ width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2), gap: GAP }}
+				snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
+				decelerationRate="fast"
+			/>
+		</View>
+	);
 };
 
-const SearchResultsMovies = ({
+const SearchResultsMovies = memo(({
 	movies,
 	search,
 } : {
 	movies: MediaMovie[];
 	search: string;
 }) => {
-	const { colors } = useTheme();
 	const t = useTranslations();
-	const { width } = useWindowDimensions();
-	return (
-	<View style={{ gap: GAP }}>
-		<Link
-		href={{
-			pathname: `/search/films`,
-			params: {
-				query: search,
-			},
-		}}
-		style={{ paddingHorizontal: PADDING_HORIZONTAL }}
-		>
-			<View style={tw`flex-row items-center`}>
-				<Text style={tw`font-semibold text-xl`} numberOfLines={1}>
-				{upperFirst(t('common.messages.film', { count: 2 }))}
-				</Text>
-				<Icons.ChevronRight color={colors.mutedForeground} />
-			</View>
-		</Link>
-		<MultiRowHorizontalList
-		data={movies}
-		renderItem={(item) => (
-			<CardMovie
-			movie={item}
-			variant='list'
-			/>
-		)}
-		keyExtractor={(item) => item.id.toString()}
-		contentContainerStyle={{
-			paddingHorizontal: PADDING_HORIZONTAL,
-			gap: GAP,
-		}}
-		columnStyle={{
-			width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2),
-			gap: GAP,
-		}}
-		snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
-		decelerationRate={"fast"}
-		/>
-	</View>
-	)
-};
+	
+	const renderItem = useCallback((item: MediaMovie) => (
+		<CardMovie movie={item} variant="list" />
+	), []);
+	
+	const keyExtractor = useCallback((item: MediaMovie) => 
+		item.id.toString(), []
+	);
 
-const SearchResultsTvSeries = ({
+	return (
+		<SearchResultSection<MediaMovie>
+			title={upperFirst(t('common.messages.film', { count: 2 }))}
+			data={movies}
+			search={search}
+			pathname="/search/films"
+			renderItem={renderItem}
+			keyExtractor={keyExtractor}
+		/>
+	);
+});
+SearchResultsMovies.displayName = 'SearchResultsMovies';
+
+const SearchResultsTvSeries = memo(({
 	tvSeries,
 	search,
 } : {
 	tvSeries: MediaTvSeries[];
 	search: string;
 }) => {
-	const { colors } = useTheme();
 	const t = useTranslations();
-	const { width } = useWindowDimensions();
-	return (
-	<View style={{ gap: GAP }}>
-		<Link
-		href={{
-			pathname: `/search/tv-series`,
-			params: {
-				query: search,
-			},
-		}}
-		style={{ paddingHorizontal: PADDING_HORIZONTAL }}
-		>
-			<View style={tw`flex-row items-center`}>
-				<Text style={tw`font-semibold text-xl`} numberOfLines={1}>
-				{upperFirst(t('common.messages.tv_series', { count: 2 }))}
-				</Text>
-				<Icons.ChevronRight color={colors.mutedForeground} />
-			</View>
-		</Link>
-		<MultiRowHorizontalList
-		data={tvSeries}
-		renderItem={(item) => (
-			<CardTvSeries
-			tvSeries={item}
-			variant='list'
-			/>
-		)}
-		keyExtractor={(item) => item.id.toString()}
-		contentContainerStyle={{
-			paddingHorizontal: PADDING_HORIZONTAL,
-			gap: GAP,
-		}}
-		columnStyle={{
-			width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2),
-			gap: GAP,
-		}}
-		snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
-		decelerationRate={"fast"}
-		/>
-	</View>
-	)
-};
+	
+	const renderItem = useCallback((item: MediaTvSeries) => (
+		<CardTvSeries tvSeries={item} variant="list" />
+	), []);
+	
+	const keyExtractor = useCallback((item: MediaTvSeries) => 
+		item.id.toString(), []
+	);
 
-const SearchResultsPersons = ({
+	return (
+		<SearchResultSection<MediaTvSeries>
+			title={upperFirst(t('common.messages.tv_series', { count: 2 }))}
+			data={tvSeries}
+			search={search}
+			pathname="/search/tv-series"
+			renderItem={renderItem}
+			keyExtractor={keyExtractor}
+		/>
+	);
+});
+SearchResultsTvSeries.displayName = 'SearchResultsTvSeries';
+
+const SearchResultsPersons = memo(({
 	persons,
 	search,
 } : {
 	persons: MediaPerson[];
 	search: string;
 }) => {
-	const { colors } = useTheme();
 	const t = useTranslations();
-	const { width } = useWindowDimensions();
-	return (
-	<View style={{ gap: GAP }}>
-		<Link
-		href={{
-			pathname: `/search/persons`,
-			params: {
-				query: search,
-			},
-		}}
-		style={{ paddingHorizontal: PADDING_HORIZONTAL }}
-		>
-			<View style={tw`flex-row items-center`}>
-				<Text style={tw`font-semibold text-xl`} numberOfLines={1}>
-				{upperFirst(t('common.messages.person', { count: 2 }))}
-				</Text>
-				<Icons.ChevronRight color={colors.mutedForeground} />
-			</View>
-		</Link>
-		<MultiRowHorizontalList
-		data={persons}
-		renderItem={(item) => (
-			<CardPerson
-			person={item}
-			variant='list'
-			/>
-		)}
-		keyExtractor={(item) => item.id.toString()}
-		contentContainerStyle={{
-			paddingHorizontal: PADDING_HORIZONTAL,
-			gap: GAP,
-		}}
-		columnStyle={{
-			width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2),
-			gap: GAP,
-		}}
-		snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
-		decelerationRate={"fast"}
-		/>
-	</View>
-	)
-};
+	
+	const renderItem = useCallback((item: MediaPerson) => (
+		<CardPerson person={item} variant="list" />
+	), []);
+	
+	const keyExtractor = useCallback((item: MediaPerson) => 
+		item.id.toString(), []
+	);
 
-const SearchResultsPlaylists = ({
+	return (
+		<SearchResultSection<MediaPerson>
+			title={upperFirst(t('common.messages.person', { count: 2 }))}
+			data={persons}
+			search={search}
+			pathname="/search/persons"
+			renderItem={renderItem}
+			keyExtractor={keyExtractor}
+		/>
+	);
+});
+SearchResultsPersons.displayName = 'SearchResultsPersons';
+
+const SearchResultsPlaylists = memo(({
 	playlists,
 	search,
 } : {
 	playlists: Playlist[];
 	search: string;
 }) => {
-	const { colors } = useTheme();
 	const t = useTranslations();
-	const { width } = useWindowDimensions();
-	return (
-	<View style={{ gap: GAP }}>
-		<Link
-		href={{
-			pathname: `/search/playlists`,
-			params: {
-				query: search,
-			},
-		}}
-		style={{ paddingHorizontal: PADDING_HORIZONTAL }}
-		>
-			<View style={tw`flex-row items-center`}>
-				<Text style={tw`font-semibold text-xl`} numberOfLines={1}>
-				{upperFirst(t('common.messages.playlist', { count: 2 }))}
-				</Text>
-				<Icons.ChevronRight color={colors.mutedForeground} />
-			</View>
-		</Link>
-		<MultiRowHorizontalList
-		data={playlists}
-		renderItem={(item) => (
-			<CardPlaylist
-			playlist={item}
-			variant='list'
-			/>
-		)}
-		keyExtractor={(item) => item.id.toString()}
-		contentContainerStyle={{
-			paddingHorizontal: PADDING_HORIZONTAL,
-			gap: GAP,
-		}}
-		columnStyle={{
-			width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2),
-			gap: GAP,
-		}}
-		snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
-		decelerationRate={"fast"}
-		/>
-	</View>
-	)
-};
+	
+	const renderItem = useCallback((item: Playlist) => (
+		<CardPlaylist playlist={item} variant="list" />
+	), []);
+	
+	const keyExtractor = useCallback((item: Playlist) => 
+		item.id.toString(), []
+	);
 
-const SearchResultsUsers = ({
+	return (
+		<SearchResultSection<Playlist>
+			title={upperFirst(t('common.messages.playlist', { count: 2 }))}
+			data={playlists}
+			search={search}
+			pathname="/search/playlists"
+			renderItem={renderItem}
+			keyExtractor={keyExtractor}
+		/>
+	);
+});
+SearchResultsPlaylists.displayName = 'SearchResultsPlaylists';
+
+const SearchResultsUsers = memo(({
 	users,
 	search,
 } : {
 	users: User[];
 	search: string;
 }) => {
-	const { colors } = useTheme();
 	const t = useTranslations();
-	const { width } = useWindowDimensions();
+	
+	const renderItem = useCallback((item: User) => (
+		<CardUser user={item} variant="list" />
+	), []);
+	
+	const keyExtractor = useCallback((item: User) => 
+		item.id.toString(), []
+	);
+
 	return (
-	<View style={{ gap: GAP }}>
-		<Link
-		href={{
-			pathname: `/search/users`,
-			params: {
-				query: search,
-			},
-		}}
-		style={{ paddingHorizontal: PADDING_HORIZONTAL }}
-		>
-			<View style={tw`flex-row items-center`}>
-				<Text style={tw`font-semibold text-xl`} numberOfLines={1}>
-				{upperFirst(t('common.messages.user', { count: 2 }))}
-				</Text>
-				<Icons.ChevronRight color={colors.mutedForeground} />
-			</View>
-		</Link>
-		<MultiRowHorizontalList
-		data={users}
-		renderItem={(item) => (
-			<CardUser
-			user={item}
-			variant='list'
-			/>
-		)}
-		keyExtractor={(item) => item.id.toString()}
-		contentContainerStyle={{
-			paddingHorizontal: PADDING_HORIZONTAL,
-			gap: GAP,
-		}}
-		columnStyle={{
-			width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2),
-			gap: GAP,
-		}}
-		snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
-		decelerationRate={"fast"}
+		<SearchResultSection<User>
+			title={upperFirst(t('common.messages.user', { count: 2 }))}
+			data={users}
+			search={search}
+			pathname="/search/users"
+			renderItem={renderItem}
+			keyExtractor={keyExtractor}
 		/>
-	</View>
-	)
-};
+	);
+});
+SearchResultsUsers.displayName = 'SearchResultsUsers';
 /* -------------------------------------------------------------------------- */
 
 export default SearchScreen;

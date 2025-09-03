@@ -1,5 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button } from '@/components/ui/Button';
 import { Link } from 'expo-router';
@@ -33,7 +33,7 @@ const LoginScreen = () => {
 	const bgImage = useRandomImage(backgroundImages);
 	const navigationHeaderHeight = useHeaderHeight();
 
-	const handleSubmit = async () => {
+	const handleSubmit = useCallback(async () => {
 		try {
 			setIsLoading(true);
 			await login({ email: email, password: password });
@@ -47,7 +47,7 @@ const LoginScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}
+	}, [email, password, login, t]);
 	return (
 	<>
 		<ImageBackground source={bgImage} style={{ flex: 1 }}>

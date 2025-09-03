@@ -1,9 +1,9 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { DrawerContentComponentProps, DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
-import { Link, useRouter } from "expo-router";
-import { Alert, Pressable } from "react-native";
+import { useRouter } from "expo-router";
+import { Alert } from "react-native";
 import { Icons } from "@/constants/Icons";
-import { useMemo } from "react";
+import { useCallback, useMemo, memo } from "react";
 import UserAvatar from "@/components/user/UserAvatar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -16,59 +16,145 @@ import { Text } from "../ui/text";
 import { View } from "../ui/view";
 import { Skeleton } from "../ui/Skeleton";
 
+type Route = {
+    name: string;
+    icon: React.ElementType;
+    onPress: () => void;
+    visible: boolean;
+    color?: string;
+}
+
+const ProfileHeader = memo(({
+    closeDrawer,
+}: {
+    closeDrawer: () => void;
+}) => {
+    const { user } = useAuth();
+    const { colors } = useTheme();
+    const router = useRouter();
+    const t = useTranslations();
+    
+    const handleProfilePress = useCallback(() => {
+        if (!user) return;
+        router.push(`/user/${user.username}`);
+        closeDrawer();
+    }, [user, router, closeDrawer]);
+
+    return (
+        <DrawerItem
+            label={() => (
+                <View>
+                    {user ? (
+                        <Text style={tw`text-xl font-semibold`}>{user.full_name}</Text>
+                    ) : (
+                        <Skeleton style={tw`w-32 h-8`} />
+                    )}
+                    {user ? (
+                        <Text style={{ color: colors.mutedForeground }}>
+                            {upperFirst(t('common.messages.view_profile'))}
+                        </Text>
+                    ) : (
+                        <Skeleton style={tw`w-24 h-5`} />
+                    )}
+                </View>
+            )}
+            icon={() => (
+                user ? (
+                    <UserAvatar 
+                        full_name={user.full_name} 
+                        avatar_url={user.avatar_url} 
+                        style={tw`w-16 h-16`} 
+                    />
+                ) : (
+                    <UserAvatar skeleton style={tw`w-16 h-16`} />
+                )
+            )}
+            onPress={handleProfilePress}
+        />
+    );
+});
+ProfileHeader.displayName = 'ProfileHeader';
+
+const RouteItem = memo(({ 
+    route, 
+    closeDrawer 
+}: { 
+    route: Route; 
+    closeDrawer: () => void; 
+}) => {
+    const { colors } = useTheme();
+    
+    const handlePress = useCallback(() => {
+        route.onPress();
+        closeDrawer();
+    }, [route.onPress, closeDrawer]);
+
+    return (
+        <DrawerItem
+            label={route.name}
+            labelStyle={{ color: route.color || colors.foreground }}
+            icon={({ size }) => (
+                <route.icon color={route.color || colors.foreground} size={size} />
+            )}
+            onPress={handlePress}
+        />
+    );
+});
+RouteItem.displayName = 'RouteItem';
+
 const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     const router = useRouter();
     const t = useTranslations();
     const { colors } = useTheme();
     const { session, user, logout } = useAuth();
 
-    const routes = useMemo((): { name: string; icon: React.ElementType; onPress: () => void, visible: boolean, color?: string }[] => {
-        return [
-            {
-                name: upperFirst(t('common.messages.login')),
-                icon: Icons.User,
-                onPress: async () => {
-                    router.push('/auth/login');
-                },
-                visible: !session,
-            },
-            {
-                name: upperFirst(t('common.messages.upgrade_to_plan', { plan: 'Premium' })),
-                icon: Icons.premium,
-                onPress: async () => {
-                    router.push('/upgrade');
-                },
-                visible: !!session && !user?.premium,
-                color: colors.accentBlue,
-            },
-            {
-                name: upperFirst(t('pages.settings.label')),
-                icon: Icons.settings,
-                onPress: async () => {
-                    router.push('/settings');
-                },
-                visible: true,
-            },
-            {
-                name: upperFirst(t('common.messages.about')),
-                icon: Icons.info,
-                onPress: () => {
-                    router.push('/about');
-                },
-                visible: true,
-            }
-        ];
-    }, [t, router, session, user, colors]);
+    const routes = useMemo(() => [
+        {
+            id: 'login',
+            name: upperFirst(t('common.messages.login')),
+            icon: Icons.User,
+            onPress: () => router.push('/auth/login'),
+            visible: !session,
+        },
+        {
+            id: 'upgrade',
+            name: upperFirst(t('common.messages.upgrade_to_plan', { plan: 'Premium' })),
+            icon: Icons.premium,
+            onPress: () => router.push('/upgrade'),
+            visible: !!session && !user?.premium,
+            color: colors.accentBlue,
+        },
+        {
+            id: 'settings',
+            name: upperFirst(t('pages.settings.label')),
+            icon: Icons.settings,
+            onPress: () => router.push('/settings'),
+            visible: true,
+        },
+        {
+            id: 'about',
+            name: upperFirst(t('common.messages.about')),
+            icon: Icons.info,
+            onPress: () => router.push('/about'),
+            visible: true,
+        }
+    ], [t, router, session, user?.premium, colors.accentBlue]);
 
-    const closeDrawer = () => {
+    const visibleRoutes = useMemo(
+        () => routes.filter(route => route.visible),
+        [routes]
+    );
+
+    const closeDrawer = useCallback(() => {
         props.navigation.closeDrawer();
-    };
-    const handleLogout = async () => {
+    }, [props.navigation]);
+
+    const handleLogout = useCallback(async () => {
         try {
             await logout();
             closeDrawer();
         } catch (error) {
-            let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
+            let errorMessage = upperFirst(t('common.messages.an_error_occurred'));
             if (error instanceof AuthError) {
                 errorMessage = upperFirst(t('common.messages.error'));
             }
@@ -79,8 +165,9 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                 haptic: 'error',
             });
         }
-    };
-    const handleLogoutButtonPress = () => {
+    }, [logout, closeDrawer, t]);
+
+    const handleLogoutButtonPress = useCallback(() => {
         Alert.alert(
             upperFirst(t('common.messages.are_u_sure')),
             undefined,
@@ -96,60 +183,39 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                 },
             ]
         );
-    };
+    }, [handleLogout, t]);
 
     return (
         <SafeAreaView
-        style={{
-            flex: 1,
-            backgroundColor: colors.muted,
-        }}
+            style={{
+                flex: 1,
+                backgroundColor: colors.muted,
+            }}
         >
-            {/* MAIN ROUTES */}
             <DrawerContentScrollView>
                 {session && (
-                    <DrawerItem
-                        label={() => (
-                            <View>
-                                {user ? <Text style={tw`text-xl font-semibold`}>{user.full_name}</Text> : <Skeleton style={tw`w-32 h-8`} />}
-                                {user ? <Text style={{ color: colors.mutedForeground }}>{upperFirst(t('common.messages.view_profile'))}</Text> : <Skeleton style={tw`w-24 h-5`} />}
-                            </View>
-                        )}
-                        icon={({ color, size }) => (
-                            user ? <UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} style={tw`w-16 h-16`} /> : <UserAvatar skeleton style={tw`w-16 h-16`} />
-                        )}
-                        onPress={() => {
-                            if (!user) return;
-                            router.push(`/user/${user.username}`);
-                            closeDrawer();
-                        }}
-                    />
+                    <ProfileHeader closeDrawer={closeDrawer} />
                 )}
-                {routes.filter(route => route.visible).map((route, index) => (
-                    <DrawerItem
-                    key={index}
-                    label={route.name}
-                    labelStyle={{ color: route.color || colors.foreground }}
-                    icon={({ color, size }) => (
-                        <route.icon color={route.color ||colors.foreground} size={size} />
-                    )}
-                    onPress={() => {
-                        route.onPress();
-                        closeDrawer();
-                    }}
+                {visibleRoutes.map((route) => (
+                    <RouteItem 
+                    key={route.id}
+                    route={route} 
+                    closeDrawer={closeDrawer} 
                     />
                 ))}
             </DrawerContentScrollView>
-            {/* FOOTER */}
-            <DrawerItem
-            label={upperFirst(t('common.messages.logout'))}
-            activeTintColor={colors.destructive}
-            inactiveTintColor={colors.destructive}
-            icon={() => <Icons.logout color={colors.destructive} />}
-            onPress={handleLogoutButtonPress}
-            />
+
+            {session && (
+                <DrawerItem
+                    label={upperFirst(t('common.messages.logout'))}
+                    activeTintColor={colors.destructive}
+                    inactiveTintColor={colors.destructive}
+                    icon={() => <Icons.logout color={colors.destructive} />}
+                    onPress={handleLogoutButtonPress}
+                />
+            )}
         </SafeAreaView>
     );
-}
+};
 
 export default CustomDrawerContent;

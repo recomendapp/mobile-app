@@ -4,33 +4,43 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { useLocalSearchParams } from "expo-router";
+import { useCallback, useMemo } from "react";
 
 const ProfileFollowersScreen = () => {
 	const { username } = useLocalSearchParams<{ username: string }>();
-	const { data } = useUserProfileQuery({ username: username });
+	const { data: profile } = useUserProfileQuery({ username: username });
 	const { bottomTabHeight, inset } = useTheme();
 	const {
-		data: followers,
+		data,
 		isLoading,
 		hasNextPage,
 		fetchNextPage,
 		refetch,
 	} = useUserFollowersInfiniteQuery({
-		userId: data?.id || undefined,
+		userId: profile?.id || undefined,
 	});
+	const followers = useMemo(() => data?.pages.flat() || [], [data]);
+	// useCallback
+	const keyExtractor = useCallback((item: typeof followers[number]) => item.follower.id.toString(), []);
+	const onEndReached = useCallback(() => {
+		if (hasNextPage) {
+			fetchNextPage();
+		}
+	}, [hasNextPage, fetchNextPage]);
+	const renderItem = useCallback(({ item }: { item: typeof followers[number], index: number }) => (
+		<CardUser variant="list" user={item.follower} />
+	), []);
 	return (
 		<LegendList
-		data={followers?.pages.flat() || []}
-		renderItem={({ item }) => (
-			<CardUser variant="list" user={item.follower} />
-		)}
+		data={followers}
+		renderItem={renderItem}
 		contentContainerStyle={{
 			paddingLeft: inset.left + PADDING_HORIZONTAL,
 			paddingRight: inset.right + PADDING_HORIZONTAL,
 			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 		}}
-		keyExtractor={(item) => item.id.toString()}
-		onEndReached={() => hasNextPage && fetchNextPage()}
+		keyExtractor={keyExtractor}
+		onEndReached={onEndReached}
 		onRefresh={refetch}
 		/>
 	);

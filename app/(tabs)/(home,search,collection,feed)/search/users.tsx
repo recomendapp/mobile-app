@@ -9,14 +9,44 @@ import useSearchStore from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList, LegendListRef } from "@legendapp/list";
 import { useScrollToTop } from "@react-navigation/native";
+import { User } from "@recomendapp/types";
 import { upperFirst } from "lodash";
-import { useRef } from "react";
+import { useRef, useCallback, useMemo, memo } from "react";
 import { useTranslations } from "use-intl";
 
-const SearchUsersScreen = () => {
+const UserItem = memo(({ item }: { item: User }) => (
+	<CardUser variant="list" user={item} />
+));
+UserItem.displayName = 'UserItem';
+
+const EmptyComponent = memo(({ 
+	isLoading, 
+	debouncedSearch,
+	noResultsText 
+}: { 
+	isLoading: boolean; 
+	debouncedSearch: string | null;
+	noResultsText: string;
+}) => {
+	if (isLoading) return <Icons.Loader />;
+	
+	if (debouncedSearch) {
+		return (
+			<View style={tw`flex-1 items-center justify-center`}>
+				<Text textColor='muted'>{noResultsText}</Text>
+			</View>
+		);
+	}
+	
+	return null;
+});
+EmptyComponent.displayName = 'EmptyComponent';
+
+const SearchUsersScreen = memo(() => {
 	const { inset, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
+	
 	// Queries
 	const {
 		data,
@@ -26,37 +56,60 @@ const SearchUsersScreen = () => {
 	} = useSearchUsersInfiniteQuery({
 		query: debouncedSearch,
 	});
+	
 	// REFs
 	const scrollRef = useRef<LegendListRef>(null);
+	
+	// Memoized values
+	const usersData = useMemo(() => 
+		data?.pages.flatMap(page => page.data as User[]) || [], 
+		[data]
+	);
+
+	// Callbacks
+	const renderItem = useCallback(({ item }: { item: User }) => (
+		<UserItem item={item} />
+	), []);
+
+	const keyExtractor = useCallback((item: User) => 
+		item.id.toString(), 
+		[]
+	);
+
+	const onEndReached = useCallback(() => {
+		if (hasNextPage) {
+			fetchNextPage();
+		}
+	}, [hasNextPage, fetchNextPage]);
+
+	const ListEmptyComponent = useCallback(() => (
+		<EmptyComponent
+			isLoading={isLoading}
+			debouncedSearch={debouncedSearch}
+			noResultsText={upperFirst(t('common.messages.no_results'))}
+		/>
+	), [isLoading, debouncedSearch, t]);
+
 	useScrollToTop(scrollRef);
 
 	return (
-	<>
 		<LegendList
-		key={debouncedSearch}
-		ref={scrollRef}
-		data={data?.pages.flatMap(page => page.data) || []}
-		renderItem={({ item }) => (
-			<CardUser variant="list" user={item} />
-		)}
-		contentContainerStyle={{
-			paddingLeft: inset.left + PADDING_HORIZONTAL,
-			paddingRight: inset.right + PADDING_HORIZONTAL,
-			paddingBottom: tabBarHeight + inset.bottom + PADDING_VERTICAL,
-			gap: GAP,
-		}}
-		keyExtractor={(item) => item.id.toString()}
-		ListEmptyComponent={
-			isLoading ? <Icons.Loader /> : debouncedSearch ? (
-				<View style={tw`flex-1 items-center justify-center`}>
-					<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
-				</View>
-			) : null
-		}
-		onEndReached={() => hasNextPage && fetchNextPage()}
+			key={debouncedSearch}
+			ref={scrollRef}
+			data={usersData}
+			renderItem={renderItem}
+			contentContainerStyle={{
+				paddingLeft: inset.left + PADDING_HORIZONTAL,
+				paddingRight: inset.right + PADDING_HORIZONTAL,
+				paddingBottom: tabBarHeight + inset.bottom + PADDING_VERTICAL,
+				gap: GAP,
+			}}
+			keyExtractor={keyExtractor}
+			ListEmptyComponent={ListEmptyComponent}
+			onEndReached={onEndReached}
 		/>
-	</>
-	)
-};
+	);
+});
+SearchUsersScreen.displayName = 'SearchUsersScreen';
 
 export default SearchUsersScreen;

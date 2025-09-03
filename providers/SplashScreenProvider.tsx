@@ -1,5 +1,5 @@
 import { SplashScreen } from "expo-router";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, use, useEffect, useMemo, useState } from "react";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -58,7 +58,7 @@ const SplashScreenProvider = ({
 };
 
 const useSplashScreen = () => {
-	const context = useContext(SplashScreenContext);
+	const context = use(SplashScreenContext);
 	if (!context) {
 		throw new Error("useSplashScreen must be used within a SplashScreenProvider");
 	}

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, use, useCallback, useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
 import { useAuth } from "./AuthProvider";
 import { useSupabaseClient } from "./SupabaseProvider";
@@ -19,7 +19,7 @@ type NotificationsContextType = {
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
 export const useNotifications = () => {
-  const ctx = useContext(NotificationsContext);
+  const ctx = use(NotificationsContext);
   if (!ctx) throw new Error("useNotifications must be used in NotificationsProvider");
   return ctx;
 };
@@ -35,7 +35,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
   const notificationsListener = useRef<Notifications.EventSubscription | null>(null);
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
 
-  const handleRegisterForPushNotificationsAsync = async () => {
+  const handleRegisterForPushNotificationsAsync = useCallback(async () => {
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('default', {
         name: 'default',
@@ -67,9 +67,8 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     } else {
       throw new Error('Must use physical device for push notifications');
     }
-  };
-
-  const handleSaveToken = async (token: string) => {
+  }, []);
+  const handleSaveToken = useCallback(async (token: string) => {
     try {
       if (!session) return;
       const provider = (Platform.OS === 'ios' || Platform.OS === 'macos') ? 'apns' : 'fcm';
@@ -86,19 +85,8 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     } catch (err) {
       console.error("Error saving push token:", err);
     }
-  };
-  const handleResponse = (response: Notifications.NotificationResponse) => {
-    // iOS APNs : data in response.notification.request.trigger.payload.data
-    // Android FCM : data in response.notification.request.content.data
-    const data = (
-      response.notification.request.content.data ||
-      (response.notification.request.trigger as any).payload.data
-    ) as NotificationPayload;
-    if (data) {
-      handleRedirect(data);
-    }
-  };
-  const handleRedirect = (data: NotificationPayload) => {
+  }, [session, supabase]);
+  const handleRedirect = useCallback((data: NotificationPayload) => {
     switch (data.type) {
       case 'reco_sent':
         router.push({
@@ -119,7 +107,18 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         // Not handled or no redirect needed
         break;
     }
-  };
+  }, [router]);
+  const handleResponse = useCallback((response: Notifications.NotificationResponse) => {
+    // iOS APNs : data in response.notification.request.trigger.payload.data
+    // Android FCM : data in response.notification.request.content.data
+    const data = (
+      response.notification.request.content.data ||
+      (response.notification.request.trigger as any).payload.data
+    ) as NotificationPayload;
+    if (data) {
+      handleRedirect(data);
+    }
+  }, [handleRedirect]);
 
   useEffect(() => {
     if (!session) return;

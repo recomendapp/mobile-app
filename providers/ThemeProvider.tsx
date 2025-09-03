@@ -2,7 +2,7 @@ import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import Colors, { TColors } from "@/constants/Colors";
 import { DefaultTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, use, useEffect, useMemo, useState } from "react";
 import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type ThemeContextType = {
@@ -66,7 +66,7 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 };
 
 const useTheme = () => {
-	const context = useContext(ThemeContext);
+	const context = use(ThemeContext);
 	if (context === undefined) {
 		throw new Error('useTheme must be used within a ThemeProvider');
 	}

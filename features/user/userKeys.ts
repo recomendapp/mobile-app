@@ -41,9 +41,7 @@ export const userKeys = {
 	 */
 	followers: (
 		userId: string,
-		filters?: {
-			search?: string | null
-		}
+		filters?: any,
 	) => filters ? [...userKeys.detail(userId), 'followers', filters] as const : [...userKeys.detail(userId), 'followers'] as const,
 
 	/**
@@ -63,11 +61,9 @@ export const userKeys = {
 	 */
 	followees: (
 		userId: string,
-		filters?: {
-			infinite?: boolean;
-			search?: string | null
-		},
+		filters?: any,
 	) => filters ? [...userKeys.detail(userId), 'followees', filters] as const : [...userKeys.detail(userId), 'followees'] as const,
+	
 	followProfile: (userId: string, profileId: string) => [...userKeys.detail(userId), 'follow', profileId] as const,
 	followPerson: (userId: string, personId: number) => [...userKeys.detail(userId), 'follow-person', personId] as const,
 
