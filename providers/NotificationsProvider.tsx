@@ -7,9 +7,11 @@ import * as Device from 'expo-device';
 import { useRouter } from "expo-router";
 import * as Burnt from 'burnt';
 import { NotificationPayload } from "@recomendapp/types";
-// import { NovuProvider } from "@novu/react-native";
+import { NovuProvider } from "@novu/react-native";
+import { useNovuSubscriberHash } from "@/features/utils/utilsQueries";
 
 type NotificationsContextType = {
+  isMounted: boolean;
   permissionStatus: Notifications.PermissionStatus | null;
   pushToken: string | null;
   notifications: Notifications.Notification[] | null;
@@ -28,9 +30,11 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
   const supabase = useSupabaseClient();
   const router = useRouter();
   const { session, pushToken, setPushToken } = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<Notifications.PermissionStatus | null>(null);
   const [notifications, setNotifications] = useState<Notifications.Notification[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
+  const { data: subscriberHash } = useNovuSubscriberHash(session?.user.id);
 
   const notificationsListener = useRef<Notifications.EventSubscription | null>(null);
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
@@ -88,13 +92,15 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
   }, [session, supabase]);
   const handleRedirect = useCallback((data: NotificationPayload) => {
     switch (data.type) {
-      case 'reco_sent':
+      case 'reco_sent_movie':
+      case 'reco_sent_tv_series':
         router.push({
           pathname: '/collection/my-recos',
           params: { recoId: data.id },
         });
         break;
-      case 'reco_completed':
+      case 'reco_completed_movie':
+      case 'reco_completed_tv_series':
         router.push({
           pathname: '/collection/my-recos',
           params: { recoId: data.id },
@@ -104,7 +110,6 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         router.push(`/user/${data.sender.username}`);
         break;
       default:
-        // Not handled or no redirect needed
         break;
     }
   }, [router]);
@@ -167,26 +172,36 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     };
   }, [session]);
 
+  useEffect(() => {
+    if (session && subscriberHash && !isMounted) {
+      setIsMounted(true);
+    }
+  }, [session, subscriberHash, isMounted]);
+
   const contextValue = useMemo(() => ({
+    isMounted,
     permissionStatus,
     pushToken,
     notifications,
     error
-  }), [permissionStatus, pushToken, notifications, error]);
+  }), [isMounted, permissionStatus, pushToken, notifications, error]);
 
-  return (
+  const defaultProvider = useMemo(() => (
     <NotificationsContext.Provider value={contextValue}>
       {children}
     </NotificationsContext.Provider>
-  );
+  ), [contextValue, children]);
 
-  // if (!session) return defaultProvider;
+  if (!session || !subscriberHash) return defaultProvider;
 
-  // return (
-  //   <>
-  //   {/* <NovuProvider subscriberId={session.user.id} applicationIdentifier={process.env.EXPO_PUBLIC_NOVU_APPLICATION_IDENTIFIER!}> */}
-  //     {defaultProvider}
-  //   {/* </NovuProvider> */}
-  //   </>
-  // )
+  return (
+    <NovuProvider
+    applicationIdentifier={process.env.EXPO_PUBLIC_NOVU_APPLICATION_IDENTIFIER!}
+    subscriberId={session.user.id}
+    subscriberHash={subscriberHash}
+    useCache={true}
+    >
+      {defaultProvider}
+    </NovuProvider>
+  )
 };

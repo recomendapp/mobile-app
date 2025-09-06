@@ -1,4 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
+import { useNotifications } from '@/providers/NotificationsProvider';
 import { TabBarHeightUpdater, useTheme } from '@/providers/ThemeProvider';
 import { Stack } from 'expo-router';
 import { upperFirst } from 'lodash';
@@ -10,6 +11,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
   const { defaultScreenOptions } = useTheme();
   const t = useTranslations();
   const { session } = useAuth();
+  const { isMounted } = useNotifications();
   const initialRouteName = useMemo(() => {
     switch (segment) {
       case '(search)':
@@ -33,7 +35,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
         <Stack.Screen name="feed" options={{ headerTitle: upperFirst(t('common.messages.feed')) }} />
       </Stack.Protected>
       {/* NOTIFICATIONS */}
-      <Stack.Protected guard={!!session}>
+      <Stack.Protected guard={!!isMounted}>
         <Stack.Screen name="notifications" options={{ headerShown: false, presentation: "modal", headerTitle: upperFirst(t('common.messages.notification', { count: 2 })) }} />
       </Stack.Protected>
       {/* COLLECTION */}
@@ -100,8 +102,9 @@ const AppLayout = ({ segment } : { segment: string }) => {
           })
         }} />
       </Stack.Protected>
-      <Stack.Screen name="upgrade" options={{ headerTitle: upperFirst(t('common.messages.upgrade')), presentation: 'modal' }} />
-      
+      <Stack.Protected guard={!!session}>
+        <Stack.Screen name="upgrade" options={{ headerTitle: upperFirst(t('common.messages.upgrade')), presentation: 'modal' }} />
+      </Stack.Protected>
       {/* ABOUT */}
       <Stack.Screen name="about/index" options={{ headerTitle: upperFirst(t('common.messages.about')) }} />
     </Stack>
