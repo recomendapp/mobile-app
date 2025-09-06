@@ -2,30 +2,36 @@ import { useAuth } from '@/providers/AuthProvider';
 import { TabBarHeightUpdater, useTheme } from '@/providers/ThemeProvider';
 import { Stack } from 'expo-router';
 import { upperFirst } from 'lodash';
+import { useMemo } from 'react';
 import { Platform } from 'react-native';
 import { useTranslations } from 'use-intl';
 
 const AppLayout = ({ segment } : { segment: string }) => {
-  const { colors, defaultScreenOptions } = useTheme();
+  const { defaultScreenOptions } = useTheme();
   const t = useTranslations();
   const { session } = useAuth();
+  const initialRouteName = useMemo(() => {
+    switch (segment) {
+      case '(search)':
+        return 'search';
+      case '(feed)':
+        return 'feed';
+      case '(collection)':
+        return 'collection/(tabs)';
+      default:
+        return 'index';
+    }
+  }, [segment]);
   return (
   <>
     <TabBarHeightUpdater />
     <Stack
-    initialRouteName={
-      segment === '(search)' ? 'search' :
-      segment === '(feed)' ? 'feed' :
-      segment === '(collection)' ? 'collection/(tabs)' :
-      'index'
-    }
+    initialRouteName={initialRouteName}
     screenOptions={defaultScreenOptions}
     >
-      {/* <Stack.Screen name="index" options={{ title: upperFirst(t('common.messages.home')) }} /> */}
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="feed" options={{ headerTitle: upperFirst(t('common.messages.feed')) }} />
       </Stack.Protected>
-      {/* <Stack.Screen name="search/index" options={{ headerShown: false, headerTitle: upperFirst(t('common.messages.search')) }} /> */}
       {/* NOTIFICATIONS */}
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="notifications" options={{ headerShown: false, presentation: "modal", headerTitle: upperFirst(t('common.messages.notification', { count: 2 })) }} />

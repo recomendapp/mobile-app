@@ -153,13 +153,13 @@ export const PlaylistMovie = ({
     ]), [t]);
 	const bottomSheetActions = useMemo((): CollectionAction<PlaylistItemMovie>[] => {
         return [
-            {
+            ...(isAllowedToEdit ? [{
                 icon: Icons.Delete,
                 label: upperFirst(t('common.messages.delete')),
                 variant: 'destructive',
                 onPress: handleDeletePlaylistItem,
 				position: 'bottom',
-            },
+            }] as const : []),
 			{
 				icon: Icons.Comment,
 				label: upperFirst(t('common.messages.view_comment', { count: 1})),
@@ -176,13 +176,13 @@ export const PlaylistMovie = ({
 			variant: 'accent-yellow',
 			position: 'left',
 		},
-		{
+		...(isAllowedToEdit ? [{
 			icon: Icons.Delete,
 			label: upperFirst(t('common.messages.delete')),
 			onPress: handleDeletePlaylistItem,
 			variant: 'destructive',
 			position: 'right',
-		}
+		}] as const : []),
 	], [handlePlaylistItemComment, handleDeletePlaylistItem, t]);
 
 	const onItemAction = useCallback((data: PlaylistItemMovie) => {

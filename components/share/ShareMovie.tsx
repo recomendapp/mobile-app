@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { View } from "../ui/view";
-import { MediaMovie } from "@recomendapp/types";
+import { MediaMovie, MediaMovieBackdrop, MediaMoviePoster } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { ImageWithFallback } from "../utils/ImageWithFallback";
 import ViewShot from "react-native-view-shot";
@@ -15,7 +15,7 @@ import { useMediaMovieBackdropInfiniteQuery, useMediaMoviePosterInfiniteQuery } 
 import { Image } from "expo-image";
 import { CaptureResult, ShareViewRef } from "./type";
 import { useAuth } from "@/providers/AuthProvider";
-import { CircleIcon } from "lucide-react-native";
+import { CircleIcon, LucideIcon } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { cropImageRatio } from "@/utils/imageManipulator";
 import { ColorPair, useImageColorPairs } from "@/hooks/useImageColorPairs";
@@ -24,6 +24,7 @@ import { ScaledCapture } from "../ui/ScaledCapture";
 import app from "@/constants/app";
 import { useWindowDimensions } from "react-native";
 import { clamp } from "lodash";
+import { TColors } from "@/constants/Colors";
 
 interface ShareMovieProps extends React.ComponentProps<typeof ViewShot> {
 	movie: MediaMovie;
@@ -34,23 +35,90 @@ interface ShareMovieProps extends React.ComponentProps<typeof ViewShot> {
 const ITEM_WIDTH = 64;
 const ITEM_SPACING = 8;
 
+
+const EditOptionsSelector = ({
+	editOptions,
+	activeEditingOption,
+	setActiveEditingOption
+}: {
+	editOptions: Array<{value: string, icon: LucideIcon}>;
+	activeEditingOption: string;
+	setActiveEditingOption: (value: string) => void;
+}) => {
+	const editButtonStyle = useMemo(() => [tw`rounded-full`, { width: HEIGHT, height: HEIGHT }], []);
+	const wheelStyle = useMemo(() => ({ marginVertical: PADDING_VERTICAL }), []);
+
+	const renderEditItem = useCallback((item: {value: string, icon: LucideIcon}, isActive: boolean) => (
+		<Button
+		variant={isActive ? "accent-yellow" : "outline"}
+		icon={item.icon}
+		size="icon"
+		style={editButtonStyle}
+		/>
+	), [editButtonStyle]);
+
+	const handleSelectionChange = useCallback((item: {value: string, icon: LucideIcon}) => {
+		setActiveEditingOption(item.value);
+	}, [setActiveEditingOption]);
+	
+	const initialIndex = useMemo(() => 
+		editOptions.findIndex(e => e.value === activeEditingOption),
+		[editOptions, activeEditingOption]);
+
+	const keyExtractor = useCallback((item: {value: string, icon: LucideIcon}) => item.value, []);
+
+	return (
+		<WheelSelector
+		id={`edit-options-selector`}
+		data={editOptions}
+		extraData={activeEditingOption}
+		entering={FadeInDown}
+		exiting={FadeOutDown}
+		renderItem={renderEditItem}
+		keyExtractor={keyExtractor}
+		onSelectionChange={handleSelectionChange}
+		initialIndex={initialIndex}
+		enableHaptics={true}
+		itemWidth={HEIGHT}
+		style={wheelStyle}
+		/>
+	);
+};
+
+
 /* -------------------------------- VARIANTS -------------------------------- */
 const ShareMovieDefault = ({ movie, poster, scale = 1 } : { movie: MediaMovie, poster: string | undefined, scale?: number }) => {
 	const { colors } = useTheme();
+	
+	const containerStyle = useMemo(() => [{
+		borderRadius: BORDER_RADIUS * scale,
+		backgroundColor: colors.muted,
+		gap: GAP * scale,
+		padding: PADDING / 2 * scale
+	}], [colors.muted, scale]);
+	
+	const imageStyle = useMemo(() => [{
+		aspectRatio: 2 / 3,
+		borderRadius: BORDER_RADIUS * scale
+	}, tw`w-full h-auto`], [scale]);
+	
+	const titleStyle = useMemo(() => [tw`font-bold`, { fontSize: 16 * scale }], [scale]);
+	const directorStyle = useMemo(() => ({ fontSize: 12 * scale }), [scale]);
+	
+	const directorsText = useMemo(() => 
+		movie.directors?.map(d => d.name!).join(', '), [movie.directors]);
+	
 	return (
-		<View style={[{ borderRadius: BORDER_RADIUS * scale, backgroundColor: colors.muted, gap: GAP * scale, padding: PADDING / 2 * scale }]}>
+		<View style={containerStyle}>
 			<ImageWithFallback
 			source={{uri: poster ?? '' }}
 			alt={movie.title ?? ''}
 			type={'movie'}
-			style={[
-				{ aspectRatio: 2 / 3, borderRadius: BORDER_RADIUS * scale },
-				tw`w-full h-auto`
-			]}
+			style={imageStyle}
 			/>
 			<View>
-			<Text style={[tw`font-bold`, { fontSize: 16 * scale }]}>{movie.title}</Text>
-			{movie.directors && <Text textColor="muted" style={{ fontSize: 12 * scale }}>{movie.directors.map(d => d.name!).join(', ')}</Text>}
+			<Text style={titleStyle}>{movie.title}</Text>
+			{directorsText && <Text textColor="muted" style={directorStyle}>{directorsText}</Text>}
 			</View>
 			<Icons.site.logo color={colors.accentYellow} height={10 * scale}/>
 		</View>
@@ -69,37 +137,159 @@ const ShareMovieCustomPoster = ({
 	setPoster: (poster: string) => void;
 }) => {
 	const {
-		data: posters,
+		data,
 		hasNextPage,
 		fetchNextPage,
 	} = useMediaMoviePosterInfiniteQuery({
 		movieId: poster ? movie.id : undefined,
-	})
+	});
+	const posters = useMemo(() => data?.pages.flat() || [], [data]);
+	const initialIndex = useMemo(() => posters.findIndex(p => p.poster_url === poster), [posters]);
+	const renderItem = useCallback((item: MediaMoviePoster, isActive: boolean) => (
+		<ImageWithFallback
+		source={{ uri: item.poster_url ?? '' }}
+		alt={movie.title ?? ''}
+		type={"movie"}
+		style={[{ aspectRatio: 2 / 3, width: ITEM_WIDTH }]}
+		/>
+	), [movie.title]);
+	const keyExtractor = useCallback((item: MediaMoviePoster) => item.id!.toString(), []);
+	const onSelectionChange = useCallback((item: MediaMoviePoster) => {
+		setPoster(item.poster_url!);
+	}, [setPoster]);
+	const onEndReached = useCallback(() => {
+		if (hasNextPage) {
+			fetchNextPage();
+		}
+	}, [hasNextPage, fetchNextPage]);
+
 	return (
 		<WheelSelector
+		id={`poster-selector`}
 		entering={FadeInDown}
 		exiting={FadeOutDown}
-		data={posters?.pages.flat() ?? []}
-		renderItem={(item, index) => (
-			<ImageWithFallback
-				source={{ uri: item.poster_url ?? '' }}
-				alt={movie.title ?? ''}
-				type={"movie"}
-				style={[{ aspectRatio: 2 / 3, width: ITEM_WIDTH }]}
-			/>
-		)}
-		onSelectionChange={(item) => setPoster(item.poster_url!)}
-		initialIndex={posters?.pages.flat().findIndex(p => p.poster_url === poster) ?? 0}
+		data={posters}
+		renderItem={renderItem}
+		keyExtractor={keyExtractor}
+		onSelectionChange={onSelectionChange}
+		initialIndex={initialIndex}
 		enableHaptics={true}
 		itemWidth={ITEM_WIDTH}
 		itemSpacing={ITEM_SPACING}
 		wheelAngle={0}
 		wheelIntensity={0.2}
 		containerStyle={tw`absolute bottom-0`}
-		onEndReached={() => hasNextPage && fetchNextPage()}
+		onEndReached={onEndReached}
 		/>
 	);
 };
+const ColorSelector = ({
+	poster,
+	bgColor,
+	setBgColor,
+	colors
+}: {
+	poster: string | undefined;
+	bgColor: { index: number, colors: ColorPair } | null;
+	setBgColor: (color: { index: number, colors: ColorPair } | null) => void;
+	colors: TColors;
+}) => {
+	const { colorPairs } = useImageColorPairs(poster);
+	const colorItemStyle = useMemo(() => [{
+		borderColor: colors.border,
+		width: ITEM_WIDTH,
+		height: ITEM_WIDTH
+	}, tw`border-2 rounded-full overflow-hidden`], [colors.border]);
+	
+	const renderColorItem = useCallback((item: ColorPair, isActive: boolean) => (
+		<Animated.View style={colorItemStyle}>
+			<LinearGradient style={tw`absolute inset-0`} colors={[item.top, item.bottom]}/>
+		</Animated.View>
+	), [colorItemStyle]);
+	
+	const handleColorSelection = useCallback((item: ColorPair, index: number) => {
+		setBgColor({ index, colors: item });
+	}, [setBgColor]);
+
+	const keyExtractor = useCallback((item: ColorPair, index: number) => index.toString(), []);
+	
+	return (
+		<WheelSelector
+		entering={FadeInDown}
+		exiting={FadeOutDown}
+		data={colorPairs}
+		renderItem={renderColorItem}
+		keyExtractor={keyExtractor}
+		onSelectionChange={handleColorSelection}
+		initialIndex={bgColor?.index ?? 0}
+		enableHaptics={true}
+		itemWidth={ITEM_WIDTH}
+		itemSpacing={ITEM_SPACING}
+		wheelAngle={0}
+		wheelIntensity={0.2}
+		/>
+	);
+};
+
+const BackdropImageSelector = ({
+	backdrops,
+	selectedBackdrop,
+	setBackdrop,
+	movieTitle,
+	hasNextPage,
+	fetchNextPage
+}: {
+	backdrops: MediaMovieBackdrop[];
+	selectedBackdrop?: string;
+	setBackdrop: (backdrop: string) => void;
+	movieTitle: string;
+	hasNextPage: boolean;
+	fetchNextPage: () => void;
+}) => {
+	const imageStyle = useMemo(() => [{ aspectRatio: 2 / 3, width: ITEM_WIDTH }], []);
+	
+	const renderBackdropItem = useCallback((item: MediaMovieBackdrop, isActive: boolean) => (
+		<ImageWithFallback
+			source={{ uri: item.backdrop_url ?? '' }}
+			alt={movieTitle}
+			type="movie"
+			style={imageStyle}
+		/>
+	), [movieTitle, imageStyle]);
+	
+	const handleBackdropSelection = useCallback((item: MediaMovieBackdrop) => {
+		setBackdrop(item.backdrop_url!);
+	}, [setBackdrop]);
+	
+	const handleEndReached = useCallback(() => {
+		if (hasNextPage) fetchNextPage();
+	}, [hasNextPage, fetchNextPage]);
+	
+	const initialIndex = useMemo(() => 
+		backdrops.findIndex(p => p.backdrop_url === selectedBackdrop) ?? 0,
+		[backdrops, selectedBackdrop]);
+	
+	const keyExtractor = useCallback((item: MediaMovieBackdrop) => item.id!.toString(), []);
+	
+	return (
+		<WheelSelector
+		entering={FadeInDown}
+		exiting={FadeOutDown}
+		data={backdrops}
+		renderItem={renderBackdropItem}
+		keyExtractor={keyExtractor}
+		onSelectionChange={handleBackdropSelection}
+		initialIndex={initialIndex}
+		enableHaptics={true}
+		itemWidth={ITEM_WIDTH}
+		itemSpacing={ITEM_SPACING}
+		wheelAngle={0}
+		wheelIntensity={0.2}
+		onEndReached={handleEndReached}
+		/>
+	);
+};
+
 const ShareMovieCustomBackdrop = ({
 	movie,
 	poster,
@@ -118,60 +308,34 @@ const ShareMovieCustomBackdrop = ({
 	setBgColor: (color: { index: number, colors: ColorPair } | null) => void;
 }) => {
 	const { colors } = useTheme();
-	const { colorPairs } = useImageColorPairs(poster);
 	const {
-		data: posters,
+		data,
 		hasNextPage,
 		fetchNextPage,
 	} = useMediaMovieBackdropInfiniteQuery({
 		movieId: bgType === 'image' ? movie.id : undefined,
 	});
+
+	const backdrops = useMemo(() => data?.pages.flat() ?? [], [data]);
+
 	return (
 		<View style={tw`absolute bottom-0`}>
 			{bgType === 'image' ? (
-				<WheelSelector
-				entering={FadeInDown}
-				exiting={FadeOutDown}
-				data={posters?.pages.flat() ?? []}
-				renderItem={(item, index) => (
-					<ImageWithFallback
-						source={{ uri: item.backdrop_url ?? '' }}
-						alt={movie.title ?? ''}
-						type={"movie"}
-						style={[{ aspectRatio: 2 / 3, width: ITEM_WIDTH }]}
-					/>
-
-				)}
-				onSelectionChange={(item) => setBackdrop(item.backdrop_url!)}
-				initialIndex={posters?.pages.flat().findIndex(p => p.backdrop_url === backdrop) ?? 0}
-				enableHaptics={true}
-				itemWidth={ITEM_WIDTH}
-				itemSpacing={ITEM_SPACING}
-				wheelAngle={0}
-				wheelIntensity={0.2}
-				onEndReached={() => hasNextPage && fetchNextPage()}
+				<BackdropImageSelector
+				backdrops={backdrops}
+				selectedBackdrop={backdrop}
+				setBackdrop={setBackdrop}
+				movieTitle={movie.title ?? ''}
+				hasNextPage={hasNextPage}
+				fetchNextPage={fetchNextPage}
 				/>
 			) : (
-				<WheelSelector
-				entering={FadeInDown}
-				exiting={FadeOutDown}
-				data={colorPairs}
-				renderItem={(item, index) => (
-					<Animated.View style={[{ borderColor: colors.border, width: ITEM_WIDTH, height: ITEM_WIDTH }, tw`border-2 rounded-full overflow-hidden`]}>
-						<LinearGradient style={tw`absolute inset-0`} colors={[item.top, item.bottom]}/>
-					</Animated.View>
-
-				)}
-				onSelectionChange={(item, index) => setBgColor({ index, colors: item })}
-				initialIndex={bgColor?.index ?? 0}
-				enableHaptics={true}
-				itemWidth={ITEM_WIDTH}
-				itemSpacing={ITEM_SPACING}
-				wheelAngle={0}
-				wheelIntensity={0.2}
-				onEndReached={() => hasNextPage && fetchNextPage()}
+				<ColorSelector
+				poster={poster}
+				bgColor={bgColor}
+				setBgColor={setBgColor}
+				colors={colors}
 				/>
-
 			)}
 		</View>
 	);
@@ -206,7 +370,18 @@ export const ShareMovie = forwardRef<
 				return <ShareMovieDefault movie={movie} poster={poster} scale={scale} />;
 		}
 	}, [movie, poster, backdrop]);
-	const renderEditingOptions = useCallback(() => {
+	const EditingSelector = useMemo(() => {
+		if (!editing) return null;
+		return (
+			<EditOptionsSelector
+			editOptions={editOptions}
+			activeEditingOption={activeEditingOption}
+			setActiveEditingOption={setActiveEditingOption}
+			/>
+		);
+	}, [editing, activeEditingOption, setActiveEditingOption]);
+
+	const EditingOptions = useMemo(() => {
 		if (!editing) return null;
 		switch (activeEditingOption) {
 			case 'poster':
@@ -233,7 +408,7 @@ export const ShareMovie = forwardRef<
 				return null;
 		}
 	}, [editing, activeEditingOption, movie, bgType]);
-	const renderEditingButtons = useCallback(() => (
+	const EditingButtons = useMemo(() => (
 		<View style={tw`absolute top-2 right-2 flex-row items-center gap-2`}>
 			{editing && backdrop && activeEditingOption === 'background' && (
 				<Animated.View entering={FadeInRight} exiting={FadeOutRight}>
@@ -288,7 +463,7 @@ export const ShareMovie = forwardRef<
 	return (
 		<View style={{ gap: GAP }} {...props}>
 			<View style={tw`items-center`}>
-				<View style={[{ aspectRatio: 9/16, paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL, borderRadius: BORDER_RADIUS, height: clamp(screenHeight / 2, 400) },tw`relative items-center justify-center overflow-hidden`]}>
+				<View style={[{ aspectRatio: 9/16, paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL, borderRadius: BORDER_RADIUS, height: clamp(400, screenHeight * 0.7) },tw`relative items-center justify-center overflow-hidden`]}>
 					{bgType === 'image' && backdrop ? (
 						<Image source={backdrop} style={tw`absolute inset-0`} />
 					) : bgType === 'color' && bgColor && (
@@ -299,33 +474,11 @@ export const ShareMovie = forwardRef<
 					targetWidth={SOCIAL_CARD_WIDTH}
 					renderContent={(scale) => renderSticker(scale)}
 					/>
-					{renderEditingButtons()}
+					{EditingButtons}
 				</View>
-				{renderEditingOptions()}
+				{EditingOptions}
 			</View>
-			{editing && (
-				<>
-				<WheelSelector
-				data={editOptions}
-				extraData={activeEditingOption}
-				entering={FadeInDown}
-				exiting={FadeOutDown}
-				renderItem={(item, isActive) => (
-					<Button
-					variant={isActive ? "accent-yellow" : "outline"}
-					icon={item.icon}
-					size="icon"
-					style={[tw`rounded-full`, { width: HEIGHT, height: HEIGHT }]}
-					/>
-				)}
-				onSelectionChange={(item) => setActiveEditingOption(item.value)}
-				initialIndex={editOptions.findIndex(e => e.value === activeEditingOption)}
-				enableHaptics={true}
-				itemWidth={HEIGHT}
-				style={{ marginVertical: PADDING_VERTICAL }}
-				/>
-			</>
-			)}
+			{EditingSelector}
 		</View>
 	);
 });

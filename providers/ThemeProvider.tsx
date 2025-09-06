@@ -2,7 +2,7 @@ import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import Colors, { TColors } from "@/constants/Colors";
 import { DefaultTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { createContext, use, useEffect, useMemo, useState } from "react";
+import { createContext, use, useCallback, useEffect, useMemo, useState } from "react";
 import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type ThemeContextType = {
@@ -23,9 +23,6 @@ type ThemeProviderProps = {
   
 const ThemeProvider = ({children}: ThemeProviderProps) => {
 	const [colors, setColors] = useState(Colors.dark);
-	const applyColors = (colorTheme: TColors) => {
-		setColors(colorTheme);
-	};
 	const inset = useSafeAreaInsets();
 	const [tabBarHeight, setTabBarHeight] = useState(0);
 
@@ -33,7 +30,7 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 		return tabBarHeight + inset.bottom;
 	}, [tabBarHeight, inset.bottom]);
 
-	const defaultScreenOptions: React.ComponentProps<typeof Stack.Screen>['options'] = {
+	const defaultScreenOptions = useMemo((): React.ComponentProps<typeof Stack.Screen>['options'] => ({
 		animation: 'ios_from_right',
 		headerShown: true,
 		headerTintColor: colors.foreground,
@@ -44,22 +41,26 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 		headerTitleAlign: 'center',
 		gestureEnabled: true,
 		gestureDirection: "vertical",
-	};
+	}), [colors]);
+
+	const applyColors = useCallback((colorTheme: TColors) => {
+		setColors(colorTheme);
+	}, []);
 
 	DefaultTheme.colors.background = colors.background;
 
+	const contextValue = useMemo(() => ({
+		applyColors,
+		colors,
+		inset,
+		tabBarHeight,
+		setTabBarHeight,
+		bottomTabHeight,
+		defaultScreenOptions,
+	}), [applyColors, colors, inset, tabBarHeight, setTabBarHeight, bottomTabHeight, defaultScreenOptions]);
+
 	return (
-		<ThemeContext.Provider
-		value={{
-			applyColors,
-			colors,
-			inset,
-			tabBarHeight,
-			setTabBarHeight,
-			bottomTabHeight,
-			defaultScreenOptions,
-		}}
-		>
+		<ThemeContext.Provider value={contextValue}>
 			{children}
 		</ThemeContext.Provider>
 	);

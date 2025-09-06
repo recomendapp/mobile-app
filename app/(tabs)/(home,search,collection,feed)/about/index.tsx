@@ -1,10 +1,11 @@
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import tw from '@/lib/tw';
+import { useMemo } from 'react';
 
 
 const AboutScreen = () => {
-	const resources = [
+	const resources = useMemo(() => [
 		{
 			name: 'Eyecandy',
 			link: 'https://eycndy.co',
@@ -69,7 +70,7 @@ const AboutScreen = () => {
 			name: 'FontBrief',
 			link: 'https://www.fontbrief.com',
 		},
-	];
+	], []);
 
   return (
     <View style={tw`flex-1 items-center justify-center`}>

@@ -28,8 +28,6 @@ const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
 ]
 
-const PADDING = 16;
-
 const ForgotPasswordScreen = () => {
 	const supabase = useSupabaseClient();
 	const { resetPasswordForEmail } = useAuth();

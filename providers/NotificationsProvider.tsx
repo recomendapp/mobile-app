@@ -1,4 +1,4 @@
-import { createContext, use, useCallback, useEffect, useRef, useState } from "react";
+import { createContext, use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
 import { useAuth } from "./AuthProvider";
 import { useSupabaseClient } from "./SupabaseProvider";
@@ -167,26 +167,26 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     };
   }, [session]);
 
-  const defaultProvider = (
-    <NotificationsContext.Provider
-    value={{
-      permissionStatus: permissionStatus,
-      pushToken: pushToken,
-      notifications: notifications,
-      error: error,
-    }}
-    >
+  const contextValue = useMemo(() => ({
+    permissionStatus,
+    pushToken,
+    notifications,
+    error
+  }), [permissionStatus, pushToken, notifications, error]);
+
+  return (
+    <NotificationsContext.Provider value={contextValue}>
       {children}
     </NotificationsContext.Provider>
   );
 
-  if (!session) return defaultProvider;
+  // if (!session) return defaultProvider;
 
-  return (
-    <>
-    {/* <NovuProvider subscriberId={session.user.id} applicationIdentifier={process.env.EXPO_PUBLIC_NOVU_APPLICATION_IDENTIFIER!}> */}
-      {defaultProvider}
-    {/* </NovuProvider> */}
-    </>
-  )
+  // return (
+  //   <>
+  //   {/* <NovuProvider subscriberId={session.user.id} applicationIdentifier={process.env.EXPO_PUBLIC_NOVU_APPLICATION_IDENTIFIER!}> */}
+  //     {defaultProvider}
+  //   {/* </NovuProvider> */}
+  //   </>
+  // )
 };

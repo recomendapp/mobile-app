@@ -1,4 +1,4 @@
-import React from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import Animated, { 
   AnimatedStyle,
   clamp, 
@@ -15,7 +15,8 @@ import * as Haptics from 'expo-haptics';
 import { GAP } from '@/theme/globals';
 import { AnimatedLegendList, AnimatedLegendListProps } from '@legendapp/list/reanimated';
 import { LegendListRef } from '@legendapp/list';
-import { StyleProp, ViewStyle } from 'react-native';
+import { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
+import useDebounce from '@/hooks/useDebounce';
 
 interface WheelSelectorItemProps<T> extends React.ComponentProps<typeof Animated.View> {
   index: number;
@@ -101,6 +102,7 @@ export interface WheelSelectorRef {
 interface WheelSelectorProps<T> extends Omit<AnimatedLegendListProps<T>, 'data' | 'renderItem'> {
   data: readonly T[];
   renderItem: (item: T, isActive: boolean) => React.ReactNode;
+  keyExtractor: (item: T, index: number) => string;
   onSelectionChange?: (item: T, index: number) => void;
   initialIndex?: number;
   enableHaptics?: boolean;
@@ -113,7 +115,7 @@ interface WheelSelectorProps<T> extends Omit<AnimatedLegendListProps<T>, 'data' 
 
 function WheelSelectorInner<T>({
     data,
-    renderItem,
+    renderItem: renderItemProps,
     onSelectionChange,
     initialIndex = 0,
     enableHaptics = true,
@@ -126,41 +128,23 @@ function WheelSelectorInner<T>({
     containerStyle,
 	...props
   }: WheelSelectorProps<T>, ref: React.ForwardedRef<WheelSelectorRef>) {
-    const scrollRef = React.useRef<LegendListRef>(null);
-    const scrollX = useSharedValue(initialIndex);
+    const scrollRef = useRef<LegendListRef>(null);
+    const scrollX = useSharedValue(0);
     const activeIndex = useSharedValue(initialIndex);
-    const [containerWidth, setContainerWidth] = React.useState(0);
+    const [selectedItem, setSelectedItem] = useState<{ item: T; index: number } | null>(data[initialIndex] ? { item: data[initialIndex], index: initialIndex } : null);
+    const debouncedSelectedItem = useDebounce(selectedItem, 200);
+    const [containerWidth, setContainerWidth] = useState(0);
 
-    const finalItemWidth = itemWidth || (containerWidth * 0.2);
-    const TOTAL_ITEM_SIZE = finalItemWidth + itemSpacing;
+     const finalItemWidth = useMemo(() => {
+      return itemWidth || (containerWidth > 0 ? containerWidth * 0.2 : 80); // fallback width
+    }, [itemWidth, containerWidth]);
 
-    const vibrate = () => {
-      if (enableHaptics && process.env.EXPO_OS === 'ios') {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      }
-    };
+    const totalItemWidth = useMemo(() => finalItemWidth + itemSpacing, [finalItemWidth, itemSpacing]);
 
-    const onScroll = useAnimatedScrollHandler(e => {
-      'worklet';
-      scrollX.value = clamp(e.contentOffset.x / TOTAL_ITEM_SIZE, 0, data.length - 1);
-      const newActiveIndex = Math.round(scrollX.value);
-      
-      if (newActiveIndex !== activeIndex.value) {
-        activeIndex.value = newActiveIndex;
-        if (enableHaptics) {
-          runOnJS(vibrate)();
-        }
-        if (onSelectionChange) {
-          runOnJS(onSelectionChange)(data[newActiveIndex], newActiveIndex);
-        }
-      }
-    });
-
-    // Expose methods to parent via ref
-    React.useImperativeHandle(ref, () => ({
+    useImperativeHandle(ref, () => ({
       scrollToIndex: (index: number, animated = true) => {
         scrollRef.current?.scrollToOffset({
-          offset: index * TOTAL_ITEM_SIZE,
+          offset: index * totalItemWidth,
           animated,
         });
       },
@@ -173,74 +157,114 @@ function WheelSelectorInner<T>({
       getCurrentIndex: () => {
         return Math.round(scrollX.value);
       },
-    }), [scrollX, TOTAL_ITEM_SIZE]);
+    }), [scrollX, totalItemWidth]);
 
-    // Initialize scroll position
-    React.useEffect(() => {
-      if (scrollRef.current && initialIndex > 0 && finalItemWidth > 0) {
-        setTimeout(() => {
-          scrollRef.current?.scrollToOffset({
-            offset: initialIndex * TOTAL_ITEM_SIZE,
-            animated: false,
-          });
-        }, 100);
+
+    const vibrate = useCallback(() => {
+      if (enableHaptics && process.env.EXPO_OS === 'ios') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
-    }, [initialIndex, TOTAL_ITEM_SIZE, finalItemWidth]);
+    }, [enableHaptics]);
+
+    const onScroll = useAnimatedScrollHandler(e => {
+      'worklet';
+      scrollX.value = clamp(e.contentOffset.x / totalItemWidth, 0, data.length - 1);
+      const newActiveIndex = Math.round(scrollX.value);
+      
+      if (newActiveIndex !== activeIndex.value) {
+        activeIndex.value = newActiveIndex;
+        if (enableHaptics) {
+          runOnJS(vibrate)();
+        }
+        runOnJS(setSelectedItem)({ item: data[newActiveIndex], index: newActiveIndex });
+      }
+    });
+
+    const handleLayout = useCallback((event: LayoutChangeEvent) => {
+      const { width } = event.nativeEvent.layout;
+      if (width !== containerWidth) {
+        setContainerWidth(width);
+      }
+    }, [containerWidth]);
+
+    const renderItem = useCallback(({ item, index }: { item: T; index: number }) => {
+      return (
+        <Pressable
+        key={index}
+        onPress={() => {
+          console.log('onPress', { item, index });
+          scrollRef.current?.scrollToOffset({
+            offset: index * totalItemWidth,
+            animated: true,
+          });
+        }}
+        >
+          <WheelSelectorItem
+          index={index}
+          totalItems={data.length}
+          item={item}
+          scrollX={scrollX}
+          renderItem={renderItemProps}
+          itemWidth={finalItemWidth}
+          wheelAngle={wheelAngle}
+          wheelIntensity={wheelIntensity}
+          />
+        </Pressable>
+      )
+    }, [finalItemWidth, scrollX, data.length, renderItemProps, totalItemWidth, wheelAngle, wheelIntensity]);
+
+    const listStyle = useMemo(() => {
+      return [
+        {
+          flexGrow: 0,
+          height: finalItemWidth * (1 + wheelIntensity)
+        },
+        style
+      ];
+    }, [finalItemWidth, wheelIntensity, style]);
+
+    const listContentContainerStyle = useMemo(() => {
+      return {
+        gap: itemSpacing,
+        paddingHorizontal: (containerWidth - finalItemWidth) / 2,
+      };
+    }, [containerWidth, finalItemWidth, itemSpacing]);
+
+    const initialScrollIndex = useMemo(() => {
+      if (initialIndex > 0) {
+        return {
+          index: initialIndex,
+          viewOffset: -((containerWidth - finalItemWidth) / 2),
+          viewPosition: 0
+        };
+      }
+      return undefined;
+    }, [initialIndex, containerWidth, finalItemWidth]);
+
+    useEffect(() => {
+      if (debouncedSelectedItem) {
+        onSelectionChange?.(debouncedSelectedItem.item, debouncedSelectedItem.index);
+      }
+    }, [debouncedSelectedItem, onSelectionChange]);
 
     return (
       <Animated.View
-        style={[{ width: '100%' }, containerStyle]}
-        onLayout={(event) => {
-          const { width } = event.nativeEvent.layout;
-          setContainerWidth(width);
-        }}
+      style={[{ width: '100%' }, containerStyle]}
+      onLayout={handleLayout}
       >
         {finalItemWidth > 0 && (
           <AnimatedLegendList<T>
             ref={scrollRef}
             data={data}
-            renderItem={({ item, index }) => (
-              <Pressable
-                key={index}
-                onPress={() => {
-                  scrollRef.current?.scrollToOffset({
-                    offset: index * TOTAL_ITEM_SIZE,
-                    animated: true,
-                  });
-                }}
-              >
-                <WheelSelectorItem
-                index={index}
-                totalItems={data.length}
-                item={item}
-                scrollX={scrollX}
-                renderItem={renderItem}
-                itemWidth={finalItemWidth}
-                wheelAngle={wheelAngle}
-                wheelIntensity={wheelIntensity}
-                />
-              </Pressable>
-            )}
-            keyExtractor={(_, index) => index.toString()}
+            renderItem={renderItem}
+            initialScrollIndex={initialScrollIndex}
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={[
-              {
-                flexGrow: 0,
-                height: finalItemWidth * (1 + wheelIntensity)
-              },
-              style
-            ]}
-            contentContainerStyle={[
-              {
-                gap: itemSpacing,
-                paddingHorizontal: (containerWidth - finalItemWidth) / 2,
-              },
-              contentContainerStyle,
-            ]}
+            style={listStyle}
+            contentContainerStyle={listContentContainerStyle}
             onScroll={onScroll}
             scrollEventThrottle={1000 / 60} // ~16ms
-            snapToInterval={TOTAL_ITEM_SIZE}
+            snapToInterval={totalItemWidth}
 			      {...props}
           />
         )}
@@ -248,7 +272,7 @@ function WheelSelectorInner<T>({
     );
   }
 
-const WheelSelector = React.forwardRef(WheelSelectorInner) as <T>(
+const WheelSelector = forwardRef(WheelSelectorInner) as <T>(
   props: WheelSelectorProps<T> & { ref?: React.Ref<WheelSelectorRef> }
 ) => React.ReactElement;
 

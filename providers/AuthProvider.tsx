@@ -10,6 +10,7 @@ import { useLocaleContext } from "./LocaleProvider";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import { makeRedirectUri } from "expo-auth-session";
 import { defaultLocale, SupportedLocale, supportedLocales } from "@/translations/locales";
+import { useRevenueCat } from "@/hooks/useRevenueCat";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -64,6 +65,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	} = useUserQuery({
 		userId: session?.user.id,
 	});
+	useRevenueCat(session?.user.id);
 
 	// Handlers
 	const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
@@ -208,24 +210,38 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		auth.setReady(true);
 	}, [session, user, auth]);
 
+	const contextValue = useMemo(() => ({
+		session,
+		user,
+		login,
+		loginWithOtp,
+		logout,
+		signup,
+		resetPasswordForEmail,
+		updateEmail,
+		verifyEmailChange,
+		cancelPendingEmailChange,
+		createSessionFromUrl,
+		pushToken,
+		setPushToken,
+	}), [
+		session,
+		user,
+		login,
+		loginWithOtp,
+		logout,
+		signup,
+		resetPasswordForEmail,
+		updateEmail,
+		verifyEmailChange,
+		cancelPendingEmailChange,
+		createSessionFromUrl,
+		pushToken,
+		setPushToken,
+	]);
+
 	return (
-		<AuthContext.Provider
-		value={{
-			session,
-			user,
-			login,
-			loginWithOtp,
-			logout,
-			signup,
-			resetPasswordForEmail,
-			updateEmail,
-			verifyEmailChange,
-			cancelPendingEmailChange,
-			createSessionFromUrl,
-			pushToken,
-			setPushToken,
-		}}
-		>
+		<AuthContext.Provider value={contextValue}>
 			{children}
 		</AuthContext.Provider>
 	);

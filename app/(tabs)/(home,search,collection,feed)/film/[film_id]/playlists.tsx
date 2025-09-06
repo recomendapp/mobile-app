@@ -11,12 +11,13 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { PADDING_VERTICAL } from "@/theme/globals";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo, memo } from "react";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { ButtonPlaylistMovieAdd } from "@/components/buttons/ButtonPlaylistMovieAdd";
 import { FadeInDown } from "react-native-reanimated";
+import { Playlist } from "@recomendapp/types";
 
 interface sortBy {
 	label: string;
@@ -31,17 +32,17 @@ const FilmPlaylists = () => {
 	const { colors, bottomTabHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
-	const sortByOptions: sortBy[] = [
+	const sortByOptions: sortBy[] = useMemo(() => [
 		{ label: upperFirst(t('common.messages.date_updated')), value: 'updated_at' },
 		{ label: upperFirst(t('common.messages.date_created')), value: 'created_at' },
 		{ label: upperFirst(t('common.messages.number_of_likes')), value: 'likes_count' },
-	];
+	], [t]);
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	// Requests
 	const { data: movie } = useMediaMovieQuery({ movieId: movieId });
 	const {
-		data: playlists,
+		data,
 		isLoading,
 		fetchNextPage,
 		hasNextPage,
@@ -54,7 +55,8 @@ const FilmPlaylists = () => {
 			sortOrder,
 		}
 	});
-	const loading = playlists === undefined || isLoading;
+	const loading = data === undefined || isLoading;
+	const playlists = useMemo(() => data?.pages.flat() || [], [data]);
 	// Handlers
 	const handleSortBy = useCallback(() => {
 		const sortByOptionsWithCancel = [
@@ -70,45 +72,52 @@ const FilmPlaylists = () => {
 			if (selectedIndex === undefined || selectedIndex === cancelIndex) return;
 			setSortBy(sortByOptionsWithCancel[selectedIndex] as sortBy);
 		});
-	}, [sortByOptions, showActionSheetWithOptions]);
+	}, [sortByOptions, showActionSheetWithOptions, t, sortBy.value]);
 
+	const handleSortOrderToggle = useCallback(() => {
+		setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc');
+	}, []);
+
+	const onEndReached = useCallback(() => {
+		if (hasNextPage) {
+			fetchNextPage();
+		}
+	}, [hasNextPage, fetchNextPage]);
 
 	return (
 	<>
 		<Stack.Screen
-		options={{
+		options={useMemo(() => ({
 			title: movie?.title || '',
 			headerTitle: (props) => <HeaderTitle {...props}>{upperFirst(t('common.messages.playlist', { count: 2 }))}</HeaderTitle>,
 			headerRight: (session && movie) ? () => (
 				<ButtonPlaylistMovieAdd movie={movie} />
 			) : undefined,
-		}}
+		}), [movie?.title, session, t])}
 		/>
 		<LegendList
-		data={playlists?.pages.flatMap((page) => page) ?? []}
-		renderItem={({ item, index }) => (
+		data={playlists}
+		renderItem={useCallback(({ item } : { item: Playlist }) => (
 			<CardPlaylist
 			key={item.id}
 			playlist={item}
 			entering={FadeInDown}
 			/>
-		)}
-		ListHeaderComponent={
-			<>
-				<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
-					<Button
-					icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
-					variant="muted"
-					size='icon'
-					onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}
-					/>
-					<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>
-						{sortBy.label}
-					</Button>
-				</View>
-			</>
-		}
-		ListEmptyComponent={
+		), [])}
+		ListHeaderComponent={useMemo(() => (
+			<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
+				<Button
+				icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
+				variant="muted"
+				size='icon'
+				onPress={handleSortOrderToggle}
+				/>
+				<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>
+					{sortBy.label}
+				</Button>
+			</View>
+		), [sortOrder, sortBy.label, handleSortOrderToggle, handleSortBy])}
+		ListEmptyComponent={useMemo(() => 
 			loading ? <Icons.Loader />
 			: (
 				<View style={tw`flex-1 items-center justify-center p-4`}>
@@ -116,24 +125,26 @@ const FilmPlaylists = () => {
 						{upperFirst(t('common.messages.no_results'))}
 					</Text>
 				</View>
-			) 
-		}
+			), [loading, colors.mutedForeground, t]
+		)}
 		numColumns={3}
-		onEndReached={() => hasNextPage && fetchNextPage()}
+		onEndReached={onEndReached}
 		onEndReachedThreshold={0.5}
-		contentContainerStyle={[
+		contentContainerStyle={useMemo(() => [
 			{
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			},
 			tw`px-4`,
-		]}
-		keyExtractor={(item) => item.id.toString()}
-		columnWrapperStyle={tw`gap-2`}
+		], [bottomTabHeight])}
+		keyExtractor={useCallback((item: any) => item.id.toString(), [])}
+		columnWrapperStyle={useMemo(() => tw`gap-2`, [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		/>
 	</>
 	);
 };
+
+FilmPlaylists.displayName = 'FilmPlaylists';
 
 export default FilmPlaylists;

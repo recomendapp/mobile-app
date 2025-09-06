@@ -40,18 +40,21 @@ const SplashScreenProvider = ({
 			SplashScreen.hide();
 		}
 	}, [ready]);
+	
+	const contextValue = useMemo(() => ({
+		auth: {
+			ready: authReady,
+			setReady: setAuthReady
+		},
+		i18n: {
+			ready: i18nReady,
+			setReady: setI18nReady
+		},
+		ready: ready
+	}), [authReady, i18nReady, ready]);
 
 	return (
-		<SplashScreenContext.Provider
-		value={{
-			auth: {
-				ready: authReady, setReady: setAuthReady
-			},
-			i18n: {
-				ready: i18nReady, setReady: setI18nReady
-			},
-			ready: ready
-		}}>
+		<SplashScreenContext.Provider value={contextValue}>
 			{children}
 		</SplashScreenContext.Provider>
 	);

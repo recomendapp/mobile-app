@@ -18,15 +18,15 @@ import { useScrollToTop } from "@react-navigation/native";
 import { BestResultsSearchResponse, MediaMovie, MediaPerson, MediaTvSeries, Playlist, User } from "@recomendapp/types";
 import { Link } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useRef, memo } from "react";
+import { useCallback, useRef, memo, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useTranslations } from "use-intl";
 
-const SearchScreen = memo(() => {
+const SearchScreen = () => {
 	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
 	
-	const renderSearch = useCallback(() => {
+	const content = useMemo(() => {
 		if (debouncedSearch) {
 			return <SearchResults search={debouncedSearch} />
 		} else {
@@ -34,8 +34,8 @@ const SearchScreen = memo(() => {
 		}
 	}, [debouncedSearch]);
 
-	return renderSearch();
-});
+	return content;
+};
 SearchScreen.displayName = 'SearchScreen';
 
 interface SearchResultsProps extends React.ComponentPropsWithoutRef<typeof ScrollView> {

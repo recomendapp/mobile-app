@@ -151,13 +151,13 @@ export const PlaylistTvSeries = ({
     ]), [t]);
 	const bottomSheetActions = useMemo((): CollectionAction<PlaylistItemTvSeries>[] => {
         return [
-            {
+            ...(isAllowedToEdit ? [{
                 icon: Icons.Delete,
                 label: upperFirst(t('common.messages.delete')),
                 variant: 'destructive',
                 onPress: handleDeletePlaylistItem,
 				position: 'bottom',
-            },
+            }] as const : []),
 			{
 				icon: Icons.Comment,
 				label: upperFirst(t('common.messages.view_comment', { count: 1})),
@@ -174,13 +174,13 @@ export const PlaylistTvSeries = ({
 			variant: 'accent-yellow',
 			position: 'left',
 		},
-		{
+		...(isAllowedToEdit ? [{
 			icon: Icons.Delete,
 			label: upperFirst(t('common.messages.delete')),
 			onPress: handleDeletePlaylistItem,
 			variant: 'destructive',
 			position: 'right',
-		}
+		}] as const : []),
 	], [handlePlaylistItemComment, handleDeletePlaylistItem, t]);
 
 	const onItemAction = useCallback((data: PlaylistItemTvSeries) => {

@@ -12,9 +12,7 @@ export const SupabaseProvider = ({
 	children: React.ReactNode;
 }) => {
 	const locale = useLocale();
-	const supabase = useMemo(() => {
-		return createClient(locale);
-	}, [locale]);
+	const supabase = useMemo(() => createClient(locale), [locale]);
 	return (
 		<SupabaseContext.Provider value={supabase}>
 			{children}

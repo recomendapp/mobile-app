@@ -16,11 +16,13 @@ import { Text } from '@/components/ui/text';
 import app from '@/constants/app';
 import { UserNav } from '@/components/user/UserNav';
 import { Skeleton } from '@/components/ui/Skeleton';
-import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import Animated, { AnimatedStyle, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import AnimatedStackScreen from '@/components/ui/AnimatedStackScreen';
 import { View } from '@/components/ui/view';
 import { AnimatedScrollView } from 'react-native-reanimated/lib/typescript/component/ScrollView';
 import { memo, useCallback, useMemo, useRef } from 'react';
+import { GAP, PADDING_VERTICAL } from '@/theme/globals';
+import { StyleProp, ViewStyle } from 'react-native';
 
 const HeaderLeft = () => {
   const { session, user } = useAuth();
@@ -95,10 +97,10 @@ const HeaderRight = () => {
 HeaderRight.displayName = 'HeaderRight';
 
 const AuthenticatedWidgets = memo(() => {
-  const widgetStyles = {
+  const widgetStyles = useMemo(() => ({
     labelStyle: tw`px-4`,
     containerStyle: tw`px-4`
-  };
+  }), []);
 
   return (
     <>
@@ -135,12 +137,28 @@ const HomeScreen = () => {
   const scrollY = useSharedValue(0);
   const triggerHeight = useSharedValue(500);
   
+  const mainContent = useMemo(() => (
+    session ? <AuthenticatedWidgets /> : <UnauthenticatedContent />
+  ), [session]);
+
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: event => {
       'worklet';
       scrollY.value = event.contentOffset.y;
     },
   });
+
+  const screenOptions = useMemo(() => ({
+    title: upperFirst(t('common.messages.home')),
+    headerLeft: () => <HeaderLeft />,
+    headerRight: () => <HeaderRight />
+  }), [t]);
+  
+  // Styles
+  const contentContainerStyle = useMemo((): StyleProp<AnimatedStyle<StyleProp<ViewStyle>>> => ({
+    gap: GAP,
+    paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+  }), [bottomTabHeight]);
 
   useScrollToTop(scrollRef);
 
@@ -149,24 +167,18 @@ const HomeScreen = () => {
       <AnimatedStackScreen
         scrollY={scrollY}
         triggerHeight={triggerHeight}
-        options={{
-          title: upperFirst(t('common.messages.home')),
-          headerLeft: () => <HeaderLeft />,
-          headerRight: () => <HeaderRight />,
-        }}
+        options={screenOptions}
       />
       <Animated.ScrollView
-        ref={scrollRef}
-        onScroll={scrollHandler}
-        contentContainerStyle={[
-          tw`gap-2`,
-          { paddingBottom: bottomTabHeight + 8 },
-        ]}
-        showsVerticalScrollIndicator={false}
-        nestedScrollEnabled
+      ref={scrollRef}
+      onScroll={scrollHandler}
+      contentContainerStyle={contentContainerStyle}
+      showsVerticalScrollIndicator={false}
+      nestedScrollEnabled
       >
         <WidgetMostRecommended />
-        {session ? <AuthenticatedWidgets /> : <UnauthenticatedContent />}
+        <Link href={'/upgrade'} asChild><Button>Upgrade</Button></Link>
+        {mainContent}
       </Animated.ScrollView>
     </>
   );

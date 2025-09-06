@@ -2,7 +2,7 @@ import { Skeleton } from '../ui/Skeleton';
 import Avatar from '../ui/Avatar';
 import tw from '@/lib/tw';
 import { CORNERS } from '@/theme/globals';
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, memo, useMemo } from 'react';
 
 interface UserAvatarBaseProps
 	extends Omit<React.ComponentPropsWithRef<typeof Avatar.Root>, 'alt'> {
@@ -23,12 +23,12 @@ type UserAvatarDataProps = {
 export type UserAvatarProps = UserAvatarBaseProps &
 	(UserAvatarSkeletonProps | UserAvatarDataProps);
 
-const UserAvatar = forwardRef<
+const UserAvatar = memo(forwardRef<
 	React.ComponentRef<typeof Avatar.Root>,
 	UserAvatarProps
 >(({ full_name, avatar_url, skeleton, style, ...props }, ref) => {
 	const skeletonStyle = useMemo(() => [
-		tw.style('h-12 w-12'),
+		tw`h-12 w-12`,
 		style,
 	], [style]);
 
@@ -39,24 +39,24 @@ const UserAvatar = forwardRef<
 	if (skeleton) {
 		return (
 			<Skeleton
-				borderRadius={CORNERS}
-				style={skeletonStyle}
+			borderRadius={CORNERS}
+			style={skeletonStyle}
 			/>
 		);
 	}
 	
 	return (
 		<Avatar.Root
-			ref={ref}
-			alt={full_name}
-			style={style}
-			{...props}
+		ref={ref}
+		alt={full_name}
+		style={style}
+		{...props}
 		>
 			<Avatar.Image source={imageSource} />
 			<Avatar.Fallback />
 		</Avatar.Root>
 	);
-});
+}));
 UserAvatar.displayName = 'UserAvatar';
 
 export default UserAvatar;
