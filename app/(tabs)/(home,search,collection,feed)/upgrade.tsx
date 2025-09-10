@@ -1,53 +1,46 @@
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { LegendList } from "@legendapp/list";
-import { useQuery } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { Icons } from "@/constants/Icons";
+import { authKeys } from "@/features/auth/authKeys";
+import { userKeys } from "@/features/user/userKeys";
+import tw from "@/lib/tw";
+import { useAuth } from "@/providers/AuthProvider";
+import { useTheme } from "@/providers/ThemeProvider";
+import {  useQueryClient } from "@tanstack/react-query";
+import { Stack, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback } from "react";
-import Purchases, { PurchasesPackage } from "react-native-purchases";
+import { useCallback, useMemo } from "react";
+import RevenueCatUI from "react-native-purchases-ui";
 import { useTranslations } from "use-intl";
 
 const UpgradeScreen = () => {
+	const router = useRouter();
+	const queryClient = useQueryClient();
 	const t = useTranslations();
-	const {
-		data,
-		isLoading,
-		error,
-	} = useQuery({
-		queryKey: ['products'],
-		queryFn: async () => {
-			const offerings = await Purchases.getOfferings();
-			return offerings;
-		}
-	});
-	const handleUpgrade = useCallback(async (item: PurchasesPackage) => {
-		try {
-			await Purchases.purchasePackage(item);
-		} catch (error: any) {
-			if (error.code === Purchases.PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR) return;
-			console.error(error);
-		}
-	}, []);
-	console.log('data',data?.current?.annual)
+	const { session } = useAuth();
+	const { defaultScreenOptions } = useTheme();
+	const screenOptions = useMemo(() => ({
+		...defaultScreenOptions,
+		headerTitle: upperFirst(t('common.messages.upgrade')),
+		headerTransparent: true,
+		headerRight: () => <Button icon={Icons.X} size="icon" variant='muted' style={tw`rounded-full`} onPress={() => router.canGoBack() && router.back()} />,
+		headerStyle: { backgroundColor: 'transparent' },
+	}), [defaultScreenOptions, t]);
+	
+	const onSuccess = useCallback(async () => {
+		await queryClient.invalidateQueries({
+			queryKey: authKeys.customerInfo(),
+		});
+		session?.user.id && await queryClient.invalidateQueries({
+			queryKey: userKeys.detail(session.user.id),
+		});
+		router.canGoBack() && router.back();
+	}, [router]);
 	return (
 	<>
-		<Stack.Screen
-			options={{
-				headerTitle: upperFirst(t('common.messages.upgrade_to_plan', { plan: 'Premium' })),
-			}}
-		/>
-		<LegendList
-		data={data?.current?.availablePackages || []}
-		renderItem={({ item }) => (
-			<View>
-				<Text>{item.product.title}</Text>
-				<Text>{item.product.description}</Text>
-				<Button onPress={() => handleUpgrade(item)}>Upgrade</Button>
-			</View>
-		)}
-		/>
+		<Stack.Screen options={screenOptions} />
+		<RevenueCatUI.Paywall onPurchaseCompleted={onSuccess} onRestoreCompleted={onSuccess} />
 	</>
 	)
 };

@@ -23,6 +23,9 @@ interface UIStore {
 
   feedView: 'community' | 'cast_and_crew';
   setFeedView: (view: 'community' | 'cast_and_crew') => void;
+
+  notificationsView: 'all' | 'unread' | 'archived';
+  setNotificationsView: (view: 'all' | 'unread' | 'archived') => void;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -67,6 +70,9 @@ export const useUIStore = create<UIStore>()(
 			// Feed
 			feedView: 'community',
 			setFeedView: (view) => set({ feedView: view }),
+			// Notifications
+			notificationsView: 'all',
+			setNotificationsView: (view) => set({ notificationsView: view }),
 		}),
 		{
 			name: 'ui-storage',

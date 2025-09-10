@@ -39,6 +39,7 @@ const createMMKVPersister = (key: string) => ({
 });
 
 const PERSISTED_QUERY_KEYS = [
+  'auth',
   'novu',
   'cached-data',
 ];

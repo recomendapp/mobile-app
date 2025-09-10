@@ -137,6 +137,7 @@ const SearchLayout = () => {
 						paddingHorizontal: PADDING_HORIZONTAL,
 						gap: GAP,
 					}}
+					keyboardShouldPersistTaps='handled'
 					/>
 				)}
 			</View>

@@ -32,7 +32,7 @@ const ModalPlaylistEditGuests = () => {
     const playlistId = Number(playlist_id);
 	const { inset, colors } = useTheme();
 	const router = useRouter();
-	const { user } = useAuth();
+	const { customerInfo } = useAuth();
 	const t = useTranslations();
 	const {
 		data: playlist,
@@ -94,7 +94,7 @@ const ModalPlaylistEditGuests = () => {
 
 	// Handlers
 	const handleToggleEdit = useCallback((userId: string) => {
-		if (!user?.premium) {
+		if (!customerInfo?.entitlements.active['premium']) {
 			router.push({ pathname: '/upgrade', params: { feature: app.features.playlist_collaborators } });
 			return;
 		}
@@ -107,7 +107,7 @@ const ModalPlaylistEditGuests = () => {
 				return guest;
 			});
 		});
-	}, []);
+	}, [customerInfo?.entitlements.active, router]);
 	const handleDeleteGuest = useCallback(async (userId: string) => {
 		setGuests((prev) => {
 			if (!prev) return prev;

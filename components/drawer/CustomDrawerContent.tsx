@@ -106,7 +106,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     const router = useRouter();
     const t = useTranslations();
     const { colors } = useTheme();
-    const { session, user, logout } = useAuth();
+    const { session, customerInfo, logout } = useAuth();
 
     const routes = useMemo(() => [
         {
@@ -121,7 +121,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             name: upperFirst(t('common.messages.upgrade_to_plan', { plan: 'Premium' })),
             icon: Icons.premium,
             onPress: () => router.push('/upgrade'),
-            visible: !!session && !user?.premium,
+            visible: !!session && !customerInfo?.entitlements.active['premium'],
             color: colors.accentBlue,
         },
         {
@@ -138,7 +138,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             onPress: () => router.push('/about'),
             visible: true,
         }
-    ], [t, router, session, user?.premium, colors.accentBlue]);
+    ], [t, router, session, customerInfo?.entitlements.active['premium'], colors.accentBlue]);
 
     const visibleRoutes = useMemo(
         () => routes.filter(route => route.visible),

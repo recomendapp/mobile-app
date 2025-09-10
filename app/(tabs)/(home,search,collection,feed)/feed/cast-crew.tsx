@@ -22,7 +22,7 @@ const CastCrewFeedScreen = () => {
 	const router = useRouter();
 	const { bottomTabHeight, colors } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
-	const { user } = useAuth();
+	const { session, customerInfo } = useAuth();
 	const {
 		data: feed,
 		isLoading,
@@ -31,19 +31,19 @@ const CastCrewFeedScreen = () => {
 		hasNextPage,
 		refetch,
 	} = useUserFeedCastCrewInfiniteQuery({
-		userId: user?.id,
-		enabled: !!user?.premium,
+		userId: session?.user.id,
+		enabled: !!customerInfo?.entitlements.active['premium'],
 	});
 	const loading = isLoading || feed === undefined;
 
-	if (user === undefined) {
+	if (session === undefined || customerInfo === undefined) {
 		return (
 			<View style={[tw`flex-1 items-center justify-center`, { paddingTop: PADDING_VERTICAL, paddingBottom: bottomTabHeight + PADDING_VERTICAL }]}>
 				<Icons.Loader />
 			</View>
 		)
 	}
-	if (!user?.premium) {
+	if (!customerInfo?.entitlements.active['premium']) {
 		return (
 			<View style={[tw`flex-1 items-center justify-center gap-2`, { paddingTop: PADDING_VERTICAL, paddingBottom: bottomTabHeight + PADDING_VERTICAL }]}>
 				<Button

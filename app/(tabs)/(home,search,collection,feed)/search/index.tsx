@@ -64,6 +64,7 @@ export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => 
 		<ScrollView
 			ref={scrollRef}
 			contentContainerStyle={{ gap: GAP, paddingBottom: tabBarHeight + inset.bottom + PADDING_VERTICAL }}
+			keyboardShouldPersistTaps='handled'
 			{...props}
 		>
 			{data.bestResult && (

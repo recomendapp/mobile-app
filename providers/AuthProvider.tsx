@@ -11,6 +11,8 @@ import * as QueryParams from "expo-auth-session/build/QueryParams";
 import { makeRedirectUri } from "expo-auth-session";
 import { defaultLocale, SupportedLocale, supportedLocales } from "@/translations/locales";
 import { useRevenueCat } from "@/hooks/useRevenueCat";
+import { useAuthCustomerInfo } from "@/features/auth/authQueries";
+import { CustomerInfo } from "react-native-purchases";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -28,6 +30,7 @@ AppState.addEventListener('change', (state) => {
 type AuthContextProps = {
 	session: Session | null | undefined;
 	user: User | null | undefined;
+	customerInfo: CustomerInfo | undefined;
 	login: (credentials: { email: string; password: string }) => Promise<void>;
 	loginWithOtp: (email: string, redirectTo?: string | null) => Promise<void>;
 	logout: () => Promise<void>;
@@ -65,8 +68,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	} = useUserQuery({
 		userId: session?.user.id,
 	});
-	useRevenueCat(session?.user.id);
-
+	const { customerInfo: initCustomerInfo } = useRevenueCat(session?.user.id);
+	const {
+		data: customerInfo,
+	} = useAuthCustomerInfo({
+		enabled: !!initCustomerInfo,
+		initialData: initCustomerInfo,
+	});
 	// Handlers
 	const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
 		const { error } = await supabase.auth.signInWithPassword({
@@ -213,6 +221,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const contextValue = useMemo(() => ({
 		session,
 		user,
+		customerInfo,
 		login,
 		loginWithOtp,
 		logout,
@@ -227,6 +236,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	}), [
 		session,
 		user,
+		customerInfo,
 		login,
 		loginWithOtp,
 		logout,

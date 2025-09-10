@@ -65,6 +65,7 @@ const FeaturedPlaylists = ({
 		ItemSeparatorComponent={itemSeparator}
 		refreshing={isRefetching}
 		onRefresh={refetch}
+		keyboardShouldPersistTaps='handled'
 		/>
 	)
 };

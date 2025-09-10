@@ -199,7 +199,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     applicationIdentifier={process.env.EXPO_PUBLIC_NOVU_APPLICATION_IDENTIFIER!}
     subscriberId={session.user.id}
     subscriberHash={subscriberHash}
-    useCache={true}
+    // useCache={true}
     >
       {defaultProvider}
     </NovuProvider>

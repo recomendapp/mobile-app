@@ -346,7 +346,7 @@ export const ShareMovie = forwardRef<
 	ShareViewRef,
 	ShareMovieProps
 >(({ movie, variant = 'default', ...props }, ref) => {
-	const { user } = useAuth();
+	const { user, customerInfo } = useAuth();
 	const router = useRouter();
 	const viewShotRef = useRef<ViewShot>(null);
 	const { height: screenHeight } = useWindowDimensions();
@@ -428,7 +428,7 @@ export const ShareMovie = forwardRef<
 			size="icon"
 			style={tw`rounded-full`}
 			onPress={() => {
-				if (!user || !user.premium) {
+				if (!customerInfo?.entitlements.active['premium']) {
 					router.push({
 						pathname: '/upgrade',
 						params: {
