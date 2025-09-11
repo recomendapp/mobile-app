@@ -47,11 +47,11 @@ const NotificationsScreen = () => {
 	const handleUnarchive = useCallback(async (notification: typeof notifications[number]) => {
 		await unarchiveMutation.mutateAsync(notification);
 	}, [unarchiveMutation]);
-	const handleRead = useCallback(async (id: string) => {
-		await readMutation.mutateAsync(id);
+	const handleRead = useCallback(async (notification: typeof notifications[number]) => {
+		await readMutation.mutateAsync(notification);
 	}, [readMutation]);
-	const handleUnread = useCallback(async (id: string) => {
-		await unreadMutation.mutateAsync(id);
+	const handleUnread = useCallback(async (notification: typeof notifications[number]) => {
+		await unreadMutation.mutateAsync(notification);
 	}, [unreadMutation]);
 	const renderItemContent = useCallback(({ item }: { item: typeof notifications[number] }) => {
 		const notif = item.content;
@@ -100,9 +100,9 @@ const NotificationsScreen = () => {
 							backgroundColor: colors.accentBlue,
 							onPress: async () => {
 								if (item.isRead) {
-									await handleUnread(item.id);
+									await handleUnread(item);
 								} else {
-									await handleRead(item.id);
+									await handleRead(item);
 								}
 							}
 						}
