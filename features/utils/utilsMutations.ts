@@ -79,7 +79,7 @@ export const useNotificationUnarchiveMutation = () => {
 				queryClient.setQueryData(key, (currentData: InfiniteData<NotificationWithContent> | undefined) => {
 					if (!currentData) return currentData;
 					const newPages = currentData.pages.map((page) => {
-						if (view === 'all' || view === 'unread') {
+						if (view === 'all') {
 							const notifs = page.notifications.filter(n => n.id !== notification.id);
 							notifs.push(Object.assign(notification, { isArchived: false }));
 							notifs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

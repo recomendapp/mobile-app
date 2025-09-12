@@ -346,7 +346,7 @@ export const ShareMovie = forwardRef<
 	ShareViewRef,
 	ShareMovieProps
 >(({ movie, variant = 'default', ...props }, ref) => {
-	const { user, customerInfo } = useAuth();
+	const { session, customerInfo } = useAuth();
 	const router = useRouter();
 	const viewShotRef = useRef<ViewShot>(null);
 	const { height: screenHeight } = useWindowDimensions();
@@ -428,7 +428,11 @@ export const ShareMovie = forwardRef<
 			size="icon"
 			style={tw`rounded-full`}
 			onPress={() => {
-				if (!customerInfo?.entitlements.active['premium']) {
+				if (!session) {
+					router.push({
+						pathname: '/auth',
+					})
+				} else if (!customerInfo?.entitlements.active['premium']) {
 					router.push({
 						pathname: '/upgrade',
 						params: {
@@ -441,7 +445,7 @@ export const ShareMovie = forwardRef<
 			}}
 			/>
 		</View>
-	), [editing, activeEditingOption, bgType, user, bgColor, backdrop]);
+	), [editing, activeEditingOption, bgType, session, bgColor, backdrop]);
 
 	// Refs
 	useImperativeHandle(ref, () => ({

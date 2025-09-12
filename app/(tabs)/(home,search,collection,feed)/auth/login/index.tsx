@@ -75,6 +75,7 @@ const LoginScreen = () => {
 					}
 				]}
 				bottomOffset={navigationHeaderHeight}
+				keyboardShouldPersistTaps='handled'
 				>
 					<View style={[tw`w-full`, { gap: GAP }]}>
 						<GroupedInput title={t('pages.auth.login.label', { app: app.name })} titleStyle={tw`text-center text-xl font-bold`}>

@@ -180,6 +180,7 @@ const ForgotPasswordScreen = () => {
 					}
 				]}
 				bottomOffset={navigationHeaderHeight}
+				keyboardShouldPersistTaps='handled'
 				>
 					{!showOtp ? (
 						<>

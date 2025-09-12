@@ -14,12 +14,14 @@ import { useCallback, useMemo } from "react";
 import { Notification } from "@novu/react-native";
 import { useNotificationArchiveMutation, useNotificationReadMutation, useNotificationUnarchiveMutation, useNotificationUnreadMutation } from "@/features/utils/utilsMutations";
 import ReusableAppleStyleSwipeableRow from "@/components/ui/swippeable/ReusableAppleStyleSwipeableRow";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useUIStore } from "@/stores/useUIStore";
-
+import * as Burnt from "burnt";
+import { useTranslations } from "use-intl";
+import { upperFirst } from "lodash";
 
 const NotificationsScreen = () => {
 	const router = useRouter();
+	const t = useTranslations();
 	const { colors } = useTheme();
 	const view = useUIStore(state => state.notificationsView);
 	const setView = useUIStore(state => state.setNotificationsView);
@@ -42,25 +44,57 @@ const NotificationsScreen = () => {
 	const unreadMutation = useNotificationUnreadMutation();
 
 	const handleArchive = useCallback(async (notification: typeof notifications[number]) => {
-		await archiveMutation.mutateAsync(notification);
+		await archiveMutation.mutateAsync(notification, {
+			onSuccess: () => {
+				Burnt.toast({
+					title: upperFirst(t('common.messages.notification_archived', { count: 1 })),
+					preset: 'done',
+					haptic: 'success',
+				});
+			}
+		});
 	}, [archiveMutation]);
 	const handleUnarchive = useCallback(async (notification: typeof notifications[number]) => {
-		await unarchiveMutation.mutateAsync(notification);
+		await unarchiveMutation.mutateAsync(notification, {
+			onSuccess: () => {
+				Burnt.toast({
+					title: upperFirst(t('common.messages.notification_unarchived', { count: 1 })),
+					preset: 'done',
+					haptic: 'success',
+				});
+			}
+		});
 	}, [unarchiveMutation]);
 	const handleRead = useCallback(async (notification: typeof notifications[number]) => {
-		await readMutation.mutateAsync(notification);
+		await readMutation.mutateAsync(notification, {
+			onSuccess: () => {
+				Burnt.toast({
+					title: upperFirst(t('common.messages.notification_marked_as_read', { count: 1 })),
+					preset: 'done',
+					haptic: 'success',
+				});
+			}
+		});
 	}, [readMutation]);
 	const handleUnread = useCallback(async (notification: typeof notifications[number]) => {
-		await unreadMutation.mutateAsync(notification);
+		await unreadMutation.mutateAsync(notification, {
+			onSuccess: () => {
+				Burnt.toast({
+					title: upperFirst(t('common.messages.notification_marked_as_unread', { count: 1 })),
+					preset: 'done',
+					haptic: 'success',
+				});
+			}
+		});
 	}, [unreadMutation]);
 	const renderItemContent = useCallback(({ item }: { item: typeof notifications[number] }) => {
 		const notif = item.content;
 		if (!notif) return null;
 		switch (notif.type) {
 			case 'reco_sent_movie':
-				return <CardNotificationRecoSentMovie sender={notif.content.sender!} movie={notif.content.movie!} onPress={!item.isRead ? () => handleRead(item.id) : undefined} />;
+				return <CardNotificationRecoSentMovie sender={notif.content.sender!} movie={notif.content.movie!} onPress={!item.isRead ? () => handleRead(item) : undefined} />;
 			case 'reco_sent_tv_series':
-				return <CardNotificationRecoSentTvSeries sender={notif.content.sender!} tvSeries={notif.content.tv_series!} onPress={!item.isRead ? () => handleRead(item.id) : undefined} />;
+				return <CardNotificationRecoSentTvSeries sender={notif.content.sender!} tvSeries={notif.content.tv_series!} onPress={!item.isRead ? () => handleRead(item) : undefined} />;
 			case 'follower_accepted':
 				return <View style={[{ backgroundColor: colors.muted}, tw`p-4 rounded-md`]}><Text textColor="muted" style={tw`text-center`}>Follower accepted {notif.content.followee.username}</Text></View>;
 			default:
@@ -121,9 +155,7 @@ const NotificationsScreen = () => {
 				}
 			}}
 			>
-				<GestureDetector gesture={Gesture.Tap().maxDuration(250)}>
-					{renderItemContent({ item })}
-				</GestureDetector>
+				{renderItemContent({ item })}
 				{!item.isRead && <View style={[tw`bg-red-500 rounded-2 w-2 aspect-square left-2`,{ position: 'absolute', top: '50%', transform: [{ translateY: "-50%" }] }]}/>}
 			</ReusableAppleStyleSwipeableRow>
 		)

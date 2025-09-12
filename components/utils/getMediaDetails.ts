@@ -1,5 +1,6 @@
-import { BORDER_RADIUS, GAP } from "@/theme/globals";
+import { BORDER_RADIUS } from "@/theme/globals";
 import { MediaMovie, MediaPerson, MediaTvSeries, MediaTvSeriesEpisode, MediaTvSeriesSeason, MediaType, Playlist, User } from "@recomendapp/types";
+import { Href } from "expo-router";
 import { StyleProp, ViewStyle } from "react-native";
 
 interface MediaBaseProps {
@@ -134,6 +135,22 @@ const getMediaDetails = ({
 				return {};
 		}
 	};
+	const getUrl = (): Href => {
+		switch (type) {
+			case 'movie':
+				return `/film/${media.slug ?? media.id}`;
+			case 'tv_series':
+				return `/tv-series/${media.slug ?? media.id}`;
+			case 'person':
+				return `/person/${media.slug ?? media.id}`;
+			case 'playlist':
+				return `/playlist/${media.id}`;
+			case 'user':
+				return `/user/${media.username}`;
+			default:
+				return '/';
+		}
+	};
 	return {
 		title: getTitle(),
 		subtitle: getSubtitle(),
@@ -141,6 +158,7 @@ const getMediaDetails = ({
 		date: getDate(),
 		description: getDescription(),
 		style: getImageStyle(),
+		url: getUrl(),
 		posterClassName: type === 'movie'
 			? 'aspect-[2/3] rounded-md'
 			: type === 'tv_series'

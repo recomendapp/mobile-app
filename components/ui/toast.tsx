@@ -40,7 +40,7 @@ export interface ToastData {
   duration?: number;
   action?: {
     label: string;
-    onPress: () => void;
+    onPress: (id: string) => void;
   };
 }
 
@@ -48,6 +48,11 @@ interface ToastProps extends ToastData {
   onDismiss: (id: string) => void;
   index: number;
   duration?: number;
+  shouldDismiss?: boolean; // Ajout du prop pour contrôler la suppression
+}
+
+interface DismissOptions {
+  animated?: boolean;
 }
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -66,11 +71,12 @@ export function Toast({
   index,
   action,
   duration = 4000,
+  shouldDismiss = false, // Nouveau prop
 }: ToastProps) {
   const { colors, inset } = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasContent, setHasContent] = useState(false);
-  const [shouldDismiss, setShouldDismiss] = useState(false);
+  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
 
   // Reanimated shared values
   const translateY = useSharedValue(-100);
@@ -123,9 +129,11 @@ export function Toast({
     onDismiss(id);
   }, [id, onDismiss]);
 
-  const dismiss = useCallback(() => {
-    setShouldDismiss(true);
-  }, []);
+  const startDismissAnimation = useCallback(() => {
+    if (!isAnimatingOut) {
+      setIsAnimatingOut(true);
+    }
+  }, [isAnimatingOut]);
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
@@ -141,7 +149,7 @@ export function Toast({
         translationY < -50 ||
         velocityY < -800
       ) {
-        runOnJS(setShouldDismiss)(true);
+        runOnJS(startDismissAnimation)();
       } else {
         // Snap back to original position
         translateY.value = withSpring(0, { damping: 15, stiffness: 120 });
@@ -205,12 +213,12 @@ export function Toast({
   useEffect(() => {
     if (duration > 0) {
       const timer = setTimeout(() => {
-        dismiss();
+        startDismissAnimation();
       }, duration);
 
       return () => clearTimeout(timer);
     }
-  }, [duration, dismiss]);
+  }, [duration, startDismissAnimation]);
 
   useEffect(() => {
     stackPosition.value = withSpring(index * 8, { 
@@ -249,8 +257,15 @@ export function Toast({
     };
   }, [title, description, action]);
 
+  // Effet pour gérer la suppression animée via shouldDismiss
   useEffect(() => {
     if (shouldDismiss) {
+      startDismissAnimation();
+    }
+  }, [shouldDismiss, startDismissAnimation]);
+
+  useEffect(() => {
+    if (isAnimatingOut) {
       translateY.value = withSpring(-150, { damping: 15, stiffness: 120 });
       opacity.value = withTiming(0, { duration: 300 });
       scale.value = withSpring(0.9, { damping: 15, stiffness: 120 }, (finished) => {
@@ -259,7 +274,7 @@ export function Toast({
         }
       });
     }
-  }, [shouldDismiss, actuallyRemoveToast]);
+  }, [isAnimatingOut, actuallyRemoveToast]);
 
   return (
     <GestureDetector gesture={panGesture}>
@@ -330,7 +345,7 @@ export function Toast({
 
               {action && (
                 <TouchableOpacity
-                  onPress={action.onPress}
+                  onPress={() => action.onPress(id)}
                   style={{
                     marginLeft: 12,
                     paddingHorizontal: 12,
@@ -353,7 +368,7 @@ export function Toast({
               )}
 
               <TouchableOpacity
-                onPress={dismiss}
+                onPress={startDismissAnimation}
                 style={{
                   marginLeft: 8,
                   padding: 4,
@@ -376,8 +391,12 @@ interface ToastContextType {
   error: (title: string, description?: string) => void;
   warning: (title: string, description?: string) => void;
   info: (title: string, description?: string) => void;
-  dismiss: (id: string) => void;
-  dismissAll: () => void;
+  dismiss: (id: string, options?: DismissOptions) => void;
+  dismissAll: (options?: DismissOptions) => void;
+}
+
+interface ToastInternalData extends ToastData {
+  shouldDismiss?: boolean;
 }
 
 const ToastContext = createContext<ToastContextType | null>(null);
@@ -387,14 +406,14 @@ interface ToastProviderProps {
 }
 
 export function ToastProvider({ children }: ToastProviderProps) {
-  const [toasts, setToasts] = useState<ToastData[]>([]);
+  const [toasts, setToasts] = useState<ToastInternalData[]>([]);
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
 
   const addToast = useCallback(
     (toastData: Omit<ToastData, 'id'>) => {
       const id = generateId();
-      const newToast: ToastData = {
+      const newToast: ToastInternalData = {
         ...toastData,
         id,
         duration: toastData.duration ?? 4000,
@@ -406,12 +425,40 @@ export function ToastProvider({ children }: ToastProviderProps) {
     []
   );
 
-  const dismissToast = useCallback((id: string) => {
+  const removeToast = useCallback((id: string) => {
     setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
   }, []);
 
-  const dismissAll = useCallback(() => {
-    setToasts([]);
+  const dismissToast = useCallback((id: string, options: DismissOptions = {}) => {
+    const { animated = true } = options;
+    
+    if (animated) {
+      // Marquer la toast pour suppression animée
+      setToasts((prevToasts) => 
+        prevToasts.map((toast) => 
+          toast.id === id 
+            ? { ...toast, shouldDismiss: true }
+            : toast
+        )
+      );
+    } else {
+      // Suppression immédiate
+      removeToast(id);
+    }
+  }, [removeToast]);
+
+  const dismissAll = useCallback((options: DismissOptions = {}) => {
+    const { animated = true } = options;
+    
+    if (animated) {
+      // Marquer toutes les toasts pour suppression animée
+      setToasts((prevToasts) => 
+        prevToasts.map((toast) => ({ ...toast, shouldDismiss: true }))
+      );
+    } else {
+      // Suppression immédiate de toutes les toasts
+      setToasts([]);
+    }
   }, []);
 
   const createVariantToast = useCallback(
@@ -458,8 +505,9 @@ export function ToastProvider({ children }: ToastProviderProps) {
               key={toast.id}
               {...toast}
               index={index}
-              onDismiss={dismissToast}
+              onDismiss={removeToast}
               duration={toast.duration}
+              shouldDismiss={toast.shouldDismiss}
             />
           ))}
         </View>

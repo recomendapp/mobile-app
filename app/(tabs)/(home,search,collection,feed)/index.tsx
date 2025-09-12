@@ -21,8 +21,9 @@ import AnimatedStackScreen from '@/components/ui/AnimatedStackScreen';
 import { View } from '@/components/ui/view';
 import { AnimatedScrollView } from 'react-native-reanimated/lib/typescript/component/ScrollView';
 import { memo, useCallback, useMemo, useRef } from 'react';
-import { GAP, PADDING_VERTICAL } from '@/theme/globals';
-import { StyleProp, ViewStyle } from 'react-native';
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
+import { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
+import { WidgetMostPopular } from '@/components/widgets/WidgetMostPopular';
 
 const HeaderLeft = () => {
   const { session, user } = useAuth();
@@ -98,8 +99,8 @@ HeaderRight.displayName = 'HeaderRight';
 
 const AuthenticatedWidgets = memo(() => {
   const widgetStyles = useMemo(() => ({
-    labelStyle: tw`px-4`,
-    containerStyle: tw`px-4`
+    labelStyle: { paddingHorizontal: PADDING_HORIZONTAL },
+    containerStyle: { paddingHorizontal: PADDING_HORIZONTAL }
   }), []);
 
   return (
@@ -118,7 +119,7 @@ const UnauthenticatedContent = memo(() => {
 
   return (
     <Link href="/auth" asChild>
-      <Button>
+      <Button style={{ marginHorizontal: PADDING_HORIZONTAL }}>
         {upperFirst(t('common.messages.get_started_its_free'))}
       </Button>
     </Link>
@@ -130,12 +131,11 @@ const HomeScreen = () => {
   const t = useTranslations();
   const { bottomTabHeight } = useTheme();
   const { session } = useAuth();
-
   // REFs
   const scrollRef = useRef<AnimatedScrollView>(null);
   // useSharedValues
   const scrollY = useSharedValue(0);
-  const triggerHeight = useSharedValue(500);
+  const triggerHeight = useSharedValue(0);
   
   const mainContent = useMemo(() => (
     session ? <AuthenticatedWidgets /> : <UnauthenticatedContent />
@@ -153,6 +153,11 @@ const HomeScreen = () => {
     headerLeft: () => <HeaderLeft />,
     headerRight: () => <HeaderRight />
   }), [t]);
+
+  const onLayoutWidgetMostRecommended = useCallback((e: LayoutChangeEvent) => {
+    const { height } = e.nativeEvent.layout;
+    triggerHeight.value = height;
+  }, [triggerHeight]);
   
   // Styles
   const contentContainerStyle = useMemo((): StyleProp<AnimatedStyle<StyleProp<ViewStyle>>> => ({
@@ -176,8 +181,9 @@ const HomeScreen = () => {
       showsVerticalScrollIndicator={false}
       nestedScrollEnabled
       >
-        <WidgetMostRecommended />
-        <Link href={'/upgrade'} asChild><Button>Upgrade</Button></Link>
+        <WidgetMostRecommended onLayout={onLayoutWidgetMostRecommended} />
+        <WidgetMostPopular labelStyle={{paddingHorizontal: PADDING_HORIZONTAL }} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
+        {/* <Link href={'/upgrade'} asChild><Button>Upgrade</Button></Link> */}
         {mainContent}
       </Animated.ScrollView>
     </>

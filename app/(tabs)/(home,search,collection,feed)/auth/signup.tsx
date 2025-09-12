@@ -295,6 +295,7 @@ const SignupScreen = () => {
 					}
 				]}
 				bottomOffset={navigationHeaderHeight}
+				keyboardShouldPersistTaps='handled'
 				>
 					{!showOtp ? (
 						<>

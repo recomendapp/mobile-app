@@ -9,6 +9,8 @@ import * as Burnt from 'burnt';
 import { NotificationPayload } from "@recomendapp/types";
 import { NovuProvider } from "@novu/react-native";
 import { useNovuSubscriberHash } from "@/features/utils/utilsQueries";
+import { useQueryClient } from "@tanstack/react-query";
+import { utilsKey } from "@/features/utils/utilsKey";
 
 type NotificationsContextType = {
   isMounted: boolean;
@@ -29,6 +31,7 @@ export const useNotifications = () => {
 export const NotificationsProvider = ({ children }: { children: React.ReactNode }) => {
   const supabase = useSupabaseClient();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { session, pushToken, setPushToken } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<Notifications.PermissionStatus | null>(null);
@@ -148,6 +151,9 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         title: notification.request.content.title || "New Notification",
         message: notification.request.content.body ?? undefined,
         preset: 'none',
+      });
+      queryClient.invalidateQueries({
+        queryKey: utilsKey.notifications()
       });
     });
 

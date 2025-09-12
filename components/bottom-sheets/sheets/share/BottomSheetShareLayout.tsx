@@ -109,14 +109,13 @@ const BottomSheetShareLayout = forwardRef<
             {...props}
         >
             <ScrollView
-                ref={scrollRef}
-                bounces={false}
-                contentContainerStyle={{ paddingTop: PADDING_VERTICAL, paddingBottom: inset.bottom, gap: GAP }}
-                stickyHeaderIndices={[0]}
+            ref={scrollRef}
+            bounces={false}
+            contentContainerStyle={{ paddingTop: PADDING_VERTICAL * 2, paddingBottom: inset.bottom, gap: GAP }}
             >
                 <Text variant="title" style={tw`text-center`}>{upperFirst(t('common.messages.share'))}</Text>
                 {children}
-                <Separator />
+                {children && <Separator />}
                 <LegendList
 				data={sharePlatform}
 				renderItem={({ item, index }) => (

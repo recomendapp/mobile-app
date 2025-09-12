@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Link, useNavigation } from 'expo-router';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
-import { GroupedInput, GroupedInputItem, Input } from '@/components/ui/Input';
+import { GroupedInput, GroupedInputItem } from '@/components/ui/Input';
 import { upperFirst } from 'lodash';
 import { Icons } from '@/constants/Icons';
 import * as Burnt from 'burnt';
@@ -27,8 +27,6 @@ import { View } from '@/components/ui/view';
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
 ]
-
-const PADDING = 16;
 
 const LoginOtpScreen = () => {
 	const supabase = useSupabaseClient();
@@ -189,6 +187,7 @@ const LoginOtpScreen = () => {
 					}
 				]}
 				bottomOffset={navigationHeaderHeight}
+				keyboardShouldPersistTaps='handled'
 				>
 					{!showOtp ? (
 						<>
