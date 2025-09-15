@@ -8,7 +8,7 @@ import * as Burnt from 'burnt';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { usePlaylistInsertMutation } from '@/features/playlist/playlistMutations';
 import { useAuth } from '@/providers/AuthProvider';
-import { Playlist } from '@/types/type.db';
+import { Playlist, PlaylistType } from '@recomendapp/types';
 import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,6 +22,7 @@ import { useTranslations } from 'use-intl';
 interface BottomSheetPlaylistCreateProps extends BottomSheetProps {
   onCreate?: (playlist: Playlist) => void;
   placeholder?: string | null;
+  playlistType?: PlaylistType;
 }
 
 const TITLE_MIN_LENGTH = 1;
@@ -30,24 +31,24 @@ const TITLE_MAX_LENGTH = 100;
 const BottomSheetPlaylistCreate = React.forwardRef<
 	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetPlaylistCreateProps
->(({ id, onCreate, placeholder, ...props }, ref) => {
-  const { user } = useAuth();
+>(({ id, onCreate, placeholder, playlistType, ...props }, ref) => {
+  const { session } = useAuth();
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors } = useTheme();
   const t = useTranslations();
-  const createPlaylistMutation = usePlaylistInsertMutation({
-    userId: user?.id,
-  });
+  const createPlaylistMutation = usePlaylistInsertMutation();
 
   /* ---------------------------------- FORM ---------------------------------- */
   const playlistSchema = z.object({
     title: z.string()
       .min(TITLE_MIN_LENGTH, { message: upperFirst(t('common.form.length.char_min', { count: TITLE_MIN_LENGTH }))})
       .max(TITLE_MAX_LENGTH, { message: upperFirst(t('common.form.length.char_max', { count: TITLE_MIN_LENGTH }))}),
+    type: z.enum(['movie', 'tv_series']),
   });
   type PlaylistFormValues = z.infer<typeof playlistSchema>;
   const defaultValues: Partial<PlaylistFormValues> = {
     title: '',
+    type: playlistType || 'movie',
   };
   const form = useForm<PlaylistFormValues>({
     resolver: zodResolver(playlistSchema),
@@ -57,8 +58,11 @@ const BottomSheetPlaylistCreate = React.forwardRef<
   /* -------------------------------------------------------------------------- */
 
   const onSubmit = async (values: PlaylistFormValues) => {
+    if (!session) return;
     await createPlaylistMutation.mutateAsync({
       title: values.title,
+      type: values.type,
+      userId: session.user.id
     }, {
       onSuccess: (playlist) => {
         Burnt.toast({
@@ -113,7 +117,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
       <Button
       onPress={() => {
         if (form.getValues('title').length === 0 && placeholder && placeholder.length > 0) {
-          onSubmit({ title: placeholder });
+          onSubmit({ title: placeholder, type: form.getValues('type') });
         } else {
           form.handleSubmit(onSubmit)();
         }

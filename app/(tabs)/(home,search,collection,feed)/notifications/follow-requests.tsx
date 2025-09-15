@@ -8,7 +8,7 @@ import { useUserFollowersRequestsQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { UserFollower } from "@/types/type.db";
+import { UserFollower } from "@recomendapp/types";
 import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";

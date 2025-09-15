@@ -5,7 +5,7 @@ import { useLinkingURL } from "expo-linking";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/providers/AuthProvider";
 import { AuthError } from "@supabase/supabase-js";
-import { Redirect, useRouter } from "expo-router";
+import { Redirect } from "expo-router";
 import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";

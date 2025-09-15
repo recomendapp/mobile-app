@@ -2,7 +2,7 @@ import { RichText } from "@10play/tentap-editor";
 import useEditor from "./editor";
 import { useEffect } from "react";
 import tw from "../tw";
-import { JSONContent } from "@/types/type.db";
+import { JSONContent } from "@recomendapp/types";
 
 interface ViewerProps {
 	content?: JSONContent;

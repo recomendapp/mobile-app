@@ -4,11 +4,8 @@ const app = {
 	features: {
 		playlist_collaborators: 'playlist_collaborators',
 		feed_cast_crew: 'feed_cast_crew',
+		custom_share_image: 'custom_share_image',
 	} as const,
-
-	ratings: {
-		countThreshold: 50 // Minimum number of ratings to display the rating from Recomend instead of TMDB
-	}
 };
 
 export default app;

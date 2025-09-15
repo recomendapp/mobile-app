@@ -3,7 +3,7 @@ import { AuthProvider } from "./AuthProvider";
 import { ReactQueryProvider } from "./ReactQueryProvider";
 import { SupabaseProvider } from "./SupabaseProvider";
 import { ThemeProvider } from "./ThemeProvider";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+// import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetManager } from "@/components/bottom-sheets/BottomSheetManager";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SplashScreenProvider } from "./SplashScreenProvider";
@@ -20,7 +20,7 @@ const Providers = ({ children } : ProvidersProps) => {
 	return (
 	<KeyboardProvider>
 		{/* <GestureHandlerRootView style={{ flex: 1 }}>	 */}
-			{/* <SafeAreaProvider> */}
+			<SafeAreaProvider>
 				<SplashScreenProvider>
 					<LocaleProvider>
 						<ThemeProvider>
@@ -41,7 +41,7 @@ const Providers = ({ children } : ProvidersProps) => {
 						</ThemeProvider>
 					</LocaleProvider>
 				</SplashScreenProvider>
-			{/* </SafeAreaProvider> */}
+			</SafeAreaProvider>
 		{/* </GestureHandlerRootView> */}
 	</KeyboardProvider>
 	)

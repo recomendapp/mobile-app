@@ -19,7 +19,7 @@ import '@formatjs/intl-displaynames/locale-data/fr';
 
 
 import { IntlProvider } from "use-intl";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, use, useCallback, useEffect, useState } from "react";
 import { getLocale, loadMessages, setLocale as setLocaleHook } from "@/lib/i18n"; // à toi d’implémenter
 import { useSplashScreen } from "./SplashScreenProvider";
 import { getCalendars } from 'expo-localization';
@@ -33,7 +33,7 @@ type LocaleContextType = {
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 
 export const useLocaleContext = () => {
-  const ctx = useContext(LocaleContext);
+  const ctx = use(LocaleContext);
   if (!ctx) throw new Error("useLocaleContext must be used in LocaleProvider");
   return ctx;
 };
@@ -44,7 +44,7 @@ export const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
   const [messages, setMessages] = useState<Record<string, string> | null>(null);
   const timeZone = getCalendars()[0]?.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const setLocale = async (newLocale: string) => {
+  const setLocale = useCallback(async (newLocale: string) => {
 	  if (newLocale === locale) return;
     if (!supportedLocales.includes(newLocale as SupportedLocale)) {
       throw new Error(`Unsupported locale: ${newLocale}`);
@@ -53,7 +53,7 @@ export const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
     const msgs = await loadMessages(newLocale as SupportedLocale);
     setLocaleState(newLocale as SupportedLocale);
     setMessages(msgs);
-  };
+  }, [locale]);
 
   useEffect(() => {
     (async () => {

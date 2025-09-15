@@ -100,16 +100,14 @@ const CollectionLayout = () => {
 			headerLeft: () => (
 			<View style={tw`flex-row items-center gap-1`}>
 				<HeaderTitle tintColor={colors.foreground}>{upperFirst(t('common.messages.library'))}</HeaderTitle>
-				<ButtonCreatePlaylist redirectAfterCreate={false} />
 			</View>
 			),
-			// headerRight: () => (
-			// <View style={tw`flex-row items-center gap-2`}>
-			// 	{/* <ButtonCreatePlaylist redirectAfterCreate={false} /> */}
-			// 	<UserNav />
-			// </View>
-			// ),
-			headerRight: () => <UserNav />,
+			headerRight: () => (
+			<View style={tw`flex-row items-center gap-1`}>
+				<ButtonCreatePlaylist variant="ghost" size="icon" redirectAfterCreate={false} />
+				<UserNav />
+			</View>
+			)
 		}}
 		/>
 		<MaterialTopTabs

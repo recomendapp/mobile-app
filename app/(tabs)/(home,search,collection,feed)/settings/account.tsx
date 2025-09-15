@@ -15,7 +15,6 @@ import { Icons } from "@/constants/Icons";
 import { useFormatter, useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { Stack } from "expo-router";
-import { ScrollView } from "react-native-gesture-handler";
 import { ActivityIndicator, Alert, Text as RNText } from "react-native";
 import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
@@ -26,6 +25,9 @@ import richTextToPlainString from "@/utils/richTextToPlainString";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { useUserDeleteRequestQuery } from "@/features/user/userQueries";
 import { Separator } from "@/components/ui/separator";
+import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -35,6 +37,7 @@ const SettingsAccountScreen = () => {
 	const format = useFormatter();
 	const t = useTranslations();
 	const { colors, bottomTabHeight } = useTheme();
+	const navigationHeaderHeight = useHeaderHeight();
 	const updateProfileMutation = useUserUpdateMutation({
 		userId: user?.id,
 	});
@@ -271,13 +274,15 @@ const SettingsAccountScreen = () => {
 					),
 				}}
 			/>
-			<ScrollView
-			contentContainerStyle={[
-				tw`gap-2 p-4`,
-				{ paddingBottom: bottomTabHeight + 8 }
-			]}
+			<KeyboardAwareScrollView
+			contentContainerStyle={{
+				gap: GAP,
+				paddingTop: PADDING_VERTICAL,
+				paddingHorizontal: PADDING_HORIZONTAL,
+				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			}}
+			bottomOffset={navigationHeaderHeight}
 			>
-				{/* <Text textColor='muted' style={tw`text-sm text-justify`}>{t(`pages.settings.account.description`)}</Text> */}
 				<Controller
 				name='username'
 				control={form.control}
@@ -397,7 +402,8 @@ const SettingsAccountScreen = () => {
 				/>
 				<Separator style={tw`my-4`} />
 				<DeleteAccountSection />
-			</ScrollView>
+			</KeyboardAwareScrollView>
+			<KeyboardToolbar />
 		</>
 	)
 };

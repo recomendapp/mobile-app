@@ -49,3 +49,5 @@ android/
 
 credentials.json
 google-services.json
+
+.vscode/

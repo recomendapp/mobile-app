@@ -21,11 +21,15 @@ import { Picker } from '@react-native-picker/picker';
 import useLocalizedLanguageName from "@/hooks/useLocalizedLanguageName";
 import { useUserUpdateMutation } from "@/features/user/userMutations";
 import { useAuth } from "@/providers/AuthProvider";
+import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const SettingsAppearanceScreen = () => {
 	const { locale, setLocale } = useLocaleContext();
 	const { session } = useAuth();
 	const { bottomTabHeight } = useTheme();
+	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locales = useLocalizedLanguageName(locale);
@@ -104,11 +108,14 @@ const SettingsAppearanceScreen = () => {
 					),
 				}}
 			/>
-			<ScrollView
-			contentContainerStyle={[
-				tw`gap-2 p-4`,
-				{ paddingBottom: bottomTabHeight + 8 }
-			]}
+			<KeyboardAwareScrollView
+			contentContainerStyle={{
+				gap: GAP,
+				paddingTop: PADDING_VERTICAL,
+				paddingHorizontal: PADDING_HORIZONTAL,
+				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			}}
+			bottomOffset={navigationHeaderHeight}
 			>
 				<Controller
 				name="locale"
@@ -132,7 +139,8 @@ const SettingsAppearanceScreen = () => {
 				</View>
 				)}
 				/>
-			</ScrollView>
+			</KeyboardAwareScrollView>
+			<KeyboardToolbar />
 		</>
 	)
 };

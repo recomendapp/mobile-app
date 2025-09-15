@@ -103,8 +103,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 					deploymentTarget: '15.1',
 				},
 				android: {
-					kotlinVersion: "1.6.21"
-				}
+					"compileSdkVersion": 35,
+					"targetSdkVersion": 35,
+					"buildToolsVersion": "35.0.0"
+				},
 			},
 		],
 		[
@@ -127,6 +129,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		typedRoutes: true,
 	},
 	extra: {
+		webDomain: getWebDomain(),
 		router: {
 			origin: false,
 		},

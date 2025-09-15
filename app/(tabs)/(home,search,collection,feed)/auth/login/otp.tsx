@@ -1,18 +1,16 @@
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useAuth } from '@/providers/AuthProvider';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button } from '@/components/ui/Button';
-import { Link, useNavigation, useRouter } from 'expo-router';
+import { Link, useNavigation } from 'expo-router';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
-import { GroupedInput, GroupedInputItem, Input } from '@/components/ui/Input';
+import { GroupedInput, GroupedInputItem } from '@/components/ui/Input';
 import { upperFirst } from 'lodash';
 import { Icons } from '@/constants/Icons';
 import * as Burnt from 'burnt';
 import { useRandomImage } from '@/hooks/useRandomImage';
 import { ImageBackground } from 'expo-image';
-import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslations } from 'use-intl';
 import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
@@ -21,12 +19,14 @@ import { AuthError } from '@supabase/supabase-js';
 import { Text } from '@/components/ui/text';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { InputOTP } from '@/components/ui/input-otp';
+import { useHeaderHeight } from "@react-navigation/elements";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
+import { View } from '@/components/ui/view';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
 ]
-
-const PADDING = 16;
 
 const LoginOtpScreen = () => {
 	const supabase = useSupabaseClient();
@@ -35,6 +35,7 @@ const LoginOtpScreen = () => {
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const bgImage = useRandomImage(backgroundImages);
+	const navigationHeaderHeight = useHeaderHeight();
 	const navigation = useNavigation();
 	const routes = navigation.getState()?.routes;
 	const prevRoute = routes? routes[routes.length - 2] : null;
@@ -174,19 +175,23 @@ const LoginOtpScreen = () => {
 			}}
 			style={tw`flex-1`}
 			>
-				<ScrollView
+				<KeyboardAwareScrollView
 				contentContainerStyle={[
-					tw`flex-1 gap-6 justify-end items-center`,
+					tw`flex-1 justify-end items-center`,
 					{
-						paddingBottom: inset.bottom + PADDING,
-						paddingLeft: inset.left + PADDING,
-						paddingRight: inset.right + PADDING,
+						gap: GAP,
+						paddingTop: PADDING_VERTICAL,
+						paddingLeft: inset.left + PADDING_HORIZONTAL,
+						paddingRight: inset.right + PADDING_HORIZONTAL,
+						paddingBottom: inset.bottom + PADDING_VERTICAL,
 					}
 				]}
+				bottomOffset={navigationHeaderHeight}
+				keyboardShouldPersistTaps='handled'
 				>
 					{!showOtp ? (
 						<>
-							<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={tw`w-full gap-4`}>
+							<View style={[tw`w-full`, { gap: GAP }]}>
 								<GroupedInput title={t('common.messages.otp')} titleStyle={tw`text-center text-xl font-bold`}>
 									<Controller
 										name="email"
@@ -210,7 +215,7 @@ const LoginOtpScreen = () => {
 								</GroupedInput>
 								{/* SUBMIT BUTTON */}
 								<Button loading={isLoading} onPress={form.handleSubmit(handleSubmit)} style={tw`w-full rounded-xl`}>{t('pages.auth.login.otp.form.submit')}</Button>
-							</KeyboardAvoidingView>
+							</View>
 							<Text textColor='muted' style={tw`text-center`}>{t('pages.auth.login.otp.password_login')} <Link href={prevRoute?.name === 'login/index' ? '../' : '/auth/login'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.login'))}</Link></Text>
 						</>
 					) : (
@@ -245,7 +250,7 @@ const LoginOtpScreen = () => {
 						</>
 					)}
 					{/* RETURNS TO LOGIN */}
-				</ScrollView>
+				</KeyboardAwareScrollView>
 			</LinearGradient>
 		</ImageBackground>
 	)

@@ -24,6 +24,10 @@ import { decode } from "base64-arraybuffer";
 import UserAvatar from "@/components/user/UserAvatar";
 import { Separator } from "@/components/ui/separator";
 import { randomUUID } from 'expo-crypto';
+import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
 const FULL_NAME_MIN_LENGTH = 1;
 const FULL_NAME_MAX_LENGTH = 30;
@@ -32,7 +36,8 @@ const BIO_MAX_LENGTH = 150;
 const SettingsProfileScreen = () => {
 	const supabase = useSupabaseClient();
 	const { user } = useAuth();
-	const { colors, bottomTabHeight } = useTheme();
+	const { bottomTabHeight } = useTheme();
+	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const updateProfileMutation = useUserUpdateMutation({
@@ -117,7 +122,7 @@ const SettingsProfileScreen = () => {
 						base64: true,
 					})
 					if (!results.canceled && results.assets?.length) {
-						setNewAvatar(results.assets[0]);
+						setNewAvatar(await handleProcessImage(results.assets[0]));
 					}
 					break;
 				case 'camera':
@@ -139,7 +144,7 @@ const SettingsProfileScreen = () => {
 						base64: true,
 					});
 					if (!cameraResults.canceled && cameraResults.assets?.length) {
-						setNewAvatar(cameraResults.assets[0]);
+						setNewAvatar(await handleProcessImage(cameraResults.assets[0]));
 					}
 					break;
 				case 'delete':
@@ -161,7 +166,7 @@ const SettingsProfileScreen = () => {
 				const { data, error } = await supabase.storage
 					.from('avatars')
 					.upload(fileName, decode(newAvatar.base64!), {
-						contentType: newAvatar.mimeType,
+						contentType: newAvatar.mimeType || `image/${SaveFormat.JPEG}`,
 						upsert: true,
 					});
 				if (error) throw error;
@@ -197,6 +202,16 @@ const SettingsProfileScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
+	};
+	const handleProcessImage = async (image: ImagePickerAsset) => {
+		const processedImage = await ImageManipulator.manipulate(image.uri)
+			.resize({ width: 1024, height: 1024 })
+			.renderAsync()
+		return await processedImage.saveAsync({
+			compress: 0.8,
+			format: SaveFormat.JPEG,
+			base64: true,
+		})
 	};
 
 	// useEffects
@@ -239,11 +254,14 @@ const SettingsProfileScreen = () => {
 				),
 			}}
 		/>
-		<ScrollView
-		contentContainerStyle={[
-			tw`gap-2 p-4`,
-			{ paddingBottom: bottomTabHeight + 8 }
-		]}
+		<KeyboardAwareScrollView
+		contentContainerStyle={{
+			gap: GAP,
+			paddingTop: PADDING_VERTICAL,
+			paddingHorizontal: PADDING_HORIZONTAL,
+			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+		}}
+		bottomOffset={navigationHeaderHeight}
 		>
 			<Pressable onPress={handleAvatarOptions} style={tw`items-center justify-center gap-2`}>
 				{user ? (
@@ -331,7 +349,8 @@ const SettingsProfileScreen = () => {
 				</View>
 			)}
 			/>
-		</ScrollView>
+		</KeyboardAwareScrollView>
+		<KeyboardToolbar />
 	</>
 	)
 };

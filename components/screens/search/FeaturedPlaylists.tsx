@@ -3,38 +3,55 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { usePlaylistFeaturedInfiniteQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { StyleProp, View, ViewStyle } from "react-native";
-import { LegendList } from "@legendapp/list";
+import { LegendList, LegendListRef } from "@legendapp/list";
+import { useCallback, useMemo, useRef } from "react";
+import { useScrollToTop } from "@react-navigation/native";
+import { Playlist } from "@recomendapp/types";
 
 const GRID_COLUMNS = 3;
-
 interface FeaturedPlaylistsProps {
 	contentContainerStyle?: StyleProp<ViewStyle>;
 }
 
 const FeaturedPlaylists = ({
 	contentContainerStyle,
-}: FeaturedPlaylistsProps) => {
+} : FeaturedPlaylistsProps) => {
 	const { bottomTabHeight } = useTheme();
 	const {
-		data: playlists,
+		data,
 		fetchNextPage,
 		hasNextPage,
 		isRefetching,
 		refetch,
 	} = usePlaylistFeaturedInfiniteQuery();
+	const playlists = useMemo(() => data?.pages.flat() || [], [data]);
+	// REFs
+	const scrollRef = useRef<LegendListRef>(null);
 
-	if (!playlists) return null;
+	// Callbacks
+	const renderItem = useCallback(({ item }: { item: { playlist: Playlist } }) => (
+		<CardPlaylist playlist={item.playlist} />
+	), []);
+	const keyExtractor = useCallback((item: { playlist: Playlist }) => 
+		item.playlist.id.toString(), 
+		[]
+	);
+	const onEndReached = useCallback(() => {
+		if (hasNextPage) {
+			fetchNextPage();
+		}
+	}, [hasNextPage, fetchNextPage]);
+	const itemSeparator = useCallback(() => <View style={tw`h-2`} />, []);
+
+	useScrollToTop(scrollRef);
 
 	return (
 		<LegendList
-		data={playlists?.pages.flat()}
-		renderItem={({ item: { playlist } }) => (
-			<View key={playlist.id} style={{ flex: 1 / GRID_COLUMNS }}>
-				<CardPlaylist playlist={playlist} />
-			</View>
-		)}
+		ref={scrollRef}
+		data={playlists}
+		renderItem={renderItem}
 		numColumns={GRID_COLUMNS}
-		onEndReached={() => hasNextPage && fetchNextPage()}
+		onEndReached={onEndReached}
 		onEndReachedThreshold={0.3}
 		contentContainerStyle={[
 			{
@@ -42,14 +59,16 @@ const FeaturedPlaylists = ({
 			},
 			contentContainerStyle,
 		]}
-		keyExtractor={(item) => item.playlist.id.toString()}
+		keyExtractor={keyExtractor}
 		showsVerticalScrollIndicator={false}
 		columnWrapperStyle={tw`gap-2`}
-		ItemSeparatorComponent={() => <View style={tw`h-2`} />}
+		ItemSeparatorComponent={itemSeparator}
 		refreshing={isRefetching}
 		onRefresh={refetch}
+		keyboardShouldPersistTaps='handled'
 		/>
 	)
 };
+FeaturedPlaylists.displayName = 'FeaturedPlaylists';
 
 export default FeaturedPlaylists;

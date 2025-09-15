@@ -101,7 +101,7 @@ const ButtonUserFollow = React.forwardRef<
 
   if (loading) {
     return (
-      <Skeleton borderRadius={CORNERS} style={tw.style("h-10 w-32")} />
+      <Skeleton borderRadius={CORNERS} style={[tw`h-10 w-full`, style]} />
     )
   }
 

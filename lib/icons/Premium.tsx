@@ -4,7 +4,6 @@ import Svg, { Path } from "react-native-svg";
 
 const Premium = forwardRef<Svg, LucideProps>((props, ref) => {
 	const { color = "currentColor", size = 24, ...otherProps } = props;
-	
 	return (
 		<Svg
 			ref={ref}
@@ -29,7 +28,6 @@ const Premium = forwardRef<Svg, LucideProps>((props, ref) => {
 		</Svg>
 	);
 });
-
 Premium.displayName = "Premium";
 
 export { Premium };

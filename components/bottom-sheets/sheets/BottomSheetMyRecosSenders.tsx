@@ -1,6 +1,6 @@
 import React from 'react';
 import tw from '@/lib/tw';
-import { UserRecosAggregated } from '@/types/type.db';
+import { UserRecosAggregated } from '@recomendapp/types';
 import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';

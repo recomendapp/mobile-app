@@ -1,6 +1,6 @@
-import { User } from "@/types/type.db";
+import { User } from "@recomendapp/types";
 import { Session } from "@supabase/supabase-js";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, use, useCallback, useEffect, useState, useMemo } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
 import { useUserQuery } from "@/features/user/userQueries";
 import { AppState } from "react-native";
@@ -10,6 +10,9 @@ import { useLocaleContext } from "./LocaleProvider";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import { makeRedirectUri } from "expo-auth-session";
 import { defaultLocale, SupportedLocale, supportedLocales } from "@/translations/locales";
+import { useRevenueCat } from "@/hooks/useRevenueCat";
+import { useAuthCustomerInfo } from "@/features/auth/authQueries";
+import { CustomerInfo } from "react-native-purchases";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -27,6 +30,7 @@ AppState.addEventListener('change', (state) => {
 type AuthContextProps = {
 	session: Session | null | undefined;
 	user: User | null | undefined;
+	customerInfo: CustomerInfo | undefined;
 	login: (credentials: { email: string; password: string }) => Promise<void>;
 	loginWithOtp: (email: string, redirectTo?: string | null) => Promise<void>;
 	logout: () => Promise<void>;
@@ -53,7 +57,7 @@ type AuthProviderProps = {
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-const AuthProvider = ({children }: AuthProviderProps) => {
+const AuthProvider = ({ children }: AuthProviderProps) => {
 	const { auth } = useSplashScreen();
 	const { setLocale } = useLocaleContext();
 	const supabase = useSupabaseClient();
@@ -64,72 +68,47 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 	} = useUserQuery({
 		userId: session?.user.id,
 	});
-
-	useEffect(() => {
-		supabase.auth.getSession().then(({data: { session }}) => {
-			setSession(session);
-		});
-
-		supabase.auth.onAuthStateChange(async (_event, session) => {
-			setSession(session);
-		});
-	}, []);
-
-	useEffect(() => {
-		const syncLanguage = async () => {
-			if (user?.language) {
-				if (supportedLocales.includes(user.language as SupportedLocale)) {
-					setLocale(user.language);
-				} else {
-					setLocale(defaultLocale);
-				}
-			}
-		};
-		if (user) {
-			syncLanguage();
-		}
-	}, [user]);
-
-	useEffect(() => {
-		if (session === undefined) return;
-		if (session && !user) return;
-		auth.setReady(true);
-	}, [session, user]);
-
-	const login = async ({ email, password }: { email: string; password: string }) => {
+	const { customerInfo: initCustomerInfo } = useRevenueCat(session?.user.id);
+	const {
+		data: customerInfo,
+	} = useAuthCustomerInfo({
+		enabled: !!initCustomerInfo,
+		initialData: initCustomerInfo,
+	});
+	// Handlers
+	const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
 		const { error } = await supabase.auth.signInWithPassword({
 			email: email,
 			password: password,
 		});
 		if (error) throw error;
-	};
+	}, [supabase]);
 
-	const loginWithOtp = async (email: string, redirectTo?: string | null) => {
+	const loginWithOtp = useCallback(async (email: string, redirectTo?: string | null) => {
 		const { error } = await supabase.auth.signInWithOtp({
-		email: email,
-		options: {
-			// emailRedirectTo: `${app.domain}/auth/callback${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`,
-			emailRedirectTo: makeRedirectUri({
-				path: "/auth/callback",
-				queryParams: {
-					redirect: redirectTo ? encodeURIComponent(redirectTo) : undefined,
-				}
-			})
-		}
+			email: email,
+			options: {
+				emailRedirectTo: makeRedirectUri({
+					path: "/auth/callback",
+					queryParams: {
+						redirect: redirectTo ? encodeURIComponent(redirectTo) : undefined,
+					}
+				})
+			}
 		});
 		if (error) throw error;
-	};
+	}, [supabase]);
 
-	const logout = async () => {
+	const logout = useCallback(async () => {
 		if (pushToken) {
 			await supabase.from("user_notification_tokens").delete().match({ token: pushToken });
 		}
 		const { error } = await supabase.auth.signOut();
 		if (error) throw error;
 		setSession(null);
-	};
+	}, [supabase, pushToken]);
 
-	const signup = async (
+	const signup = useCallback(async (
 		credentials: {
 			email: string;
 			name: string;
@@ -143,7 +122,6 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			email: credentials.email,
 			password: credentials.password,
 			options: {
-				// emailRedirectTo: `${app.domain}/auth/callback${credentials.redirectTo ? `?redirect=${encodeURIComponent(credentials.redirectTo)}` : ''}`,
 				emailRedirectTo: makeRedirectUri({
 					path: "/auth/callback",
 					queryParams: {
@@ -158,26 +136,25 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 			}
 		})
 		if (error) throw error;
-	};
+	}, [supabase]);
 
-	const resetPasswordForEmail = async (email: string) => {
+	const resetPasswordForEmail = useCallback(async (email: string) => {
 		const { error } = await supabase.auth.resetPasswordForEmail(email, {
-			// redirectTo: `${app.domain}/auth/reset-password`,
 			redirectTo: makeRedirectUri({
 				path: "/auth/reset-password",
 			})
 		});
 		if (error) throw error;
-	};
+	}, [supabase]);
 
-	const updateEmail = async (email: string) => {
+	const updateEmail = useCallback(async (email: string) => {
 		const { error } = await supabase.auth.updateUser({
 			email: email,
 		});
 		if (error) throw error;
-	};
+	}, [supabase]);
 
-	const verifyEmailChange = async (email: string, token: string) => {
+	const verifyEmailChange = useCallback(async (email: string, token: string) => {
 		const { error } = await supabase.auth.verifyOtp({
 			type: 'email_change',
 			token: token,
@@ -186,14 +163,14 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		if (error) throw error;
 		const { error: refreshError } = await supabase.auth.refreshSession(session ? { refresh_token: session.refresh_token } : undefined);
 		if (refreshError) throw refreshError;
-	};
+	}, [supabase, session]);
 
-	const cancelPendingEmailChange = async () => {
+	const cancelPendingEmailChange = useCallback(async () => {
 		const { error } = await supabase.rpc('utils_cancel_email_change');
 		if (error) throw error;
-	};
+	}, [supabase]);
 
-	const createSessionFromUrl = async (url: string) => {
+	const createSessionFromUrl = useCallback(async (url: string) => {
 		const { params, errorCode } = QueryParams.getQueryParams(url);
 		if (errorCode) throw new Error(errorCode);
 		const { access_token, refresh_token } = params;
@@ -204,33 +181,84 @@ const AuthProvider = ({children }: AuthProviderProps) => {
 		});
 		if (error) throw error;
 		return data.session;
-	};
+	}, [supabase]);
+
+	const syncLanguage = useCallback(async (data: User) => {
+		if (data?.language) {
+			if (supportedLocales.includes(data.language as SupportedLocale)) {
+				setLocale(data.language);
+			} else {
+				setLocale(defaultLocale);
+			}
+		}
+	}, [setLocale]);
+
+	// useEffects
+	useEffect(() => {
+		supabase.auth.getSession().then(({ data: { session } }) => {
+			setSession(session);
+		});
+
+		const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+			setSession(session);
+		});
+
+		return () => subscription.unsubscribe();
+	}, [supabase]);
+
+	useEffect(() => {
+		if (user) {
+			syncLanguage(user);
+		}
+	}, [user, syncLanguage]);
+
+	useEffect(() => {
+		if (session === undefined) return;
+		if (session && !user) return;
+		auth.setReady(true);
+	}, [session, user, auth]);
+
+	const contextValue = useMemo(() => ({
+		session,
+		user,
+		customerInfo,
+		login,
+		loginWithOtp,
+		logout,
+		signup,
+		resetPasswordForEmail,
+		updateEmail,
+		verifyEmailChange,
+		cancelPendingEmailChange,
+		createSessionFromUrl,
+		pushToken,
+		setPushToken,
+	}), [
+		session,
+		user,
+		customerInfo,
+		login,
+		loginWithOtp,
+		logout,
+		signup,
+		resetPasswordForEmail,
+		updateEmail,
+		verifyEmailChange,
+		cancelPendingEmailChange,
+		createSessionFromUrl,
+		pushToken,
+		setPushToken,
+	]);
 
 	return (
-		<AuthContext.Provider
-		value={{
-			session: session,
-			user: user,
-			login: login,
-			loginWithOtp: loginWithOtp,
-			logout: logout,
-			signup: signup,
-			resetPasswordForEmail: resetPasswordForEmail,
-			updateEmail: updateEmail,
-			verifyEmailChange: verifyEmailChange,
-			cancelPendingEmailChange: cancelPendingEmailChange,
-			createSessionFromUrl: createSessionFromUrl,
-			pushToken: pushToken,
-			setPushToken: setPushToken,
-		}}
-		>
+		<AuthContext.Provider value={contextValue}>
 			{children}
 		</AuthContext.Provider>
 	);
 };
 
 const useAuth = () => {
-	const context = useContext(AuthContext);
+	const context = use(AuthContext);
 	if (context === undefined) {
 		throw new Error("useAuth must be used within an AuthProvider");
 	}

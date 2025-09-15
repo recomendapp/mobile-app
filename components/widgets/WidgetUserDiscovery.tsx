@@ -6,6 +6,8 @@ import { CardUser } from "../cards/CardUser";
 import { LegendList } from "@legendapp/list";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
+import { useCallback, useMemo } from "react";
+import { User } from "@recomendapp/types";
 
 interface WidgetUserDiscoveryProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -16,42 +18,67 @@ export const WidgetUserDiscovery = ({
   style,
   labelStyle,
   containerStyle
-}: WidgetUserDiscoveryProps) => {
+} : WidgetUserDiscoveryProps) => {
   const t = useTranslations();
   const {
-	data: users,
-	fetchNextPage,
-	hasNextPage,
-} = useUserDiscoveryInfinite({
-	filters: {
-		resultsPerPage: 20,
-		order: 'created_at-desc',
-	}
-  })
+    data: users,
+    fetchNextPage,
+    hasNextPage,
+  } = useUserDiscoveryInfinite({
+    filters: {
+      resultsPerPage: 20,
+      order: 'created_at-desc',
+    }
+  });
 
-  if (!users || !users.pages[0].length) return null;
+  const userData = useMemo(() => users?.pages.flat() || [], [users]);
+
+  const renderItem = useCallback(({ item }: { item: User }) => (
+    <View style={tw`max-h-24`}>
+      <CardUser user={item} style={tw`h-full w-48`} />
+    </View>
+  ), []);
+
+  const keyExtractor = useCallback((item: User) => 
+    item.id.toString(), 
+    []
+  );
+
+  const onEndReached = useCallback(() => {
+    if (hasNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, fetchNextPage]);
+
+  const ItemSeparatorComponent = useCallback(() => 
+    <View style={tw`w-2`} />, 
+    []
+  );
+
+  if (!userData.length) {
+    return null;
+  }
 
   return (
-  <View style={[tw`gap-2`, style]}>
-	  <ThemedText style={[tw`font-semibold text-xl`, labelStyle]}>{upperFirst(t('common.messages.discover_users'))}</ThemedText>
-    <LegendList
-    data={users.pages.flat()}
-    renderItem={({ item }) => (
-		<View key={item.id} style={tw`max-h-24`}>
-			<CardUser key={item.id} user={item} style={tw`h-full w-48`}/>
-		</View>
-    )}
-    snapToInterval={200}
-    decelerationRate="fast"
-    keyExtractor={(item) => item.id.toString()}
-    horizontal
-    showsHorizontalScrollIndicator={false}
-    onEndReached={() => hasNextPage && fetchNextPage()}
-    onEndReachedThreshold={0.2}
-    ItemSeparatorComponent={() => <View style={tw`w-2`} />}
-    contentContainerStyle={containerStyle}
-    nestedScrollEnabled
-    />
-  </View>
-  )
+    <View style={[tw`gap-2`, style]}>
+      <ThemedText style={[tw`font-semibold text-xl`, labelStyle]}>
+        {upperFirst(t('common.messages.discover_users'))}
+      </ThemedText>
+      <LegendList
+        data={userData}
+        renderItem={renderItem}
+        snapToInterval={200}
+        decelerationRate="fast"
+        keyExtractor={keyExtractor}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.2}
+        ItemSeparatorComponent={ItemSeparatorComponent}
+        contentContainerStyle={containerStyle}
+        nestedScrollEnabled
+      />
+    </View>
+  );
 };
+WidgetUserDiscovery.displayName = 'WidgetUserDiscovery';
