@@ -2,20 +2,23 @@ import * as React from "react"
 import { useRouter } from "expo-router";
 import { Pressable, View, StyleProp, ViewStyle } from "react-native";
 import Animated from "react-native-reanimated";
-import { User } from "@/types/type.db";
+import { User } from "@recomendapp/types";
 import UserAvatar from "../user/UserAvatar";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Icons } from "@/constants/Icons";
 import { Skeleton } from "../ui/Skeleton";
 import { Text } from "../ui/text";
-import { FixedOmit } from "@/types";
+import { FixedOmit } from "@recomendapp/types";
+import useBottomSheetStore from "@/stores/useBottomSheetStore";
+import BottomSheetUser from "../bottom-sheets/sheets/BottomSheetUser";
 
 interface CardUserBaseProps
   extends React.ComponentPropsWithoutRef<typeof Animated.View> {
   onPress?: () => void;
+  onLongPress?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
-  variant?: "default" | "icon" | "username" | "inline";
+  variant?: "default" | "icon" | "username" | "inline" | "list";
   linked?: boolean;
   width?: number;
   height?: number;
@@ -132,11 +135,48 @@ const CardUserInline = React.forwardRef<
 });
 CardUserInline.displayName = "CardUserInline";
 
+const CardUserList = React.forwardRef<
+	React.ComponentRef<typeof Animated.View>,
+	FixedOmit<CardUserProps, "variant" | "linked" | "onPress" | "onLongPress">
+>(({ user, skeleton, children, style, ...props }, ref) => {
+	const { colors } = useTheme();
+	return (
+		<Animated.View
+		ref={ref}
+		style={[
+			tw.style('flex-row items-center justify-between p-1 gap-2'),
+			style,
+		]}
+		{...props}
+		>
+			<View style={tw`flex-row items-center justify-center`}>
+				{!skeleton ? <UserAvatar full_name={user.full_name} avatar_url={user?.avatar_url} /> : <UserAvatar skeleton />}
+				<View style={tw.style('shrink px-2 py-1 gap-1')}>
+					<View style={tw.style('flex-row items-center gap-1')}>
+						{!skeleton ? <Text numberOfLines={2}>{user?.full_name}</Text> : <Skeleton style={tw`w-20 h-5`} />}
+						{!skeleton && user?.premium && (
+							<Icons.premium color={colors.accentBlue} size={14}/>
+						)}
+					</View>
+					{!skeleton ? (
+						<Text numberOfLines={2} style={{ color: colors.mutedForeground }}>@{user?.username}</Text>
+					) : (
+						<Skeleton style={tw`w-20 h-5`} />
+					)}
+				</View>
+			</View>
+			{children}
+		</Animated.View>
+	);
+});
+CardUserList.displayName = "CardUserList";
+
 const CardUser = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CardUserProps
->(({ variant = "default", linked = true, onPress, containerStyle, ...props }, ref) => {
+>(({ variant = "default", linked = true, onPress, onLongPress, containerStyle, ...props }, ref) => {
 	const router = useRouter();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 
 	const content = (
 		variant === "default" ? (
@@ -147,6 +187,8 @@ const CardUser = React.forwardRef<
 			<CardUserUsername ref={ref} {...props} />
 		) : variant === "inline" ? (
 			<CardUserInline ref={ref} {...props} />
+		) : variant === "list" ? (
+			<CardUserList ref={ref} {...props} />
 		) : null
 	);
 
@@ -157,6 +199,12 @@ const CardUser = React.forwardRef<
 		onPress={() => {
 			if (linked) router.push(`/user/${props.user.username}`);
 			onPress?.();
+		}}
+		onLongPress={() => {
+			openSheet(BottomSheetUser, {
+				user: props.user,
+			});
+			onLongPress?.();
 		}}
 		style={containerStyle}
 		>

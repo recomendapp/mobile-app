@@ -1,31 +1,28 @@
-import { CardUserActivity } from "@/components/cards/CardUserActivity";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserFeedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { upperFirst } from "lodash";
-import { LegendList } from "@legendapp/list";
+import { LegendList, LegendListRef } from "@legendapp/list";
 import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
 import { useTranslations } from "use-intl";
 import { useTheme } from "@/providers/ThemeProvider";
-import { CardFeedItem } from "@/components/cards/CardFeedItem";
-import { CardReview } from "@/components/cards/CardReview";
-import { Href, useRouter } from "expo-router";
-import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import BottomSheetMedia from "@/components/bottom-sheets/sheets/BottomSheetMedia";
-import UserAvatar from "@/components/user/UserAvatar";
-import FeedUserActivity from "@/components/screens/feed/FeedUserActivity";
-import { PADDING_VERTICAL } from "@/theme/globals";
-import { Pressable } from "react-native-gesture-handler";
+import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { CardFeedActivityMovie } from "@/components/cards/feed/CardFeedActivityMovie";
+import { UserFeedItem } from "@recomendapp/types";
+import { CardFeedActivityTvSeries } from "@/components/cards/feed/CardFeedActivityTvSeries";
+import { CardFeedPlaylistLike } from "@/components/cards/feed/CardFeedPlaylistLike";
+import { CardFeedReviewMovieLike } from "@/components/cards/feed/CardFeedReviewMovieLike";
+import { CardFeedReviewTvSeriesLike } from "@/components/cards/feed/CardFeedReviewTvSeriesLike";
+import { useScrollToTop } from "@react-navigation/native";
+import { useCallback, useMemo, useRef } from "react";
 
 const FeedScreen = () => {
 	const { user } = useAuth();
-	const router = useRouter();
 	const t = useTranslations();
-	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const { bottomTabHeight, colors } = useTheme();
 	const {
-		data: feed,
+		data,
 		isLoading,
 		isFetching,
 		fetchNextPage,
@@ -34,49 +31,64 @@ const FeedScreen = () => {
 	} = useUserFeedInfiniteQuery({
 		userId: user?.id,
 	});
-	const loading = isLoading || feed === undefined;
+	const loading = isLoading || data === undefined;
+	const feed = useMemo(() => data?.pages.flat() || [], [data]);
+	// REFs
+	const scrollRef = useRef<LegendListRef>(null);
+	useScrollToTop(scrollRef);
+
+	// useCallback
+	const keyExtractor = useCallback((item: UserFeedItem) => (
+		item.feed_id.toString()
+	), []);
+	const onEndReached = useCallback(() => {
+		if (hasNextPage) {
+			fetchNextPage();
+		}
+	}, [hasNextPage, fetchNextPage]);
+
+	// Render 
+	const renderItem = useCallback(({ item } : { item: UserFeedItem, index: number }) => {
+		switch (item.activity_type) {
+			case 'activity_movie':
+				const { movie, ...activityMovie } = item.content;
+				return <CardFeedActivityMovie author={item.author} activity={activityMovie} movie={movie!} />;
+			case 'activity_tv_series':
+				const { tv_series, ...activityTvSeries } = item.content;
+				return <CardFeedActivityTvSeries author={item.author} activity={activityTvSeries} tvSeries={tv_series!} />;
+			case 'playlist_like':
+				return <CardFeedPlaylistLike author={item.author} playlistLike={item.content} />;
+			case 'review_movie_like':
+				return <CardFeedReviewMovieLike author={item.author} reviewLike={item.content} movie={item.content.review?.activity?.movie!} />;
+			case 'review_tv_series_like':
+				return <CardFeedReviewTvSeriesLike author={item.author} reviewLike={item.content} tvSeries={item.content.review?.activity?.tv_series!} />;
+			default:
+				return <View style={[{ backgroundColor: colors.muted}, tw`p-4 rounded-md`]}><Text textColor="muted" style={tw`text-center`}>Unsupported activity type</Text></View>;
+		}
+	}, []);
+	const renderEmpty = useCallback(() => (
+		!loading ? (
+			<Text style={tw`text-center`} textColor='muted'>{upperFirst(t('common.messages.no_activity'))}</Text>
+		) : null
+	), [t, loading]);
+
 	return (
 		<LegendList
-		data={feed?.pages.flat() || []}
-		renderItem={({ item, index }) => (
-			<CardFeedItem
-			title={item.media?.title ?? ''}
-			posterUrl={item.media?.avatar_url ?? ''}
-			posterType={item.media?.media_type}
-			onPosterPress={() => router.push(item.media?.url as Href)}
-			description={item.media?.extra_data.overview ?? ''}
-			content={
-				<View style={tw`flex-row items-center gap-1`}>
-					<UserAvatar avatar_url={item.user?.avatar_url} full_name={item.user?.full_name!} style={tw`w-6 h-6`} />
-					<FeedUserActivity activity={item} style={[{ color: colors.mutedForeground }, tw`text-sm`]} />
-				</View>
-			}
-			footer={item.review ? (
-				<CardReview activity={item} review={item?.review} author={item?.user!} style={{ backgroundColor: colors.background }} />
-			) : undefined}
-			onPress={() => router.push(`/user/${item.user?.username}`)}
-			onLongPress={() => openSheet(BottomSheetMedia, {
-				media: item.media,
-				activity: item,
-			})}
-			/>
-		)}
-		ListEmptyComponent={() => !loading ? (
-			<View style={tw`flex-1 items-center justify-center`}>
-				<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
-			</View>
-		) : null}
+		ref={scrollRef}
+		data={feed}
+		renderItem={renderItem}
+		ListEmptyComponent={renderEmpty}
 		contentContainerStyle={[
-			tw`px-4 gap-1`,
+			tw`gap-1`,
 			{
+				paddingHorizontal: PADDING_HORIZONTAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL
 			}
 		]}
-		keyExtractor={(_, index) => index.toString()}
-		estimatedItemSize={feed?.pages.flatMap((page) => page).length}
+		keyExtractor={keyExtractor}
 		showsVerticalScrollIndicator={false}
 		refreshing={isFetching}
-		onEndReached={() => hasNextPage && fetchNextPage()}
+		onEndReached={onEndReached}
 		onEndReachedThreshold={0.3}
 		nestedScrollEnabled
 		onRefresh={refetch}

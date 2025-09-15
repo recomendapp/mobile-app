@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/client";
-import { Database } from "@/types";
+import { Database } from "@recomendapp/types";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { createContext, useContext, useMemo } from "react";
+import { createContext, use, useMemo } from "react";
 import { useLocale } from "use-intl";
 
 const SupabaseContext = createContext<SupabaseClient<Database> | undefined>(undefined);
@@ -12,9 +12,7 @@ export const SupabaseProvider = ({
 	children: React.ReactNode;
 }) => {
 	const locale = useLocale();
-	const supabase = useMemo(() => {
-		return createClient(locale);
-	}, [locale]);
+	const supabase = useMemo(() => createClient(locale), [locale]);
 	return (
 		<SupabaseContext.Provider value={supabase}>
 			{children}
@@ -23,7 +21,7 @@ export const SupabaseProvider = ({
 }
 
 export const useSupabaseClient = () => {
-	const context = useContext(SupabaseContext);
+	const context = use(SupabaseContext);
 	if (!context) {
 		throw new Error('useSupabaseClient must be used within a SupabaseProvider');
 	}

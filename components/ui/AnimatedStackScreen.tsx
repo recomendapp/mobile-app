@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import React from "react";
+import { forwardRef, memo, useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { StyleProp, ViewStyle } from "react-native";
@@ -35,43 +35,27 @@ export interface AnimatedStackScreenProps extends React.ComponentProps<typeof St
 
 const ReanimatedHeaderTitle = Animated.createAnimatedComponent(HeaderTitle);
 
-
-function getBackgroundColor(style: StyleProp<ViewStyle>) {
-  if (!style) return undefined;
-  if (Array.isArray(style)) {
-    for (const s of style) {
-      if (s && typeof s === 'object' && 'backgroundColor' in s && typeof s.backgroundColor === 'string') {
-        return s.backgroundColor;
-      }
-    }
-    return undefined;
-  }
-  if (typeof style === 'object' && style !== null && 'backgroundColor' in style && typeof style.backgroundColor === 'string') {
-    return style.backgroundColor;
-  }
-  return undefined;
-}
-
-const AnimatedStackScreen = React.forwardRef<
+const AnimatedStackScreen = memo(forwardRef<
 	React.ComponentRef<typeof Stack.Screen>,
 	AnimatedStackScreenProps
 >(({ onMenuPress, scrollY, triggerHeight, animationStartRatio = 0.25, scaleStartRatio = 0.90, ...props }, ref) => {
 	const navigationHeaderHeight = useHeaderHeight();
 	const { colors } = useTheme();
-
-	const defaultOptions = {
+	const defaultOptions = useMemo(() => ({
 		headerTransparent: true,
-	};
+	}), []);
 
-	const { headerReplaceBackground, headerBackground, ...options } = {
+	const { headerReplaceBackground, headerBackground, ...options } = useMemo(() => ({
 		...defaultOptions,
 		...(typeof props.options === 'object' ? props.options : {}),
-	};
+	}), [defaultOptions, props.options]);
 
-	const headerTitle = typeof options.headerTitle === 'string' ? options.headerTitle : undefined;
-	const headerBackgroundColor = getBackgroundColor(options.headerStyle);
+	const headerTitle = useMemo(() => (
+		typeof options.headerTitle === 'string' ? options.headerTitle : undefined
+	), [options.headerTitle]);
 
 	const titleAnimatedStyle = useAnimatedStyle(() => {
+		'worklet';
 		const animationDistance = triggerHeight.get() - navigationHeaderHeight;
 		const start = animationDistance * animationStartRatio;
         const end = animationDistance;
@@ -87,8 +71,10 @@ const AnimatedStackScreen = React.forwardRef<
 			},
 			],
 		};
-	});
+	}, [navigationHeaderHeight, animationStartRatio, scaleStartRatio]);
+
 	const backgroundAnimatedStyle = useAnimatedStyle(() => {
+		'worklet';
 		const animationDistance = triggerHeight.get() - navigationHeaderHeight;
 		const start = animationDistance * animationStartRatio;
         const end = animationDistance;
@@ -101,27 +87,39 @@ const AnimatedStackScreen = React.forwardRef<
 			},
 			],
 		};
-	});
+	}, [navigationHeaderHeight, animationStartRatio]);
 
-	return (
-	<Stack.Screen
-	{...props}
-	options={{
-		...onMenuPress ? {
-			headerRight: () => (
-				<Button
-					variant="ghost"
-					size="icon"
-					icon={Icons.EllipsisVertical}
-					onPress={onMenuPress}
-				/>
-			)
-		} : {},
-		headerStyle: [
-			options.headerStyle,
-			{ backgroundColor: 'transparent' },
-		],
-		headerBackground: () => (
+	const getBackgroundColor = useCallback((style: StyleProp<ViewStyle>) => {
+		if (!style) return undefined;
+		if (Array.isArray(style)) {
+			for (const s of style) {
+			if (s && typeof s === 'object' && 'backgroundColor' in s && typeof s.backgroundColor === 'string') {
+				return s.backgroundColor;
+			}
+			}
+			return undefined;
+		}
+		if (typeof style === 'object' && style !== null && 'backgroundColor' in style && typeof style.backgroundColor === 'string') {
+			return style.backgroundColor;
+		}
+		return undefined;
+	}, []);
+
+	const headerBackgroundColor = useMemo(() => (
+		getBackgroundColor(options.headerStyle)
+	), [getBackgroundColor, options.headerStyle]);
+
+	// Renders
+	const renderHeaderRight = useCallback(() => (
+		<Button
+			variant="ghost"
+			size="icon"
+			icon={Icons.EllipsisVertical}
+			onPress={onMenuPress}
+		/>
+	), [onMenuPress]);
+
+	const renderHeaderBackground = useCallback(() => (
 		<>
 			{!headerReplaceBackground && (
 				<>
@@ -150,22 +148,38 @@ const AnimatedStackScreen = React.forwardRef<
 			)}
 			{headerBackground?.()}
 		</>
-		),
-		title: headerTitle,
-		...options,
-		headerTitle: (props) => (
-			<ReanimatedHeaderTitle
+	), [headerReplaceBackground, headerBackgroundColor, colors.background, backgroundAnimatedStyle, headerBackground]);
+
+	const renderHeaderTitle = useCallback(() => (
+		<ReanimatedHeaderTitle
 			style={titleAnimatedStyle}
 			tintColor={colors.foreground}
-			{...props}
-			>
-				{headerTitle}
-			</ReanimatedHeaderTitle>
-		),
-	}}
+		>
+			{headerTitle}
+		</ReanimatedHeaderTitle>
+	), [titleAnimatedStyle, colors.foreground, headerTitle]);
+
+	const screenOptions = useMemo(() => ({
+		...onMenuPress ? {
+			headerRight: renderHeaderRight
+		} : {},
+		headerStyle: [
+			options.headerStyle,
+			{ backgroundColor: 'transparent' }
+		],
+		headerBackground: renderHeaderBackground,
+		title: headerTitle,
+		...options,
+		headerTitle: renderHeaderTitle
+	}), [onMenuPress, renderHeaderBackground, headerTitle, options]);
+
+	return (
+	<Stack.Screen
+	{...props}
+	options={screenOptions}
 	/>
 	);
-});
+}));
 AnimatedStackScreen.displayName = "AnimatedStackScreen";
 
 export default AnimatedStackScreen;

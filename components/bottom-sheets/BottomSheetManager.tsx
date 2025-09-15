@@ -1,5 +1,4 @@
-import React from 'react';
-import { useTheme } from '@/providers/ThemeProvider';
+import { useEffect, useMemo } from 'react';
 import { useNavigation } from 'expo-router';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
@@ -9,13 +8,30 @@ export interface BottomSheetProps extends Omit<React.ComponentPropsWithoutRef<ty
 };
 
 export const BottomSheetManager = () => {
-  const { colors } = useTheme();
   const navigation = useNavigation();
   const sheets = useBottomSheetStore((state) => state.sheets);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const removeSheet = useBottomSheetStore((state) => state.removeSheet);
 
-  React.useEffect(() => {
+  const renderSheets = useMemo(() => {
+    return sheets.map(({ id, content: Content, props, sizes, ref }) => (
+      <Content
+        key={id}
+        ref={ref}
+        id={id}
+        sizes={sizes}
+        initialIndex={0}
+        closeSheet={closeSheet}
+        removeSheet={removeSheet}
+        onDismiss={() => {
+          removeSheet(id);
+        }}
+        {...props}
+      />
+    ));
+  }, [sheets, closeSheet, removeSheet]);
+
+  useEffect(() => {
     const unsubscribe = navigation.addListener('state', () => {
       sheets.forEach(async (sheet) => {
         if (!sheet.persistent && sheet.ref?.current) {
@@ -26,28 +42,6 @@ export const BottomSheetManager = () => {
 
     return unsubscribe;
   }, [sheets, closeSheet, navigation]);
-  return (
-    <>
-      {sheets.map(({ id, content: Content, props, sizes, ref }) => (
-        <Content
-        key={id}
-        ref={ref}
-        onLayout={() => {
-          if (typeof ref === 'object' && ref?.current?.present) {
-            ref.current.present();
-          };
-        }}
-        id={id}
-        sizes={sizes}
-        initialIndex={1}
-        closeSheet={closeSheet}
-        removeSheet={removeSheet}
-        onDismiss={() => {
-          removeSheet(id);
-        }}
-        {...props}
-        />
-      ))}
-    </>
-  );
+
+  return renderSheets;
 };

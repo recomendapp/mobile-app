@@ -12,7 +12,7 @@ import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import { PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { User } from "@/types/type.db";
+import { User } from "@recomendapp/types";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
@@ -51,10 +51,9 @@ const ModalPlaylistEditGuestsAdd = () => {
 		hasNextPage,
 		refetch,
 	} = usePlaylistGuestsSearchInfiniteQuery({
-		playlistId,
-		enabled: !!session,
+		playlistId: (!!session && guests) ? playlistId : undefined,
+		query: search,
 		filters: {
-			search: search,
 			exclude: [
 				session?.user.id!,
 				...(guests?.map((guest) => guest.user_id) || [])
@@ -189,10 +188,10 @@ const ModalPlaylistEditGuestsAdd = () => {
 			/>
 		</View>
 		<AnimatedLegendList
-		data={users?.pages.flat().map((user) => ({
+		data={users?.pages.flatMap((page) => page.data.map((user) => ({
 			user,
 			isSelected: selectedUsers.some((u) => u.id === user.id),
-		})) || []}
+		}))) || []}
 		renderItem={renderItems}
 		ListEmptyComponent={
 			isLoading ? <Icons.Loader />

@@ -1,10 +1,9 @@
-import { KeyboardAvoidingView, Platform, View} from 'react-native';
 import { useAuth } from '@/providers/AuthProvider';
 import { useEffect, useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button } from '@/components/ui/Button';
-import { Link, Stack } from 'expo-router';
+import { Link } from 'expo-router';
 import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,17 +12,20 @@ import { useUsernameAvailability } from '@/hooks/useUsernameAvailability';
 import { Icons } from '@/constants/Icons';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
-import { GroupedInput, GroupedInputItem, Input } from '@/components/ui/Input';
+import { GroupedInput, GroupedInputItem } from '@/components/ui/Input';
 import { upperFirst } from 'lodash';
-import app from '@/constants/app';
 import { ImageBackground } from 'expo-image';
-import { ScrollView } from 'react-native-gesture-handler';
 import * as Burnt from 'burnt';
 import { useRandomImage } from '@/hooks/useRandomImage';
 import { InputOTP } from '@/components/ui/input-otp';
 import { Text } from '@/components/ui/text';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { useLocale, useTranslations } from 'use-intl';
+import { useHeaderHeight } from "@react-navigation/elements";
+import { KeyboardAwareScrollView, KeyboardToolbar } from 'react-native-keyboard-controller';
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
+import { View } from '@/components/ui/view';
+
 
 const backgroundImages = [
 	require('@/assets/images/auth/signup/background/1.gif'),
@@ -45,6 +47,7 @@ const SignupScreen = () => {
 	const locale = useLocale();
 	const t = useTranslations();
 	const bgImage = useRandomImage(backgroundImages);
+	const navigationHeaderHeight = useHeaderHeight();
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
 	const signupSchema = z.object({
@@ -280,22 +283,23 @@ const SignupScreen = () => {
 			}}
 			style={tw`flex-1`}
 			>
-				<ScrollView
+				<KeyboardAwareScrollView
 				contentContainerStyle={[
-					tw`flex-1 gap-6 justify-end items-center`,
+					tw`flex-1 justify-end items-center`,
 					{
-						paddingBottom: inset.bottom + PADDING,
-						paddingLeft: inset.left + PADDING,
-						paddingRight: inset.right + PADDING,
+						gap: GAP,
+						paddingTop: PADDING_VERTICAL,
+						paddingLeft: inset.left + PADDING_HORIZONTAL,
+						paddingRight: inset.right + PADDING_HORIZONTAL,
+						paddingBottom: inset.bottom + PADDING_VERTICAL,
 					}
 				]}
+				bottomOffset={navigationHeaderHeight}
+				keyboardShouldPersistTaps='handled'
 				>
 					{!showOtp ? (
 						<>
-						<KeyboardAvoidingView
-						behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-						style={tw.style('w-full gap-4')}
-						>
+						<View style={[tw`w-full`, { gap: GAP }]}>
 							<GroupedInput title={upperFirst(t('common.messages.signup'))} titleStyle={tw`text-center text-xl font-bold`}>
 								<Controller
 								name="email"
@@ -409,7 +413,7 @@ const SignupScreen = () => {
 							>
 								{upperFirst(t('common.messages.signup'))}
 							</Button>
-						</KeyboardAvoidingView>
+						</View>
 						{/* SIGNUP */}
 						<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>{t('pages.auth.signup.return_to_login')} <Link href={'/auth/login'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.login'))}</Link></Text>
 						</>
@@ -444,7 +448,8 @@ const SignupScreen = () => {
 						</View>
 						</>
 					)}
-				</ScrollView>
+				</KeyboardAwareScrollView>
+				<KeyboardToolbar />
 			</LinearGradient>
 		</ImageBackground>
 	</>

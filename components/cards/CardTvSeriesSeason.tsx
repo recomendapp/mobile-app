@@ -1,5 +1,5 @@
 import * as React from "react"
-import { MediaTvSeriesSeason } from "@/types/type.db";
+import { MediaTvSeriesSeason } from "@recomendapp/types";
 import { ThemedText } from "../ui/ThemedText";
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "../utils/ImageWithFallback";
@@ -44,8 +44,8 @@ const CardTvSeriesSeasonDefault = React.forwardRef<
 		{...props}
 		>
 			<ImageWithFallback
-				source={{uri: season.avatar_url ?? ''}}
-				alt={season.title ?? ''}
+				source={{uri: season.poster_url ?? ''}}
+				alt={season.name ?? ''}
 				type={'tv_season'}
 				style={[
 					{ aspectRatio: 2 / 3 },
@@ -54,7 +54,7 @@ const CardTvSeriesSeasonDefault = React.forwardRef<
 			>
 				{showRating && (
 					<IconMediaRating
-					rating={season.tmdb_vote_average}
+					rating={season.vote_average}
 					variant="general"
 					style={tw`absolute top-1 right-1`}
 					/>
@@ -83,9 +83,6 @@ const CardTvSeriesSeason = React.forwardRef<
 		}
 	};
 	const onLongPress = () => {
-		// openSheet(BottomSheetMedia, {
-		// 	media: props.media,
-		// });
 	};
 	return (
 	<Pressable

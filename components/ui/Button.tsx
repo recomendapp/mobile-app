@@ -168,7 +168,7 @@ export const Button = forwardRef<View, ButtonProps>(
         case 'outline':
           return { ...baseTextStyle, color: primaryColor };
         case 'muted':
-          return { ...baseTextStyle, color: mutedForegroundColor };
+          return { ...baseTextStyle, color: colors.foreground };
         case 'ghost':
           return { ...baseTextStyle, color: primaryColor };
         case 'link':
@@ -201,7 +201,7 @@ export const Button = forwardRef<View, ButtonProps>(
         case 'outline':
           return primaryColor;
         case 'muted':
-          return mutedForegroundColor;
+          return colors.foreground;
         case 'ghost':
           return primaryColor;
         case 'link':

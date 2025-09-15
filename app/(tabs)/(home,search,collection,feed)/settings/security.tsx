@@ -12,14 +12,17 @@ import { AuthError } from "@supabase/supabase-js";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { Input } from "@/components/ui/Input";
-import { ScrollView } from "react-native-gesture-handler";
 import { Stack } from "expo-router";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
+import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const SettingsSecurityScreen = () => {
 	const supabase = useSupabaseClient();
-	const { colors, bottomTabHeight } = useTheme();
+	const { bottomTabHeight } = useTheme();
+	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const profileFormSchema = z.object({
@@ -111,11 +114,14 @@ const SettingsSecurityScreen = () => {
 					),
 				}}
 			/>
-			<ScrollView
-			contentContainerStyle={[
-				tw`gap-2 p-4`,
-				{ paddingBottom: bottomTabHeight + 8 }
-			]}
+			<KeyboardAwareScrollView
+			contentContainerStyle={{
+				gap: GAP,
+				paddingTop: PADDING_VERTICAL,
+				paddingHorizontal: PADDING_HORIZONTAL,
+				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			}}
+			bottomOffset={navigationHeaderHeight}
 			>
 				<Text textColor='muted' style={tw`text-sm text-justify`}>{t(`pages.settings.security.description`)}</Text>
 				<Controller
@@ -164,7 +170,8 @@ const SettingsSecurityScreen = () => {
 				</View>
 				)}
 				/>
-			</ScrollView>
+			</KeyboardAwareScrollView>
+			<KeyboardToolbar />
 		</>
 	)
 };

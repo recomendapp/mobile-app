@@ -7,6 +7,8 @@ import { CardPlaylist } from "../cards/CardPlaylist";
 import { LegendList } from "@legendapp/list";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
+import { useCallback, useMemo } from "react";
+import { Playlist } from "@recomendapp/types";
 
 interface WidgetUserFriendsPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -17,35 +19,54 @@ export const WidgetUserFriendsPlaylists = ({
   style,
   labelStyle,
   containerStyle,
-} : WidgetUserFriendsPlaylistsProps) => {
+}: WidgetUserFriendsPlaylistsProps) => {
   const t = useTranslations();
-  const { user } = useAuth();
+  const { session } = useAuth();
   const { data: playlists } = useUserPlaylistsFriendsInfinite({
-    userId: user?.id,
-		filters: {
-			resultsPerPage: 20,
-		},
-  })
+    userId: session?.user.id,
+    filters: {
+      resultsPerPage: 20,
+    },
+  });
 
-  if (!user || !playlists || !playlists.pages[0].length) return null;
+  const playlistData = useMemo(() => playlists?.pages.flat() || [], [playlists]);
+
+  const renderItem = useCallback(({ item }: { item: Playlist }) => (
+    <CardPlaylist playlist={item} style={tw`w-36`} />
+  ), []);
+
+  const keyExtractor = useCallback((item: Playlist) => 
+    item.id.toString(), 
+    []
+  );
+
+  const ItemSeparatorComponent = useCallback(() => 
+    <View style={tw`w-2`} />, 
+    []
+  );
+
+  if (!playlistData.length) {
+    return null;
+  }
 
   return (
-  <View style={[tw`flex-1 gap-2`, style]}>
-    <ThemedText style={[tw`font-semibold text-xl`, labelStyle]}>{upperFirst(t('common.messages.friends_playlists'))}</ThemedText>
-    <LegendList
-    data={playlists.pages.flat()}
-    renderItem={({ item }) => (
-      <CardPlaylist key={item.id} playlist={item} style={tw`w-36`} />
-    )}
-    snapToInterval={152}
-    decelerationRate="fast"
-    keyExtractor={(item) => item.id.toString()}
-    horizontal
-    showsHorizontalScrollIndicator={false}
-    ItemSeparatorComponent={() => <View style={tw`w-2`} />}
-    contentContainerStyle={containerStyle}
-    nestedScrollEnabled
-    />
-  </View>
-  )
+    <View style={[tw`flex-1 gap-2`, style]}>
+      <ThemedText style={[tw`font-semibold text-xl`, labelStyle]}>
+        {upperFirst(t('common.messages.friends_playlists'))}
+      </ThemedText>
+      <LegendList
+        data={playlistData}
+        renderItem={renderItem}
+        snapToInterval={152}
+        decelerationRate="fast"
+        keyExtractor={keyExtractor}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        ItemSeparatorComponent={ItemSeparatorComponent}
+        contentContainerStyle={containerStyle}
+        nestedScrollEnabled
+      />
+    </View>
+  );
 };
+WidgetUserFriendsPlaylists.displayName = 'WidgetUserFriendsPlaylists';

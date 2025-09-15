@@ -1,7 +1,7 @@
 import React from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
-import { Playlist } from '@/types/type.db';
+import { Playlist } from '@recomendapp/types';
 import { usePathname, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -59,9 +59,7 @@ const BottomSheetPlaylist = React.forwardRef<
 	const insertPlaylistSaved = useUserPlaylistSavedInsertMutation();
 	const deletePlaylistSaved = useUserPlaylistSavedDeleteMutation();
 
-  const playlistDeleteMutation = usePlaylistDeleteMutation({
-    userId: session?.user.id,
-  });
+  const playlistDeleteMutation = usePlaylistDeleteMutation();
 
   const items: Item[][] = React.useMemo(() => {
     return [
@@ -116,12 +114,14 @@ const BottomSheetPlaylist = React.forwardRef<
           label: upperFirst(t('common.messages.go_to_playlist')),
           disabled: pathname.startsWith(`/playlist/${playlist.id}`),
         },
-        {
-          icon: Icons.User,
-          onPress: () => router.push(`/user/${playlist.user?.username}`),
-          label: upperFirst(t('common.messages.go_to_user')),
-        },
-        ...(session?.user.id === playlist.user?.id ? [
+        ...(playlist.user ? [
+          {
+            icon: Icons.User,
+            onPress: () => router.push(`/user/${playlist.user?.username}`),
+            label: upperFirst(t('common.messages.go_to_user')),
+          }
+        ] : []),
+        ...(session?.user.id === playlist.user_id ? [
           {
             icon: Icons.Users,
             onPress: () => router.push(`/playlist/${playlist.id}/edit/guests`),
@@ -147,7 +147,7 @@ const BottomSheetPlaylist = React.forwardRef<
                     text: upperFirst(t('common.messages.delete')),
                     onPress: async () => {
                       await playlistDeleteMutation.mutateAsync(
-                        { id: playlist.id },
+                        { playlistId: playlist.id, userId: session.user.id },
                         {
                           onSuccess: () => {
                             Burnt.toast({
@@ -212,9 +212,9 @@ const BottomSheetPlaylist = React.forwardRef<
           />
           <View style={tw`shrink`}>
             <Text numberOfLines={2} style={tw`shrink`}>{playlist.title}</Text>
-            <Text textColor='muted' numberOfLines={1} style={tw`shrink`}>
+            {playlist.user && <Text textColor='muted' numberOfLines={1} style={tw`shrink`}>
               {t('common.messages.by_name', { name: playlist.user?.username! })}
-            </Text>
+            </Text>}
           </View>
         </View>
       </View>

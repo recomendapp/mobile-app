@@ -14,7 +14,7 @@ import { usePlaylistGuestsQuery, usePlaylistQuery } from "@/features/playlist/pl
 import Switch from "@/components/ui/Switch";
 import { Alert } from "react-native";
 import { usePlaylistGuestsDeleteMutation, usePlaylistGuestsUpsertMutation, usePlaylistUpdateMutation } from "@/features/playlist/playlistMutations";
-import { User } from "@/types/type.db";
+import { User } from "@recomendapp/types";
 import Fuse from "fuse.js";
 import { SearchBar } from "@/components/ui/searchbar";
 import { LegendList } from "@legendapp/list";
@@ -32,7 +32,7 @@ const ModalPlaylistEditGuests = () => {
     const playlistId = Number(playlist_id);
 	const { inset, colors } = useTheme();
 	const router = useRouter();
-	const { user } = useAuth();
+	const { customerInfo } = useAuth();
 	const t = useTranslations();
 	const {
 		data: playlist,
@@ -94,7 +94,7 @@ const ModalPlaylistEditGuests = () => {
 
 	// Handlers
 	const handleToggleEdit = useCallback((userId: string) => {
-		if (!user?.premium) {
+		if (!customerInfo?.entitlements.active['premium']) {
 			router.push({ pathname: '/upgrade', params: { feature: app.features.playlist_collaborators } });
 			return;
 		}
@@ -107,7 +107,7 @@ const ModalPlaylistEditGuests = () => {
 				return guest;
 			});
 		});
-	}, []);
+	}, [customerInfo?.entitlements.active, router]);
 	const handleDeleteGuest = useCallback(async (userId: string) => {
 		setGuests((prev) => {
 			if (!prev) return prev;

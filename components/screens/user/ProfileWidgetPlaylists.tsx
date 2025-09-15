@@ -4,7 +4,7 @@ import { Icons } from "@/constants/Icons";
 import { useUserPlaylistsInfiniteQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
-import { Profile } from "@/types/type.db";
+import { Profile } from "@recomendapp/types";
 import { LegendList } from "@legendapp/list";
 import { Link } from "expo-router";
 import { upperFirst } from "lodash";

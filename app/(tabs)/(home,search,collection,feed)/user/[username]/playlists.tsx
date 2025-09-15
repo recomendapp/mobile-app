@@ -13,6 +13,7 @@ import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { PADDING_VERTICAL } from "@/theme/globals";
+import { FadeInDown } from "react-native-reanimated";
 
 interface sortBy {
 	label: string;
@@ -76,8 +77,14 @@ const UserPlaylistsScreen = () => {
 		/>
 		<LegendList
 		data={playlists?.pages.flatMap((page) => page) ?? []}
-		renderItem={({ item }) => (
-			<CardPlaylist key={item.id} playlist={item} showItemsCount showPlaylistAuthor={false} />
+		renderItem={({ item, index }) => (
+			<CardPlaylist
+			key={item.id}
+			playlist={item}
+			showItemsCount
+			showPlaylistAuthor={false}
+			entering={FadeInDown}
+			/>
 		)}
 		ListHeaderComponent={
 			<>

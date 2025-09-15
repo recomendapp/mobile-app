@@ -14,12 +14,13 @@ import { Text } from "@/components/ui/text";
 import { FlatList } from "react-native-gesture-handler";
 import { Button, ButtonProps } from "@/components/ui/Button";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import { Media } from "@/types/type.db";
 import { UseQueryResult } from "@tanstack/react-query";
 import { LucideIcon } from "lucide-react-native";
 import { CollectionItem } from "./CollectionItem";
 import { ImageType } from "@/components/utils/ImageWithFallback";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { MediaType, ViewType } from "@recomendapp/types";
+import { LegendListRenderItemProps } from "@legendapp/list";
 
 interface ToolbarItem {
     label?: string;
@@ -39,13 +40,6 @@ export interface CollectionAction<T> {
     label: string;
     variant?: ButtonProps['variant'];
     onPress: (item: T) => void;
-    confirmationConfig?: {
-        title: string;
-        description: string;
-        confirmText: string;
-        successMessage: string;
-        errorMessage: string;
-    };
 	position: 'top' | 'bottom' | 'left' | 'right';
 }
 
@@ -54,8 +48,10 @@ interface CollectionScreenConfig<T> extends Omit<React.ComponentProps<typeof Ani
     scrollY?: SharedValue<number>;
     headerHeight?: SharedValue<number>;
     screenTitle: string;
+    hideHeader?: boolean;
+    hideTitle?: boolean;
+    hideNumberOfItems?: boolean;
     screenSubtitle?: string | React.ReactNode | (() => React.ReactNode);
-    showPoster?: boolean;
     poster?: string;
     posterType?: ImageType;
     searchPlaceholder: string;
@@ -67,13 +63,15 @@ interface CollectionScreenConfig<T> extends Omit<React.ComponentProps<typeof Ani
     customFilters?: React.ReactNode;
     additionalToolbarItems?: ToolbarItem[];
     getItemId: (item: T) => string | number;
-	getItemMedia: (item: T) => Media;
     getItemTitle: (item: T) => string;
     getItemSubtitle?: (item: T) => string;
     getItemImageUrl?: (item: T) => string;
     getItemUrl?: (item: T) => string;
     getItemBackdropUrl?: (item: T) => string;
     getCreatedAt?: (item: T) => string;
+    onItemAction?: (item: T) => void;
+    view?: ViewType;
+    type?: MediaType;
 	fuseKeys?: FuseOptionKey<T>[];
 	fuseThreshold?: number;
 }
@@ -83,8 +81,10 @@ const CollectionScreen = <T extends {}>({
     scrollY = useSharedValue(0),
     headerHeight = useSharedValue(0),
     screenTitle,
+    hideHeader,
+    hideTitle,
+    hideNumberOfItems,
     screenSubtitle,
-    showPoster,
     poster,
     posterType,
     searchPlaceholder,
@@ -96,16 +96,18 @@ const CollectionScreen = <T extends {}>({
     customFilters,
     additionalToolbarItems,
     getItemId,
-	getItemMedia,
     getItemTitle,
     getItemSubtitle,
     getItemImageUrl,
     getItemUrl,
     getItemBackdropUrl,
     getCreatedAt,
+    onItemAction,
+    view = 'list',
+    numColumns = 4,
+    type,
 	fuseKeys,
 	fuseThreshold = 0.5,
-	// Props for the AnimatedLegendList
 	...props
 }: CollectionScreenConfig<T>) => {
     const { colors, bottomTabHeight } = useTheme();
@@ -165,18 +167,18 @@ const CollectionScreen = <T extends {}>({
             setSortOrder(selected.defaultOrder);
         });
     }, [sortByOptions, showActionSheetWithOptions, sortBy.value, t]);
-
+    
+    // Render
     const renderToolbar = () => {
         const toolbarItems: ToolbarItem[] = [
             ...(additionalToolbarItems || []),
             {
-                // label: upperFirst(t('common.messages.order')),
                 icon: sortOrder === 'asc' ? Icons.ArrowUpNarrowWide : Icons.ArrowDownNarrowWide,
                 onPress: () => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'),
             },
             {
                 label: sortBy.label,
-                icon: Icons.Filter,
+                icon: Icons.Filters,
                 onPress: handleSortBy,
             },
         ];
@@ -194,12 +196,31 @@ const CollectionScreen = <T extends {}>({
                     {item.label}
                 </Button>
             )}
-            contentContainerStyle={tw`px-4`}
             showsHorizontalScrollIndicator={false}
             ItemSeparatorComponent={() => <View style={tw`w-2`} />}
             />
         );
     };
+    const renderItem = ({ item, index } : LegendListRenderItemProps<T>) => {
+        return (
+            <CollectionItem
+            key={getItemId(item)}
+            item={item}
+            swipeActions={swipeActions}
+            bottomSheetActions={bottomSheetActions}
+            renderCustom={renderCustomItem}
+            getItemId={getItemId}
+            getItemTitle={getItemTitle}
+            getItemSubtitle={getItemSubtitle}
+            getItemImageUrl={getItemImageUrl}
+            getItemUrl={getItemUrl}
+            onItemAction={onItemAction}
+            view={view}
+            type={type}
+            index={index}
+            />
+        )
+    }
 
     React.useEffect(() => {
         if (data) {
@@ -221,18 +242,19 @@ const CollectionScreen = <T extends {}>({
 			onScroll={scrollHandler}
 			ListHeaderComponent={
 				<>
-					<CollectionHeader
+					{!hideHeader && <CollectionHeader
 						title={screenTitle}
-                        showPoster={showPoster}
+                        hideTitle={hideTitle}
                         poster={poster}
                         posterType={posterType}
                         bottomText={screenSubtitle}
 						numberOfItems={data?.length || 0}
+                        hideNumberOfItems={hideNumberOfItems}
 						scrollY={scrollY}
 						headerHeight={headerHeight}
-						loading={loading}
 						backdrops={backdrops}
-					/>
+                        type={type}
+					/>}
 					{!loading && (
 						<View style={tw`gap-2`}>
 							<SearchBar
@@ -241,7 +263,7 @@ const CollectionScreen = <T extends {}>({
                             onSearch={handleSearch}
                             debounceMs={200}
                             placeholder={searchPlaceholder}
-                            containerStyle={tw`mx-4`}
+                            // containerStyle={{ marginHorizontal: PADDING_HORIZONTAL }}
 							/>
                             {renderToolbar()}
 							{customFilters}
@@ -251,21 +273,8 @@ const CollectionScreen = <T extends {}>({
 			}
 			ListHeaderComponentStyle={tw`mb-2`}
 			data={renderItems || []}
-			renderItem={({ item }) => (
-				<CollectionItem
-				key={getItemId(item)}
-				item={item}
-				swipeActions={swipeActions}
-				bottomSheetActions={bottomSheetActions}
-				renderCustom={renderCustomItem}
-				getItemId={getItemId}
-				getItemMedia={getItemMedia}
-				getItemTitle={getItemTitle}
-				getItemSubtitle={getItemSubtitle}
-				getItemImageUrl={getItemImageUrl}
-				getItemUrl={getItemUrl}
-				/>
-			)}
+            extraData={view}
+			renderItem={renderItem}
 			keyExtractor={(item) => getItemId(item).toString()}
 			ListEmptyComponent={
 				loading ? <Icons.Loader /> : (
@@ -280,8 +289,11 @@ const CollectionScreen = <T extends {}>({
 			refreshing={isRefetching}
 			onRefresh={refetch}
 			contentContainerStyle={{
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+                paddingHorizontal: PADDING_HORIZONTAL,
+                paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+                gap: GAP,
 			}}
+            numColumns={view === 'grid' ? numColumns : 1}
 			{...props}
             />
         </>

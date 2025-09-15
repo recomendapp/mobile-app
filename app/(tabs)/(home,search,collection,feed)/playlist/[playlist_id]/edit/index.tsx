@@ -26,10 +26,11 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import Switch from "@/components/ui/Switch";
 import { Alert } from "react-native";
 import { usePlaylistUpdateMutation } from "@/features/playlist/playlistMutations";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LucideIcon } from "lucide-react-native";
 import { Icons } from "@/constants/Icons";
+import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 
 const TITLE_MIN_LENGTH = 1;
 const TITLE_MAX_LENGTH = 100;
@@ -127,7 +128,7 @@ const ModalPlaylistEdit = () => {
 						base64: true,
 					})
 					if (!results.canceled && results.assets?.length) {
-						setNewPoster(results.assets[0]);
+						setNewPoster(await handleProcessImage(results.assets[0]));
 					}
 					break;
 				case 'camera':
@@ -149,7 +150,7 @@ const ModalPlaylistEdit = () => {
 						base64: true,
 					});
 					if (!cameraResults.canceled && cameraResults.assets?.length) {
-						setNewPoster(cameraResults.assets[0]);
+						setNewPoster(await handleProcessImage(cameraResults.assets[0]));
 					}
 					break;
 				case 'delete':
@@ -171,7 +172,7 @@ const ModalPlaylistEdit = () => {
 				const { data, error } = await supabase.storage
 					.from('playlist_posters')
 					.upload(fileName, decode(newPoster.base64!), {
-						contentType: newPoster.mimeType,
+						contentType: newPoster.mimeType || `image/${SaveFormat.JPEG}`,
 						upsert: true,
 					});
 				if (error) throw error;
@@ -180,10 +181,10 @@ const ModalPlaylistEdit = () => {
 					.getPublicUrl(data.path)
 				poster_url = publicUrl;
 			} else if (newPoster === null) {
-				poster_url = null; // Delete poster
+				poster_url = null;
 			}
 			await updatePlaylistMutation.mutateAsync({
-				id: playlist.id,
+				playlistId: playlist.id,
 				title: values.title.trim(),
 				description: values.description?.trim() || null,
 				private: values.private,
@@ -229,6 +230,16 @@ const ModalPlaylistEdit = () => {
 		} else {
 			router.dismiss();
 		}
+	};
+	const handleProcessImage = async (image: ImagePickerAsset) => {
+		const processedImage = await ImageManipulator.manipulate(image.uri)
+			.resize({ width: 1024, height: 1024 })
+			.renderAsync()
+		return await processedImage.saveAsync({
+			compress: 0.8,
+			format: SaveFormat.JPEG,
+			base64: true,
+		})
 	};
 
 	// useEffects
@@ -390,6 +401,7 @@ const ModalPlaylistEdit = () => {
 				</>
 			)}
 		</KeyboardAwareScrollView>
+		<KeyboardToolbar />
 	</>
 	)
 };

@@ -74,7 +74,7 @@ Root.displayName = 'RootAvatar';
 
 // Hook pour utiliser le contexte
 function useRootContext() {
-  const context = React.useContext(RootContext);
+  const context = React.use(RootContext);
   if (!context) {
     throw new Error('Avatar components must be used within Avatar.Root');
   }

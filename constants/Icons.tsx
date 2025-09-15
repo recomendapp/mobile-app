@@ -1,5 +1,5 @@
 import { RecomendLogo } from "@/lib/icons/RecomendLogo";
-import { AlertCircleIcon, ArrowDownNarrowWideIcon, ArrowUpNarrowWideIcon, BellIcon, BookmarkIcon, CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, ClapperboardIcon, CompassIcon, CreditCardIcon, EditIcon, EllipsisIcon, EllipsisVerticalIcon, EyeIcon, EyeOffIcon, FilterIcon, HeartIcon, HomeIcon, InfoIcon, LibraryIcon, LinkIcon, ListOrderedIcon, ListPlusIcon, ListVideoIcon, Loader2Icon, LockIcon, LogOutIcon, LucideProps, MailIcon, MenuIcon, PlusIcon, RectangleEllipsisIcon, SearchIcon, Send, SendIcon, SettingsIcon, ShieldIcon, StarIcon, StoreIcon, TextIcon, TrashIcon, UserIcon, UserPlusIcon, UsersIcon, XIcon, ZapIcon } from "lucide-react-native";
+import { AlertCircleIcon, ArchiveIcon, ArchiveRestoreIcon, ArrowDownNarrowWideIcon, ArrowUpNarrowWideIcon, BellIcon, BookmarkIcon, CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, ClapperboardIcon, CompassIcon, CreditCardIcon, EditIcon, EllipsisIcon, EllipsisVerticalIcon, EyeIcon, EyeOffIcon, FilterIcon, HeartIcon, HomeIcon, ImageIcon, InfoIcon, LayoutGridIcon, LibraryIcon, LinkIcon, ListIcon, ListOrderedIcon, ListPlusIcon, ListVideoIcon, Loader2Icon, LockIcon, LogOutIcon, LucideProps, MailIcon, MenuIcon, PlusIcon, RectangleEllipsisIcon, RectangleHorizontalIcon, RectangleVerticalIcon, SearchIcon, Send, SendIcon, Settings2Icon, SettingsIcon, ShieldIcon, StarIcon, StoreIcon, TextIcon, TrashIcon, UserIcon, UserPlusIcon, UsersIcon, WallpaperIcon, XIcon, ZapIcon } from "lucide-react-native";
 import { Premium } from "@/lib/icons/Premium";
 import { ActivityIndicator } from "react-native";
 
@@ -8,9 +8,9 @@ export const Icons = {
 		logo: RecomendLogo,
 	},
 	spinner: Loader2Icon,
-	// loader: ({ style, ...props }: LucideProps) => (
-	// 	<Icons.spinner style={[tw.style(''), style]} {...props} />
 	Loader: ActivityIndicator,
+	Archive: ArchiveIcon,
+	Unarchive: ArchiveRestoreIcon,
 	premium: Premium,
 	home: HomeIcon,
 	Text: TextIcon,
@@ -47,7 +47,7 @@ export const Icons = {
 	Movie: ClapperboardIcon,
 	AddPlaylist: ListPlusIcon,
 	Delete: TrashIcon,
-	Filter: FilterIcon,
+	Filters: Settings2Icon,
 	Cancel: XIcon,
 	Comment: TextIcon,
 	Check: CheckIcon,
@@ -62,4 +62,11 @@ export const Icons = {
 	Menu: MenuIcon,
 	ListOrdered: ListOrderedIcon,
 	X: XIcon,
+	Share: LinkIcon,
+	Grid: LayoutGridIcon,
+	List: ListIcon,
+	RectangleHorizontal: RectangleHorizontalIcon,
+	RectangleVertical: RectangleVerticalIcon,
+	Wallpaper: WallpaperIcon,
+	Image: ImageIcon,
 };

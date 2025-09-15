@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
 import { useAuth } from "./AuthProvider";
 import { useSupabaseClient } from "./SupabaseProvider";
@@ -6,10 +6,14 @@ import { Platform } from "react-native";
 import * as Device from 'expo-device';
 import { useRouter } from "expo-router";
 import * as Burnt from 'burnt';
-import { NotificationPayload } from "@/types";
-// import { NovuProvider } from "@novu/react-native";
+import { NotificationPayload } from "@recomendapp/types";
+import { NovuProvider } from "@novu/react-native";
+import { useNovuSubscriberHash } from "@/features/utils/utilsQueries";
+import { useQueryClient } from "@tanstack/react-query";
+import { utilsKey } from "@/features/utils/utilsKey";
 
 type NotificationsContextType = {
+  isMounted: boolean;
   permissionStatus: Notifications.PermissionStatus | null;
   pushToken: string | null;
   notifications: Notifications.Notification[] | null;
@@ -19,7 +23,7 @@ type NotificationsContextType = {
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
 export const useNotifications = () => {
-  const ctx = useContext(NotificationsContext);
+  const ctx = use(NotificationsContext);
   if (!ctx) throw new Error("useNotifications must be used in NotificationsProvider");
   return ctx;
 };
@@ -27,15 +31,18 @@ export const useNotifications = () => {
 export const NotificationsProvider = ({ children }: { children: React.ReactNode }) => {
   const supabase = useSupabaseClient();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { session, pushToken, setPushToken } = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<Notifications.PermissionStatus | null>(null);
   const [notifications, setNotifications] = useState<Notifications.Notification[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
+  const { data: subscriberHash } = useNovuSubscriberHash(session?.user.id);
 
   const notificationsListener = useRef<Notifications.EventSubscription | null>(null);
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
 
-  const handleRegisterForPushNotificationsAsync = async () => {
+  const handleRegisterForPushNotificationsAsync = useCallback(async () => {
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('default', {
         name: 'default',
@@ -67,9 +74,8 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     } else {
       throw new Error('Must use physical device for push notifications');
     }
-  };
-
-  const handleSaveToken = async (token: string) => {
+  }, []);
+  const handleSaveToken = useCallback(async (token: string) => {
     try {
       if (!session) return;
       const provider = (Platform.OS === 'ios' || Platform.OS === 'macos') ? 'apns' : 'fcm';
@@ -86,27 +92,18 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     } catch (err) {
       console.error("Error saving push token:", err);
     }
-  };
-  const handleResponse = (response: Notifications.NotificationResponse) => {
-    // iOS APNs : data in response.notification.request.trigger.payload.data
-    // Android FCM : data in response.notification.request.content.data
-    const data = (
-      response.notification.request.content.data ||
-      (response.notification.request.trigger as any).payload.data
-    ) as NotificationPayload;
-    if (data) {
-      handleRedirect(data);
-    }
-  };
-  const handleRedirect = (data: NotificationPayload) => {
+  }, [session, supabase]);
+  const handleRedirect = useCallback((data: NotificationPayload) => {
     switch (data.type) {
-      case 'reco_sent':
+      case 'reco_sent_movie':
+      case 'reco_sent_tv_series':
         router.push({
           pathname: '/collection/my-recos',
           params: { recoId: data.id },
         });
         break;
-      case 'reco_completed':
+      case 'reco_completed_movie':
+      case 'reco_completed_tv_series':
         router.push({
           pathname: '/collection/my-recos',
           params: { recoId: data.id },
@@ -116,10 +113,20 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         router.push(`/user/${data.sender.username}`);
         break;
       default:
-        // Not handled or no redirect needed
         break;
     }
-  };
+  }, [router]);
+  const handleResponse = useCallback((response: Notifications.NotificationResponse) => {
+    // iOS APNs : data in response.notification.request.trigger.payload.data
+    // Android FCM : data in response.notification.request.content.data
+    const data = (
+      response.notification.request.content.data ||
+      (response.notification.request.trigger as any).payload.data
+    ) as NotificationPayload;
+    if (data) {
+      handleRedirect(data);
+    }
+  }, [handleRedirect]);
 
   useEffect(() => {
     if (!session) return;
@@ -145,6 +152,9 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         message: notification.request.content.body ?? undefined,
         preset: 'none',
       });
+      queryClient.invalidateQueries({
+        queryKey: utilsKey.notifications()
+      });
     });
 
     // Listener when notification is clicked
@@ -168,26 +178,36 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     };
   }, [session]);
 
-  const defaultProvider = (
-    <NotificationsContext.Provider
-    value={{
-      permissionStatus: permissionStatus,
-      pushToken: pushToken,
-      notifications: notifications,
-      error: error,
-    }}
-    >
+  useEffect(() => {
+    if (session && subscriberHash && !isMounted) {
+      setIsMounted(true);
+    }
+  }, [session, subscriberHash, isMounted]);
+
+  const contextValue = useMemo(() => ({
+    isMounted,
+    permissionStatus,
+    pushToken,
+    notifications,
+    error
+  }), [isMounted, permissionStatus, pushToken, notifications, error]);
+
+  const defaultProvider = useMemo(() => (
+    <NotificationsContext.Provider value={contextValue}>
       {children}
     </NotificationsContext.Provider>
-  );
+  ), [contextValue, children]);
 
-  if (!session) return defaultProvider;
+  if (!session || !subscriberHash) return defaultProvider;
 
   return (
-    <>
-    {/* <NovuProvider subscriberId={session.user.id} applicationIdentifier={process.env.EXPO_PUBLIC_NOVU_APPLICATION_IDENTIFIER!}> */}
+    <NovuProvider
+    applicationIdentifier={process.env.EXPO_PUBLIC_NOVU_APPLICATION_IDENTIFIER!}
+    subscriberId={session.user.id}
+    subscriberHash={subscriberHash}
+    // useCache={true}
+    >
       {defaultProvider}
-    {/* </NovuProvider> */}
-    </>
+    </NovuProvider>
   )
 };
