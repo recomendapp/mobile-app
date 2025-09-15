@@ -1129,57 +1129,37 @@ export const useUserFeedInfiniteQuery = ({
 export const useUserFeedCastCrewInfiniteQuery = ({
 	userId,
 	filters,
-	enabled = true,
 } : {
 	userId?: string;
 	filters?: {
-		resultsPerPage?: number;
-		order?: 'release_date-desc';
+		perPage?: number;
 	};
-	enabled?: boolean;
 }) => {
 	const mergedFilters = {
-		resultsPerPage: 20,
-		order: 'release_date-desc',
+		perPage: 20,
 		...filters,
 	};
 	const supabase = useSupabaseClient();
 	return useInfiniteQuery({
-		queryKey: userKeys.feedCastCrew(userId!, mergedFilters),
+		queryKey: userKeys.feedCastCrew({
+			userId: userId!,
+			filters: filters,
+		}),
 		queryFn: async ({ pageParam = 1 }) => {
-			let from = (pageParam - 1) * mergedFilters.resultsPerPage;
-	  		let to = from - 1 + mergedFilters.resultsPerPage;
-			let request = supabase
-				.from('user_feed_cast_crew')
-				.select(`
-					*,
-					media:media_movie!inner(id, media_id, title,avatar_url,extra_data,url,date, media_type, main_credit),
-					person:media_person(title,avatar_url,url)
-				`)
-				.not('media.date', 'is', null)
-				.range(from, to);
-			
-			if (mergedFilters) {
-				if (mergedFilters.order) {
-					const [ column, direction ] = mergedFilters.order.split('-');
-					switch (column) {
-						case 'release_date':
-							request = request
-								.order('media(date)', { ascending: direction === 'asc' });
-							break;
-					}
-				}
-			}
-			const { data, error } = await request
-				.overrideTypes<UserFeedCastCrew[], { merge: false }>();
+			let from = (pageParam - 1) * mergedFilters.perPage;
+			const { data, error } = await  supabase
+				.rpc('get_feed_cast_crew', {
+					page_limit: mergedFilters.perPage,
+					page_offset: from
+				})
 			if (error) throw error;
 			return data;
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
-		enabled: !!userId && enabled,
+		enabled: !!userId,
 	});
 };
 /* -------------------------------------------------------------------------- */

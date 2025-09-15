@@ -68,11 +68,9 @@ const FeedScreen = () => {
 	}, []);
 	const renderEmpty = useCallback(() => (
 		!loading ? (
-			<View style={tw`flex-1 items-center justify-center`}>
-				<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
-			</View>
+			<Text style={tw`text-center`} textColor='muted'>{upperFirst(t('common.messages.no_activity'))}</Text>
 		) : null
-	), [t]);
+	), [t, loading]);
 
 	return (
 		<LegendList

@@ -213,10 +213,13 @@ export const userKeys = {
 		filters?: any;
 	}) => filters ? [...userKeys.detail(userId), 'feed', filters] as const : [...userKeys.detail(userId), 'feed'] as const,
 
-	feedCastCrew: (
-		userId: string,
-		filters?: any
-	) => filters ? [...userKeys.detail(userId), 'feed-cast-crew', filters] as const : [...userKeys.detail(userId), 'feed-cast-crew'] as const,
+	feedCastCrew: ({
+		userId,
+		filters,
+	} : {
+		userId: string;
+		filters?: any;
+	}) => filters ? [...userKeys.detail(userId), 'feed-cast-crew', filters] as const : [...userKeys.detail(userId), 'feed-cast-crew'] as const,
 	/* -------------------------------------------------------------------------- */
 
 	/* -------------------------------- PLAYLIST -------------------------------- */
