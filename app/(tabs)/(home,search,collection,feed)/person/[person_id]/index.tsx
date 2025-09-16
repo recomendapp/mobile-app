@@ -1,9 +1,12 @@
 import BottomSheetPerson from "@/components/bottom-sheets/sheets/BottomSheetPerson";
+import ButtonPersonFollow from "@/components/buttons/ButtonPersonFollow";
 import { PersonHeader } from "@/components/screens/person/PersonHeader";
 import PersonWidgetFilms from "@/components/screens/person/PersonWidgetFilms";
 import PersonWidgetTvSeries from "@/components/screens/person/PersonWidgetTvSeries";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
+import { Button } from "@/components/ui/Button";
 import { ThemedText } from "@/components/ui/ThemedText"
+import { Icons } from "@/constants/Icons";
 import { useMediaPersonQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -73,14 +76,29 @@ const PersonScreen = () => {
 		options={{
 			headerTitle: person?.name || '',
 			headerTransparent: true,
+			headerRight: () => (
+				<View style={tw`flex-row items-center gap-1`}>
+					<ButtonPersonFollow personId={personId} />
+					<Button
+					variant="ghost"
+					size="icon"
+					icon={Icons.EllipsisVertical}
+					onPress={person ? () => {
+						openSheet(BottomSheetPerson, {
+							person: person,
+						})
+					} : undefined}
+					/>
+				</View>
+			)
 		}}
 		scrollY={scrollY}
 		triggerHeight={headerHeight}
-		onMenuPress={person ? () => {
-			openSheet(BottomSheetPerson, {
-				person: person,
-			})
-		} : undefined}
+		// onMenuPress={person ? () => {
+		// 	openSheet(BottomSheetPerson, {
+		// 		person: person,
+		// 	})
+		// } : undefined}
 		/>
 		<Animated.ScrollView
 		onScroll={scrollHandler}

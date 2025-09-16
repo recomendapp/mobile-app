@@ -3,57 +3,58 @@ import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuth } from '@/providers/AuthProvider';
 import upperFirst from 'lodash/upperFirst';
-import { useUserFollowProfileQuery } from '@/features/user/userQueries';
+import { useUserFollowPersonQuery } from '@/features/user/userQueries';
 import { Alert, ViewStyle } from 'react-native';
-import { useUserFollowProfileInsertMutation, useUserFollowProfileDeleteMutation } from '@/features/user/userMutations';
+import { useUserFollowPersonInsertMutation, useUserFollowPersonDeleteMutation } from '@/features/user/userMutations';
 import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
 import * as Burnt from "burnt";
 import { CORNERS } from "@/theme/globals";
 
-interface ButtonUserFollowBaseProps
+interface ButtonPersonFollowBaseProps
   extends React.ComponentProps<typeof Button> {
   }
 
-type ButtonUserFollowSkeletonProps = {
+type ButtonPersonFollowSkeletonProps = {
   skeleton: true;
-  profileId?: never;
+  personId?: never;
 }
 
-type ButtonUserFollowDataProps = {
+type ButtonPersonFollowDataProps = {
   skeleton?: false;
-  profileId: string;
+  personId: number;
 }
 
-export type ButtonUserFollowProps = ButtonUserFollowBaseProps &
-  (ButtonUserFollowSkeletonProps | ButtonUserFollowDataProps);
+export type ButtonPersonFollowProps = ButtonPersonFollowBaseProps &
+  (ButtonPersonFollowSkeletonProps | ButtonPersonFollowDataProps);
 
-const ButtonUserFollow = React.forwardRef<
+const ButtonPersonFollow = React.forwardRef<
   React.ComponentRef<typeof Button>,
-  ButtonUserFollowProps
->(({ profileId, onPress, skeleton, style, ...props }, ref) => {
+  ButtonPersonFollowProps
+>(({ personId, onPress, skeleton, style, ...props }, ref) => {
   const t = useTranslations();
-  const { user } = useAuth();
+  const { session } = useAuth();
 
   const {
     data: isFollow,
     isLoading,
-  } = useUserFollowProfileQuery({
-    userId: user?.id,
-    followeeId: profileId,
+  } = useUserFollowPersonQuery({
+    userId: session?.user.id,
+    personId: personId,
   });
-  const loading = skeleton || !profileId || isLoading || isFollow === undefined;
+  const loading = skeleton || !personId || isLoading || isFollow === undefined;
 
-  const insertFollow = useUserFollowProfileInsertMutation();
-  const deleteFollowerMutation = useUserFollowProfileDeleteMutation();
+  const insertFollow = useUserFollowPersonInsertMutation();
+  const deleteFollowerMutation = useUserFollowPersonDeleteMutation();
 
-  const followUser = async () => {
-    if (!user || !profileId) return;
+  const followPerson = async () => {
+    if (!session || !personId) return;
     await insertFollow.mutateAsync({
-      userId: user?.id,
-      followeeId: profileId,
+      userId: session.user.id,
+      personId: personId,
     }, {
       onError: (error) => {
+        console.log(error);
         Burnt.toast({
           title: upperFirst(t('common.messages.error')),
           message: upperFirst(t('common.messages.an_error_occurred')),
@@ -64,8 +65,8 @@ const ButtonUserFollow = React.forwardRef<
     });
   }
 
-  const unfollowUser = async () => {
-    if (!user || !profileId) return;
+  const unfollowPerson = async () => {
+    if (!session || !personId) return;
     Alert.alert(
       upperFirst(t('common.messages.are_u_sure')),
       undefined,
@@ -75,11 +76,11 @@ const ButtonUserFollow = React.forwardRef<
           style: 'cancel',
         },
         {
-          text: isFollow?.is_pending ? upperFirst(t('common.messages.cancel_request')) : upperFirst(t('common.messages.unfollow')),
+          text: upperFirst(t('common.messages.unfollow')),
           onPress: async () => {
             await deleteFollowerMutation.mutateAsync({
-              userId: user?.id,
-              followeeId: profileId,
+              userId: session.user.id,
+              personId: personId,
             }, {
               onError: (error) => {
                 Burnt.toast({
@@ -97,7 +98,7 @@ const ButtonUserFollow = React.forwardRef<
     );
   }
 
-  if (!user || user.id == profileId) return null;
+  if (!session) return null;
 
   if (loading) {
     return (
@@ -109,22 +110,22 @@ const ButtonUserFollow = React.forwardRef<
     <Button
     ref={ref}
     onPress={() => {
-      isFollow ? unfollowUser() : followUser();
+      isFollow ? unfollowPerson() : followPerson();
       onPress?.();
     }}
     variant={isFollow ? "muted" : "accent-yellow"}
     style={[
-      tw.style('px-4 py-2 rounded-full'),
+      tw.style('px-4 py-2 h-auto rounded-full'),
       style as ViewStyle,
     ]}
     {...props}
     >
       {isFollow ? (
-        isFollow.is_pending ? upperFirst(t('common.messages.request_sent')) : upperFirst(t('common.messages.followed'))
+        upperFirst(t('common.messages.followed'))
       ) : upperFirst(t('common.messages.follow'))}
     </Button>
   );
 });
-ButtonUserFollow.displayName = "ButtonUserFollow";
+ButtonPersonFollow.displayName = "ButtonPersonFollow";
 
-export default ButtonUserFollow;
+export default ButtonPersonFollow;
