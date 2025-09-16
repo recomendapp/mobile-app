@@ -1673,7 +1673,7 @@ export const useUserDiscoveryInfinite = ({
 	});
 };
 
-export const useUserFollowProfile = ({
+export const useUserFollowProfileQuery = ({
 	userId,
 	followeeId,
 } : {
@@ -1695,5 +1695,35 @@ export const useUserFollowProfile = ({
 			return data;
 		},
 		enabled: !!userId && !!followeeId && userId !== followeeId,
+	});
+};
+
+
+export const useUserFollowPersonQuery = ({
+	userId,
+	personId,
+} : {
+	userId?: string;
+	personId?: number;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: userKeys.followPerson(userId!, personId!),
+		queryFn: async () => {
+			if (!userId) throw Error('Missing user id');
+			if (!personId) throw Error('Missing person id');
+			const { data, error } = await supabase
+				.from('user_person_follower')
+				.select('*')
+				.match({
+					user_id: userId,
+					person_id: personId,
+				})
+				.maybeSingle();
+			console.log('user_person_follower', { data, error });
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!userId && !!personId,
 	});
 };

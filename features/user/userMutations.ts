@@ -210,6 +210,66 @@ export const useUserFollowProfileDeleteMutation = () => {
 	});
 };
 
+export const useUserFollowPersonInsertMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			userId,
+			personId,
+		} : {
+			userId: string;
+			personId: number;
+		}) => {
+			const { data, error } = await supabase
+				.from('user_person_follower')
+				.insert({
+					person_id: personId,
+					user_id: userId,
+				})
+				.select('*')
+				.single();
+			if (error) throw error;
+			return data;
+		},
+		onSuccess: (data) => {
+			queryClient.setQueryData(userKeys.followPerson(data.user_id, data.person_id), data);
+			queryClient.invalidateQueries({
+				queryKey: userKeys.feedCastCrew({ userId: data.user_id })
+			})
+		},
+	});
+};
+
+export const useUserFollowPersonDeleteMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			userId,
+			personId,
+		} : {
+			userId: string;
+			personId: number;
+		}) => {
+			const { data, error } = await supabase
+				.from('user_person_follower')
+				.delete()
+				.eq('user_id', userId)
+				.eq('person_id', personId)
+				.select('*')
+				.single();
+			if (error) throw error;
+			return data;
+		},
+		onSuccess: (data) => {
+			queryClient.setQueryData(userKeys.followPerson(data.user_id, data.person_id), null);
+			queryClient.invalidateQueries({
+				queryKey: userKeys.feedCastCrew({ userId: data.user_id })
+			})
+		},
+	});
+};
 
 /* -------------------------------- ACTIVITY -------------------------------- */
 // Movies
