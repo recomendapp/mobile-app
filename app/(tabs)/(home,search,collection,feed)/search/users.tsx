@@ -9,12 +9,12 @@ import useSearchStore from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList, LegendListRef } from "@legendapp/list";
 import { useScrollToTop } from "@react-navigation/native";
-import { User } from "@recomendapp/types";
+import { Profile } from "@recomendapp/types";
 import { upperFirst } from "lodash";
 import { useRef, useCallback, useMemo, memo } from "react";
 import { useTranslations } from "use-intl";
 
-const UserItem = memo(({ item }: { item: User }) => (
+const UserItem = memo(({ item }: { item: Profile }) => (
 	<CardUser variant="list" user={item} />
 ));
 UserItem.displayName = 'UserItem';
@@ -62,17 +62,17 @@ const SearchUsersScreen = memo(() => {
 	
 	// Memoized values
 	const usersData = useMemo(() => 
-		data?.pages.flatMap(page => page.data as User[]) || [], 
+		data?.pages.flatMap(page => page.data) || [], 
 		[data]
 	);
 
 	// Callbacks
-	const renderItem = useCallback(({ item }: { item: User }) => (
+	const renderItem = useCallback(({ item }: { item: Profile }) => (
 		<UserItem item={item} />
 	), []);
 
-	const keyExtractor = useCallback((item: User) => 
-		item.id.toString(), 
+	const keyExtractor = useCallback((item: Profile) => 
+		item.id!.toString(), 
 		[]
 	);
 

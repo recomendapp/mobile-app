@@ -12,7 +12,7 @@ import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import { PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { User } from "@recomendapp/types";
+import { Profile } from "@recomendapp/types";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
@@ -36,13 +36,13 @@ const ModalPlaylistEditGuestsAdd = () => {
 
 	// States
 	const [ search, setSearch ] = useState('');
-	const [ selectedUsers, setSelectedUsers ] = useState<User[]>([]);
+	const [ selectedUsers, setSelectedUsers ] = useState<Profile[]>([]);
 	const canSave = useMemo((): boolean => {
 		return selectedUsers.length > 0;
 	}, [selectedUsers]);
 	const { data: guests } = usePlaylistGuestsQuery({ playlistId });
 	const {
-		data: users,
+		data,
 		isLoading,
 		isRefetching,
 		isError,
@@ -60,12 +60,18 @@ const ModalPlaylistEditGuestsAdd = () => {
 			]
 		}
 	});
+	const users = useMemo(() => (
+		data?.pages.flatMap((page) => page.data.map((user) => ({
+			user,
+			isSelected: selectedUsers.some((u) => u.id === user.id),
+		}))) || []
+	), [data, selectedUsers]);
 
 	// Mutations
 	const upsertGuestsMutation = usePlaylistGuestsUpsertMutation();
 
 	// Handlers
-	const handleToggleUser = useCallback((user: User) => {
+	const handleToggleUser = useCallback((user: Profile) => {
 		setSelectedUsers((prev) => {
 			const isSelected = prev.some((u) => u.id === user.id);
 			if (isSelected) {
@@ -80,7 +86,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 			await upsertGuestsMutation.mutateAsync({
 				playlistId: playlistId,
 				guests: selectedUsers.map((guest) => ({
-					user_id: guest.id,
+					user_id: guest.id!,
 				})),
 			}, { onError: (error) => { throw error } })
 			Burnt.toast({
@@ -127,7 +133,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 	}, [canSave, router, t]);
 
 	// Render
-	const renderItems = useCallback(({ item }: { item: { user: User, isSelected: boolean } }) => {
+	const renderItems = useCallback(({ item }: { item: { user: Profile, isSelected: boolean } }) => {
 		return (
 		<CardUser user={item.user} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}>
 			<Checkbox
@@ -188,10 +194,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 			/>
 		</View>
 		<AnimatedLegendList
-		data={users?.pages.flatMap((page) => page.data.map((user) => ({
-			user,
-			isSelected: selectedUsers.some((u) => u.id === user.id),
-		}))) || []}
+		data={users}
 		renderItem={renderItems}
 		ListEmptyComponent={
 			isLoading ? <Icons.Loader />
@@ -226,7 +229,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 		renderItem={({ item }) => (
 			<CardUser variant="icon" linked={false} onPress={() => handleToggleUser(item)} user={item} width={50} height={50}/>
 		)}
-		keyExtractor={(user) => user.id}
+		keyExtractor={(user) => user.id!}
 		/>
 	</>
 	)

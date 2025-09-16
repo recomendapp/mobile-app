@@ -2,7 +2,7 @@ import * as React from "react"
 import { useRouter } from "expo-router";
 import { Pressable, View, StyleProp, ViewStyle } from "react-native";
 import Animated from "react-native-reanimated";
-import { User } from "@recomendapp/types";
+import { Profile, User } from "@recomendapp/types";
 import UserAvatar from "../user/UserAvatar";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -32,7 +32,7 @@ type CardUserSkeletonProps = {
 
 type CardUserDataProps = {
   skeleton?: false;
-  user: User;
+  user: User | Profile;
 };
 
 export type CardUserProps = CardUserBaseProps &
@@ -53,8 +53,8 @@ const CardUserDefault = React.forwardRef<
 		]}
 		{...props}
 		>
-			<View style={tw`flex-row items-center justify-center`}>
-				{!skeleton ? <UserAvatar full_name={user.full_name} avatar_url={user?.avatar_url} /> : <UserAvatar skeleton />}
+			<View style={tw`flex-row items-center justify-center shrink`}>
+				{!skeleton ? <UserAvatar full_name={user.full_name!} avatar_url={user?.avatar_url} /> : <UserAvatar skeleton />}
 				<View style={tw.style('shrink px-2 py-1 gap-1')}>
 					<View style={tw.style('flex-row items-center gap-1')}>
 						{!skeleton ? <Text numberOfLines={2}>{user?.full_name}</Text> : <Skeleton style={tw`w-20 h-5`} />}
@@ -87,7 +87,7 @@ const CardUserIcon = React.forwardRef<
 			{!skeleton ? (
 				<UserAvatar
 				style={{ width: width, height: height }}
-				full_name={user?.full_name}
+				full_name={user?.full_name!}
 				avatar_url={user?.avatar_url}
 				skeleton={skeleton}
 				/>
@@ -150,7 +150,7 @@ const CardUserList = React.forwardRef<
 		{...props}
 		>
 			<View style={tw`flex-row items-center justify-center`}>
-				{!skeleton ? <UserAvatar full_name={user.full_name} avatar_url={user?.avatar_url} /> : <UserAvatar skeleton />}
+				{!skeleton ? <UserAvatar full_name={user.full_name!} avatar_url={user?.avatar_url} /> : <UserAvatar skeleton />}
 				<View style={tw.style('shrink px-2 py-1 gap-1')}>
 					<View style={tw.style('flex-row items-center gap-1')}>
 						{!skeleton ? <Text numberOfLines={2}>{user?.full_name}</Text> : <Skeleton style={tw`w-20 h-5`} />}

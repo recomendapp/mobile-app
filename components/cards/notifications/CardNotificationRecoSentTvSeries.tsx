@@ -1,5 +1,5 @@
 import tw from "@/lib/tw";
-import { MediaTvSeries, User } from "@recomendapp/types";
+import { MediaTvSeries, Profile } from "@recomendapp/types";
 import * as React from "react"
 import Animated, { runOnJS } from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
@@ -11,7 +11,7 @@ import { useTranslations } from "use-intl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { CardUser } from "../CardUser";
 import { useTheme } from "@/providers/ThemeProvider";
-import { GAP, PADDING_HORIZONTAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 interface CardNotificationRecoSentTvSeriesBaseProps
@@ -28,7 +28,7 @@ type CardNotificationRecoSentTvSeriesSkeletonProps = {
 
 type CardNotificationRecoSentTvSeriesDataProps = {
 	skeleton?: false;
-	sender: User;
+	sender: Profile;
 	tvSeries: MediaTvSeries;
 };
 
@@ -54,6 +54,7 @@ const CardNotificationRecoSentTvSeriesDefault = React.forwardRef<
 			style={[
 				{
 					backgroundColor: colors.background,
+					paddingVertical: PADDING_VERTICAL,
 					paddingLeft: PADDING_HORIZONTAL * 2,
 					paddingRight: PADDING_HORIZONTAL,
 					gap: GAP,

@@ -2,7 +2,7 @@ import { IconMediaRating } from "@/components/medias/IconMediaRating";
 import { Icons } from "@/constants/Icons";
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { User, UserActivity, UserActivityMovie, UserActivityTvSeries } from "@recomendapp/types";
+import { Profile, UserActivityMovie, UserActivityTvSeries } from "@recomendapp/types";
 import { forwardRef } from "react";
 import { View } from "react-native";
 import { useTranslations } from "use-intl";
@@ -10,7 +10,7 @@ import { Text } from "@/components/ui/text";
 
 interface FeedUserActivityProps
   extends React.ComponentProps<typeof View> {
-	author: User;
+	author: Profile;
 	activity: UserActivityMovie | UserActivityTvSeries | null;
 }
 

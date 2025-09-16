@@ -882,7 +882,7 @@ export const usePlaylistGuestsUpsertMutation = () => {
 				)
 				.select(`
 					*,
-					user(*)
+					user:profile(*)
 				`)
 			if (error) throw error;
 			return { playlistId, data };

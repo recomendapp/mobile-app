@@ -1,5 +1,5 @@
 import tw from "@/lib/tw";
-import { MediaMovie, Profile } from "@recomendapp/types";
+import { MediaTvSeries, Profile } from "@recomendapp/types";
 import * as React from "react"
 import Animated, { runOnJS } from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
@@ -11,43 +11,43 @@ import { useTranslations } from "use-intl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { CardUser } from "../CardUser";
 import { useTheme } from "@/providers/ThemeProvider";
-import { GAP, PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
-interface CardNotificationRecoSentMovieBaseProps
+interface CardNotificationRecoCompletedTvSeriesBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
 		variant?: "default";
 		onPress?: () => void;
 	}
 
-type CardNotificationRecoSentMovieSkeletonProps = {
+type CardNotificationRecoCompletedTvSeriesSkeletonProps = {
 	skeleton: true;
-	sender?: never;
-	movie?: never;
+	receiver?: never;
+	tvSeries?: never;
 };
 
-type CardNotificationRecoSentMovieDataProps = {
+type CardNotificationRecoCompletedTvSeriesDataProps = {
 	skeleton?: false;
-	sender: Profile;
-	movie: MediaMovie;
+	receiver: Profile;
+	tvSeries: MediaTvSeries;
 };
 
-export type CardNotificationRecoSentMovieProps = CardNotificationRecoSentMovieBaseProps &
-	(CardNotificationRecoSentMovieSkeletonProps | CardNotificationRecoSentMovieDataProps);
+export type CardNotificationRecoCompletedTvSeriesProps = CardNotificationRecoCompletedTvSeriesBaseProps &
+	(CardNotificationRecoCompletedTvSeriesSkeletonProps | CardNotificationRecoCompletedTvSeriesDataProps);
 
-const CardNotificationRecoSentMovieDefault = React.forwardRef<
+const CardNotificationRecoCompletedTvSeriesDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	FixedOmit<CardNotificationRecoSentMovieProps, "variant">
->(({ style, children, sender, movie, skeleton, onPress, ...props }, ref) => {
+	FixedOmit<CardNotificationRecoCompletedTvSeriesProps, "variant">
+>(({ style, children, receiver, tvSeries, skeleton, onPress, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
 	const router = useRouter();
 	const onUserPress = React.useCallback(() => {
-		if (!sender?.username) return;
+		if (!receiver?.username) return;
 		router.canGoBack() && router.back();
-		router.push(`/user/${sender.username}`);
+		router.push(`/user/${receiver.username}`);
 		onPress?.();
-	}, [router, sender?.username]);
+	}, [router, receiver?.username]);
 	return (
 		<Animated.View
 			ref={ref}
@@ -66,17 +66,17 @@ const CardNotificationRecoSentMovieDefault = React.forwardRef<
 		>
 			<View style={tw`flex-1 gap-2`}>
 				{!skeleton ? <View style={tw`flex-row gap-1`}>
-					<CardUser linked={false} user={sender} variant="icon" style={tw`w-20`} onPress={onUserPress} />
+					<CardUser linked={false}  user={receiver} variant="icon" onPress={onUserPress} />
 					<Text>
-					{t.rich('notifications.reco_sent_movie.description', {
+					{t.rich('notifications.reco_completed_tv_series.description', {
 						user: () => (
 						<Text onPress={onUserPress} style={tw`font-semibold`}>
-							{sender.username}
+							{receiver.username}
 						</Text>
 						),
-						movie: () => (
+						tv_series: () => (
 						<Text style={tw`font-semibold`}>
-							{movie.title}
+							{tvSeries.name}
 						</Text>
 						),
 					})}
@@ -85,9 +85,9 @@ const CardNotificationRecoSentMovieDefault = React.forwardRef<
 			</View>
 			{!skeleton ? (
 				<ImageWithFallback
-				source={{ uri: movie.poster_url ?? '' }}
-				alt={movie.title ?? ''}
-				type={'movie'}
+				source={{ uri: tvSeries.poster_url ?? '' }}
+				alt={tvSeries.name ?? ''}
+				type={'tv_series'}
 				style={[
 					{ aspectRatio: 9 / 16 },
 					tw`w-10`
@@ -99,19 +99,19 @@ const CardNotificationRecoSentMovieDefault = React.forwardRef<
 		</Animated.View>
 	);
 });
-CardNotificationRecoSentMovieDefault.displayName = "CardNotificationRecoSentMovieDefault";
+CardNotificationRecoCompletedTvSeriesDefault.displayName = "CardNotificationRecoCompletedTvSeriesDefault";
 
-const CardNotificationRecoSentMovie = React.forwardRef<
+const CardNotificationRecoCompletedTvSeries = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	CardNotificationRecoSentMovieProps
+	CardNotificationRecoCompletedTvSeriesProps
 >(({ variant = "default", ...props }, ref) => {
 	const router = useRouter();
 	const navigate = React.useCallback(() => {
 		if (props.skeleton) return;
 		router.canGoBack() && router.back();
-		router.push(props.movie?.url as Href);
+		router.push(props.tvSeries?.url as Href);
 		props.onPress?.();
-	}, [router, props.movie?.url, props.onPress]);
+	}, [router, props.tvSeries?.url, props.onPress]);
 	const tapGesture = React.useMemo(() => (
 		Gesture.Tap()
 			.maxDuration(250)
@@ -123,7 +123,7 @@ const CardNotificationRecoSentMovie = React.forwardRef<
 	), [navigate]);
 	const content = (
 		variant === "default" ? (
-			<CardNotificationRecoSentMovieDefault ref={ref} {...props} />
+			<CardNotificationRecoCompletedTvSeriesDefault ref={ref} {...props} />
 		) : null
 	);
 
@@ -135,9 +135,9 @@ const CardNotificationRecoSentMovie = React.forwardRef<
 		</GestureDetector>
 	)
 });
-CardNotificationRecoSentMovie.displayName = "CardNotificationRecoSentMovie";
+CardNotificationRecoCompletedTvSeries.displayName = "CardNotificationRecoCompletedTvSeries";
 
 export {
-	CardNotificationRecoSentMovie,
-	CardNotificationRecoSentMovieDefault,
+	CardNotificationRecoCompletedTvSeries,
+	CardNotificationRecoCompletedTvSeriesDefault,
 }

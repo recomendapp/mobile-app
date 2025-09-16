@@ -1,6 +1,6 @@
 
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const useUsernameAvailability = () => {
 	const supabase = useSupabaseClient();
@@ -12,11 +12,11 @@ const useUsernameAvailability = () => {
 		setIsLoading(false);
 	}
 
-	const check = async (username: string) => {
+	const check = useCallback(async (username: string) => {
 		try {
 			setIsAvailable(undefined);
 			setIsLoading(true);
-			const { data, error } = await supabase.from('user').select('username').eq('username', username).maybeSingle();
+			const { data, error } = await supabase.from('profile').select('username').eq('username', username).maybeSingle();
 			if (error) throw error;
 			setIsAvailable(data === null);
 		} catch (error) {
@@ -24,7 +24,7 @@ const useUsernameAvailability = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}
+	}, [supabase]);
 
 	return { isAvailable, reset, isLoading, check };	
 };

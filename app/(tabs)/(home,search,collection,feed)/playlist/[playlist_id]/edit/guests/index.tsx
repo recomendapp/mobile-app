@@ -14,7 +14,7 @@ import { usePlaylistGuestsQuery, usePlaylistQuery } from "@/features/playlist/pl
 import Switch from "@/components/ui/Switch";
 import { Alert } from "react-native";
 import { usePlaylistGuestsDeleteMutation, usePlaylistGuestsUpsertMutation, usePlaylistUpdateMutation } from "@/features/playlist/playlistMutations";
-import { User } from "@recomendapp/types";
+import { Profile } from "@recomendapp/types";
 import Fuse from "fuse.js";
 import { SearchBar } from "@/components/ui/searchbar";
 import { LegendList } from "@legendapp/list";
@@ -54,7 +54,7 @@ const ModalPlaylistEditGuests = () => {
 	const deleteGuestsMutation = usePlaylistGuestsDeleteMutation();
 
 	// States
-	const [ guests, setGuests ] = useState<{ user: User, edit: boolean }[] | undefined>(undefined);
+	const [ guests, setGuests ] = useState<{ user: Profile, edit: boolean }[] | undefined>(undefined);
 	useEffect(() => {
 		if (guestsRequest) {
 			setGuests(guestsRequest.map((guest) => ({ user: guest.user!, edit: guest.edit })));
@@ -128,7 +128,7 @@ const ModalPlaylistEditGuests = () => {
 				await upsertGuestsMutation.mutateAsync({
 					playlistId: playlist.id,
 					guests: guestsToUpsert.map((guest) => ({
-						user_id: guest.user.id,
+						user_id: guest.user.id!,
 						edit: guest.edit
 					})),
 				}, { onError: (error) => { throw error } })
@@ -183,12 +183,12 @@ const ModalPlaylistEditGuests = () => {
 			router.dismiss();
 		}
 	};
-	const RightActions = useCallback((prog: SharedValue<number>, drag: SharedValue<number>, item: { user: User, edit: boolean }, swipeable: SwipeableMethods) => {
+	const RightActions = useCallback((prog: SharedValue<number>, drag: SharedValue<number>, item: { user: Profile, edit: boolean }, swipeable: SwipeableMethods) => {
 		const actionWidth = 50;
 		const swipeActions = [
 			{
 				icon: Icons.X,
-				onPress: () => handleDeleteGuest(item.user.id),
+				onPress: () => handleDeleteGuest(item.user.id!),
 			},
 		];
 		const styleAnimation = useAnimatedStyle(() => {
@@ -220,7 +220,7 @@ const ModalPlaylistEditGuests = () => {
 		);
 	}, [])
 	// Render
-	const renderItems = useCallback(({ item }: { item: { user: User, edit: boolean } }) => (
+	const renderItems = useCallback(({ item }: { item: { user: Profile, edit: boolean } }) => (
 		<Swipeable
 		friction={2}
 		enableTrackpadTwoFingerGesture
@@ -231,7 +231,7 @@ const ModalPlaylistEditGuests = () => {
 				<Switch
 				key={String(item.edit)}
 				value={item.edit}
-				onValueChange={() => handleToggleEdit(item.user.id)}
+				onValueChange={() => handleToggleEdit(item.user.id!)}
 				// disabled={!user?.premium}
 				/>
 			</CardUser>
@@ -307,7 +307,7 @@ const ModalPlaylistEditGuests = () => {
 				</View>
 			) 
 		}
-		keyExtractor={(item) => item.user.id.toString()}
+		keyExtractor={(item) => item.user.id!.toString()}
 		nestedScrollEnabled
 		refreshing={isGuestsRequestRefetching}
 		onRefresh={refetchGuests}

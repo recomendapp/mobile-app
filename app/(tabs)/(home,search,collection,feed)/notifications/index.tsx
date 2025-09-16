@@ -1,5 +1,3 @@
-import { CardNotificationRecoSentMovie } from "@/components/cards/notifications/CardNotificationRecoSentMovie";
-import { CardNotificationRecoSentTvSeries } from "@/components/cards/notifications/CardNotificationRecoSentTvSeries";
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
@@ -18,6 +16,14 @@ import { useUIStore } from "@/stores/useUIStore";
 import * as Burnt from "burnt";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
+import { CardNotificationRecoSentMovie } from "@/components/cards/notifications/CardNotificationRecoSentMovie";
+import { CardNotificationRecoSentTvSeries } from "@/components/cards/notifications/CardNotificationRecoSentTvSeries";
+import { CardNotificationRecoCompletedMovie } from "@/components/cards/notifications/CardNotificationRecoCompletedMovie";
+import { CardNotificationRecoCompletedTvSeries } from "@/components/cards/notifications/CardNotificationRecoCompletedTvSeries";
+import { CardNotificationFollowerAccepted } from "@/components/cards/notifications/CardNotificationFollowerAccepted";
+import { CardNotificationFollowerCreated } from "@/components/cards/notifications/CardNotificationFollowerCreated";
+import { CardNotificationFriendCreated } from "@/components/cards/notifications/CardNotificationFriendCreated";
+import { CardNotificationFollowerRequest } from "@/components/cards/notifications/CardNotificationFollowerRequest";
 
 const NotificationsScreen = () => {
 	const router = useRouter();
@@ -89,16 +95,31 @@ const NotificationsScreen = () => {
 	}, [unreadMutation]);
 	const renderItemContent = useCallback(({ item }: { item: typeof notifications[number] }) => {
 		const notif = item.content;
-		if (!notif) return null;
+		const onPress = () => {
+			if (!item.isRead) {
+				handleRead(item);
+			}
+		};
+		if (!notif || !notif.content) return null;
 		switch (notif.type) {
 			case 'reco_sent_movie':
-				return <CardNotificationRecoSentMovie sender={notif.content.sender!} movie={notif.content.movie!} onPress={!item.isRead ? () => handleRead(item) : undefined} />;
+				return <CardNotificationRecoSentMovie sender={notif.content.sender!} movie={notif.content.movie!} onPress={onPress} />;
 			case 'reco_sent_tv_series':
-				return <CardNotificationRecoSentTvSeries sender={notif.content.sender!} tvSeries={notif.content.tv_series!} onPress={!item.isRead ? () => handleRead(item) : undefined} />;
+				return <CardNotificationRecoSentTvSeries sender={notif.content.sender!} tvSeries={notif.content.tv_series!} onPress={onPress} />;
+			case 'reco_completed_movie':
+				return <CardNotificationRecoCompletedMovie receiver={notif.content.receiver!} movie={notif.content.movie!} onPress={onPress} />;
+			case 'reco_completed_tv_series':
+				return <CardNotificationRecoCompletedTvSeries receiver={notif.content.receiver!} tvSeries={notif.content.tv_series!} onPress={onPress} />;
+			case 'follower_created':
+				return <CardNotificationFollowerCreated follower={notif.content.user!} onPress={onPress} />;
 			case 'follower_accepted':
-				return <View style={[{ backgroundColor: colors.muted}, tw`p-4 rounded-md`]}><Text textColor="muted" style={tw`text-center`}>Follower accepted {notif.content.followee.username}</Text></View>;
+				return <CardNotificationFollowerAccepted followee={notif.content.followee!} onPress={onPress} />;
+			case 'friend_created':
+				return <CardNotificationFriendCreated friend={notif.content.friend!} onPress={onPress} />;
+			case 'follower_request':
+				return <CardNotificationFollowerRequest notification={notif} follower={notif.content.user!} onPress={onPress} />;
 			default:
-				return <View style={[{ backgroundColor: colors.muted}, tw`p-4 rounded-md`]}><Text textColor="muted" style={tw`text-center`}>Unsupported notification type</Text></View>;
+				return <View style={[{ backgroundColor: colors.muted}, tw`p-4 mx-4`]}><Text textColor="muted" style={tw`text-center`}>Unsupported notification type</Text></View>;
 		}
 	}, []);
 	const renderItem = useCallback(({ item }: { item: typeof notifications[number] }) => {
@@ -168,7 +189,7 @@ const NotificationsScreen = () => {
 	}, [hasNextPage, fetchNextPage]);
 	const listEmptyComponent = useCallback(() => (
 		loading ? <Icons.Loader />
-		: <Text textColor="muted" style={tw`text-center p-4`}>No notifications</Text>
+		: <Text textColor="muted" style={tw`text-center p-4`}>{upperFirst(t('common.messages.no_notifications'))}</Text>
 	), [loading]);
 
 	return (
@@ -176,25 +197,25 @@ const NotificationsScreen = () => {
 		<Stack.Screen
 		options={useMemo(() => ({
 			headerRight: () => (
-				<Button
-				variant="ghost"
-				icon={Icons.ChevronDown}
-				size="fit"
-				iconProps={{ color: colors.mutedForeground }}
-				textStyle={tw`text-base font-semibold`}
-				onPress={() => setView(viewOptions[(viewOptions.indexOf(view) + 1) % viewOptions.length])}
-				>
-					{view === 'all' ? 'All' : view === 'unread' ? 'Unread' : 'Archived'}
-				</Button>
+				<View style={[tw`flex-row items-center`]}>
+					<Button
+					variant="ghost"
+					icon={Icons.UserPlus}
+					size="icon"
+					onPress={() => router.push("/notifications/follow-requests")}
+					/>
+					<Button
+					variant="ghost"
+					icon={Icons.ChevronDown}
+					size="fit"
+					iconProps={{ color: colors.mutedForeground }}
+					textStyle={tw`text-base font-semibold`}
+					onPress={() => setView(viewOptions[(viewOptions.indexOf(view) + 1) % viewOptions.length])}
+					>
+						{view === 'all' ? 'All' : view === 'unread' ? 'Unread' : 'Archived'}
+					</Button>
+				</View>
 			),
-			// headerRight: () => (
-			// 	<Button
-			// 	variant="ghost"
-			// 	icon={Icons.UserPlus}
-			// 	size="icon"
-			// 	onPress={() => router.push("/notifications/follow-requests")}
-			// 	/>
-			// )
 		}), [router, view])}
 		/>
 		<LegendList

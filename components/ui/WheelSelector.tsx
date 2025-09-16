@@ -192,7 +192,6 @@ function WheelSelectorInner<T>({
         <Pressable
         key={index}
         onPress={() => {
-          console.log('onPress', { item, index });
           scrollRef.current?.scrollToOffset({
             offset: index * totalItemWidth,
             animated: true,
