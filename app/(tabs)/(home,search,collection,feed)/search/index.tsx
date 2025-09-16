@@ -15,7 +15,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import useSearchStore from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useScrollToTop } from "@react-navigation/native";
-import { BestResultsSearchResponse, MediaMovie, MediaPerson, MediaTvSeries, Playlist, User } from "@recomendapp/types";
+import { BestResultsSearchResponse, MediaMovie, MediaPerson, MediaTvSeries, Playlist, Profile } from "@recomendapp/types";
 import { Link } from "expo-router";
 import { upperFirst } from "lodash";
 import { useCallback, useRef, memo, useMemo } from "react";
@@ -83,7 +83,7 @@ export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => 
 				<SearchResultsPlaylists playlists={data.playlists.data as Playlist[]} search={search} />
 			)}
 			{data.users.data.length > 0 && (
-				<SearchResultsUsers users={data.users.data as User[]} search={search} />
+				<SearchResultsUsers users={data.users.data} search={search} />
 			)}
 		</ScrollView>
 	);
@@ -109,7 +109,7 @@ const SearchBestResult = memo(({
 			case 'playlist':
 				return <CardPlaylist variant="list" playlist={best.data as Playlist} />;
 			case 'user':
-				return <CardUser variant="list" user={best.data as User} />;
+				return <CardUser variant="list" user={best.data as Profile} />;
 			default:
 				return null;
 		}
@@ -300,21 +300,21 @@ const SearchResultsUsers = memo(({
 	users,
 	search,
 } : {
-	users: User[];
+	users: Profile[];
 	search: string;
 }) => {
 	const t = useTranslations();
 	
-	const renderItem = useCallback((item: User) => (
+	const renderItem = useCallback((item: Profile) => (
 		<CardUser user={item} variant="list" />
 	), []);
 	
-	const keyExtractor = useCallback((item: User) => 
-		item.id.toString(), []
+	const keyExtractor = useCallback((item: Profile) => 
+		item.id!.toString(), []
 	);
 
 	return (
-		<SearchResultSection<User>
+		<SearchResultSection<Profile>
 			title={upperFirst(t('common.messages.user', { count: 2 }))}
 			data={users}
 			search={search}

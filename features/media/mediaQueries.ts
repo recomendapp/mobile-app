@@ -410,7 +410,7 @@ export const useMediaReviewsMovieInfiniteQuery = ({
 				.from('user_reviews_movie')
 				.select(`
 					*,
-					activity:user_activities_movie!inner(*, user(*))
+					activity:user_activities_movie!inner(*, user:profile(*))
 				`)
 				.eq('activity.movie_id', movieId)
 				.range(from, to)
@@ -469,7 +469,7 @@ export const useMediaReviewsTvSeriesInfiniteQuery = ({
 				.from('user_reviews_tv_series')
 				.select(`
 					*,
-					activity:user_activities_tv_series!inner(*, user(*))
+					activity:user_activities_tv_series!inner(*, user:profile(*))
 				`)
 				.eq('activity.tv_series_id', tvSeriesId)
 				.range(from, to)
@@ -528,7 +528,7 @@ export const useMediaPlaylistsMovieInfiniteQuery = ({
 	  		let to = from - 1 + mergedFilters.perPage;
 			let request = supabase
 				.from('playlists')
-				.select('*, user(*), playlist_items_movie!inner(*)')
+				.select('*, user:profile(*), playlist_items_movie!inner(*)')
 				.match({
 					'type': 'movie',
 					'playlist_items_movie.movie_id': movieId,
@@ -590,7 +590,7 @@ export const useMediaPlaylistsTvSeriesInfiniteQuery = ({
 	  		let to = from - 1 + mergedFilters.perPage;
 			let request = supabase
 				.from('playlists')
-				.select('*, user(*), playlist_items_tv_series!inner(*)')
+				.select('*, user:profile(*), playlist_items_tv_series!inner(*)')
 				.match({
 					'type': 'tv_series',
 					'playlist_items_tv_series.tv_series_id': tvSeriesId,

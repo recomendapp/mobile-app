@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { PlaylistLike, User } from "@recomendapp/types";
+import { PlaylistLike, Profile } from "@recomendapp/types";
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Pressable, View } from "react-native";
@@ -30,7 +30,7 @@ type CardFeedPlaylistLikeSkeletonProps = {
 
 type CardFeedPlaylistLikeDataProps = {
 	skeleton?: false;
-	author: User;
+	author: Profile;
 	playlistLike: PlaylistLike;
 	footer?: React.ReactNode;
 };

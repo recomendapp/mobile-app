@@ -1,6 +1,6 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaTvSeries, User, UserActivityTvSeries } from "@recomendapp/types";
+import { MediaTvSeries, Profile, UserActivityTvSeries } from "@recomendapp/types";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
@@ -34,7 +34,7 @@ type CardFeedActivityTvSeriesSkeletonProps = {
 
 type CardFeedActivityTvSeriesDataProps = {
 	skeleton?: false;
-	author: User;
+	author: Profile;
 	activity: UserActivityTvSeries;
 	tvSeries: MediaTvSeries;
 	footer?: React.ReactNode;

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { JSONContent, User, UserActivityTvSeries, UserReviewTvSeries } from "@recomendapp/types";
+import { JSONContent, Profile, UserActivityTvSeries, UserReviewTvSeries } from "@recomendapp/types";
 import Animated from "react-native-reanimated";
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
@@ -35,7 +35,7 @@ type CardReviewTvSeriesDataProps = {
   skeleton?: false;
   review: UserReviewTvSeries;
   activity: UserActivityTvSeries;
-  author: User;
+  author: Profile;
   url: Href;
 };
 

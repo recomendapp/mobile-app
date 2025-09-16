@@ -49,7 +49,7 @@ const BottomSheetMyRecosSenders = React.forwardRef<
 		ListHeaderComponent={
 			<ThemedText style={tw`text-center text-xl font-bold`}>{upperFirst(t('common.messages.reco', { count: comments.length }))}</ThemedText>
   		}
-		keyExtractor={(item) => item.user.id}
+		keyExtractor={(item) => item.user.id!}
 		contentContainerStyle={{
 			paddingTop: 16,
 			paddingLeft: 16,

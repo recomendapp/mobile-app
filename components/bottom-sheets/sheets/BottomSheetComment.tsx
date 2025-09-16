@@ -57,7 +57,6 @@ export const BottomSheetComment = React.forwardRef<
 
 	// Handlers
 	const handleSave = async (values: CommentFormValues) => {
-		console.log('Saving comment:', values.comment);
 		if (values.comment == comment) {
 			closeSheet(id);
 			return;

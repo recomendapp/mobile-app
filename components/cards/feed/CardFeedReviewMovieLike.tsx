@@ -1,6 +1,6 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaMovie, User, UserReviewMovieLike } from "@recomendapp/types";
+import { MediaMovie, Profile, UserReviewMovieLike } from "@recomendapp/types";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
@@ -32,7 +32,7 @@ type CardFeedReviewMovieLikeSkeletonProps = {
 
 type CardFeedReviewMovieLikeDataProps = {
 	skeleton?: false;
-	author: User;
+	author: Profile;
 	reviewLike: UserReviewMovieLike;
 	movie: MediaMovie;
 	footer?: React.ReactNode;

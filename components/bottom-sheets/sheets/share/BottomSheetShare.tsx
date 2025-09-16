@@ -199,20 +199,6 @@ const BottomSheetShare = forwardRef<
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				/>
-				{/* <Button
-				onPress={async () => {
-					console.log("SHARE");
-					const uri = await capture();
-					console.log(uri);
-					if (uri) {
-						await Share.shareSingle({
-							social: Social.InstagramStories,
-							appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
-							stickerImage: uri,
-						})
-					}
-				}}
-				>Share</Button> */}
 			</ScrollView>
 		</ThemedTrueSheet>
 	);

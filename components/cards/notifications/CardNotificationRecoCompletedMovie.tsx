@@ -14,40 +14,40 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { GAP, PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
-interface CardNotificationRecoSentMovieBaseProps
+interface CardNotificationRecoCompletedMovieBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
 		variant?: "default";
 		onPress?: () => void;
 	}
 
-type CardNotificationRecoSentMovieSkeletonProps = {
+type CardNotificationRecoCompletedMovieSkeletonProps = {
 	skeleton: true;
-	sender?: never;
+	receiver?: never;
 	movie?: never;
 };
 
-type CardNotificationRecoSentMovieDataProps = {
+type CardNotificationRecoCompletedMovieDataProps = {
 	skeleton?: false;
-	sender: Profile;
+	receiver: Profile;
 	movie: MediaMovie;
 };
 
-export type CardNotificationRecoSentMovieProps = CardNotificationRecoSentMovieBaseProps &
-	(CardNotificationRecoSentMovieSkeletonProps | CardNotificationRecoSentMovieDataProps);
+export type CardNotificationRecoCompletedMovieProps = CardNotificationRecoCompletedMovieBaseProps &
+	(CardNotificationRecoCompletedMovieSkeletonProps | CardNotificationRecoCompletedMovieDataProps);
 
-const CardNotificationRecoSentMovieDefault = React.forwardRef<
+const CardNotificationRecoCompletedMovieDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	FixedOmit<CardNotificationRecoSentMovieProps, "variant">
->(({ style, children, sender, movie, skeleton, onPress, ...props }, ref) => {
+	FixedOmit<CardNotificationRecoCompletedMovieProps, "variant">
+>(({ style, children, receiver, movie, skeleton, onPress, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
 	const router = useRouter();
 	const onUserPress = React.useCallback(() => {
-		if (!sender?.username) return;
+		if (!receiver?.username) return;
 		router.canGoBack() && router.back();
-		router.push(`/user/${sender.username}`);
+		router.push(`/user/${receiver.username}`);
 		onPress?.();
-	}, [router, sender?.username]);
+	}, [router, receiver?.username]);
 	return (
 		<Animated.View
 			ref={ref}
@@ -66,12 +66,12 @@ const CardNotificationRecoSentMovieDefault = React.forwardRef<
 		>
 			<View style={tw`flex-1 gap-2`}>
 				{!skeleton ? <View style={tw`flex-row gap-1`}>
-					<CardUser linked={false} user={sender} variant="icon" style={tw`w-20`} onPress={onUserPress} />
+					<CardUser linked={false} user={receiver} variant="icon" style={tw`w-20`} onPress={onUserPress} />
 					<Text>
-					{t.rich('notifications.reco_sent_movie.description', {
+					{t.rich('notifications.reco_completed_movie.description', {
 						user: () => (
 						<Text onPress={onUserPress} style={tw`font-semibold`}>
-							{sender.username}
+							{receiver.username}
 						</Text>
 						),
 						movie: () => (
@@ -99,11 +99,11 @@ const CardNotificationRecoSentMovieDefault = React.forwardRef<
 		</Animated.View>
 	);
 });
-CardNotificationRecoSentMovieDefault.displayName = "CardNotificationRecoSentMovieDefault";
+CardNotificationRecoCompletedMovieDefault.displayName = "CardNotificationRecoCompletedMovieDefault";
 
-const CardNotificationRecoSentMovie = React.forwardRef<
+const CardNotificationRecoCompletedMovie = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	CardNotificationRecoSentMovieProps
+	CardNotificationRecoCompletedMovieProps
 >(({ variant = "default", ...props }, ref) => {
 	const router = useRouter();
 	const navigate = React.useCallback(() => {
@@ -123,7 +123,7 @@ const CardNotificationRecoSentMovie = React.forwardRef<
 	), [navigate]);
 	const content = (
 		variant === "default" ? (
-			<CardNotificationRecoSentMovieDefault ref={ref} {...props} />
+			<CardNotificationRecoCompletedMovieDefault ref={ref} {...props} />
 		) : null
 	);
 
@@ -135,9 +135,9 @@ const CardNotificationRecoSentMovie = React.forwardRef<
 		</GestureDetector>
 	)
 });
-CardNotificationRecoSentMovie.displayName = "CardNotificationRecoSentMovie";
+CardNotificationRecoCompletedMovie.displayName = "CardNotificationRecoCompletedMovie";
 
 export {
-	CardNotificationRecoSentMovie,
-	CardNotificationRecoSentMovieDefault,
+	CardNotificationRecoCompletedMovie,
+	CardNotificationRecoCompletedMovieDefault,
 }

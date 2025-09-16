@@ -21,7 +21,7 @@ export const usePlaylistQuery = ({
 				.from('playlists')
 				.select(`
 					*,
-					user(*)
+					user:profile(*)
 				`)
 				.eq('id', playlistId)
 				.maybeSingle()
@@ -97,7 +97,7 @@ export const usePlaylistGuestsQuery = ({
 				.from('playlist_guests')
 				.select(`
 					*,
-					user:user(*)
+					user:profile(*)
 				`)
 				.eq('playlist_id', playlistId)
 			if (error) throw error;
@@ -220,7 +220,7 @@ export const usePlaylistFeaturedInfiniteQuery = ({
 			let to = from - 1 + mergedFilters.resultsPerPage;
 			let query = supabase
 				.from('playlists_featured')
-				.select('*, playlist:playlists(*, user(*))')
+				.select('*, playlist:playlists(*, user:profile(*))')
 				.range(from, to)
 			
 			if (mergedFilters) {

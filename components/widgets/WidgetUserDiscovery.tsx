@@ -7,7 +7,7 @@ import { LegendList } from "@legendapp/list";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo } from "react";
-import { User } from "@recomendapp/types";
+import { Profile } from "@recomendapp/types";
 
 interface WidgetUserDiscoveryProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -33,14 +33,14 @@ export const WidgetUserDiscovery = ({
 
   const userData = useMemo(() => users?.pages.flat() || [], [users]);
 
-  const renderItem = useCallback(({ item }: { item: User }) => (
+  const renderItem = useCallback(({ item }: { item: Profile }) => (
     <View style={tw`max-h-24`}>
       <CardUser user={item} style={tw`h-full w-48`} />
     </View>
   ), []);
 
-  const keyExtractor = useCallback((item: User) => 
-    item.id.toString(), 
+  const keyExtractor = useCallback((item: Profile) => 
+    item.id!.toString(), 
     []
   );
 

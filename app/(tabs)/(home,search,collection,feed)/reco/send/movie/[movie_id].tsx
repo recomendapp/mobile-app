@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { useAuth } from "@/providers/AuthProvider";
-import { User } from "@recomendapp/types";
+import { Profile } from "@recomendapp/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
@@ -67,7 +67,13 @@ const RecoSendMovie = () => {
 	// States
 	const [search, setSearch] = useState('');
 	const [results, setResults] = useState<typeof friends>([]);
-	const [selected, setSelected] = useState<User[]>([]);
+	const [selected, setSelected] = useState<Profile[]>([]);
+	const resultsRender = useMemo(() => (
+		results?.map((item) => ({
+			item: item,
+			isSelected: selected.some((selectedItem) => selectedItem.id === item.friend.id),
+		})) || []
+	), [results, selected]);
 	const canSave = useMemo(() => {
 		return selected.length > 0 && form.formState.isValid;
 	}, [selected, form.formState.isValid]);
@@ -98,7 +104,7 @@ const RecoSendMovie = () => {
 	}, [search, friends, fuse]);
 
 	// Handlers
-	const handleToggleUser = useCallback((user: User) => {
+	const handleToggleUser = useCallback((user: Profile) => {
 		setSelected((prev) => {
 			const isSelected = prev.some((p) => p.id === user.id);
 			if (isSelected) {
@@ -155,7 +161,7 @@ const RecoSendMovie = () => {
 	};
 
 	// Render
-	const renderItems = useCallback(({ item: { item, isSelected} }: { item: { item: { friend: User, as_watched: boolean, already_sent: boolean }, isSelected: boolean }}) => {
+	const renderItems = useCallback(({ item: { item, isSelected} }: { item: { item: { friend: Profile, as_watched: boolean, already_sent: boolean }, isSelected: boolean }}) => {
 		return (
 			<CardUser user={item.friend} linked={false} style={[{ marginHorizontal: PADDING_HORIZONTAL }]} onPress={() => handleToggleUser(item.friend)}>
 				<View style={tw`flex-row items-center gap-2`}>
@@ -219,10 +225,7 @@ const RecoSendMovie = () => {
 			/>
 		</View>
 		<AnimatedLegendList
-		data={results?.map((item) => ({
-			item: item,
-			isSelected: selected.some((selectedItem) => selectedItem.id === item.friend.id),
-		})) || []}
+		data={resultsRender}
 		renderItem={renderItems}
 		ListEmptyComponent={
 			sendReco.isPending ? <Icons.Loader />
@@ -234,7 +237,7 @@ const RecoSendMovie = () => {
 				</View>
 			)
 		}
-		keyExtractor={({ item }) => item.friend.id.toString()}
+		keyExtractor={({ item }) => item.friend.id!.toString()}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		onEndReachedThreshold={0.5}
@@ -250,7 +253,7 @@ const RecoSendMovie = () => {
 		renderItem={({ item }) => (
 			<CardUser user={item} variant="icon" linked={false} onPress={() => handleToggleUser(item)} width={50} height={50} />
 		)}
-		keyExtractor={(item) => item.id.toString()}
+		keyExtractor={(item) => item.id!.toString()}
 		>
 			<Controller
 			name="comment"

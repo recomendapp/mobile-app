@@ -1,5 +1,5 @@
 import * as React from "react"
-import { JSONContent, User, UserActivityMovie, UserReviewMovie } from "@recomendapp/types";
+import { JSONContent, Profile, UserActivityMovie, UserReviewMovie } from "@recomendapp/types";
 import Animated from "react-native-reanimated";
 import { Pressable, View } from "react-native";
 import { Href, useRouter } from "expo-router";
@@ -34,7 +34,7 @@ type CardReviewMovieDataProps = {
   skeleton?: false;
   review: UserReviewMovie;
   activity: UserActivityMovie;
-  author: User;
+  author: Profile;
   url: Href;
 };
 

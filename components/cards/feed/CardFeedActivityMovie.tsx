@@ -1,6 +1,6 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaMovie, User, UserActivityMovie } from "@recomendapp/types";
+import { MediaMovie, Profile, UserActivityMovie } from "@recomendapp/types";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
@@ -34,7 +34,7 @@ type CardFeedActivityMovieSkeletonProps = {
 
 type CardFeedActivityMovieDataProps = {
 	skeleton?: false;
-	author: User;
+	author: Profile;
 	activity: UserActivityMovie;
 	movie: MediaMovie;
 	footer?: React.ReactNode;
