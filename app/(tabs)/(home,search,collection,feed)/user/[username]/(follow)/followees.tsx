@@ -20,7 +20,7 @@ const ProfileFolloweesScreen = () => {
 		userId: profile?.id || undefined,
 	});
 	const followees = useMemo(() => data?.pages.flat() || [], [data]);
-	const keyExtractor = useCallback((item: typeof followees[number]) => item.followee.id.toString(), []);
+	const keyExtractor = useCallback((item: typeof followees[number]) => item.followee.id!.toString(), []);
 	const onEndReached = useCallback(() => {
 		if (hasNextPage) {
 			fetchNextPage();
