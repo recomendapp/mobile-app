@@ -109,6 +109,18 @@ const CardFeedReviewMovieLike = React.forwardRef<
 >(({ variant = "default", onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
+	const handleOnPress = React.useCallback(() => {
+		if (!props.movie) return;
+		router.push(props.movie.url as Href);
+		onPress?.();
+	}, [onPress, props.movie, router]);
+	const handleOnLongPress = React.useCallback(() => {
+		if (!props.movie) return;
+		openSheet(BottomSheetMovie, {
+			movie: props.movie
+		})
+		onLongPress?.();
+	}, [onLongPress, openSheet, props.movie]);
 	const content = (
 		variant === "default" ? (
 			<CardFeedReviewMovieLikeDefault ref={ref} {...props} />
@@ -119,16 +131,8 @@ const CardFeedReviewMovieLike = React.forwardRef<
 
 	return (
 		<Pressable
-		onPress={() => {
-			router.push(props.movie.url as Href);
-			onPress?.();
-		}}
-		onLongPress={() => {
-			openSheet(BottomSheetMovie, {
-				movie: props.movie
-			})
-			onLongPress?.();
-		}}
+		onPress={handleOnPress}
+		onLongPress={handleOnLongPress}
 		>
 			{content}
 		</Pressable>

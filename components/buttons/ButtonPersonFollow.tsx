@@ -98,13 +98,7 @@ const ButtonPersonFollow = React.forwardRef<
     );
   }
 
-  if (!session) return null;
-
-  if (loading) {
-    return (
-      <Skeleton borderRadius={CORNERS} style={[tw`h-10 w-full`, style]} />
-    )
-  }
+  if (!session || loading) return null;
 
   return (
     <Button

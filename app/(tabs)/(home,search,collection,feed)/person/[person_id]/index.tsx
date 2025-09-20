@@ -5,10 +5,12 @@ import PersonWidgetFilms from "@/components/screens/person/PersonWidgetFilms";
 import PersonWidgetTvSeries from "@/components/screens/person/PersonWidgetTvSeries";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { Button } from "@/components/ui/Button";
+import { Text } from "@/components/ui/text";
 import { ThemedText } from "@/components/ui/ThemedText"
 import { Icons } from "@/constants/Icons";
 import { useMediaPersonQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
+import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
@@ -23,6 +25,7 @@ const PersonScreen = () => {
 	const { person_id } = useLocalSearchParams<{ person_id: string }>();
 	const { id: personId } = getIdFromSlug(person_id);
 	const { bottomTabHeight } = useTheme();
+	const { session } = useAuth();
 	const t = useTranslations();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	// Queries
@@ -47,6 +50,25 @@ const PersonScreen = () => {
 		},
 	});
 
+	const screenOptions = useMemo(() => ({
+		headerTitle: person?.name || '',
+		headerTransparent: true,
+		headerRight: () => (
+			<View style={tw`flex-row items-center gap-1`}>
+				{session && <ButtonPersonFollow personId={personId} />}
+				<Button
+				variant="ghost"
+				size="icon"
+				icon={Icons.EllipsisVertical}
+				onPress={person ? () => {
+					openSheet(BottomSheetPerson, {
+						person: person,
+					})
+				} : undefined}
+				/>
+			</View>
+		)
+	}), [person, session, personId, openSheet]);
 	// Render
 	const renderContent = useMemo(() => {
 		if (loading) return null;
@@ -73,32 +95,9 @@ const PersonScreen = () => {
 	return (
 	<>
 		<AnimatedStackScreen
-		options={{
-			headerTitle: person?.name || '',
-			headerTransparent: true,
-			headerRight: () => (
-				<View style={tw`flex-row items-center gap-1`}>
-					<ButtonPersonFollow personId={personId} />
-					<Button
-					variant="ghost"
-					size="icon"
-					icon={Icons.EllipsisVertical}
-					onPress={person ? () => {
-						openSheet(BottomSheetPerson, {
-							person: person,
-						})
-					} : undefined}
-					/>
-				</View>
-			)
-		}}
+		options={screenOptions}
 		scrollY={scrollY}
 		triggerHeight={headerHeight}
-		// onMenuPress={person ? () => {
-		// 	openSheet(BottomSheetPerson, {
-		// 		person: person,
-		// 	})
-		// } : undefined}
 		/>
 		<Animated.ScrollView
 		onScroll={scrollHandler}

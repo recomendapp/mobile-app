@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { userKeys } from "./userKeys"
-import { UserFeedCastCrew, Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserWatchlist, Profile, UserWatchlistTvSeries, UserWatchlistMovie, UserReviewMovie, UserReviewTvSeries, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserActivityMovie, UserActivityTvSeries, UserFeedItem } from "@recomendapp/types";
+import { Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserWatchlist, Profile, UserWatchlistTvSeries, UserWatchlistMovie, UserReviewMovie, UserReviewTvSeries, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserActivityMovie, UserActivityTvSeries, UserFeedItem } from "@recomendapp/types";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 
 /* ---------------------------------- USER ---------------------------------- */
@@ -1476,7 +1476,7 @@ export const useUserFollowersInfiniteQuery = ({
 
 			let query = supabase
 				.from('user_follower')
-				.select('id, follower:user!user_follower_user_id_fkey!inner(*)')
+				.select('id, follower:profile!user_follower_user_id_fkey!inner(*)')
 				.eq('followee_id', userId)
 				.eq('is_pending', false)
 				.order('created_at', { ascending: false })
@@ -1540,7 +1540,7 @@ export const useUserFolloweesInfiniteQuery = ({
 
 			let query = supabase
 				.from('user_follower')
-				.select('id, followee:user!user_follower_followee_id_fkey!inner(*)')
+				.select('id, followee:profile!user_follower_followee_id_fkey!inner(*)')
 				.eq('user_id', userId)
 				.eq('is_pending', false)
 				.order('created_at', { ascending: false })

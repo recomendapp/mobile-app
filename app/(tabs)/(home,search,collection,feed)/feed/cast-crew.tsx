@@ -1,8 +1,8 @@
-import { CardFeedItem } from "@/components/cards/CardFeedItem";
+import { CardFeedCastCrewMovie } from "@/components/cards/feed/CardFeedCastCrewMovie";
+import { CardFeedCastCrewTvSeries } from "@/components/cards/feed/CardFeedCastCrewTvSeries";
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import UserAvatar from "@/components/user/UserAvatar";
 import app from "@/constants/app";
 import { Icons } from "@/constants/Icons";
 import { useUserFeedCastCrewInfiniteQuery } from "@/features/user/userQueries";
@@ -10,13 +10,12 @@ import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { BORDER_RADIUS, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { Database } from "@recomendapp/types";
-import { Href, Link, useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo } from "react";
-import { Pressable } from "react-native-gesture-handler";
 import { useTranslations } from "use-intl";
 
 const CastCrewFeedScreen = () => {
@@ -40,11 +39,15 @@ const CastCrewFeedScreen = () => {
 
 	// Render
 	const renderItem = ({ item } : { item: Database['public']['Functions']['get_feed_cast_crew']['Returns'][number], index: number }) => {
-		return (
-			<View>
-				<Text>{item?.person.name}</Text>
-			</View>
-		);
+		item.jobs
+		switch (item.media_type) {
+			case 'movie':
+				return <CardFeedCastCrewMovie movie={item.media} person={item.person} jobs={item.jobs} />;
+			case 'tv_series':
+				return <CardFeedCastCrewTvSeries tvSeries={item.media} person={item.person} jobs={item.jobs} />;
+			default:
+				return <View style={[{ backgroundColor: colors.muted}, { borderRadius: BORDER_RADIUS, paddingVertical: PADDING_VERTICAL, paddingHorizontal: PADDING_HORIZONTAL }]}><Text textColor="muted" style={tw`text-center`}>Unsupported media type</Text></View>;
+		};
 	};
 	const listEmptyComponent = useCallback(() => {
 		if (loading) return null;
@@ -118,7 +121,6 @@ const CastCrewFeedScreen = () => {
 		contentContainerStyle={[
 			tw`px-4 gap-1`,
 			{
-				paddingTop: PADDING_VERTICAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL
 			}
 		]}

@@ -1,52 +1,49 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaTvSeries, Profile, UserActivityTvSeries } from "@recomendapp/types";
+import { MediaPerson, MediaTvSeries } from "@recomendapp/types";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Pressable, View } from "react-native";
-import FeedUserActivity from "@/components/screens/feed/FeedUserActivity";
-import { Href, useRouter } from "expo-router";
+import { Href, Link, useRouter } from "expo-router";
 import { Text } from "@/components/ui/text";
 import { FixedOmit } from "@recomendapp/types";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
+import UserAvatar from "@/components/user/UserAvatar";
 import { Skeleton } from "@/components/ui/Skeleton";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
-import { CardUser } from "../CardUser";
-import { CardReviewTvSeries } from "../reviews/CardReviewTvSeries";
+import { BadgeMedia } from "@/components/badges/BadgeMedia";
 
-interface CardFeedActivityTvSeriesBaseProps
+interface CardFeedCastCrewTvSeriesBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
 		variant?: "default";
 		onPress?: () => void;
 		onLongPress?: () => void;
 	}
 
-type CardFeedActivityTvSeriesSkeletonProps = {
+type CardFeedCastCrewTvSeriesSkeletonProps = {
 	skeleton: true;
-	author?: never;
-	activity?: never;
 	tvSeries?: never;
-	footer?: never;
+	person?: never;
+	jobs?: never;
 };
 
-type CardFeedActivityTvSeriesDataProps = {
+type CardFeedCastCrewTvSeriesDataProps = {
 	skeleton?: false;
-	author: Profile;
-	activity: UserActivityTvSeries;
 	tvSeries: MediaTvSeries;
-	footer?: React.ReactNode;
+	person: MediaPerson;
+	jobs: string[];
 };
 
-export type CardFeedActivityTvSeriesProps = CardFeedActivityTvSeriesBaseProps &
-	(CardFeedActivityTvSeriesSkeletonProps | CardFeedActivityTvSeriesDataProps);
+export type CardFeedCastCrewTvSeriesProps = CardFeedCastCrewTvSeriesBaseProps &
+	(CardFeedCastCrewTvSeriesSkeletonProps | CardFeedCastCrewTvSeriesDataProps);
 
-const CardFeedActivityTvSeriesDefault = React.forwardRef<
+const CardFeedCastCrewTvSeriesDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	FixedOmit<CardFeedActivityTvSeriesProps, "variant" | "onPress" | "onLongPress">
->(({ style, children, author, activity, tvSeries, footer, skeleton, ...props }, ref) => {
+	FixedOmit<CardFeedCastCrewTvSeriesProps, "variant" | "onPress">
+>(({ style, children, tvSeries, person, jobs, onLongPress, skeleton, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
 	const router = useRouter();
@@ -65,59 +62,55 @@ const CardFeedActivityTvSeriesDefault = React.forwardRef<
 				source={{ uri: tvSeries.poster_url ?? '' }}
 				alt={tvSeries.name ?? ''}
 				type={'tv_series'}
-				style={tw`w-20 h-full`}
+				style={[tw`w-20 h-full`, { backgroundColor: colors.background }]}
 				/>
 			) : (
 				<Skeleton style={tw`w-20 h-full`} />
 			)}
 			<View style={tw`flex-1 gap-2 p-2`}>
-				{!skeleton ? <View style={tw`flex-row items-center gap-1`}>
-					<CardUser user={author} variant="icon" />
-					<FeedUserActivity author={author} activity={activity} style={[{ color: colors.mutedForeground }, tw`text-sm`]} />
-				</View> : <Skeleton style={tw`w-full h-6`} />}
+				<View style={tw`flex-row items-center gap-1`}>
+					{!skeleton ? (
+						<Pressable onPress={() => router.push(person.url as Href)}>
+							<UserAvatar avatar_url={person.profile_url} full_name={person.name ?? ''} style={tw`rounded-md`}/>
+						</Pressable>
+					) : <Skeleton style={tw`w-6 h-6 rounded-md`} />}
+					{!skeleton ? (
+						<Text textColor="muted">
+							{t.rich('pages.feed.cast_and_crew.label', {
+								name: person.name!,
+								roles: jobs.length ? jobs.join(', ').toLowerCase() : t('common.messages.unknown'),
+								linkPerson: (chunk) => <Link href={person?.url as Href} style={{ color: colors.foreground }}>{chunk}</Link>,
+								important: (chunk) => <Text textColor="default">{chunk}</Text>
+							})}
+						</Text>
+					) : <Skeleton style={tw`w-40 h-4`} />}
+				</View>
 				<View style={tw`gap-2`}>
 					{!skeleton ? (
 						<Text numberOfLines={2} style={tw`font-bold`}>
 						{tvSeries.name}
 						</Text>
  					) : <Skeleton style={tw`w-full h-5`} />}
-					{footer || (
-						skeleton
-							? <Skeleton style={tw`w-full h-12`} />
-							: activity.review ? (
-								<CardReviewTvSeries
-								author={author}
-								activity={activity!}
-								review={activity.review!}
-								url={{
-									pathname: '/tv-series/[tv_series_id]/review/[review_id]',
-									params: {
-										tv_series_id: tvSeries.slug || tvSeries.id,
-										review_id: activity.review.id
-									}
-								}}
-								style={{ backgroundColor: colors.background }}
-								/>
-							) : (
-								<Text
-								textColor={!tvSeries.overview ? "muted" : undefined}
-								numberOfLines={2}
-								style={tw`text-xs text-justify`}
-								>
-									{tvSeries.overview || upperFirst(t('common.messages.no_description'))}
-								</Text>
-							) 
-					)}
+					{!skeleton ? <BadgeMedia type={'tv_series'} /> : <Skeleton style={tw`w-20 h-5 rounded-full`} />}
+					{!skeleton ? (
+						<Text
+						textColor={!tvSeries.overview ? "muted" : undefined}
+						numberOfLines={2}
+						style={tw`text-xs text-justify`}
+						>
+							{tvSeries.overview || upperFirst(t('common.messages.no_description'))}
+						</Text>
+					) : <Skeleton style={tw`w-full h-12`} />}
 				</View>
 			</View>
 		</Animated.View>
 	);
 });
-CardFeedActivityTvSeriesDefault.displayName = "CardFeedActivityTvSeriesDefault";
+CardFeedCastCrewTvSeriesDefault.displayName = "CardFeedCastCrewTvSeriesDefault";
 
-const CardFeedActivityTvSeries = React.forwardRef<
+const CardFeedCastCrewTvSeries = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	CardFeedActivityTvSeriesProps
+	CardFeedCastCrewTvSeriesProps
 >(({ variant = "default", onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -135,7 +128,7 @@ const CardFeedActivityTvSeries = React.forwardRef<
 	}, [onLongPress, openSheet, props.tvSeries]);
 	const content = (
 		variant === "default" ? (
-			<CardFeedActivityTvSeriesDefault ref={ref} {...props} />
+			<CardFeedCastCrewTvSeriesDefault ref={ref} onLongPress={onLongPress} {...props} />
 		) : null
 	);
 
@@ -150,9 +143,9 @@ const CardFeedActivityTvSeries = React.forwardRef<
 		</Pressable>
 	)
 });
-CardFeedActivityTvSeries.displayName = "CardFeedActivityTvSeries";
+CardFeedCastCrewTvSeries.displayName = "CardFeedCastCrewTvSeries";
 
 export {
-	CardFeedActivityTvSeries,
-	CardFeedActivityTvSeriesDefault,
+	CardFeedCastCrewTvSeries,
+	CardFeedCastCrewTvSeriesDefault,
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import {
 	LayoutChangeEvent,
+	useWindowDimensions,
 } from 'react-native';
 import Animated, {
 	Extrapolation,
@@ -39,7 +40,6 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 	headerHeight,
 	headerOverlayHeight,
 }) => {
-	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
 	const { hslToRgb } = useColorConverter();
 	const { colors } = useTheme();
@@ -50,29 +50,15 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 	const posterHeight = useSharedValue(0);
 	// Animated styles
 	const posterAnim = useAnimatedStyle(() => {
-		const scaleValue = interpolate(
-			scrollY.get(),
-			[-headerHeight.get(), 0],
-			[3, 1],
-			Extrapolation.CLAMP,
-		);
-		const scaleOffset = (posterHeight.get() * (scaleValue - 1)) / 2;
-		const freezeScroll = interpolate(
-			scrollY.get(),
-			[-headerHeight.get(), 0],
-			[-headerHeight.get(), 1],
-			Extrapolation.CLAMP,
-		);
+		const stretch = Math.max(-scrollY.value, 0);
+		const base = Math.max(posterHeight.value, 1);
+		const scale = 1 + stretch / base;
+		const clampedScale = Math.min(scale, 3);
+		const translateY = -stretch / 2;
 		return {
-			opacity: interpolate(
-				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight) / 0.8],
-				[1, 0],
-				Extrapolation.CLAMP,
-			),
 			transform: [
-				{ scale: scaleValue },
-				{ translateY: freezeScroll + scaleOffset },
+				{ translateY },
+				{ scale: clampedScale },
 			],
 		};
 	});
@@ -89,7 +75,7 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 					scale: interpolate(
 					scrollY.get(),
 					[0, (headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight)) / 2],
-					[1, 0.95],
+					[1, 0.98],
 					'clamp',
 					),
 				},
@@ -97,25 +83,19 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 		};
 	});
 	const bgAnim = useAnimatedStyle(() => {
-		const scaleValue = interpolate(
-			scrollY.get(),
-			[-headerHeight.get(), 0],
-			[2, 1],
-			Extrapolation.CLAMP,
-		);
-		const offset = (headerHeight.get() * (scaleValue - 1)) / 2;
+		const stretch = Math.max(-scrollY.value, 0);
 		return {
-			transform: [
-				{ scale: scaleValue },
-				{ translateY: -offset },
-			],
+			height: headerHeight.value + stretch,
+			transform: [{ translateY: -stretch }],
 		};
 	});
+
 	return (
 	<Animated.View
 	style={[
 		tw.style('w-full'),
-		{ paddingTop: navigationHeaderHeight }
+		{ paddingTop: navigationHeaderHeight },
+		textAnim,
 	]}
 	onLayout={(event: LayoutChangeEvent) => {
 		'worklet';
@@ -158,11 +138,11 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 				]}
 				type={'person'}
 				/>
-			) : <Skeleton style={[{ aspectRatio: 1 / 1 }, tw`w-48`, posterAnim]}/>}
+			) : <Skeleton style={[{ aspectRatio: 1 / 1 }, tw`w-48` ]}/>}
 			<Animated.View
 			style={[
 				tw`gap-2 w-full`,
-				textAnim
+				// textAnim
 			]}
 			>
 				{/* GENRES */}

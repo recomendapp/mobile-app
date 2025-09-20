@@ -11,6 +11,7 @@ import { LocaleProvider } from "./LocaleProvider";
 import { NotificationsProvider } from "./NotificationsProvider";
 import { ToastProvider } from "@/components/ui/toast";
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -19,7 +20,7 @@ type ProvidersProps = {
 const Providers = ({ children } : ProvidersProps) => {
 	return (
 	<KeyboardProvider>
-		{/* <GestureHandlerRootView style={{ flex: 1 }}>	 */}
+		<GestureHandlerRootView style={{ flex: 1 }}>	
 			<SafeAreaProvider>
 				<SplashScreenProvider>
 					<LocaleProvider>
@@ -42,7 +43,7 @@ const Providers = ({ children } : ProvidersProps) => {
 					</LocaleProvider>
 				</SplashScreenProvider>
 			</SafeAreaProvider>
-		{/* </GestureHandlerRootView> */}
+		</GestureHandlerRootView>
 	</KeyboardProvider>
 	)
 };
