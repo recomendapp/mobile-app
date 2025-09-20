@@ -21,7 +21,7 @@ const ProfileFollowersScreen = () => {
 	});
 	const followers = useMemo(() => data?.pages.flat() || [], [data]);
 	// useCallback
-	const keyExtractor = useCallback((item: typeof followers[number]) => item.follower.id.toString(), []);
+	const keyExtractor = useCallback((item: typeof followers[number]) => item.follower.id!.toString(), []);
 	const onEndReached = useCallback(() => {
 		if (hasNextPage) {
 			fetchNextPage();

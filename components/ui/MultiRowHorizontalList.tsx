@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
 import { LegendList, LegendListProps } from '@legendapp/list';
 
-interface MultiRowHorizontalListProps<T> extends Omit<LegendListProps<T[]>, 'data' | 'renderItem' | 'keyExtractor'> {
+interface MultiRowHorizontalListProps<T> extends Omit<LegendListProps<T[]>, 'data' | 'renderItem' | 'keyExtractor' | 'children'> {
   data: T[];
   numRows?: number;
   renderItem: (item: T, index: number) => React.ReactElement;

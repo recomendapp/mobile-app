@@ -123,7 +123,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 					"./assets/sounds/notif.wav"
 				]
 			}
-      	]
+      	],
+		[
+			"expo-web-browser",
+			{
+			"experimentalLauncherActivity": true
+			}
+		]
 	],
 	experiments: {
 		typedRoutes: true,
