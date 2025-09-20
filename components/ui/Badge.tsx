@@ -76,7 +76,7 @@ const Badge = React.forwardRef<React.ComponentRef<typeof Animated.View>, BadgePr
   ({ variant, disabled, style, children, ...props }, ref) => {
     const { colors } = useTheme();
     const variantStyles = React.useMemo(() => {
-      const shared = "flex-row items-center justify-center gap-2 rounded-full px-2 py-1";
+      const shared = "flex-row items-center justify-center self-start gap-2 rounded-full px-2 py-1";
       let style = {};
       switch (variant) {
         case 'destructive':
@@ -113,7 +113,6 @@ const Badge = React.forwardRef<React.ComponentRef<typeof Animated.View>, BadgePr
           tw.style(variantStyles.shared),
           variantStyles.variant,
           style,
-          // tw.style(BadgeVariants({ variant, size })),
         ]}
         {...props}
         >
@@ -121,22 +120,6 @@ const Badge = React.forwardRef<React.ComponentRef<typeof Animated.View>, BadgePr
             {children}
           </BadgeText>
         </Animated.View>
-      // <TextClassContext.Provider
-      //   value={cn(
-      //     props.disabled && 'web:pointer-events-none',
-      //     BadgeTextVariants({ variant, size })
-      //   )}
-      // >
-      //   <Pressable
-      //     className={cn(
-      //       props.disabled && 'opacity-50 web:pointer-events-none',
-      //       BadgeVariants({ variant, size, className })
-      //     )}
-      //     ref={ref}
-      //     role='Badge'
-      //     {...props}
-      //   />
-      // </TextClassContext.Provider>
     );
   }
 );

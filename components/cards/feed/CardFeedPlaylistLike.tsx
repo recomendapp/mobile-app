@@ -106,6 +106,21 @@ const CardFeedPlaylistLike = React.forwardRef<
 >(({ variant = "default", onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
+	const handleOnPress = React.useCallback(() => {
+		if (!props.playlistLike) return;
+		router.push({
+			pathname: '/playlist/[playlist_id]',
+			params: { playlist_id: props.playlistLike.playlist_id }
+		});
+		onPress?.();
+	}, [onPress, props.playlistLike, router]);
+	const handleOnLongPress = React.useCallback(() => {
+		if (!props.playlistLike) return;
+		openSheet(BottomSheetPlaylist, {
+			playlist: props.playlistLike.playlist!
+		})
+		onLongPress?.();
+	}, [onLongPress, openSheet, props.playlistLike]);
 	const content = (
 		variant === "default" ? (
 			<CardFeedPlaylistLikeDefault ref={ref} {...props} />
@@ -116,16 +131,8 @@ const CardFeedPlaylistLike = React.forwardRef<
 
 	return (
 		<Pressable
-		onPress={() => {
-			router.push(`/playlist/${props.playlistLike.playlist_id}`);
-			onPress?.();
-		}}
-		onLongPress={() => {
-			openSheet(BottomSheetPlaylist, {
-				playlist: props.playlistLike.playlist!
-			})
-			onLongPress?.();
-		}}
+		onPress={handleOnPress}
+		onLongPress={handleOnLongPress}
 		>
 			{content}
 		</Pressable>

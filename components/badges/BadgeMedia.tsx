@@ -4,17 +4,17 @@ import { useTranslations } from "use-intl";
 import { Badge } from "../ui/Badge";
 
 interface BadgeMediaProps
-	extends React.ComponentProps<typeof Badge> {
+	extends React.ComponentPropsWithoutRef<typeof Badge> {
 		type?: MediaType | null;
 	}
 
 const BadgeMedia = React.forwardRef<
-	HTMLDivElement,
+	React.ComponentRef<typeof Badge>,
 	BadgeMediaProps
->(({ type, variant, className, ...props }, ref) => {
+>(({ type, variant, ...props }, ref) => {
 	const t = useTranslations();
 	return (
-		<Badge variant={variant ?? 'accent-yellow'} className={className} {...props}>
+		<Badge ref={ref} variant={variant ?? 'accent-yellow'} {...props}>
 		{type === 'movie'
 			? t('common.messages.film', { count: 1 })
 			: type === 'tv_series'

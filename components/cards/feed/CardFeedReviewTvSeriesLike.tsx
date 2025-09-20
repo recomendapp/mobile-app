@@ -109,6 +109,18 @@ const CardFeedReviewTvSeriesLike = React.forwardRef<
 >(({ variant = "default", onPress, onLongPress, ...props }, ref) => {
 	const router = useRouter();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
+	const handleOnPress = React.useCallback(() => {
+		if (!props.tvSeries) return;
+		router.push(props.tvSeries.url as Href);
+		onPress?.();
+	}, [onPress, props.tvSeries, router]);
+	const handleOnLongPress = React.useCallback(() => {
+		if (!props.tvSeries) return;
+		openSheet(BottomSheetTvSeries, {
+			tvSeries: props.tvSeries
+		})
+		onLongPress?.();
+	}, [onLongPress, openSheet, props.tvSeries]);
 	const content = (
 		variant === "default" ? (
 			<CardFeedReviewTvSeriesLikeDefault ref={ref} {...props} />
@@ -119,16 +131,8 @@ const CardFeedReviewTvSeriesLike = React.forwardRef<
 
 	return (
 		<Pressable
-		onPress={() => {
-			router.push(props.tvSeries.url as Href);
-			onPress?.();
-		}}
-		onLongPress={() => {
-			openSheet(BottomSheetTvSeries, {
-				tvSeries: props.tvSeries
-			})
-			onLongPress?.();
-		}}
+		onPress={handleOnPress}
+		onLongPress={handleOnLongPress}
 		>
 			{content}
 		</Pressable>
