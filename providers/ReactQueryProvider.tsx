@@ -6,7 +6,7 @@ import {
   PersistQueryClientProvider,
   PersistQueryClientProviderProps,
 } from '@tanstack/react-query-persist-client';
-import { useReactQueryDevTools } from "@dev-plugins/react-query";
+// import { useReactQueryDevTools } from "@dev-plugins/react-query";
 
 const queryStorage = new MMKV({
   id: 'react-query-cache',
@@ -123,7 +123,7 @@ function QueryProviderInner({
     };
   }, [userId]);
 
-  useReactQueryDevTools(queryClient);
+  // useReactQueryDevTools(queryClient);
 
   useEffect(() => {
     setupNetworkListeners();

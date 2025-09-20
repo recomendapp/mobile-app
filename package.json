@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "@10play/tentap-editor": "^0.7.5-alpha.0",
-    "@dev-plugins/react-query": "^0.3.1",
     "@expo/react-native-action-sheet": "^4.1.1",
     "@formatjs/intl-datetimeformat": "^6.18.0",
     "@formatjs/intl-displaynames": "^6.8.11",
@@ -113,8 +112,8 @@
     "@types/color": "^4.2.0",
     "@types/d3-interpolate": "^3.0.4",
     "@types/lodash": "^4.17.20",
-    "@types/react": "~19.0.10",
-    "typescript": "~5.8.3"
+    "@types/react": "^19.1.13",
+    "typescript": "~5.9.2"
   },
   "private": true
 }

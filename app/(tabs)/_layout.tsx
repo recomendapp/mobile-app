@@ -1,4 +1,5 @@
 import { Tabs, useRouter } from 'expo-router';
+// import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 import { Icons } from "@/constants/Icons";
 import { Platform } from 'react-native';
 import { useAuth } from '@/providers/AuthProvider';
@@ -13,6 +14,38 @@ const TabsLayout = () => {
 	const { colors } = useTheme();
 	const t = useTranslations();
 	const router = useRouter();
+	// return (
+	// 	<NativeTabs iconColor={colors.muted} tintColor={colors.tint}>
+	// 		<NativeTabs.Trigger name='(home)'>
+	// 			<Label>{upperFirst(t('common.messages.home'))}</Label>
+	// 			<Icon sf={'house.fill'} drawable='ic_menu_mylocation' />
+	// 		</NativeTabs.Trigger>
+	// 		<NativeTabs.Trigger name='(search)'>
+	// 			<Label>{upperFirst(t('common.messages.search'))}</Label>
+	// 			<Icon sf={'magnifyingglass'} drawable='ic_menu_mylocation' />
+	// 		</NativeTabs.Trigger>
+
+	// 		{/* LOGIN ONLY */}
+	// 		<Tabs.Protected guard={!!session}>
+	// 			<NativeTabs.Trigger name='(feed)'>
+	// 				<Label>{upperFirst(t('common.messages.feed'))}</Label>
+	// 				<Icon sf={'text.justify'} drawable='ic_menu_mylocation' />
+	// 			</NativeTabs.Trigger>
+	// 			<NativeTabs.Trigger name='(collection)'>
+	// 				<Label>{upperFirst(t('common.messages.library'))}</Label>
+	// 				<Icon sf={'books.vertical.fill'} drawable='ic_menu_mylocation' />
+	// 			</NativeTabs.Trigger>
+	// 		</Tabs.Protected>
+
+	// 		{/* ANON ONLY */}
+	// 		<Tabs.Protected guard={!session}>
+	// 			<NativeTabs.Trigger name='auth'>
+	// 				<Label>{upperFirst(t('common.messages.login'))}</Label>
+	// 				<Icon sf={'person.crop.circle'} drawable='ic_menu_mylocation' />
+	// 			</NativeTabs.Trigger>
+	// 		</Tabs.Protected>
+	// 	</NativeTabs>
+	// )
 	return (
 	<Tabs
 		initialRouteName='(home)'
