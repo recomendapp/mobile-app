@@ -10,6 +10,7 @@ const AuthLayout = () => {
   const { colors } = useTheme();
   return (
     <Stack
+    initialRouteName="index"
     screenOptions={{
       animation: 'ios_from_right',
       headerTintColor: colors.foreground,
