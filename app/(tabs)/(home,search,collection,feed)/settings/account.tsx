@@ -182,7 +182,7 @@ const SettingsAccountScreen = () => {
 						},
 						{
 							text: upperFirst(t('common.messages.ok')),
-							onPress: (text) => {
+							onPress: (text?: string) => {
 								if (text) {
 									handleVerifyEmail(selectedOption.value, text);
 								}
