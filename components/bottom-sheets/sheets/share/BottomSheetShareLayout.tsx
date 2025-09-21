@@ -19,6 +19,7 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { ShareViewRef } from "@/components/share/type";
 import { LucideIcon } from "lucide-react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type SharePlatform = {
 	label: string;
@@ -43,7 +44,7 @@ const BottomSheetShareLayout = forwardRef<
     ...props
 }, ref) => {
     const t = useTranslations();
-    const { inset } = useTheme();
+    const insets = useSafeAreaInsets();
     const url = `https://${Constants.expoConfig?.extra?.webDomain}${path}`;
     
     // REFs
@@ -111,7 +112,7 @@ const BottomSheetShareLayout = forwardRef<
             <ScrollView
             ref={scrollRef}
             bounces={false}
-            contentContainerStyle={{ paddingTop: PADDING_VERTICAL * 2, paddingBottom: inset.bottom, gap: GAP }}
+            contentContainerStyle={{ paddingTop: PADDING_VERTICAL * 2, paddingBottom: insets.bottom, gap: GAP }}
             >
                 <Text variant="title" style={tw`text-center`}>{upperFirst(t('common.messages.share'))}</Text>
                 {children}

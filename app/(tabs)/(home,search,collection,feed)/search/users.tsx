@@ -12,6 +12,7 @@ import { useScrollToTop } from "@react-navigation/native";
 import { Profile } from "@recomendapp/types";
 import { upperFirst } from "lodash";
 import { useRef, useCallback, useMemo, memo } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
 const UserItem = memo(({ item }: { item: Profile }) => (
@@ -43,7 +44,8 @@ const EmptyComponent = memo(({
 EmptyComponent.displayName = 'EmptyComponent';
 
 const SearchUsersScreen = memo(() => {
-	const { inset, tabBarHeight } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
 	
@@ -99,9 +101,9 @@ const SearchUsersScreen = memo(() => {
 			data={usersData}
 			renderItem={renderItem}
 			contentContainerStyle={{
-				paddingLeft: inset.left + PADDING_HORIZONTAL,
-				paddingRight: inset.right + PADDING_HORIZONTAL,
-				paddingBottom: tabBarHeight + inset.bottom + PADDING_VERTICAL,
+				paddingLeft: insets.left + PADDING_HORIZONTAL,
+				paddingRight: insets.right + PADDING_HORIZONTAL,
+				paddingBottom: tabBarHeight + insets.bottom + PADDING_VERTICAL,
 				gap: GAP,
 			}}
 			keyExtractor={keyExtractor}

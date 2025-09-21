@@ -5,11 +5,13 @@ import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useMemo } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ProfileFollowersScreen = () => {
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data: profile } = useUserProfileQuery({ username: username });
-	const { bottomTabHeight, inset } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { bottomTabHeight } = useTheme();
 	const {
 		data,
 		isLoading,
@@ -35,8 +37,8 @@ const ProfileFollowersScreen = () => {
 		data={followers}
 		renderItem={renderItem}
 		contentContainerStyle={{
-			paddingLeft: inset.left + PADDING_HORIZONTAL,
-			paddingRight: inset.right + PADDING_HORIZONTAL,
+			paddingLeft: insets.left + PADDING_HORIZONTAL,
+			paddingRight: insets.right + PADDING_HORIZONTAL,
 			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 		}}
 		keyExtractor={keyExtractor}

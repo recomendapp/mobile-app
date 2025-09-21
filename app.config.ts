@@ -56,7 +56,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			`applinks:${getWebDomain()}`
 		],
 		infoPlist: {
-			ITSAppUsesNonExemptEncryption: false
+			ITSAppUsesNonExemptEncryption: false,
+			UIDesignRequiresCompatibility: true, // Disable iOS 26 Liquid Glass effect
 		}
 	},
 	android: {

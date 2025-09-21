@@ -16,6 +16,7 @@ import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { PADDING_HORIZONTAL } from '@/theme/globals';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('screen');
 const ITEM_WIDTH = width * 0.2;
@@ -99,7 +100,8 @@ const BottomSheetRating = React.forwardRef<
 	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetRatingProps
 >(({ id, media, rating, onRatingChange, sizes = ['auto'], ...props }, ref) => {
-	const { colors, inset } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { colors } = useTheme();
 	const t = useTranslations();
 	const closeSheet = useBottomSheetStore((state) => state.closeSheet);
 	const scrollRef = React.useRef<FlatList>(null);
@@ -165,7 +167,7 @@ const BottomSheetRating = React.forwardRef<
 		ref={ref}
 		sizes={sizes}
 		FooterComponent={() => (
-			<View style={{ paddingBottom: inset.bottom, paddingHorizontal: PADDING_HORIZONTAL }}>
+			<View style={{ paddingBottom: insets.bottom, paddingHorizontal: PADDING_HORIZONTAL }}>
 				{rating ? (
 					<View style={tw`flex-row gap-2 justify-between`}>
 						<Button variant="destructive" onPress={handleDeleteRating} style={{ flex: 1 }}>

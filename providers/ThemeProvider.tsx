@@ -8,7 +8,6 @@ import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 type ThemeContextType = {
 	colors: TColors;
 	applyColors: (colors: TColors) => void;
-	inset: EdgeInsets;
 	tabBarHeight: number;
 	setTabBarHeight: (height: number) => void;
 	bottomTabHeight: number;
@@ -23,12 +22,12 @@ type ThemeProviderProps = {
   
 const ThemeProvider = ({children}: ThemeProviderProps) => {
 	const [colors, setColors] = useState(Colors.dark);
-	const inset = useSafeAreaInsets();
+	const insets = useSafeAreaInsets();
 	const [tabBarHeight, setTabBarHeight] = useState(0);
 
 	const bottomTabHeight = useMemo(() => {
-		return tabBarHeight + inset.bottom;
-	}, [tabBarHeight, inset.bottom]);
+		return tabBarHeight + insets.bottom;
+	}, [tabBarHeight, insets.bottom]);
 
 	const defaultScreenOptions = useMemo((): React.ComponentProps<typeof Stack.Screen>['options'] => ({
 		animation: 'ios_from_right',
@@ -39,8 +38,6 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 		},
 		headerShadowVisible: false,
 		headerTitleAlign: 'center',
-		gestureEnabled: true,
-		gestureDirection: "vertical",
 	}), [colors]);
 
 	const applyColors = useCallback((colorTheme: TColors) => {
@@ -52,12 +49,11 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 	const contextValue = useMemo(() => ({
 		applyColors,
 		colors,
-		inset,
 		tabBarHeight,
 		setTabBarHeight,
 		bottomTabHeight,
 		defaultScreenOptions,
-	}), [applyColors, colors, inset, tabBarHeight, setTabBarHeight, bottomTabHeight, defaultScreenOptions]);
+	}), [applyColors, colors, tabBarHeight, setTabBarHeight, bottomTabHeight, defaultScreenOptions]);
 
 	return (
 		<ThemeContext.Provider value={contextValue}>

@@ -22,6 +22,7 @@ import { useLocale, useTranslations } from "use-intl";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface MediaHeaderProps {
 	season?: MediaTvSeriesSeason | null;
@@ -41,7 +42,8 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 	const t = useTranslations();
 	const navigationHeaderHeight = useHeaderHeight();
 	const { hslToRgb } = useColorConverter();
-	const { colors, inset } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { colors } = useTheme();
 	const title = upperFirst(t('common.messages.tv_season_value', { number: season?.season_number! }));
 	const bgColor = hslToRgb(colors.background);
 	const posterHeight = useSharedValue(0);
@@ -51,7 +53,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + inset.top) / 0.8],
+				[0, headerHeight.get() - (headerOverlayHeight.get() + insets.top) / 0.8],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -59,7 +61,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 				{
 					scale: interpolate(
 					scrollY.get(),
-					[0, (headerHeight.get() - (headerOverlayHeight.get() + inset.top)) / 2],
+					[0, (headerHeight.get() - (headerOverlayHeight.get() + insets.top)) / 2],
 					[1, 0.95],
 					'clamp',
 					),

@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
 import BottomSheetShare from './share/BottomSheetShare';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BottomSheetPersonProps extends BottomSheetProps {
   person?: MediaPerson,
@@ -40,7 +41,8 @@ const BottomSheetPerson = React.forwardRef<
 >(({ id, person, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const { colors, inset } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -84,7 +86,7 @@ const BottomSheetPerson = React.forwardRef<
       <ScrollView
       ref={scrollRef}
       bounces={false}
-      contentContainerStyle={{ paddingBottom: inset.bottom }}
+      contentContainerStyle={{ paddingBottom: insets.bottom }}
       stickyHeaderIndices={[0]}
       >
         <View

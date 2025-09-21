@@ -23,13 +23,14 @@ import { useTranslations } from "use-intl";
 import * as Burnt from 'burnt';
 import { PostgrestError } from "@supabase/supabase-js";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ModalPlaylistEditGuestsAdd = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
 	const playlistId = Number(playlist_id);
 	const t = useTranslations();
 	const { session } = useAuth();
-	const { inset } = useTheme();
+	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	// SharedValues
 	const footerHeight = useSharedValue(0);
@@ -150,7 +151,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
-		const paddingBottom =  PADDING_VERTICAL + (selectedUsers.length > 0 ? footerHeight.value : inset.bottom);
+		const paddingBottom =  PADDING_VERTICAL + (selectedUsers.length > 0 ? footerHeight.value : insets.bottom);
 		return {
 			paddingBottom: withTiming(paddingBottom, { duration: 200 }),
 		};

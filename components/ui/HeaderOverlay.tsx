@@ -14,6 +14,7 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface HeaderOverlayProps {
 	triggerHeight: SharedValue<number>;
@@ -31,15 +32,16 @@ const HeaderOverlay: React.FC<HeaderOverlayProps> = ({
 	title,
 	onMenuPress,
 }) => {
-	const { colors, inset } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { colors } = useTheme();
 	const navigation = useNavigation();
 	const opacityAnim = useAnimatedStyle(() => {
 		return {
 			opacity: interpolate(
 			scrollY.get(),
 			[
-				((triggerHeight.get() - (headerHeight.get() + inset.top)) / 4) * 3,
-				triggerHeight.get() - (headerHeight.get() + inset.top) + 1,
+				((triggerHeight.get() - (headerHeight.get() + insets.top)) / 4) * 3,
+				triggerHeight.get() - (headerHeight.get() + insets.top) + 1,
 			],
 			[0, 1],
 			),
@@ -48,8 +50,8 @@ const HeaderOverlay: React.FC<HeaderOverlayProps> = ({
 				scale: interpolate(
 				scrollY.get(),
 				[
-					((triggerHeight.get() - (headerHeight.get() + inset.top)) / 4) * 3,
-					triggerHeight.get() - (headerHeight.get() + inset.top) + 1,
+					((triggerHeight.get() - (headerHeight.get() + insets.top)) / 4) * 3,
+					triggerHeight.get() - (headerHeight.get() + insets.top) + 1,
 				],
 				[0.98, 1],
 				Extrapolation.CLAMP,
@@ -59,15 +61,15 @@ const HeaderOverlay: React.FC<HeaderOverlayProps> = ({
 				translateY: interpolate(
 				scrollY.get(),
 				[
-					((triggerHeight.get() - (headerHeight.get() + inset.top)) / 4) * 3,
-					triggerHeight.get() - (headerHeight.get() + inset.top) + 1,
+					((triggerHeight.get() - (headerHeight.get() + insets.top)) / 4) * 3,
+					triggerHeight.get() - (headerHeight.get() + insets.top) + 1,
 				],
 				[-10, 0],
 				Extrapolation.CLAMP,
 				),
 			},
 			],
-			paddingTop: inset.top === 0 ? 8 : inset.top,
+			paddingTop: insets.top === 0 ? 8 : insets.top,
 		};
 	});
 
@@ -96,7 +98,7 @@ const HeaderOverlay: React.FC<HeaderOverlayProps> = ({
 			style={[
 				tw.style('absolute z-10'),
 				{
-					top: inset.top,
+					top: insets.top,
 					left: 14,
 				}
 			]}
@@ -110,7 +112,7 @@ const HeaderOverlay: React.FC<HeaderOverlayProps> = ({
 			style={[
 				tw.style('absolute z-10'),
 				{
-					top: inset.top,
+					top: insets.top,
 					right: 14,
 				}
 			]}

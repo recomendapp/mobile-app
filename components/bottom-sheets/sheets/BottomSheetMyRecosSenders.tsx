@@ -11,6 +11,7 @@ import { FlashList, FlashListRef } from '@shopify/flash-list';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BottomSheetMyRecosSendersProps extends BottomSheetProps {
   comments: UserRecosAggregated['senders'];
@@ -20,10 +21,11 @@ const BottomSheetMyRecosSenders = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetMyRecosSendersProps
 >(({ id, comments, sizes, ...props }, ref) => {
-  const { colors, inset } = useTheme();
-  const t = useTranslations();
-  const flashlistRef = React.useRef<FlashListRef<UserRecosAggregated['senders'][number]>>(null);
-  return (
+	const insets = useSafeAreaInsets();
+	const { colors } = useTheme();
+	const t = useTranslations();
+	const flashlistRef = React.useRef<FlashListRef<UserRecosAggregated['senders'][number]>>(null);
+	return (
     <ThemedTrueSheet
     ref={ref}
 	sizes={['large']}
@@ -54,12 +56,12 @@ const BottomSheetMyRecosSenders = React.forwardRef<
 			paddingTop: 16,
 			paddingLeft: 16,
 			paddingRight: 16,
-			paddingBottom: inset.bottom,
+			paddingBottom: insets.bottom,
 		}}
 		ItemSeparatorComponent={() => <View style={tw`h-2`} />}
 		/>
     </ThemedTrueSheet>
-  );
+	);
 });
 BottomSheetMyRecosSenders.displayName = 'BottomSheetMyRecosSenders';
 

@@ -16,6 +16,7 @@ import { Icons } from '@/constants/Icons';
 import { useTranslations } from 'use-intl';
 import { interpolateRgb } from 'd3-interpolate'; 
 import { Text } from '@/components/ui/text';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BottomSheetUserActivityMovieFollowersRatingProps extends BottomSheetProps {
   movieId: number;
@@ -26,7 +27,7 @@ const BottomSheetUserActivityMovieFollowersRating = React.forwardRef<
 	BottomSheetUserActivityMovieFollowersRatingProps
 >(({ id, movieId, sizes = ['medium', 'large'], ...props }, ref) => {
   const { user } = useAuth();
-  const { inset } = useTheme();
+  const insets = useSafeAreaInsets();
   const t = useTranslations();
   const {
     data: followersRating,
@@ -104,7 +105,7 @@ const BottomSheetUserActivityMovieFollowersRating = React.forwardRef<
       contentContainerStyle={[
         tw`p-4`,
         {
-          paddingBottom: inset.bottom,
+          paddingBottom: insets.bottom,
         },
       ]}
       ItemSeparatorComponent={() => <View style={tw.style('h-2')} />}

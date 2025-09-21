@@ -8,6 +8,7 @@ import { useUIStore } from "@/stores/useUIStore";
 import { useTheme } from "@/providers/ThemeProvider";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { View } from "@/components/ui/view";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type SegmentedOption = {
   label: string;
@@ -20,19 +21,18 @@ const FeedHeader = memo(({
   segmentedOptions,
   feedView,
   onValueChange,
-  inset
 }: {
   segmentedOptions: SegmentedOption[];
   feedView: 'community' | 'cast_and_crew';
   onValueChange: (value: string) => void;
-  inset: { top: number; left: number; right: number; bottom: number };
 }) => {
+  const insets = useSafeAreaInsets();
   return (
     <View
     style={{
-      paddingTop: inset.top,
-      paddingLeft: inset.left + PADDING_HORIZONTAL,
-      paddingRight: inset.right + PADDING_HORIZONTAL,
+      paddingTop: insets.top,
+      paddingLeft: insets.left + PADDING_HORIZONTAL,
+      paddingRight: insets.right + PADDING_HORIZONTAL,
       paddingBottom: PADDING_VERTICAL
     }}
     >
@@ -50,7 +50,6 @@ const FeedLayout = memo(() => {
   const t = useTranslations();
   const router = useRouter();
   const { session } = useAuth();
-  const { inset } = useTheme();
   const feedView = useUIStore(state => state.feedView);
   const setFeedView = useUIStore(state => state.setFeedView);
 
@@ -90,7 +89,6 @@ const FeedLayout = memo(() => {
             segmentedOptions={segmentedOptions}
             feedView={feedView}
             onValueChange={handleValueChange}
-            inset={inset}
           />
         )
       }}

@@ -24,13 +24,14 @@ import app from "@/constants/app";
 import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { PADDING_VERTICAL } from "@/theme/globals";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const PADDING = 16;
 
 const ModalPlaylistEditGuests = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
     const playlistId = Number(playlist_id);
-	const { inset, colors } = useTheme();
+	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const { customerInfo } = useAuth();
 	const t = useTranslations();
@@ -313,7 +314,7 @@ const ModalPlaylistEditGuests = () => {
 		onRefresh={refetchGuests}
 		contentContainerStyle={[
 			tw`gap-2`,
-			{ paddingBottom: inset.bottom + PADDING_VERTICAL }
+			{ paddingBottom: insets.bottom + PADDING_VERTICAL }
 		]}
 		/>
 	</>

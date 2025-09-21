@@ -20,6 +20,7 @@ import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
 import BottomSheetShare from './share/BottomSheetShare';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BottomSheetTvSeriesProps extends BottomSheetProps {
   tvSeries?: MediaTvSeries,
@@ -43,7 +44,8 @@ const BottomSheetTvSeries = React.forwardRef<
 >(({ id, tvSeries, activity, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const { colors, inset } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -132,7 +134,7 @@ const BottomSheetTvSeries = React.forwardRef<
       <ScrollView
       ref={scrollRef}
       bounces={false}
-      contentContainerStyle={{ paddingBottom: inset.bottom }}
+      contentContainerStyle={{ paddingBottom: insets.bottom }}
       stickyHeaderIndices={[0]}
       >
         <View

@@ -31,6 +31,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { LucideIcon } from "lucide-react-native";
 import { Icons } from "@/constants/Icons";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const TITLE_MIN_LENGTH = 1;
 const TITLE_MAX_LENGTH = 100;
@@ -40,7 +41,8 @@ const ModalPlaylistEdit = () => {
 	const supabase = useSupabaseClient();
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
     const playlistId = Number(playlist_id);
-	const { colors, inset } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { colors } = useTheme();
 	const router = useRouter();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const t = useTranslations();
@@ -299,7 +301,7 @@ const ModalPlaylistEdit = () => {
 			tw`gap-2 p-4`,
 		]}
 		nestedScrollEnabled
-		contentInset={{ bottom: inset.bottom }}
+		contentInset={{ bottom: insets.bottom }}
 		bottomOffset={headerHeight}
 		>
 			<Pressable onPress={handlePosterOptions} style={tw`relative items-center justify-center gap-2`}>

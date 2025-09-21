@@ -17,10 +17,12 @@ import DraggableFlatList, { DragEndParams, RenderItemParams, ScaleDecorator } fr
 import { useTranslations } from "use-intl";
 import * as Burnt from "burnt";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export const PlaylistSortTvSeries = () => {
 	const { session } = useAuth();
-	const { colors, inset } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { colors } = useTheme();
 	const t = useTranslations();
 	const { playlist_id } = useLocalSearchParams();
 	const playlistId = Number(playlist_id);
@@ -149,7 +151,7 @@ export const PlaylistSortTvSeries = () => {
 			{ paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL },
 		]}
 		style={{
-			marginBottom: inset.bottom,
+			marginBottom: insets.bottom,
 		}}
 		/>
 	);

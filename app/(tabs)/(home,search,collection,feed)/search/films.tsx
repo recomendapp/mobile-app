@@ -17,6 +17,7 @@ import { useNavigation } from "expo-router";
 import { upperFirst } from "lodash";
 import { useLayoutEffect, useRef, useState, useCallback, useMemo, memo, forwardRef } from "react";
 import { ScrollView } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
 const FiltersButton = memo(({ onPress }: { onPress: () => void }) => {
@@ -68,7 +69,7 @@ const EmptyComponent = memo(({
 EmptyComponent.displayName = 'EmptyComponent';
 
 const FiltersSheet = memo(forwardRef<TrueSheet>((_, ref) => {
-	const { inset } = useTheme();
+	const insets = useSafeAreaInsets();
 	const t = useTranslations();
 	const filtersScrollViewRef = useRef<ScrollView>(null);
 
@@ -83,8 +84,8 @@ const FiltersSheet = memo(forwardRef<TrueSheet>((_, ref) => {
 				bounces={false}
 				contentContainerStyle={{
 					paddingTop: PADDING_VERTICAL,
-					paddingLeft: inset.left + PADDING_HORIZONTAL,
-					paddingRight: inset.right + PADDING_HORIZONTAL,
+					paddingLeft: insets.left + PADDING_HORIZONTAL,
+					paddingRight: insets.right + PADDING_HORIZONTAL,
 					backgroundColor: 'red', // TODO: Remove debug style
 				}}
 			>
@@ -102,7 +103,8 @@ const FiltersSheet = memo(forwardRef<TrueSheet>((_, ref) => {
 FiltersSheet.displayName = 'FiltersSheet';
 
 const SearchFilmsScreen = memo(() => {
-	const { inset, tabBarHeight } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { tabBarHeight } = useTheme();
 	const navigation = useNavigation();
 	const t = useTranslations();
 	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
@@ -183,9 +185,9 @@ const SearchFilmsScreen = memo(() => {
 				data={moviesData}
 				renderItem={renderItem}
 				contentContainerStyle={{
-					paddingLeft: inset.left + PADDING_HORIZONTAL,
-					paddingRight: inset.right + PADDING_HORIZONTAL,
-					paddingBottom: tabBarHeight + inset.bottom + PADDING_VERTICAL,
+					paddingLeft: insets.left + PADDING_HORIZONTAL,
+					paddingRight: insets.right + PADDING_HORIZONTAL,
+					paddingBottom: tabBarHeight + insets.bottom + PADDING_VERTICAL,
 					gap: GAP,
 				}}
 				keyExtractor={keyExtractor}

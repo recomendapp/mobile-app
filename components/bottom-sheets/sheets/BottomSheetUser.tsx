@@ -18,6 +18,7 @@ import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
 import BottomSheetShare from './share/BottomSheetShare';
 import UserAvatar from '@/components/user/UserAvatar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BottomSheetUserProps extends BottomSheetProps {
   user: User | Profile,
@@ -40,7 +41,8 @@ const BottomSheetUser = React.forwardRef<
 >(({ id, user, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const { colors, inset } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -84,7 +86,7 @@ const BottomSheetUser = React.forwardRef<
       <ScrollView
       ref={scrollRef}
       bounces={false}
-      contentContainerStyle={{ paddingBottom: inset.bottom }}
+      contentContainerStyle={{ paddingBottom: insets.bottom }}
       stickyHeaderIndices={[0]}
       >
         <View
