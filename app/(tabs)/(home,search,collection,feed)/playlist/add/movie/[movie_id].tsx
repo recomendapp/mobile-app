@@ -34,6 +34,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { usePlaylistMovieAddToQuery } from "@/features/playlist/playlistQueries";
 import { playlistKeys } from "@/features/playlist/playlistKeys";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const COMMENT_MAX_LENGTH = 180;
 
@@ -41,7 +42,8 @@ const PlaylistMovieAdd = () => {
 	const t = useTranslations();
 	const router = useRouter();
 	const queryClient = useQueryClient();
-	const { colors, inset } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { colors } = useTheme();
 	const { session } = useAuth();
 	const { movie_id, movie_title } = useLocalSearchParams();
 	const movieId = Number(movie_id);
@@ -208,7 +210,7 @@ const PlaylistMovieAdd = () => {
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
-		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : inset.bottom);
+		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : insets.bottom);
 		return {
 			paddingBottom: withTiming(paddingBottom, { duration: 200 }),
 		};

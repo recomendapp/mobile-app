@@ -10,6 +10,7 @@ import { Href, Stack, usePathname, useRouter } from "expo-router"
 import { upperFirst } from "lodash"
 import { useEffect, useMemo, useCallback } from "react";
 import Animated, { FadeInUp, FadeOutUp, LinearTransition, SlideInLeft, SlideInRight, SlideOutLeft, SlideOutRight } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
 type TypeItem = { value: SearchType, label: string, href: Href };
@@ -39,7 +40,7 @@ const SearchLayout = () => {
 	const t = useTranslations();
 	const router = useRouter();
 	const pathname = usePathname();
-	const { inset } = useTheme();
+	const insets = useSafeAreaInsets();
 	const search = useSearchStore(state => state.search);
 	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
 	const setSearch = useSearchStore(state => state.setSearch);
@@ -78,9 +79,9 @@ const SearchLayout = () => {
 		return (
 			<View
 			style={{
-				paddingTop: inset.top,
-				paddingLeft: inset.left,
-				paddingRight: inset.right,
+				paddingTop: insets.top,
+				paddingLeft: insets.left,
+				paddingRight: insets.right,
 				paddingBottom: PADDING_VERTICAL,
 				gap: GAP,
 			}}
@@ -142,7 +143,7 @@ const SearchLayout = () => {
 				)}
 			</View>
 		)
-	}, [inset, search, setSearch, t, type, debouncedSearch, renderTypeItem, keyExtractor]);
+	}, [insets, search, setSearch, t, type, debouncedSearch, renderTypeItem, keyExtractor]);
 
 	useEffect(() => {
 		switch (pathname) {

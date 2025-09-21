@@ -29,6 +29,7 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type ToastVariant = 'default' | 'success' | 'error' | 'warning' | 'info';
 
@@ -73,7 +74,8 @@ export function Toast({
   duration = 4000,
   shouldDismiss = false, // Nouveau prop
 }: ToastProps) {
-  const { colors, inset } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasContent, setHasContent] = useState(false);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
@@ -189,7 +191,7 @@ export function Toast({
 
   const toastStyle: ViewStyle = {
     position: 'absolute',
-    top: inset.top,
+    top: insets.top,
     alignSelf: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -497,7 +499,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
 
   return (
     <ToastContext.Provider value={contextValue}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      {/* <GestureHandlerRootView style={{ flex: 1 }}> */}
         {children}
         <View style={containerStyle} pointerEvents='box-none'>
           {toasts.slice(0, 4).map((toast, index) => (
@@ -511,7 +513,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
             />
           ))}
         </View>
-      </GestureHandlerRootView>
+      {/* </GestureHandlerRootView> */}
     </ToastContext.Provider>
   );
 }

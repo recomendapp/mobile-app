@@ -21,6 +21,7 @@ import * as Burnt from 'burnt';
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { ShareViewRef } from "@/components/share/type";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface BottomSheetShareBaseProps extends BottomSheetProps {
 	type: MediaType | "user" | "playlist" | "review";
@@ -91,7 +92,7 @@ const BottomSheetShare = forwardRef<
 	...props
 }, ref) => {
 	const t = useTranslations();
-	const { inset } = useTheme();
+	const insets = useSafeAreaInsets();
 	const url = `https://${Constants.expoConfig?.extra?.webDomain}${path}`;
 	// REFs
 	const scrollRef = useRef<ScrollView>(null);
@@ -171,7 +172,7 @@ const BottomSheetShare = forwardRef<
 			<ScrollView
 			ref={scrollRef}
 			bounces={false}
-			contentContainerStyle={{ paddingTop: PADDING_VERTICAL, paddingBottom: inset.bottom, gap: GAP }}
+			contentContainerStyle={{ paddingTop: PADDING_VERTICAL, paddingBottom: insets.bottom, gap: GAP }}
 			stickyHeaderIndices={[0]}
 			>
 				<Text variant="title" style={tw`text-center`}>Share</Text>

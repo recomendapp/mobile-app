@@ -18,6 +18,7 @@ import { PADDING_VERTICAL } from '@/theme/globals';
 import { Alert } from 'react-native';
 import { useUserReviewMovieDeleteMutation } from '@/features/user/userMutations';
 import * as Burnt from 'burnt';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BottomSheetReviewMovieProps extends BottomSheetProps {
   review: UserReviewMovie,
@@ -40,7 +41,8 @@ export const BottomSheetReviewMovie = React.forwardRef<
 >(({ id, review, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const { colors, inset } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -129,7 +131,7 @@ export const BottomSheetReviewMovie = React.forwardRef<
       <ScrollView
       ref={scrollRef}
       bounces={false}
-      contentContainerStyle={{ paddingTop: PADDING_VERTICAL, paddingBottom: inset.bottom }}
+      contentContainerStyle={{ paddingTop: PADDING_VERTICAL, paddingBottom: insets.bottom }}
       >
         {items.map((group, i) => (
           <React.Fragment key={i}>

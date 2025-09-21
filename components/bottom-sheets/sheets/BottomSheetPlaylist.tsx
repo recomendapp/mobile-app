@@ -22,6 +22,7 @@ import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import richTextToPlainString from '@/utils/richTextToPlainString';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BottomSheetPlaylistProps extends BottomSheetProps {
   playlist: Playlist,
@@ -43,7 +44,8 @@ const BottomSheetPlaylist = React.forwardRef<
 >(({ id, playlist, additionalItemsTop = [], ...props }, ref) => {
   const { session } = useAuth();
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const { colors, inset } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations();
@@ -191,7 +193,7 @@ const BottomSheetPlaylist = React.forwardRef<
     <ScrollView
     ref={scrollRef}
     bounces={false}
-    contentContainerStyle={{ paddingBottom: inset.bottom }}
+    contentContainerStyle={{ paddingBottom: insets.bottom }}
     stickyHeaderIndices={[0]}
     >
       <View

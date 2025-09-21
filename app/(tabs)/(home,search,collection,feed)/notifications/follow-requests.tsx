@@ -14,10 +14,11 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import * as Burnt from "burnt";
 import { useTheme } from "@/providers/ThemeProvider";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const FollowRequestsScreen = () => {
 	const t = useTranslations();
-	const { inset } = useTheme();
+	const insets = useSafeAreaInsets();
 	const { session } = useAuth();
 	const {
 		data: requests,
@@ -120,7 +121,7 @@ const FollowRequestsScreen = () => {
 			{
 				paddingHorizontal: PADDING_HORIZONTAL,
 				paddingTop: PADDING_VERTICAL,
-				paddingBottom: inset.bottom + PADDING_VERTICAL,
+				paddingBottom: insets.bottom + PADDING_VERTICAL,
 			}
 		]}
 		/>

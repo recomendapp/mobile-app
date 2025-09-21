@@ -28,13 +28,15 @@ import { Input } from "@/components/ui/Input";
 import { useUserRecosTvSeriesInsertMutation } from "@/features/user/userMutations";
 import { CardUser } from "@/components/cards/CardUser";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const COMMENT_MAX_LENGTH = 180;
 
 const RecoSendTvSeries = () => {
 	const t = useTranslations();
 	const router = useRouter();
-	const { colors, inset } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { colors } = useTheme();
 	const { session } = useAuth();
 	const { tv_series_id, tv_series_name } = useLocalSearchParams();
 	const tvSeriesId = Number(tv_series_id);
@@ -189,7 +191,7 @@ const RecoSendTvSeries = () => {
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
-		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : inset.bottom);
+		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : insets.bottom);
 		return {
 			paddingBottom: withTiming(paddingBottom, { duration: 200 }),
 		};

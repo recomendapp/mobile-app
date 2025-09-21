@@ -21,6 +21,7 @@ import { upperFirst } from "lodash";
 import { useCallback, useRef, memo, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
 const SearchScreen = () => {
@@ -43,7 +44,8 @@ interface SearchResultsProps extends React.ComponentPropsWithoutRef<typeof Scrol
 };
 
 export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => {
-	const { inset, tabBarHeight } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { tabBarHeight } = useTheme();
 	const {
 		data,
 		isLoading,
@@ -63,7 +65,7 @@ export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => 
 	return (
 		<ScrollView
 			ref={scrollRef}
-			contentContainerStyle={{ gap: GAP, paddingBottom: tabBarHeight + inset.bottom + PADDING_VERTICAL }}
+			contentContainerStyle={{ gap: GAP, paddingBottom: tabBarHeight + insets.bottom + PADDING_VERTICAL }}
 			keyboardShouldPersistTaps='handled'
 			{...props}
 		>

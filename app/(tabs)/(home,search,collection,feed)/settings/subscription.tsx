@@ -7,7 +7,7 @@ import { useCallback } from "react";
 
 const SettingsSubscriptionScreen = () => {
 	const router = useRouter();
-	const { colors, bottomTabHeight, inset } = useTheme();
+	const { bottomTabHeight } = useTheme();
 	const onDimiss = useCallback(() => {
 		router.canGoBack() && router.back();
 	}, [router]);

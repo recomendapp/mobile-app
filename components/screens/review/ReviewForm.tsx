@@ -18,6 +18,7 @@ import { View } from "@/components/ui/view";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const MAX_TITLE_LENGTH = 50;
 const MAX_BODY_LENGTH = 5000;
@@ -53,7 +54,8 @@ const ReviewForm = ({
 	review,
 	onSave,
 } : ReviewFormProps) => {
-	const { colors, bottomTabHeight, inset } = useTheme();
+	const insets = useSafeAreaInsets();	
+	const { colors, bottomTabHeight } = useTheme();
 	const t = useTranslations();
 	const [title, setTitle] = useState(review?.title ?? '');
 	const navigationHeaderHeight = useHeaderHeight();
@@ -118,8 +120,8 @@ const ReviewForm = ({
 			{
 				gap: GAP,
 				paddingTop: PADDING_VERTICAL,
-				paddingLeft: inset.left + PADDING_HORIZONTAL,
-				paddingRight: inset.right + PADDING_HORIZONTAL,
+				paddingLeft: insets.left + PADDING_HORIZONTAL,
+				paddingRight: insets.right + PADDING_HORIZONTAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			},
 			tw`flex-1`

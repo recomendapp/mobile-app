@@ -5,7 +5,7 @@ import { SupabaseProvider } from "./SupabaseProvider";
 import { ThemeProvider } from "./ThemeProvider";
 // import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetManager } from "@/components/bottom-sheets/BottomSheetManager";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import { SplashScreenProvider } from "./SplashScreenProvider";
 import { LocaleProvider } from "./LocaleProvider";
 import { NotificationsProvider } from "./NotificationsProvider";
@@ -21,7 +21,7 @@ const Providers = ({ children } : ProvidersProps) => {
 	return (
 	<KeyboardProvider>
 		<GestureHandlerRootView style={{ flex: 1 }}>	
-			<SafeAreaProvider>
+			<SafeAreaProvider initialMetrics={initialWindowMetrics}>
 				<SplashScreenProvider>
 					<LocaleProvider>
 						<ThemeProvider>

@@ -1,6 +1,7 @@
 import { useTheme } from '@/providers/ThemeProvider';
 import { forwardRef } from 'react';
 import { View, ViewProps } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // import { SafeAreaView, SafeAreaViewProps } from 'react-native-safe-area-context';
 
 interface ThemedSafeAreaViewProps extends ViewProps {
@@ -12,16 +13,17 @@ const ThemedSafeAreaView = forwardRef<
   React.ComponentRef<typeof View>,
   ThemedSafeAreaViewProps
 >(({ style, ...props }, ref) => {
-  const { colors, inset } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   return (
   <View
   ref={ref}
   style={[
     {
-      paddingTop: inset.top,
-      paddingBottom: inset.bottom,
-      paddingLeft: inset.left,
-      paddingRight: inset.right,
+      paddingTop: insets.top,
+      paddingBottom: insets.bottom,
+      paddingLeft: insets.left,
+      paddingRight: insets.right,
       backgroundColor: colors.background,
     },
     style,

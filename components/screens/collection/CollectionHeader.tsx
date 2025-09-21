@@ -51,7 +51,7 @@ const CollectionHeader = forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CollectionHeaderProps
 >(({ loading, headerHeight, scrollY, title, hideTitle, poster, posterType, bottomText, numberOfItems, hideNumberOfItems, backdrops, type, ...props }, ref) => {
-	const { colors, inset } = useTheme();
+	const { colors } = useTheme();
 	const { hslToRgb } = useColorConverter();
 	const t = useTranslations();
 	const bgBackdrop = useRandomBackdrop(backdrops || []);
