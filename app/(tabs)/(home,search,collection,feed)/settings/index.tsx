@@ -3,11 +3,12 @@ import { Icons } from "@/constants/Icons";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
+import { PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { Href, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { LucideIcon } from "lucide-react-native";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { Pressable } from "react-native-gesture-handler";
 import { useTranslations } from "use-intl";
 
@@ -20,7 +21,7 @@ type Route = {
 
 const SettingsScreen = () => {
 	const { session } = useAuth();
-	const { colors, bottomTabHeight } = useTheme();
+	const { colors, tabBarHeight, bottomTabHeight } = useTheme();
 	const router = useRouter();
 	const t = useTranslations();
 	const routes = useMemo((): Route[] => {
@@ -35,37 +36,42 @@ const SettingsScreen = () => {
 		return routes.filter(route => !route.authOnly || (route.authOnly && session));
 	}, [t, session]);
 
+	const renderItem = useCallback(({ item, index }: { item: Route; index: number }) => (
+		<Pressable
+		onPress={() => router.push(item.route)}
+		style={[
+			{ borderColor: colors.muted },
+			tw`flex-1 flex-row justify-between items-center gap-2 p-4`,
+			index < routes.length - 1 ? tw`border-b` : null,
+		]}
+		>
+			<Button
+			variant="ghost"
+			size="fit"
+			icon={item.icon}
+			>
+				{item.label}
+			</Button>
+			<Button
+			variant="ghost"
+			icon={Icons.ChevronRight}
+			size="icon"
+			/>
+		</Pressable>
+	), [colors.muted, routes.length, router]);
+
 	return (
 	<>
 		<LegendList
 		data={routes}
-		renderItem={({ item, index }) => (
-			<Pressable
-			onPress={() => router.push(item.route)}
-			style={[
-				{ borderColor: colors.muted },
-				tw`flex-1 flex-row justify-between items-center gap-2 p-4`,
-				index < routes.length - 1 ? tw`border-b` : null,
-			]}
-			>
-				<Button
-				variant="ghost"
-				size="fit"
-				icon={item.icon}
-				>
-					{item.label}
-				</Button>
-				<Button
-				variant="ghost"
-				icon={Icons.ChevronRight}
-				size="icon"
-				/>
-			</Pressable>
-		)}
+		renderItem={renderItem}
 		contentContainerStyle={{
-			paddingBottom: bottomTabHeight + 8,
+			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 		}}
-		keyExtractor={(item) => item.label}
+		keyExtractor={useCallback((_: Route, number: number) => number.toString(), [])}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight
+		}}
 		/>
 	</>
 	);

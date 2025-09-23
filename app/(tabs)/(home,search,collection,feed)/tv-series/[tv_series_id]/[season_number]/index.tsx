@@ -1,9 +1,9 @@
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useMediaTvSeriesSeasonDetailsQuery } from "@/features/media/mediaQueries";
-import { Stack, useLocalSearchParams } from "expo-router"
+import { useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { LayoutChangeEvent, Text, View } from "react-native";
-import { MediaTvSeriesSeason } from "@recomendapp/types";
+import { MediaTvSeriesEpisode, MediaTvSeriesSeason } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
@@ -19,10 +19,11 @@ import { Icons } from "@/constants/Icons";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { IconMediaRating } from "@/components/medias/IconMediaRating";
 import { useLocale, useTranslations } from "use-intl";
-import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useCallback, useMemo } from "react";
 
 interface MediaHeaderProps {
 	season?: MediaTvSeriesSeason | null;
@@ -119,7 +120,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 		</Animated.View>
 		<Animated.View
 		style={[
-			tw.style('flex-row items-center gap-4'),
+			tw`flex-row items-center gap-4`,
 			textAnim
 		]}
 		>
@@ -133,7 +134,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 				source={{ uri: season?.poster_url ?? '' }}
 				style={[
 					{ aspectRatio: 2 / 3 },
-					tw.style('rounded-md w-24 h-auto'),
+					tw`rounded-md w-24 h-auto`,
 				]}
 				type={'tv_season'}
 				>
@@ -143,10 +144,11 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 					style={tw`absolute top-1 right-1`}
 					/>
 				</AnimatedImageWithFallback>
-			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw.style('w-24')]}/>}
+			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw`w-24`]}/>}
 			<Animated.View
 			style={[
-				tw.style('gap-2 w-full'),
+				{ gap: GAP },
+				tw`w-full`,
 			]}
 			>
 				{season ? <ThemedText>
@@ -154,21 +156,21 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 						{upperFirst(t(`common.messages.tv_season`, { count: 1 }))}
 					</ThemedText>
 					{` | ${season.serie?.name}`}
-				</ThemedText> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
+				</ThemedText> : loading ? <Skeleton style={tw`w-32 h-8`} /> : null}
 				{/* TITLE */}
 				{!loading ? (
 					<ThemedText
 					numberOfLines={2}
 					style={[
-						tw.style('text-4xl font-bold'),
+						tw`text-4xl font-bold`,
 						(!season && !loading) && { textAlign: 'center', color: colors.mutedForeground }
 					]}
 					>
 						{title ?? upperFirst(t('common.messages.media_not_found'))}
 					</ThemedText>
-				) : <Skeleton style={tw.style('w-64 h-12')} />}
+				) : <Skeleton style={tw`w-64 h-12`} />}
 				{season?.name && (
-					<ThemedText numberOfLines={1} style={[ { color: colors.mutedForeground }, tw.style('text-lg font-semibold')]}>
+					<ThemedText numberOfLines={1} style={[ { color: colors.mutedForeground }, tw`text-lg font-semibold`]}>
 						{season.name}
 					</ThemedText>
 				)}
@@ -186,7 +188,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 const TvSeriesSeasonScreen = () => {
 	const { tv_series_id, season_number } = useLocalSearchParams<{ tv_series_id: string, season_number: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
-	const { colors, bottomTabHeight } = useTheme();
+	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
 	const locale = useLocale();
 	const t = useTranslations();
 	const {
@@ -221,10 +223,9 @@ const TvSeriesSeasonScreen = () => {
 		triggerHeight={headerHeight}
 		/>
 		<AnimatedLegendList
-		data={season?.episodes ?? []}
-		renderItem={({ item }) => (
+		data={season?.episodes || []}
+		renderItem={useCallback(({ item }: { item: MediaTvSeriesEpisode }) => (
 			<Animated.View
-			key={item.id}
 			style={[
 				{ backgroundColor: colors.card, borderColor: colors.border, marginHorizontal: PADDING_HORIZONTAL },
 				tw`flex-row justify-between items-center rounded-xl h-24 gap-2 border overflow-hidden`,
@@ -262,9 +263,9 @@ const TvSeriesSeasonScreen = () => {
 					</View>
 				</View>
 			</Animated.View>
-		)}
+		), [colors, locale, season, t])}
 		onScroll={scrollHandler}
-		ListHeaderComponent={
+		ListHeaderComponent={useMemo(() => (
 			<TvSeriesSeasonHeader
 			season={season}
 			loading={loading}
@@ -272,8 +273,8 @@ const TvSeriesSeasonScreen = () => {
 			headerHeight={headerHeight}
 			headerOverlayHeight={headerOverlayHeight}
 			/>
-		}
-		ListEmptyComponent={
+		), [loading, scrollY, season])}
+		ListEmptyComponent={useMemo(() => (
 			loading ? <Icons.Loader />
 			: (
 				<View style={[tw`flex-1 items-center justify-center`, { paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }]}>
@@ -281,16 +282,16 @@ const TvSeriesSeasonScreen = () => {
 						{upperFirst(t('common.messages.no_tv_episodes'))}
 					</Text>
 				</View>
-			) 
-		}
-		contentContainerStyle={[
-			tw`gap-2`,
-			{
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
-			},
-		]}
-
-		keyExtractor={(item) => item.id!.toString()}
+			)
+		), [loading, colors.mutedForeground, t])}
+		contentContainerStyle={{
+			gap: GAP,
+			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+		}}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight,
+		}}
+		keyExtractor={useCallback((item: MediaTvSeriesEpisode) => item.id!.toString(), [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		/>

@@ -1720,7 +1720,6 @@ export const useUserFollowPersonQuery = ({
 					person_id: personId,
 				})
 				.maybeSingle();
-			console.log('user_person_follower', { data, error });
 			if (error) throw error;
 			return data;
 		},

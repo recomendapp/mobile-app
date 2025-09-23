@@ -16,15 +16,15 @@ import { Pressable, RefreshControl, ScrollView } from "react-native-gesture-hand
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { View } from "@/components/ui/view";
-import { GridView } from "@/components/ui/GridView";
 import ProfileWidgetPlaylists from "@/components/screens/user/ProfileWidgetPlaylists";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import ProfileWidgetActivitiesMovie from "@/components/screens/user/ProfileWidgetActivitiesMovie";
 import ProfileWidgetActivitiesTvSeries from "@/components/screens/user/ProfileWidgetActivitiesTvSeries";
 import { ActivityIndicator } from "react-native";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetUser from "@/components/bottom-sheets/sheets/BottomSheetUser";
+import { useCallback, useMemo } from "react";
 
 const ProfileHeader = ({
 	profile,
@@ -37,6 +37,16 @@ const ProfileHeader = ({
 	const { user } = useAuth();
 	const { colors } = useTheme();
 	const t = useTranslations();
+	const routesFollow = useMemo(() => ([
+		{
+			label: t('common.messages.follower', { count: 2}),
+			onPress: () => router.push(`/user/${profile?.username}/followers`),
+		},
+		{
+			label: t('common.messages.followee', { count: 2 }),
+			onPress: () => router.push(`/user/${profile?.username}/followees`),
+		},
+	]), [profile?.username, router, t]);
 	return (
 		<View
 		style={[
@@ -53,16 +63,7 @@ const ProfileHeader = ({
 							{profile?.full_name}
 						</Text> : <Skeleton style={tw`w-12 h-5`} />}
 						<View style={tw`flex-row items-center gap-4`}>
-							{[
-								{
-									label: t('common.messages.follower', { count: 2 }),
-									onPress: () => router.push(`/user/${profile?.username}/followers`),
-								},
-								{
-									label: t('common.messages.followee', { count: 2 }),
-									onPress: () => router.push(`/user/${profile?.username}/followees`),
-								},
-							].map((item, index) => (
+							{routesFollow.map((item, index) => (
 								<Pressable key={index} style={tw`gap-0.5`} onPress={item.onPress}>
 									{!skeleton ? <Text style={tw`text-sm`}>
 										{item.label}
@@ -110,7 +111,7 @@ const ProfileScreen = () => {
 	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { session } = useAuth();
-	const { colors, bottomTabHeight } = useTheme();
+	const { colors, tabBarHeight, bottomTabHeight } = useTheme();
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -141,7 +142,7 @@ const ProfileScreen = () => {
 	};
 
 	// Render
-	const renderContent = () => {
+	const renderContent = useCallback(() => {
 		if (loading) return null;
 
         if (!profile?.visible) {
@@ -164,17 +165,17 @@ const ProfileScreen = () => {
 
 		return (
 		<>
-		<ProfileWidgetActivitiesMovie profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
-		<ProfileWidgetActivitiesTvSeries profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
-		<ProfileWidgetPlaylists profile={profile} labelStyle={tw`px-4`} containerStyle={tw`px-4`} />
+		<ProfileWidgetActivitiesMovie profile={profile} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
+		<ProfileWidgetActivitiesTvSeries profile={profile} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
+		<ProfileWidgetPlaylists profile={profile} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
 		</>
 		)
-	};
+	}, [loading, profile, areWidgetsLoading, hasActivity, colors.mutedForeground, t]);
 
 	return (
 	<>
 		<Stack.Screen
-			options={{
+			options={useMemo(() => ({
 				title: profile ? `@${profile.username}` : '',
 				headerTitle: (props) => (
 					<View style={tw`flex-row items-center gap-1`}>
@@ -188,12 +189,12 @@ const ProfileScreen = () => {
 				headerRight: () => (
 				<>
 					{profile?.id === session?.user.id && (
-					<Button
-					variant="ghost"
-					size="icon"
-					icon={Icons.settings}
-					onPress={() => router.push('/settings')}
-					/>
+						<Button
+						variant="ghost"
+						size="icon"
+						icon={Icons.settings}
+						onPress={() => router.push('/settings')}
+						/>
 					)}
 					<Button
 					variant="ghost"
@@ -205,16 +206,18 @@ const ProfileScreen = () => {
 					/>
 				</>
 				)
-			}}
+			}), [profile, colors.accentBlue, session?.user.id, router, openSheet])}
 		/>
 		<ScrollView
 		refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refresh} />}
-		contentContainerStyle={[
-			tw`gap-2`,
-			{
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
-			}
-		]}>
+		contentContainerStyle={{
+			gap: GAP,
+			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+		}}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight,
+		}}
+		>
 			<ProfileHeader profile={profile} skeleton={loading} />
 			{renderContent()}
 		</ScrollView>

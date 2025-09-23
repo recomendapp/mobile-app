@@ -10,18 +10,19 @@ import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { BORDER_RADIUS, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { BORDER_RADIUS, GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { Database } from "@recomendapp/types";
-import { Href, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
 const CastCrewFeedScreen = () => {
 	const t = useTranslations();
 	const router = useRouter();
-	const { bottomTabHeight, colors } = useTheme();
+	const { tabBarHeight, bottomTabHeight, colors } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const { session, customerInfo } = useAuth();
 	const {
@@ -49,7 +50,7 @@ const CastCrewFeedScreen = () => {
 				return <View style={[{ backgroundColor: colors.muted}, { borderRadius: BORDER_RADIUS, paddingVertical: PADDING_VERTICAL, paddingHorizontal: PADDING_HORIZONTAL }]}><Text textColor="muted" style={tw`text-center`}>Unsupported media type</Text></View>;
 		};
 	};
-	const listEmptyComponent = useCallback(() => {
+	const renderEmpty = useCallback(() => {
 		if (loading) return null;
 		return (
 			<Text style={tw`text-center`} textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
@@ -92,40 +93,17 @@ const CastCrewFeedScreen = () => {
 		<LegendList
 		data={feed}
 		renderItem={renderItem}
-		// renderItem={({ item }) => (
-		// 	<CardFeedItem
-		// 	title={item.media?.title ?? ''}
-		// 	posterUrl={item.media?.avatar_url ?? ''}
-		// 	posterType={item.media?.media_type}
-		// 	onPosterPress={() => router.push(item.media?.url as Href)}
-		// 	description={item.media?.extra_data.overview ?? ''}
-		// 	content={
-		// 		<View style={tw`flex-row items-center gap-1`}>
-		// 			<Pressable onPress={() => router.push(item.person?.url as Href)}>
-		// 				<UserAvatar avatar_url={item.person?.avatar_url} full_name={item.person?.title ?? ''} style={tw`rounded-md`}/>
-		// 			</Pressable>
-		// 			<Text textColor="muted">
-		// 				{t.rich('pages.feed.cast_and_crew.label', {
-		// 					name: item?.person?.title!,
-		// 					roles: item?.jobs?.length ? item.jobs.join(', ').toLowerCase() : t('common.messages.unknown'),
-		// 					linkPerson: (chunk) => <Link href={item?.person?.url as Href} style={{ color: colors.foreground }}>{chunk}</Link>,
-		// 					important: (chunk) => <Text textColor="default">{chunk}</Text>
-		// 				})}
-		// 			</Text>
-		// 		</View>
-		// 	}
-		// 	onPress={() => router.push(item.media?.url as Href)}
-		// 	/>
-		// )}
-		ListEmptyComponent={listEmptyComponent}
-		contentContainerStyle={[
-			tw`px-4 gap-1`,
-			{
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL
-			}
-		]}
+		ListEmptyComponent={renderEmpty}
+		contentContainerStyle={{
+			paddingTop: GAP,
+			paddingHorizontal: PADDING_HORIZONTAL,
+			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			gap: GAP,
+		}}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight,
+		}}
 		keyExtractor={keyExtractor}
-		showsVerticalScrollIndicator={false}
 		refreshing={isRefetching}
 		onEndReached={onEndReached}
 		onEndReachedThreshold={0.3}

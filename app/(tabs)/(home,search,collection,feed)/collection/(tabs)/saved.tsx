@@ -8,11 +8,14 @@ import { Icons } from "@/constants/Icons";
 import { upperFirst } from "lodash";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useTranslations } from "use-intl";
+import { Playlist } from "@recomendapp/types";
+import { useCallback } from "react";
+import { PADDING_VERTICAL } from "@/theme/globals";
 
 const CollectionSavedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
-	const { colors, bottomTabHeight } = useTheme();
+	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
 	const {
 		data: playlists,
 		isLoading,
@@ -26,33 +29,40 @@ const CollectionSavedScreen = () => {
 	});
 	const loading = isLoading || playlists === undefined;
 
+	const renderItem = useCallback(({ item }: { item: { playlist: Playlist} }) => (
+		<View style={tw`p-1`}>
+			<CardPlaylist playlist={item.playlist} style={tw`w-full`} />
+		</View>
+	), []);
+	const ListEmptyComponent = useCallback(() => {
+		if (loading) {
+			return <Icons.Loader />;
+		}
+		return (
+			<View style={tw`flex-1 items-center justify-center p-4`}>
+				<Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
+					{upperFirst(t('common.messages.no_playlists_saved'))}
+				</Text>
+			</View>
+		);
+	}, [loading, colors.mutedForeground, t]);
+	const keyExtractor = useCallback((item: { playlist: Playlist }) => item.playlist.id.toString(), []);
+	const onEndReached = useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage]);
 	return (
 		<LegendList
 		data={playlists?.pages.flatMap((page) => page) ?? []}
-		renderItem={({ item, index }) => (
-			<View key={index} style={tw`p-1`}>
-				<CardPlaylist playlist={item.playlist} style={tw`w-full`} />
-			</View>
-		)}
-		ListEmptyComponent={
-			loading ? <Icons.Loader />
-			: (
-				<View style={tw`flex-1 items-center justify-center p-4`}>
-					<Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
-						{upperFirst(t('common.messages.no_playlists_saved'))}
-					</Text>
-				</View>
-			)
-		}
+		renderItem={renderItem}
+		ListEmptyComponent={ListEmptyComponent}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		numColumns={3}
 		contentContainerStyle={{
-			paddingBottom: bottomTabHeight + 8,
+			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 		}}
-		keyExtractor={(_, index) => index.toString()}
+		scrollIndicatorInsets={{ bottom: tabBarHeight }}
+		keyExtractor={keyExtractor}
 		showsVerticalScrollIndicator={false}
-		onEndReached={() => hasNextPage && fetchNextPage()}
+		onEndReached={onEndReached}
 		onEndReachedThreshold={0.3}
 		nestedScrollEnabled
 		/>

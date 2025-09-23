@@ -7,6 +7,7 @@ import { LegendList, LegendListRef } from "@legendapp/list";
 import { useCallback, useMemo, useRef } from "react";
 import { useScrollToTop } from "@react-navigation/native";
 import { Playlist } from "@recomendapp/types";
+import { GAP, PADDING_VERTICAL } from "@/theme/globals";
 
 const GRID_COLUMNS = 3;
 interface FeaturedPlaylistsProps {
@@ -55,17 +56,17 @@ const FeaturedPlaylists = ({
 		onEndReachedThreshold={0.3}
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabHeight + 8,
+				gap: GAP,
+				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			},
 			contentContainerStyle,
 		]}
 		keyExtractor={keyExtractor}
 		showsVerticalScrollIndicator={false}
-		columnWrapperStyle={tw`gap-2`}
 		ItemSeparatorComponent={itemSeparator}
 		refreshing={isRefetching}
 		onRefresh={refetch}
-		keyboardShouldPersistTaps='handled'
+		keyboardShouldPersistTaps='always'
 		/>
 	)
 };

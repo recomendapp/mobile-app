@@ -54,7 +54,6 @@ const ButtonPersonFollow = React.forwardRef<
       personId: personId,
     }, {
       onError: (error) => {
-        console.log(error);
         Burnt.toast({
           title: upperFirst(t('common.messages.error')),
           message: upperFirst(t('common.messages.an_error_occurred')),

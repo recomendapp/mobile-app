@@ -7,15 +7,16 @@ import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import ButtonMyReviewTvSeries from "@/components/buttons/ButtonMyReviewTvSeries";
 import { CardReviewTvSeries } from "@/components/cards/reviews/CardReviewTvSeries";
 import { FadeInDown } from "react-native-reanimated";
+import { UserReviewTvSeries } from "@recomendapp/types";
 
 interface sortBy {
 	label: string;
@@ -26,20 +27,20 @@ const TvSeriesReviews = () => {
 	const t = useTranslations();
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: tvSeriesId } = getIdFromSlug(tv_series_id);
-	const { colors, bottomTabHeight } = useTheme();
+	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
-	const sortByOptions: sortBy[] = [
+	const sortByOptions = useMemo((): sortBy[] => [
 		{ label: upperFirst(t('common.messages.date_updated')), value: 'updated_at' },
 		{ label: upperFirst(t('common.messages.date_created')), value: 'created_at' },
 		{ label: upperFirst(t('common.messages.number_of_likes')), value: 'likes_count' },
-	];
+	], [t]);
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	// Requests
 	const { data: tvSeries } = useMediaTvSeriesQuery({ tvSeriesId: tvSeriesId });
 	const {
-		data: reviews,
+		data,
 		isLoading,
 		fetchNextPage,
 		hasNextPage,
@@ -52,7 +53,8 @@ const TvSeriesReviews = () => {
 			sortOrder,
 		}
 	});
-	const loading = reviews === undefined || isLoading;
+	const loading = data === undefined || isLoading;
+	const reviews = useMemo(() => data?.pages.flat() || [], [data]);
 	// Handlers
 	const handleSortBy = useCallback(() => {
 		const sortByOptionsWithCancel = [
@@ -69,11 +71,14 @@ const TvSeriesReviews = () => {
 			setSortBy(sortByOptionsWithCancel[selectedIndex] as sortBy);
 		});
 	}, [sortByOptions, showActionSheetWithOptions]);
+	const handleSortOrderToggle = useCallback(() => {
+		setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc');
+	}, []);
 
 	return (
 	<>
 		<Stack.Screen
-		options={{
+		options={useMemo(() => ({
 			title: tvSeries?.name || '',
 			headerTitle: (props) => <HeaderTitle {...props}>{upperFirst(t('common.messages.review', { count: 2 }))}</HeaderTitle>,
 			headerRight: tvSeries ? () => (
@@ -81,33 +86,31 @@ const TvSeriesReviews = () => {
 					<ButtonMyReviewTvSeries tvSeries={tvSeries} size="icon" />
 				</>
 			) : undefined,
-		}}
+		}), [tvSeries?.name, t])}
 		/>
 		<LegendList
-		data={reviews?.pages.flatMap((page) => page) ?? []}
-		renderItem={({ item, index }) => (
+		data={reviews}
+		renderItem={useCallback(({ item } : { item: UserReviewTvSeries }) => (
 			<CardReviewTvSeries
 			review={item}
-			activity={item.activity}
-			author={item.activity.user}
+			activity={item.activity!}
+			author={item.activity!.user!}
 			url={`/tv-series/${tvSeries?.slug || tvSeries?.id}/review/${item.id}`}
 			entering={FadeInDown}
 			/>
-		)}
-		ListHeaderComponent={
-			<>
-				<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
-					<Button
-					icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
-					variant="muted"
-					size='icon'
-					onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}
-					/>
-					<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>{sortBy.label}</Button>
-				</View>
-			</>
-		}
-		ListEmptyComponent={() => (
+		), [])}
+		ListHeaderComponent={useMemo(() => (
+			<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
+				<Button
+				icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
+				variant="muted"
+				size='icon'
+				onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}
+				/>
+				<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>{sortBy.label}</Button>
+			</View>
+		), [sortBy.label, handleSortOrderToggle, handleSortBy, sortOrder])}
+		ListEmptyComponent={useMemo(() => (
 			loading ? <Icons.Loader />
 			: (
 				<View style={tw`flex-1 items-center justify-center p-4`}>
@@ -116,17 +119,16 @@ const TvSeriesReviews = () => {
 					</Text>
 				</View>
 			) 
-		)}
-		onEndReached={() => hasNextPage && fetchNextPage()}
+		), [loading, colors.mutedForeground, t])}
+		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
 		onEndReachedThreshold={0.5}
-		contentContainerStyle={[
-			{
+		contentContainerStyle={{
+				paddingHorizontal: PADDING_HORIZONTAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
-			},
-			tw`px-4`,
-		]}
-		keyExtractor={(item) => item.id.toString()}
-		columnWrapperStyle={tw`gap-2`}
+				gap: GAP,
+		}}
+		scrollIndicatorInsets={{ bottom: tabBarHeight }}
+		keyExtractor={useCallback((item: UserReviewTvSeries) => item.id.toString(), [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		/>
