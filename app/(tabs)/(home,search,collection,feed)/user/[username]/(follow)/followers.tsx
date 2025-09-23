@@ -11,7 +11,7 @@ const ProfileFollowersScreen = () => {
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data: profile } = useUserProfileQuery({ username: username });
 	const insets = useSafeAreaInsets();
-	const { bottomTabHeight } = useTheme();
+	const { tabBarHeight, bottomTabHeight } = useTheme();
 	const {
 		data,
 		isLoading,
@@ -40,6 +40,9 @@ const ProfileFollowersScreen = () => {
 			paddingLeft: insets.left + PADDING_HORIZONTAL,
 			paddingRight: insets.right + PADDING_HORIZONTAL,
 			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+		}}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight,
 		}}
 		keyExtractor={keyExtractor}
 		onEndReached={onEndReached}

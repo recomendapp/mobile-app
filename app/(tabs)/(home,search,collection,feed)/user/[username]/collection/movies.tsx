@@ -8,12 +8,13 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
 import { useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardMovie } from "@/components/cards/CardMovie";
 import { FadeInDown } from "react-native-reanimated";
+import { UserActivityMovie } from "@recomendapp/types";
 
 interface sortBy {
 	label: string;
@@ -23,8 +24,8 @@ interface sortBy {
 const UserCollectionMovieScreen = () => {
 	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
-	const { data, } = useUserProfileQuery({ username: username });
-	const { colors, bottomTabHeight } = useTheme();
+	const { data: userProfile } = useUserProfileQuery({ username: username });
+	const { colors, tabBarHeight, bottomTabHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions: sortBy[] = [
@@ -34,20 +35,21 @@ const UserCollectionMovieScreen = () => {
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	const {
-		data: movies,
+		data,
 		isLoading,
 		fetchNextPage,
 		hasNextPage,
 		isRefetching,
 		refetch,
 	} = useUserActivitiesMovieInfiniteQuery({
-		userId: data?.id || undefined,
+		userId: userProfile?.id || undefined,
 		filters: {
 			sortBy: sortBy.value,
 			sortOrder,
 		}
 	});
-	const loading = movies === undefined || isLoading;
+	const loading = data === undefined || isLoading;
+	const movies = useMemo(() => data?.pages.flat() || [], [data]);
 	// Handlers
 	const handleSortBy = useCallback(() => {
 		const sortByOptionsWithCancel = [
@@ -64,37 +66,34 @@ const UserCollectionMovieScreen = () => {
 			setSortBy(sortByOptionsWithCancel[selectedIndex] as sortBy);
 		});
 	}, [sortByOptions, showActionSheetWithOptions]);
-
+	
 	return (
 	<>
 		<LegendList
-		data={movies?.pages.flatMap((page) => page) ?? []}
-		renderItem={({ item, index }) => (
+		data={movies}
+		renderItem={useCallback(({ item } : { item: UserActivityMovie }) => (
 			<CardMovie
-			key={item.id}
 			variant="poster"
 			movie={item.movie!}
 			profileActivity={item}
 			style={tw`w-full`}
 			entering={FadeInDown}
 			/>
-		)}
-		ListHeaderComponent={
-			<>
-				<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
-					<Button
-					icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
-					variant="muted"
-					size='icon'
-					onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}
-					/>
-					<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>
-						{sortBy.label}
-					</Button>
-				</View>
-			</>
-		}
-		ListEmptyComponent={
+		), [])}
+		ListHeaderComponent={useMemo(() => (
+			<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
+				<Button
+				icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
+				variant="muted"
+				size='icon'
+				onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}
+				/>
+				<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>
+					{sortBy.label}
+				</Button>
+			</View>
+		), [handleSortBy, sortBy, sortOrder])}
+		ListEmptyComponent={useMemo(() => (
 			loading ? <Icons.Loader />
 			: (
 				<View style={tw`flex-1 items-center justify-center p-4`}>
@@ -102,19 +101,20 @@ const UserCollectionMovieScreen = () => {
 						{upperFirst(t('common.messages.no_results'))}
 					</Text>
 				</View>
-			) 
-		}
+			)
+		), [loading, colors.mutedForeground, t])}
 		numColumns={3}
-		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.5}
-		contentContainerStyle={[
-			{
+		contentContainerStyle={{
+				gap: GAP,
+				paddingHorizontal: PADDING_HORIZONTAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
-			},
-			tw`px-4`,
-		]}
-		keyExtractor={(item) => item.id.toString()}
-		columnWrapperStyle={tw`gap-2`}
+		}}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight,
+		}}
+		keyExtractor={useCallback((item: UserActivityMovie) => item.id.toString(), [])}
+		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		/>

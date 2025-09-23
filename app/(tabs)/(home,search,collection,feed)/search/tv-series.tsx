@@ -103,7 +103,7 @@ FiltersSheet.displayName = 'FiltersSheet';
 
 const SearchTvSeriesScreen = memo(() => {
 	const insets = useSafeAreaInsets();
-	const { tabBarHeight } = useTheme();
+	const { tabBarHeight, bottomTabHeight } = useTheme();
 	const navigation = useNavigation();
 	const t = useTranslations();
 	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
@@ -180,8 +180,11 @@ const SearchTvSeriesScreen = memo(() => {
 				contentContainerStyle={{
 					paddingLeft: insets.left + PADDING_HORIZONTAL,
 					paddingRight: insets.right + PADDING_HORIZONTAL,
-					paddingBottom: tabBarHeight + insets.bottom + PADDING_VERTICAL,
+					paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 					gap: GAP,
+				}}
+				scrollIndicatorInsets={{
+					bottom: tabBarHeight,
 				}}
 				keyExtractor={keyExtractor}
 				ListEmptyComponent={ListEmptyComponent}

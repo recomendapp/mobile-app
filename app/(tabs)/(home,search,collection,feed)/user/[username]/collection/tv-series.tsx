@@ -8,12 +8,13 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
 import { useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { FadeInDown } from "react-native-reanimated";
+import { UserActivityTvSeries } from "@recomendapp/types";
 
 interface sortBy {
 	label: string;
@@ -24,7 +25,7 @@ const UserCollectionTvSeries = () => {
 	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data, } = useUserProfileQuery({ username: username });
-	const { colors, bottomTabHeight } = useTheme();
+	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions: sortBy[] = [
@@ -70,7 +71,7 @@ const UserCollectionTvSeries = () => {
 	<>
 		<LegendList
 		data={tvSeries?.pages.flatMap((page) => page) ?? []}
-		renderItem={({ item, index }) => (
+		renderItem={useCallback(({ item } : { item: UserActivityTvSeries }) => (
 			<CardTvSeries
 			key={item.id}
 			variant="poster"
@@ -79,23 +80,21 @@ const UserCollectionTvSeries = () => {
 			style={tw`w-full`}
 			entering={FadeInDown}
 			/>
-		)}
-		ListHeaderComponent={
-			<>
-				<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
-					<Button
-					icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
-					variant="muted"
-					size='icon'
-					onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}
-					/>
-					<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>
-						{sortBy.label}
-					</Button>
-				</View>
-			</>
-		}
-		ListEmptyComponent={
+		), [])}
+		ListHeaderComponent={useMemo(() => (
+			<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
+				<Button
+				icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
+				variant="muted"
+				size='icon'
+				onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}
+				/>
+				<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>
+					{sortBy.label}
+				</Button>
+			</View>
+		), [handleSortBy, sortBy, sortOrder])}
+		ListEmptyComponent={useMemo(() => (
 			loading ? <Icons.Loader />
 			: (
 				<View style={tw`flex-1 items-center justify-center p-4`}>
@@ -104,18 +103,19 @@ const UserCollectionTvSeries = () => {
 					</Text>
 				</View>
 			) 
-		}
+		), [loading, colors.mutedForeground, t])}
 		numColumns={3}
-		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.5}
-		contentContainerStyle={[
-			{
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
-			},
-			tw`px-4`,
-		]}
-		keyExtractor={(item) => item.id.toString()}
-		columnWrapperStyle={tw`gap-2`}
+		contentContainerStyle={{
+			gap: GAP,
+			paddingHorizontal: PADDING_HORIZONTAL,
+			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+		}}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight,
+		}}
+		keyExtractor={useCallback((item: UserActivityTvSeries) => item.id.toString(), [])}
+		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		/>

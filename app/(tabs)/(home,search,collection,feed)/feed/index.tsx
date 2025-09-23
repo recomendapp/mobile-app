@@ -7,7 +7,7 @@ import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
 import { useTranslations } from "use-intl";
 import { useTheme } from "@/providers/ThemeProvider";
-import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardFeedActivityMovie } from "@/components/cards/feed/CardFeedActivityMovie";
 import { UserFeedItem } from "@recomendapp/types";
 import { CardFeedActivityTvSeries } from "@/components/cards/feed/CardFeedActivityTvSeries";
@@ -20,7 +20,7 @@ import { useCallback, useMemo, useRef } from "react";
 const FeedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
-	const { bottomTabHeight, colors } = useTheme();
+	const { tabBarHeight, bottomTabHeight, colors } = useTheme();
 	const {
 		data,
 		isLoading,
@@ -78,15 +78,16 @@ const FeedScreen = () => {
 		data={feed}
 		renderItem={renderItem}
 		ListEmptyComponent={renderEmpty}
-		contentContainerStyle={[
-			tw`gap-1`,
-			{
-				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL
-			}
-		]}
+		contentContainerStyle={{
+			paddingTop: GAP,
+			paddingHorizontal: PADDING_HORIZONTAL,
+			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			gap: GAP,
+		}}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight,
+		}}
 		keyExtractor={keyExtractor}
-		showsVerticalScrollIndicator={false}
 		refreshing={isFetching}
 		onEndReached={onEndReached}
 		onEndReachedThreshold={0.3}

@@ -1,6 +1,6 @@
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import { Stack, useLocalSearchParams } from "expo-router";
-import {  useTranslations } from "use-intl";
+import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { upperFirst } from "lodash";
 import { useAuth } from "@/providers/AuthProvider";
@@ -8,10 +8,10 @@ import { Text, View } from "react-native";
 import { useMediaMovieQuery, useMediaPlaylistsMovieInfiniteQuery, useMediaReviewsTvSeriesInfiniteQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
-import { useCallback, useState, useMemo, memo } from "react";
+import { useCallback, useState, useMemo } from "react";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
@@ -29,10 +29,10 @@ const FilmPlaylists = () => {
 	const { session } = useAuth();
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
-	const { colors, bottomTabHeight } = useTheme();
+	const { colors, tabBarHeight, bottomTabHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
-	const sortByOptions: sortBy[] = useMemo(() => [
+	const sortByOptions = useMemo((): sortBy[] => [
 		{ label: upperFirst(t('common.messages.date_updated')), value: 'updated_at' },
 		{ label: upperFirst(t('common.messages.date_created')), value: 'created_at' },
 		{ label: upperFirst(t('common.messages.number_of_likes')), value: 'likes_count' },
@@ -78,12 +78,6 @@ const FilmPlaylists = () => {
 		setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc');
 	}, []);
 
-	const onEndReached = useCallback(() => {
-		if (hasNextPage) {
-			fetchNextPage();
-		}
-	}, [hasNextPage, fetchNextPage]);
-
 	return (
 	<>
 		<Stack.Screen
@@ -99,7 +93,6 @@ const FilmPlaylists = () => {
 		data={playlists}
 		renderItem={useCallback(({ item } : { item: Playlist }) => (
 			<CardPlaylist
-			key={item.id}
 			playlist={item}
 			entering={FadeInDown}
 			/>
@@ -128,16 +121,15 @@ const FilmPlaylists = () => {
 			), [loading, colors.mutedForeground, t]
 		)}
 		numColumns={3}
-		onEndReached={onEndReached}
+		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
 		onEndReachedThreshold={0.5}
-		contentContainerStyle={useMemo(() => [
-			{
+		contentContainerStyle={{
+				paddingHorizontal: PADDING_HORIZONTAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
-			},
-			tw`px-4`,
-		], [bottomTabHeight])}
-		keyExtractor={useCallback((item: any) => item.id.toString(), [])}
-		columnWrapperStyle={useMemo(() => tw`gap-2`, [])}
+				gap: GAP,
+		}}
+		scrollIndicatorInsets={{ bottom: tabBarHeight }}
+		keyExtractor={useCallback((item: Playlist) => item.id.toString(), [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		/>

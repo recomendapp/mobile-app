@@ -121,7 +121,7 @@ const NotificationsScreen = () => {
 			default:
 				return <View style={[{ backgroundColor: colors.muted}, tw`p-4 mx-4`]}><Text textColor="muted" style={tw`text-center`}>Unsupported notification type</Text></View>;
 		}
-	}, []);
+	}, [colors, handleRead]);
 	const renderItem = useCallback(({ item }: { item: typeof notifications[number] }) => {
 		if (!item.content) return null;
 		const leftAction = (() => {

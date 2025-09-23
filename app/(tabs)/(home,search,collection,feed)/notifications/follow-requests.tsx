@@ -7,14 +7,14 @@ import { useUserAcceptFollowerRequestMutation, useUserDeclineFollowerRequestMuta
 import { useUserFollowersRequestsQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
-import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { UserFollower } from "@recomendapp/types";
 import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import * as Burnt from "burnt";
-import { useTheme } from "@/providers/ThemeProvider";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useCallback, useMemo } from "react";
 
 const FollowRequestsScreen = () => {
 	const t = useTranslations();
@@ -40,7 +40,7 @@ const FollowRequestsScreen = () => {
 	});
 
 	// Handlers
-	const handleAcceptRequest = async (requestId: number) => {
+	const handleAcceptRequest = useCallback(async (requestId: number) => {
 		await acceptRequest.mutateAsync({
 			requestId
 		}, {
@@ -59,8 +59,8 @@ const FollowRequestsScreen = () => {
 				});
 			}
 		});
-	};
-	const handleDeclineRequest = async (requestId: number) => {
+	}, [acceptRequest, t]);
+	const handleDeclineRequest = useCallback(async (requestId: number) => {
 		await declineRequest.mutateAsync({
 			requestId
 		}, {
@@ -79,10 +79,10 @@ const FollowRequestsScreen = () => {
 				});
 			}
 		});
-	};
+	}, [declineRequest, t]);
 
 	// Renders
-	const renderItems = ({ item } : { item: UserFollower }) => {
+	const renderItems = useCallback(({ item } : { item: UserFollower }) => {
 		return (
 			<CardUser user={item.user} style={tw`bg-transparent border-0 p-0 h-auto`}>
 				<View style={tw`flex-row items-center justify-between gap-2`}>
@@ -95,7 +95,7 @@ const FollowRequestsScreen = () => {
 				</View>
 			</CardUser>
 		)
-	};
+	}, [handleAcceptRequest, handleDeclineRequest, t]);
 
 
 	return (
@@ -103,10 +103,10 @@ const FollowRequestsScreen = () => {
 		<LegendList
 		data={requests || []}
 		renderItem={renderItems}
-		keyExtractor={(item) => item.id.toString()}
+		keyExtractor={useCallback((item: UserFollower) => item.id.toString(), [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}
-		ListEmptyComponent={
+		ListEmptyComponent={useMemo(() => (
 			loading ? <Icons.Loader />
 			: (
 				<View>
@@ -115,10 +115,10 @@ const FollowRequestsScreen = () => {
 					</Text>
 				</View>
 			)
-		}
+		), [loading, t])}
 		contentContainerStyle={[
-			tw`gap-2`,
 			{
+				gap: GAP,
 				paddingHorizontal: PADDING_HORIZONTAL,
 				paddingTop: PADDING_VERTICAL,
 				paddingBottom: insets.bottom + PADDING_VERTICAL,

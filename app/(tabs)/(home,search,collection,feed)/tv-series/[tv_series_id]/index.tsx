@@ -1,5 +1,5 @@
 import { useMediaTvSeriesDetailsQuery } from "@/features/media/mediaQueries";
-import { Href, Link, useLocalSearchParams } from "expo-router"
+import { Href, useLocalSearchParams, useRouter } from "expo-router"
 import { upperFirst } from "lodash";
 import { Pressable, View } from "react-native";
 import { MediaTvSeriesPerson } from "@recomendapp/types";
@@ -9,13 +9,12 @@ import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native
 import { LegendList } from "@legendapp/list";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import TvSeriesWidgetSeasons from "@/components/screens/tv-series/TvSeriesWidgetSeasons";
-import { RefreshControl } from "react-native-gesture-handler";
 import { useLocale, useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 import { CardPerson } from "@/components/cards/CardPerson";
 import TvSeriesHeader from "@/components/screens/tv-series/TvSeriesHeader";
@@ -25,7 +24,7 @@ import TvSeriesWidgetReviews from "@/components/screens/tv-series/TvSeriesWidget
 const TvSeriesScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
-	const { bottomTabHeight } = useTheme();
+	const { tabBarHeight, bottomTabHeight } = useTheme();
 	const t = useTranslations();
 	const locale = useLocale();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -53,6 +52,14 @@ const TvSeriesScreen = () => {
 		},
 	});
 
+	const handleMenuPress = useCallback(() => {
+		if (series) {
+			openSheet(BottomSheetTvSeries, {
+				tvSeries: series,
+			});
+		}
+	}, [series, openSheet]);
+
 	return (
 	<>
 		<AnimatedStackScreen
@@ -62,26 +69,17 @@ const TvSeriesScreen = () => {
 		}}
 		scrollY={scrollY}
 		triggerHeight={headerHeight}
-		onMenuPress={series ? () => {
-			openSheet(BottomSheetTvSeries, {
-				tvSeries: series,
-			})
-		} : undefined}
+		onMenuPress={series ? handleMenuPress : undefined}
 		/>
 		<Animated.ScrollView
 		onScroll={scrollHandler}
 		scrollToOverflowEnabled
-		contentContainerStyle={[
-			{
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
-			},
-		]}
-		refreshControl={
-			<RefreshControl
-				refreshing={isRefetching}
-				onRefresh={refetch}
-			/>
-		}
+		contentContainerStyle={{
+			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+		}}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight,
+		}}
 		>
 			<TvSeriesHeader
 			tvSeries={series}
@@ -90,10 +88,10 @@ const TvSeriesScreen = () => {
 			headerHeight={headerHeight}
 			headerOverlayHeight={headerOverlayHeight}
 			/>
-			{series && <View style={tw.style('flex-col gap-4')}>
+			{series && <View style={tw`flex-col gap-4`}>
 				{/* SYNOPSIS */}
 				<Pressable
-				style={tw.style('gap-1 px-4')}
+				style={{ gap: GAP, paddingHorizontal: PADDING_HORIZONTAL }}
 				onPress={() => setShowFullSynopsis((prev) => !prev)}
 				>
 					<Text style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.overview'))}</Text>
@@ -121,34 +119,43 @@ const TvSeriesCast = ({
 	cast: MediaTvSeriesPerson[]
 }) => {
 	const { colors } = useTheme();
+	const router = useRouter();
+
+	const handlePress = useCallback((id: string | number) => {
+		router.push({
+			pathname: '/person/[person_id]',
+			params: { person_id: id.toString() }
+		})
+	}, [router]);
+	const renderItem = useCallback(({ item }: { item: MediaTvSeriesPerson }) => {
+		if (!item.person) return null;
+		return (
+			<Pressable onPress={() => handlePress(item.person?.id!)} style={[{ gap: GAP }, tw`w-24`]}>
+				<CardPerson
+				key={item.id}
+				variant='poster'
+				person={item.person}
+				style={tw.style('w-full')}
+				/>
+				<View style={tw`flex-col gap-1 items-center`}>
+					<Text numberOfLines={2}>{item.person?.name}</Text>
+					{item.character ? <Text numberOfLines={2} style={[{ color: colors.accentYellow }, tw`italic text-sm`]}>{item.character}</Text> : null}
+				</View>
+			</Pressable>
+		);
+	}, [colors.accentYellow, handlePress]);
 	return (
 		<LegendList
 		data={cast}
-		renderItem={({ item, index }) => {
-			if (!item.person) return null;
-			return (
-			<Link key={index} href={`/person/${item.person?.id}`} asChild>
-				<View style={tw.style('gap-2 w-24')}>
-					<CardPerson
-					key={item.id}
-					variant='poster'
-					person={item.person}
-					style={tw.style('w-full')}
-					/>
-					<View style={tw.style('flex-col gap-1 items-center')}>
-						<Text numberOfLines={2}>{item.person?.name}</Text>
-						{item.character ? <Text numberOfLines={2} style={[{ color: colors.accentYellow }, tw.style('italic text-sm')]}>{item.character}</Text> : null}
-					</View>
-				</View>
-			</Link>
-			)
-		}}
+		renderItem={renderItem}
     	snapToInterval={104}
-		contentContainerStyle={tw`px-4`}
-		keyExtractor={(item) => item.id.toString()}
+		contentContainerStyle={{
+			paddingHorizontal: PADDING_HORIZONTAL,
+			gap: GAP,
+		}}
+		keyExtractor={useCallback((item: MediaTvSeriesPerson) => item.id.toString(), [])}
 		showsHorizontalScrollIndicator={false}
 		horizontal
-		ItemSeparatorComponent={() => <View style={tw.style('w-2')} />}
 		nestedScrollEnabled
 		/>
 	);

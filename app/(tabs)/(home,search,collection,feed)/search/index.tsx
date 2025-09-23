@@ -5,6 +5,7 @@ import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { CardUser } from "@/components/cards/CardUser";
 import FeaturedPlaylists from "@/components/screens/search/FeaturedPlaylists";
+import KeyboardAwareView from "@/components/ui/KeyboardAwareView";
 import { MultiRowHorizontalList } from "@/components/ui/MultiRowHorizontalList";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
@@ -21,7 +22,7 @@ import { upperFirst } from "lodash";
 import { useCallback, useRef, memo, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useTranslations } from "use-intl";
 
 const SearchScreen = () => {
@@ -44,8 +45,6 @@ interface SearchResultsProps extends React.ComponentPropsWithoutRef<typeof Scrol
 };
 
 export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => {
-	const insets = useSafeAreaInsets();
-	const { tabBarHeight } = useTheme();
 	const {
 		data,
 		isLoading,
@@ -63,11 +62,16 @@ export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => 
 	if (loading) return null;
 	
 	return (
-		<ScrollView
-			ref={scrollRef}
-			contentContainerStyle={{ gap: GAP, paddingBottom: tabBarHeight + insets.bottom + PADDING_VERTICAL }}
-			keyboardShouldPersistTaps='handled'
-			{...props}
+	<KeyboardAwareView>
+		<KeyboardAwareScrollView
+		ref={scrollRef}
+		contentContainerStyle={{ gap: GAP }}
+		keyboardShouldPersistTaps='always'
+		scrollIndicatorInsets={{
+			top: -PADDING_VERTICAL,
+			// bottom: height.value + PADDING_VERTICAL
+		}}
+		{...props}
 		>
 			{data.bestResult && (
 				<SearchBestResult best={data.bestResult} />
@@ -87,7 +91,8 @@ export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => 
 			{data.users.data.length > 0 && (
 				<SearchResultsUsers users={data.users.data} search={search} />
 			)}
-		</ScrollView>
+		</KeyboardAwareScrollView>
+	</KeyboardAwareView>
 	);
 });
 SearchResults.displayName = 'SearchResults';

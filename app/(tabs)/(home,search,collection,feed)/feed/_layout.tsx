@@ -33,7 +33,6 @@ const FeedHeader = memo(({
       paddingTop: insets.top,
       paddingLeft: insets.left + PADDING_HORIZONTAL,
       paddingRight: insets.right + PADDING_HORIZONTAL,
-      paddingBottom: PADDING_VERTICAL
     }}
     >
       <SegmentedControl
