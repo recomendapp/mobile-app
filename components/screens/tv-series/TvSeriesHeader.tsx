@@ -65,29 +65,15 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 	const posterHeight = useSharedValue(0);
 	// Animated styles
 	const posterAnim = useAnimatedStyle(() => {
-		const scaleValue = interpolate(
-			scrollY.get(),
-			[-headerHeight.get(), 0],
-			[3, 1],
-			Extrapolation.CLAMP,
-		);
-		const scaleOffset = (posterHeight.get() * (scaleValue - 1)) / 2;
-		const freezeScroll = interpolate(
-			scrollY.get(),
-			[-headerHeight.get(), 0],
-			[-headerHeight.get(), 1],
-			Extrapolation.CLAMP,
-		);
+		const stretch = Math.max(-scrollY.value, 0);
+		const base = Math.max(posterHeight.value, 1);
+		const scale = 1 + stretch / base;
+		const clampedScale = Math.min(scale, 3);
+		const translateY = -stretch / 2;
 		return {
-			opacity: interpolate(
-				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight) / 0.8],
-				[1, 0],
-				Extrapolation.CLAMP,
-			),
 			transform: [
-				{ scale: scaleValue },
-				{ translateY: freezeScroll + scaleOffset },
+				{ translateY },
+				{ scale: clampedScale },
 			],
 		};
 	});
@@ -104,7 +90,7 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 					scale: interpolate(
 					scrollY.get(),
 					[0, (headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight)) / 2],
-					[1, 0.95],
+					[1, 0.98],
 					'clamp',
 					),
 				},
@@ -112,17 +98,15 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 		};
 	});
 	const bgAnim = useAnimatedStyle(() => {
-		const scaleValue = interpolate(
-			scrollY.get(),
-			[-headerHeight.get(), 0],
-			[2, 1],
-			Extrapolation.CLAMP,
-		);
-		const offset = (headerHeight.get() * (scaleValue - 1)) / 2;
+		const stretch = Math.max(-scrollY.value, 0);
+		const base = Math.max(headerHeight.value, 1);
+		const scale = 1 + stretch / base;
+		const clampedScale = Math.min(scale, 3);
+
 		return {
 			transform: [
-				{ scale: scaleValue },
-				{ translateY: -offset },
+				{ translateY: -stretch / 2 },
+				{ scale: clampedScale },
 			],
 		};
 	});

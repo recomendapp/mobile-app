@@ -7,7 +7,7 @@ import tw from "@/lib/tw";
 import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
@@ -15,17 +15,16 @@ import { Input } from "@/components/ui/Input";
 import { Stack } from "expo-router";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { useHeaderHeight } from "@react-navigation/elements";
+import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 
 const SettingsSecurityScreen = () => {
 	const supabase = useSupabaseClient();
-	const { bottomTabHeight } = useTheme();
-	const navigationHeaderHeight = useHeaderHeight();
+	const { bottomTabHeight, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
-	const profileFormSchema = z.object({
+	const profileFormSchema = useMemo(() => z.object({
 		newpassword: z
 		.string()
 		.min(8, {
@@ -47,14 +46,14 @@ const SettingsSecurityScreen = () => {
 	}).refine((data) => data.newpassword === data.confirmnewpassword, {
 		message: t('pages.settings.security.confirm_password.form.match'),
 		path: ['confirmnewpassword'],
-	});
+	}), [t]);
 
 	type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-	const defaultValues: Partial<ProfileFormValues> = {
+	const defaultValues = useMemo((): Partial<ProfileFormValues> => ({
 		newpassword: '',
 		confirmnewpassword: '',
-	};
+	}), []);
 
 	const form = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileFormSchema),
@@ -63,7 +62,7 @@ const SettingsSecurityScreen = () => {
 	});
 
 	// Handlers
-	const handleSubmit = async (data: ProfileFormValues) => {
+	const handleSubmit = useCallback(async (data: ProfileFormValues) => {
 		try {
 			setIsLoading(true);
 			const { error } = await supabase.auth.updateUser({
@@ -94,12 +93,12 @@ const SettingsSecurityScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, [supabase, t, form]);
 
 	return (
 		<>
 			<Stack.Screen
-				options={{
+				options={useMemo(() => ({
 					headerTitle: upperFirst(t('pages.settings.security.label')),
 					headerRight: () => (
 						<Button
@@ -112,7 +111,7 @@ const SettingsSecurityScreen = () => {
 							{upperFirst(t('common.messages.save'))}
 						</Button>
 					),
-				}}
+				}), [t, isLoading, form, handleSubmit])}
 			/>
 			<KeyboardAwareScrollView
 			contentContainerStyle={{
@@ -121,7 +120,10 @@ const SettingsSecurityScreen = () => {
 				paddingHorizontal: PADDING_HORIZONTAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			}}
-			bottomOffset={navigationHeaderHeight}
+			scrollIndicatorInsets={{
+				bottom: tabBarHeight
+			}}
+			bottomOffset={bottomTabHeight + PADDING_VERTICAL}
 			>
 				<Text textColor='muted' style={tw`text-sm text-justify`}>{t(`pages.settings.security.description`)}</Text>
 				<Controller

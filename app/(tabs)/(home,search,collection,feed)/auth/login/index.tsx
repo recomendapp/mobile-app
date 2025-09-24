@@ -15,10 +15,10 @@ import { ImageBackground } from 'expo-image';
 import { useTranslations } from 'use-intl';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
-import { useHeaderHeight } from "@react-navigation/elements";
-import { KeyboardAwareScrollView, KeyboardToolbar } from 'react-native-keyboard-controller';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
@@ -33,7 +33,6 @@ const LoginScreen = () => {
 	const [ password, setPassword ] = useState('');
 	const [ isLoading, setIsLoading ] = useState(false);
 	const bgImage = useRandomImage(backgroundImages);
-	const navigationHeaderHeight = useHeaderHeight();
 
 	const handleSubmit = useCallback(async () => {
 		try {
@@ -76,7 +75,6 @@ const LoginScreen = () => {
 						paddingBottom: insets.bottom + PADDING_VERTICAL,
 					}
 				]}
-				bottomOffset={navigationHeaderHeight}
 				keyboardShouldPersistTaps='handled'
 				>
 					<View style={[tw`w-full`, { gap: GAP }]}>

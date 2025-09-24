@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 import { BadgeMedia } from "@/components/badges/BadgeMedia";
+import { GAP } from "@/theme/globals";
 
 interface CardFeedCastCrewTvSeriesBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -51,8 +52,8 @@ const CardFeedCastCrewTvSeriesDefault = React.forwardRef<
 		<Animated.View
 			ref={ref}
 			style={[
-				{ backgroundColor: skeleton ? colors.background : colors.card, borderColor: colors.border },
-				tw`flex-row rounded-xl p-1 gap-2 border`,
+				{ gap: GAP * 2 },
+				tw`flex-row rounded-xl`,
 				style
 			]}
 			{...props}

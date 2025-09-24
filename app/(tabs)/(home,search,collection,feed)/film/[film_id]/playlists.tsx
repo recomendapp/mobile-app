@@ -97,7 +97,7 @@ const FilmPlaylists = () => {
 			entering={FadeInDown}
 			/>
 		), [])}
-		ListHeaderComponent={useMemo(() => (
+		ListHeaderComponent={
 			<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
 				<Button
 				icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
@@ -109,8 +109,8 @@ const FilmPlaylists = () => {
 					{sortBy.label}
 				</Button>
 			</View>
-		), [sortOrder, sortBy.label, handleSortOrderToggle, handleSortBy])}
-		ListEmptyComponent={useMemo(() => 
+		}
+		ListEmptyComponent={ 
 			loading ? <Icons.Loader />
 			: (
 				<View style={tw`flex-1 items-center justify-center p-4`}>
@@ -118,8 +118,8 @@ const FilmPlaylists = () => {
 						{upperFirst(t('common.messages.no_results'))}
 					</Text>
 				</View>
-			), [loading, colors.mutedForeground, t]
-		)}
+			)
+		}
 		numColumns={3}
 		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
 		onEndReachedThreshold={0.5}

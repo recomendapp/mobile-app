@@ -1,7 +1,7 @@
 import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
-import { Href, useLocalSearchParams, useRouter } from "expo-router"
-import { upperFirst } from "lodash";
-import { Pressable } from "react-native";
+import { Href, Link, useLocalSearchParams, useRouter } from "expo-router"
+import { clamp, upperFirst } from "lodash";
+import { Pressable, useWindowDimensions } from "react-native";
 import { MediaMoviePerson } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -20,6 +20,8 @@ import MovieWidgetReviews from "@/components/screens/film/MovieWidgetReviews";
 import MovieWidgetPlaylists from "@/components/screens/film/MovieWidgetPlaylists";
 import { CardPerson } from "@/components/cards/CardPerson";
 import { View } from "@/components/ui/view";
+import { MultiRowHorizontalList } from "@/components/ui/MultiRowHorizontalList";
+import { Button } from "@/components/ui/Button";
 
 const FilmScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
@@ -108,7 +110,14 @@ const FilmScreen = () => {
 				</Pressable>
 				{/* CASTING */}
 				<View style={tw`gap-1`}> 
-					<Text style={[{ paddingHorizontal: PADDING_HORIZONTAL }, tw`text-lg font-medium`]}>{upperFirst(t('common.messages.cast'))}</Text>
+					<View style={[{ gap: GAP, paddingHorizontal: PADDING_HORIZONTAL }, tw`flex-row items-center justify-between`]}>
+						<Text style={tw`text-lg font-medium`}>{upperFirst(t('common.messages.cast'))}</Text>
+						<Link href={{ pathname: '/film/[film_id]/credits', params: { film_id } }} asChild>
+							<Button variant='ghost' size="fit">
+								{upperFirst(t('common.messages.show_credit', { count: 2 }))}
+							</Button>
+						</Link>
+					</View>
 					{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <Text textColor='muted' style={{ paddingHorizontal: PADDING_HORIZONTAL }}>{upperFirst(t('common.messages.no_cast'))}</Text>}
 				</View>
 				<MovieWidgetPlaylists movieId={movie.id!} url={movie.url as Href} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}/>
@@ -126,52 +135,43 @@ const FilmCast = memo(({
 }) => {
 	const { colors } = useTheme();
 	const router = useRouter();
-
+	const { width: screenWidth } = useWindowDimensions();
+	const width = useMemo(() => clamp(screenWidth - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
 	const handlePress = useCallback((id: string | number) => {
 		router.push({
 			pathname: '/person/[person_id]',
 			params: { person_id: id.toString() }
 		})
 	}, [router]);
-	const renderItem = useCallback(({ item }: { item: MediaMoviePerson; index: number }) => {
-		if (!item.person) return null;
-		return (
-			<Pressable onPress={() => handlePress(item.person?.id!)} style={[{ gap: GAP }, tw`w-24`]}>
-				<CardPerson
-					key={item.id}
-					variant='poster'
-					person={item.person}
-					style={tw`w-full`}
-				/>
-				<View style={tw`flex-col gap-1 items-center`}>
-					<Text numberOfLines={2}>{item.person?.name}</Text>
-					{item.role?.character ? (
-						<Text
-							numberOfLines={2}
-							style={[{ color: colors.accentYellow }, tw`italic text-sm`]}
-						>
-							{item.role?.character}
-						</Text>
-					) : null}
-				</View>
-			</Pressable>
-		);
-	}, [colors.accentYellow, handlePress]);
+	const renderItem = useCallback((item: MediaMoviePerson) => (
+		<CardPerson variant='list' hideKnownForDepartment person={item.person!}>
+			{item.role?.character ? (
+				<Text
+				numberOfLines={2}
+				style={[{ color: colors.accentYellow }, tw`italic text-sm`]}
+				>
+					{item.role?.character}
+				</Text>
+			) : null}
+		</CardPerson>
+	), [handlePress, colors.accentYellow]);
 	return (
-		<LegendList
+		<MultiRowHorizontalList<MediaMoviePerson>
 		data={cast}
 		renderItem={renderItem}
-		snapToInterval={104}
+		keyExtractor={useCallback((item) => item.id.toString(), [])}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
 			gap: GAP,
 		}}
-		keyExtractor={useCallback((item: MediaMoviePerson) => item.id.toString(), [])}
-		showsHorizontalScrollIndicator={false}
-		horizontal
-		nestedScrollEnabled
+		columnStyle={{
+			width: width,
+			gap: GAP,
+		}}
+		snapToInterval={width + GAP}
+		decelerationRate={"fast"}
 		/>
-	);
+	)
 });
 
 export default FilmScreen;

@@ -1,7 +1,6 @@
 import tw from "@/lib/tw";
-import { StyleProp, TextStyle, useWindowDimensions, View, ViewStyle } from "react-native";
-import { LegendList } from "@legendapp/list";
-import { upperFirst } from "lodash";
+import { useWindowDimensions, View } from "react-native";
+import { clamp, upperFirst } from "lodash";
 import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useMediaPersonFilmsInfiniteQuery, useMediaPlaylistsMovieInfiniteQuery } from "@/features/media/mediaQueries";
@@ -13,6 +12,7 @@ import { CardMovie } from "@/components/cards/CardMovie";
 import { MediaMovie } from "@recomendapp/types";
 import { MultiRowHorizontalList } from "@/components/ui/MultiRowHorizontalList";
 import { GAP, PADDING_HORIZONTAL } from "@/theme/globals";
+import { useMemo } from "react";
 
 interface PersonWidgetFilmsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	personId: number;
@@ -26,7 +26,8 @@ const PersonWidgetFilms = ({
 } : PersonWidgetFilmsProps) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
-	const { width } = useWindowDimensions();
+	const { width: screenWidth } = useWindowDimensions();
+	const width = useMemo(() => clamp(screenWidth - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
 	const {
 		data: movies,
 		isLoading,
@@ -67,10 +68,10 @@ const PersonWidgetFilms = ({
 			gap: GAP,
 		}}
 		columnStyle={{
-			width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2),
+			width: width,
 			gap: GAP,
 		}}
-		snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
+		snapToInterval={width + GAP}
 		decelerationRate={"fast"}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.5}

@@ -8,12 +8,13 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
 import { useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { FadeInDown } from "react-native-reanimated";
+import { UserActivityTvSeries } from "@recomendapp/types";
 
 interface sortBy {
 	label: string;
@@ -23,31 +24,32 @@ interface sortBy {
 const UserCollectionTvSeries = () => {
 	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
-	const { data, } = useUserProfileQuery({ username: username });
+	const { data: profile } = useUserProfileQuery({ username: username });
 	const { colors, bottomTabHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
-	const sortByOptions: sortBy[] = [
+	const sortByOptions = useMemo((): sortBy[] => [
 		{ label: upperFirst(t('common.messages.watched_date')), value: 'watched_date' },
 		{ label: upperFirst(t('common.messages.rating')), value: 'rating' },
-	];
+	], [t]);
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	const {
-		data: medias,
+		data,
 		isLoading,
 		fetchNextPage,
 		hasNextPage,
 		isRefetching,
 		refetch,
 	} = useUserActivitiesTvSeriesInfiniteQuery({
-		userId: data?.id || undefined,
+		userId: profile?.id || undefined,
 		filters: {
 			sortBy: sortBy.value,
 			sortOrder,
 		}
 	});
-	const loading = medias === undefined || isLoading;
+	const loading = data === undefined || isLoading;
+	const medias = useMemo(() => data?.pages.flat() || [], [data]);
 	// Handlers
 	const handleSortBy = useCallback(() => {
 		const sortByOptionsWithCancel = [
@@ -64,13 +66,15 @@ const UserCollectionTvSeries = () => {
 			setSortBy(sortByOptionsWithCancel[selectedIndex] as sortBy);
 		});
 	}, [sortByOptions, showActionSheetWithOptions]);
-
+	const handleSortOrder = useCallback(() => {
+		setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc');
+	}, []);
 
 	return (
 	<>
 		<LegendList
-		data={medias?.pages.flatMap((page) => page) ?? []}
-		renderItem={({ item, index }) => (
+		data={medias}
+		renderItem={useCallback(({ item } : { item: UserActivityTvSeries }) => (
 			<CardTvSeries
 			key={item.id}
 			variant="poster"
@@ -79,21 +83,19 @@ const UserCollectionTvSeries = () => {
 			style={tw`w-full`}
 			entering={FadeInDown}
 			/>
-		)}
+		), [])}
 		ListHeaderComponent={
-			<>
-				<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
-					<Button
-					icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
-					variant="muted"
-					size='icon'
-					onPress={() => setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc')}
-					/>
-					<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>
-						{sortBy.label}
-					</Button>
-				</View>
-			</>
+			<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
+				<Button
+				icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
+				variant="muted"
+				size='icon'
+				onPress={handleSortOrder}
+				/>
+				<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>
+					{sortBy.label}
+				</Button>
+			</View>
 		}
 		ListEmptyComponent={
 			loading ? <Icons.Loader />
@@ -106,16 +108,14 @@ const UserCollectionTvSeries = () => {
 			) 
 		}
 		numColumns={3}
-		onEndReached={() => hasNextPage && fetchNextPage()}
+		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
 		onEndReachedThreshold={0.5}
-		contentContainerStyle={[
-			{
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
-			},
-			tw`px-4`,
-		]}
-		keyExtractor={(item) => item.id.toString()}
-		columnWrapperStyle={tw`gap-2`}
+		contentContainerStyle={{
+			gap: GAP,
+			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingHorizontal: PADDING_HORIZONTAL,
+		}}
+		keyExtractor={useCallback((item: UserActivityTvSeries) => item.id.toString(), [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		/>

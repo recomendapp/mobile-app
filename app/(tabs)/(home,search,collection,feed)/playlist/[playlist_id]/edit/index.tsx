@@ -26,12 +26,13 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import Switch from "@/components/ui/Switch";
 import { Alert } from "react-native";
 import { usePlaylistUpdateMutation } from "@/features/playlist/playlistMutations";
-import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LucideIcon } from "lucide-react-native";
 import { Icons } from "@/constants/Icons";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 
 const TITLE_MIN_LENGTH = 1;
 const TITLE_MAX_LENGTH = 100;

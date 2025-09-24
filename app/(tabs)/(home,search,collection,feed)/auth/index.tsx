@@ -5,7 +5,7 @@ import { Icons } from "@/constants/Icons";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Image } from "expo-image";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import { upperFirst } from "lodash";
 import { useMemo } from "react";
 import { useTranslations } from "use-intl";
@@ -17,7 +17,6 @@ const images = {
 const AuthScreen = () => {
   const { colors } = useTheme();
 	const t = useTranslations();
-	const router = useRouter();
 
   const presets = useMemo((): { [key: string]: OnboardingStep[] } => ({
     features: [

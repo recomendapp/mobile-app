@@ -1,18 +1,21 @@
-import * as ImageManipulator from 'expo-image-manipulator';
-import { Image } from 'react-native';
+import { Image } from "react-native";
+import {
+  ImageManipulator,
+  SaveFormat,
+  ImageResult,
+} from "expo-image-manipulator";
 
-/**
- * Prend l'URI d'une image (supposée être en 16:9) et la recadre
- * au centre pour obtenir un format 9:16.
- * @param originalUri L'URI de l'image source.
- * @returns L'URI de la nouvelle image recadrée.
- */
-export const cropImageRatio = async (originalUri: string, targetRatio: number = 9 / 16): Promise<string> => {
+export const cropImageRatio = async (
+  originalUri: string,
+  targetRatio: number = 9 / 16
+): Promise<ImageResult> => {
   return new Promise((resolve, reject) => {
     Image.getSize(originalUri, async (originalWidth, originalHeight) => {
       try {
         const originalRatio = originalWidth / originalHeight;
-        let cropWidth, cropHeight, originX, originY;
+
+        let cropWidth: number, cropHeight: number, originX: number, originY: number;
+
         if (originalRatio > targetRatio) {
           cropHeight = originalHeight;
           cropWidth = originalHeight * targetRatio;
@@ -24,24 +27,18 @@ export const cropImageRatio = async (originalUri: string, targetRatio: number = 
           originY = (originalHeight - cropHeight) / 2;
           originX = 0;
         }
-        const result = await ImageManipulator.manipulateAsync(
-          originalUri,
-          [
-            {
-              crop: {
-                originX,
-                originY,
-                width: cropWidth,
-                height: cropHeight,
-              },
-            },
-          ],
-          { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG }
-        );
-        resolve(result.uri);
-      } catch (error) {
-        console.error("Erreur lors du recadrage de l'image:", error);
-        reject(error);
+
+        const ctx = ImageManipulator.manipulate(originalUri);
+        ctx.crop({ originX, originY, width: cropWidth, height: cropHeight });
+
+        const imageRef = await ctx.renderAsync();
+        const result = await imageRef.saveAsync({
+          format: SaveFormat.JPEG,
+        });
+
+        resolve(result);
+      } catch (e) {
+        reject(e);
       }
     });
   });

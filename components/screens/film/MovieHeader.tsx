@@ -65,29 +65,15 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 	const posterHeight = useSharedValue(0);
 	// Animated styles
 	const posterAnim = useAnimatedStyle(() => {
-		const scaleValue = interpolate(
-			scrollY.get(),
-			[-headerHeight.get(), 0],
-			[3, 1],
-			Extrapolation.CLAMP,
-		);
-		const scaleOffset = (posterHeight.get() * (scaleValue - 1)) / 2;
-		const freezeScroll = interpolate(
-			scrollY.get(),
-			[-headerHeight.get(), 0],
-			[-headerHeight.get(), 1],
-			Extrapolation.CLAMP,
-		);
+		const stretch = Math.max(-scrollY.value, 0);
+		const base = Math.max(posterHeight.value, 1);
+		const scale = 1 + stretch / base;
+		const clampedScale = Math.min(scale, 3);
+		const translateY = -stretch / 2;
 		return {
-			opacity: interpolate(
-				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight) / 0.8],
-				[1, 0],
-				Extrapolation.CLAMP,
-			),
 			transform: [
-				{ scale: scaleValue },
-				{ translateY: freezeScroll + scaleOffset },
+				{ translateY },
+				{ scale: clampedScale },
 			],
 		};
 	});
@@ -104,7 +90,7 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 					scale: interpolate(
 					scrollY.get(),
 					[0, (headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight)) / 2],
-					[1, 0.95],
+					[1, 0.98],
 					'clamp',
 					),
 				},
@@ -112,24 +98,22 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 		};
 	});
 	const bgAnim = useAnimatedStyle(() => {
-		const scaleValue = interpolate(
-			scrollY.get(),
-			[-headerHeight.get(), 0],
-			[2, 1],
-			Extrapolation.CLAMP,
-		);
-		const offset = (headerHeight.get() * (scaleValue - 1)) / 2;
+		const stretch = Math.max(-scrollY.value, 0);
+		const base = Math.max(headerHeight.value, 1);
+		const scale = 1 + stretch / base;
+		const clampedScale = Math.min(scale, 3);
+
 		return {
 			transform: [
-				{ scale: scaleValue },
-				{ translateY: -offset },
+				{ translateY: -stretch / 2 },
+				{ scale: clampedScale },
 			],
 		};
 	});
 	return (
 	<Animated.View
 	style={[
-		tw.style('w-full'),
+		tw`w-full`,
 		{ paddingTop: navigationHeaderHeight }
 	]}
 	onLayout={(event: LayoutChangeEvent) => {
@@ -159,7 +143,7 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 		</Animated.View>
 		<Animated.View
 		style={[
-			tw.style('items-center gap-4'),
+			tw`items-center gap-4`,
 			{ paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }
 		]}
 		>
@@ -173,7 +157,7 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 				source={{ uri: movie?.poster_url ?? '' }}
 				style={[
 					{ aspectRatio: 2 / 3 },
-					tw.style('rounded-md w-48 h-auto'),
+					tw`rounded-md w-48 h-auto`,
 					posterAnim
 				]}
 				type={'movie'}
@@ -195,10 +179,10 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 						)}
 					</View>
 				</AnimatedImageWithFallback>
-			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw.style('w-48'), posterAnim]}/>}
+			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw`w-48`, posterAnim]}/>}
 			<Animated.View
 			style={[
-				tw.style('gap-2 w-full'),
+				tw`gap-2 w-full`,
 				textAnim
 			]}
 			>
@@ -208,7 +192,7 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 						{upperFirst(t('common.messages.film', { count: 1 }))}
 					</Text>
 					{movie?.genres ? <Genres genres={movie.genres} /> : null}
-				</Text> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
+				</Text> : loading ? <Skeleton style={tw`w-32 h-8`} /> : null}
 				{/* TITLE */}
 				{!loading ? (
 					<Text
@@ -220,9 +204,9 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 					>
 						{movie?.title || upperFirst(t('common.messages.film_not_found'))}
 					</Text>
-				) : <Skeleton style={tw.style('w-64 h-12')} />}
+				) : <Skeleton style={tw`w-64 h-12`} />}
 				{(movie?.original_title && lowerCase(movie.original_title) !== lowerCase(movie.title!)) ? (
-					<Text numberOfLines={1} style={[ { color: colors.mutedForeground }, tw.style('text-lg font-semibold')]}>
+					<Text numberOfLines={1} style={[ { color: colors.mutedForeground }, tw`text-lg font-semibold`]}>
 						{movie.original_title}
 					</Text>
 				) : null}

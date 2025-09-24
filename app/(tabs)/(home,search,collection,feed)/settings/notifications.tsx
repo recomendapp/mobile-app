@@ -7,10 +7,11 @@ import { Label } from "@/components/ui/Label";
 import { upperFirst } from "lodash";
 import { Linking, ScrollView } from "react-native";
 import { Button } from "@/components/ui/Button";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
 const SettingsNotificationsScreen = () => {
 	const t = useTranslations();
-	const { colors, bottomTabHeight } = useTheme();
+	const { tabBarHeight, bottomTabHeight } = useTheme();
 	const { permissionStatus } = useNotifications();
 	const openAppSettings = () => {
         Linking.openSettings();
@@ -19,9 +20,16 @@ const SettingsNotificationsScreen = () => {
 	<>
 		<ScrollView
 		contentContainerStyle={[
-			tw`gap-2 p-4`,
-			{ paddingBottom: bottomTabHeight + 8 }
+			{
+				gap: GAP,
+				paddingTop: PADDING_VERTICAL,
+				paddingHorizontal: PADDING_HORIZONTAL,
+				paddingBottom: bottomTabHeight + PADDING_VERTICAL
+			}
 		]}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight
+		}}
 		>
 		<View style={tw`flex-row items-center justify-between gap-2`}>
 			<Label>{upperFirst(t('pages.settings.notifications.push_notifications.label'))}</Label>

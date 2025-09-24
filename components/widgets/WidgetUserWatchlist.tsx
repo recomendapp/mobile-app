@@ -13,6 +13,7 @@ import { CardMovie } from "../cards/CardMovie";
 import { MediaMovie, MediaTvSeries, UserWatchlist } from "@recomendapp/types";
 import { CardTvSeries } from "../cards/CardTvSeries";
 import { useCallback } from "react";
+import { GAP } from "@/theme/globals";
 
 interface WidgetUserWatchlistProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -21,11 +22,11 @@ interface WidgetUserWatchlistProps extends React.ComponentPropsWithoutRef<typeof
 
 const WatchlistItem = ({ item }: { item: UserWatchlist }) => {
   if (item.type === 'movie') {
-    return <CardMovie movie={item.media as MediaMovie} />;
+    return <CardMovie variant='list' hideReleaseDate hideDirectors movie={item.media as MediaMovie} />;
   }
   
   if (item.type === 'tv_series') {
-    return <CardTvSeries tvSeries={item.media as MediaTvSeries} />;
+    return <CardTvSeries variant='list' hideReleaseDate hideCreator tvSeries={item.media as MediaTvSeries} />;
   }
   
   return null;
@@ -58,6 +59,7 @@ export const WidgetUserWatchlist = ({
   containerStyle,
 }: WidgetUserWatchlistProps) => {
   const { session } = useAuth();
+  const { colors } = useTheme();
   const { data: watchlist } = useUserWatchlistQuery({
     userId: session?.user.id,
     filters: {
@@ -75,26 +77,19 @@ export const WidgetUserWatchlist = ({
     []
   );
 
-  const ItemSeparatorComponent = useCallback(() => 
-    <View style={tw`h-1`} />, 
-    []
-  );
-
   if (!watchlist?.length) {
     return null;
   }
 
   return (
-    <View style={[tw`gap-2`, style]}>
+    <View style={[{ gap: GAP }, style]}>
       <WidgetHeader labelStyle={labelStyle} />
       <LegendList
         data={watchlist}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         numColumns={2}
-        columnWrapperStyle={tw`gap-1`}
-        contentContainerStyle={containerStyle}
-        ItemSeparatorComponent={ItemSeparatorComponent}
+        contentContainerStyle={[{ gap: GAP }, containerStyle]}
         nestedScrollEnabled
       />
     </View>

@@ -40,8 +40,24 @@ type CardTvSeriesDataProps = {
 	tvSeries: MediaTvSeries;
 };
 
-export type CardTvSeriesProps = CardTvSeriesBaseProps &
-	(CardTvSeriesSkeletonProps | CardTvSeriesDataProps);
+type VariantBaseProps = Omit<CardTvSeriesBaseProps, "variant"> &
+  (CardTvSeriesSkeletonProps | CardTvSeriesDataProps);
+
+type VariantMap = {
+	default: VariantBaseProps & {
+		variant?: "default"
+	};
+	poster: VariantBaseProps & {
+		variant: "poster"
+	};
+	list: VariantBaseProps & {
+		variant: "list";
+		hideReleaseDate?: boolean;
+		hideCreator?: boolean;
+	};
+};
+
+export type CardTvSeriesProps = VariantMap[keyof VariantMap];
 
 const CardTvSeriesDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
@@ -131,8 +147,8 @@ CardTvSeriesPoster.displayName = "CardTvSeriesPoster";
 
 const CardTvSeriesList = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	FixedOmit<CardTvSeriesProps, "variant" | "linked" | "onPress" | "onLongPress">
->(({ style, tvSeries, skeleton, activity, showActionRating, profileActivity, children, showRating, ...props }, ref) => {
+	FixedOmit<VariantMap["list"], "variant" | "linked" | "onPress" | "onLongPress">
+>(({ style, tvSeries, skeleton, activity, showActionRating, profileActivity, children, showRating, hideReleaseDate, hideCreator, ...props }, ref) => {
 	return (
 		<Animated.View
 		ref={ref}
@@ -156,21 +172,25 @@ const CardTvSeriesList = React.forwardRef<
 				/> : <Skeleton style={{ aspectRatio: 2 / 3, width: 'auto' }} />}
 				<View style={tw`shrink px-2 py-1 gap-1`}>
 					{!skeleton ? <Text numberOfLines={2}>{tvSeries.name}</Text> : <Skeleton style={tw.style('w-full h-5')} />}
-					{skeleton ? <Skeleton style={tw`w-20 h-5`} /> : tvSeries.created_by?.length && (
-						<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
-							{tvSeries.created_by.map((creator) => creator.name).join(', ')}
-						</Text>
+					{!hideCreator && (
+						skeleton ? <Skeleton style={tw`w-20 h-5`} /> : tvSeries.created_by?.length && (
+							<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
+								{tvSeries.created_by.map((creator) => creator.name).join(', ')}
+							</Text>
+						)
 					)}
 					{children}
 				</View>
 			</View>
-			<View style={[tw`flex-row items-center`, { gap: GAP }]}>
-				{skeleton ? <Skeleton style={tw`h-5 w-12`} /> : tvSeries.first_air_date && (
-					<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
-						{new Date(tvSeries.first_air_date).getFullYear()}
-					</Text>
-				)}
-			</View>
+			{!hideReleaseDate && (
+				<View style={[tw`flex-row items-center`, { gap: GAP }]}>
+					{skeleton ? <Skeleton style={tw`h-5 w-12`} /> : tvSeries.first_air_date && (
+						<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
+							{new Date(tvSeries.first_air_date).getFullYear()}
+						</Text>
+					)}
+				</View>
+			)}
 		</Animated.View>
 	);
 });

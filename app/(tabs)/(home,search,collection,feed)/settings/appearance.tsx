@@ -1,18 +1,14 @@
-import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
-import tw from "@/lib/tw";
 import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
-import { Input } from "@/components/ui/Input";
-import { ScrollView } from "react-native-gesture-handler";
 import { Stack } from "expo-router";
 import { View } from "@/components/ui/view";
 import { supportedLocales } from "@/translations/locales";
@@ -21,15 +17,14 @@ import { Picker } from '@react-native-picker/picker';
 import useLocalizedLanguageName from "@/hooks/useLocalizedLanguageName";
 import { useUserUpdateMutation } from "@/features/user/userMutations";
 import { useAuth } from "@/providers/AuthProvider";
-import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { useHeaderHeight } from "@react-navigation/elements";
+import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 
 const SettingsAppearanceScreen = () => {
 	const { locale, setLocale } = useLocaleContext();
 	const { session } = useAuth();
-	const { bottomTabHeight } = useTheme();
-	const navigationHeaderHeight = useHeaderHeight();
+	const { bottomTabHeight, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locales = useLocalizedLanguageName(locale);
@@ -38,13 +33,13 @@ const SettingsAppearanceScreen = () => {
 	})
 
 	// Form
-	const profileFormSchema = z.object({
+	const profileFormSchema = useMemo(() => z.object({
 		locale: z.enum(supportedLocales)
-	});
+	}), [supportedLocales]);
 	type ProfileFormValues = z.infer<typeof profileFormSchema>;
-	const defaultValues: Partial<ProfileFormValues> = {
+	const defaultValues = useMemo((): Partial<ProfileFormValues> => ({
 		locale: locale,
-	};
+	}), [locale]);
 	const form = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues,
@@ -52,10 +47,9 @@ const SettingsAppearanceScreen = () => {
 	});
 
 	// Handlers
-	const handleSubmit = async (data: ProfileFormValues) => {
+	const handleSubmit = useCallback(async (data: ProfileFormValues) => {
 		try {
 			setIsLoading(true);
-			// 
 			if (session) {
 				await updateUser.mutateAsync({
 					language: data.locale,
@@ -81,7 +75,7 @@ const SettingsAppearanceScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, [session, t, setLocale, updateUser, form]);
 
 	// useEffects
 	useEffect(() => {
@@ -93,7 +87,7 @@ const SettingsAppearanceScreen = () => {
 	return (
 		<>
 			<Stack.Screen
-				options={{
+				options={useMemo(() => ({
 					headerTitle: upperFirst(t('pages.settings.appearance.label')),
 					headerRight: () => (
 						<Button
@@ -106,7 +100,7 @@ const SettingsAppearanceScreen = () => {
 							{upperFirst(t('common.messages.save'))}
 						</Button>
 					),
-				}}
+				}), [t, isLoading, form, handleSubmit])}
 			/>
 			<KeyboardAwareScrollView
 			contentContainerStyle={{
@@ -115,7 +109,10 @@ const SettingsAppearanceScreen = () => {
 				paddingHorizontal: PADDING_HORIZONTAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			}}
-			bottomOffset={navigationHeaderHeight}
+			scrollIndicatorInsets={{
+				bottom: tabBarHeight
+			}}
+			bottomOffset={bottomTabHeight + PADDING_VERTICAL}
 			>
 				<Controller
 				name="locale"

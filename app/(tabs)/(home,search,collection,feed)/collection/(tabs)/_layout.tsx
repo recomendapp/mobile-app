@@ -5,16 +5,17 @@ import { Text } from "@/components/ui/text";
 import { UserNav } from "@/components/user/UserNav";
 import tw from "@/lib/tw";
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
-import { ParamListBase, TabNavigationState } from "@react-navigation/native";
+import { NavigationRoute, ParamListBase, TabNavigationState } from "@react-navigation/native";
 import { Stack, withLayoutContext } from "expo-router";
 import { upperFirst } from "lodash";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { useTheme } from "@/providers/ThemeProvider";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -32,7 +33,7 @@ const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => 
 		onPressTab(state.routes[state.index], state.index, true);
 	}, [state.index]);
 
-	const onPressTab = (item: typeof state.routes[0], index: number, isFocused: boolean) => {
+	const onPressTab = useCallback((item: typeof state.routes[0], index: number, isFocused: boolean) => {
 		const event = navigation.emit({
 			type: 'tabPress',
 			target: item.key,
@@ -44,13 +45,13 @@ const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => 
 		}
 
 		flatListRef.current?.scrollToIndex({ index, animated: true });
-	};
+	}, [navigation]);
 	return (
 		<View>
 			<Animated.FlatList
 			ref={flatListRef}
 			data={state.routes}
-			renderItem={({ item, index }) => {
+			renderItem={useCallback(({ item, index } : { item: NavigationRoute<ParamListBase, string>, index: number }) => {
 				const { options } = descriptors[item.key];
 				const label =
 				(options.tabBarLabel !== undefined && typeof options.tabBarLabel === 'string')
@@ -78,9 +79,11 @@ const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => 
 						{upperFirst(label)}
 					</Button>
 				);
-			}}
-			keyExtractor={(item) => item.key}
-			contentContainerStyle={tw`gap-2 px-4 py-1`}
+			}, [descriptors, navigation, state.index])}
+			keyExtractor={useCallback((item: NavigationRoute<ParamListBase, string>) => item.key, [])}
+			contentContainerStyle={{
+				gap: GAP,
+				paddingHorizontal: PADDING_HORIZONTAL,			}}
 			horizontal
 			showsHorizontalScrollIndicator={false}
 			/>

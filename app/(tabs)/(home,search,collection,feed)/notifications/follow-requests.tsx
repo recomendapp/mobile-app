@@ -106,7 +106,7 @@ const FollowRequestsScreen = () => {
 		keyExtractor={useCallback((item: UserFollower) => item.id.toString(), [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}
-		ListEmptyComponent={useMemo(() => (
+		ListEmptyComponent={
 			loading ? <Icons.Loader />
 			: (
 				<View>
@@ -115,7 +115,7 @@ const FollowRequestsScreen = () => {
 					</Text>
 				</View>
 			)
-		), [loading, t])}
+		}
 		contentContainerStyle={[
 			{
 				gap: GAP,
