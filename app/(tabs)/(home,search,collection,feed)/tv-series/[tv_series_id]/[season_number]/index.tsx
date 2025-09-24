@@ -265,7 +265,7 @@ const TvSeriesSeasonScreen = () => {
 			</Animated.View>
 		), [colors, locale, season, t])}
 		onScroll={scrollHandler}
-		ListHeaderComponent={useMemo(() => (
+		ListHeaderComponent={
 			<TvSeriesSeasonHeader
 			season={season}
 			loading={loading}
@@ -273,8 +273,8 @@ const TvSeriesSeasonScreen = () => {
 			headerHeight={headerHeight}
 			headerOverlayHeight={headerOverlayHeight}
 			/>
-		), [loading, scrollY, season])}
-		ListEmptyComponent={useMemo(() => (
+		}
+		ListEmptyComponent={
 			loading ? <Icons.Loader />
 			: (
 				<View style={[tw`flex-1 items-center justify-center`, { paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }]}>
@@ -283,7 +283,7 @@ const TvSeriesSeasonScreen = () => {
 					</Text>
 				</View>
 			)
-		), [loading, colors.mutedForeground, t])}
+		}
 		contentContainerStyle={{
 			gap: GAP,
 			paddingBottom: bottomTabHeight + PADDING_VERTICAL,

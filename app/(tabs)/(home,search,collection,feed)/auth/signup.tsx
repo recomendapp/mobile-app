@@ -1,5 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button } from '@/components/ui/Button';
@@ -21,11 +21,11 @@ import { InputOTP } from '@/components/ui/input-otp';
 import { Text } from '@/components/ui/text';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { useLocale, useTranslations } from 'use-intl';
-import { useHeaderHeight } from "@react-navigation/elements";
-import { KeyboardAwareScrollView, KeyboardToolbar } from 'react-native-keyboard-controller';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { View } from '@/components/ui/view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 
 
 const backgroundImages = [
@@ -49,10 +49,9 @@ const SignupScreen = () => {
 	const locale = useLocale();
 	const t = useTranslations();
 	const bgImage = useRandomImage(backgroundImages);
-	const navigationHeaderHeight = useHeaderHeight();
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
-	const signupSchema = z.object({
+	const signupSchema = useMemo(() => z.object({
 		email: z.email({
 			error: t('common.form.email.error.invalid')
 		}),
@@ -109,17 +108,17 @@ const SignupScreen = () => {
 	}).refine(data => data.password === data.confirm_password, {
 		message: t('common.form.password.schema.match'),
 		path: ['confirm_password'],
-	});
+	}), [t]);
 
 	type SignupFormValues = z.infer<typeof signupSchema>;
 
-	const defaultValues: Partial<SignupFormValues> = {
+	const defaultValues = useMemo((): Partial<SignupFormValues> => ({
 		email: '',
 		full_name: '',
 		username: '',
 		password: '',
 		confirm_password: '',
-	};
+	}), []);
 	/* -------------------------------------------------------------------------- */
 
 	const form = useForm<SignupFormValues>({
@@ -135,7 +134,7 @@ const SignupScreen = () => {
 	const [otp, setOtp] = useState('');
 
 	// Handlers
-	const handleSubmit = async (data: SignupFormValues) => {
+	const handleSubmit = useCallback(async (data: SignupFormValues) => {
 		try {
 			setIsLoading(true);
 			await signup({
@@ -178,8 +177,8 @@ const SignupScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
-	const handleResendOtp = async () => {
+	}, [signup, t, locale, form]);
+	const handleResendOtp = useCallback(async () => {
 		try {
 			setIsLoading(true);
 			await loginWithOtp(form.getValues('email'));
@@ -213,8 +212,8 @@ const SignupScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
-	const handleVerifyOtp = async (otp: string) => {
+	}, [loginWithOtp, t]);
+	const handleVerifyOtp = useCallback(async (otp: string) => {
 		try {
 		  setIsLoading(true);
 		  const { error } = await supabase.auth.verifyOtp({
@@ -255,7 +254,7 @@ const SignupScreen = () => {
 		} finally {
 		  setIsLoading(false);
 		}
-	};
+	}, [supabase, t, form]);
 	// useEffects
 	useEffect(() => {
 		if (!form.formState.errors.username?.message && usernameToCheck) {
@@ -296,7 +295,6 @@ const SignupScreen = () => {
 						paddingBottom: insets.bottom + PADDING_VERTICAL,
 					}
 				]}
-				bottomOffset={navigationHeaderHeight}
 				keyboardShouldPersistTaps='handled'
 				>
 					{!showOtp ? (

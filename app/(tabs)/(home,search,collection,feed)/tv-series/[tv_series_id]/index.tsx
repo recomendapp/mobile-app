@@ -1,7 +1,7 @@
 import { useMediaTvSeriesDetailsQuery } from "@/features/media/mediaQueries";
-import { Href, useLocalSearchParams, useRouter } from "expo-router"
-import { upperFirst } from "lodash";
-import { Pressable, View } from "react-native";
+import { Href, Link, useLocalSearchParams, useRouter } from "expo-router"
+import { clamp, upperFirst } from "lodash";
+import { Pressable, useWindowDimensions, View } from "react-native";
 import { MediaTvSeriesPerson } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -9,7 +9,7 @@ import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native
 import { LegendList } from "@legendapp/list";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import TvSeriesWidgetSeasons from "@/components/screens/tv-series/TvSeriesWidgetSeasons";
 import { useLocale, useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
@@ -20,6 +20,8 @@ import { CardPerson } from "@/components/cards/CardPerson";
 import TvSeriesHeader from "@/components/screens/tv-series/TvSeriesHeader";
 import TvSeriesWidgetPlaylists from "@/components/screens/tv-series/TvSeriesWidgetPlaylists";
 import TvSeriesWidgetReviews from "@/components/screens/tv-series/TvSeriesWidgetReviews";
+import { MultiRowHorizontalList } from "@/components/ui/MultiRowHorizontalList";
+import { Button } from "@/components/ui/Button";
 
 const TvSeriesScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
@@ -102,7 +104,14 @@ const TvSeriesScreen = () => {
 				<TvSeriesWidgetSeasons seasons={series.seasons || []} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
 				{/* CASTING */}
 				<View style={tw.style('gap-1')}> 
-					<Text style={tw.style('px-4 text-lg font-medium')}>{upperFirst(t('common.messages.cast'))}</Text>
+					<View style={[{ gap: GAP, paddingHorizontal: PADDING_HORIZONTAL }, tw`flex-row items-center justify-between`]}>
+						<Text style={tw`text-lg font-medium`}>{upperFirst(t('common.messages.cast'))}</Text>
+						<Link href={{ pathname: '/tv-series/[tv_series_id]/credits', params: { tv_series_id: series.id } }} asChild>
+							<Button variant='ghost' size="fit">
+								{upperFirst(t('common.messages.show_credit', { count: 2 }))}
+							</Button>
+						</Link>
+					</View>
 					{series.cast?.length ? <TvSeriesCast cast={series.cast} /> : <Text textColor='muted' style={tw`px-4`}>{upperFirst(t('common.messages.no_cast'))}</Text>}
 				</View>
 				<TvSeriesWidgetPlaylists tvSeriesId={series.id} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
@@ -120,43 +129,41 @@ const TvSeriesCast = ({
 }) => {
 	const { colors } = useTheme();
 	const router = useRouter();
-
+	const { width: screenWidth } = useWindowDimensions();
+	const width = useMemo(() => clamp(screenWidth - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
 	const handlePress = useCallback((id: string | number) => {
 		router.push({
 			pathname: '/person/[person_id]',
 			params: { person_id: id.toString() }
 		})
 	}, [router]);
-	const renderItem = useCallback(({ item }: { item: MediaTvSeriesPerson }) => {
-		if (!item.person) return null;
-		return (
-			<Pressable onPress={() => handlePress(item.person?.id!)} style={[{ gap: GAP }, tw`w-24`]}>
-				<CardPerson
-				key={item.id}
-				variant='poster'
-				person={item.person}
-				style={tw.style('w-full')}
-				/>
-				<View style={tw`flex-col gap-1 items-center`}>
-					<Text numberOfLines={2}>{item.person?.name}</Text>
-					{item.character ? <Text numberOfLines={2} style={[{ color: colors.accentYellow }, tw`italic text-sm`]}>{item.character}</Text> : null}
-				</View>
-			</Pressable>
-		);
-	}, [colors.accentYellow, handlePress]);
+	const renderItem = useCallback((item: MediaTvSeriesPerson) => (
+		<CardPerson variant='list' hideKnownForDepartment person={item.person!}>
+			{item.character ? (
+				<Text
+				numberOfLines={2}
+				style={[{ color: colors.accentYellow }, tw`italic text-sm`]}
+				>
+					{item.character}
+				</Text>
+			) : null}
+		</CardPerson>
+	), [handlePress, colors.accentYellow]);
 	return (
-		<LegendList
+		<MultiRowHorizontalList<MediaTvSeriesPerson>
 		data={cast}
 		renderItem={renderItem}
-    	snapToInterval={104}
+		keyExtractor={useCallback((item) => item.id.toString(), [])}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
 			gap: GAP,
 		}}
-		keyExtractor={useCallback((item: MediaTvSeriesPerson) => item.id.toString(), [])}
-		showsHorizontalScrollIndicator={false}
-		horizontal
-		nestedScrollEnabled
+		columnStyle={{
+			width: width,
+			gap: GAP,
+		}}
+		snapToInterval={width + GAP}
+		decelerationRate={"fast"}
 		/>
 	);
 };

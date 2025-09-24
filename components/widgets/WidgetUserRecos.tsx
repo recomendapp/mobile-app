@@ -15,6 +15,7 @@ import { useCallback, useMemo } from "react";
 import { MediaMovie, MediaTvSeries, UserRecosAggregated } from "@recomendapp/types";
 import { CardMovie } from "../cards/CardMovie";
 import { CardTvSeries } from "../cards/CardTvSeries";
+import { GAP } from "@/theme/globals";
 
 interface WidgetUserRecosProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -75,7 +76,7 @@ const RecoItem = ({
 
   if (item.type === 'movie') {
     return (
-      <CardMovie movie={item.media as MediaMovie}>
+      <CardMovie variant='list' hideReleaseDate hideDirectors movie={item.media as MediaMovie}>
         {sendersContent}
       </CardMovie>
     );
@@ -83,7 +84,7 @@ const RecoItem = ({
 
   if (item.type === 'tv_series') {
     return (
-      <CardTvSeries tvSeries={item.media as MediaTvSeries}>
+      <CardTvSeries variant='list' hideReleaseDate hideCreator tvSeries={item.media as MediaTvSeries}>
         {sendersContent}
       </CardTvSeries>
     );
@@ -119,6 +120,7 @@ export const WidgetUserRecos = ({
   containerStyle
 }: WidgetUserRecosProps) => {
   const { session } = useAuth();
+  const { colors } = useTheme();
   const { data: recos } = useUserRecosQuery({
     userId: session?.user.id,
     filters: {
@@ -138,26 +140,19 @@ export const WidgetUserRecos = ({
     []
   );
 
-  const ItemSeparatorComponent = useCallback(() => 
-    <View style={tw`h-1`} />, 
-    []
-  );
-
   if (!recos?.length) {
     return null;
   }
 
   return (
-    <View style={[tw`gap-2`, style]}>
+    <View style={[{ gap: GAP }, style]}>
       <WidgetHeader labelStyle={labelStyle} />
       <LegendList
       data={recos}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       numColumns={2}
-      columnWrapperStyle={tw`gap-1`}
-      contentContainerStyle={containerStyle}
-      ItemSeparatorComponent={ItemSeparatorComponent}
+      contentContainerStyle={[{ gap: GAP }, containerStyle]}
       nestedScrollEnabled
       />
     </View>

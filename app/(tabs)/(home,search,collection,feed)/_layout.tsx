@@ -47,12 +47,14 @@ const AppLayout = ({ segment } : { segment: string }) => {
       </Stack.Protected>
       {/* MOVIES */}
       <Stack.Screen name="film/[film_id]/review/[review_id]/index" options={{ headerTitle: upperFirst(t('common.messages.review', { count: 1 })) }} />
+      <Stack.Screen name="film/[film_id]/credits" options={{ headerTitle: upperFirst(t('common.messages.credits')) }} />
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="film/[film_id]/review/create" options={{ headerTitle: upperFirst(t('common.messages.new_review')) }} />
         <Stack.Screen name="film/[film_id]/review/[review_id]/edit" options={{ headerTitle: upperFirst(t('common.messages.edit_review')) }} />
       </Stack.Protected>
       {/* TV SERIES */}
       <Stack.Screen name="tv-series/[tv_series_id]/review/[review_id]/index" options={{ headerTitle: upperFirst(t('common.messages.review', { count: 1 })) }} />
+      <Stack.Screen name="tv-series/[tv_series_id]/credits" options={{ headerTitle: upperFirst(t('common.messages.credits')) }} />
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="tv-series/[tv_series_id]/review/create" options={{ headerTitle: upperFirst(t('common.messages.new_review')) }} />
         <Stack.Screen name="tv-series/[tv_series_id]/review/[review_id]/edit" options={{ headerTitle: upperFirst(t('common.messages.edit_review')) }} />

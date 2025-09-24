@@ -3,8 +3,6 @@ import { Stack } from "expo-router";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 
-const SPACE = 8;
-
 const AuthLayout = () => {
   const t = useTranslations();
   const { colors } = useTheme();

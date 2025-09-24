@@ -455,7 +455,7 @@ export const ShareMovie = forwardRef<
 			const backgroundImage = (bgType === 'image' && backdrop) ? await cropImageRatio(backdrop, options?.background?.ratio ?? 9 / 16) : undefined;
 			return {
 				sticker: uri,
-				backgroundImage: backgroundImage,
+				backgroundImage: backgroundImage?.uri,
 				...(bgType === 'color' && bgColor ? {
 					backgroundTopColor: bgColor.colors.top,
 					backgroundBottomColor: bgColor.colors.bottom

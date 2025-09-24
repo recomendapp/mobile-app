@@ -18,7 +18,7 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useScrollToTop } from "@react-navigation/native";
 import { BestResultsSearchResponse, MediaMovie, MediaPerson, MediaTvSeries, Playlist, Profile } from "@recomendapp/types";
 import { Link } from "expo-router";
-import { upperFirst } from "lodash";
+import { clamp, upperFirst } from "lodash";
 import { useCallback, useRef, memo, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
@@ -149,7 +149,8 @@ const SearchResultSection = <T,>({
 	keyExtractor: (item: T) => string;
 }) => {
 	const { colors } = useTheme();
-	const { width } = useWindowDimensions();
+	const { width: screenWidth } = useWindowDimensions();
+	const width = useMemo(() => clamp(screenWidth - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
 
 	return (
 		<View style={{ gap: GAP }}>
@@ -175,8 +176,8 @@ const SearchResultSection = <T,>({
 					paddingHorizontal: PADDING_HORIZONTAL,
 					gap: GAP,
 				}}
-				columnStyle={{ width: width - ((PADDING_HORIZONTAL * 2) + GAP * 2), gap: GAP }}
-				snapToInterval={(width - ((PADDING_HORIZONTAL * 2) + GAP * 2)) + GAP}
+				columnStyle={{ width: width, gap: GAP }}
+				snapToInterval={width + GAP}
 				decelerationRate="fast"
 			/>
 		</View>

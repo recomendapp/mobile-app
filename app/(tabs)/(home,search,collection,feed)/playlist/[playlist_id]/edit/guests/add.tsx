@@ -11,7 +11,7 @@ import { usePlaylistGuestsQuery, usePlaylistGuestsSearchInfiniteQuery } from "@/
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-import { PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Profile } from "@recomendapp/types";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -213,13 +213,13 @@ const ModalPlaylistEditGuestsAdd = () => {
 				</View>
 			)
 		}
-		keyExtractor={(item) => item.user.id.toString()}
+		keyExtractor={useCallback((item: { user: Profile }) => item.user.id!.toString(), [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}
-		onEndReached={() => hasNextPage && fetchNextPage()}
+		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[
-			tw`gap-2`,
+			{ gap: GAP },
 			animatedFooterStyle
 		]}
 		renderScrollComponent={renderScroll}
@@ -227,9 +227,9 @@ const ModalPlaylistEditGuestsAdd = () => {
 		<SelectionFooter
 		data={selectedUsers}
 		height={footerHeight}
-		renderItem={({ item }) => (
+		renderItem={useCallback(({ item } : { item: Profile}) => (
 			<CardUser variant="icon" linked={false} onPress={() => handleToggleUser(item)} user={item} width={50} height={50}/>
-		)}
+		), [handleToggleUser])}
 		keyExtractor={(user) => user.id!}
 		/>
 	</>

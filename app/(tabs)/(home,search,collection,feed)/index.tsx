@@ -181,7 +181,7 @@ const HomeScreen = () => {
       showsVerticalScrollIndicator={false}
       nestedScrollEnabled
       >
-        <WidgetMostRecommended onLayout={onLayoutWidgetMostRecommended} />
+        <WidgetMostRecommended scrollY={scrollY} onLayout={onLayoutWidgetMostRecommended} />
         <WidgetMostPopular labelStyle={{paddingHorizontal: PADDING_HORIZONTAL }} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
         {/* <Link href={'/upgrade'} asChild><Button>Upgrade</Button></Link> */}
         {mainContent}

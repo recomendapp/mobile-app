@@ -99,7 +99,7 @@ const TvSeriesReviews = () => {
 			entering={FadeInDown}
 			/>
 		), [])}
-		ListHeaderComponent={useMemo(() => (
+		ListHeaderComponent={
 			<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
 				<Button
 				icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
@@ -109,8 +109,8 @@ const TvSeriesReviews = () => {
 				/>
 				<Button icon={Icons.ChevronDown} variant="muted" onPress={handleSortBy}>{sortBy.label}</Button>
 			</View>
-		), [sortBy.label, handleSortOrderToggle, handleSortBy, sortOrder])}
-		ListEmptyComponent={useMemo(() => (
+		}
+		ListEmptyComponent={
 			loading ? <Icons.Loader />
 			: (
 				<View style={tw`flex-1 items-center justify-center p-4`}>
@@ -119,7 +119,7 @@ const TvSeriesReviews = () => {
 					</Text>
 				</View>
 			) 
-		), [loading, colors.mutedForeground, t])}
+		}
 		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={{

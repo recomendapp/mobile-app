@@ -3,9 +3,9 @@ import { useWidgetMostRecommended } from "@/features/widget/widgetQueries";
 import { Skeleton } from "../ui/Skeleton";
 import { useCallback, useMemo, useRef } from "react";
 import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
-import { useSharedValue } from "react-native-reanimated";
+import Animated, { SharedValue, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import tw from "@/lib/tw";
-import { ImageBackground } from "expo-image";
+import { Image } from "expo-image";
 import { Database } from "@recomendapp/types";
 import { getMediaDetails } from "../utils/getMediaDetails";
 import { MediaMovie, MediaTvSeries } from "@recomendapp/types";
@@ -24,9 +24,11 @@ import BottomSheetMovie from "../bottom-sheets/sheets/BottomSheetMovie";
 import BottomSheetTvSeries from "../bottom-sheets/sheets/BottomSheetTvSeries";
 
 interface WidgetMostRecommendedProps extends ViewProps {
+	scrollY?: SharedValue<number>;
 }
 
 const WidgetMostRecommended = ({
+	scrollY,
 	style,
 	...props
 } : WidgetMostRecommendedProps) => {
@@ -52,8 +54,8 @@ const WidgetMostRecommended = ({
 
 	// Render
 	const renderItem = useCallback(({ item, index }: { item: Database['public']['Functions']['get_widget_most_recommended']['Returns'][number], index: number }) => (
-		<WidgetMostRecommendedItem item={item} position={index + 1} style={[style]} />
-	), [style]);
+		<WidgetMostRecommendedItem item={item} position={index + 1} style={[style]} scrollY={scrollY} baseHeight={height} />
+	), [style, scrollY, height]);
 
 	if (data === undefined || isLoading) {
 		return <Skeleton style={[{ height: height }, tw`w-full`, style]} />
@@ -76,6 +78,7 @@ const WidgetMostRecommended = ({
 			renderItem={renderItem}
 			autoPlay={true}
 			autoPlayInterval={6000}
+			style={{ overflow: 'visible'}}
 			/>
 			<Pagination.Basic
 			progress={progress}
@@ -93,10 +96,14 @@ const WidgetMostRecommendedItem = ({
 	item,
 	position,
 	style,
+	scrollY,
+	baseHeight,
 } : {
 	item: Database['public']['Views']['widget_most_recommended']['Row'];
 	position: number;
 	style?: StyleProp<ViewStyle>;
+	scrollY?: SharedValue<number>;
+	baseHeight: number;
 }) => {
 	const openSheet = useBottomSheetStore(state => state.openSheet);
 	const router = useRouter();
@@ -127,31 +134,55 @@ const WidgetMostRecommendedItem = ({
 				return null;
 		}
 	}, [details]);
+
+	const bgAnim = useAnimatedStyle(() => {
+		if (!scrollY) return {};
+		const stretch = Math.max(-scrollY.value, 0);
+		const base = baseHeight;
+		const scale = 1 + stretch / base;
+		const clampedScale = Math.min(scale, 3);
+
+		return {
+			transform: [
+				{ translateY: -stretch / 2 },
+				{ scaleY: clampedScale },
+			],
+		};
+	});
 	return (
 		<Pressable onPress={handleOnPress} onLongPress={handleOnLongPress}>
-			<ImageBackground
-			source={{ uri: item.media?.backdrop_url ?? ''}}
+			<View
 			style={[
 				{ paddingTop: navigationHeaderHeight },
 				tw`h-full`,
 				style
 			]}
 			>
-				<LinearGradient
-				colors={[
-					'transparent',
-					Color.hsl(colors.background).alpha(0.6).string(),
-					Color.hsl(colors.background).alpha(0.8).string(),
-					Color.hsl(colors.background).string(),
+
+				<Animated.View
+				style={[
+					tw`absolute inset-0`,
+					bgAnim,
 				]}
-				locations={[
-					0,
-					0.5,
-					0.75,
-					1,
-				]}
-				style={StyleSheet.absoluteFill}
-				/>
+				>
+					{(item.media.backdrop_url) && <Image style={StyleSheet.absoluteFill} source={item.media.backdrop_url} />}
+					<LinearGradient
+					colors={[
+						'transparent',
+						Color.hsl(colors.background).alpha(0.6).string(),
+						Color.hsl(colors.background).alpha(0.8).string(),
+						Color.hsl(colors.background).string(),
+					]}
+					locations={[
+						0,
+						0.5,
+						0.75,
+						1,
+					]}
+					style={StyleSheet.absoluteFill}
+					/>
+
+				</Animated.View>
 				<View style={[tw`flex-1 justify-end`, { gap: GAP, paddingHorizontal: PADDING_HORIZONTAL, paddingBottom: PADDING_VERTICAL }]}>
 					<View style={[{ gap: GAP * 2 }, tw`flex-row items-center justify-between`]}>
 						<Text style={tw`font-bold`}>{upperFirst(t('common.messages.most_recommended', { count: 2 }))}</Text>
@@ -165,7 +196,7 @@ const WidgetMostRecommendedItem = ({
 						{details?.description && <Text style={tw`text-base`} numberOfLines={2}>{details.description}</Text>}
 					</View>
 				</View>
-			</ImageBackground>
+			</View>
 		</Pressable>
 	);
 };

@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetPlaylist from "@/components/bottom-sheets/sheets/BottomSheetPlaylist";
 import { CardUser } from "../CardUser";
+import { GAP } from "@/theme/globals";
 
 interface CardFeedPlaylistLikeBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -48,8 +49,8 @@ const CardFeedPlaylistLikeDefault = React.forwardRef<
 		<Animated.View
 			ref={ref}
 			style={[
-				{ backgroundColor: skeleton ? colors.background : colors.card, borderColor: colors.border },
-				tw`flex-row rounded-xl p-1 gap-2 border`,
+				{ gap: GAP },
+				tw`flex-row rounded-xl`,
 				style
 			]}
 			{...props}

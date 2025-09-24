@@ -24,7 +24,7 @@ import { useTranslations } from "use-intl";
 const PersonScreen = () => {
 	const { person_id } = useLocalSearchParams<{ person_id: string }>();
 	const { id: personId } = getIdFromSlug(person_id);
-	const { bottomTabHeight } = useTheme();
+	const { bottomTabHeight, tabBarHeight } = useTheme();
 	const { session } = useAuth();
 	const t = useTranslations();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -37,7 +37,7 @@ const PersonScreen = () => {
 	} = useMediaPersonQuery({
 		personId: personId,
 	});
-	const loading = person === undefined || isLoading;
+	const loading = useMemo(() => person === undefined || isLoading, [person, isLoading]);
 	// SharedValue
 	const headerHeight = useSharedValue(0);
 	const headerOverlayHeight = useSharedValue(0);
@@ -50,25 +50,6 @@ const PersonScreen = () => {
 		},
 	});
 
-	const screenOptions = useMemo(() => ({
-		headerTitle: person?.name || '',
-		headerTransparent: true,
-		headerRight: () => (
-			<View style={tw`flex-row items-center gap-1`}>
-				{session && <ButtonPersonFollow personId={personId} />}
-				<Button
-				variant="ghost"
-				size="icon"
-				icon={Icons.EllipsisVertical}
-				onPress={person ? () => {
-					openSheet(BottomSheetPerson, {
-						person: person,
-					})
-				} : undefined}
-				/>
-			</View>
-		)
-	}), [person, session, personId, openSheet]);
 	// Render
 	const renderContent = useMemo(() => {
 		if (loading) return null;
@@ -95,7 +76,25 @@ const PersonScreen = () => {
 	return (
 	<>
 		<AnimatedStackScreen
-		options={screenOptions}
+		options={{
+			headerTitle: person?.name || '',
+			headerTransparent: true,
+			headerRight: () => (
+				<View style={tw`flex-row items-center gap-1`}>
+					{session && <ButtonPersonFollow personId={personId} />}
+					<Button
+					variant="ghost"
+					size="icon"
+					icon={Icons.EllipsisVertical}
+					onPress={person ? () => {
+						openSheet(BottomSheetPerson, {
+							person: person,
+						})
+					} : undefined}
+					/>
+				</View>
+			)
+		}}
 		scrollY={scrollY}
 		triggerHeight={headerHeight}
 		/>
@@ -108,6 +107,9 @@ const PersonScreen = () => {
 				gap: GAP,
 			},
 		]}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight
+		}}
 		>
 			<PersonHeader
 			person={person}

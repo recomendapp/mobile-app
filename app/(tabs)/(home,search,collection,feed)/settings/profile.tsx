@@ -3,7 +3,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useUserUpdateMutation } from "@/features/user/userMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
@@ -13,7 +13,7 @@ import { upperFirst } from "lodash";
 import { Input } from "@/components/ui/Input";
 import { Icons } from "@/constants/Icons";
 import { Stack } from "expo-router";
-import { Pressable, ScrollView } from "react-native-gesture-handler";
+import { Pressable } from "react-native-gesture-handler";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { Label } from "@/components/ui/Label";
@@ -25,9 +25,9 @@ import UserAvatar from "@/components/user/UserAvatar";
 import { Separator } from "@/components/ui/separator";
 import { randomUUID } from 'expo-crypto';
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
-import { useHeaderHeight } from "@react-navigation/elements";
-import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 
 const FULL_NAME_MIN_LENGTH = 1;
 const FULL_NAME_MAX_LENGTH = 30;
@@ -36,8 +36,7 @@ const BIO_MAX_LENGTH = 150;
 const SettingsProfileScreen = () => {
 	const supabase = useSupabaseClient();
 	const { user } = useAuth();
-	const { bottomTabHeight } = useTheme();
-	const navigationHeaderHeight = useHeaderHeight();
+	const { bottomTabHeight, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const updateProfileMutation = useUserUpdateMutation({
@@ -46,7 +45,7 @@ const SettingsProfileScreen = () => {
 	const [ isLoading, setIsLoading ] = useState(false);
 	const [ newAvatar, setNewAvatar ] = useState<ImagePickerAsset | null | undefined>(undefined);
 	// Form
-	const profileFormSchema = z.object({
+	const profileFormSchema = useMemo(() => z.object({
 		full_name: z
 		  .string()
 		  .min(FULL_NAME_MIN_LENGTH, {
@@ -72,7 +71,7 @@ const SettingsProfileScreen = () => {
 		  })
 		  .optional()
 		  .nullable(),
-	});
+	}), [t]);
 	type ProfileFormValues = z.infer<typeof profileFormSchema>;
 	const defaultValues = useMemo((): Partial<ProfileFormValues> => ({
 		full_name: user?.full_name ?? '',
@@ -98,7 +97,7 @@ const SettingsProfileScreen = () => {
 	], [user?.avatar_url, newAvatar, t]);
 
 	// Handlers
-	const handleAvatarOptions = () => {
+	const handleAvatarOptions = useCallback(() => {
 		const options = [
 			...avatarOptions,
 			{ label: upperFirst(t('common.messages.cancel')), value: 'cancel' },
@@ -122,7 +121,8 @@ const SettingsProfileScreen = () => {
 						base64: true,
 					})
 					if (!results.canceled && results.assets?.length) {
-						setNewAvatar(await handleProcessImage(results.assets[0]));
+						const processImage = await handleProcessImage(results.assets[0]);
+						setNewAvatar(processImage);
 					}
 					break;
 				case 'camera':
@@ -144,7 +144,8 @@ const SettingsProfileScreen = () => {
 						base64: true,
 					});
 					if (!cameraResults.canceled && cameraResults.assets?.length) {
-						setNewAvatar(await handleProcessImage(cameraResults.assets[0]));
+						const processImage = await handleProcessImage(cameraResults.assets[0]);
+						setNewAvatar(processImage);
 					}
 					break;
 				case 'delete':
@@ -154,8 +155,8 @@ const SettingsProfileScreen = () => {
 					break;
 			};
 		});
-	};
-	const handleSubmit = async (values: ProfileFormValues) => {
+	}, [avatarOptions, showActionSheetWithOptions, user?.avatar_url, t]);
+	const handleSubmit = useCallback(async (values: ProfileFormValues) => {
 		try {
 			if (!user) return;
 			setIsLoading(true);
@@ -171,23 +172,26 @@ const SettingsProfileScreen = () => {
 					});
 				if (error) throw error;
 				const { data: { publicUrl } } = supabase.storage
-					.from('avatars')
-					.getPublicUrl(data.path)
+				.from('avatars')
+				.getPublicUrl(data.path)
 				avatar_url = publicUrl;
 			} else if (newAvatar === null) {
 				avatar_url = null; // Delete avatar
 			}
+			console.log('go saved');
 			await updateProfileMutation.mutateAsync({
 				fullName: values.full_name,
 				bio: values.bio?.trim() || null,
 				website: values.website?.trim() || null,
 				avatarUrl: avatar_url,
 			});
+			console.log('saved');
 			Burnt.toast({
 				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
 				preset: 'done',
 			});
 		} catch (error) {
+			console.error(error);
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof Error) {
 				errorMessage = error.message;
@@ -202,8 +206,8 @@ const SettingsProfileScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
-	const handleProcessImage = async (image: ImagePickerAsset) => {
+	}, [user, newAvatar, supabase, updateProfileMutation, t]);
+	const handleProcessImage = useCallback(async (image: ImagePickerAsset) => {
 		const processedImage = await ImageManipulator.manipulate(image.uri)
 			.resize({ width: 1024, height: 1024 })
 			.renderAsync()
@@ -212,7 +216,7 @@ const SettingsProfileScreen = () => {
 			format: SaveFormat.JPEG,
 			base64: true,
 		})
-	};
+	}, []);
 
 	// useEffects
 	useEffect(() => {
@@ -239,7 +243,7 @@ const SettingsProfileScreen = () => {
 	return (
 	<>
 		<Stack.Screen
-			options={{
+			options={useMemo(() => ({
 				headerTitle: upperFirst(t('pages.settings.profile.label')),
 				headerRight: () => (
 					<Button
@@ -252,7 +256,7 @@ const SettingsProfileScreen = () => {
 						{upperFirst(t('common.messages.save'))}
 					</Button>
 				),
-			}}
+			}), [t, isLoading, canSave, form, handleSubmit])}
 		/>
 		<KeyboardAwareScrollView
 		contentContainerStyle={{
@@ -261,7 +265,10 @@ const SettingsProfileScreen = () => {
 			paddingHorizontal: PADDING_HORIZONTAL,
 			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 		}}
-		bottomOffset={navigationHeaderHeight}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight
+		}}
+		bottomOffset={bottomTabHeight + PADDING_VERTICAL}
 		>
 			<Pressable onPress={handleAvatarOptions} style={tw`items-center justify-center gap-2`}>
 				{user ? (

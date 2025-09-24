@@ -32,8 +32,23 @@ type CardPersonDataProps = {
 	person: MediaPerson;
 };
 
-export type CardPersonProps = CardPersonBaseProps &
-	(CardPersonSkeletonProps | CardPersonDataProps);
+type VariantBaseProps = Omit<CardPersonBaseProps, "variant"> &
+  (CardPersonSkeletonProps | CardPersonDataProps);
+
+type VariantMap = {
+	default: VariantBaseProps & {
+		variant?: "default"
+	};
+	poster: VariantBaseProps & {
+		variant: "poster"
+	};
+	list: VariantBaseProps & {
+		variant: "list";
+		hideKnownForDepartment?: boolean;
+	};
+};
+
+export type CardPersonProps = VariantMap[keyof VariantMap];
 
 const CardPersonDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
@@ -97,13 +112,14 @@ CardPersonPoster.displayName = "CardPersonPoster";
 
 const CardPersonList = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	FixedOmit<CardPersonProps, "variant" | "linked" | "onPress" | "onLongPress">
->(({ style, person, skeleton, children, ...props }, ref) => {
+	FixedOmit<VariantMap['list'], "variant" | "linked" | "onPress" | "onLongPress">
+>(({ style, person, skeleton, children, hideKnownForDepartment, ...props }, ref) => {
 	return (
 		<Animated.View
 		ref={ref}
 		style={[
-			tw`flex-row justify-between items-center p-1 h-20 gap-2`,
+			{ gap: GAP },
+			tw`flex-row justify-between items-center p-1 h-20`,
 			style,
 		]}
 		{...props}
@@ -125,13 +141,15 @@ const CardPersonList = React.forwardRef<
 					{children}
 				</View>
 			</View>
-			<View style={[tw`flex-row items-center`, { gap: GAP }]}>
-				{skeleton ? <Skeleton style={tw`h-5 w-12`} /> : person.known_for_department && (
-					<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
-						{person.known_for_department}
-					</Text>
-				)}
-			</View>
+			{!hideKnownForDepartment && (
+				<View style={[tw`flex-row items-center`, { gap: GAP }]}>
+					{skeleton ? <Skeleton style={tw`h-5 w-12`} /> : person.known_for_department && (
+						<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
+							{person.known_for_department}
+						</Text>
+					)}
+				</View>
+			)}
 		</Animated.View>
 	);
 });

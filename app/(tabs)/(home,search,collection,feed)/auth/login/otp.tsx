@@ -1,5 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button } from '@/components/ui/Button';
 import { Link, useNavigation } from 'expo-router';
@@ -19,11 +19,11 @@ import { AuthError } from '@supabase/supabase-js';
 import { Text } from '@/components/ui/text';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { InputOTP } from '@/components/ui/input-otp';
-import { useHeaderHeight } from "@react-navigation/elements";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { View } from '@/components/ui/view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
@@ -37,7 +37,6 @@ const LoginOtpScreen = () => {
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const bgImage = useRandomImage(backgroundImages);
-	const navigationHeaderHeight = useHeaderHeight();
 	const navigation = useNavigation();
 	const routes = navigation.getState()?.routes;
 	const prevRoute = routes? routes[routes.length - 2] : null;
@@ -47,15 +46,15 @@ const LoginOtpScreen = () => {
 	const [otp, setOtp] = useState('');
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
-	const forgotPasswordSchema = z.object({
+	const forgotPasswordSchema = useMemo(() => z.object({
 		email: z.email({
 			error: t('common.form.email.error.invalid')
 		})
-	});
+	}), [t]);
 	type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
-	const defaultValues: Partial<ForgotPasswordFormValues> = {
+	const defaultValues = useMemo((): Partial<ForgotPasswordFormValues> => ({
 		email: '',
-	};
+	}), []);
 	const form = useForm<ForgotPasswordFormValues>({
 		resolver: zodResolver(forgotPasswordSchema),
 		defaultValues: defaultValues,
@@ -64,7 +63,7 @@ const LoginOtpScreen = () => {
 	/* -------------------------------------------------------------------------- */
 
 	// Handlers
-	const handleSubmit = async (data: ForgotPasswordFormValues) => {
+	const handleSubmit = useCallback(async (data: ForgotPasswordFormValues) => {
 		try {
 			setIsLoading(true);
 			await loginWithOtp(data.email);
@@ -118,8 +117,8 @@ const LoginOtpScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
-	const handleVerifyOtp = async (otp: string) => {
+	}, [loginWithOtp, t]);
+	const handleVerifyOtp = useCallback(async (otp: string) => {
 		try {
 			setIsLoading(true);
 			const { error } = await supabase.auth.verifyOtp({
@@ -162,7 +161,7 @@ const LoginOtpScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, [supabase, form, t]);
 	return (
 		<ImageBackground source={bgImage} style={{ flex: 1 }}>
 			<LinearGradient
@@ -188,7 +187,6 @@ const LoginOtpScreen = () => {
 						paddingBottom: insets.bottom + PADDING_VERTICAL,
 					}
 				]}
-				bottomOffset={navigationHeaderHeight}
 				keyboardShouldPersistTaps='handled'
 				>
 					{!showOtp ? (
@@ -253,6 +251,7 @@ const LoginOtpScreen = () => {
 					)}
 					{/* RETURNS TO LOGIN */}
 				</KeyboardAwareScrollView>
+				<KeyboardToolbar />
 			</LinearGradient>
 		</ImageBackground>
 	)

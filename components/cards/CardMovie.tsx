@@ -40,8 +40,24 @@ type CardMovieDataProps = {
 	movie: MediaMovie;
 };
 
-export type CardMovieProps = CardMovieBaseProps &
-	(CardMovieSkeletonProps | CardMovieDataProps);
+type VariantBaseProps = Omit<CardMovieBaseProps, "variant"> &
+  (CardMovieSkeletonProps | CardMovieDataProps);
+
+type VariantMap = {
+	default: VariantBaseProps & {
+		variant?: "default"
+	};
+	poster: VariantBaseProps & {
+		variant: "poster"
+	};
+	list: VariantBaseProps & {
+		variant: "list";
+		hideReleaseDate?: boolean;
+		hideDirectors?: boolean;
+	};
+};
+
+export type CardMovieProps = VariantMap[keyof VariantMap];
 
 const CardMovieDefault = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
@@ -131,13 +147,14 @@ CardMoviePoster.displayName = "CardMoviePoster";
 
 const CardMovieList = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
-	FixedOmit<CardMovieProps, "variant" | "linked" | "onPress" | "onLongPress">
->(({ style, movie, skeleton, activity, showActionRating, profileActivity, children, showRating, ...props }, ref) => {
+	FixedOmit<VariantMap["list"], "variant" | "linked" | "onPress" | "onLongPress">
+>(({ style, movie, skeleton, activity, showActionRating, profileActivity, children, showRating, hideReleaseDate, hideDirectors, ...props }, ref) => {
 	return (
 		<Animated.View
 		ref={ref}
 		style={[
-			tw`flex-row justify-between items-center p-1 h-20 gap-2`,
+			{ gap: GAP },
+			tw`flex-row justify-between items-center p-1 h-20`,
 			style,
 		]}
 		{...props}
@@ -156,21 +173,25 @@ const CardMovieList = React.forwardRef<
 				/> : <Skeleton style={{ aspectRatio: 2 / 3, width: 'auto' }} />}
 				<View style={tw`shrink px-2 py-1 gap-1`}>
 					{!skeleton ? <Text numberOfLines={2}>{movie.title}</Text> : <Skeleton style={tw.style('w-full h-5')} />}
-					{skeleton ? <Skeleton style={tw`w-20 h-5`} /> : movie.directors?.length && (
-						<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
-							{movie.directors.map((director) => director.name).join(', ')}
-						</Text>
+					{!hideDirectors && (
+						skeleton ? <Skeleton style={tw`w-20 h-5`} /> : movie.directors?.length && (
+							<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
+								{movie.directors.map((director) => director.name).join(', ')}
+							</Text>
+						)
 					)}
 					{children}
 				</View>
 			</View>
-			<View style={[tw`flex-row items-center`, { gap: GAP }]}>
-				{skeleton ? <Skeleton style={tw`h-5 w-12`} /> : movie.release_date && (
-					<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
-						{new Date(movie.release_date).getFullYear()}
-					</Text>
-				)}
-			</View>
+			{!hideReleaseDate && (
+				<View style={[tw`flex-row items-center`, { gap: GAP }]}>
+					{skeleton ? <Skeleton style={tw`h-5 w-12`} /> : movie.release_date && (
+						<Text style={tw`text-sm`} textColor='muted' numberOfLines={1}>
+							{new Date(movie.release_date).getFullYear()}
+						</Text>
+					)}
+				</View>
+			)}
 		</Animated.View>
 	);
 });

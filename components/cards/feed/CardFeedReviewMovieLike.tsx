@@ -14,6 +14,7 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { CardReviewMovie } from "../reviews/CardReviewMovie";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { CardUser } from "../CardUser";
+import { GAP } from "@/theme/globals";
 
 interface CardFeedReviewMovieLikeBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -47,13 +48,12 @@ const CardFeedReviewMovieLikeDefault = React.forwardRef<
 >(({ style, children, author, reviewLike, movie, footer, skeleton, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
-	const router = useRouter();
 	return (
 		<Animated.View
 			ref={ref}
 			style={[
-				{ backgroundColor: skeleton ? colors.background : colors.card, borderColor: colors.border },
-				tw`flex-row rounded-xl p-1 gap-2 border`,
+				{ gap: GAP },
+				tw`flex-row rounded-xl`,
 				style
 			]}
 			{...props}
@@ -92,7 +92,6 @@ const CardFeedReviewMovieLikeDefault = React.forwardRef<
 							activity={reviewLike.review?.activity!}
 							review={reviewLike.review!}
 							url={`${movie.url}/review/${reviewLike.review_id}` as Href}
-							style={{ backgroundColor: colors.background }}
 							/>
 						) : <Skeleton style={tw`w-full h-12`} />
 					)}

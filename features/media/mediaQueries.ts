@@ -211,6 +211,7 @@ export const useMediaPersonFilmsInfiniteQuery = ({
 		sortOrder?: 'asc' | 'desc';
 		department?: string;
 		job?: string;
+		showMoviesWithoutReleaseDate?: boolean;
 	};
 }) => {
 	const mergedFilters = {
@@ -232,10 +233,8 @@ export const useMediaPersonFilmsInfiniteQuery = ({
 					.select(`
 						*,
 						movie:media_movie!inner(*)
-					`, {
-						count: 'exact',
-					})
-					.match({ 'person_id': personId })
+					`)
+					.eq('person_id', personId)
 					.range(from, to);
 			} else {
 				request = supabase
@@ -243,10 +242,8 @@ export const useMediaPersonFilmsInfiniteQuery = ({
 					.select(`
 						*,
 						movie:media_movie!inner(*)
-					`, {
-						count: 'exact',
-					})
-					.match({ 'person_id': personId })
+					`)
+					.eq('person_id', personId)
 					.range(from, to);
 			}
 
@@ -269,12 +266,12 @@ export const useMediaPersonFilmsInfiniteQuery = ({
 				if (mergedFilters.job) {
 					request = request.eq('job', mergedFilters.job);
 				}
+
+				if (mergedFilters.showMoviesWithoutReleaseDate !== true) {
+					request = request.filter('movie.release_date', 'not.is', null);
+				}
 			}
-			const { data, error } = await request
-				.filter('movie.release_date', 'not.is', null)
-				.overrideTypes<Array<{
-					movie: MediaMovie;
-				}>, { merge: true }>()
+			const { data, error } = await request;
 			if (error) throw error;
 			return data;
 		},

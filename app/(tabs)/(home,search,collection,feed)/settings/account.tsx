@@ -3,7 +3,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useUserDeleteRequestDeleteMutation, useUserDeleteRequestInsertMutation, useUserUpdateMutation } from "@/features/user/userMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {  useEffect, useMemo, useState } from "react";
+import {  useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
 import * as Burnt from 'burnt';
@@ -12,7 +12,7 @@ import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
 import useDebounce from "@/hooks/useDebounce";
 import { Input } from "@/components/ui/Input";
 import { Icons } from "@/constants/Icons";
-import { useFormatter, useTranslations } from "use-intl";
+import { useFormatter, useNow, useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { Stack } from "expo-router";
 import { ActivityIndicator, Alert, Text as RNText } from "react-native";
@@ -25,9 +25,9 @@ import richTextToPlainString from "@/utils/richTextToPlainString";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { useUserDeleteRequestQuery } from "@/features/user/userQueries";
 import { Separator } from "@/components/ui/separator";
-import { KeyboardAwareScrollView, KeyboardToolbar } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { useHeaderHeight } from "@react-navigation/elements";
+import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -36,8 +36,7 @@ const SettingsAccountScreen = () => {
 	const { user, session, updateEmail, cancelPendingEmailChange, verifyEmailChange } = useAuth();
 	const format = useFormatter();
 	const t = useTranslations();
-	const { colors, bottomTabHeight } = useTheme();
-	const navigationHeaderHeight = useHeaderHeight();
+	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
 	const updateProfileMutation = useUserUpdateMutation({
 		userId: user?.id,
 	});
@@ -45,14 +44,16 @@ const SettingsAccountScreen = () => {
 	const [ hasUnsavedChanges, setHasUnsavedChanges ] = useState(false);
 	const [ isLoading, setIsLoading ] = useState(false);
 
-	const date = new Date();
-	const dateLastUsernameUpdate = user?.username_updated_at
-		? new Date(user.username_updated_at)
-		: new Date('01/01/1970');
-	const usernameDisabled = (date.getTime() - dateLastUsernameUpdate.getTime()) / (1000 * 60 * 60 * 24) < 30 ? true : false;
+	const now = useNow();
+	const dateLastUsernameUpdate = useMemo(() => {
+		return user?.username_updated_at
+			? new Date(user.username_updated_at)
+			: new Date('01/01/1970');
+	}, [user?.username_updated_at]);
+	const usernameDisabled = useMemo(() => (now.getTime() - dateLastUsernameUpdate.getTime()) / (1000 * 60 * 60 * 24) < 30 ? true : false, [now, dateLastUsernameUpdate]);
 
 	// Form
-	const accountFormSchema = z.object({
+	const accountFormSchema = useMemo(() => z.object({
 		username: z
 			.string()
 			.min(USERNAME_MIN_LENGTH, {
@@ -75,7 +76,7 @@ const SettingsAccountScreen = () => {
 			}),
 		private: z.boolean(),
 		email: z.email({ error: t('common.form.email.error.invalid') })
-	});
+	}), [t]);
 	type AccountFormValues = z.infer<typeof accountFormSchema>;
 	const defaultValues = useMemo((): Partial<AccountFormValues> => ({
 		username: user?.username,
@@ -91,7 +92,7 @@ const SettingsAccountScreen = () => {
 	const usernameToCheck = useDebounce(form.watch('username'), 500);
 
 	// Handlers
-	const handleOnSubmit = async (values: AccountFormValues) => {
+	const handleOnSubmit = useCallback(async (values: AccountFormValues) => {
 		try {
 			if (!user) return;
 			setIsLoading(true);
@@ -127,8 +128,8 @@ const SettingsAccountScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
-	const handleCancelEmailChange = async () => {
+	}, [user, session, t, updateProfileMutation, updateEmail]);
+	const handleCancelEmailChange = useCallback(async () => {
 		try {
 			setIsLoading(true);
 			await cancelPendingEmailChange();
@@ -152,8 +153,8 @@ const SettingsAccountScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
-	const handleVerifyEmailButtonPress = () => {
+	}, [t, cancelPendingEmailChange]);
+	const handleVerifyEmailButtonPress = useCallback(() => {
 		const options = [
 			...(session?.user.email ? [{label: session?.user.email, value: session?.user.email}] : []),
 			...(session?.user.new_email ? [{label: session?.user.new_email, value: session?.user.new_email}] : []),
@@ -195,8 +196,8 @@ const SettingsAccountScreen = () => {
 				);
 			}
 		})
-	};
-	const handleVerifyEmail = async (email: string, token: string) => {
+	}, [session?.user.email, session?.user.new_email, showActionSheetWithOptions, t]);
+	const handleVerifyEmail = useCallback(async (email: string, token: string) => {
 		try {
 			setIsLoading(true);
 			await verifyEmailChange(email, token);
@@ -220,7 +221,7 @@ const SettingsAccountScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, [t, verifyEmailChange]);
 
 	// useEffects
 	useEffect(() => {
@@ -259,20 +260,20 @@ const SettingsAccountScreen = () => {
 	return (
 		<>
 			<Stack.Screen
-				options={{
-					headerTitle: upperFirst(t('pages.settings.account.label')),
-					headerRight: () => (
-						<Button
-						variant="ghost"
-						size="fit"
-						loading={isLoading}
-						onPress={form.handleSubmit(handleOnSubmit)}
-						disabled={!hasUnsavedChanges || !form.formState.isValid || isLoading}
-						>
-							{upperFirst(t('common.messages.save'))}
-						</Button>
-					),
-				}}
+			options={useMemo(() => ({
+				headerTitle: upperFirst(t('pages.settings.account.label')),
+				headerRight: () => (
+					<Button
+					variant="ghost"
+					size="fit"
+					loading={isLoading}
+					onPress={form.handleSubmit(handleOnSubmit)}
+					disabled={!hasUnsavedChanges || !form.formState.isValid || isLoading}
+					>
+						{upperFirst(t('common.messages.save'))}
+					</Button>
+				),
+			}), [t, isLoading, hasUnsavedChanges, form, handleOnSubmit])}
 			/>
 			<KeyboardAwareScrollView
 			contentContainerStyle={{
@@ -281,7 +282,10 @@ const SettingsAccountScreen = () => {
 				paddingHorizontal: PADDING_HORIZONTAL,
 				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			}}
-			bottomOffset={navigationHeaderHeight}
+			scrollIndicatorInsets={{
+				bottom: tabBarHeight
+			}}
+			bottomOffset={bottomTabHeight + PADDING_VERTICAL}
 			>
 				<Controller
 				name='username'

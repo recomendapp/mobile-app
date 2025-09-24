@@ -1,7 +1,6 @@
 import React from 'react';
 import {
 	LayoutChangeEvent,
-	useWindowDimensions,
 } from 'react-native';
 import Animated, {
 	Extrapolation,
@@ -18,7 +17,6 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
-import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useTranslations } from 'use-intl';
 import { Text } from '@/components/ui/text';
 import { BORDER_RADIUS, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
@@ -84,9 +82,15 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 	});
 	const bgAnim = useAnimatedStyle(() => {
 		const stretch = Math.max(-scrollY.value, 0);
+		const base = Math.max(headerHeight.value, 1);
+		const scale = 1 + stretch / base;
+		const clampedScale = Math.min(scale, 3);
+
 		return {
-			height: headerHeight.value + stretch,
-			transform: [{ translateY: -stretch }],
+			transform: [
+				{ translateY: -stretch / 2 },
+				{ scale: clampedScale },
+			],
 		};
 	});
 
@@ -95,7 +99,6 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 	style={[
 		tw.style('w-full'),
 		{ paddingTop: navigationHeaderHeight },
-		textAnim,
 	]}
 	onLayout={(event: LayoutChangeEvent) => {
 		'worklet';
@@ -105,7 +108,7 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 		<Animated.View
 		style={[
 			tw`absolute inset-0`,
-			// bgAnim,
+			bgAnim,
 		]}
 		>
 			{colorPairs.length ? <View style={[{ backgroundColor: colorPairs[0].bottom }, tw`absolute inset-0`]}/> : null}
@@ -142,7 +145,7 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 			<Animated.View
 			style={[
 				tw`gap-2 w-full`,
-				// textAnim
+				textAnim
 			]}
 			>
 				{/* GENRES */}
@@ -169,11 +172,6 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 						{person?.name || upperFirst(t('common.messages.person_not_found'))}
 					</Text>
 				) : <Skeleton style={tw`w-64 h-12`} />}
-				{/* {(movie?.original_title && lowerCase(movie.original_title) !== lowerCase(movie.title!)) ? (
-					<Text numberOfLines={1} style={[ { color: colors.mutedForeground }, tw.style('text-lg font-semibold')]}>
-						{movie.original_title}
-					</Text>
-				) : null} */}
 			</Animated.View>
 		</Animated.View>
 	</Animated.View>
