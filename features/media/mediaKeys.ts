@@ -19,6 +19,14 @@ export const mediaKeys = {
 		full?: boolean;
 	}) => [...mediaKeys.specify({ type }), String(id), full] as const,
 	
+	credits: ({
+		id,
+		type,
+	} : {
+		id: number;
+		type: MediaType;
+	}) => [...mediaKeys.detail({ id, type }), 'credits'] as const,
+
 	seasonDetail: ({
 		id,
 		seasonNumber,

@@ -1,7 +1,6 @@
 
 import ButtonCreatePlaylist from "@/components/buttons/ButtonCreatePlaylist";
 import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/text";
 import { UserNav } from "@/components/user/UserNav";
 import tw from "@/lib/tw";
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
@@ -15,7 +14,7 @@ import Animated from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { useTheme } from "@/providers/ThemeProvider";
-import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL } from "@/theme/globals";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -115,11 +114,6 @@ const CollectionLayout = () => {
 		/>
 		<MaterialTopTabs
 		tabBar={(props) => <TabBar {...props} />}
-		screenLayout={(props) => (
-			<View style={tw`flex-1 py-2 px-4`}>
-				{props.children}
-			</View>
-		)}
 		>
 			<MaterialTopTabs.Screen name="index" options={{ title: "perso" }} />
 			<MaterialTopTabs.Screen name="saved" options={{ title: upperFirst(t('common.messages.saved', { gender: 'female', count: 2 })) }} />

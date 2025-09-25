@@ -178,14 +178,12 @@ const SettingsProfileScreen = () => {
 			} else if (newAvatar === null) {
 				avatar_url = null; // Delete avatar
 			}
-			console.log('go saved');
 			await updateProfileMutation.mutateAsync({
 				fullName: values.full_name,
 				bio: values.bio?.trim() || null,
 				website: values.website?.trim() || null,
 				avatarUrl: avatar_url,
 			});
-			console.log('saved');
 			Burnt.toast({
 				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
 				preset: 'done',

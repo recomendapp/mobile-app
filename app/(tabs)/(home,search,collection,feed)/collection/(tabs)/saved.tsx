@@ -10,7 +10,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useTranslations } from "use-intl";
 import { Playlist } from "@recomendapp/types";
 import { useCallback } from "react";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
 const CollectionSavedScreen = () => {
 	const { user } = useAuth();
@@ -57,11 +57,11 @@ const CollectionSavedScreen = () => {
 		onRefresh={refetch}
 		numColumns={3}
 		contentContainerStyle={{
+			paddingHorizontal: PADDING_HORIZONTAL,
 			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={keyExtractor}
-		showsVerticalScrollIndicator={false}
 		onEndReached={onEndReached}
 		onEndReachedThreshold={0.3}
 		nestedScrollEnabled

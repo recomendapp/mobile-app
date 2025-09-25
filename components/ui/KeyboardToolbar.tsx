@@ -1,4 +1,5 @@
 import { useTheme } from "@/providers/ThemeProvider";
+import { useMemo } from "react";
 import { DefaultKeyboardToolbarTheme, KeyboardToolbar as RNKeyboardToolbar } from "react-native-keyboard-controller";
 import { KeyboardToolbarTheme } from "react-native-keyboard-controller/lib/typescript/components/KeyboardToolbar/types";
 
@@ -9,20 +10,19 @@ export const KeyboardToolbar = ({
 	...props
 }: KeyboardToolbarProps) => {
 	const { colors } = useTheme();
-	const themeDefault: KeyboardToolbarTheme = {
+	const themeDefault: KeyboardToolbarTheme = useMemo(() => ({
 		...DefaultKeyboardToolbarTheme,
 		dark: {
 			...DefaultKeyboardToolbarTheme.dark,
-			background: colors.muted,
-			primary: colors.foreground,
-			
+			// background: colors.muted,
+			// primary: colors.foreground,
 		},
 		light: {
-			...DefaultKeyboardToolbarTheme.light,
-			background: colors.muted,
-			primary: colors.foreground,
+			...DefaultKeyboardToolbarTheme.dark,
+			// background: colors.muted,
+			// primary: colors.foreground,
 		},
 		...theme,
-	}
+	}), [colors, theme]);
 	return <RNKeyboardToolbar theme={themeDefault} {...props} />;
 };
