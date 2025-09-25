@@ -129,7 +129,7 @@ UnauthenticatedContent.displayName = 'UnauthenticatedContent';
 
 const HomeScreen = () => {
   const t = useTranslations();
-  const { bottomTabHeight } = useTheme();
+  const { bottomTabHeight, tabBarHeight } = useTheme();
   const { session } = useAuth();
   // REFs
   const scrollRef = useRef<AnimatedScrollView>(null);
@@ -178,7 +178,9 @@ const HomeScreen = () => {
       ref={scrollRef}
       onScroll={scrollHandler}
       contentContainerStyle={contentContainerStyle}
-      showsVerticalScrollIndicator={false}
+      scrollIndicatorInsets={{
+        bottom: tabBarHeight
+      }}
       nestedScrollEnabled
       >
         <WidgetMostRecommended scrollY={scrollY} onLayout={onLayoutWidgetMostRecommended} />

@@ -199,6 +199,58 @@ export const useMediaTvSeriesSeasonDetailsQuery = ({
 };
 /* -------------------------------------------------------------------------- */
 
+/* --------------------------------- CREDITS -------------------------------- */
+export const useMediaMovieCreditsQuery = ({
+	movieId,
+} : {
+	movieId?: number | null;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: mediaKeys.credits({ id: movieId!, type: 'movie' }),
+		queryFn: async () => {
+			if (!movieId) throw Error('No movieId provided');
+			const { data, error } = await supabase
+				.from('tmdb_movie_credits')
+				.select(`
+					*,
+					person:media_person(*),
+					role:tmdb_movie_roles(*)
+				`)
+				.eq('movie_id', movieId)
+				.neq('department', 'Acting')
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!movieId,
+	});
+};
+export const useMediaTvSeriesCreditsQuery = ({
+	tvSeriesId,
+} : {
+	tvSeriesId?: number | null;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery({
+		queryKey: mediaKeys.credits({ id: tvSeriesId!, type: 'tv_series' }),
+		queryFn: async () => {
+			if (!tvSeriesId) throw Error('No tvSeriesId provided');
+			const { data, error } = await supabase
+				.from('tmdb_tv_series_credits')
+				.select(`
+					*,
+					person:media_person(*)
+				`)
+				.eq('serie_id', tvSeriesId)
+				.neq('department', 'Acting')
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!tvSeriesId,
+	});
+};
+/* -------------------------------------------------------------------------- */
+
 /* --------------------------------- PERSONS -------------------------------- */
 export const useMediaPersonFilmsInfiniteQuery = ({
 	personId,
