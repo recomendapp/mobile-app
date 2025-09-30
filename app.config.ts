@@ -28,7 +28,7 @@ const getAppName = () => {
 };
 
 const getWebDomain = () => {
-	return process.env.EXPO_PUBLIC_WEB_APP!;
+	return process.env.EXPO_PUBLIC_WEB_APP;
 }
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
@@ -41,11 +41,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	scheme: 'recomend',
 	userInterfaceStyle: 'automatic',
 	newArchEnabled: true,
-	splash: {
-		image: './src/assets/images/splash.png',
-		resizeMode: 'contain',
-		backgroundColor: '#ffffff',
-	},
 	assetBundlePatterns: [
 		'**/*'
 	],
@@ -130,7 +125,34 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			{
 			"experimentalLauncherActivity": true
 			}
-		]
+		],
+		[
+          'expo-splash-screen',
+          {
+            ios: {
+              enableFullScreenImage_legacy: true,
+              backgroundColor: '#ffffff',
+              image: './src/assets/splash/splash.png',
+              resizeMode: 'cover',
+              dark: {
+                enableFullScreenImage_legacy: true,
+                backgroundColor: '#001429',
+                image: './src/assets/splash/splash-dark.png',
+                resizeMode: 'cover',
+              },
+            },
+            android: {
+              backgroundColor: '#0c7cff',
+              image: './src/assets/splash/splash-android-icon.png',
+              imageWidth: 150,
+              dark: {
+                backgroundColor: '#0c2a49',
+                image: './src/assets/splash/splash-android-icon-dark.png',
+                imageWidth: 150,
+              },
+            },
+          },
+        ],
 	],
 	experiments: {
 		typedRoutes: true,

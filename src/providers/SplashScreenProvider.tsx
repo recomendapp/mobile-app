@@ -1,18 +1,33 @@
-import { SplashScreen } from "expo-router";
 import { createContext, use, useEffect, useMemo, useState } from "react";
+import { isAndroid, isIOS } from '@/platform/detection';
+import * as SystemUI from 'expo-system-ui'
+import * as ScreenOrientation from 'expo-screen-orientation'
+import { logger } from '@/logger'
+import * as SplashScreen from 'expo-splash-screen';
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync()
+if (isIOS) {
+	SystemUI.setBackgroundColorAsync('black')
+}
+if (isAndroid) {
+	// iOS is handled by the config plugin -sfn
+	ScreenOrientation.lockAsync(
+		ScreenOrientation.OrientationLock.PORTRAIT_UP,
+	).catch(error =>
+		logger.debug('Could not lock orientation', {safeMessage: error}),
+	)
+}
 
 interface SplashScreenContextProps {
-  auth: {
+	auth: {
+		ready: boolean;
+		setReady: (ready: boolean) => void;
+	},
+	i18n: {
+		ready: boolean;
+		setReady: (ready: boolean) => void;
+	},
 	ready: boolean;
-	setReady: (ready: boolean) => void;
-  },
-  i18n: {
-	ready: boolean;
-	setReady: (ready: boolean) => void;
-  },
-  ready: boolean;
 }
 
 const SplashScreenContext = createContext<SplashScreenContextProps | undefined>(undefined);

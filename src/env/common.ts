@@ -60,15 +60,13 @@ export const LOG_LEVEL = (process.env.EXPO_PUBLIC_LOG_LEVEL || 'info') as
  */
 export const LOG_DEBUG: string = process.env.EXPO_PUBLIC_LOG_DEBUG || ''
 
+export const DOMAIN_NAME: string = process.env.EXPO_PUBLIC_WEB_APP!
+
 /**
  * Sentry DSN for telemetry
  */
-export const SENTRY_DSN: string | undefined = process.env.EXPO_PUBLIC_SENTRY_DSN
-
-/**
- * Bitdrift API key. If undefined, Bitdrift should be disabled.
- */
-export const BITDRIFT_API_KEY: string | undefined =
-  process.env.EXPO_PUBLIC_BITDRIFT_API_KEY
+export const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN
+export const SENTRY_PROJECT = process.env.EXPO_PUBLIC_SENTRY_PROJECT
+export const SENTRY_ORG = process.env.EXPO_PUBLIC_SENTRY_ORG
 
 

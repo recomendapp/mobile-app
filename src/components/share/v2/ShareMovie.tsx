@@ -129,7 +129,7 @@ const ShareMovieDefault = ({ movie, poster, scale = 1 } : { movie: MediaMovie, p
 			<Text style={[tw`font-bold`, { fontSize: 16 * scale }]}>{movie.title}</Text>
 			{directorsText && <Text textColor="muted" style={{ fontSize: 12 * scale }}>{directorsText}</Text>}
 			</View>
-			<Icons.site.logo color={colors.accentYellow} height={10 * scale}/>
+			<Icons.app.logo color={colors.accentYellow} height={10 * scale}/>
 		</View>
 	)
 };
