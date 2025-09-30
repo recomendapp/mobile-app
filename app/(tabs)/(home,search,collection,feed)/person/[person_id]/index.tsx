@@ -40,7 +40,6 @@ const PersonScreen = () => {
 	const loading = useMemo(() => person === undefined || isLoading, [person, isLoading]);
 	// SharedValue
 	const headerHeight = useSharedValue(0);
-	const headerOverlayHeight = useSharedValue(0);
 	const scrollY = useSharedValue(0);
 
 	const scrollHandler = useAnimatedScrollHandler({
@@ -115,8 +114,7 @@ const PersonScreen = () => {
 			person={person}
 			loading={loading}
 			scrollY={scrollY}
-			headerHeight={headerHeight}
-			headerOverlayHeight={headerOverlayHeight}
+			triggerHeight={headerHeight}
 			/>
 			{renderContent}
 		</Animated.ScrollView>

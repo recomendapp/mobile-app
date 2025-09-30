@@ -48,7 +48,6 @@ const FilmScreen = () => {
 
 	// SharedValue
 	const headerHeight = useSharedValue<number>(0);
-	const headerOverlayHeight = useSharedValue<number>(0);
 	const scrollY = useSharedValue<number>(0);
 
 	const scrollHandler = useAnimatedScrollHandler({
@@ -94,8 +93,7 @@ const FilmScreen = () => {
 			movie={movie}
 			loading={loading}
 			scrollY={scrollY}
-			headerHeight={headerHeight}
-			headerOverlayHeight={headerOverlayHeight}
+			triggerHeight={headerHeight}
 			/>
 			{movie && <View style={tw`flex-col gap-4`}>
 				{/* SYNOPSIS */}

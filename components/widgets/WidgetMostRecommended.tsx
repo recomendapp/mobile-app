@@ -22,6 +22,7 @@ import { useRouter } from "expo-router";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "../bottom-sheets/sheets/BottomSheetMovie";
 import BottomSheetTvSeries from "../bottom-sheets/sheets/BottomSheetTvSeries";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface WidgetMostRecommendedProps extends ViewProps {
 	scrollY?: SharedValue<number>;
@@ -33,6 +34,9 @@ const WidgetMostRecommended = ({
 	...props
 } : WidgetMostRecommendedProps) => {
 	const { colors } = useTheme();
+	const insets = useSafeAreaInsets();
+	const navigationHeaderHeight = useHeaderHeight();
+	// Dimensions
 	const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 	const {
 		data,
@@ -60,7 +64,7 @@ const WidgetMostRecommended = ({
 	if (data === undefined || isLoading) {
 		return <Skeleton style={[{ height: height }, tw`w-full`, style]} />
 	}
-	if (!data.length || isError) return <View style={[{ height: height }, tw`w-full`, style]} />;
+	if (!data.length || isError) return <View style={[{ height: navigationHeaderHeight }, tw`w-full`, style]} />;
 	return (
 		<View
 		style={[

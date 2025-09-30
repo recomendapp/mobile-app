@@ -40,15 +40,13 @@ interface TvSeriesHeaderProps {
 	tvSeries?: MediaTvSeries | null;
 	loading: boolean;
 	scrollY: SharedValue<number>;
-	headerHeight: SharedValue<number>;
-	headerOverlayHeight: SharedValue<number>;
+	triggerHeight: SharedValue<number>;
 }
 const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 	tvSeries,
 	loading,
 	scrollY,
-	headerHeight,
-	headerOverlayHeight,
+	triggerHeight,
 }) => {
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
@@ -63,6 +61,7 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 	});
 	// SharedValue
 	const posterHeight = useSharedValue(0);
+	const headerHeight = useSharedValue(0);
 	// Animated styles
 	const posterAnim = useAnimatedStyle(() => {
 		const stretch = Math.max(-scrollY.value, 0);
@@ -81,7 +80,7 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight) / 0.8],
+				[0, (headerHeight.get() - navigationHeaderHeight) / 0.8],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -89,7 +88,7 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 				{
 					scale: interpolate(
 					scrollY.get(),
-					[0, (headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight)) / 2],
+					[0, (headerHeight.get() - navigationHeaderHeight) / 2],
 					[1, 0.98],
 					'clamp',
 					),
@@ -118,7 +117,9 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 	]}
 	onLayout={(event: LayoutChangeEvent) => {
 		'worklet';
-		headerHeight.value = event.nativeEvent.layout.height;
+		const height = event.nativeEvent.layout.height;
+		headerHeight.value = height;
+		triggerHeight.value = (height - navigationHeaderHeight) * 0.7;
 	}}
 	>
 		<Animated.View

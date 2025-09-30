@@ -115,6 +115,18 @@ const BottomSheetMovie = React.forwardRef<
           movie: movie!,
         }),
         label: upperFirst(t('common.messages.share')),
+      },
+      {
+        icon: Icons.Share,
+       
+        onPress: () => movie?.id && router.push({
+          pathname: '/share/film/[movie_id]',
+          params: {
+            movie_id: movie.id,
+            movie_title: movie.title,
+          }
+        }),
+        label: `${upperFirst(t('common.messages.share'))} (new)`,
       }
     ],
     [
