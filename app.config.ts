@@ -37,12 +37,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	slug: 'recomend',
 	version: '1.0.0',
 	orientation: 'portrait',
-	icon: './assets/images/icon.png',
+	icon: './src/assets/images/icon.png',
 	scheme: 'recomend',
 	userInterfaceStyle: 'automatic',
 	newArchEnabled: true,
 	splash: {
-		image: './assets/images/splash.png',
+		image: './src/assets/images/splash.png',
 		resizeMode: 'contain',
 		backgroundColor: '#ffffff',
 	},
@@ -62,7 +62,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	},
 	android: {
 		adaptiveIcon: {
-			foregroundImage: './assets/images/adaptive-icon.png',
+			foregroundImage: './src/assets/images/adaptive-icon.png',
 			backgroundColor: '#ffffff',
 		},
 		edgeToEdgeEnabled: true,
@@ -92,7 +92,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	web: {
 		bundler: 'metro',
 		output: 'static',
-		favicon: './assets/images/favicon.png',
+		favicon: './src/assets/images/favicon.png',
 	},
 	plugins: [
 		'expo-router',
@@ -121,7 +121,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			{
 			"sounds":
 				[
-					"./assets/sounds/notif.wav"
+					"./src/assets/sounds/notif.wav"
 				]
 			}
       	],
