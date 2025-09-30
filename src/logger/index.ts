@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid/non-secure'
 import { add } from '@/logger/logDump'
 import { type MetricEvents } from '@/logger/metrics'
 import { consoleTransport } from '@/logger/transports/console'
-import { sentryTransport } from '@/logger/transports/sentry'
+// import { sentryTransport } from '@/logger/transports/sentry'
 import {
   LogContext,
   LogLevel,
@@ -15,7 +15,7 @@ import { ENV } from '@/env'
 const TRANSPORTS: Transport[] = (function configureTransports() {
   switch (ENV) {
     case 'production': {
-      return [sentryTransport].filter(
+      return [].filter(
         Boolean,
       ) as Transport[]
     }

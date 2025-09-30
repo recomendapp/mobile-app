@@ -120,7 +120,7 @@ const ShareMovieDefault = ({ movie, poster, scale = 1 } : { movie: MediaMovie, p
 			<Text style={titleStyle}>{movie.title}</Text>
 			{directorsText && <Text textColor="muted" style={directorStyle}>{directorsText}</Text>}
 			</View>
-			<Icons.site.logo color={colors.accentYellow} height={10 * scale}/>
+			<Icons.app.logo color={colors.accentYellow} height={10 * scale}/>
 		</View>
 	)
 };

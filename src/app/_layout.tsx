@@ -6,11 +6,6 @@ import CustomDrawerContent from '@/components/drawer/CustomDrawerContent';
 import StatusBar from '@/components/StatusBar';
 import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
-import { SplashScreen } from 'expo-router';
-import { isAndroid, isIOS } from '@/platform/detection';
-import * as SystemUI from 'expo-system-ui'
-import * as ScreenOrientation from 'expo-screen-orientation'
-import { logger } from '@/logger'
 
 export {
   ErrorBoundary,
@@ -21,20 +16,7 @@ configureReanimatedLogger({
   strict: false,
 })
 
-SplashScreen.preventAutoHideAsync()
-if (isIOS) {
-  SystemUI.setBackgroundColorAsync('black')
-}
-if (isAndroid) {
-  // iOS is handled by the config plugin -sfn
-  ScreenOrientation.lockAsync(
-    ScreenOrientation.OrientationLock.PORTRAIT_UP,
-  ).catch(error =>
-    logger.debug('Could not lock orientation', {safeMessage: error}),
-  )
-}
-
-export default function RootLayout() {
+const RootLayout = () => {
   const hasMounted = useRef(false);
   const [isColorSchemeLoaded, setIsColorSchemeLoaded] = useState(false);
 
@@ -66,3 +48,5 @@ export default function RootLayout() {
     </Providers>
   );
 }
+
+export default RootLayout;
