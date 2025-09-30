@@ -29,32 +29,31 @@ interface MediaHeaderProps {
 	season?: MediaTvSeriesSeason | null;
 	loading: boolean;
 	scrollY: SharedValue<number>;
-	headerHeight: SharedValue<number>;
-	headerOverlayHeight: SharedValue<number>;
+	triggerHeight: SharedValue<number>;
 }
 
 const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 	season,
 	loading,
 	scrollY,
-	headerHeight,
-	headerOverlayHeight,
+	triggerHeight,
 }) => {
 	const t = useTranslations();
 	const navigationHeaderHeight = useHeaderHeight();
 	const { hslToRgb } = useColorConverter();
-	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
 	const title = upperFirst(t('common.messages.tv_season_value', { number: season?.season_number! }));
 	const bgColor = hslToRgb(colors.background);
-	const posterHeight = useSharedValue(0);
 	const randomBg = useRandomImage(season?.episodes?.filter(episode => episode.still_url).map(episode => episode.still_url!) ?? []);
+	// SharedValue
+	const posterHeight = useSharedValue(0);
+	const headerHeight = useSharedValue(0);
 
 	const textAnim = useAnimatedStyle(() => {
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + insets.top) / 0.8],
+				[0, (headerHeight.get() - navigationHeaderHeight) / 0.8],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -62,8 +61,8 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 				{
 					scale: interpolate(
 					scrollY.get(),
-					[0, (headerHeight.get() - (headerOverlayHeight.get() + insets.top)) / 2],
-					[1, 0.95],
+					[0, (headerHeight.get() - navigationHeaderHeight) / 2],
+					[1, 0.98],
 					'clamp',
 					),
 				},
@@ -71,17 +70,15 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 		};
 	});
 	const bgAnim = useAnimatedStyle(() => {
-		const scaleValue = interpolate(
-			scrollY.get(),
-			[-headerHeight.get(), 0],
-			[2, 1],
-			Extrapolation.CLAMP,
-		);
-		const offset = (headerHeight.get() * (scaleValue - 1)) / 2;
+		const stretch = Math.max(-scrollY.value, 0);
+		const base = Math.max(headerHeight.value, 1);
+		const scale = 1 + stretch / base;
+		const clampedScale = Math.min(scale, 3);
+
 		return {
 			transform: [
-				{ scale: scaleValue },
-				{ translateY: -offset },
+				{ translateY: -stretch / 2 },
+				{ scale: clampedScale },
 			],
 		};
 	});
@@ -90,7 +87,9 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 	<Animated.View
 	onLayout={(event: LayoutChangeEvent) => {
 		'worklet';
-		headerHeight.value = event.nativeEvent.layout.height;
+		const height = event.nativeEvent.layout.height;
+		headerHeight.value = height;
+		triggerHeight.value = (height - navigationHeaderHeight) * 0.7
 	}}
 	style={{
 		paddingHorizontal: PADDING_HORIZONTAL,
@@ -203,7 +202,6 @@ const TvSeriesSeasonScreen = () => {
 	const loading = season === undefined || isLoading;
 	// SharedValue
 	const headerHeight = useSharedValue<number>(0);
-	const headerOverlayHeight = useSharedValue<number>(0);
 	const scrollY = useSharedValue<number>(0);
 
 	const scrollHandler = useAnimatedScrollHandler({
@@ -270,8 +268,7 @@ const TvSeriesSeasonScreen = () => {
 			season={season}
 			loading={loading}
 			scrollY={scrollY}
-			headerHeight={headerHeight}
-			headerOverlayHeight={headerOverlayHeight}
+			triggerHeight={headerHeight}
 			/>
 		}
 		ListEmptyComponent={

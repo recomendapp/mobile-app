@@ -68,7 +68,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	} = useUserQuery({
 		userId: session?.user.id,
 	});
-	const { customerInfo: initCustomerInfo } = useRevenueCat(session?.user.id);
+	const { customerInfo: initCustomerInfo } = useRevenueCat(session);
 	const {
 		data: customerInfo,
 	} = useAuthCustomerInfo({

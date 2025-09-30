@@ -3,7 +3,6 @@ import Animated, {
   AnimatedStyle,
   clamp, 
   interpolate, 
-  runOnJS, 
   SharedValue, 
   useAnimatedScrollHandler, 
   useAnimatedStyle, 
@@ -17,29 +16,31 @@ import { AnimatedLegendList, AnimatedLegendListProps } from '@legendapp/list/rea
 import { LegendListRef } from '@legendapp/list';
 import { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
 import useDebounce from '@/hooks/useDebounce';
+import { scheduleOnRN } from 'react-native-worklets';
 
 interface WheelSelectorItemProps<T> extends React.ComponentProps<typeof Animated.View> {
   index: number;
-  totalItems: number;
   item: T;
   scrollX: SharedValue<number>;
   renderItem: (item: T, isActive: boolean) => React.ReactNode;
   itemWidth: number;
   wheelAngle: number;
   wheelIntensity: number;
+  isActive: boolean;
 }
 
 const WheelSelectorItem = <T,>({
   index,
-  totalItems,
   item,
   scrollX,
   renderItem,
   itemWidth,
   wheelAngle,
   wheelIntensity,
+  isActive,
   ...props
 }: WheelSelectorItemProps<T>) => {
+
   const animatedStyle = useAnimatedStyle(() => {
     const inputRange = [index - 1, index, index + 1];
     const opacityRange = [0.65, 1, 0.65];
@@ -72,12 +73,10 @@ const WheelSelectorItem = <T,>({
     }
     
     return {
-    //   opacity: interpolate(scrollX.value, inputRange, opacityRange),
+      opacity: interpolate(scrollX.value, inputRange, opacityRange),
       transform: transformations,
     };
   }, [scrollX, index, itemWidth, wheelAngle, wheelIntensity]);
-
-  const isActive = Math.round(scrollX.value) === index;
 
   return (
     <Animated.View
@@ -159,24 +158,25 @@ function WheelSelectorInner<T>({
       },
     }), [scrollX, totalItemWidth]);
 
-
     const vibrate = useCallback(() => {
       if (enableHaptics && process.env.EXPO_OS === 'ios') {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
     }, [enableHaptics]);
-
+  
     const onScroll = useAnimatedScrollHandler(e => {
       'worklet';
       scrollX.value = clamp(e.contentOffset.x / totalItemWidth, 0, data.length - 1);
       const newActiveIndex = Math.round(scrollX.value);
       
+      console.log('onScroll', { scrollX: scrollX.value, newActiveIndex, activeIndex: activeIndex.value });
       if (newActiveIndex !== activeIndex.value) {
         activeIndex.value = newActiveIndex;
+        console.log('newActiveIndex', newActiveIndex);
         if (enableHaptics) {
-          runOnJS(vibrate)();
+          scheduleOnRN(vibrate);
         }
-        runOnJS(setSelectedItem)({ item: data[newActiveIndex], index: newActiveIndex });
+        scheduleOnRN(setSelectedItem, { item: data[newActiveIndex], index: newActiveIndex });
       }
     });
 
@@ -188,57 +188,30 @@ function WheelSelectorInner<T>({
     }, [containerWidth]);
 
     const renderItem = useCallback(({ item, index }: { item: T; index: number }) => {
+      console.log('[WheelSelector] current selectedItem', selectedItem?.index);
+      console.log(`[WheelSelector] item: ${index}, isActive: ${selectedItem?.index === index}`);
       return (
         <Pressable
-        key={index}
         onPress={() => {
-          scrollRef.current?.scrollToOffset({
-            offset: index * totalItemWidth,
+          scrollRef.current?.scrollToIndex({
+            index,
             animated: true,
           });
         }}
         >
           <WheelSelectorItem
           index={index}
-          totalItems={data.length}
           item={item}
           scrollX={scrollX}
           renderItem={renderItemProps}
           itemWidth={finalItemWidth}
           wheelAngle={wheelAngle}
           wheelIntensity={wheelIntensity}
+          isActive={selectedItem?.index === index}
           />
         </Pressable>
       )
-    }, [finalItemWidth, scrollX, data.length, renderItemProps, totalItemWidth, wheelAngle, wheelIntensity]);
-
-    const listStyle = useMemo(() => {
-      return [
-        {
-          flexGrow: 0,
-          height: finalItemWidth * (1 + wheelIntensity)
-        },
-        style
-      ];
-    }, [finalItemWidth, wheelIntensity, style]);
-
-    const listContentContainerStyle = useMemo(() => {
-      return {
-        gap: itemSpacing,
-        paddingHorizontal: (containerWidth - finalItemWidth) / 2,
-      };
-    }, [containerWidth, finalItemWidth, itemSpacing]);
-
-    const initialScrollIndex = useMemo(() => {
-      if (initialIndex > 0) {
-        return {
-          index: initialIndex,
-          viewOffset: -((containerWidth - finalItemWidth) / 2),
-          viewPosition: 0
-        };
-      }
-      return undefined;
-    }, [initialIndex, containerWidth, finalItemWidth]);
+    }, [finalItemWidth, scrollX, data.length, renderItemProps, totalItemWidth, wheelAngle, wheelIntensity, selectedItem]);
 
     useEffect(() => {
       if (debouncedSelectedItem) {
@@ -246,25 +219,54 @@ function WheelSelectorInner<T>({
       }
     }, [debouncedSelectedItem, onSelectionChange]);
 
+    useEffect(() => {
+      console.log('MOUNT WHEEL SELECTOR');
+      return () => {
+        console.log('UNMOUNT WHEEL SELECTOR');
+      }
+    }, []);
+
+    useEffect(() => {
+      console.log('SelectedItem', selectedItem?.index);
+    }, [selectedItem]);
+
+    // useEffect(() => {
+    //   if (scrollRef.current) {
+    //     scrollRef.current.scrollToOffset({
+    //       offset: initialIndex * totalItemWidth,
+    //       animated: false,
+    //     });
+    //   }
+    // }, []);
+
     return (
       <Animated.View
       style={[{ width: '100%' }, containerStyle]}
       onLayout={handleLayout}
       >
         {finalItemWidth > 0 && (
-          <AnimatedLegendList<T>
-            ref={scrollRef}
-            data={data}
-            renderItem={renderItem}
-            initialScrollIndex={initialScrollIndex}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={listStyle}
-            contentContainerStyle={listContentContainerStyle}
-            onScroll={onScroll}
-            scrollEventThrottle={1000 / 60} // ~16ms
-            snapToInterval={totalItemWidth}
-			      {...props}
+          <AnimatedLegendList
+          ref={scrollRef}
+          data={data}
+          renderItem={renderItem}
+          initialScrollIndex={initialIndex}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={[
+            {
+              flexGrow: 0,
+              height: finalItemWidth * (1 + wheelIntensity)
+            },
+            style
+          ]}
+          contentContainerStyle={{
+            gap: itemSpacing,
+            paddingHorizontal: (containerWidth - finalItemWidth) / 2,
+          }}
+          onScroll={onScroll}
+          scrollEventThrottle={1000 / 60} // ~16ms
+          snapToInterval={totalItemWidth}
+          {...props}
           />
         )}
       </Animated.View>

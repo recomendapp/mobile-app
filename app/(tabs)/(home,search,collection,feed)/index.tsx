@@ -24,6 +24,7 @@ import { memo, useCallback, useMemo, useRef } from 'react';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
 import { WidgetMostPopular } from '@/components/widgets/WidgetMostPopular';
+import { useHeaderHeight } from '@react-navigation/elements';
 
 const HeaderLeft = () => {
   const { session, user } = useAuth();
@@ -131,6 +132,7 @@ const HomeScreen = () => {
   const t = useTranslations();
   const { bottomTabHeight, tabBarHeight } = useTheme();
   const { session } = useAuth();
+  const navigationHeaderHeight = useHeaderHeight();
   // REFs
   const scrollRef = useRef<AnimatedScrollView>(null);
   // useSharedValues
@@ -156,7 +158,7 @@ const HomeScreen = () => {
 
   const onLayoutWidgetMostRecommended = useCallback((e: LayoutChangeEvent) => {
     const { height } = e.nativeEvent.layout;
-    triggerHeight.value = height;
+    triggerHeight.value = (height - navigationHeaderHeight) * 0.7;
   }, [triggerHeight]);
   
   // Styles

@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import { forwardRef, memo, useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
-import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
+import Animated, { SharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { StyleProp, ViewStyle } from "react-native";
 import { Button } from "./Button";
 import { Icons } from "@/constants/Icons";
@@ -56,39 +56,23 @@ const AnimatedStackScreen = memo(forwardRef<
 
 	const titleAnimatedStyle = useAnimatedStyle(() => {
 		'worklet';
-		const animationDistance = triggerHeight.get() - navigationHeaderHeight;
-		const start = animationDistance * animationStartRatio;
-        const end = animationDistance;
-
+		const show = scrollY.value >= triggerHeight.get();
 		return {
-			opacity: interpolate(scrollY.value, [start, end], [0, 1], Extrapolation.CLAMP),
+			opacity: withTiming(show ? 1 : 0, { duration: 200 }),
 			transform: [
-			{
-				scale: interpolate(scrollY.value, [start, end], [scaleStartRatio, 1], Extrapolation.CLAMP),
-			},
-			{
-				translateY: interpolate(scrollY.value, [start, end], [-10, 0], Extrapolation.CLAMP),
-			},
+			{ scale: withTiming(show ? 1 : scaleStartRatio, { duration: 200 }) },
+			{ translateY: withTiming(show ? 0 : -10, { duration: 200 }) },
 			],
 		};
-	}, [navigationHeaderHeight, animationStartRatio, scaleStartRatio]);
-
+	});
 	const backgroundAnimatedStyle = useAnimatedStyle(() => {
 		'worklet';
-		const animationDistance = triggerHeight.get() - navigationHeaderHeight;
-		const start = animationDistance * animationStartRatio;
-        const end = animationDistance;
-
+		const show = scrollY.value >= triggerHeight.get();
 		return {
-			opacity: interpolate(scrollY.value, [start, end], [0, 1], Extrapolation.CLAMP),
-			transform: [
-			{
-				translateY: interpolate(scrollY.value, [start, end], [-10, 0], Extrapolation.CLAMP),
-			},
-			],
+			opacity: withTiming(show ? 1 : 0, { duration: 200 }),
+			transform: [{ translateY: withTiming(show ? 0 : -10, { duration: 200 }) }],
 		};
-	}, [navigationHeaderHeight, animationStartRatio]);
-
+	});
 	const getBackgroundColor = useCallback((style: StyleProp<ViewStyle>) => {
 		if (!style) return undefined;
 		if (Array.isArray(style)) {

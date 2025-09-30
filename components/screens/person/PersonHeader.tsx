@@ -21,31 +21,30 @@ import { useTranslations } from 'use-intl';
 import { Text } from '@/components/ui/text';
 import { BORDER_RADIUS, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { useHeaderHeight } from '@react-navigation/elements';
-import { useImageColorPairs } from '@/hooks/useImageColorPairs';
 import { View } from '@/components/ui/view';
+import { useImagePalette } from '@/hooks/useImagePalette';
 
 interface PersonHeaderProps {
 	person?: MediaPerson | null;
 	loading: boolean;
 	scrollY: SharedValue<number>;
-	headerHeight: SharedValue<number>;
-	headerOverlayHeight: SharedValue<number>;
+	triggerHeight: SharedValue<number>;
 }
 export const PersonHeader: React.FC<PersonHeaderProps> = ({
 	person,
 	loading,
 	scrollY,
-	headerHeight,
-	headerOverlayHeight,
+	triggerHeight,
 }) => {
 	const t = useTranslations();
 	const { hslToRgb } = useColorConverter();
 	const { colors } = useTheme();
 	const navigationHeaderHeight = useHeaderHeight();
 	const bgColor = hslToRgb(colors.background);
-	const { colorPairs } = useImageColorPairs(person?.profile_url || undefined);
+	const { palette } = useImagePalette(person?.profile_url || undefined);
 	// SharedValue
 	const posterHeight = useSharedValue(0);
+	const headerHeight = useSharedValue(0);
 	// Animated styles
 	const posterAnim = useAnimatedStyle(() => {
 		const stretch = Math.max(-scrollY.value, 0);
@@ -64,7 +63,7 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 		return {
 			opacity: interpolate(
 				scrollY.get(),
-				[0, headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight) / 0.8],
+				[0, (headerHeight.get() - navigationHeaderHeight) / 0.8],
 				[1, 0],
 				Extrapolation.CLAMP,
 			),
@@ -72,7 +71,7 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 				{
 					scale: interpolate(
 					scrollY.get(),
-					[0, (headerHeight.get() - (headerOverlayHeight.get() + navigationHeaderHeight)) / 2],
+					[0, (headerHeight.get() - navigationHeaderHeight) / 2],
 					[1, 0.98],
 					'clamp',
 					),
@@ -102,7 +101,9 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 	]}
 	onLayout={(event: LayoutChangeEvent) => {
 		'worklet';
-		headerHeight.value = event.nativeEvent.layout.height;
+		const height = event.nativeEvent.layout.height;
+		headerHeight.value = height;
+		triggerHeight.value = (height - navigationHeaderHeight) * 0.7;
 	}}
 	>
 		<Animated.View
@@ -111,7 +112,7 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 			bgAnim,
 		]}
 		>
-			{colorPairs.length ? <View style={[{ backgroundColor: colorPairs[0].bottom }, tw`absolute inset-0`]}/> : null}
+			{palette?.length ? <View style={[{ backgroundColor: palette[0] }, tw`absolute inset-0`]}/> : null}
 			<LinearGradient
 			style={tw`absolute inset-0`}
 			colors={[
