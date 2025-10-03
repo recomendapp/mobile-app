@@ -44,10 +44,12 @@ expo-env.d.ts
 ios/
 android/
 *.aab
+*.apk
 
 # vscode
 .vscode/
 
+credentials/
 credentials.json
 google-services.json
 

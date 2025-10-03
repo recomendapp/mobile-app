@@ -28,7 +28,7 @@ const getAppName = () => {
 };
 
 const getWebDomain = () => {
-	return process.env.EXPO_PUBLIC_WEB_APP!;
+	return process.env.EXPO_PUBLIC_WEB_APP;
 }
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
@@ -37,15 +37,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	slug: 'recomend',
 	version: '1.0.0',
 	orientation: 'portrait',
-	icon: './assets/images/icon.png',
+	icon: './src/assets/images/icon.png',
 	scheme: 'recomend',
 	userInterfaceStyle: 'automatic',
 	newArchEnabled: true,
-	splash: {
-		image: './assets/images/splash.png',
-		resizeMode: 'contain',
-		backgroundColor: '#ffffff',
-	},
 	assetBundlePatterns: [
 		'**/*'
 	],
@@ -56,12 +51,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			`applinks:${getWebDomain()}`
 		],
 		infoPlist: {
-			ITSAppUsesNonExemptEncryption: false
+			ITSAppUsesNonExemptEncryption: false,
+			UIDesignRequiresCompatibility: true, // Disable iOS 26 Liquid Glass effect
 		}
 	},
 	android: {
 		adaptiveIcon: {
-			foregroundImage: './assets/images/adaptive-icon.png',
+			foregroundImage: './src/assets/images/adaptive-icon.png',
 			backgroundColor: '#ffffff',
 		},
 		edgeToEdgeEnabled: true,
@@ -91,7 +87,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	web: {
 		bundler: 'metro',
 		output: 'static',
-		favicon: './assets/images/favicon.png',
+		favicon: './src/assets/images/favicon.png',
 	},
 	plugins: [
 		'expo-router',
@@ -120,7 +116,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			{
 			"sounds":
 				[
-					"./assets/sounds/notif.wav"
+					"./src/assets/sounds/notif.wav"
 				]
 			}
       	],
@@ -128,6 +124,57 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			"expo-web-browser",
 			{
 			"experimentalLauncherActivity": true
+			}
+		],
+		[
+          'expo-splash-screen',
+          {
+            ios: {
+              enableFullScreenImage_legacy: true,
+              backgroundColor: '#ffffff',
+              image: './src/assets/splash/splash.png',
+              resizeMode: 'cover',
+              dark: {
+                enableFullScreenImage_legacy: true,
+                backgroundColor: '#0b0909',
+                image: './src/assets/splash/splash-dark.png',
+                resizeMode: 'cover',
+              },
+            },
+            android: {
+              backgroundColor: '#0c7cff',
+              image: './src/assets/splash/splash-android-icon.png',
+              imageWidth: 150,
+              dark: {
+                backgroundColor: '#0c2a49',
+                image: './src/assets/splash/splash-android-icon-dark.png',
+                imageWidth: 150,
+              },
+            },
+          },
+        ],
+		[
+			"react-native-share",
+			{
+				"ios": [
+					"fb",
+					"instagram",
+					"twitter",
+					"tiktoksharesdk",
+					"whatsapp",
+					"messenger",
+					"snapchat",
+				],
+				"android": [
+					"com.facebook.katana",
+					"com.instagram.android",
+					"com.twitter.android",
+					"com.zhiliaoapp.musically",
+					"com.whatsapp",
+					"com.facebook.orca",
+					"com.snapchat.android",
+				],
+				"enableBase64ShareAndroid": true
 			}
 		]
 	],
