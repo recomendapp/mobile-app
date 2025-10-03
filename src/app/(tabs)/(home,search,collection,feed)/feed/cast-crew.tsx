@@ -9,21 +9,18 @@ import { useUserFeedCastCrewInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { BORDER_RADIUS, GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { Database } from "@recomendapp/types";
 import { useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
 const CastCrewFeedScreen = () => {
 	const t = useTranslations();
 	const router = useRouter();
 	const { tabBarHeight, bottomTabHeight, colors } = useTheme();
-	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const { session, customerInfo } = useAuth();
 	const {
 		data,
@@ -95,7 +92,6 @@ const CastCrewFeedScreen = () => {
 		renderItem={renderItem}
 		ListEmptyComponent={renderEmpty}
 		contentContainerStyle={{
-			paddingTop: GAP,
 			paddingHorizontal: PADDING_HORIZONTAL,
 			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			gap: GAP,

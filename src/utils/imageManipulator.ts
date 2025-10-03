@@ -1,45 +1,37 @@
-import { Image } from "react-native";
+import { Image } from "expo-image";
 import {
-  ImageManipulator,
-  SaveFormat,
-  ImageResult,
+	ImageManipulator,
+	SaveFormat,
+	ImageResult,
 } from "expo-image-manipulator";
 
 export const cropImageRatio = async (
-  originalUri: string,
-  targetRatio: number = 9 / 16
+	originalUri: string,
+	targetRatio: number = 9 / 16
 ): Promise<ImageResult> => {
-  return new Promise((resolve, reject) => {
-    Image.getSize(originalUri, async (originalWidth, originalHeight) => {
-      try {
-        const originalRatio = originalWidth / originalHeight;
+	const img = await Image.loadAsync(originalUri);
+	const originalRatio = img.width / img.height;
 
-        let cropWidth: number, cropHeight: number, originX: number, originY: number;
+	let cropWidth: number, cropHeight: number, originX: number, originY: number;
 
-        if (originalRatio > targetRatio) {
-          cropHeight = originalHeight;
-          cropWidth = originalHeight * targetRatio;
-          originX = (originalWidth - cropWidth) / 2;
-          originY = 0;
-        } else {
-          cropWidth = originalWidth;
-          cropHeight = originalWidth / targetRatio;
-          originY = (originalHeight - cropHeight) / 2;
-          originX = 0;
-        }
+	if (originalRatio > targetRatio) {
+		cropHeight = img.height;
+		cropWidth = img.height * targetRatio;
+		originX = (img.width - cropWidth) / 2;
+		originY = 0;
+	} else {
+		cropWidth = img.width;
+		cropHeight = img.width / targetRatio;
+		originY = (img.height - cropHeight) / 2;
+		originX = 0;
+	}
 
-        const ctx = ImageManipulator.manipulate(originalUri);
-        ctx.crop({ originX, originY, width: cropWidth, height: cropHeight });
+	const ctx = ImageManipulator.manipulate(img);
+	ctx.crop({ originX, originY, width: cropWidth, height: cropHeight });
 
-        const imageRef = await ctx.renderAsync();
-        const result = await imageRef.saveAsync({
-          format: SaveFormat.JPEG,
-        });
-
-        resolve(result);
-      } catch (e) {
-        reject(e);
-      }
-    });
-  });
+	const imageRef = await ctx.renderAsync();
+	const result = await imageRef.saveAsync({
+		format: SaveFormat.JPEG,
+	});
+	return result;
 };

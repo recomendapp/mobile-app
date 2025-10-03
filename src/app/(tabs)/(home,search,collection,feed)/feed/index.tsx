@@ -79,7 +79,6 @@ const FeedScreen = () => {
 		renderItem={renderItem}
 		ListEmptyComponent={renderEmpty}
 		contentContainerStyle={{
-			paddingTop: GAP,
 			paddingHorizontal: PADDING_HORIZONTAL,
 			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
 			gap: GAP,

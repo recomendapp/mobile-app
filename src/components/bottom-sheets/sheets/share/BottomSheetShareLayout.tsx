@@ -82,6 +82,49 @@ const BottomSheetShareLayout = forwardRef<
             }
         },
         {
+            label: "WhatsApp",
+            icon: Icons.settings,
+            onPress: async () => {
+                await Share.shareSingle({
+                    social: Social.Whatsapp,
+                    title: "Recomend",
+                    message: url,
+                    url: url,
+                    appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
+                });
+            }
+        },
+        {
+            label: "Messenger",
+            icon: Icons.settings,
+            onPress: async () => {
+                await Share.shareSingle({
+                    social: Social.Messenger,
+                    appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
+                    title: "Recomend",
+                    message: url,
+                    url: url,
+                });
+            }
+        },
+        // {
+        //     label: "Snapchat",
+        //     icon: Icons.shop,
+        //     onPress: async () => {
+        //         const data = await contentRef.current?.capture();
+        //         if (!data) return;
+        //         console.log('Sharing to Snapchat with data:', data);
+        //         await Share.shareSingle({
+        //             social: Social.Snapchat,
+        //             appId: process.env.EXPO_PUBLIC_SNAPCHAT_CLIENT_ID!,
+        //             title: "Recomend",
+        //             url: url,
+        //             type: 'image/png',
+                    
+        //         });
+        //     }
+        // },
+        {
             label: "More",
             icon: Icons.EllipsisHorizontal,
             onPress: async () => {
@@ -96,7 +139,11 @@ const BottomSheetShareLayout = forwardRef<
     const handlePlatformPress = (item: SharePlatform, index: number) => async () => {
         setLoadingPlatform(index);
         try {
+            console.log('Sharing via:', item.label);
             await item.onPress();
+            console.log('Share successful via:', item.label);
+        } catch (error) {
+            console.error('Error sharing:', error);
         } finally {
             setLoadingPlatform(null);
         }

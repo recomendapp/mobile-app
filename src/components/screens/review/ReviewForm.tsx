@@ -2,12 +2,10 @@ import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import {  MediaMovie, MediaTvSeries, UserActivityMovie, UserActivityTvSeries, UserReviewMovie, UserReviewTvSeries } from "@recomendapp/types";
 import { useEffect, useState } from "react";
-import { RichText, Toolbar } from "@10play/tentap-editor";
 import { upperFirst } from "lodash";
 import * as Burnt from "burnt";
 import useEditor from "@/lib/10tap/editor";
 import { useSharedValue } from "react-native-reanimated";
-import { BetterInput } from "@/components/ui/BetterInput";
 import { useTranslations } from "use-intl";
 import { Stack } from "expo-router";
 import { Button } from "@/components/ui/Button";
@@ -17,8 +15,10 @@ import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { View } from "@/components/ui/view";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Toolbar } from "../../RichText/Toolbar";
+import { Input } from "@/components/ui/Input";
+import { RichText } from "@/components/RichText/RichText";
 
 const MAX_TITLE_LENGTH = 50;
 const MAX_BODY_LENGTH = 5000;
@@ -134,12 +134,12 @@ const ReviewForm = ({
 				headerHeight.value = e.nativeEvent.layout.height + 8;
 			}}
 			>
-				<BetterInput
+				<Input
 				value={title}
 				onChangeText={(text) => setTitle(text.replace(/\s+/g, ' ').trimStart())}
 				placeholder={upperFirst(t('common.messages.title'))}
 				maxLength={MAX_TITLE_LENGTH}
-				containerStyle={tw`bg-transparent p-0`}
+				inputContainerStyle={tw`bg-transparent border-0 rounded-none`}
 				style={[
 					tw`h-auto font-bold`,
 					{
@@ -157,31 +157,13 @@ const ReviewForm = ({
 					<CardTvSeries tvSeries={tvSeries} linked={false} showActionRating />
 				)}
 			</View>
-			<View style={tw`flex-1`}>
-				<RichText
-				scrollEnabled={false}
-				editor={editor}
-				exclusivelyUseCustomOnMessage={false}
-				style={[
-					tw`px-2`,
-					{ backgroundColor: colors.background }
-				]}
-				/>
-				{/* <KeyboardAvoidingView
-					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-					style={tw`absolute bottom-0`}
-					keyboardVerticalOffset={headerHeight.get() + navigationHeaderHeight}
-				>
-					<Toolbar editor={editor} hidden={false} />
-				</KeyboardAvoidingView> */}
-			</View>
+			<RichText
+			scrollEnabled={false}
+			editor={editor}
+			exclusivelyUseCustomOnMessage={false}
+			/>
 		</KeyboardAwareScrollView>
-		<KeyboardToolbar
-		showArrows={false}
-		content={
-			<Toolbar editor={editor} hidden={false} />
-		}
-		/>
+		<Toolbar editor={editor} />
 	</>
 	);
 };

@@ -24,6 +24,7 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { View } from '@/components/ui/view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
+import { useHeaderHeight } from '@react-navigation/elements';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
@@ -34,6 +35,7 @@ const LoginOtpScreen = () => {
 	const { loginWithOtp } = useAuth();
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
+	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const bgImage = useRandomImage(backgroundImages);
@@ -181,7 +183,7 @@ const LoginOtpScreen = () => {
 					tw`flex-1 justify-end items-center`,
 					{
 						gap: GAP,
-						paddingTop: PADDING_VERTICAL,
+						paddingTop: navigationHeaderHeight,
 						paddingLeft: insets.left + PADDING_HORIZONTAL,
 						paddingRight: insets.right + PADDING_HORIZONTAL,
 						paddingBottom: insets.bottom + PADDING_VERTICAL,

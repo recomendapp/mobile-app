@@ -82,7 +82,9 @@ const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => 
 			keyExtractor={useCallback((item: NavigationRoute<ParamListBase, string>) => item.key, [])}
 			contentContainerStyle={{
 				gap: GAP,
-				paddingHorizontal: PADDING_HORIZONTAL,			}}
+				paddingHorizontal: PADDING_HORIZONTAL,
+				paddingBottom: GAP,
+			}}
 			horizontal
 			showsHorizontalScrollIndicator={false}
 			/>

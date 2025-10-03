@@ -90,7 +90,7 @@
     "react-native-get-random-values": "^1.11.0",
     "react-native-image-colors": "^2.5.0",
     "react-native-keyboard-controller": "1.18.5",
-    "react-native-mmkv": "^3.3.0",
+    "react-native-mmkv": "^3.3.3",
     "react-native-nitro-modules": "^0.29.6",
     "react-native-pager-view": "6.9.1",
     "react-native-purchases": "^9.3.0",

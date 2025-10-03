@@ -169,10 +169,8 @@ function WheelSelectorInner<T>({
       scrollX.value = clamp(e.contentOffset.x / totalItemWidth, 0, data.length - 1);
       const newActiveIndex = Math.round(scrollX.value);
       
-      console.log('onScroll', { scrollX: scrollX.value, newActiveIndex, activeIndex: activeIndex.value });
       if (newActiveIndex !== activeIndex.value) {
         activeIndex.value = newActiveIndex;
-        console.log('newActiveIndex', newActiveIndex);
         if (enableHaptics) {
           scheduleOnRN(vibrate);
         }
@@ -188,8 +186,6 @@ function WheelSelectorInner<T>({
     }, [containerWidth]);
 
     const renderItem = useCallback(({ item, index }: { item: T; index: number }) => {
-      console.log('[WheelSelector] current selectedItem', selectedItem?.index);
-      console.log(`[WheelSelector] item: ${index}, isActive: ${selectedItem?.index === index}`);
       return (
         <Pressable
         onPress={() => {
@@ -218,26 +214,6 @@ function WheelSelectorInner<T>({
         onSelectionChange?.(debouncedSelectedItem.item, debouncedSelectedItem.index);
       }
     }, [debouncedSelectedItem, onSelectionChange]);
-
-    useEffect(() => {
-      console.log('MOUNT WHEEL SELECTOR');
-      return () => {
-        console.log('UNMOUNT WHEEL SELECTOR');
-      }
-    }, []);
-
-    useEffect(() => {
-      console.log('SelectedItem', selectedItem?.index);
-    }, [selectedItem]);
-
-    // useEffect(() => {
-    //   if (scrollRef.current) {
-    //     scrollRef.current.scrollToOffset({
-    //       offset: initialIndex * totalItemWidth,
-    //       animated: false,
-    //     });
-    //   }
-    // }, []);
 
     return (
       <Animated.View

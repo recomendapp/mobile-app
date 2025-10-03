@@ -14,13 +14,13 @@ export const KeyboardToolbar = ({
 		...DefaultKeyboardToolbarTheme,
 		dark: {
 			...DefaultKeyboardToolbarTheme.dark,
-			// background: colors.muted,
-			// primary: colors.foreground,
+			background: colors.muted,
+			primary: colors.foreground,
 		},
 		light: {
 			...DefaultKeyboardToolbarTheme.dark,
-			// background: colors.muted,
-			// primary: colors.foreground,
+			background: colors.muted,
+			primary: colors.foreground,
 		},
 		...theme,
 	}), [colors, theme]);

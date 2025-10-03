@@ -136,7 +136,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
               resizeMode: 'cover',
               dark: {
                 enableFullScreenImage_legacy: true,
-                backgroundColor: '#001429',
+                backgroundColor: '#0b0909',
                 image: './src/assets/splash/splash-dark.png',
                 resizeMode: 'cover',
               },
@@ -153,6 +153,30 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
             },
           },
         ],
+		[
+			"react-native-share",
+			{
+				"ios": [
+					"fb",
+					"instagram",
+					"twitter",
+					"tiktoksharesdk",
+					"whatsapp",
+					"messenger",
+					"snapchat",
+				],
+				"android": [
+					"com.facebook.katana",
+					"com.instagram.android",
+					"com.twitter.android",
+					"com.zhiliaoapp.musically",
+					"com.whatsapp",
+					"com.facebook.orca",
+					"com.snapchat.android",
+				],
+				"enableBase64ShareAndroid": true
+			}
+		]
 	],
 	experiments: {
 		typedRoutes: true,
