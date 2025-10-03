@@ -5,6 +5,7 @@ import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { ShareViewRef } from "@/components/share/type";
 import BottomSheetShareLayout from "./BottomSheetShareLayout"; // Importer le layout
 import { ShareMovie } from "@/components/share/ShareMovie";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface BottomSheetShareMovieProps extends BottomSheetProps {
     movie: MediaMovie;
@@ -17,6 +18,7 @@ const BottomSheetShareMovie = forwardRef<
     movie,
     ...props
 }, ref) => {
+    const { customerInfo } = useAuth();
     const shareViewRef = useRef<ShareViewRef>(null);
     return (
         <BottomSheetShareLayout
@@ -25,7 +27,11 @@ const BottomSheetShareMovie = forwardRef<
             contentRef={shareViewRef} 
             {...props}
         >
-            <ShareMovie ref={shareViewRef} movie={movie} />
+            <ShareMovie
+			ref={shareViewRef}
+			movie={movie}
+			isPremium={!!customerInfo?.entitlements.active['premium']}
+			/>
         </BottomSheetShareLayout>
     );
 });

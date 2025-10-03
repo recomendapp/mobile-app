@@ -17,19 +17,20 @@ import {
   NativeSyntheticEvent,
   FocusEvent,
   BlurEvent,
+  StyleProp,
 } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { useTranslations } from 'use-intl';
 
-export interface InputProps extends Omit<TextInputProps, 'style'> {
+export interface InputProps extends TextInputProps {
   label?: string | null;
   error?: string;
   icon?: React.ComponentType<LucideProps>;
   rightComponent?: React.ReactNode | (() => React.ReactNode);
   containerStyle?: ViewStyle;
-  inputStyle?: TextStyle;
-  labelStyle?: TextStyle;
-  errorStyle?: TextStyle;
+  inputStyle?: StyleProp<TextStyle>;
+  labelStyle?: StyleProp<TextStyle>;
+  errorStyle?: StyleProp<TextStyle>;
   leftSectionStyle?: ViewStyle;
   inputContainerStyle?: ViewStyle | ViewStyle[];
   variant?: 'filled' | 'outline';

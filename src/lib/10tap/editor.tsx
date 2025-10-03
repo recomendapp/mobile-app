@@ -11,11 +11,14 @@ const useEditor = ({
 	const { colors } = useTheme();
 	const customCodeBlockCSS = useMemo(() => `
 		* {
-			background-color: ${colors.background};
+			background-color: 'transparent';
 			color: ${colors.foreground};
 			padding: 0;
 			margin: 0;
 			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+		}
+		strong, b {
+			color: ${colors.accentYellow};
 		}
 		blockquote {
 			border-left: 3px solid #babaca;
@@ -28,25 +31,57 @@ const useEditor = ({
 			color: ${colors.muted};
 			font-style: italic;
 		}
+		a {
+			color: ${colors.accentPink};
+		}
 	`, [colors]);
 	return useEditorBridge({
 			avoidIosKeyboard: avoidIosKeyboard,
 			theme: {
 				toolbar: {
 					toolbarBody: {
-						backgroundColor: colors.muted,
+						backgroundColor: 'transparent',
 						borderTopWidth: 0,
 						borderBottomWidth: 0,
-						paddingTop: 16,
-						paddingBottom: 16,
-						height: 'auto',
 					},
 					toolbarButton: {
-						backgroundColor: colors.muted,
-					}
+						backgroundColor: 'transparent',
+					},
+					iconWrapper: {
+						backgroundColor: 'transparent',
+					},
+					iconWrapperActive: {
+						backgroundColor: 'transparent',
+					},
+					icon: {
+						tintColor: colors.foreground,
+					},
+					iconActive: {
+						tintColor: colors.accentYellow,
+					},
+					iconDisabled: {
+						tintColor: colors.mutedForeground,
+					},
+					linkBarTheme: {
+						addLinkContainer: {
+							backgroundColor: 'transparent',
+							borderTopWidth: 0,
+							borderBottomWidth: 0,
+						},
+						linkInput: {
+							color: colors.foreground,
+						},
+						placeholderTextColor: colors.mutedForeground,
+						doneButtonText: {
+							color: colors.accentYellow,
+						},
+						doneButton: {
+							backgroundColor: colors.muted,
+						},
+					},
 				},
 				webview: {
-					backgroundColor: colors.background,
+					backgroundColor: 'transparent',
 				},
 				...(theme || {}) 
 			},

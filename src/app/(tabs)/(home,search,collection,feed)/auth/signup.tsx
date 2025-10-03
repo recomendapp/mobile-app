@@ -26,13 +26,12 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { View } from '@/components/ui/view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
+import { useHeaderHeight } from '@react-navigation/elements';
 
 
 const backgroundImages = [
 	require('@/assets/images/auth/signup/background/1.gif'),
 ]
-
-const PADDING = 16;
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -44,6 +43,7 @@ const SignupScreen = () => {
 	const supabase = useSupabaseClient();
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
+	const navigationHeaderHeight = useHeaderHeight();
 	const { signup, loginWithOtp } = useAuth();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locale = useLocale();
@@ -289,7 +289,7 @@ const SignupScreen = () => {
 					tw`flex-1 justify-end items-center`,
 					{
 						gap: GAP,
-						paddingTop: PADDING_VERTICAL,
+						paddingTop: navigationHeaderHeight,
 						paddingLeft: insets.left + PADDING_HORIZONTAL,
 						paddingRight: insets.right + PADDING_HORIZONTAL,
 						paddingBottom: insets.bottom + PADDING_VERTICAL,

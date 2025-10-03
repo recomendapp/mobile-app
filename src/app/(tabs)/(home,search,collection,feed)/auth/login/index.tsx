@@ -19,6 +19,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
+import { useHeaderHeight } from '@react-navigation/elements';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
@@ -28,6 +29,7 @@ const LoginScreen = () => {
 	const { login } = useAuth();
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
+	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const [ email, setEmail ] = useState('');
 	const [ password, setPassword ] = useState('');
@@ -69,7 +71,7 @@ const LoginScreen = () => {
 					tw`flex-1 justify-end items-center`,
 					{
 						gap: GAP,
-						paddingTop: PADDING_VERTICAL,
+						paddingTop: navigationHeaderHeight,
 						paddingLeft: insets.left + PADDING_HORIZONTAL,
 						paddingRight: insets.right + PADDING_HORIZONTAL,
 						paddingBottom: insets.bottom + PADDING_VERTICAL,

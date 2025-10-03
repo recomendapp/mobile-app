@@ -91,9 +91,6 @@ const AppLayout = ({ segment } : { segment: string }) => {
         />
       </Stack.Protected>
 
-      {/* SHARE */}
-      <Stack.Screen name='share/film/[movie_id]' options={{ headerTitle: upperFirst(t('common.messages.share')), presentation: 'formSheet', gestureDirection: "vertical", animation: "slide_from_bottom", sheetGrabberVisible: true, sheetAllowedDetents: 'fitToContents' }} />
-
       {/* AUTH */}
       <Stack.Protected guard={!session}>
         <Stack.Screen

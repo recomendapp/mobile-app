@@ -5,8 +5,7 @@ import { useMemo, useCallback, memo } from "react";
 import { useTranslations } from "use-intl";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useUIStore } from "@/stores/useUIStore";
-import { useTheme } from "@/providers/ThemeProvider";
-import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_HORIZONTAL } from "@/theme/globals";
 import { View } from "@/components/ui/view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -33,6 +32,7 @@ const FeedHeader = memo(({
       paddingTop: insets.top,
       paddingLeft: insets.left + PADDING_HORIZONTAL,
       paddingRight: insets.right + PADDING_HORIZONTAL,
+      paddingBottom: GAP,
     }}
     >
       <SegmentedControl
