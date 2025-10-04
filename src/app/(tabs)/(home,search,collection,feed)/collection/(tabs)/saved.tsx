@@ -9,7 +9,7 @@ import { upperFirst } from "lodash";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useTranslations } from "use-intl";
 import { Playlist } from "@recomendapp/types";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
 const CollectionSavedScreen = () => {
@@ -17,7 +17,7 @@ const CollectionSavedScreen = () => {
 	const t = useTranslations();
 	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
 	const {
-		data: playlists,
+		data,
 		isLoading,
 		isFetching,
 		isRefetching,
@@ -27,32 +27,29 @@ const CollectionSavedScreen = () => {
 	} = useUserPlaylistsSavedInfiniteQuery({
 		userId: user?.id,
 	});
-	const loading = isLoading || playlists === undefined;
+	const loading = isLoading || data === undefined;
+	const playlists = useMemo(() => data?.pages.flat() ?? [], [data]);
 
 	const renderItem = useCallback(({ item }: { item: { playlist: Playlist} }) => (
 		<View style={tw`p-1`}>
 			<CardPlaylist playlist={item.playlist} style={tw`w-full`} />
 		</View>
 	), []);
-	const ListEmptyComponent = useCallback(() => {
-		if (loading) {
-			return <Icons.Loader />;
-		}
-		return (
-			<View style={tw`flex-1 items-center justify-center p-4`}>
-				<Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
-					{upperFirst(t('common.messages.no_playlists_saved'))}
-				</Text>
-			</View>
-		);
-	}, [loading, colors.mutedForeground, t]);
 	const keyExtractor = useCallback((item: { playlist: Playlist }) => item.playlist.id.toString(), []);
 	const onEndReached = useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage]);
 	return (
 		<LegendList
-		data={playlists?.pages.flatMap((page) => page) ?? []}
+		data={playlists}
 		renderItem={renderItem}
-		ListEmptyComponent={ListEmptyComponent}
+		ListEmptyComponent={
+			loading ? <Icons.Loader /> : (
+				<View style={tw`flex-1 items-center justify-center p-4`}>
+					<Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
+						{upperFirst(t('common.messages.no_playlists_saved'))}
+					</Text>
+				</View>
+			)
+		}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		numColumns={3}

@@ -1,6 +1,6 @@
 import { useAuth } from '@/providers/AuthProvider';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AuthError } from '@supabase/supabase-js';
+import { AuthError, Provider } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button } from '@/components/ui/Button';
 import { Link } from 'expo-router';
@@ -14,7 +14,7 @@ import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
 import { GroupedInput, GroupedInputItem } from '@/components/ui/Input';
 import { upperFirst } from 'lodash';
-import { ImageBackground } from 'expo-image';
+import { Image, ImageBackground } from 'expo-image';
 import * as Burnt from 'burnt';
 import { useRandomImage } from '@/hooks/useRandomImage';
 import { InputOTP } from '@/components/ui/input-otp';
@@ -27,10 +27,30 @@ import { View } from '@/components/ui/view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useHeaderHeight } from '@react-navigation/elements';
-
+import { LegendList } from '@legendapp/list';
 
 const backgroundImages = [
 	require('@/assets/images/auth/signup/background/1.gif'),
+]
+
+type Providers = {
+	name: Provider;
+	label: string;
+	img: any;
+}[];
+
+
+const providers: Providers = [
+	{
+		name: "google",
+		label: "Google",
+		img: require("@/assets/images/providers/google.png")
+	},
+	{
+		name: "github",
+		label: "GitHub",
+		img: require("@/assets/images/providers/github.png"),
+	}
 ]
 
 const USERNAME_MIN_LENGTH = 3;
@@ -44,7 +64,7 @@ const SignupScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
 	const navigationHeaderHeight = useHeaderHeight();
-	const { signup, loginWithOtp } = useAuth();
+	const { signup, loginWithOtp, loginWithOAuth } = useAuth();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locale = useLocale();
 	const t = useTranslations();
@@ -255,6 +275,22 @@ const SignupScreen = () => {
 		  setIsLoading(false);
 		}
 	}, [supabase, t, form]);
+
+	const handleProviderPress = useCallback(async (provider: Provider) => {
+		try {
+			await loginWithOAuth(provider);
+		} catch (error) {
+			if (error instanceof Error) {
+				if (error.message === 'cancelled') return;
+			}
+			Burnt.toast({
+				title: upperFirst(t('common.messages.error')),
+				message: upperFirst(t('common.messages.an_error_occurred')),
+				preset: 'error',
+				haptic: 'error',
+			});
+		}
+	}, [loginWithOAuth]);
 	// useEffects
 	useEffect(() => {
 		if (!form.formState.errors.username?.message && usernameToCheck) {
@@ -413,6 +449,21 @@ const SignupScreen = () => {
 							>
 								{upperFirst(t('common.messages.signup'))}
 							</Button>
+						</View>
+						<View style={[tw`w-full`, { gap: GAP }]}>
+							<Text style={tw`text-center`} textColor='muted'>{upperFirst(t('common.messages.or_continue_with'))}</Text>
+							<LegendList
+							data={providers}
+							renderItem={({ item }) => (
+								<Button variant='muted' onPress={() => handleProviderPress(item.name)}>
+									<Image source={item.img} style={{ height: 18, width: 18 }} contentFit="cover" />
+									<Text style={{ color: colors.foreground }}>{item.label}</Text>
+								</Button>
+							)}
+							keyExtractor={(item) => item.name}
+							numColumns={2}
+							contentContainerStyle={{ gap: GAP }}
+							/>
 						</View>
 						{/* SIGNUP */}
 						<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>{t('pages.auth.signup.return_to_login')} <Link href={'/auth/login'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.login'))}</Link></Text>

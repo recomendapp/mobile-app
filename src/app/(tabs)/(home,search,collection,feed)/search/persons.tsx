@@ -84,14 +84,6 @@ const SearchPersonsScreen = memo(() => {
 		}
 	}, [hasNextPage, fetchNextPage]);
 
-	const ListEmptyComponent = useCallback(() => (
-		<EmptyComponent
-			isLoading={isLoading}
-			debouncedSearch={debouncedSearch}
-			noResultsText={upperFirst(t('common.messages.no_results'))}
-		/>
-	), [isLoading, debouncedSearch, t]);
-
 	useScrollToTop(scrollRef);
 
 	return (
@@ -110,7 +102,13 @@ const SearchPersonsScreen = memo(() => {
 				bottom: tabBarHeight,
 			}}
 			keyExtractor={keyExtractor}
-			ListEmptyComponent={ListEmptyComponent}
+			ListEmptyComponent={
+				<EmptyComponent
+				isLoading={isLoading}
+				debouncedSearch={debouncedSearch}
+				noResultsText={upperFirst(t('common.messages.no_results'))}
+				/>
+			}
 			onEndReached={onEndReached}
 		/>
 	);

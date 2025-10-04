@@ -10,11 +10,11 @@ interface UIStore {
   setHeartPicksTab: (tab: UserActivityType) => void;
   setHeartPicksView: (view: ViewType) => void;
 
-  watchlistTab: { tab: UserWatchlistType; view: ViewType };
+  watchlist: { tab: UserWatchlistType; view: ViewType };
   setWatchlistTab: (tab: UserWatchlistType) => void;
   setWatchlistView: (view: ViewType) => void;
 
-  myRecosTab: { tab: UserRecosType; view: ViewType };
+  myRecos: { tab: UserRecosType; view: ViewType };
   setMyRecosTab: (tab: UserRecosType) => void;
   setMyRecosView: (view: ViewType) => void;
 
@@ -43,26 +43,26 @@ export const useUIStore = create<UIStore>()(
 				heartPicks: { ...state.heartPicks, view },
 			})),
 			// Watchlist
-			watchlistTab: {
+			watchlist: {
 				tab: 'movie',
 				view: 'grid',
 			},
 			setWatchlistTab: (tab) => set(state => ({
-				watchlistTab: { ...state.watchlistTab, tab },
+				watchlist: { ...state.watchlist, tab },
 			})),
 			setWatchlistView: (view) => set(state => ({
-				watchlistTab: { ...state.watchlistTab, view },
+				watchlist: { ...state.watchlist, view },
 			})),
 			// My Recos
-			myRecosTab: {
+			myRecos: {
 				tab: 'movie',
 				view: 'grid',
 			},
 			setMyRecosTab: (tab) => set(state => ({
-				myRecosTab: { ...state.myRecosTab, tab },
+				myRecos: { ...state.myRecos, tab },
 			})),
 			setMyRecosView: (view) => set(state => ({
-				myRecosTab: { ...state.myRecosTab, view },
+				myRecos: { ...state.myRecos, view },
 			})),
 			// Playlist
 			playlistView: 'list',

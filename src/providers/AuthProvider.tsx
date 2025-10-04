@@ -1,5 +1,5 @@
 import { User } from "@recomendapp/types";
-import { Session } from "@supabase/supabase-js";
+import { Provider, Session } from "@supabase/supabase-js";
 import { createContext, use, useCallback, useEffect, useState, useMemo } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
 import { useUserQuery } from "@/features/user/userQueries";
@@ -7,12 +7,15 @@ import { AppState } from "react-native";
 import { supabase } from "@/lib/supabase/client";
 import { useSplashScreen } from "./SplashScreenProvider";
 import { useLocaleContext } from "./LocaleProvider";
+import * as AuthSession from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import { makeRedirectUri } from "expo-auth-session";
 import { defaultLocale, SupportedLocale, supportedLocales } from "@/translations/locales";
 import { useRevenueCat } from "@/hooks/useRevenueCat";
 import { useAuthCustomerInfo } from "@/features/auth/authQueries";
 import { CustomerInfo } from "react-native-purchases";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -32,6 +35,7 @@ type AuthContextProps = {
 	user: User | null | undefined;
 	customerInfo: CustomerInfo | undefined;
 	login: (credentials: { email: string; password: string }) => Promise<void>;
+	loginWithOAuth: (provider: Provider, redirectTo?: string | null) => Promise<void>;
 	loginWithOtp: (email: string, redirectTo?: string | null) => Promise<void>;
 	logout: () => Promise<void>;
 	signup: (credentials: {
@@ -61,6 +65,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const { auth } = useSplashScreen();
 	const { setLocale } = useLocaleContext();
 	const supabase = useSupabaseClient();
+	const redirectUri = AuthSession.makeRedirectUri();
 	const [session, setSession] = useState<Session | null | undefined>(undefined);
 	const [pushToken, setPushToken] = useState<string | null>(null);
 	const {
@@ -75,6 +80,21 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		enabled: !!initCustomerInfo,
 		initialData: initCustomerInfo,
 	});
+
+	// Functions
+	const createSessionFromUrl = useCallback(async (url: string) => {
+		const { params, errorCode } = QueryParams.getQueryParams(url);
+		if (errorCode) throw new Error(errorCode);
+		const { access_token, refresh_token } = params;
+		if (!access_token) throw new Error("No access token provided in the URL");
+		const { data, error } = await supabase.auth.setSession({
+			access_token,
+			refresh_token,
+		});
+		if (error) throw error;
+		return data.session;
+	}, [supabase]);
+
 	// Handlers
 	const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
 		const { error } = await supabase.auth.signInWithPassword({
@@ -83,6 +103,44 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		});
 		if (error) throw error;
 	}, [supabase]);
+
+	const loginWithOAuth = useCallback(async (provider: Provider, redirectTo?: string | null) => {
+		switch (provider) {
+			case "google":
+				GoogleSignin.configure({
+					scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+					iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+					webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+				})
+				await GoogleSignin.hasPlayServices();
+				const userInfo = await GoogleSignin.signIn();
+				if (userInfo.type === 'cancelled') throw new Error('cancelled');
+				if (!userInfo.data?.idToken) {
+					throw new Error('No ID token received');
+				}
+				const { error: googleError } = await supabase.auth.signInWithIdToken({
+					provider: 'google',
+					token: userInfo.data.idToken,
+				});
+				if (googleError) throw googleError;
+				break;
+			default:
+				const { data, error } = await supabase.auth.signInWithOAuth({
+					provider: provider,
+					options: {
+						redirectTo: redirectUri,
+						skipBrowserRedirect: true,
+					},
+				})
+				if (error) throw error
+				const res = await WebBrowser.openAuthSessionAsync(data?.url ?? '', redirectUri);
+				if (res.type === 'success') {
+					const { url } = res
+					await createSessionFromUrl(url)
+				}
+				break;
+		}
+	}, [supabase, redirectUri, createSessionFromUrl]);
 
 	const loginWithOtp = useCallback(async (email: string, redirectTo?: string | null) => {
 		const { error } = await supabase.auth.signInWithOtp({
@@ -170,19 +228,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		if (error) throw error;
 	}, [supabase]);
 
-	const createSessionFromUrl = useCallback(async (url: string) => {
-		const { params, errorCode } = QueryParams.getQueryParams(url);
-		if (errorCode) throw new Error(errorCode);
-		const { access_token, refresh_token } = params;
-		if (!access_token) throw new Error("No access token provided in the URL");
-		const { data, error } = await supabase.auth.setSession({
-			access_token,
-			refresh_token,
-		});
-		if (error) throw error;
-		return data.session;
-	}, [supabase]);
-
 	const syncLanguage = useCallback(async (data: User) => {
 		if (data?.language) {
 			if (supportedLocales.includes(data.language as SupportedLocale)) {
@@ -223,6 +268,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		user,
 		customerInfo,
 		login,
+		loginWithOAuth,
 		loginWithOtp,
 		logout,
 		signup,
@@ -238,6 +284,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		user,
 		customerInfo,
 		login,
+		loginWithOAuth,
 		loginWithOtp,
 		logout,
 		signup,

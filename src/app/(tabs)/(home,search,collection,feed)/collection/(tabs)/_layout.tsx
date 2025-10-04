@@ -45,41 +45,44 @@ const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => 
 
 		flatListRef.current?.scrollToIndex({ index, animated: true });
 	}, [navigation]);
+
+	const renderItem = useCallback(({ item, index } : { item: NavigationRoute<ParamListBase, string>, index: number }) => {
+		const { options } = descriptors[item.key];
+		const label =
+		(options.tabBarLabel !== undefined && typeof options.tabBarLabel === 'string')
+			? options.tabBarLabel
+			: options.title !== undefined
+			? options.title
+			: item.name;
+		const isFocused = state.index === index;
+		const onPress = () => {
+			const event = navigation.emit({
+				type: 'tabPress',
+				target: item.key,
+				canPreventDefault: true,
+			});
+			if (!isFocused && !event.defaultPrevented) {
+				navigation.navigate(item.name);
+			}
+		};
+		return (
+			<Button
+			variant={isFocused ? 'default' : 'outline'}
+			style={{ borderRadius: 9999}}
+			onPress={onPress}
+			>
+				{upperFirst(label)}
+			</Button>
+		);
+	}, [descriptors, navigation, state.index]);
+	const keyExtractor = useCallback((item: NavigationRoute<ParamListBase, string>) => item.key, []);
 	return (
 		<View>
 			<Animated.FlatList
 			ref={flatListRef}
 			data={state.routes}
-			renderItem={useCallback(({ item, index } : { item: NavigationRoute<ParamListBase, string>, index: number }) => {
-				const { options } = descriptors[item.key];
-				const label =
-				(options.tabBarLabel !== undefined && typeof options.tabBarLabel === 'string')
-					? options.tabBarLabel
-					: options.title !== undefined
-					? options.title
-					: item.name;
-				const isFocused = state.index === index;
-				const onPress = () => {
-					const event = navigation.emit({
-						type: 'tabPress',
-						target: item.key,
-						canPreventDefault: true,
-					});
-					if (!isFocused && !event.defaultPrevented) {
-						navigation.navigate(item.name);
-					}
-				};
-				return (
-					<Button
-					variant={isFocused ? 'default' : 'outline'}
-					style={{ borderRadius: 9999}}
-					onPress={onPress}
-					>
-						{upperFirst(label)}
-					</Button>
-				);
-			}, [descriptors, navigation, state.index])}
-			keyExtractor={useCallback((item: NavigationRoute<ParamListBase, string>) => item.key, [])}
+			renderItem={renderItem}
+			keyExtractor={keyExtractor}
 			contentContainerStyle={{
 				gap: GAP,
 				paddingHorizontal: PADDING_HORIZONTAL,

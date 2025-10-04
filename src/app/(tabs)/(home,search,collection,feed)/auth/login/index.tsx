@@ -2,7 +2,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { useCallback, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button } from '@/components/ui/Button';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
 import { GroupedInput, GroupedInputItem } from '@/components/ui/Input';
@@ -11,24 +11,47 @@ import { Icons } from '@/constants/Icons';
 import * as Burnt from 'burnt';
 import app from '@/constants/app';
 import { useRandomImage } from '@/hooks/useRandomImage';
-import { ImageBackground } from 'expo-image';
+import { Image, ImageBackground } from 'expo-image';
 import { useTranslations } from 'use-intl';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
+import { GAP, HEIGHT, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useHeaderHeight } from '@react-navigation/elements';
+import { Provider } from '@supabase/supabase-js';
+import { LegendList } from '@legendapp/list';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
 ]
 
+type Providers = {
+	name: Provider;
+	label: string;
+	img: any;
+}[];
+
+
+const providers: Providers = [
+	{
+		name: "google",
+		label: "Google",
+		img: require("@/assets/images/providers/google.png")
+	},
+	{
+		name: "github",
+		label: "GitHub",
+		img: require("@/assets/images/providers/github.png"),
+	}
+]
+
 const LoginScreen = () => {
-	const { login } = useAuth();
+	const { login, loginWithOAuth } = useAuth();
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
+	const router = useRouter();
 	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const [ email, setEmail ] = useState('');
@@ -51,6 +74,23 @@ const LoginScreen = () => {
 			setIsLoading(false);
 		}
 	}, [email, password, login, t]);
+
+	const handleProviderPress = useCallback(async (provider: Provider) => {
+		try {
+			await loginWithOAuth(provider);
+		} catch (error) {
+			if (error instanceof Error) {
+				if (error.message === 'cancelled') return;
+			}
+			Burnt.toast({
+				title: upperFirst(t('common.messages.error')),
+				message: upperFirst(t('common.messages.an_error_occurred')),
+				preset: 'error',
+				haptic: 'error',
+			});
+		}
+	}, [loginWithOAuth]);
+
 	return (
 	<>
 		<ImageBackground source={bgImage} style={{ flex: 1 }}>
@@ -111,13 +151,23 @@ const LoginScreen = () => {
 						{/* SUBMIT BUTTON */}
 						<Button loading={isLoading} onPress={handleSubmit} style={tw`w-full rounded-xl`}>{t('pages.auth.login.form.submit')}</Button>
 					</View>
-					<View style={tw`gap-2 w-full`}>
-						<Link href={'/auth/login/otp'} asChild>
-							<Button variant="outline" icon={Icons.OTP}>
-								{upperCase(t('common.messages.otp'))}
+					<View style={[tw`w-full`, { gap: GAP }]}>
+						<Text style={tw`text-center`} textColor='muted'>{upperFirst(t('common.messages.or_continue_with'))}</Text>
+						<Button variant="muted" onPress={() => router.push('/auth/login/otp')} icon={Icons.OTP}>
+							{upperCase(t('common.messages.otp'))}
+						</Button>
+						<LegendList
+						data={providers}
+						renderItem={({ item }) => (
+							<Button variant='muted' onPress={() => handleProviderPress(item.name)}>
+								<Image source={item.img} style={{ height: 18, width: 18 }} contentFit="cover" />
+								<Text style={{ color: colors.foreground }}>{item.label}</Text>
 							</Button>
-						</Link>
-
+						)}
+						keyExtractor={(item) => item.name}
+						numColumns={2}
+						contentContainerStyle={{ gap: GAP }}
+						/>
 					</View>
 					{/* SIGNUP */}
 					<Text style={[{ color: colors.mutedForeground }, tw`text-right`]}>{t('pages.auth.login.no_account_yet')} <Link href={'/auth/signup'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.signup'))}</Link></Text>
