@@ -176,7 +176,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				],
 				"enableBase64ShareAndroid": true
 			}
-		]
+		],
+		[
+			"@react-native-google-signin/google-signin",
+			{
+				"iosUrlScheme": "com.googleusercontent.apps.413826532912-vt9h8pp36bbk9akq5lshsmf3joqoapmn"
+			}
+		],
 	],
 	experiments: {
 		typedRoutes: true,

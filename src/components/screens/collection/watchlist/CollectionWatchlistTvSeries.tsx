@@ -20,7 +20,7 @@ export const CollectionWatchlistTvSeries = () => {
 	const t = useTranslations();
     const { user } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
-	const view = useUIStore((state) => state.watchlistTab.view);
+	const view = useUIStore((state) => state.watchlist.view);
     const queryData = useUserWatchlistTvSeriesQuery({
 		userId: user?.id,
     });

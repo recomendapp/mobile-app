@@ -62,37 +62,35 @@ export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => 
 	if (loading) return null;
 	
 	return (
-	<KeyboardAwareView>
-		<KeyboardAwareScrollView
-		ref={scrollRef}
-		contentContainerStyle={{ gap: GAP }}
-		keyboardShouldPersistTaps='always'
-		scrollIndicatorInsets={{
-			top: -PADDING_VERTICAL,
-			// bottom: height.value + PADDING_VERTICAL
-		}}
-		{...props}
-		>
-			{data.bestResult && (
-				<SearchBestResult best={data.bestResult} />
-			)}
-			{data.movies.data.length > 0 && (
-				<SearchResultsMovies movies={data.movies.data as MediaMovie[]} search={search} />
-			)}
-			{data.tv_series.data.length > 0 && (
-				<SearchResultsTvSeries tvSeries={data.tv_series.data as MediaTvSeries[]} search={search} />
-			)}
-			{data.persons.data.length > 0 && (
-				<SearchResultsPersons persons={data.persons.data as MediaPerson[]} search={search} />
-			)}
-			{data.playlists.data.length > 0 && (
-				<SearchResultsPlaylists playlists={data.playlists.data as Playlist[]} search={search} />
-			)}
-			{data.users.data.length > 0 && (
-				<SearchResultsUsers users={data.users.data} search={search} />
-			)}
-		</KeyboardAwareScrollView>
-	</KeyboardAwareView>
+	<KeyboardAwareScrollView
+	ref={scrollRef}
+	contentContainerStyle={{ gap: GAP }}
+	keyboardShouldPersistTaps='always'
+	scrollIndicatorInsets={{
+		top: -PADDING_VERTICAL,
+		// bottom: height.value + PADDING_VERTICAL
+	}}
+	{...props}
+	>
+		{data.bestResult && (
+			<SearchBestResult best={data.bestResult} />
+		)}
+		{data.movies.data.length > 0 && (
+			<SearchResultsMovies movies={data.movies.data as MediaMovie[]} search={search} />
+		)}
+		{data.tv_series.data.length > 0 && (
+			<SearchResultsTvSeries tvSeries={data.tv_series.data as MediaTvSeries[]} search={search} />
+		)}
+		{data.persons.data.length > 0 && (
+			<SearchResultsPersons persons={data.persons.data as MediaPerson[]} search={search} />
+		)}
+		{data.playlists.data.length > 0 && (
+			<SearchResultsPlaylists playlists={data.playlists.data as Playlist[]} search={search} />
+		)}
+		{data.users.data.length > 0 && (
+			<SearchResultsUsers users={data.users.data} search={search} />
+		)}
+	</KeyboardAwareScrollView>
 	);
 });
 SearchResults.displayName = 'SearchResults';

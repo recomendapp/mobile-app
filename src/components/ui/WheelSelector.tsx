@@ -73,7 +73,7 @@ const WheelSelectorItem = <T,>({
     }
     
     return {
-      opacity: interpolate(scrollX.value, inputRange, opacityRange),
+      // opacity: interpolate(scrollX.value, inputRange, opacityRange),
       transform: transformations,
     };
   }, [scrollX, index, itemWidth, wheelAngle, wheelIntensity]);

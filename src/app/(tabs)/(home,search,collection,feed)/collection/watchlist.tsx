@@ -13,12 +13,17 @@ import { Button } from "@/components/ui/Button";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CollectionWatchlistMovie } from "@/components/screens/collection/watchlist/CollectionWatchlistMovie";
 import { CollectionWatchlistTvSeries } from "@/components/screens/collection/watchlist/CollectionWatchlistTvSeries";
+import { NativeSyntheticEvent } from "react-native";
+import { NativeSegmentedControlIOSChangeEvent } from "@react-native-segmented-control/segmented-control";
 
 const WatchlistScreen = () => {
     const t = useTranslations();
-    const { tab, view } = useUIStore((state) => state.watchlistTab);
-    const setTab = useUIStore((state) => state.setWatchlistTab);
-    const setView = useUIStore((state) => state.setWatchlistView);
+    const { tab, view, setWatchlistTab: setTab, setWatchlistView: setView } = useUIStore((state) => ({
+        tab: state.watchlist.tab,
+        view: state.watchlist.view,
+        setWatchlistTab: state.setWatchlistTab,
+        setWatchlistView: state.setWatchlistView,
+    }));
 
     // States
     const segmentedOptions = useMemo((): { label: string, value: UserActivityType }[] => [
@@ -31,18 +36,27 @@ const WatchlistScreen = () => {
             value: 'tv_series',
         },
     ], [t]);
-	const components = useCallback(() => {
-		return (
-			<>
-				{tab === 'movie' && (
-					<CollectionWatchlistMovie />
-				)}
-				{tab === 'tv_series' && (
-					<CollectionWatchlistTvSeries />
-				)}
-			</>
-		);
-	}, [tab]);
+	
+    const SelectedComponent = useMemo(() => {
+        switch (tab) {
+            case 'movie':
+                return CollectionWatchlistMovie;
+            case 'tv_series':
+                return CollectionWatchlistTvSeries;
+            default:
+                return CollectionWatchlistMovie;
+        }
+    }, [tab]);
+
+    const handleChangeView = useCallback(() => {
+        setView(view === 'grid' ? 'list' : 'grid');
+    }, [setView, view]);
+
+    const handleChangeTab = useCallback((event: NativeSyntheticEvent<NativeSegmentedControlIOSChangeEvent>) => {
+        const value = segmentedOptions[event.nativeEvent.selectedSegmentIndex].value;
+        setTab(value);
+    }, [setTab]);
+
     return (
     <>
         <Stack.Screen
@@ -53,7 +67,7 @@ const WatchlistScreen = () => {
 					variant="ghost"
 					icon={view === 'grid' ? Icons.Grid : Icons.List}
 					size="icon"
-					onPress={() => setView(view === 'grid' ? 'list' : 'grid')}
+					onPress={handleChangeView}
 					/>
 				</View>
 			)
@@ -65,9 +79,7 @@ const WatchlistScreen = () => {
             <SegmentedControl
                 values={segmentedOptions.map((option) => option.label)}
                 selectedIndex={segmentedOptions.findIndex((option) => option.value === tab)}
-                onChange={(event) => {
-                    setTab(segmentedOptions[event.nativeEvent.selectedSegmentIndex].value);
-                }}
+                onChange={handleChangeTab}
             />
         </View>
 		<Animated.View
@@ -76,7 +88,7 @@ const WatchlistScreen = () => {
 			exiting={FadeOut}
 			style={tw`flex-1`}
 		>
-			{components()}
+			<SelectedComponent />
 		</Animated.View>
     </>
     )

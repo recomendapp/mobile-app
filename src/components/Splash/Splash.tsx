@@ -28,6 +28,7 @@ import splashImagePointer from '@/assets/splash/splash.png'
 import darkSplashImagePointer from '@/assets/splash/splash-dark.png'
 import { clamp } from 'lodash'
 import Svg from 'react-native-svg'
+import tw from '@/lib/tw'
 
 const splashImageUri = RNImage.resolveAssetSource(splashImagePointer).uri
 const darkSplashImageUri = RNImage.resolveAssetSource(darkSplashImagePointer).uri
@@ -115,11 +116,11 @@ export function Splash(props: React.PropsWithChildren<Props>) {
 
 	const appAnimation = useAnimatedStyle(() => {
 		return {
-			transform: [
-				{
-					scale: interpolate(outroApp.get(), [0, 1], [1.1, 1], 'clamp'),
-				},
-			],
+			// transform: [
+			// 	{
+			// 		scale: interpolate(outroApp.get(), [0, 1], [1.1, 1], 'clamp'),
+			// 	},
+			// ],
 			opacity: interpolate(
 				outroAppOpacity.get(),
 				[0, 0.1, 0.2, 1],
@@ -212,7 +213,7 @@ export function Splash(props: React.PropsWithChildren<Props>) {
 
 			{isReady && (
 				<>
-					<Animated.View style={[{flex: 1}, appAnimation]}>
+					<Animated.View style={[tw`flex-1`, appAnimation]}>
 						{props.children}
 					</Animated.View>
 

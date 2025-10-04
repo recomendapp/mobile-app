@@ -13,12 +13,17 @@ import { Button } from "@/components/ui/Button";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CollectionMyRecosMovie } from "@/components/screens/collection/my-recos/CollectionMyRecosMovie";
 import { CollectionMyRecosTvSeries } from "@/components/screens/collection/my-recos/CollectionMyRecosTvSeries";
+import { NativeSyntheticEvent } from "react-native";
+import { NativeSegmentedControlIOSChangeEvent } from "@react-native-segmented-control/segmented-control";
 
 const MyRecosScreen = () => {
     const t = useTranslations();
-    const { tab, view } = useUIStore((state) => state.myRecosTab);
-    const setTab = useUIStore((state) => state.setMyRecosTab);
-    const setView = useUIStore((state) => state.setMyRecosView);
+    const { tab, view, setMyRecosTab: setTab, setMyRecosView: setView } = useUIStore((state) => ({
+        tab: state.myRecos.tab,
+        view: state.myRecos.view,
+        setMyRecosTab: state.setMyRecosTab,
+        setMyRecosView: state.setMyRecosView,
+    }));
 
     // States
     const segmentedOptions = useMemo((): { label: string, value: UserActivityType }[] => [
@@ -31,18 +36,27 @@ const MyRecosScreen = () => {
             value: 'tv_series',
         },
     ], [t]);
-	const components = useCallback(() => {
-		return (
-			<>
-				{tab === 'movie' && (
-					<CollectionMyRecosMovie />
-				)}
-				{tab === 'tv_series' && (
-					<CollectionMyRecosTvSeries />
-				)}
-			</>
-		);
-	}, [tab]);
+
+    const SelectedComponent = useMemo(() => {
+        switch (tab) {
+            case 'movie':
+                return CollectionMyRecosMovie;
+            case 'tv_series':
+                return CollectionMyRecosTvSeries;
+            default:
+                return CollectionMyRecosMovie;
+        }
+    }, [tab]);
+    
+	const handleChangeView = useCallback(() => {
+        setView(view === 'grid' ? 'list' : 'grid');
+    }, [setView, view]);
+
+    const handleChangeTab = useCallback((event: NativeSyntheticEvent<NativeSegmentedControlIOSChangeEvent>) => {
+        const value = segmentedOptions[event.nativeEvent.selectedSegmentIndex].value;
+        setTab(value);
+    }, [setTab]);
+
     return (
     <>
         <Stack.Screen
@@ -53,7 +67,7 @@ const MyRecosScreen = () => {
 					variant="ghost"
 					icon={view === 'grid' ? Icons.Grid : Icons.List}
 					size="icon"
-					onPress={() => setView(view === 'grid' ? 'list' : 'grid')}
+					onPress={handleChangeView}
 					/>
 				</View>
 			)
@@ -63,11 +77,9 @@ const MyRecosScreen = () => {
         style={{ paddingHorizontal: PADDING_HORIZONTAL, paddingBottom: PADDING_VERTICAL }}
         >
             <SegmentedControl
-                values={segmentedOptions.map((option) => option.label)}
-                selectedIndex={segmentedOptions.findIndex((option) => option.value === tab)}
-                onChange={(event) => {
-                    setTab(segmentedOptions[event.nativeEvent.selectedSegmentIndex].value);
-                }}
+            values={segmentedOptions.map((option) => option.label)}
+            selectedIndex={segmentedOptions.findIndex((option) => option.value === tab)}
+            onChange={handleChangeTab}
             />
         </View>
 		<Animated.View
@@ -76,7 +88,7 @@ const MyRecosScreen = () => {
 			exiting={FadeOut}
 			style={tw`flex-1`}
 		>
-			{components()}
+			<SelectedComponent />
 		</Animated.View>
     </>
     )

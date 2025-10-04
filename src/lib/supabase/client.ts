@@ -1,61 +1,92 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient as createClientSupabase } from "@supabase/supabase-js";
-import * as SecureStore from 'expo-secure-store';
-import * as aesjs from 'aes-js';
-import 'react-native-get-random-values';
+import { MMKV } from "react-native-mmkv";
+import * as SecureStore from "expo-secure-store";
+import "react-native-get-random-values";
 import { Database } from "@recomendapp/types";
-
-// As Expo's SecureStore does not support values larger than 2048
-// bytes, an AES-256 key is generated and stored in SecureStore, while
-// it is used to encrypt/decrypt values stored in AsyncStorage.
-class LargeSecureStore {
-  private async _encrypt(key: string, value: string) {
-    const encryptionKey = crypto.getRandomValues(new Uint8Array(256 / 8));
-    const cipher = new aesjs.ModeOfOperation.ctr(encryptionKey, new aesjs.Counter(1));
-    const encryptedBytes = cipher.encrypt(aesjs.utils.utf8.toBytes(value));
-    await SecureStore.setItemAsync(key, aesjs.utils.hex.fromBytes(encryptionKey));
-    return aesjs.utils.hex.fromBytes(encryptedBytes);
-  }
-  private async _decrypt(key: string, value: string) {
-    const encryptionKeyHex = await SecureStore.getItemAsync(key);
-    if (!encryptionKeyHex) {
-      return encryptionKeyHex;
-    }
-    const cipher = new aesjs.ModeOfOperation.ctr(aesjs.utils.hex.toBytes(encryptionKeyHex), new aesjs.Counter(1));
-    const decryptedBytes = cipher.decrypt(aesjs.utils.hex.toBytes(value));
-    return aesjs.utils.utf8.fromBytes(decryptedBytes);
-  }
-  async getItem(key: string) {
-    const encrypted = await AsyncStorage.getItem(key);
-    if (!encrypted) { return encrypted; }
-    return await this._decrypt(key, encrypted);
-  }
-  async removeItem(key: string) {
-    await AsyncStorage.removeItem(key);
-    await SecureStore.deleteItemAsync(key);
-  }
-  async setItem(key: string, value: string) {
-    const encrypted = await this._encrypt(key, value);
-    await AsyncStorage.setItem(key, encrypted);
-  }
-}
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
 
+async function getOrCreateEncryptionKey(): Promise<string> {
+	const KEY_NAME = "mmkv_encryption_key";
+	
+	try {
+		let key = await SecureStore.getItemAsync(KEY_NAME);
+	
+		if (!key) {
+			const randomBytes = new Uint8Array(32);
+			crypto.getRandomValues(randomBytes);
+			key = Array.from(randomBytes)
+				.map(b => b.toString(16).padStart(2, '0'))
+				.join('');
+			
+			await SecureStore.setItemAsync(KEY_NAME, key);
+		}
+		
+		return key;
+	} catch (error) {
+		console.error("Erreur lors de la gestion de la clé:", error);
+		throw error;
+	}
+}
+
+let supabaseStorage: MMKV | null = null;
+
+async function initializeStorage() {
+	if (!supabaseStorage) {
+		const encryptionKey = await getOrCreateEncryptionKey();
+		supabaseStorage = new MMKV({
+			id: "supabase",
+			encryptionKey: encryptionKey,
+		});
+	}
+	return supabaseStorage;
+}
+
+class MMKVStore {
+	private storage: MMKV | null = null;
+
+	async ensureStorage() {
+		if (!this.storage) {
+			this.storage = await initializeStorage();
+		}
+		return this.storage;
+	}
+
+	async getItem(key: string) {
+		const storage = await this.ensureStorage();
+		const value = storage.getString(key);
+		return value ?? null;
+	}
+
+	async setItem(key: string, value: string) {
+		const storage = await this.ensureStorage();
+		storage.set(key, value);
+	}
+
+	async removeItem(key: string) {
+		const storage = await this.ensureStorage();
+		storage.delete(key);
+	}
+}
+
 export const createClient = (locale?: string) => {
 	return createClientSupabase<Database>(supabaseUrl, supabaseKey, {
 		auth: {
-			storage: new LargeSecureStore(),
+			storage: new MMKVStore(),
 			autoRefreshToken: true,
 			persistSession: true,
 			detectSessionInUrl: false,
 		},
-		...(locale ? { global: {
-			headers: {
-				'language': locale,
-			}
-		}} : {})
+		...(locale
+			? {
+					global: {
+						headers: {
+							language: locale,
+						},
+					},
+				}
+			: {}),
 	});
 };
 

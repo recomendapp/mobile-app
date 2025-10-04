@@ -144,14 +144,6 @@ const SearchTvSeriesScreen = memo(() => {
 		}
 	}, [hasNextPage, fetchNextPage]);
 
-	const ListEmptyComponent = useCallback(() => (
-		<EmptyComponent
-			isLoading={isLoading}
-			debouncedSearch={debouncedSearch}
-			noResultsText={upperFirst(t('common.messages.no_results'))}
-		/>
-	), [isLoading, debouncedSearch, t]);
-
 	const handleFiltersPress = useCallback(() => {
 		filtersRef.current?.present();
 	}, []);
@@ -187,7 +179,13 @@ const SearchTvSeriesScreen = memo(() => {
 					bottom: tabBarHeight,
 				}}
 				keyExtractor={keyExtractor}
-				ListEmptyComponent={ListEmptyComponent}
+				ListEmptyComponent={
+					<EmptyComponent
+					isLoading={isLoading}
+					debouncedSearch={debouncedSearch}
+					noResultsText={upperFirst(t('common.messages.no_results'))}
+					/>
+				}
 				onEndReached={onEndReached}
 			/>
 			<FiltersSheet ref={filtersRef} />

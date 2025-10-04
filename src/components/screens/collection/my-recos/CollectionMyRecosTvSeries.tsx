@@ -20,7 +20,7 @@ export const CollectionMyRecosTvSeries = () => {
 	const t = useTranslations();
     const { user } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
-	const view = useUIStore((state) => state.myRecosTab.view);
+	const view = useUIStore((state) => state.myRecos.view);
     const queryData = useUserRecosTvSeriesQuery({
 		userId: user?.id,
     });

@@ -22,8 +22,7 @@ import { useLocale, useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 interface MediaHeaderProps {
 	season?: MediaTvSeriesSeason | null;
