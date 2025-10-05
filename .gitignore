@@ -45,6 +45,7 @@ ios/
 android/
 *.aab
 *.apk
+*.ipa
 
 # vscode
 .vscode/

@@ -5,18 +5,16 @@ import PersonWidgetFilms from "@/components/screens/person/PersonWidgetFilms";
 import PersonWidgetTvSeries from "@/components/screens/person/PersonWidgetTvSeries";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/text";
-import { ThemedText } from "@/components/ui/ThemedText"
 import { Icons } from "@/constants/Icons";
 import { useMediaPersonQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, PADDING_VERTICAL } from "@/theme/globals";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import { useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { View } from "react-native"
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { useTranslations } from "use-intl";

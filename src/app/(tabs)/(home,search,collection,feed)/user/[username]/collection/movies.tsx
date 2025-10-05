@@ -28,10 +28,10 @@ const UserCollectionMovieScreen = () => {
 	const { colors, tabBarHeight, bottomTabHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
-	const sortByOptions: sortBy[] = [
+	const sortByOptions = useMemo((): sortBy[] => [
 		{ label: upperFirst(t('common.messages.watched_date')), value: 'watched_date' },
 		{ label: upperFirst(t('common.messages.rating')), value: 'rating' },
-	];
+	], [t]);
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	const {

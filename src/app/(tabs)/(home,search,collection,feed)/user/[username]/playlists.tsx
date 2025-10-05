@@ -8,7 +8,7 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
@@ -27,11 +27,11 @@ const UserPlaylistsScreen = () => {
 	const { colors, bottomTabHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
-	const sortByOptions: sortBy[] = [
+	const sortByOptions = useMemo((): sortBy[] => [
 		{ label: upperFirst(t('common.messages.date_created')), value: 'updated_at' },
 		{ label: upperFirst(t('common.messages.date_updated')), value: 'created_at' },
 		{ label: upperFirst(t('common.messages.number_of_likes')), value: 'likes_count' },
-	];
+	], [t]);
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	const {

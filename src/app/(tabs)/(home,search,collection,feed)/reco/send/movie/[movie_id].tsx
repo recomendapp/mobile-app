@@ -6,7 +6,7 @@ import { Profile } from "@recomendapp/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollViewProps } from "react-native";
 import { useTranslations } from "use-intl";
@@ -43,17 +43,17 @@ const RecoSendMovie = () => {
 	const movieTitle = movie_title;
 
 	// Form
-	const sendRecoMovieFormSchema = z.object({
+	const sendRecoMovieFormSchema = useMemo(() => z.object({
 		comment: z.string()
 			.max(COMMENT_MAX_LENGTH, { message: upperFirst(t('common.form.length.char_max', { count: COMMENT_MAX_LENGTH }))})
 			.regex(/^(?!\s+$)(?!.*\n\s*\n)[\s\S]*$/)
 			.optional()
 			.nullable(),
-	});
+	}), [t]);
 	type SendRecoMovieFormValues = z.infer<typeof sendRecoMovieFormSchema>;
-	const defaultValues: Partial<SendRecoMovieFormValues> = {
+	const defaultValues = useMemo((): Partial<SendRecoMovieFormValues> => ({
 		comment: '',
-	};
+	}), []);
 	const form = useForm<SendRecoMovieFormValues>({
 		resolver: zodResolver(sendRecoMovieFormSchema),
 		defaultValues,
@@ -115,7 +115,7 @@ const RecoSendMovie = () => {
 			return [...prev, user];
 		});
 	}, []);
-	const handleSubmit = async (values: SendRecoMovieFormValues) => {
+	const handleSubmit = useCallback(async (values: SendRecoMovieFormValues) => {
 		if (!session?.user.id) return;
 		if (selected.length === 0) return;
 		await sendReco.mutateAsync({
@@ -140,8 +140,8 @@ const RecoSendMovie = () => {
 				});
 			}
 		});
-	};
-	const handleCancel = () => {
+	}, [router, sendReco, session?.user.id, selected, t, movieId]);
+	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
 				upperFirst(t('common.messages.are_u_sure')),
@@ -160,7 +160,7 @@ const RecoSendMovie = () => {
 		} else {
 			router.dismiss();
 		}
-	};
+	}, [canSave, router, t]);
 
 	// Render
 	const renderItems = useCallback(({ item: { item, isSelected} }: { item: { item: { friend: Profile, as_watched: boolean, already_sent: boolean }, isSelected: boolean }}) => {

@@ -187,8 +187,6 @@ const HomeScreen = () => {
       >
         <WidgetMostRecommended scrollY={scrollY} onLayout={onLayoutWidgetMostRecommended} />
         <WidgetMostPopular labelStyle={{paddingHorizontal: PADDING_HORIZONTAL }} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
-        <Link href={'/test'} asChild><Button>Test</Button></Link>
-        {/* <Link href={'/upgrade'} asChild><Button>Upgrade</Button></Link> */}
         {mainContent}
       </Animated.ScrollView>
     </>

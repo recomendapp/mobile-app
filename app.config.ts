@@ -53,7 +53,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		infoPlist: {
 			ITSAppUsesNonExemptEncryption: false,
 			UIDesignRequiresCompatibility: true, // Disable iOS 26 Liquid Glass effect
-		}
+		},
+		usesAppleSignIn: true,
 	},
 	android: {
 		adaptiveIcon: {
@@ -183,6 +184,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				"iosUrlScheme": "com.googleusercontent.apps.413826532912-vt9h8pp36bbk9akq5lshsmf3joqoapmn"
 			}
 		],
+		["expo-apple-authentication"],
 	],
 	experiments: {
 		typedRoutes: true,

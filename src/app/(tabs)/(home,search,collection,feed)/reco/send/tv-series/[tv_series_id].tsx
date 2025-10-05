@@ -6,7 +6,7 @@ import { Profile } from "@recomendapp/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollViewProps } from "react-native";
 import { useTranslations } from "use-intl";
@@ -43,17 +43,17 @@ const RecoSendTvSeries = () => {
 	const tvSeriesName = tv_series_name;
 
 	// Form
-	const sendRecoTvSeriesFormSchema = z.object({
+	const sendRecoTvSeriesFormSchema = useMemo(() => z.object({
 		comment: z.string()
 			.max(COMMENT_MAX_LENGTH, { message: upperFirst(t('common.form.length.char_max', { count: COMMENT_MAX_LENGTH }))})
 			.regex(/^(?!\s+$)(?!.*\n\s*\n)[\s\S]*$/)
 			.optional()
 			.nullable(),
-	});
+	}), [t]);
 	type SendRecoTvSeriesFormValues = z.infer<typeof sendRecoTvSeriesFormSchema>;
-	const defaultValues: Partial<SendRecoTvSeriesFormValues> = {
+	const defaultValues = useMemo((): Partial<SendRecoTvSeriesFormValues> => ({
 		comment: '',
-	};
+	}), []);
 	const form = useForm<SendRecoTvSeriesFormValues>({
 		resolver: zodResolver(sendRecoTvSeriesFormSchema),
 		defaultValues,
@@ -115,7 +115,7 @@ const RecoSendTvSeries = () => {
 			return [...prev, user];
 		});
 	}, []);
-	const handleSubmit = async (values: SendRecoTvSeriesFormValues) => {
+	const handleSubmit = useCallback(async (values: SendRecoTvSeriesFormValues) => {
 		if (!session?.user.id) return;
 		if (selected.length === 0) return;
 		await sendReco.mutateAsync({
@@ -140,8 +140,8 @@ const RecoSendTvSeries = () => {
 				});
 			}
 		});
-	};
-	const handleCancel = () => {
+	}, [router, sendReco, session?.user.id, selected, t, tvSeriesId]);
+	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
 				upperFirst(t('common.messages.are_u_sure')),
@@ -160,7 +160,7 @@ const RecoSendTvSeries = () => {
 		} else {
 			router.dismiss();
 		}
-	};
+	}, [canSave, router, t]);
 
 	// Render
 	const renderItems = useCallback(({ item: { item, isSelected} }: { item: { item: { friend: Profile, as_watched: boolean, already_sent: boolean }, isSelected: boolean }}) => {

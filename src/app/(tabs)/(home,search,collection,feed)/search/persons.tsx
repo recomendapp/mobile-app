@@ -22,16 +22,16 @@ PersonItem.displayName = 'PersonItem';
 
 const EmptyComponent = memo(({ 
 	isLoading, 
-	debouncedSearch,
+	search,
 	noResultsText 
 }: { 
 	isLoading: boolean; 
-	debouncedSearch: string | null;
+	search: string | null;
 	noResultsText: string;
 }) => {
 	if (isLoading) return <Icons.Loader />;
 	
-	if (debouncedSearch) {
+	if (search) {
 		return (
 			<View style={tw`flex-1 items-center justify-center`}>
 				<Text textColor='muted'>{noResultsText}</Text>
@@ -47,7 +47,7 @@ const SearchPersonsScreen = memo(() => {
 	const insets = useSafeAreaInsets();
 	const { tabBarHeight, bottomTabHeight} = useTheme();
 	const t = useTranslations();
-	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
+	const search = useSearchStore(state => state.search);
 	
 	// Queries
 	const {
@@ -56,7 +56,7 @@ const SearchPersonsScreen = memo(() => {
 		hasNextPage,
 		fetchNextPage,
 	} = useSearchPersonsInfiniteQuery({
-		query: debouncedSearch,
+		query: search,
 	});
 	
 	// REFs
@@ -88,7 +88,7 @@ const SearchPersonsScreen = memo(() => {
 
 	return (
 		<LegendList
-			key={debouncedSearch}
+			key={search}
 			ref={scrollRef}
 			data={personsData}
 			renderItem={renderItem}
@@ -105,7 +105,7 @@ const SearchPersonsScreen = memo(() => {
 			ListEmptyComponent={
 				<EmptyComponent
 				isLoading={isLoading}
-				debouncedSearch={debouncedSearch}
+				search={search}
 				noResultsText={upperFirst(t('common.messages.no_results'))}
 				/>
 			}

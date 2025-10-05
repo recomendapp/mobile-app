@@ -20,8 +20,7 @@ const PlaylistScreen = () => {
 	const { session } = useAuth();
 	const { playlist_id } = useLocalSearchParams();
 	const playlistId = Number(playlist_id) || undefined;
-	const view = useUIStore((state) => state.playlistView);
-	const setView = useUIStore((state) => state.setPlaylistView);
+	const { playlistView, setPlaylistView } = useUIStore((state) => state);
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const { data: playlist } = usePlaylistQuery({
 		playlistId: playlistId,
@@ -47,8 +46,8 @@ const PlaylistScreen = () => {
 					<Button
 					variant="ghost"
 					size="icon"
-					icon={view === 'grid' ? Icons.Grid : Icons.List}
-					onPress={() => setView(view === 'grid' ? 'list' : 'grid')}
+					icon={playlistView === 'grid' ? Icons.Grid : Icons.List}
+					onPress={() => setPlaylistView(playlistView === 'grid' ? 'list' : 'grid')}
 					/>
 					<Button
 					variant="ghost"

@@ -46,16 +46,16 @@ TvSeriesItem.displayName = 'TvSeriesItem';
 
 const EmptyComponent = memo(({ 
 	isLoading, 
-	debouncedSearch,
+	search,
 	noResultsText 
 }: { 
 	isLoading: boolean; 
-	debouncedSearch: string | null;
+	search: string | null;
 	noResultsText: string;
 }) => {
 	if (isLoading) return <Icons.Loader />;
 	
-	if (debouncedSearch) {
+	if (search) {
 		return (
 			<View style={tw`flex-1 items-center justify-center`}>
 				<Text textColor='muted'>{noResultsText}</Text>
@@ -106,7 +106,7 @@ const SearchTvSeriesScreen = memo(() => {
 	const { tabBarHeight, bottomTabHeight } = useTheme();
 	const navigation = useNavigation();
 	const t = useTranslations();
-	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
+	const search = useSearchStore(state => state.search);
 	
 	// Queries
 	const {
@@ -115,7 +115,7 @@ const SearchTvSeriesScreen = memo(() => {
 		hasNextPage,
 		fetchNextPage,
 	} = useSearchTvSeriesInfiniteQuery({
-		query: debouncedSearch,
+		query: search,
 	});
 	
 	// REFs
@@ -165,7 +165,7 @@ const SearchTvSeriesScreen = memo(() => {
 	return (
 		<>
 			<LegendList
-				key={debouncedSearch}
+				key={search}
 				ref={scrollRef}
 				data={tvSeriesData}
 				renderItem={renderItem}
@@ -182,7 +182,7 @@ const SearchTvSeriesScreen = memo(() => {
 				ListEmptyComponent={
 					<EmptyComponent
 					isLoading={isLoading}
-					debouncedSearch={debouncedSearch}
+					search={search}
 					noResultsText={upperFirst(t('common.messages.no_results'))}
 					/>
 				}

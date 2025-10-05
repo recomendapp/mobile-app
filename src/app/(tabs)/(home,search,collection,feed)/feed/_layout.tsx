@@ -49,8 +49,7 @@ const FeedLayout = memo(() => {
   const t = useTranslations();
   const router = useRouter();
   const { session } = useAuth();
-  const feedView = useUIStore(state => state.feedView);
-  const setFeedView = useUIStore(state => state.setFeedView);
+  const { feedView, setFeedView } = useUIStore((state) => state);
 
   const segmentedOptions = useMemo((): SegmentedOption[] => [
     {

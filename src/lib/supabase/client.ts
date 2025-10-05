@@ -1,7 +1,7 @@
 import { createClient as createClientSupabase } from "@supabase/supabase-js";
 import { MMKV } from "react-native-mmkv";
 import * as SecureStore from "expo-secure-store";
-import "react-native-get-random-values";
+import { getRandomValues } from "expo-crypto";
 import { Database } from "@recomendapp/types";
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
@@ -15,7 +15,7 @@ async function getOrCreateEncryptionKey(): Promise<string> {
 	
 		if (!key) {
 			const randomBytes = new Uint8Array(32);
-			crypto.getRandomValues(randomBytes);
+			getRandomValues(randomBytes);
 			key = Array.from(randomBytes)
 				.map(b => b.toString(16).padStart(2, '0'))
 				.join('');
