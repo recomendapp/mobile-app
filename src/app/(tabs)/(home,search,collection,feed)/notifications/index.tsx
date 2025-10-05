@@ -29,8 +29,7 @@ const NotificationsScreen = () => {
 	const router = useRouter();
 	const t = useTranslations();
 	const { colors } = useTheme();
-	const view = useUIStore(state => state.notificationsView);
-	const setView = useUIStore(state => state.setNotificationsView);
+	const { notificationsView, setNotificationsView } = useUIStore((state) => state);
 	const viewOptions = ['all', 'unread', 'archived'] as const;
 	const {
 		data,
@@ -38,7 +37,7 @@ const NotificationsScreen = () => {
 		hasNextPage,
 		fetchNextPage,
 	} = useNotificationsInfiniteQuery({
-		view: view,
+		view: notificationsView,
 	});
 	const loading = isLoading || data === undefined;
 	const notifications = useMemo(() => data?.pages.flatMap(page => page.notifications) || [], [data]);
@@ -125,7 +124,7 @@ const NotificationsScreen = () => {
 	const renderItem = useCallback(({ item }: { item: typeof notifications[number] }) => {
 		if (!item.content) return null;
 		const leftAction = (() => {
-			switch (view) {
+			switch (notificationsView) {
 				case 'all':
 				case 'unread':
 					return {
@@ -146,7 +145,7 @@ const NotificationsScreen = () => {
 			}
 		})();
 		const rightActions = (() => {
-			switch (view) {
+			switch (notificationsView) {
 				case 'all':
 				case 'unread':
 					return [
@@ -180,7 +179,7 @@ const NotificationsScreen = () => {
 				{!item.isRead && <View style={[tw`bg-red-500 rounded-2 w-2 aspect-square left-2`,{ position: 'absolute', top: '50%', transform: [{ translateY: "-50%" }] }]}/>}
 			</ReusableAppleStyleSwipeableRow>
 		)
-	}, [renderItemContent, view, colors, handleArchive, handleUnarchive, handleRead, handleUnread]);
+	}, [renderItemContent, notificationsView, colors, handleArchive, handleUnarchive, handleRead, handleUnread]);
 	const keyExtractor = useCallback((item: Notification) => item.id.toString(), []);
 	const onEndReached = useCallback(() => {
 		if (hasNextPage) {
@@ -210,13 +209,13 @@ const NotificationsScreen = () => {
 					size="fit"
 					iconProps={{ color: colors.mutedForeground }}
 					textStyle={tw`text-base font-semibold`}
-					onPress={() => setView(viewOptions[(viewOptions.indexOf(view) + 1) % viewOptions.length])}
+					onPress={() => setNotificationsView(viewOptions[(viewOptions.indexOf(notificationsView) + 1) % viewOptions.length])}
 					>
-						{view === 'all' ? 'All' : view === 'unread' ? 'Unread' : 'Archived'}
+						{notificationsView === 'all' ? 'All' : notificationsView === 'unread' ? 'Unread' : 'Archived'}
 					</Button>
 				</View>
 			),
-		}), [router, view])}
+		}), [router, notificationsView, setNotificationsView, colors])}
 		/>
 		<LegendList
 		data={notifications}

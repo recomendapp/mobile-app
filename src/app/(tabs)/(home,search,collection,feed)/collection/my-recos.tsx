@@ -18,12 +18,7 @@ import { NativeSegmentedControlIOSChangeEvent } from "@react-native-segmented-co
 
 const MyRecosScreen = () => {
     const t = useTranslations();
-    const { tab, view, setMyRecosTab: setTab, setMyRecosView: setView } = useUIStore((state) => ({
-        tab: state.myRecos.tab,
-        view: state.myRecos.view,
-        setMyRecosTab: state.setMyRecosTab,
-        setMyRecosView: state.setMyRecosView,
-    }));
+    const { myRecos: { tab, view }, setMyRecosTab, setMyRecosView } = useUIStore((state) => state);
 
     // States
     const segmentedOptions = useMemo((): { label: string, value: UserActivityType }[] => [
@@ -49,13 +44,13 @@ const MyRecosScreen = () => {
     }, [tab]);
     
 	const handleChangeView = useCallback(() => {
-        setView(view === 'grid' ? 'list' : 'grid');
-    }, [setView, view]);
+        setMyRecosView(view === 'grid' ? 'list' : 'grid');
+    }, [setMyRecosView, view]);
 
     const handleChangeTab = useCallback((event: NativeSyntheticEvent<NativeSegmentedControlIOSChangeEvent>) => {
         const value = segmentedOptions[event.nativeEvent.selectedSegmentIndex].value;
-        setTab(value);
-    }, [setTab]);
+        setMyRecosTab(value);
+    }, [setMyRecosTab]);
 
     return (
     <>

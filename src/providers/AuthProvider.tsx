@@ -3,7 +3,7 @@ import { Provider, Session } from "@supabase/supabase-js";
 import { createContext, use, useCallback, useEffect, useState, useMemo } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
 import { useUserQuery } from "@/features/user/userQueries";
-import { AppState } from "react-native";
+import { AppState, Platform } from "react-native";
 import { supabase } from "@/lib/supabase/client";
 import { useSplashScreen } from "./SplashScreenProvider";
 import { useLocaleContext } from "./LocaleProvider";
@@ -16,6 +16,8 @@ import { useRevenueCat } from "@/hooks/useRevenueCat";
 import { useAuthCustomerInfo } from "@/features/auth/authQueries";
 import { CustomerInfo } from "react-native-purchases";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { randomUUID } from "expo-crypto";
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -124,6 +126,43 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				});
 				if (googleError) throw googleError;
 				break;
+			
+			case 'apple':
+				if (Platform.OS === 'ios') {
+					try {
+						const rawNone = randomUUID();
+						const credential = await AppleAuthentication.signInAsync({
+							requestedScopes: [
+								AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+								AppleAuthentication.AppleAuthenticationScope.EMAIL,
+							],
+							state: rawNone,
+						});
+						if (credential.state !== rawNone) {
+							throw new Error('State does not match');
+						}
+						const { identityToken } = credential;
+						if (!identityToken) {
+							throw new Error('No identity token provided');
+						}
+						const { error: appleError } = await supabase.auth.signInWithIdToken({
+							provider: 'apple',
+							token: identityToken,
+						});
+						if (appleError) throw appleError;
+						break;
+					} catch (error) {
+						if (error instanceof Error) {
+							if (!(
+								('code' in error && error.code === 'ERR_REQUEST_CANCELED')
+							)) {
+								throw error;
+							}
+						} else {
+							throw error;
+						}
+					}
+				}
 			default:
 				const { data, error } = await supabase.auth.signInWithOAuth({
 					provider: provider,

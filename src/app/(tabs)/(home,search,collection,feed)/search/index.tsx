@@ -26,15 +26,15 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useTranslations } from "use-intl";
 
 const SearchScreen = () => {
-	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
+	const search = useSearchStore(state => state.search);
 	
 	const content = useMemo(() => {
-		if (debouncedSearch) {
-			return <SearchResults search={debouncedSearch} />
+		if (search) {
+			return <SearchResults search={search} />
 		} else {
 			return <FeaturedPlaylists contentContainerStyle={tw`px-4`} />
 		}
-	}, [debouncedSearch]);
+	}, [search]);
 
 	return content;
 };
@@ -45,6 +45,8 @@ interface SearchResultsProps extends React.ComponentPropsWithoutRef<typeof Scrol
 };
 
 export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => {
+	const { bottomTabHeight, tabBarHeight } = useTheme();
+
 	const {
 		data,
 		isLoading,
@@ -64,11 +66,13 @@ export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => 
 	return (
 	<KeyboardAwareScrollView
 	ref={scrollRef}
-	contentContainerStyle={{ gap: GAP }}
+	contentContainerStyle={{
+		gap: GAP,
+		paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+	}}
 	keyboardShouldPersistTaps='always'
 	scrollIndicatorInsets={{
-		top: -PADDING_VERTICAL,
-		// bottom: height.value + PADDING_VERTICAL
+		bottom: tabBarHeight,
 	}}
 	{...props}
 	>

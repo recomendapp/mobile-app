@@ -18,12 +18,7 @@ import { NativeSegmentedControlIOSChangeEvent } from "@react-native-segmented-co
 
 const WatchlistScreen = () => {
     const t = useTranslations();
-    const { tab, view, setWatchlistTab: setTab, setWatchlistView: setView } = useUIStore((state) => ({
-        tab: state.watchlist.tab,
-        view: state.watchlist.view,
-        setWatchlistTab: state.setWatchlistTab,
-        setWatchlistView: state.setWatchlistView,
-    }));
+    const { watchlist: { tab, view }, setWatchlistTab, setWatchlistView } = useUIStore((state) => state);
 
     // States
     const segmentedOptions = useMemo((): { label: string, value: UserActivityType }[] => [
@@ -49,13 +44,13 @@ const WatchlistScreen = () => {
     }, [tab]);
 
     const handleChangeView = useCallback(() => {
-        setView(view === 'grid' ? 'list' : 'grid');
-    }, [setView, view]);
+        setWatchlistView(view === 'grid' ? 'list' : 'grid');
+    }, [setWatchlistView, view]);
 
     const handleChangeTab = useCallback((event: NativeSyntheticEvent<NativeSegmentedControlIOSChangeEvent>) => {
         const value = segmentedOptions[event.nativeEvent.selectedSegmentIndex].value;
-        setTab(value);
-    }, [setTab]);
+        setWatchlistTab(value);
+    }, [setWatchlistTab]);
 
     return (
     <>

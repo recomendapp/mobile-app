@@ -47,16 +47,16 @@ MovieItem.displayName = 'MovieItem';
 
 const EmptyComponent = memo(({ 
 	isLoading, 
-	debouncedSearch,
+	search,
 	noResultsText 
 }: { 
 	isLoading: boolean; 
-	debouncedSearch: string | null;
+	search: string | null;
 	noResultsText: string;
 }) => {
 	if (isLoading) return <Icons.Loader />;
 	
-	if (debouncedSearch) {
+	if (search) {
 		return (
 			<View style={tw`flex-1 items-center justify-center`}>
 				<Text textColor='muted'>{noResultsText}</Text>
@@ -107,7 +107,7 @@ const SearchFilmsScreen = memo(() => {
 	const { tabBarHeight, bottomTabHeight } = useTheme();
 	const navigation = useNavigation();
 	const t = useTranslations();
-	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
+	const search = useSearchStore(state => state.search);
 	
 	// States
 	const [runtimeFilter, setRuntimeFilter] = useState<{ min?: number; max?: number }>({ 
@@ -122,7 +122,7 @@ const SearchFilmsScreen = memo(() => {
 		hasNextPage,
 		fetchNextPage,
 	} = useSearchMoviesInfiniteQuery({
-		query: debouncedSearch,
+		query: search,
 	});
 	
 	// REFs
@@ -172,7 +172,7 @@ const SearchFilmsScreen = memo(() => {
 	return (
 		<>
 			<LegendList
-				key={debouncedSearch}
+				key={search}
 				ref={scrollRef}
 				data={moviesData}
 				renderItem={renderItem}
@@ -189,7 +189,7 @@ const SearchFilmsScreen = memo(() => {
 				ListEmptyComponent={
 					<EmptyComponent
 					isLoading={isLoading}
-					debouncedSearch={debouncedSearch}
+					search={search}
 					noResultsText={upperFirst(t('common.messages.no_results'))}
 					/>
 				}

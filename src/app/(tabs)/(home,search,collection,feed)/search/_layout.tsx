@@ -8,7 +8,7 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Href, Stack, usePathname, useRouter } from "expo-router"
 import { upperFirst } from "lodash"
-import { useEffect, useMemo, useCallback } from "react";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import Animated, { FadeInUp, FadeOutUp, LinearTransition, SlideInLeft, SlideInRight, SlideOutLeft, SlideOutRight } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
@@ -41,11 +41,8 @@ const SearchLayout = () => {
 	const router = useRouter();
 	const pathname = usePathname();
 	const insets = useSafeAreaInsets();
-	const search = useSearchStore(state => state.search);
-	const debouncedSearch = useSearchStore(state => state.debouncedSearch);
-	const setSearch = useSearchStore(state => state.setSearch);
-	const type = useSearchStore(state => state.type);
-	const setType = useSearchStore(state => state.setType);
+	const { search, setSearch } = useSearchStore(state => state);
+	const [type, setType] = useState<SearchType | null>(null);
 
 	const types = useMemo((): TypeItem[] => [
 		{ value: 'movies', label: upperFirst(t('common.messages.film', { count: 2 })), href: '/search/films' },
@@ -108,8 +105,7 @@ const SearchLayout = () => {
 					layout={LinearTransition.springify().delay(100)}
 					>
 						<SearchBar
-						value={search}
-						onChangeText={setSearch}
+						onSearch={setSearch}
 						placeholder={type === 'movies' ? upperFirst(t('common.messages.search_film', { count: 2 })) : t('pages.search.placeholder')}
 						/>
 					</Animated.View>
@@ -125,7 +121,7 @@ const SearchLayout = () => {
 						</Animated.View>
 					)}
 				</Animated.View>
-				{(debouncedSearch?.length || type) && (
+				{(search?.length || type) && (
 					<AnimatedLegendList
 					data={types}
 					entering={FadeInUp}
@@ -143,7 +139,7 @@ const SearchLayout = () => {
 				)}
 			</View>
 		)
-	}, [insets, search, setSearch, t, type, debouncedSearch, renderTypeItem, keyExtractor]);
+	}, [insets, t, type, search, renderTypeItem, keyExtractor]);
 
 	useEffect(() => {
 		switch (pathname) {

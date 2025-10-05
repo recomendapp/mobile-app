@@ -18,12 +18,7 @@ import { NativeSyntheticEvent } from "react-native";
 
 const HeartPicksScreen = () => {
 	const t = useTranslations();
-	const { tab, view, setHeartPicksTab: setTab, setHeartPicksView: setView } = useUIStore((state) => ({
-		tab: state.heartPicks.tab,
-		view: state.heartPicks.view,
-		setHeartPicksTab: state.setHeartPicksTab,
-		setHeartPicksView: state.setHeartPicksView,
-	}));
+	const { heartPicks: { tab, view }, setHeartPicksTab, setHeartPicksView } = useUIStore((state) => state);
 
 	// States
 	const segmentedOptions = useMemo((): { label: string, value: UserActivityType }[] => [
@@ -49,13 +44,13 @@ const HeartPicksScreen = () => {
 	}, [tab]);
 
 	const handleChangeView = useCallback(() => {
-		setView(view === 'grid' ? 'list' : 'grid');
-	}, [setView, view]);
+		setHeartPicksView(view === 'grid' ? 'list' : 'grid');
+	}, [setHeartPicksView, view]);
 
 	const handleChangeTab = useCallback((event: NativeSyntheticEvent<NativeSegmentedControlIOSChangeEvent>) => {
 		const value = segmentedOptions[event.nativeEvent.selectedSegmentIndex].value;
-		setTab(value);
-	}, [setTab]);
+		setHeartPicksTab(value);
+	}, [setHeartPicksTab]);
 
 	return (
 	<>
