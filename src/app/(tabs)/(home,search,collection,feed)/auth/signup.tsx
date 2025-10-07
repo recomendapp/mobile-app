@@ -15,7 +15,6 @@ import { useTheme } from '@/providers/ThemeProvider';
 import { GroupedInput, GroupedInputItem } from '@/components/ui/Input';
 import { upperFirst } from 'lodash';
 import { ImageBackground } from 'expo-image';
-import * as Burnt from 'burnt';
 import { useRandomImage } from '@/hooks/useRandomImage';
 import { InputOTP } from '@/components/ui/input-otp';
 import { Text } from '@/components/ui/text';
@@ -28,6 +27,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
+import { useToast } from '@/components/Toast';
 
 const backgroundImages = [
 	require('@/assets/images/auth/signup/background/1.gif'),
@@ -43,6 +43,7 @@ const SignupScreen = () => {
 	const supabase = useSupabaseClient();
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
+	const toast = useToast();
 	const navigationHeaderHeight = useHeaderHeight();
 	const { signup, loginWithOtp } = useAuth();
 	const [ isLoading, setIsLoading ] = useState(false);
@@ -144,11 +145,7 @@ const SignupScreen = () => {
 				password: data.password,
 				language: locale,
 			});
-			Burnt.toast({
-				title: upperFirst(t('common.form.success')),
-				message: t('common.form.email.sent', { email: data.email }),
-				preset: 'done',
-			});
+			toast.success(upperFirst(t('common.form.success')), { description: t('common.form.email.sent', { email: data.email }) });
 			setShowOtp(true);
 		} catch (error) {
 			if (error instanceof AuthError) {
@@ -159,20 +156,10 @@ const SignupScreen = () => {
 						});
 						break;
 					default:
-						Burnt.toast({
-							title: upperFirst(t('common.messages.error')),
-							message: error.message,
-							preset: 'error',
-							haptic: 'error',
-						});
+						toast.error(upperFirst(t('common.messages.error')), { description: error.message });
 				}
 			} else {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		} finally {
 			setIsLoading(false);
@@ -182,33 +169,22 @@ const SignupScreen = () => {
 		try {
 			setIsLoading(true);
 			await loginWithOtp(form.getValues('email'));
-			Burnt.toast({
-				title: upperFirst(t('common.form.code_sent')),
-				preset: 'done',
-			});
+			toast.success(upperFirst(t('common.form.code_sent')));
 		} catch (error) {
+			let errorMessage = '';
 			if (error instanceof AuthError) {
 				switch (error.status) {
 					case 429:
-						Burnt.toast({
-							title: upperFirst(t('common.form.error.too_many_attempts')),
-							preset: 'error',
-						});
+						errorMessage = t('common.form.error.too_many_attempts');
 						break;
 					default:
-						Burnt.toast({
-							title: upperFirst(t('common.messages.error')),
-							message: error.message,
-							preset: 'error',
-						});
+						errorMessage = error.message;
+						break;
 				}
 			} else {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-				});
+				errorMessage = upperFirst(t('common.messages.an_error_occurred'));
 			}
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		} finally {
 			setIsLoading(false);
 		}
@@ -222,35 +198,22 @@ const SignupScreen = () => {
 			type: 'email',
 		  });
 		  if (error) throw error;
-		  Burnt.toast({
-			title: upperFirst(t('common.form.email.verified')),
-			preset: 'done',
-		  });
+		  toast.success(upperFirst(t('common.form.email.verified')));
 		} catch (error) {
-		  if (error instanceof AuthError) {
-			switch (error.status) {
-			  case 403:
-				// toast.error(common('form.error.invalid_code'));
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.form.error.invalid_code')),
-					preset: 'error',
-				});
-				break
-			  default:
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: error.message,
-					preset: 'error',
-				});
-			}
-		  } else {
-			Burnt.toast({
-				title: upperFirst(t('common.messages.error')),
-				message: upperFirst(t('common.errors.an_error_occurred')),
-				preset: 'error',
-			});
-		  }
+			let errorMessage = '';
+			if (error instanceof AuthError) {
+				switch (error.status) {
+				case 403:
+					errorMessage = t('common.form.error.invalid_code');
+					break
+				default:
+					errorMessage = error.message;
+					break;
+				}
+		  	} else {
+				errorMessage = upperFirst(t('common.messages.an_error_occurred'));
+		  	}
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		} finally {
 		  setIsLoading(false);
 		}

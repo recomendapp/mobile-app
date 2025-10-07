@@ -7,16 +7,17 @@ import CollectionScreen, { CollectionAction, SortByOption } from "@/components/s
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import * as Burnt from "burnt";
 import { useSharedValue } from "react-native-reanimated";
 import { useUserActivityTvSeriesUpdateMutation } from "@/features/user/userMutations";
 import { useUserHeartPicksTvSeriesQuery } from "@/features/user/userQueries";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useUIStore } from "@/stores/useUIStore";
+import { useToast } from "@/components/Toast";
 
 export const CollectionHeartPicksTvSeries = () => {
 	const t = useTranslations();
+	const toast = useToast();
     const { user } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.heartPicks.view);
@@ -48,18 +49,10 @@ export const CollectionHeartPicksTvSeries = () => {
 							isLiked: false,
 						}, {
 							onSuccess: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.deleted', { count: 1, gender: 'male' })),
-									preset: 'done',
-								});
+								toast.success(upperFirst(t('common.messages.deleted', { count: 1, gender: 'male' })));
 							},
 							onError: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.error')),
-									message: upperFirst(t('common.messages.an_error_occurred')),
-									preset: 'error',
-									haptic: 'error',
-								});
+								toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 							}
 						});
 					},

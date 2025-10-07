@@ -1,6 +1,5 @@
 import * as React from "react"
 import { Button } from '@/components/ui/Button';
-import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuth } from '@/providers/AuthProvider';
 import upperFirst from 'lodash/upperFirst';
 import { useUserFollowPersonQuery } from '@/features/user/userQueries';
@@ -8,8 +7,7 @@ import { Alert, ViewStyle } from 'react-native';
 import { useUserFollowPersonInsertMutation, useUserFollowPersonDeleteMutation } from '@/features/user/userMutations';
 import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
-import * as Burnt from "burnt";
-import { CORNERS } from "@/theme/globals";
+import { useToast } from "../Toast";
 
 interface ButtonPersonFollowBaseProps
   extends React.ComponentProps<typeof Button> {
@@ -32,6 +30,7 @@ const ButtonPersonFollow = React.forwardRef<
   React.ComponentRef<typeof Button>,
   ButtonPersonFollowProps
 >(({ personId, onPress, skeleton, style, ...props }, ref) => {
+  const toast = useToast();
   const t = useTranslations();
   const { session } = useAuth();
 
@@ -54,12 +53,7 @@ const ButtonPersonFollow = React.forwardRef<
       personId: personId,
     }, {
       onError: (error) => {
-        Burnt.toast({
-          title: upperFirst(t('common.messages.error')),
-          message: upperFirst(t('common.messages.an_error_occurred')),
-          preset: 'error',
-          haptic: 'error',
-        });
+        toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
       }
     });
   }
@@ -82,12 +76,13 @@ const ButtonPersonFollow = React.forwardRef<
               personId: personId,
             }, {
               onError: (error) => {
-                Burnt.toast({
-                  title: upperFirst(t('common.messages.error')),
-                  message: upperFirst(t('common.messages.an_error_occurred')),
-                  preset: 'error',
-                  haptic: 'error',
-                });
+                // Burnt.toast({
+                //   title: upperFirst(t('common.messages.error')),
+                //   message: upperFirst(t('common.messages.an_error_occurred')),
+                //   preset: 'error',
+                //   haptic: 'error',
+                // });
+                toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
               }
             });
           },

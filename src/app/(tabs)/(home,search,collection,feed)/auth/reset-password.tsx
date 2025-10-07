@@ -6,13 +6,14 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/providers/AuthProvider";
 import { AuthError } from "@supabase/supabase-js";
 import { Redirect } from "expo-router";
-import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
+import { useToast } from "@/components/Toast";
 
 const AuthResetPasswordScreen = () => {
 	const url = useLinkingURL();
 	const t = useTranslations();
+	const toast = useToast();
 	const { createSessionFromUrl } = useAuth();
 	const [error, setError] = useState<string | null>(null);
 
@@ -26,12 +27,7 @@ const AuthResetPasswordScreen = () => {
 				} else if (error instanceof Error) {
 					errorMessage = error.message;
 				}
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: errorMessage,
-					preset: "error",
-					haptic: "error",
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 				setError(errorMessage);
 				});
 		}

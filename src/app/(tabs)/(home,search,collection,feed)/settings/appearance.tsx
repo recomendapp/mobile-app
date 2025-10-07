@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
-import * as Burnt from 'burnt';
 import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -20,10 +19,12 @@ import { useAuth } from "@/providers/AuthProvider";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
+import { useToast } from "@/components/Toast";
 
 const SettingsAppearanceScreen = () => {
 	const { locale, setLocale } = useLocaleContext();
 	const { session } = useAuth();
+	const toast = useToast();
 	const { bottomTabHeight, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
@@ -56,22 +57,14 @@ const SettingsAppearanceScreen = () => {
 				});
 			}
 			setLocale(data.locale);
-			Burnt.toast({
-				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
-				preset: 'done',
-			})
+			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 			form.reset();
 		} catch (error) {
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof AuthError) {
 				errorMessage = error.message;
 			}
-			Burnt.toast({
-				title: upperFirst(t('common.messages.error')),
-				message: errorMessage,
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		} finally {
 			setIsLoading(false);
 		}

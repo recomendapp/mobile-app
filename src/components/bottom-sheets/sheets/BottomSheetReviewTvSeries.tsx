@@ -17,8 +17,8 @@ import { useAuth } from '@/providers/AuthProvider';
 import { PADDING_VERTICAL } from '@/theme/globals';
 import { Alert } from 'react-native';
 import { useUserReviewTvSeriesDeleteMutation } from '@/features/user/userMutations';
-import * as Burnt from 'burnt';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useToast } from '@/components/Toast';
 
 interface BottomSheetReviewTvSeriesProps extends BottomSheetProps {
   review: UserReviewTvSeries,
@@ -39,6 +39,7 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetReviewTvSeriesProps
 >(({ id, review, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
+  const toast = useToast();
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const insets = useSafeAreaInsets();
@@ -87,21 +88,14 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
                       { id: review.id, tvSeriesId: review.activity?.tv_series_id! },
                       {
                         onSuccess: () => {
-                          Burnt.toast({
-                            title: upperFirst(t('common.messages.deleted')),
-                            preset: 'done',
-                          });
+                          toast.success(upperFirst(t('common.messages.deleted')));
                           if (pathname.startsWith(`/tv-series/${review.activity?.tv_series?.slug || review.activity?.tv_series_id}/review/${review.id}`)) {
                             router.canGoBack() ? router.back() : router.replace(`/tv-series/${review.activity?.tv_series?.slug || review.activity?.tv_series_id}`);
                           }
                           closeSheet(id);
                         },
                         onError: () => {
-                          Burnt.toast({
-                            title: upperFirst(t('common.messages.an_error_occurred')),
-                            preset: 'error',
-                            haptic: 'error',
-                          });
+                          toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
                         },
                       }
                     );

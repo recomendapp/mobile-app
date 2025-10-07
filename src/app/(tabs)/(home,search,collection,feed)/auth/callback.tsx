@@ -5,14 +5,15 @@ import { useAuth } from "@/providers/AuthProvider";
 import { AuthError } from "expo-auth-session";
 import { useLinkingURL } from "expo-linking";
 import { useEffect, useState } from "react";
-import * as Burnt from "burnt";
 import { Redirect } from "expo-router";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
+import { useToast } from "@/components/Toast";
 
 const AuthCallbackScreen = () => {
 	const url = useLinkingURL();
 	const t = useTranslations();
+	const toast = useToast();
 	const { createSessionFromUrl } = useAuth();
 	const [error, setError] = useState<string | null>(null);
 
@@ -26,11 +27,8 @@ const AuthCallbackScreen = () => {
 					} else if (error instanceof Error) {
 						errorMessage = error.message;
 					}
-					Burnt.toast({
-						title: upperFirst(t('common.messages.error')),
-						message: errorMessage,
-						preset: "error",
-						haptic: "error",
+					toast.error(upperFirst(t('common.messages.error')), {
+						description: upperFirst(errorMessage),
 					});
 					setError(errorMessage);
 				});

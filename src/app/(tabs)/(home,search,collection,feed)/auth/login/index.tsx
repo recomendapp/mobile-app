@@ -8,7 +8,6 @@ import { useTheme } from '@/providers/ThemeProvider';
 import { GroupedInput, GroupedInputItem } from '@/components/ui/Input';
 import { upperCase, upperFirst } from 'lodash';
 import { Icons } from '@/constants/Icons';
-import * as Burnt from 'burnt';
 import app from '@/constants/app';
 import { useRandomImage } from '@/hooks/useRandomImage';
 import { ImageBackground } from 'expo-image';
@@ -21,6 +20,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
+import { useToast } from '@/components/Toast';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
@@ -31,6 +31,7 @@ const LoginScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
 	const router = useRouter();
+	const toast = useToast();
 	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const [ email, setEmail ] = useState('');
@@ -43,12 +44,7 @@ const LoginScreen = () => {
 			setIsLoading(true);
 			await login({ email: email, password: password });
 		} catch (error) {
-			Burnt.toast({
-				title: upperFirst(t('common.messages.error')),
-				message: t('pages.auth.login.form.wrong_credentials'),
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.error')), { description: t('pages.auth.login.form.wrong_credentials') });
 		} finally {
 			setIsLoading(false);
 		}

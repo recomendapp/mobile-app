@@ -11,7 +11,6 @@ import { Alert, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAuth } from '@/providers/AuthProvider';
 import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
-import * as Burnt from 'burnt';
 import { useUserPlaylistSavedQuery } from '@/features/user/userQueries';
 import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation } from '@/features/user/userMutations';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
@@ -23,6 +22,7 @@ import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import richTextToPlainString from '@/utils/richTextToPlainString';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useToast } from '@/components/Toast';
 
 interface BottomSheetPlaylistProps extends BottomSheetProps {
   playlist: Playlist,
@@ -43,6 +43,7 @@ const BottomSheetPlaylist = React.forwardRef<
   BottomSheetPlaylistProps
 >(({ id, playlist, additionalItemsTop = [], ...props }, ref) => {
   const { session } = useAuth();
+  const toast = useToast();
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -80,12 +81,7 @@ const BottomSheetPlaylist = React.forwardRef<
                   savedId: saved.id,
                 }, {
                   onError: () => {
-                    Burnt.toast({
-                      title: upperFirst(t('common.messages.error')),
-                      message: upperFirst(t('common.messages.an_error_occurred')),
-                      preset: 'error',
-                      haptic: 'error',
-                    });
+                    toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
                   }
                 });
               } else {
@@ -94,12 +90,7 @@ const BottomSheetPlaylist = React.forwardRef<
                   playlistId: playlist.id,
                 }, {
                   onError: () => {
-                    Burnt.toast({
-                      title: upperFirst(t('common.messages.error')),
-                      message: upperFirst(t('common.messages.an_error_occurred')),
-                      preset: 'error',
-                      haptic: 'error',
-                    });
+                    toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
                   }
                 });
 
@@ -152,21 +143,14 @@ const BottomSheetPlaylist = React.forwardRef<
                         { playlistId: playlist.id, userId: session.user.id },
                         {
                           onSuccess: () => {
-                            Burnt.toast({
-                              title: upperFirst(t('common.messages.deleted')),
-                              preset: 'done',
-                            });
+                            toast.success(upperFirst(t('common.messages.deleted')));
                             if (pathname.startsWith(`/playlist/${playlist.id}`)) {
                               router.replace('/collection');
                             }
                             closeSheet(id);
                           },
                           onError: () => {
-                            Burnt.toast({
-                              title: upperFirst(t('common.messages.an_error_occurred')),
-                              preset: 'error',
-                              haptic: 'error',
-                            });
+                            toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
                           },
                         }
                       );

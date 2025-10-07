@@ -10,7 +10,6 @@ import { usePlaylistGuestsUpsertMutation } from "@/features/playlist/playlistMut
 import { usePlaylistGuestsQuery, usePlaylistGuestsSearchInfiniteQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
-import { useTheme } from "@/providers/ThemeProvider";
 import { GAP, PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Profile } from "@recomendapp/types";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
@@ -20,15 +19,16 @@ import {  useCallback, useMemo, useState } from "react";
 import { Alert, ScrollViewProps } from "react-native";
 import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
-import * as Burnt from 'burnt';
 import { PostgrestError } from "@supabase/supabase-js";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useToast } from "@/components/Toast";
 
 const ModalPlaylistEditGuestsAdd = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
 	const playlistId = Number(playlist_id);
 	const t = useTranslations();
+	const toast = useToast();
 	const { session } = useAuth();
 	const insets = useSafeAreaInsets();
 	const router = useRouter();
@@ -90,10 +90,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 					user_id: guest.id!,
 				})),
 			}, { onError: (error) => { throw error } })
-			Burnt.toast({
-				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
-				preset: 'done',
-			});
+			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 			router.dismiss();
 		} catch (error) {
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
@@ -104,12 +101,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 			} else if (typeof error === 'string') {
 				errorMessage = error;
 			}
-			Burnt.toast({
-				title: upperFirst(t('common.messages.error')),
-				message: errorMessage,
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		}
 	};
 	const handleCancel = useCallback(() => {

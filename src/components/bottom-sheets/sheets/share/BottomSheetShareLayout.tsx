@@ -14,12 +14,12 @@ import { Separator } from "@/components/ui/separator";
 import { Icons } from "@/constants/Icons";
 import * as Clipboard from 'expo-clipboard';
 import { LegendList } from "@legendapp/list";
-import * as Burnt from 'burnt';
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { ShareViewRef } from "@/components/share/type";
 import { LucideIcon } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useToast } from "@/components/Toast";
 
 type SharePlatform = {
 	label: string;
@@ -43,6 +43,7 @@ const BottomSheetShareLayout = forwardRef<
     children,
     ...props
 }, ref) => {
+    const toast = useToast();
     const t = useTranslations();
     const insets = useSafeAreaInsets();
     const url = `https://${Constants.expoConfig?.extra?.webDomain}${path}`;
@@ -57,10 +58,7 @@ const BottomSheetShareLayout = forwardRef<
             icon: Icons.link,
             onPress: async () => {
                 await Clipboard.setStringAsync(url);
-                Burnt.toast({
-                    title: upperFirst(t('common.messages.copied', { count: 1, gender: 'male' })),
-                    preset: 'done',
-                });
+                toast.success(upperFirst(t('common.messages.copied', { count: 1, gender: 'male' })));
             }
         },
         {
@@ -120,7 +118,7 @@ const BottomSheetShareLayout = forwardRef<
         //             title: "Recomend",
         //             url: url,
         //             type: 'image/png',
-                    
+                            
         //         });
         //     }
         // },

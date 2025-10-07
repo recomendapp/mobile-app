@@ -5,9 +5,9 @@ import { useUserPlaylistLikeDeleteMutation, useUserPlaylistLikeInsertMutation } 
 import { useTheme } from "@/providers/ThemeProvider";
 import { Icons } from "@/constants/Icons";
 import { Button } from "@/components/ui/Button";
-import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
+import { useToast } from "../Toast";
 
 interface ButtonActionPlaylistLikeProps
 	extends React.ComponentProps<typeof Button> {
@@ -18,6 +18,7 @@ const ButtonActionPlaylistLike = React.forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonActionPlaylistLikeProps
 >(({ playlistId, variant = "ghost", size = "icon", icon = Icons.like, onPress, iconProps, ...props }, ref) => {
+	const toast = useToast();
 	const { colors } = useTheme();
 	const { session } = useAuth();
 	const t = useTranslations();
@@ -37,12 +38,7 @@ const ButtonActionPlaylistLike = React.forwardRef<
 			playlistId: playlistId,
 		}, {
 			onError: (error) => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};
@@ -52,12 +48,7 @@ const ButtonActionPlaylistLike = React.forwardRef<
 			likeId: like.id
 		}, {
 			onError: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};

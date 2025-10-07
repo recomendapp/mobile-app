@@ -11,7 +11,6 @@ import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollViewProps } from "react-native";
 import { useTranslations } from "use-intl";
 import { z } from "zod";
-import * as Burnt from "burnt";
 import { SelectionFooter } from "@/components/ui/SelectionFooter";
 import tw from "@/lib/tw";
 import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
@@ -29,6 +28,7 @@ import { useUserRecosTvSeriesInsertMutation } from "@/features/user/userMutation
 import { CardUser } from "@/components/cards/CardUser";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useToast } from "@/components/Toast";
 
 const COMMENT_MAX_LENGTH = 180;
 
@@ -36,6 +36,7 @@ const RecoSendTvSeries = () => {
 	const t = useTranslations();
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
+	const toast = useToast();
 	const { colors } = useTheme();
 	const { session } = useAuth();
 	const { tv_series_id, tv_series_name } = useLocalSearchParams();
@@ -125,19 +126,11 @@ const RecoSendTvSeries = () => {
 			comment: values.comment?.trim() || undefined,
 		}, {
 			onSuccess: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.sent', { count: selected.length, gender: 'female' })),
-					preset: 'done',
-				});
+				toast.success(upperFirst(t('common.messages.sent', { count: selected.length, gender: 'female' })));
 				router.dismiss();
 			},
 			onError: (error) => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	}, [router, sendReco, session?.user.id, selected, t, tvSeriesId]);

@@ -17,8 +17,8 @@ import { useAuth } from '@/providers/AuthProvider';
 import { PADDING_VERTICAL } from '@/theme/globals';
 import { Alert } from 'react-native';
 import { useUserReviewMovieDeleteMutation } from '@/features/user/userMutations';
-import * as Burnt from 'burnt';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useToast } from '@/components/Toast';
 
 interface BottomSheetReviewMovieProps extends BottomSheetProps {
   review: UserReviewMovie,
@@ -42,6 +42,7 @@ export const BottomSheetReviewMovie = React.forwardRef<
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const insets = useSafeAreaInsets();
+  const toast = useToast();
   const { colors } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
@@ -87,21 +88,14 @@ export const BottomSheetReviewMovie = React.forwardRef<
                       { id: review.id, movieId: review.activity?.movie_id! },
                       {
                         onSuccess: () => {
-                          Burnt.toast({
-                            title: upperFirst(t('common.messages.deleted')),
-                            preset: 'done',
-                          });
+                          toast.success(upperFirst(t('common.messages.deleted')));
                           if (pathname.startsWith(`/film/${review.activity?.movie?.slug || review.activity?.movie_id}/review/${review.id}`)) {
                             router.canGoBack() ? router.back() : router.replace(`/film/${review.activity?.movie?.slug || review.activity?.movie_id}`);
                           }
                           closeSheet(id);
                         },
                         onError: () => {
-                          Burnt.toast({
-                            title: upperFirst(t('common.messages.an_error_occurred')),
-                            preset: 'error',
-                            haptic: 'error',
-                          });
+                          toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
                         },
                       }
                     );

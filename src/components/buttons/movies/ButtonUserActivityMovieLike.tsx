@@ -7,13 +7,13 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { MediaMovie } from "@recomendapp/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { userKeys } from "@/features/user/userKeys";
-import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useSharedValue } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { ICON_ACTION_SIZE } from "@/theme/globals";
+import { useToast } from "@/components/Toast";
 
 interface ButtonUserActivityMovieLikeProps
 	extends React.ComponentProps<typeof Button> {
@@ -26,6 +26,7 @@ const ButtonUserActivityMovieLike = React.forwardRef<
 >(({ movie, icon = Icons.like, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session } = useAuth();
+	const toast = useToast();
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations();
@@ -57,11 +58,7 @@ const ButtonUserActivityMovieLike = React.forwardRef<
 				},
 				onError: () => {
 					isLiked.value = 0;
-					Burnt.toast({
-						title: upperFirst(t('common.messages.an_error_occurred')),
-						preset: 'error',
-						haptic: 'error',
-					});
+					toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 				}
 			});
 		} else {
@@ -77,11 +74,7 @@ const ButtonUserActivityMovieLike = React.forwardRef<
 				},
 				onError: () => {
 					isLiked.value = 0;
-					Burnt.toast({
-						title: upperFirst(t('common.messages.an_error_occurred')),
-						preset: 'error',
-						haptic: 'error',
-					});
+					toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 				}
 			});
 		}
@@ -100,11 +93,7 @@ const ButtonUserActivityMovieLike = React.forwardRef<
 				});
 			},
 			onError: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 				isLiked.value = 1;
 			}
 		});

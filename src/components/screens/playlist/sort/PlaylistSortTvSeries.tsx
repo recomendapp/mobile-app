@@ -15,12 +15,13 @@ import { upperFirst } from "lodash";
 import { useCallback, useEffect, useState } from "react";
 import DraggableFlatList, { DragEndParams, RenderItemParams, ScaleDecorator } from "react-native-draggable-flatlist";
 import { useTranslations } from "use-intl";
-import * as Burnt from "burnt";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useToast } from "@/components/Toast";
 
 export const PlaylistSortTvSeries = () => {
 	const { session } = useAuth();
+	const toast = useToast();
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
 	const t = useTranslations();
@@ -40,39 +41,35 @@ export const PlaylistSortTvSeries = () => {
 	const loading = playlistItems === undefined || (playlistItemsRequest === undefined || playlistItemsRequestIsLoading);
 	
 	// Handlers
-	const handleSaveItem = async (item: PlaylistItemTvSeries) => {
-			try {
-				await updatePlaylistItem.mutateAsync({
-					itemId: item.id,
-					rank: item.rank,
-				});
-			} catch (error) {
-				let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
-				if (error instanceof Error) {
-					errorMessage = error.message;
-				} else if (error instanceof PostgrestError) {
-					errorMessage = error.message;
-				} else if (typeof error === 'string') {
-					errorMessage = error;
-				}
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: errorMessage,
-					preset: 'error',
-					haptic: 'error',
-				});
+	const handleSaveItem = useCallback(async (item: PlaylistItemTvSeries) => {
+		try {
+			await updatePlaylistItem.mutateAsync({
+				itemId: item.id,
+				rank: item.rank,
+			});
+		} catch (error) {
+			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
+			if (error instanceof Error) {
+				errorMessage = error.message;
+			} else if (error instanceof PostgrestError) {
+				errorMessage = error.message;
+			} else if (typeof error === 'string') {
+				errorMessage = error;
 			}
-	};
-	const handleOnDragEnd = ({ from, to, data }: DragEndParams<PlaylistItemTvSeries>) => {
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
+		}
+	}, [updatePlaylistItem, t, toast]);
+	const handleOnDragEnd = useCallback(({ from, to, data }: DragEndParams<PlaylistItemTvSeries>) => {
 		if (from === to) return;
 		const updatedItem = data.at(to);
 		updatedItem && handleSaveItem({
 			...updatedItem,
 			rank: to + 1,
 		});
-	};
-	const handleQuickMove = (item: PlaylistItemTvSeries) => {
-	};
+	}, [handleSaveItem]);
+	const handleQuickMove = useCallback((item: PlaylistItemTvSeries) => {
+		// Implement quick move logic here
+	}, [handleSaveItem]);
 
 	// Render
 	const renderItem = useCallback(({ item, drag, isActive }: RenderItemParams<PlaylistItemTvSeries>) => {

@@ -6,13 +6,13 @@ import { Icons } from "@/constants/Icons";
 import { useUserActivityMovieDeleteMutation, useUserActivityMovieInsertMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaMovie } from "@recomendapp/types";
-import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { ICON_ACTION_SIZE } from "@/theme/globals";
+import { useToast } from "@/components/Toast";
 
 interface ButtonUserActivityMovieWatchProps
 	extends React.ComponentProps<typeof Button> {
@@ -24,6 +24,7 @@ const ButtonUserActivityMovieWatch = React.forwardRef<
 	ButtonUserActivityMovieWatchProps
 >(({ movie, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, style, ...props }, ref) => {
 	const { colors } = useTheme();
+	const toast = useToast();
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -46,11 +47,7 @@ const ButtonUserActivityMovieWatch = React.forwardRef<
 			movieId: movie.id,
 		}), {
 			onError: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		};
 	};
@@ -72,11 +69,7 @@ const ButtonUserActivityMovieWatch = React.forwardRef<
 							activityId: activity.id,
 						}, {
 							onError: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.an_error_occurred')),
-									preset: 'error',
-									haptic: 'error',
-								});
+								toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 							}
 						});
 					},

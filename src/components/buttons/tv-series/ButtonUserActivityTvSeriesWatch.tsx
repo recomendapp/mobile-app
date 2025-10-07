@@ -1,18 +1,18 @@
 import React from "react"
 import { Alert, View } from "react-native";
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserActivityMovieQuery, useUserActivityTvSeriesQuery } from "@/features/user/userQueries";
+import { useUserActivityTvSeriesQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
-import { useUserActivityMovieDeleteMutation, useUserActivityMovieInsertMutation, useUserActivityTvSeriesDeleteMutation, useUserActivityTvSeriesInsertMutation } from "@/features/user/userMutations";
+import { useUserActivityTvSeriesDeleteMutation, useUserActivityTvSeriesInsertMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
-import { MediaMovie, MediaTvSeries } from "@recomendapp/types";
-import * as Burnt from "burnt";
+import { MediaTvSeries } from "@recomendapp/types";
 import { upperFirst } from "lodash";
 import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { ICON_ACTION_SIZE } from "@/theme/globals";
+import { useToast } from "@/components/Toast";
 
 interface ButtonUserActivityTvSeriesWatchProps
 	extends React.ComponentProps<typeof Button> {
@@ -23,6 +23,7 @@ const ButtonUserActivityTvSeriesWatch = React.forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserActivityTvSeriesWatchProps
 >(({ tvSeries, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, style, ...props }, ref) => {
+	const toast = useToast();
 	const { colors } = useTheme();
 	const { session } = useAuth();
 	const router = useRouter();
@@ -46,11 +47,7 @@ const ButtonUserActivityTvSeriesWatch = React.forwardRef<
 			tvSeriesId: tvSeries.id,
 		}), {
 			onError: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		};
 	};
@@ -72,11 +69,7 @@ const ButtonUserActivityTvSeriesWatch = React.forwardRef<
 							activityId: activity.id,
 						}, {
 							onError: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.an_error_occurred')),
-									preset: 'error',
-									haptic: 'error',
-								});
+								toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 							}
 						});
 					},

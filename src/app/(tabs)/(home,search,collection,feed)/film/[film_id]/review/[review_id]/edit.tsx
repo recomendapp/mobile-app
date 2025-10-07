@@ -6,14 +6,15 @@ import tw from "@/lib/tw";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native"
 import { useUserReviewMovieUpsertMutation } from "@/features/user/userMutations";
-import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
+import { useToast } from "@/components/Toast";
 
 const ReviewMovieEditScreen = () => {
 	const { session }	= useAuth();
 	const router = useRouter();
 	const t = useTranslations();
+	const toast = useToast();
 	const { review_id } = useLocalSearchParams();
 	// Requetes
 	const {
@@ -38,15 +39,9 @@ const ReviewMovieEditScreen = () => {
 		}, {
 			onSuccess: () => {
 				router.back();
-				// router.replace(`/film/${review.activity?.movie?.slug || review.activity?.movie?.id}/review/${review.id}`);
 			},
 			onError: (error) => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		})
 	};

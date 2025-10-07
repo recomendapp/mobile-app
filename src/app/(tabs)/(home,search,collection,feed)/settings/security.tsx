@@ -2,7 +2,6 @@ import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
-import * as Burnt from 'burnt';
 import tw from "@/lib/tw";
 import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
@@ -18,9 +17,11 @@ import { View } from "@/components/ui/view";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
+import { useToast } from "@/components/Toast";
 
 const SettingsSecurityScreen = () => {
 	const supabase = useSupabaseClient();
+	const toast = useToast();
 	const { bottomTabHeight, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
@@ -70,26 +71,14 @@ const SettingsSecurityScreen = () => {
 			});
 			if (error) throw error;
 			await supabase.auth.signOut({ scope: "others" });
-			Burnt.toast({
-				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
-				preset: 'done',
-			})
+			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 			form.reset();
 		} catch (error) {
+			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof AuthError) {
-				Burnt.toast({
-					title: t('common.messages.error'),
-					message: error.message,
-					preset: 'error',
-					haptic: 'error',
-				});
-			} else {
-				Burnt.toast({
-					title: t('common.messages.error'),
-					preset: 'error',
-					haptic: 'error',
-				})
+				errorMessage = error.message;
 			}
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		} finally {
 			setIsLoading(false);
 		}

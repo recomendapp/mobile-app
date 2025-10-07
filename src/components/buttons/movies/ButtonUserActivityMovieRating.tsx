@@ -13,7 +13,7 @@ import BottomSheetRating from "@/components/bottom-sheets/sheets/BottomSheetRati
 import { useUserActivityMovieInsertMutation, useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
-import * as Burnt from "burnt";
+import { useToast } from "@/components/Toast";
 
 interface ButtonUserActivityMovieRatingProps
 	extends React.ComponentProps<typeof Button> {
@@ -25,6 +25,7 @@ const ButtonUserActivityMovieRating = React.forwardRef<
 	ButtonUserActivityMovieRatingProps
 >(({ movie, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
 	const { session } = useAuth();
+	const toast = useToast();
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations();
@@ -50,12 +51,7 @@ const ButtonUserActivityMovieRating = React.forwardRef<
 				rating: rating,
 			}, {
 				onError: () => {
-					Burnt.toast({
-						title: upperFirst(t('common.messages.an_error_occurred')),
-						preset: 'error',
-						haptic: 'error',
-					});
-					throw new Error('Failed to rate movie');
+					toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 				}
 			});
 		} else {
@@ -65,37 +61,22 @@ const ButtonUserActivityMovieRating = React.forwardRef<
 				rating: rating,
 			}, {
 				onError: () => {
-					Burnt.toast({
-						title: upperFirst(t('common.messages.an_error_occurred')),
-						preset: 'error',
-						haptic: 'error',
-					});
-					throw new Error('Failed to rate movie');
+					toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 				}
 			});
 		}
 	};
 	const handleUnrate = async () => {
 		if (activity?.review) {
-			return Burnt.toast({
-				title: upperFirst(t('common.messages.an_error_occurred')),
-				message: 'You cannot unrate a media with a review.',
-				duration: 3,
-				preset: 'error',
-				haptic: 'error',
-			})
+			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: 'You cannot unrate a media with a review.' });
+			return;
 		}
 		await updateActivity.mutateAsync({
 			activityId: activity!.id!,
 			rating: null,
 		}, {
 			onError: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
-				throw new Error('Failed to unrate movie');
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};

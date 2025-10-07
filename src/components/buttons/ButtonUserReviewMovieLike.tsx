@@ -2,14 +2,13 @@ import * as React from "react"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserReviewMovieLikeQuery } from "@/features/user/userQueries";
 import { useUserReviewMovieLikeDeleteMutation, useUserReviewMovieLikeInsertMutation } from "@/features/user/userMutations";
-import { usePathname, useRouter } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Icons } from "@/constants/Icons";
 import { Button } from "@/components/ui/Button";
-import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
+import { useToast } from "../Toast";
 
 interface ButtonUserReviewMovieLikeProps
 	extends React.ComponentProps<typeof Button> {
@@ -24,8 +23,7 @@ const ButtonUserReviewMovieLike = React.forwardRef<
 	const { colors } = useTheme();
 	const { session } = useAuth();
 	const t = useTranslations();
-	const router = useRouter();
-	const pathname = usePathname();
+	const toast = useToast();
 	const {
 		data: like,
 		isLoading,
@@ -48,12 +46,7 @@ const ButtonUserReviewMovieLike = React.forwardRef<
 				setLikeCount((prev) => (prev ?? 0) + 1);
 			},
 			onError: (error) => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};
@@ -66,12 +59,7 @@ const ButtonUserReviewMovieLike = React.forwardRef<
 				setLikeCount((prev) => (prev ?? 0) - 1);
 			},
 			onError: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};
