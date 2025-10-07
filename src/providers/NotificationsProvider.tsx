@@ -5,12 +5,12 @@ import { useSupabaseClient } from "./SupabaseProvider";
 import { Platform } from "react-native";
 import * as Device from 'expo-device';
 import { useRouter } from "expo-router";
-import * as Burnt from 'burnt';
 import { NotificationPayload } from "@recomendapp/types";
 import { NovuProvider } from "@novu/react-native";
 import { useNovuSubscriberHash } from "@/features/utils/utilsQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import { utilsKey } from "@/features/utils/utilsKey";
+import { useToast } from "@/components/Toast";
 
 type NotificationsContextType = {
   isMounted: boolean;
@@ -29,6 +29,7 @@ export const useNotifications = () => {
 };
 
 export const NotificationsProvider = ({ children }: { children: React.ReactNode }) => {
+  const toast = useToast();
   const supabase = useSupabaseClient();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -147,11 +148,10 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     notificationsListener.current = Notifications.addNotificationReceivedListener((notification) => {
       console.log("🔔 Notification received:", notification);
       setNotifications((prev) => (prev ? [...prev, notification] : [notification]));
-      Burnt.toast({
-        title: notification.request.content.title || "New Notification",
-        message: notification.request.content.body ?? undefined,
-        preset: 'none',
+      toast.info(notification.request.content.title || "New Notification", {
+        description: notification.request.content.body ?? undefined,
       });
+      // Invalidate notifications queries
       queryClient.invalidateQueries({
         queryKey: utilsKey.notifications()
       });

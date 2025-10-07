@@ -14,7 +14,6 @@ import { Controller, useForm } from "react-hook-form";
 import { Alert, ScrollViewProps } from "react-native";
 import { useTranslations } from "use-intl";
 import { z } from "zod";
-import * as Burnt from "burnt";
 import { SelectionFooter } from "@/components/ui/SelectionFooter";
 import { Pressable } from "react-native-gesture-handler";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
@@ -35,6 +34,7 @@ import { usePlaylistMovieAddToQuery } from "@/features/playlist/playlistQueries"
 import { playlistKeys } from "@/features/playlist/playlistKeys";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useToast } from "@/components/Toast";
 
 const COMMENT_MAX_LENGTH = 180;
 
@@ -43,6 +43,7 @@ const PlaylistMovieAdd = () => {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const insets = useSafeAreaInsets();
+	const toast = useToast();
 	const { colors } = useTheme();
 	const { session } = useAuth();
 	const { movie_id, movie_title } = useLocalSearchParams();
@@ -143,19 +144,11 @@ const PlaylistMovieAdd = () => {
 			comment: values.comment || undefined,
 		}, {
 			onSuccess: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
-					preset: 'done',
-				});
+				toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 				router.dismiss();
 			},
 			onError: (error) => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};

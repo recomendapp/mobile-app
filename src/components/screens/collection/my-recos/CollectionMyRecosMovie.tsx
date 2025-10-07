@@ -7,7 +7,6 @@ import CollectionScreen, { CollectionAction, SortByOption } from "@/components/s
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import * as Burnt from "burnt";
 import { useSharedValue } from "react-native-reanimated";
 import { useUserRecosMovieCompleteMutation, useUserRecosMovieDeleteMutation } from "@/features/user/userMutations";
 import { useUserRecosMovieQuery } from "@/features/user/userQueries";
@@ -15,8 +14,10 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { useUIStore } from "@/stores/useUIStore";
 import BottomSheetMyRecosSenders from "@/components/bottom-sheets/sheets/BottomSheetMyRecosSenders";
+import { useToast } from "@/components/Toast";
 
 export const CollectionMyRecosMovie = () => {
+	const toast = useToast();
 	const t = useTranslations();
     const { user } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -50,18 +51,10 @@ export const CollectionMyRecosMovie = () => {
 							movieId: data.movie!.id,
 						}, {
 							onSuccess: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.deleted', { count: 1, gender: 'male' })),
-									preset: 'done',
-								});
+								toast.success(upperFirst(t('common.messages.deleted', { count: 1, gender: 'male' })));
 							},
 							onError: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.error')),
-									message: upperFirst(t('common.messages.an_error_occurred')),
-									preset: 'error',
-									haptic: 'error',
-								});
+								toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 							}
 						});
 					},
@@ -69,7 +62,7 @@ export const CollectionMyRecosMovie = () => {
 				}
 			]
 		)
-	}, [deleteReco, t, user]);
+	}, [deleteReco, t, user, toast]);
 	const handleCompleteReco = React.useCallback((data: UserRecosMovieAggregated) => {
 		Alert.alert(
 			upperFirst(t('common.messages.are_u_sure')),
@@ -87,18 +80,10 @@ export const CollectionMyRecosMovie = () => {
 							movieId: data.movie!.id,
 						}, {
 							onSuccess: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.completed', { count: 1, gender: 'female' })),
-									preset: 'done',
-								});
+								toast.success(upperFirst(t('common.messages.completed', { count: 1, gender: 'female' })));
 							},
 							onError: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.error')),
-									message: upperFirst(t('common.messages.an_error_occurred')),
-									preset: 'error',
-									haptic: 'error',
-								});
+								toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 							}
 						});
 					},
@@ -106,7 +91,7 @@ export const CollectionMyRecosMovie = () => {
 				}
 			]
 		)
-	}, [completeReco, deleteReco, t, user]);
+	}, [completeReco, deleteReco, t, user, toast]);
 
     const sortByOptions = React.useMemo((): SortByOption<UserRecosMovieAggregated>[] => ([
         {

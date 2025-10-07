@@ -13,7 +13,6 @@ import { Notification } from "@novu/react-native";
 import { useNotificationArchiveMutation, useNotificationReadMutation, useNotificationUnarchiveMutation, useNotificationUnreadMutation } from "@/features/utils/utilsMutations";
 import ReusableAppleStyleSwipeableRow from "@/components/ui/swippeable/ReusableAppleStyleSwipeableRow";
 import { useUIStore } from "@/stores/useUIStore";
-import * as Burnt from "burnt";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { CardNotificationRecoSentMovie } from "@/components/cards/notifications/CardNotificationRecoSentMovie";
@@ -24,10 +23,12 @@ import { CardNotificationFollowerAccepted } from "@/components/cards/notificatio
 import { CardNotificationFollowerCreated } from "@/components/cards/notifications/CardNotificationFollowerCreated";
 import { CardNotificationFriendCreated } from "@/components/cards/notifications/CardNotificationFriendCreated";
 import { CardNotificationFollowerRequest } from "@/components/cards/notifications/CardNotificationFollowerRequest";
+import { useToast } from "@/components/Toast";
 
 const NotificationsScreen = () => {
 	const router = useRouter();
 	const t = useTranslations();
+	const toast = useToast();
 	const { colors } = useTheme();
 	const { notificationsView, setNotificationsView } = useUIStore((state) => state);
 	const viewOptions = ['all', 'unread', 'archived'] as const;
@@ -51,44 +52,40 @@ const NotificationsScreen = () => {
 	const handleArchive = useCallback(async (notification: typeof notifications[number]) => {
 		await archiveMutation.mutateAsync(notification, {
 			onSuccess: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.notification_archived', { count: 1 })),
-					preset: 'done',
-					haptic: 'success',
-				});
+				toast.success(upperFirst(t('common.messages.notification_archived', { count: 1 })));
+			},
+			onError: () => {
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	}, [archiveMutation]);
 	const handleUnarchive = useCallback(async (notification: typeof notifications[number]) => {
 		await unarchiveMutation.mutateAsync(notification, {
 			onSuccess: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.notification_unarchived', { count: 1 })),
-					preset: 'done',
-					haptic: 'success',
-				});
+				toast.success(upperFirst(t('common.messages.notification_unarchived', { count: 1 })));
+			},
+			onError: () => {
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	}, [unarchiveMutation]);
 	const handleRead = useCallback(async (notification: typeof notifications[number]) => {
 		await readMutation.mutateAsync(notification, {
 			onSuccess: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.notification_marked_as_read', { count: 1 })),
-					preset: 'done',
-					haptic: 'success',
-				});
+				toast.success(upperFirst(t('common.messages.notification_marked_as_read', { count: 1 })));
+			},
+			onError: () => {
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	}, [readMutation]);
 	const handleUnread = useCallback(async (notification: typeof notifications[number]) => {
 		await unreadMutation.mutateAsync(notification, {
 			onSuccess: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.notification_marked_as_unread', { count: 1 })),
-					preset: 'done',
-					haptic: 'success',
-				});
+				toast.success(upperFirst(t('common.messages.notification_marked_as_unread', { count: 1 })));
+			},
+			onError: () => {
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	}, [unreadMutation]);

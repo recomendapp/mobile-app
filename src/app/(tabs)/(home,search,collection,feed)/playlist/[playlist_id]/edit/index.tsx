@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
-import * as Burnt from 'burnt';
 import { Button } from "@/components/ui/Button";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
@@ -33,6 +32,7 @@ import { Icons } from "@/constants/Icons";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
+import { useToast } from "@/components/Toast";
 
 const TITLE_MIN_LENGTH = 1;
 const TITLE_MAX_LENGTH = 100;
@@ -43,6 +43,7 @@ const ModalPlaylistEdit = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
     const playlistId = Number(playlist_id);
 	const insets = useSafeAreaInsets();
+	const toast = useToast();
 	const { colors } = useTheme();
 	const router = useRouter();
 	const { showActionSheetWithOptions } = useActionSheet();
@@ -137,12 +138,7 @@ const ModalPlaylistEdit = () => {
 				case 'camera':
 					const hasPermission = await requestCameraPermissionsAsync();
 					if (!hasPermission.granted) {
-						Burnt.toast({
-							title: upperFirst(t('common.messages.error')),
-							message: upperFirst(t('common.messages.camera_permission_denied')),
-							preset: 'error',
-							haptic: 'error',
-						});
+						toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.camera_permission_denied')) });
 						return;
 					}
 					const cameraResults = await launchCameraAsync({
@@ -193,10 +189,7 @@ const ModalPlaylistEdit = () => {
 				private: values.private,
 				poster_url: poster_url,
 			});
-			Burnt.toast({
-				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
-				preset: 'done',
-			});
+			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 			router.dismiss();
 		} catch (error) {
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
@@ -205,11 +198,7 @@ const ModalPlaylistEdit = () => {
 			} else if (typeof error === 'string') {
 				errorMessage = error;
 			}
-			Burnt.toast({
-				title: errorMessage,
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		} finally {
 			setIsLoading(false);
 		}

@@ -6,10 +6,10 @@ import { Text } from "../ui/text";
 import { GAP } from "@/theme/globals";
 import { useCallback } from "react";
 import { useAuth } from "@/providers/AuthProvider";
-import * as Burnt from 'burnt';
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useTheme } from "@/providers/ThemeProvider";
+import { useToast } from "../Toast";
 
 type Provider = {
 	name: AuthProvider;
@@ -52,6 +52,7 @@ export const OAuthProviders = ({
 	contentContainerStyle,
 	...props 
 }: OAuthProvidersProps) => {
+	const toast = useToast();
 	const { loginWithOAuth } = useAuth();
 	const { colors } = useTheme();
 	const t = useTranslations();
@@ -62,14 +63,9 @@ export const OAuthProviders = ({
 			if (error instanceof Error) {
 				if (error.message === 'cancelled') return;
 			}
-			Burnt.toast({
-				title: upperFirst(t('common.messages.error')),
-				message: upperFirst(t('common.messages.an_error_occurred')),
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 		}
-	}, [loginWithOAuth, t]);
+	}, [loginWithOAuth, t, toast]);
 	return (
 		<LegendList
 		data={data}

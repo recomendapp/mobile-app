@@ -9,7 +9,6 @@ import Constants from 'expo-constants';
 import { ShareMovie } from "@/components/share/ShareMovie";
 import ShareTvSeries from "@/components/share/ShareTvSeries";
 import { ScrollView } from "react-native-gesture-handler";
-import { useTheme } from "@/providers/ThemeProvider";
 import { Text } from "@/components/ui/text";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Button } from "@/components/ui/Button";
@@ -17,11 +16,11 @@ import { Separator } from "@/components/ui/separator";
 import { Icons } from "@/constants/Icons";
 import * as Clipboard from 'expo-clipboard';
 import { LegendList } from "@legendapp/list";
-import * as Burnt from 'burnt';
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { ShareViewRef } from "@/components/share/type";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useToast } from "@/components/Toast";
 
 interface BottomSheetShareBaseProps extends BottomSheetProps {
 	type: MediaType | "user" | "playlist" | "review";
@@ -91,6 +90,7 @@ const BottomSheetShare = forwardRef<
 	playlist,
 	...props
 }, ref) => {
+	const toast = useToast();
 	const t = useTranslations();
 	const insets = useSafeAreaInsets();
 	const url = `https://${Constants.expoConfig?.extra?.webDomain}${path}`;
@@ -117,10 +117,7 @@ const BottomSheetShare = forwardRef<
 			icon: Icons.link,
 			onPress: async () => {
 				await Clipboard.setStringAsync(url);
-				Burnt.toast({
-					title: upperFirst(t('common.messages.copied', { count: 1, gender: 'male' })),
-					preset: 'done',
-				});
+				toast.success(upperFirst(t('common.messages.copied', { count: 1, gender: 'male' })));
 			}
 		},
 		{

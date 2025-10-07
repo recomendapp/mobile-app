@@ -11,10 +11,10 @@ import tw from "@/lib/tw";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { AuthError } from "@supabase/supabase-js";
-import * as Burnt from "burnt";
 import { Text } from "../ui/text";
 import { View } from "../ui/view";
 import { Skeleton } from "../ui/Skeleton";
+import { useToast } from "../Toast";
 
 type Route = {
     name: string;
@@ -104,6 +104,7 @@ RouteItem.displayName = 'RouteItem';
 
 const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     const router = useRouter();
+    const toast = useToast();
     const t = useTranslations();
     const { colors } = useTheme();
     const { session, customerInfo, logout } = useAuth();
@@ -158,12 +159,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             if (error instanceof AuthError) {
                 errorMessage = upperFirst(t('common.messages.error'));
             }
-            Burnt.toast({
-                title: upperFirst(t('common.messages.error')),
-                message: errorMessage,
-                preset: 'error',
-                haptic: 'error',
-            });
+            toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
         }
     }, [logout, closeDrawer, t]);
 

@@ -1,8 +1,6 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import * as Burnt from 'burnt';
 import { Button } from "@/components/ui/Button";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
@@ -23,16 +21,16 @@ import { PostgrestError } from "@supabase/supabase-js";
 import app from "@/constants/app";
 import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const PADDING = 16;
+import { useToast } from "@/components/Toast";
 
 const ModalPlaylistEditGuests = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
     const playlistId = Number(playlist_id);
 	const insets = useSafeAreaInsets();
 	const router = useRouter();
+	const toast = useToast();
 	const { customerInfo } = useAuth();
 	const t = useTranslations();
 	const {
@@ -140,10 +138,7 @@ const ModalPlaylistEditGuests = () => {
 					ids: guestsToDelete.map((guest) => guest.id),
 				}, { onError: (error) => { throw error } })
 			}
-			Burnt.toast({
-				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
-				preset: 'done',
-			});
+			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 			router.dismiss();
 		} catch (error) {
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
@@ -154,12 +149,7 @@ const ModalPlaylistEditGuests = () => {
 			} else if (typeof error === 'string') {
 				errorMessage = error;
 			}
-			Burnt.toast({
-				title: upperFirst(t('common.messages.error')),
-				message: errorMessage,
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		} finally {
 			setIsLoading(false);
 		}
@@ -194,7 +184,7 @@ const ModalPlaylistEditGuests = () => {
 		];
 		const styleAnimation = useAnimatedStyle(() => {
 			return {
-				transform: [{ translateX: (drag.value - PADDING + actionWidth) * swipeActions.length }],
+				transform: [{ translateX: (drag.value - PADDING_HORIZONTAL + actionWidth) * swipeActions.length }],
 				opacity: interpolate(drag.value, [0, -actionWidth * swipeActions.length], [0, 1]),
 			};
 		});
@@ -226,7 +216,7 @@ const ModalPlaylistEditGuests = () => {
 		friction={2}
 		enableTrackpadTwoFingerGesture
 		renderRightActions={(prog, drag, swipeable) => RightActions(prog, drag, item, swipeable)}
-		containerStyle={{ paddingHorizontal: PADDING }}
+		containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}
 		>
 			<CardUser user={item.user} linked={false}>
 				<Switch
@@ -285,7 +275,7 @@ const ModalPlaylistEditGuests = () => {
 				),
 			}}
 		/>
-		<View style={[tw`gap-2`, { paddingHorizontal: PADDING, paddingVertical: PADDING_VERTICAL }]}>
+		<View style={[tw`gap-2`, { paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }]}>
 			<SearchBar
 			onSearch={setSearch}
 			autoCorrect={false}

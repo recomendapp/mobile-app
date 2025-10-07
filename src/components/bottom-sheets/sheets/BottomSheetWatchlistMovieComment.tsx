@@ -5,7 +5,6 @@ import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useUserWatchlistMovieUpdateMutation } from '@/features/user/userMutations';
 import { Button } from '@/components/ui/Button';
-import * as Burnt from 'burnt';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
@@ -18,6 +17,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { View } from '@/components/ui/view';
 import { useTheme } from '@/providers/ThemeProvider';
+import { useToast } from '@/components/Toast';
 
 interface BottomSheetWatchlistMovieCommentProps extends BottomSheetProps {
 	watchlistItem: UserWatchlistMovie
@@ -31,6 +31,7 @@ export const BottomSheetWatchlistMovieComment = React.forwardRef<
   BottomSheetWatchlistMovieCommentProps
 >(({ id, watchlistItem, ...props }, ref) => {
 	const { colors } = useTheme();
+	const toast = useToast();
 	const closeSheet = useBottomSheetStore((state) => state.closeSheet);
 	const t = useTranslations();
 	const updateWatchlist = useUserWatchlistMovieUpdateMutation();
@@ -59,12 +60,7 @@ export const BottomSheetWatchlistMovieComment = React.forwardRef<
 			return;
 		}
 		if (!watchlistItem?.id) {
-			Burnt.toast({
-				title: upperFirst(t('common.messages.error')),
-				message: upperFirst(t('common.messages.an_error_occurred')),
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			return;
 		}
 		await updateWatchlist.mutateAsync({
@@ -72,19 +68,11 @@ export const BottomSheetWatchlistMovieComment = React.forwardRef<
 			comment: values.comment.replace(/\s+/g, ' ').trimStart(),
 		}, {
 			onSuccess: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
-					preset: 'done',
-				});
+				toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 				closeSheet(id);
 			},
 			onError: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};

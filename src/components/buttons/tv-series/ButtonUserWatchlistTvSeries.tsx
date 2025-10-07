@@ -5,7 +5,6 @@ import { Icons } from "@/constants/Icons";
 import { useUserWatchlistTvSeriesDeleteMutation, useUserWatchlistTvSeriesInsertMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaTvSeries } from "@recomendapp/types";
-import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
@@ -13,6 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { ICON_ACTION_SIZE } from "@/theme/globals";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { BottomSheetWatchlistTvSeriesComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistTvSeriesComment";
+import { useToast } from "@/components/Toast";
 
 interface ButtonUserWatchlistTvSeriesProps
 	extends React.ComponentProps<typeof Button> {
@@ -24,6 +24,7 @@ export const ButtonUserWatchlistTvSeries = React.forwardRef<
 	ButtonUserWatchlistTvSeriesProps
 >(({ tvSeries, icon = Icons.Watchlist, variant = "ghost", size = "fit", onPress: onPressProps, onLongPress: onLongPressProps, iconProps, ...props }, ref) => {
 	const { colors } = useTheme();
+	const toast = useToast();
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -44,43 +45,29 @@ export const ButtonUserWatchlistTvSeries = React.forwardRef<
 	const handleWatchlist = async () => {
 		if (watchlist) return;
 		if (!session || !tvSeries.id) {
-			return Burnt.toast({
-				title: upperFirst(t('common.messages.an_error_occurred')),
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
+			return;
 		}
 		await insertWatchlist.mutateAsync({
 			userId: session.user.id,
 			tvSeriesId: tvSeries.id,
 		}, {
 		  onError: () => {
-			Burnt.toast({
-				title: upperFirst(t('common.messages.an_error_occurred')),
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 		  }
 		});
 	};
 	const handleUnwatchlist = async () => {
 		if (!watchlist) return;
 		if (!watchlist.id) {
-			return Burnt.toast({
-				title: upperFirst(t('common.messages.an_error_occurred')),
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
+			return;
 		}
 		await deleteWatchlist.mutateAsync({
 		  watchlistId: watchlist.id,
 		}, {
 		  onError: () => {
-			Burnt.toast({
-				title: upperFirst(t('common.messages.an_error_occurred')),
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 		  }
 		});
 	};

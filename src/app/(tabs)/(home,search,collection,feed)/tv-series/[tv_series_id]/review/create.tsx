@@ -8,13 +8,14 @@ import tw from "@/lib/tw";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native"
 import { useUserReviewTvSeriesUpsertMutation } from "@/features/user/userMutations";
-import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
+import { useToast } from "@/components/Toast";
 
 const ReviewTvSeriesCreateScreen = () => {
 	const { user } = useAuth();
 	const router = useRouter();
+	const toast = useToast();
 	const t = useTranslations();
 	const { tv_series_id } = useLocalSearchParams();
 	const { id: tvSeriesId } = getIdFromSlug(tv_series_id as string);
@@ -50,11 +51,7 @@ const ReviewTvSeriesCreateScreen = () => {
 				router.replace(`/tv-series/${tvSeries?.slug || tvSeries?.id}/review/${review.id}`);
 			},
 			onError: (error) => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					preset: 'error',
-					haptic: 'error',
-				})
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};

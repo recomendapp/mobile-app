@@ -8,8 +8,8 @@ import { Alert, ViewStyle } from 'react-native';
 import { useUserFollowProfileInsertMutation, useUserFollowProfileDeleteMutation } from '@/features/user/userMutations';
 import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
-import * as Burnt from "burnt";
 import { CORNERS } from "@/theme/globals";
+import { useToast } from "../Toast";
 
 interface ButtonUserFollowBaseProps
   extends React.ComponentProps<typeof Button> {
@@ -33,6 +33,7 @@ const ButtonUserFollow = React.forwardRef<
   ButtonUserFollowProps
 >(({ profileId, onPress, skeleton, style, ...props }, ref) => {
   const t = useTranslations();
+  const toast = useToast();
   const { user } = useAuth();
 
   const {
@@ -54,12 +55,7 @@ const ButtonUserFollow = React.forwardRef<
       followeeId: profileId,
     }, {
       onError: (error) => {
-        Burnt.toast({
-          title: upperFirst(t('common.messages.error')),
-          message: upperFirst(t('common.messages.an_error_occurred')),
-          preset: 'error',
-          haptic: 'error',
-        });
+        toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
       }
     });
   }
@@ -82,12 +78,7 @@ const ButtonUserFollow = React.forwardRef<
               followeeId: profileId,
             }, {
               onError: (error) => {
-                Burnt.toast({
-                  title: upperFirst(t('common.messages.error')),
-                  message: upperFirst(t('common.messages.an_error_occurred')),
-                  preset: 'error',
-                  haptic: 'error',
-                });
+                toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
               }
             });
           },

@@ -14,7 +14,6 @@ import useDebounce from "@/hooks/useDebounce";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { usePlaylistItemsMovieRealtimeMutation, usePlaylistMovieDeleteMutation, usePlaylistMovieUpdateMutation } from "@/features/playlist/playlistMutations";
-import * as Burnt from "burnt";
 import { CardUser } from "@/components/cards/CardUser";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
@@ -23,6 +22,7 @@ import { SharedValue, useSharedValue } from "react-native-reanimated";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { useUIStore } from "@/stores/useUIStore";
 import { BottomSheetComment } from "@/components/bottom-sheets/sheets/BottomSheetComment";
+import { useToast } from "@/components/Toast";
 
 interface PlaylistMovieProps {
 	playlist: Playlist;
@@ -36,6 +36,7 @@ export const PlaylistMovie = ({
 	headerHeight = useSharedValue(0),
 } : PlaylistMovieProps) => {
 	const t = useTranslations();
+	const toast = useToast();
 	const router = useRouter();
 	const supabase = useSupabaseClient();
 	const { session } = useAuth();
@@ -73,19 +74,10 @@ export const PlaylistMovie = ({
 							itemId: data.id,
 						}, {
 							onSuccess: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.deleted', { count: 1, gender: 'male' })),
-									preset: 'done',
-									haptic: 'success',
-								});
+								toast.success(upperFirst(t('common.messages.deleted', { count: 1, gender: 'male' })));
 							},
 							onError: () => {
-								Burnt.toast({
-									title: upperFirst(t('common.messages.error')),
-									message: upperFirst(t('common.messages.an_error_occurred')),
-									preset: 'error',
-									haptic: 'error',
-								});
+								toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 							}
 						});
 					},
@@ -93,7 +85,7 @@ export const PlaylistMovie = ({
 				}
 			]
 		)
-	}, [t]);
+	}, [t, deletePlaylistItemMutation, toast]);
 	const handlePlaylistItemComment = useCallback((data: PlaylistItemMovie) => {
 		openSheet(BottomSheetComment, {
 			comment: data.comment || '',
@@ -104,17 +96,12 @@ export const PlaylistMovie = ({
 					comment: newComment?.replace(/\s+/g, ' ').trimStart() || null,
 				}, {
 					onError: () => {
-						Burnt.toast({
-							title: upperFirst(t('common.messages.error')),
-							message: upperFirst(t('common.messages.an_error_occurred')),
-							preset: 'error',
-							haptic: 'error',
-						});
+						toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 					}
 				})
 			}
 		});
-	}, [openSheet, isAllowedToEdit]);
+	}, [openSheet, isAllowedToEdit, updatePlaylistItemMutation, t, toast]);
 
     const sortByOptions = useMemo((): SortByOption<PlaylistItemMovie>[] => ([
 		{

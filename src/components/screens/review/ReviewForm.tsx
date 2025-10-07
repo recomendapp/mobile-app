@@ -1,9 +1,8 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import {  MediaMovie, MediaTvSeries, UserActivityMovie, UserActivityTvSeries, UserReviewMovie, UserReviewTvSeries } from "@recomendapp/types";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { upperFirst } from "lodash";
-import * as Burnt from "burnt";
 import useEditor from "@/lib/10tap/editor";
 import { useSharedValue } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
@@ -19,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Toolbar } from "../../RichText/Toolbar";
 import { Input } from "@/components/ui/Input";
 import { RichText } from "@/components/RichText/RichText";
+import { useToast } from "@/components/Toast";
 
 const MAX_TITLE_LENGTH = 50;
 const MAX_BODY_LENGTH = 5000;
@@ -54,6 +54,7 @@ const ReviewForm = ({
 	review,
 	onSave,
 } : ReviewFormProps) => {
+	const toast = useToast();
 	const insets = useSafeAreaInsets();	
 	const { colors, bottomTabHeight } = useTheme();
 	const t = useTranslations();
@@ -66,21 +67,17 @@ const ReviewForm = ({
 	});
 
 	// HANDLER
-	const handleSave = async () => {
+	const handleSave = useCallback(async () => {
 		const content = await editor.getJSON();
 		if (!activity?.rating) {
-			return Burnt.toast({
-				title: upperFirst(t('common.messages.error')),
-				message: upperFirst(t('common.messages.a_rating_is_required_to_add_a_review')),
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.a_rating_is_required_to_add_a_review')) });
+			return;
 		}
 		onSave?.({
 			title: title,
 			body: content,
 		})
-	}
+	}, [activity?.rating, editor, onSave, title, t, toast]);
 
 	useEffect(() => {
 		if (review) {

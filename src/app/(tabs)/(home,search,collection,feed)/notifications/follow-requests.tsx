@@ -12,13 +12,14 @@ import { UserFollower } from "@recomendapp/types";
 import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
-import * as Burnt from "burnt";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
+import { useToast } from "@/components/Toast";
 
 const FollowRequestsScreen = () => {
 	const t = useTranslations();
 	const insets = useSafeAreaInsets();
+	const toast = useToast();
 	const { session } = useAuth();
 	const {
 		data: requests,
@@ -45,41 +46,25 @@ const FollowRequestsScreen = () => {
 			requestId
 		}, {
 			onSuccess: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.request_accepted', { count: 1 })),
-					preset: 'done',
-				});
+				toast.success(upperFirst(t('common.messages.request_accepted', { count: 1 })));
 			},
 			onError: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error'
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [acceptRequest, t]);
+	}, [acceptRequest, t, toast]);
 	const handleDeclineRequest = useCallback(async (requestId: number) => {
 		await declineRequest.mutateAsync({
 			requestId
 		}, {
 			onSuccess: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.request_declined', { count: 1 })),
-					preset: 'done'
-				});
+				toast.success(upperFirst(t('common.messages.request_declined', { count: 1 })));
 			},
 			onError: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error'
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [declineRequest, t]);
+	}, [declineRequest, t, toast]);
 
 	// Renders
 	const renderItems = useCallback(({ item } : { item: UserFollower }) => {

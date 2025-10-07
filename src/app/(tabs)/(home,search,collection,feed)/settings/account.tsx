@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {  useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
-import * as Burnt from 'burnt';
 import { Button } from "@/components/ui/Button";
 import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
 import useDebounce from "@/hooks/useDebounce";
@@ -28,6 +27,7 @@ import { Separator } from "@/components/ui/separator";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
+import { useToast } from "@/components/Toast";
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -36,6 +36,7 @@ const SettingsAccountScreen = () => {
 	const { user, session, updateEmail, cancelPendingEmailChange, verifyEmailChange } = useAuth();
 	const format = useFormatter();
 	const t = useTranslations();
+	const toast = useToast();
 	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
 	const updateProfileMutation = useUserUpdateMutation({
 		userId: user?.id,
@@ -108,10 +109,7 @@ const SettingsAccountScreen = () => {
 			if (values.email && values.email !== session?.user.email) {
 				await updateEmail(values.email);
 			}
-			Burnt.toast({
-				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
-				preset: 'done',
-			})
+			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 		} catch (error) {
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof Error) {
@@ -119,12 +117,7 @@ const SettingsAccountScreen = () => {
 			} else if (typeof error === 'string') {
 				errorMessage = error;
 			}
-			Burnt.toast({
-				title: upperFirst(t('common.messages.error')),
-				message: errorMessage,
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		} finally {
 			setIsLoading(false);
 		}
@@ -133,10 +126,7 @@ const SettingsAccountScreen = () => {
 		try {
 			setIsLoading(true);
 			await cancelPendingEmailChange();
-			Burnt.toast({
-				title: upperFirst(t('common.messages.request_canceled')),
-				preset: 'done',
-			});
+			toast.success(upperFirst(t('common.messages.request_canceled')));
 		} catch (error) {
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof Error) {
@@ -144,12 +134,7 @@ const SettingsAccountScreen = () => {
 			} else if (typeof error === 'string') {
 				errorMessage = error;
 			}
-			Burnt.toast({
-				title: upperFirst(t('common.messages.an_error_occurred')),
-				message: errorMessage,
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		} finally {
 			setIsLoading(false);
 		}
@@ -201,10 +186,7 @@ const SettingsAccountScreen = () => {
 		try {
 			setIsLoading(true);
 			await verifyEmailChange(email, token);
-			Burnt.toast({
-				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
-				preset: 'done',
-			});
+			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 		} catch (error) {
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof Error) {
@@ -212,12 +194,7 @@ const SettingsAccountScreen = () => {
 			} else if (typeof error === 'string') {
 				errorMessage = error;
 			}
-			Burnt.toast({
-				title: upperFirst(t('common.messages.error')),
-				message: errorMessage,
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		} finally {
 			setIsLoading(false);
 		}
@@ -415,6 +392,7 @@ const SettingsAccountScreen = () => {
 const DeleteAccountSection = () => {
 	const { user } = useAuth();
 	const { colors } = useTheme();
+	const toast = useToast();
 	const format = useFormatter();
 	const t = useTranslations();
 	const {
@@ -453,16 +431,10 @@ const DeleteAccountSection = () => {
 			userId: user.id,
 		}, {
 			onSuccess: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.request_made')),
-					preset: 'done',
-				});
+				toast.success(upperFirst(t('common.messages.request_made')));
 			},
 			onError: (error) => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};
@@ -472,16 +444,10 @@ const DeleteAccountSection = () => {
 			userId: user.id,
 		}, {
 			onSuccess: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.request_canceled')),
-					preset: 'done',
-				});
+				toast.success(upperFirst(t('common.messages.request_canceled')));
 			},
 			onError: (error) => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};

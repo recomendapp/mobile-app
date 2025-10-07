@@ -4,7 +4,6 @@ import { useTheme } from '@/providers/ThemeProvider';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import { Button } from '@/components/ui/Button';
-import * as Burnt from 'burnt';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { usePlaylistInsertMutation } from '@/features/playlist/playlistMutations';
 import { useAuth } from '@/providers/AuthProvider';
@@ -18,6 +17,7 @@ import { BottomSheetProps } from '../BottomSheetManager';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BetterInput } from '@/components/ui/BetterInput';
 import { useTranslations } from 'use-intl';
+import { useToast } from '@/components/Toast';
 
 interface BottomSheetPlaylistCreateProps extends BottomSheetProps {
   onCreate?: (playlist: Playlist) => void;
@@ -33,6 +33,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
 	BottomSheetPlaylistCreateProps
 >(({ id, onCreate, placeholder, playlistType, ...props }, ref) => {
   const { session } = useAuth();
+  const toast = useToast();
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors } = useTheme();
   const t = useTranslations();
@@ -65,21 +66,13 @@ const BottomSheetPlaylistCreate = React.forwardRef<
       userId: session.user.id
     }, {
       onSuccess: (playlist) => {
-        Burnt.toast({
-          title: upperFirst(t('common.messages.added', { gender: 'female', count: 1 })),
-          preset: 'done',
-        });
+        toast.success(upperFirst(t('common.messages.added', { gender: 'female', count: 1 })));
         form.reset();
         onCreate && onCreate(playlist);
         closeSheet(id);
       },
       onError: () => {
-        Burnt.toast({
-          title: upperFirst(t('common.messages.error')),
-          message: upperFirst(t('common.messages.an_error_occurred')),
-          preset: 'error',
-          haptic: 'error',
-        });
+        toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
       }
     });
   };

@@ -8,7 +8,6 @@ import { useTheme } from '@/providers/ThemeProvider';
 import { GroupedInput, GroupedInputItem } from '@/components/ui/Input';
 import { upperFirst } from 'lodash';
 import { Icons } from '@/constants/Icons';
-import * as Burnt from 'burnt';
 import { useRandomImage } from '@/hooks/useRandomImage';
 import { ImageBackground } from 'expo-image';
 import { useTranslations } from 'use-intl';
@@ -25,6 +24,7 @@ import { View } from '@/components/ui/view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useHeaderHeight } from '@react-navigation/elements';
+import { useToast } from '@/components/Toast';
 
 const backgroundImages = [
 	require('@/assets/images/auth/login/background/1.gif'),
@@ -35,6 +35,7 @@ const LoginOtpScreen = () => {
 	const { loginWithOtp } = useAuth();
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
+	const toast = useToast();
 	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
@@ -69,53 +70,28 @@ const LoginOtpScreen = () => {
 		try {
 			setIsLoading(true);
 			await loginWithOtp(data.email);
-			Burnt.toast({
-				title: upperFirst(t('common.form.code_sent')),
-				preset: "done",
-			});
+			toast.success(upperFirst(t('common.form.code_sent')));
 			setShowOtp(true);
 		} catch (error) {
+			let errorMessage = '';
 			if (error instanceof z.ZodError) {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: error.message,
-					preset: 'error',
-					haptic: 'error',
-				});
+				errorMessage = error.message;
 			} else if (error instanceof AuthError) {
 				switch (error.status) {
 					case 500:
-						Burnt.toast({
-							title: upperFirst(t('pages.auth.login.otp.form.error.no_user_found')),
-							preset: 'error',
-							haptic: 'error',
-						});
+						errorMessage = t('pages.auth.login.otp.form.error.no_user_found');
 						break;
 					case 429:
-						Burnt.toast({
-							title: upperFirst(t('common.messages.error')),
-							message: t('common.form.error.too_many_attempts'),
-							preset: 'error',
-							haptic: 'error',
-						});
+						errorMessage = t('common.form.error.too_many_attempts');
 						break;
 				default:
-					Burnt.toast({
-						title: upperFirst(t('common.messages.error')),
-						message: error.message,
-						preset: 'error',
-						haptic: 'error',
-					});
+					errorMessage = error.message;
 					break;
 				}
 			} else {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				errorMessage = upperFirst(t('common.messages.an_error_occurred'));
 			}
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		} finally {
 			setIsLoading(false);
 		}
@@ -129,37 +105,22 @@ const LoginOtpScreen = () => {
 				type: 'email',
 			});
 			if (error) throw error;
-			Burnt.toast({
-				title: upperFirst(t('common.form.code_verified')),
-				preset: 'done',
-			});
+			toast.success(upperFirst(t('common.form.code_verified')));
 		} catch (error) {
+			let errorMessage = '';
 			if (error instanceof AuthError) {
 				switch (error.status) {
 				case 400:
-					Burnt.toast({
-						title: upperFirst(t('common.form.error.invalid_code')),
-						preset: 'error',
-						haptic: 'error',
-					});
+					errorMessage = t('common.form.error.invalid_code');
 					break;
 				default:
-					Burnt.toast({
-						title: upperFirst(t('common.messages.error')),
-						message: error.message,
-						preset: 'error',
-						haptic: 'error',
-					});
+					errorMessage = error.message;
 					break;
 				}
 			} else {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				errorMessage = upperFirst(t('common.messages.an_error_occurred'));
 			}
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		} finally {
 			setIsLoading(false);
 		}

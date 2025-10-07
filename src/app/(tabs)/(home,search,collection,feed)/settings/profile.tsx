@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
-import * as Burnt from 'burnt';
 import { Button } from "@/components/ui/Button";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
@@ -28,6 +27,7 @@ import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
+import { useToast } from "@/components/Toast";
 
 const FULL_NAME_MIN_LENGTH = 1;
 const FULL_NAME_MAX_LENGTH = 30;
@@ -36,6 +36,7 @@ const BIO_MAX_LENGTH = 150;
 const SettingsProfileScreen = () => {
 	const supabase = useSupabaseClient();
 	const { user } = useAuth();
+	const toast = useToast();
 	const { bottomTabHeight, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const { showActionSheetWithOptions } = useActionSheet();
@@ -128,12 +129,7 @@ const SettingsProfileScreen = () => {
 				case 'camera':
 					const hasPermission = await requestCameraPermissionsAsync();
 					if (!hasPermission.granted) {
-						Burnt.toast({
-							title: upperFirst(t('common.messages.error')),
-							message: upperFirst(t('common.messages.camera_permission_denied')),
-							preset: 'error',
-							haptic: 'error',
-						});
+						toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.camera_permission_denied')) });
 						return;
 					}
 					const cameraResults = await launchCameraAsync({
@@ -184,10 +180,7 @@ const SettingsProfileScreen = () => {
 				website: values.website?.trim() || null,
 				avatarUrl: avatar_url,
 			});
-			Burnt.toast({
-				title: upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })),
-				preset: 'done',
-			});
+			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 		} catch (error) {
 			console.error(error);
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
@@ -196,11 +189,7 @@ const SettingsProfileScreen = () => {
 			} else if (typeof error === 'string') {
 				errorMessage = error;
 			}
-			Burnt.toast({
-				title: errorMessage,
-				preset: 'error',
-				haptic: 'error',
-			});
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		} finally {
 			setIsLoading(false);
 		}

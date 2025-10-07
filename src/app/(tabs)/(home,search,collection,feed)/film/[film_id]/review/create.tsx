@@ -8,14 +8,15 @@ import tw from "@/lib/tw";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native"
 import { useUserReviewMovieUpsertMutation } from "@/features/user/userMutations";
-import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
+import { useToast } from "@/components/Toast";
 
 const ReviewMovieCreateScreen = () => {
 	const { user } = useAuth();
 	const router = useRouter();
 	const t = useTranslations();
+	const toast = useToast();
 	const { film_id } = useLocalSearchParams();
 	const { id: filmId} = getIdFromSlug(film_id as string);
 	// Requetes
@@ -50,12 +51,7 @@ const ReviewMovieCreateScreen = () => {
 				router.replace(`/film/${movie?.slug || movie?.id}/review/${review.id}`);
 			},
 			onError: (error) => {
-				console.error(error);
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					preset: 'error',
-					haptic: 'error',
-				})
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};

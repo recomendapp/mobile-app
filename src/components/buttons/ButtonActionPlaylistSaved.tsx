@@ -5,9 +5,9 @@ import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation 
 import { useTheme } from "@/providers/ThemeProvider";
 import { Icons } from "@/constants/Icons";
 import { Button } from "@/components/ui/Button";
-import * as Burnt from "burnt";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
+import { useToast } from "../Toast";
 
 interface ButtonActionPlaylistSavedProps
 	extends React.ComponentProps<typeof Button> {
@@ -20,6 +20,7 @@ const ButtonActionPlaylistSaved = React.forwardRef<
 >(({ playlistId, variant = "ghost", size = "icon", icon = Icons.Watchlist, onPress, iconProps, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session } = useAuth();
+	const toast = useToast();
 	const t = useTranslations();
 	const {
 		data: saved,
@@ -37,12 +38,7 @@ const ButtonActionPlaylistSaved = React.forwardRef<
 			playlistId: playlistId,
 		}, {
 			onError: (error) => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};
@@ -52,12 +48,7 @@ const ButtonActionPlaylistSaved = React.forwardRef<
 			savedId: saved.id
 		}, {
 			onError: () => {
-				Burnt.toast({
-					title: upperFirst(t('common.messages.error')),
-					message: upperFirst(t('common.messages.an_error_occurred')),
-					preset: 'error',
-					haptic: 'error',
-				});
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
 	};
