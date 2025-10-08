@@ -159,21 +159,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			{
 				"ios": [
 					"fb",
+					"fb-messenger",
 					"instagram",
 					"twitter",
 					"tiktoksharesdk",
 					"whatsapp",
-					"messenger",
-					"snapchat",
 				],
 				"android": [
 					"com.facebook.katana",
+					"com.facebook.orca",
 					"com.instagram.android",
 					"com.twitter.android",
 					"com.zhiliaoapp.musically",
 					"com.whatsapp",
-					"com.facebook.orca",
-					"com.snapchat.android",
 				],
 				"enableBase64ShareAndroid": true
 			}
@@ -185,6 +183,27 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			}
 		],
 		["expo-apple-authentication"],
+		[
+			"expo-video",
+			{
+				"supportsBackgroundPlayback": true,
+				"supportsPictureInPicture": true
+			}
+		],
+		[
+			"expo-asset",
+			{
+				"assets": [
+					// Brands
+					"./src/assets/images/brands/apple_light.png",
+					"./src/assets/images/brands/apple_dark.png",
+					"./src/assets/images/brands/facebook_colored.png",
+					"./src/assets/images/brands/github_dark.png",
+					"./src/assets/images/brands/github_light.png",
+					"./src/assets/images/brands/google_colored.png",
+				]
+			}
+		]
 	],
 	experiments: {
 		typedRoutes: true,

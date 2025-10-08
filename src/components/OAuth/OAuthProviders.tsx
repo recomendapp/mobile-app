@@ -4,12 +4,13 @@ import { Button } from "../ui/Button";
 import { Image } from "expo-image";
 import { Text } from "../ui/text";
 import { GAP } from "@/theme/globals";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useAuth } from "@/providers/AuthProvider";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useToast } from "../Toast";
+import { Assets } from "@/constants/Assets";
 
 type Provider = {
 	name: AuthProvider;
@@ -17,36 +18,12 @@ type Provider = {
 	img: any;
 };
 
-
-const providers: Provider[] = [
-	{
-		name: "google",
-		label: "Google",
-		img: require("@/assets/images/providers/google.png")
-	},
-	{
-		name: 'apple',
-		label: 'Apple',
-		img: require('@/assets/images/providers/apple.png'),
-	},
-	{
-		name: 'facebook',
-		label: 'Facebook',
-		img: require('@/assets/images/providers/facebook.png'),
-	},
-	{
-		name: "github",
-		label: "GitHub",
-		img: require("@/assets/images/providers/github.png"),
-	},
-]
-
 interface OAuthProvidersProps extends Omit<LegendListProps<Provider>, 'data'> {
 	data?: Provider[];
 }
 
 export const OAuthProviders = ({
-	data = providers,
+	data,
 	numColumns = 2,
 	style,
 	contentContainerStyle,
@@ -54,8 +31,32 @@ export const OAuthProviders = ({
 }: OAuthProvidersProps) => {
 	const toast = useToast();
 	const { loginWithOAuth } = useAuth();
-	const { colors } = useTheme();
+	const { colors, mode } = useTheme();
 	const t = useTranslations();
+
+	const providers = useMemo((): Provider[] => data || ([
+		{
+			name: "google",
+			label: "Google",
+			img: Assets.brands.google.colored,
+		},
+		{
+			name: 'apple',
+			label: 'Apple',
+			img: mode === 'dark' ? Assets.brands.apple.dark : Assets.brands.apple.light,
+		},
+		{
+			name: 'facebook',
+			label: 'Facebook',
+			img: Assets.brands.facebook.colored,
+		},
+		{
+			name: "github",
+			label: "GitHub",
+			img: mode === 'dark' ? Assets.brands.github.dark : Assets.brands.github.light,
+		},
+	]), [mode]);
+
 	const handleProviderPress = useCallback(async (provider: AuthProvider) => {
 		try {
 			await loginWithOAuth(provider);
@@ -66,12 +67,13 @@ export const OAuthProviders = ({
 			toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 		}
 	}, [loginWithOAuth, t, toast]);
+
 	return (
 		<LegendList
-		data={data}
+		data={providers}
 		renderItem={({ item }) => (
 			<Button variant='muted' onPress={() => handleProviderPress(item.name)}>
-				<Image source={item.img} style={{ width: 18, aspectRatio: 1 }} contentFit="contain" />
+				<Image source={{ uri: item.img }} style={{ width: 18, aspectRatio: 1 }} contentFit="contain" />
 				<Text style={{ color: colors.foreground }}>{item.label}</Text>
 			</Button>
 		)}

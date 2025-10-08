@@ -1,30 +1,9 @@
 import {toast, Toaster as SNToaster} from 'sonner-native'
 import { useTheme } from '@/providers/ThemeProvider'
-import { useCallback } from 'react'
+import { createContext, use, useCallback } from 'react'
 import { ExternalToast, ToastAction } from './types'
 import { Button } from '../ui/Button'
 import * as Haptics from 'expo-haptics'
-
-export const Toaster = () => {
-	const { colors } = useTheme();
-	return (
-		<SNToaster
-		pauseWhenPageIsHidden
-		closeButton
-		styles={{
-			toast: {
-				backgroundColor: colors.muted
-			},
-			title: {
-				color: colors.foreground
-			},
-			description: {
-				color: colors.foreground
-			}, 
-		}}
-		/>
-	);
-};
 
 type HapticType = "none" | "success" | "error" | "warning";
 
@@ -32,10 +11,19 @@ type ExternalToastCustom = ExternalToast & {
 	haptic?: HapticType;
 };
 
+type ToastContextProps = {
+	success: (message: string, opts?: ExternalToastCustom) => void
+	error: (message: string, opts?: ExternalToastCustom) => void
+	info: (message: string, opts?: ExternalToastCustom) => void
+	warning: (message: string, opts?: ExternalToastCustom) => void
+	dismiss: (id?: string | number | undefined) => string | number | undefined
+	wiggle: (id: string | number) => void
+};
 
-export function useToast() {
-	const { colors } = useTheme();
-	const { success, error, info, warning } = toast;
+export const ToastContext = createContext<ToastContextProps | undefined>(undefined);
+
+export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
+	const { success, error, info, warning, dismiss, wiggle } = toast;
 
 	const triggerHaptic = useCallback((type: HapticType) => {
 		if (type === 'none') return;
@@ -82,12 +70,50 @@ export function useToast() {
 			},
 		[renderAction, triggerHaptic]
 	);
+	return (
+		<ToastContext.Provider
+		value={{
+			...toast,
+			success: withAction(success, 'success'),
+			error: withAction(error, 'error'),
+			info: withAction(info, 'none'),
+			warning: withAction(warning, 'warning'),
+			dismiss: dismiss,
+			wiggle: wiggle,
+		}}
+		>
+			{children}
+			<Toaster />
+		</ToastContext.Provider>
+	);
+};
 
-	return {
-		...toast,
-		success: withAction(success, 'success'),
-		error: withAction(error, 'error'),
-		info: withAction(info, 'none'),
-		warning: withAction(warning, 'warning'),
+export const Toaster = () => {
+	const { colors } = useTheme();
+
+	return (
+		<SNToaster
+		pauseWhenPageIsHidden
+		closeButton
+		styles={{
+			toast: {
+				backgroundColor: colors.muted
+			},
+			title: {
+				color: colors.foreground
+			},
+			description: {
+				color: colors.foreground
+			}, 
+		}}
+		/>
+	);
+};
+
+export function useToast() {
+	const context = use(ToastContext);
+	if (!context) {
+		throw new Error('useToast must be used within a ToastProvider');
 	}
-}
+	return context;
+};

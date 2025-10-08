@@ -28,10 +28,7 @@ import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
 import { useToast } from '@/components/Toast';
-
-const backgroundImages = [
-	require('@/assets/images/auth/signup/background/1.gif'),
-]
+import { Assets } from '@/constants/Assets';
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -49,7 +46,7 @@ const SignupScreen = () => {
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locale = useLocale();
 	const t = useTranslations();
-	const bgImage = useRandomImage(backgroundImages);
+	const bgImage = useRandomImage(Assets.screens.auth.signup.background);
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
 	const signupSchema = useMemo(() => z.object({

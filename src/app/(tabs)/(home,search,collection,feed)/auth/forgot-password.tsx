@@ -25,10 +25,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useToast } from '@/components/Toast';
-
-const backgroundImages = [
-	require('@/assets/images/auth/login/background/1.gif'),
-]
+import { Assets } from '@/constants/Assets';
 
 const ForgotPasswordScreen = () => {
 	const supabase = useSupabaseClient();
@@ -39,7 +36,7 @@ const ForgotPasswordScreen = () => {
 	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
-	const bgImage = useRandomImage(backgroundImages);
+	const bgImage = useRandomImage(Assets.screens.auth.login.background);
 	const navigation = useNavigation();
 	const routes = navigation.getState()?.routes;
 	const prevRoute = routes? routes[routes.length - 2] : null;

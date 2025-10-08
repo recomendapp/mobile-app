@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import { Onboarding, OnboardingStep } from "@/components/ui/onboarding";
 import { ThemedSafeAreaView } from "@/components/ui/ThemedSafeAreaView";
+import { Assets } from "@/constants/Assets";
 import { Icons } from "@/constants/Icons";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -11,7 +12,7 @@ import { useMemo } from "react";
 import { useTranslations } from "use-intl";
 
 const images = {
-  tracking: require('@/assets/images/auth/login/background/1.gif'),
+  tracking: Assets.screens.auth.login.background[0],
 }
 
 const AuthScreen = () => {

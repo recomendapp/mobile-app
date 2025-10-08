@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import tw from '@/lib/tw';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
@@ -15,7 +15,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { View } from '@/components/ui/view';
 import { useTheme } from '@/providers/ThemeProvider';
-import { Icons } from '@/constants/Icons';
 import { Pressable } from 'react-native-gesture-handler';
 
 interface BottomSheetCommentProps extends BottomSheetProps {
@@ -38,12 +37,12 @@ export const BottomSheetComment = React.forwardRef<
 	const [isLoading, setIsLoading] = React.useState(false);
 
 	/* ---------------------------------- FORM ---------------------------------- */
-	const commentSchema = z.object({
+	const commentSchema = useMemo(() => z.object({
 		comment: z.string()
 			.min(commentMinLength, { message: upperFirst(t('common.form.length.char_min', { count: commentMinLength }))})
 			.max(commentMaxLength, { message: upperFirst(t('common.form.length.char_max', { count: commentMaxLength }))})
 			.nullable(),
-	});
+	}), [commentMinLength, commentMaxLength, t]);
 	type CommentFormValues = z.infer<typeof commentSchema>;
 	const defaultValues = useMemo((): Partial<CommentFormValues> => ({
 		comment: comment || null,
@@ -56,7 +55,7 @@ export const BottomSheetComment = React.forwardRef<
 	/* -------------------------------------------------------------------------- */
 
 	// Handlers
-	const handleSave = async (values: CommentFormValues) => {
+	const handleSave = useCallback(async (values: CommentFormValues) => {
 		if (values.comment == comment) {
 			closeSheet(id);
 			return;
@@ -69,7 +68,7 @@ export const BottomSheetComment = React.forwardRef<
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, [onSave, comment, closeSheet, id]);
 
 	// useEffects
 	React.useEffect(() => {

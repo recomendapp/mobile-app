@@ -70,7 +70,7 @@ const ReviewForm = ({
 	const handleSave = useCallback(async () => {
 		const content = await editor.getJSON();
 		if (!activity?.rating) {
-			toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.a_rating_is_required_to_add_a_review')) });
+			toast.error(upperFirst(t('common.messages.a_rating_is_required_to_add_a_review')));
 			return;
 		}
 		onSave?.({
