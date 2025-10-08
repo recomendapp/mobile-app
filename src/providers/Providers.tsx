@@ -12,7 +12,7 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Splash } from "@/components/Splash/Splash";
 import { PropsWithChildren } from "react";
-import { Toaster } from "@/components/Toast";
+import { ToastProvider } from "@/components/Toast";
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -26,21 +26,22 @@ const Providers = ({ children } : ProvidersProps) => {
 				<SplashScreenProvider>
 					<LocaleProvider>
 						<ThemeProvider>
-							<ActionSheetProvider>
-								<SupabaseProvider>
-									<ReactQueryProvider>
-										<AuthProvider>
-											<NotificationsProvider>
-												<ProvidersInner>
-													{children}
-													<Toaster />
-												</ProvidersInner>
-												<BottomSheetManager />
-											</NotificationsProvider>
-										</AuthProvider>
-									</ReactQueryProvider>
-								</SupabaseProvider>
-							</ActionSheetProvider>
+							<ToastProvider>
+								<ActionSheetProvider>
+									<SupabaseProvider>
+										<ReactQueryProvider>
+											<AuthProvider>
+												<NotificationsProvider>
+													<ProvidersInner>
+														{children}
+													</ProvidersInner>
+													<BottomSheetManager />
+												</NotificationsProvider>
+											</AuthProvider>
+										</ReactQueryProvider>
+									</SupabaseProvider>
+								</ActionSheetProvider>
+							</ToastProvider>
 						</ThemeProvider>
 					</LocaleProvider>
 				</SplashScreenProvider>

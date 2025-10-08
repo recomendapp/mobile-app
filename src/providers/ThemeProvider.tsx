@@ -48,7 +48,7 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 		setColors(colorTheme);
 	}, []);
 
-	const mode: ThemeMode = useMemo(() => {
+	const mode = useMemo((): ThemeMode => {
 		return getModeFromColor(colors.background);
 	}, [colors]);
 

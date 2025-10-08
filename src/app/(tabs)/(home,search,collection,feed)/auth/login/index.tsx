@@ -21,10 +21,7 @@ import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
 import { useToast } from '@/components/Toast';
-
-const backgroundImages = [
-	require('@/assets/images/auth/login/background/1.gif'),
-]
+import { Assets } from '@/constants/Assets';
 
 const LoginScreen = () => {
 	const { login } = useAuth();
@@ -37,7 +34,7 @@ const LoginScreen = () => {
 	const [ email, setEmail ] = useState('');
 	const [ password, setPassword ] = useState('');
 	const [ isLoading, setIsLoading ] = useState(false);
-	const bgImage = useRandomImage(backgroundImages);
+	const bgImage = useRandomImage(Assets.screens.auth.login.background);
 
 	const handleSubmit = useCallback(async () => {
 		try {

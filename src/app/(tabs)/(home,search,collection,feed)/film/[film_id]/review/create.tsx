@@ -11,6 +11,7 @@ import { useUserReviewMovieUpsertMutation } from "@/features/user/userMutations"
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
+import { useCallback } from "react";
 
 const ReviewMovieCreateScreen = () => {
 	const { user } = useAuth();
@@ -41,7 +42,7 @@ const ReviewMovieCreateScreen = () => {
 	});
 
 	// Handlers
-	const handleSave = async (data: { title: string; body: object }) => {
+	const handleSave = useCallback(async (data: { title: string; body: object }) => {
 		await insertReview.mutateAsync({
 			activityId: activity?.id,
 			title: data.title || null,
@@ -54,7 +55,7 @@ const ReviewMovieCreateScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
+	}, [insertReview, activity?.id, movie?.id, movie?.slug, movie?.id, router, t, toast]);
 
 	if (movie === null) return router.back();
 	if (activity?.review) return router.replace(`/film/${movie?.slug || movie?.id}/review/${activity?.review?.id}`);

@@ -1,4 +1,4 @@
-import { forwardRef, useRef, useState } from "react";
+import { forwardRef, useCallback, useMemo, useRef, useState } from "react";
 import { BottomSheetProps } from "../../BottomSheetManager";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import ThemedTrueSheet from "@/components/ui/ThemedTrueSheet";
@@ -6,7 +6,6 @@ import tw from "@/lib/tw";
 import Share, { Social } from "react-native-share"
 import Constants from 'expo-constants';
 import { ScrollView } from "react-native-gesture-handler";
-import { useTheme } from "@/providers/ThemeProvider";
 import { Text } from "@/components/ui/text";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Button } from "@/components/ui/Button";
@@ -52,7 +51,7 @@ const BottomSheetShareLayout = forwardRef<
     const scrollRef = useRef<ScrollView>(null);
     const [loadingPlatform, setLoadingPlatform] = useState<number | null>(null);
 
-    const sharePlatform: SharePlatform[] = [
+    const sharePlatform = useMemo((): SharePlatform[] => ([
         {
             label: "Copier le lien",
             icon: Icons.link,
@@ -85,10 +84,9 @@ const BottomSheetShareLayout = forwardRef<
             onPress: async () => {
                 await Share.shareSingle({
                     social: Social.Whatsapp,
-                    title: "Recomend",
-                    message: url,
-                    url: url,
                     appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
+                    title: "Recomend",
+                    url: url,
                 });
             }
         },
@@ -100,7 +98,6 @@ const BottomSheetShareLayout = forwardRef<
                     social: Social.Messenger,
                     appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
                     title: "Recomend",
-                    message: url,
                     url: url,
                 });
             }
@@ -117,8 +114,36 @@ const BottomSheetShareLayout = forwardRef<
         //             appId: process.env.EXPO_PUBLIC_SNAPCHAT_CLIENT_ID!,
         //             title: "Recomend",
         //             url: url,
-        //             type: 'image/png',
-                            
+        //         });
+        //     }
+        // },
+        {
+            label: "Flux",
+            icon: Icons.Reco,
+            onPress: async () => {
+                await Share.shareSingle({
+                    social: Social.Facebook,
+                    appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
+                    title: "Recomend",
+                    url: url,
+                });
+            }
+        },
+        // {
+        //     label: "Stories",
+        //     icon: Icons.Reco,
+        //     onPress: async () => {
+        //         const data = await contentRef.current?.capture();
+        //         if (!data) return;
+        //         await Share.shareSingle({
+        //             social: Social.FacebookStories,
+        //             appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
+        //             title: "Recomend",
+        //             stickerImage: data.sticker,
+        //             backgroundImage: data.backgroundImage,
+        //             backgroundTopColor: data.backgroundTopColor,
+        //             backgroundBottomColor: data.backgroundBottomColor,
+        //             backgroundVideo: data.backgroundVideo,
         //         });
         //     }
         // },
@@ -126,15 +151,19 @@ const BottomSheetShareLayout = forwardRef<
             label: "More",
             icon: Icons.EllipsisHorizontal,
             onPress: async () => {
+                const data = await contentRef.current?.capture();
                 await Share.open({
                     url: url,
+                    message: url,
+                    title: "Recomend",
+                    ...(data ? { url: data.sticker } : {}),
                 })
             }
         }
-    ];
+    ]), [contentRef, url, t, toast]);
 
     // Handlers
-    const handlePlatformPress = (item: SharePlatform, index: number) => async () => {
+    const handlePlatformPress = useCallback((item: SharePlatform, index: number) => async () => {
         setLoadingPlatform(index);
         try {
             console.log('Sharing via:', item.label);
@@ -145,14 +174,27 @@ const BottomSheetShareLayout = forwardRef<
         } finally {
             setLoadingPlatform(null);
         }
-    };
+    }, []);
+
+    const renderItem = useCallback(({ item, index }: { item: SharePlatform, index: number }) => (
+        <Button
+            variant="outline"
+            icon={item.icon}
+            size="lg"
+            style={tw`rounded-full`}
+            loading={loadingPlatform === index}
+            onPress={handlePlatformPress(item, index)}
+        >
+            {item.label}
+        </Button>
+    ), [handlePlatformPress, loadingPlatform]);
 
     return (
         <ThemedTrueSheet
-            ref={ref}
-            scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
-            contentContainerStyle={tw`p-0`}
-            {...props}
+        ref={ref}
+        scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
+        contentContainerStyle={tw`p-0`}
+        {...props}
         >
             <ScrollView
             ref={scrollRef}
@@ -164,23 +206,12 @@ const BottomSheetShareLayout = forwardRef<
                 {children && <Separator />}
                 <LegendList
 				data={sharePlatform}
-				renderItem={({ item, index }) => (
-					<Button
-						variant="outline"
-						icon={item.icon}
-						size="lg"
-						style={tw`rounded-full`}
-						loading={loadingPlatform === index}
-						onPress={handlePlatformPress(item, index)}
-					>
-						{item.label}
-					</Button>
-				)}
+				renderItem={renderItem}
 				contentContainerStyle={{
 					paddingHorizontal: PADDING_HORIZONTAL,
 					gap: GAP,
 				}}
-				keyExtractor={item => item.label}
+                keyExtractor={useCallback((item: SharePlatform, index: number) => index.toString(), [])}
 				horizontal
 				showsHorizontalScrollIndicator={false}
                 />
