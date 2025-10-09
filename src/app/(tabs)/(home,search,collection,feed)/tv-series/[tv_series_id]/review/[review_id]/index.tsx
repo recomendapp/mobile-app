@@ -19,7 +19,7 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 
 const ReviewTvSeriesScreen = () => {
 	const { session } = useAuth();
-	const { bottomTabHeight, colors } = useTheme();
+	const { bottomOffset, colors } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
 	const router = useRouter();
@@ -63,7 +63,7 @@ const ReviewTvSeriesScreen = () => {
 		/>
 		<ScrollView
 		contentContainerStyle={[
-			{ paddingBottom: bottomTabHeight + 8 },
+			{ paddingBottom: bottomOffset + 8 },
 			tw`gap-2 px-4`
 		]}
 		refreshControl={

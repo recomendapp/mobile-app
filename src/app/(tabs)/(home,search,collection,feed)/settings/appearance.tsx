@@ -25,7 +25,7 @@ const SettingsAppearanceScreen = () => {
 	const { locale, setLocale } = useLocaleContext();
 	const { session } = useAuth();
 	const toast = useToast();
-	const { bottomTabHeight, tabBarHeight } = useTheme();
+	const { bottomOffset, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locales = useLocalizedLanguageName(locale);
@@ -100,12 +100,12 @@ const SettingsAppearanceScreen = () => {
 				gap: GAP,
 				paddingTop: PADDING_VERTICAL,
 				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 			}}
 			scrollIndicatorInsets={{
 				bottom: tabBarHeight
 			}}
-			bottomOffset={bottomTabHeight + PADDING_VERTICAL}
+			bottomOffset={bottomOffset + PADDING_VERTICAL}
 			>
 				<Controller
 				name="locale"

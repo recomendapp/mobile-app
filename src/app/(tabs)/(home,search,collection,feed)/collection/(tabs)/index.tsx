@@ -14,7 +14,7 @@ import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
 const CollectionScreen = () => {
 	const { user } = useAuth();
-	const { bottomTabHeight, tabBarHeight } = useTheme();
+	const { bottomOffset, tabBarHeight } = useTheme();
 	const staticRoutes = useCollectionStaticRoutes();
 	const {
 		data: playlists,
@@ -68,7 +68,7 @@ const CollectionScreen = () => {
 		numColumns={3}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={keyExtractor}

@@ -21,7 +21,7 @@ type Route = {
 
 const SettingsScreen = () => {
 	const { session } = useAuth();
-	const { colors, tabBarHeight, bottomTabHeight } = useTheme();
+	const { colors, tabBarHeight, bottomOffset } = useTheme();
 	const router = useRouter();
 	const t = useTranslations();
 	const routes = useMemo((): Route[] => {
@@ -66,7 +66,7 @@ const SettingsScreen = () => {
 		data={routes}
 		renderItem={renderItem}
 		contentContainerStyle={{
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		keyExtractor={useCallback((_: Route, number: number) => number.toString(), [])}
 		scrollIndicatorInsets={{

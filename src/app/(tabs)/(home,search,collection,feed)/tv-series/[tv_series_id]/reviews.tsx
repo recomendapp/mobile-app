@@ -27,7 +27,7 @@ const TvSeriesReviews = () => {
 	const t = useTranslations();
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: tvSeriesId } = getIdFromSlug(tv_series_id);
-	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -124,7 +124,7 @@ const TvSeriesReviews = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={{
 				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 				gap: GAP,
 		}}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}

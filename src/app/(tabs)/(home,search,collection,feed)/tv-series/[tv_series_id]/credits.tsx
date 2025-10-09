@@ -18,7 +18,7 @@ const TvSeriesCreditsScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
 	const t = useTranslations();
-	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 
 
 	const {
@@ -136,7 +136,7 @@ const TvSeriesCreditsScreen = () => {
 			return `person-${item.department}-${item.job}-${item.person.id}`;
 		}, [])}
 		contentContainerStyle={[
-			{ paddingBottom: bottomTabHeight + PADDING_VERTICAL }
+			{ paddingBottom: bottomOffset + PADDING_VERTICAL }
 		]}
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight

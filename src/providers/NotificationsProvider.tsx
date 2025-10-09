@@ -94,24 +94,26 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
       console.error("Error saving push token:", err);
     }
   }, [session, supabase]);
+  
   const handleRedirect = useCallback((data: NotificationPayload) => {
     switch (data.type) {
       case 'reco_sent_movie':
-      case 'reco_sent_tv_series':
         router.push({
-          pathname: '/collection/my-recos',
-          params: { recoId: data.id },
+          pathname: '/film/[film_id]',
+          params: { film_id: data.media.id },
         });
         break;
-      case 'reco_completed_movie':
-      case 'reco_completed_tv_series':
+      case 'reco_sent_tv_series':
         router.push({
-          pathname: '/collection/my-recos',
-          params: { recoId: data.id },
+          pathname: '/tv-series/[tv_series_id]',
+          params: { tv_series_id: data.media.id },
         });
         break;
       case 'follower_created':
-        router.push(`/user/${data.sender.username}`);
+        router.push({
+          pathname: '/user/[username]',
+          params: { username: data.sender.username },
+        });
         break;
       default:
         break;
@@ -128,6 +130,17 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
       handleRedirect(data);
     }
   }, [handleRedirect]);
+
+  const handleToast = useCallback((notification: Notifications.Notification) => {
+    const data = (
+      notification.request.content.data ||
+      (notification.request.trigger as any).payload.data
+    ) as NotificationPayload;
+    toast.info(notification.request.content.title || "New Notification", {
+      description: notification.request.content.body ?? undefined,
+      onPress: (data && data.type) ? () => handleRedirect(data) : undefined,
+    });
+  }, [handleRedirect, toast]);
 
   useEffect(() => {
     if (!session) return;
@@ -148,9 +161,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     notificationsListener.current = Notifications.addNotificationReceivedListener((notification) => {
       console.log("🔔 Notification received:", notification);
       setNotifications((prev) => (prev ? [...prev, notification] : [notification]));
-      toast.info(notification.request.content.title || "New Notification", {
-        description: notification.request.content.body ?? undefined,
-      });
+      handleToast(notification);
       // Invalidate notifications queries
       queryClient.invalidateQueries({
         queryKey: utilsKey.notifications()
@@ -165,7 +176,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
 
     // Handle notification that opened the app
     (async () => {
-      const initialResponse = await Notifications.getLastNotificationResponseAsync();
+      const initialResponse = Notifications.getLastNotificationResponse();
       if (initialResponse) {
         console.log("🔔 Initial notification response:", JSON.stringify(initialResponse, null, 2));
         handleResponse(initialResponse);

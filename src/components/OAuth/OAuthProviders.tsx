@@ -18,7 +18,7 @@ type Provider = {
 	img: any;
 };
 
-interface OAuthProvidersProps extends Omit<LegendListProps<Provider>, 'data'> {
+interface OAuthProvidersProps extends Omit<LegendListProps<Provider>, 'data' | 'children'> {
 	data?: Provider[];
 }
 
@@ -68,15 +68,17 @@ export const OAuthProviders = ({
 		}
 	}, [loginWithOAuth, t, toast]);
 
+	const renderItem = useCallback(({ item }: { item: Provider }) => (
+		<Button variant='muted' onPress={() => handleProviderPress(item.name)}>
+			<Image source={{ uri: item.img }} style={{ width: 18, aspectRatio: 1 }} contentFit="contain" />
+			<Text style={{ color: colors.foreground }}>{item.label}</Text>
+		</Button>
+	), [handleProviderPress, colors.foreground]);
+
 	return (
 		<LegendList
 		data={providers}
-		renderItem={({ item }) => (
-			<Button variant='muted' onPress={() => handleProviderPress(item.name)}>
-				<Image source={{ uri: item.img }} style={{ width: 18, aspectRatio: 1 }} contentFit="contain" />
-				<Text style={{ color: colors.foreground }}>{item.label}</Text>
-			</Button>
-		)}
+		renderItem={renderItem}
 		keyExtractor={(item) => item.name}
 		numColumns={numColumns}
 		style={[{ overflow: 'visible' }, style]}

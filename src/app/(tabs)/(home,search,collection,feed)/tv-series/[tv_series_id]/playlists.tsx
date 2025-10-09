@@ -29,7 +29,7 @@ const TvSeriesPlaylists = () => {
 	const { session } = useAuth();
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
-	const { colors, tabBarHeight, bottomTabHeight } = useTheme();
+	const { colors, tabBarHeight, bottomOffset } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -126,7 +126,7 @@ const TvSeriesPlaylists = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={{
 				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 				gap: GAP,
 		}}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}

@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/Button";
 const TvSeriesScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
-	const { tabBarHeight, bottomTabHeight } = useTheme();
+	const { tabBarHeight, bottomOffset } = useTheme();
 	const t = useTranslations();
 	const locale = useLocale();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -76,7 +76,7 @@ const TvSeriesScreen = () => {
 		onScroll={scrollHandler}
 		scrollToOverflowEnabled
 		contentContainerStyle={{
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,

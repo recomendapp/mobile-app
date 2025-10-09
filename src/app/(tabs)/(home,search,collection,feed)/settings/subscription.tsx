@@ -7,7 +7,7 @@ import { useCallback } from "react";
 
 const SettingsSubscriptionScreen = () => {
 	const router = useRouter();
-	const { bottomTabHeight } = useTheme();
+	const { bottomOffset } = useTheme();
 	const onDimiss = useCallback(() => {
 		router.canGoBack() && router.back();
 	}, [router]);
@@ -19,7 +19,7 @@ const SettingsSubscriptionScreen = () => {
 		style={{
 			flex: 1,
 			gap: GAP,
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL
+			paddingBottom: bottomOffset + PADDING_VERTICAL
 		}}
 		/>
 	</>

@@ -1,6 +1,6 @@
 import { useAuth } from '@/providers/AuthProvider';
 import { useNotifications } from '@/providers/NotificationsProvider';
-import { TabBarHeightUpdater, useTheme } from '@/providers/ThemeProvider';
+import { ThemeUpdater, useTheme } from '@/providers/ThemeProvider';
 import { Stack } from 'expo-router';
 import { upperFirst } from 'lodash';
 import { useMemo } from 'react';
@@ -26,7 +26,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
   }, [segment]);
   return (
   <>
-    <TabBarHeightUpdater />
+    <ThemeUpdater />
     <Stack
     initialRouteName={initialRouteName}
     screenOptions={defaultScreenOptions}

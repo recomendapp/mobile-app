@@ -23,7 +23,6 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { View } from '@/components/ui/view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
-import { useHeaderHeight } from '@react-navigation/elements';
 import { useToast } from '@/components/Toast';
 import { Assets } from '@/constants/Assets';
 
@@ -33,7 +32,6 @@ const ForgotPasswordScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
 	const toast = useToast();
-	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const bgImage = useRandomImage(Assets.screens.auth.login.background);
@@ -138,7 +136,6 @@ const ForgotPasswordScreen = () => {
 					tw`flex-1 justify-end items-center`,
 					{
 						gap: GAP,
-						paddingTop: navigationHeaderHeight,
 						paddingLeft: insets.left + PADDING_HORIZONTAL,
 						paddingRight: insets.right + PADDING_HORIZONTAL,
 						paddingBottom: insets.bottom + PADDING_VERTICAL,

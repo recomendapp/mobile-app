@@ -62,14 +62,25 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 	const withAction = useCallback(
 		(fn: Function, defaultHaptic: HapticType) =>
 			(message: string, opts?: ExternalToastCustom) => {
-				const hapticType = opts?.haptic ?? defaultHaptic;
-				if (hapticType !== 'none') triggerHaptic(hapticType);
+			const hapticType = opts?.haptic ?? defaultHaptic;
+			if (hapticType !== 'none') triggerHaptic(hapticType);
 
-				const { haptic, ...restOpts } = opts || {};
-				return fn(message, { ...restOpts, action: renderAction(restOpts?.action) });
+			const { haptic, ...restOpts } = opts || {};
+
+			const id = fn(message, {
+				...restOpts,
+				action: renderAction(restOpts?.action),
+				onPress: () => {
+					restOpts?.onPress?.();
+					dismiss(id);
+				}
+			});
+
+			return id;
 			},
 		[renderAction, triggerHaptic]
 	);
+
 	return (
 		<ToastContext.Provider
 		value={{

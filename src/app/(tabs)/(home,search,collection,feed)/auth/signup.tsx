@@ -20,15 +20,14 @@ import { InputOTP } from '@/components/ui/input-otp';
 import { Text } from '@/components/ui/text';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { useLocale, useTranslations } from 'use-intl';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { View } from '@/components/ui/view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
-import { useHeaderHeight } from '@react-navigation/elements';
 import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
 import { useToast } from '@/components/Toast';
 import { Assets } from '@/constants/Assets';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -39,9 +38,8 @@ const PASSWORD_MIN_LENGTH = 8;
 const SignupScreen = () => {
 	const supabase = useSupabaseClient();
 	const insets = useSafeAreaInsets();
-	const { colors } = useTheme();
+	const { colors, keyboardOffset } = useTheme();
 	const toast = useToast();
-	const navigationHeaderHeight = useHeaderHeight();
 	const { signup, loginWithOtp } = useAuth();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locale = useLocale();
@@ -247,16 +245,16 @@ const SignupScreen = () => {
 			>
 				<KeyboardAwareScrollView
 				contentContainerStyle={[
-					tw`flex-1 justify-end items-center`,
+					tw`flex-1 flex-grow justify-end items-center`,
 					{
 						gap: GAP,
-						paddingTop: navigationHeaderHeight,
 						paddingLeft: insets.left + PADDING_HORIZONTAL,
 						paddingRight: insets.right + PADDING_HORIZONTAL,
 						paddingBottom: insets.bottom + PADDING_VERTICAL,
 					}
 				]}
 				keyboardShouldPersistTaps='handled'
+				extraKeyboardSpace={-139 - keyboardOffset}
 				>
 					{!showOtp ? (
 						<>

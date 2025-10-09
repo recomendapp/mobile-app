@@ -186,7 +186,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 const TvSeriesSeasonScreen = () => {
 	const { tv_series_id, season_number } = useLocalSearchParams<{ tv_series_id: string, season_number: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
-	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const locale = useLocale();
 	const t = useTranslations();
 	const {
@@ -282,7 +282,7 @@ const TvSeriesSeasonScreen = () => {
 		}
 		contentContainerStyle={{
 			gap: GAP,
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,

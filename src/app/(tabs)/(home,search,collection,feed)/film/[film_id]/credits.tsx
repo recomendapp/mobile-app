@@ -18,7 +18,7 @@ const FilmCreditsScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
 	const t = useTranslations();
-	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 
 	const {
 		data,
@@ -135,7 +135,7 @@ const FilmCreditsScreen = () => {
 			return `person-${item.department}-${item.job}-${item.person.id}`;
 		}, [])}
 		contentContainerStyle={[
-			{ paddingBottom: bottomTabHeight + PADDING_VERTICAL }
+			{ paddingBottom: bottomOffset + PADDING_VERTICAL }
 		]}
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight

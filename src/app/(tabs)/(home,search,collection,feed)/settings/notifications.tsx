@@ -11,7 +11,7 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
 const SettingsNotificationsScreen = () => {
 	const t = useTranslations();
-	const { tabBarHeight, bottomTabHeight } = useTheme();
+	const { tabBarHeight, bottomOffset } = useTheme();
 	const { permissionStatus } = useNotifications();
 	const openAppSettings = () => {
         Linking.openSettings();
@@ -24,7 +24,7 @@ const SettingsNotificationsScreen = () => {
 				gap: GAP,
 				paddingTop: PADDING_VERTICAL,
 				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL
+				paddingBottom: bottomOffset + PADDING_VERTICAL
 			}
 		]}
 		scrollIndicatorInsets={{

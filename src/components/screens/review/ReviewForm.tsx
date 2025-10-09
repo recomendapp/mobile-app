@@ -56,7 +56,7 @@ const ReviewForm = ({
 } : ReviewFormProps) => {
 	const toast = useToast();
 	const insets = useSafeAreaInsets();	
-	const { colors, bottomTabHeight } = useTheme();
+	const { colors, bottomOffset } = useTheme();
 	const t = useTranslations();
 	const [title, setTitle] = useState(review?.title ?? '');
 	const navigationHeaderHeight = useHeaderHeight();
@@ -119,7 +119,7 @@ const ReviewForm = ({
 				paddingTop: PADDING_VERTICAL,
 				paddingLeft: insets.left + PADDING_HORIZONTAL,
 				paddingRight: insets.right + PADDING_HORIZONTAL,
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 			},
 			tw`flex-1`
 		]}

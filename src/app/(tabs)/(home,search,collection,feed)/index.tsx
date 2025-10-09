@@ -25,7 +25,6 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
 import { WidgetMostPopular } from '@/components/widgets/WidgetMostPopular';
 import { useHeaderHeight } from '@react-navigation/elements';
-import { useToast } from '@/components/Toast';
 
 const HeaderLeft = () => {
   const { session, user } = useAuth();
@@ -131,7 +130,7 @@ UnauthenticatedContent.displayName = 'UnauthenticatedContent';
 
 const HomeScreen = () => {
   const t = useTranslations();
-  const { bottomTabHeight, tabBarHeight } = useTheme();
+  const { bottomOffset, tabBarHeight } = useTheme();
   const { session } = useAuth();
   const navigationHeaderHeight = useHeaderHeight();
   // REFs
@@ -165,8 +164,8 @@ const HomeScreen = () => {
   // Styles
   const contentContainerStyle = useMemo((): StyleProp<AnimatedStyle<StyleProp<ViewStyle>>> => ({
     gap: GAP,
-    paddingBottom: bottomTabHeight + PADDING_VERTICAL,
-  }), [bottomTabHeight]);
+    paddingBottom: bottomOffset + PADDING_VERTICAL,
+  }), [bottomOffset]);
 
   useScrollToTop(scrollRef);
 
@@ -188,7 +187,6 @@ const HomeScreen = () => {
       >
         <WidgetMostRecommended scrollY={scrollY} onLayout={onLayoutWidgetMostRecommended} />
         <WidgetMostPopular labelStyle={{paddingHorizontal: PADDING_HORIZONTAL }} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
-        <Test />
         {mainContent}
       </Animated.ScrollView>
     </>
@@ -196,17 +194,3 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
-
-const Test = () => {
-  const toast = useToast();
-  return (
-  <View style={{ paddingHorizontal: PADDING_HORIZONTAL, gap: GAP }}>
-    <Button onPress={() => toast.success('Hello World!', { description: 'this is a description', haptic: 'none' })}>Open toast</Button>
-    <Button onPress={() => toast.error('Something went wrong!')}>Open error toast</Button>
-    <Button onPress={() => toast.warning('This is a warning!')}>Open warning toast</Button>
-    <Button onPress={() => toast.info('This is some info!')}>Open info toast</Button>
-    <Button onPress={() => toast.info('This is some info!', { action: { label: 'Undo', onClick: () => toast.dismiss() } })}>Open toast with action</Button>
-    <Button onPress={() => toast.success('custom bouton', { action: <Button variant='accent-blue' size='sm' onPress={() => toast.dismiss()}>Custom</Button> })}>Open toast with custom action</Button>
-  </View>
-  );
-};

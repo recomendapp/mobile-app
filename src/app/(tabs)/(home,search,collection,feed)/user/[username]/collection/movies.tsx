@@ -25,7 +25,7 @@ const UserCollectionMovieScreen = () => {
 	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data: userProfile } = useUserProfileQuery({ username: username });
-	const { colors, tabBarHeight, bottomTabHeight } = useTheme();
+	const { colors, tabBarHeight, bottomOffset } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -108,7 +108,7 @@ const UserCollectionMovieScreen = () => {
 		contentContainerStyle={{
 				gap: GAP,
 				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,

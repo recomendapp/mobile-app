@@ -27,7 +27,7 @@ const FilmReviews = () => {
 	const t = useTranslations();
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
-	const { colors, tabBarHeight, bottomTabHeight } = useTheme();
+	const { colors, tabBarHeight, bottomOffset } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -123,7 +123,7 @@ const FilmReviews = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={{
 				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 				gap: GAP,
 		}}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}
