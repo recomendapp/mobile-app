@@ -26,7 +26,7 @@ const PersonFilmsScreen = () => {
 	const t = useTranslations();
 	const { person_id } = useLocalSearchParams<{ person_id: string }>();
 	const { id: personId } = getIdFromSlug(person_id);
-	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -115,7 +115,7 @@ const PersonFilmsScreen = () => {
 		contentContainerStyle={{
 			gap: GAP,
 			paddingHorizontal: PADDING_HORIZONTAL,
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={useCallback((item: typeof movies[number]) => item.movie.id.toString(), [])}

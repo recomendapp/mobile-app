@@ -14,22 +14,20 @@ import { ImageBackground } from 'expo-image';
 import { useTranslations } from 'use-intl';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
-import { useHeaderHeight } from '@react-navigation/elements';
 import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
 import { useToast } from '@/components/Toast';
 import { Assets } from '@/constants/Assets';
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 
 const LoginScreen = () => {
 	const { login } = useAuth();
 	const insets = useSafeAreaInsets();
-	const { colors } = useTheme();
+	const { colors, keyboardOffset } = useTheme();
 	const router = useRouter();
 	const toast = useToast();
-	const navigationHeaderHeight = useHeaderHeight();
 	const t = useTranslations();
 	const [ email, setEmail ] = useState('');
 	const [ password, setPassword ] = useState('');
@@ -41,7 +39,7 @@ const LoginScreen = () => {
 			setIsLoading(true);
 			await login({ email: email, password: password });
 		} catch (error) {
-			toast.error(upperFirst(t('common.messages.error')), { description: t('pages.auth.login.form.wrong_credentials') });
+			toast.error(t('pages.auth.login.form.wrong_credentials'));
 		} finally {
 			setIsLoading(false);
 		}
@@ -64,16 +62,16 @@ const LoginScreen = () => {
 			>
 				<KeyboardAwareScrollView
 				contentContainerStyle={[
-					tw`flex-1 justify-end items-center`,
+					tw`flex-1 flex-grow justify-end items-center`,
 					{
 						gap: GAP,
-						paddingTop: navigationHeaderHeight,
 						paddingLeft: insets.left + PADDING_HORIZONTAL,
 						paddingRight: insets.right + PADDING_HORIZONTAL,
 						paddingBottom: insets.bottom + PADDING_VERTICAL,
 					}
 				]}
 				keyboardShouldPersistTaps='handled'
+				extraKeyboardSpace={-180 - keyboardOffset}
 				>
 					<View style={[tw`w-full`, { gap: GAP }]}>
 						<GroupedInput title={t('pages.auth.login.label', { app: app.name })} titleStyle={tw`text-center text-xl font-bold`}>

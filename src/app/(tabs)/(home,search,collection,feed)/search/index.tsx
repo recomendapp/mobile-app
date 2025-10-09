@@ -45,7 +45,7 @@ interface SearchResultsProps extends React.ComponentPropsWithoutRef<typeof Scrol
 };
 
 export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => {
-	const { bottomTabHeight, tabBarHeight } = useTheme();
+	const { bottomOffset, tabBarHeight } = useTheme();
 
 	const {
 		data,
@@ -68,7 +68,7 @@ export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => 
 	ref={scrollRef}
 	contentContainerStyle={{
 		gap: GAP,
-		paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+		paddingBottom: bottomOffset + PADDING_VERTICAL,
 	}}
 	keyboardShouldPersistTaps='always'
 	scrollIndicatorInsets={{

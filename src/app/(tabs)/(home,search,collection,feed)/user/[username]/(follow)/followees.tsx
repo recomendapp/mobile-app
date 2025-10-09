@@ -11,7 +11,7 @@ const ProfileFolloweesScreen = () => {
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data: profile } = useUserProfileQuery({ username: username });
 	const insets = useSafeAreaInsets();
-	const { tabBarHeight, bottomTabHeight } = useTheme();
+	const { tabBarHeight, bottomOffset } = useTheme();
 	const {
 		data,
 		isLoading,
@@ -38,7 +38,7 @@ const ProfileFolloweesScreen = () => {
 		contentContainerStyle={{
 			paddingLeft: insets.left + PADDING_HORIZONTAL,
 			paddingRight: insets.right + PADDING_HORIZONTAL,
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,

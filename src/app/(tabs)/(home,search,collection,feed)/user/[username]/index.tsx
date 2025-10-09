@@ -111,7 +111,7 @@ const ProfileScreen = () => {
 	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { session } = useAuth();
-	const { colors, tabBarHeight, bottomTabHeight } = useTheme();
+	const { colors, tabBarHeight, bottomOffset } = useTheme();
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -212,7 +212,7 @@ const ProfileScreen = () => {
 		refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refresh} />}
 		contentContainerStyle={{
 			gap: GAP,
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,

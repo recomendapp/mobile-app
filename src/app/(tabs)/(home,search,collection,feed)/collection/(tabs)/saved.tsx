@@ -15,7 +15,7 @@ import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 const CollectionSavedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
-	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const {
 		data,
 		isLoading,
@@ -55,7 +55,7 @@ const CollectionSavedScreen = () => {
 		numColumns={3}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={keyExtractor}

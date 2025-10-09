@@ -72,11 +72,11 @@ const EditOptionsSelector = ({
 	const handleSelectionChange = useCallback((item: EditOption) => {
 		setActiveEditingOption(item.value);
 	}, [setActiveEditingOption]);
-	
-	const initialIndex = useMemo(() => 
-		editOptions.findIndex(e => e.value === activeEditingOption),
-		[editOptions, activeEditingOption]
-	);
+
+	const initialIndex = useMemo(() => {
+		const isFind = editOptions.findIndex(e => e.value === activeEditingOption);
+		return isFind === -1 ? 0 : isFind;
+	}, [editOptions, activeEditingOption]);
 
 	const keyExtractor = useCallback((item: EditOption) => item.value, []);
 
@@ -153,7 +153,10 @@ const PosterSelector = ({
 		movieId: poster ? movie.id : undefined,
 	});
 	const posters = useMemo(() => data?.pages.flat() || [], [data]);
-	const initialIndex = useMemo(() => posters.findIndex(p => p.poster_url === poster), [posters]);
+	const initialIndex = useMemo(() => {
+		const isFind = posters.findIndex(p => p.poster_url === poster);
+		return isFind === -1 ? 0 : isFind;
+	}, [posters]);
 	const renderItem = useCallback((item: MediaMoviePoster, isActive: boolean) => (
 		<ImageWithFallback
 		source={{ uri: item.poster_url ?? '' }}
@@ -274,10 +277,11 @@ const BackdropImageSelector = ({
 		if (hasNextPage) fetchNextPage();
 	}, [hasNextPage, fetchNextPage]);
 	
-	const initialIndex = useMemo(() => 
-		backdrops.findIndex(p => p.backdrop_url === selectedBackdrop) ?? 0,
-		[backdrops, selectedBackdrop]);
-	
+	const initialIndex = useMemo(() => {
+		const isFind = backdrops.findIndex(p => p.backdrop_url === selectedBackdrop);
+		return isFind === -1 ? 0 : isFind;
+	}, [backdrops, selectedBackdrop]);
+
 	const keyExtractor = useCallback((item: MediaMovieBackdrop) => item.id!.toString(), []);
 	
 	return (

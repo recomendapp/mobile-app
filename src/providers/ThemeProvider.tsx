@@ -1,5 +1,6 @@
 import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import Colors, { TColors } from "@/constants/Colors";
+import { useKeyboardToolbarOffset } from "@/hooks/useKeyboardToolbarOffset";
 import { getModeFromColor } from "@/utils/getModeFromColor";
 import { DefaultTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
@@ -13,9 +14,11 @@ type ThemeContextType = {
 	applyColors: (colors: TColors) => void;
 	tabBarHeight: number;
 	setTabBarHeight: (height: number) => void;
-	bottomTabHeight: number;
+	bottomOffset: number;
 	defaultScreenOptions: React.ComponentProps<typeof Stack.Screen>['options'];
 	mode: ThemeMode;
+	keyboardOffset: number;
+	setKeyboardToolbarOffset: (offset: number) => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -24,12 +27,13 @@ type ThemeProviderProps = {
 	children?: React.ReactNode;
 };
   
-const ThemeProvider = ({children}: ThemeProviderProps) => {
+export const ThemeProvider = ({children}: ThemeProviderProps) => {
 	const [colors, setColors] = useState(Colors.dark);
 	const insets = useSafeAreaInsets();
 	const [tabBarHeight, setTabBarHeight] = useState(0);
+	const [keyboardOffset, setKeyboardToolbarOffset] = useState(0);
 
-	const bottomTabHeight = useMemo(() => {
+	const bottomOffset = useMemo(() => {
 		return tabBarHeight + insets.bottom;
 	}, [tabBarHeight, insets.bottom]);
 
@@ -59,10 +63,12 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 		colors,
 		tabBarHeight,
 		setTabBarHeight,
-		bottomTabHeight,
+		bottomOffset,
 		defaultScreenOptions,
 		mode,
-	}), [applyColors, colors, tabBarHeight, setTabBarHeight, bottomTabHeight, defaultScreenOptions, mode]);
+		keyboardOffset,
+		setKeyboardToolbarOffset,
+	}), [applyColors, colors, tabBarHeight, setTabBarHeight, bottomOffset, defaultScreenOptions, mode, keyboardOffset, setKeyboardToolbarOffset]);
 
 	return (
 		<ThemeContext.Provider value={contextValue}>
@@ -71,7 +77,7 @@ const ThemeProvider = ({children}: ThemeProviderProps) => {
 	);
 };
 
-const useTheme = () => {
+export const useTheme = () => {
 	const context = use(ThemeContext);
 	if (context === undefined) {
 		throw new Error('useTheme must be used within a ThemeProvider');
@@ -79,13 +85,16 @@ const useTheme = () => {
 	return context;
 };
 
-export {
-	ThemeProvider,
-	useTheme,
-	TabBarHeightUpdater,
+/* ---------------------------------- UTILS --------------------------------- */
+export const ThemeUpdater = () => {
+	return (
+	<>
+		<TabBarHeightUpdater />
+		<KeyboardToolbarOffsetUpdater />
+	</>
+	);
 };
 
-/* ---------------------------------- UTILS --------------------------------- */
 const TabBarHeightUpdater = () => {
 	const tabBarHeight = useBottomTabOverflow();
 	const { setTabBarHeight } = useTheme();
@@ -95,5 +104,17 @@ const TabBarHeightUpdater = () => {
 			setTabBarHeight(0);
 		}
 	}, [tabBarHeight, setTabBarHeight]);
+	return null;
+};
+
+const KeyboardToolbarOffsetUpdater = () => {
+	const keyboardOffset = useKeyboardToolbarOffset();
+	const { setKeyboardToolbarOffset } = useTheme();
+	useEffect(() => {
+		setKeyboardToolbarOffset(keyboardOffset);
+		return () => {
+			setKeyboardToolbarOffset(0);
+		}
+	}, [keyboardOffset, setKeyboardToolbarOffset]);
 	return null;
 };

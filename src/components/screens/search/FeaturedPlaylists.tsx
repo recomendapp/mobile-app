@@ -17,7 +17,7 @@ interface FeaturedPlaylistsProps {
 const FeaturedPlaylists = ({
 	contentContainerStyle,
 } : FeaturedPlaylistsProps) => {
-	const { bottomTabHeight } = useTheme();
+	const { bottomOffset } = useTheme();
 	const {
 		data,
 		fetchNextPage,
@@ -57,7 +57,7 @@ const FeaturedPlaylists = ({
 		contentContainerStyle={[
 			{
 				gap: GAP,
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 			},
 			contentContainerStyle,
 		]}

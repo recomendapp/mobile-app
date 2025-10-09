@@ -22,7 +22,7 @@ import { useTranslations } from "use-intl";
 const PersonScreen = () => {
 	const { person_id } = useLocalSearchParams<{ person_id: string }>();
 	const { id: personId } = getIdFromSlug(person_id);
-	const { bottomTabHeight, tabBarHeight } = useTheme();
+	const { bottomOffset, tabBarHeight } = useTheme();
 	const { session } = useAuth();
 	const t = useTranslations();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -100,7 +100,7 @@ const PersonScreen = () => {
 		scrollToOverflowEnabled
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 				gap: GAP,
 			},
 		]}

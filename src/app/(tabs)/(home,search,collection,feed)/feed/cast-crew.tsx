@@ -20,7 +20,7 @@ import { useTranslations } from "use-intl";
 const CastCrewFeedScreen = () => {
 	const t = useTranslations();
 	const router = useRouter();
-	const { tabBarHeight, bottomTabHeight, colors } = useTheme();
+	const { tabBarHeight, bottomOffset, colors } = useTheme();
 	const { session, customerInfo } = useAuth();
 	const {
 		data,
@@ -64,14 +64,14 @@ const CastCrewFeedScreen = () => {
 
 	if (session === undefined || customerInfo === undefined) {
 		return (
-			<View style={[tw`flex-1 items-center justify-center`, { paddingTop: PADDING_VERTICAL, paddingBottom: bottomTabHeight + PADDING_VERTICAL }]}>
+			<View style={[tw`flex-1 items-center justify-center`, { paddingTop: PADDING_VERTICAL, paddingBottom: bottomOffset + PADDING_VERTICAL }]}>
 				<Icons.Loader />
 			</View>
 		)
 	}
 	if (!customerInfo?.entitlements.active['premium']) {
 		return (
-			<View style={[tw`flex-1 items-center justify-center gap-2`, { paddingTop: PADDING_VERTICAL, paddingBottom: bottomTabHeight + PADDING_VERTICAL }]}>
+			<View style={[tw`flex-1 items-center justify-center gap-2`, { paddingTop: PADDING_VERTICAL, paddingBottom: bottomOffset + PADDING_VERTICAL }]}>
 				<Button
 				onPress={() => router.push({
 					pathname: '/upgrade',
@@ -93,7 +93,7 @@ const CastCrewFeedScreen = () => {
 		ListEmptyComponent={renderEmpty}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 			gap: GAP,
 		}}
 		scrollIndicatorInsets={{

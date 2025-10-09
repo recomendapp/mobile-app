@@ -20,7 +20,7 @@ import { useCallback, useMemo, useRef } from "react";
 const FeedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
-	const { tabBarHeight, bottomTabHeight, colors } = useTheme();
+	const { tabBarHeight, bottomOffset, colors } = useTheme();
 	const {
 		data,
 		isLoading,
@@ -80,7 +80,7 @@ const FeedScreen = () => {
 		ListEmptyComponent={renderEmpty}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 			gap: GAP,
 		}}
 		scrollIndicatorInsets={{

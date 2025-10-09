@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/Button";
 const FilmScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
-	const { tabBarHeight, bottomTabHeight} = useTheme();
+	const { tabBarHeight, bottomOffset} = useTheme();
 	const locale = useLocale();
 	const t = useTranslations();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -83,7 +83,7 @@ const FilmScreen = () => {
 		onScroll={scrollHandler}
 		scrollToOverflowEnabled
 		contentContainerStyle={{
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,

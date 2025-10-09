@@ -25,7 +25,7 @@ const PersonTvSeriesScreen = () => {
 	const t = useTranslations();
 	const { person_id } = useLocalSearchParams<{ person_id: string }>();
 	const { id: personId } = getIdFromSlug(person_id);
-	const { colors, bottomTabHeight, tabBarHeight } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -114,7 +114,7 @@ const PersonTvSeriesScreen = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={{
 			gap: GAP,
-			paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 			paddingHorizontal: PADDING_HORIZONTAL,
 		}}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}

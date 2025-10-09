@@ -7,9 +7,14 @@ interface KeyboardToolbarProps extends React.ComponentPropsWithoutRef<typeof RNK
 
 export const KeyboardToolbar = ({
 	theme,
+	offset: offsetProps,
 	...props
 }: KeyboardToolbarProps) => {
-	const { colors } = useTheme();
+	const { colors, keyboardOffset } = useTheme();
+	const offset = {
+		opened: keyboardOffset,
+		...offsetProps,
+	};
 	const themeDefault: KeyboardToolbarTheme = useMemo(() => ({
 		...DefaultKeyboardToolbarTheme,
 		dark: {
@@ -24,5 +29,5 @@ export const KeyboardToolbar = ({
 		},
 		...theme,
 	}), [colors, theme]);
-	return <RNKeyboardToolbar theme={themeDefault} {...props} />;
+	return <RNKeyboardToolbar offset={offset} theme={themeDefault} {...props} />;
 };

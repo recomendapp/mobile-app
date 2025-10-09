@@ -110,7 +110,7 @@ const CollectionScreen = <T extends {}>({
 	fuseThreshold = 0.5,
 	...props
 }: CollectionScreenConfig<T>) => {
-    const { colors, bottomTabHeight } = useTheme();
+    const { colors, bottomOffset } = useTheme();
     const t = useTranslations();
     const { showActionSheetWithOptions } = useActionSheet();
 
@@ -290,7 +290,7 @@ const CollectionScreen = <T extends {}>({
 			onRefresh={refetch}
 			contentContainerStyle={{
                 paddingHorizontal: PADDING_HORIZONTAL,
-                paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+                paddingBottom: bottomOffset + PADDING_VERTICAL,
                 gap: GAP,
 			}}
             numColumns={view === 'grid' ? numColumns : 1}

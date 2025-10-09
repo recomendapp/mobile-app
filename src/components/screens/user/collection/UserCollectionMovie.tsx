@@ -25,7 +25,7 @@ const UserCollectionMovie = () => {
 	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data: profile } = useUserProfileQuery({ username: username });
-	const { colors, bottomTabHeight } = useTheme();
+	const { colors, bottomOffset } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -111,7 +111,7 @@ const UserCollectionMovie = () => {
 	onEndReachedThreshold={0.5}
 	contentContainerStyle={{
 		gap: GAP,
-		paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+		paddingBottom: bottomOffset + PADDING_VERTICAL,
 		paddingHorizontal: PADDING_HORIZONTAL,
 	}}
 	keyExtractor={useCallback((item: UserActivityMovie) => item.id.toString(), [])}

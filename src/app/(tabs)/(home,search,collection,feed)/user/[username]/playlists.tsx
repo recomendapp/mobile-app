@@ -24,7 +24,7 @@ const UserPlaylistsScreen = () => {
 	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data, } = useUserProfileQuery({ username: username });
-	const { colors, bottomTabHeight } = useTheme();
+	const { colors, bottomOffset } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -116,7 +116,7 @@ const UserPlaylistsScreen = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[
 			{
-				paddingBottom: bottomTabHeight + PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 			},
 			tw`px-4`,
 		]}

@@ -15,14 +15,13 @@ const AuthLayout = () => {
       headerStyle: {
         backgroundColor: 'transparent',
       },
-      headerTransparent: true,
     }}
     >
-      <Stack.Screen name="index" options={{ headerTransparent: true, headerTitle: upperFirst(t('common.messages.welcome')) }} />
-      <Stack.Screen name="login/index" options={{ headerTransparent: true, headerTitle: upperFirst(t('common.messages.login')) }} />
-      <Stack.Screen name="login/otp" options={{ headerTransparent: true, headerTitle: upperFirst(t('common.messages.otp')) }} />
-      <Stack.Screen name="signup" options={{ headerTransparent: true, headerTitle: upperFirst(t('common.messages.signup')) }} />
-      <Stack.Screen name="forgot-password" options={{ headerTransparent: true, headerTitle: upperFirst(t('pages.auth.forgot_password.label')) }} />
+      <Stack.Screen name="index" options={{ headerTitle: upperFirst(t('common.messages.welcome')) }} />
+      <Stack.Screen name="login/index" options={{ headerTitle: upperFirst(t('common.messages.login')) }} />
+      <Stack.Screen name="login/otp" options={{ headerTitle: upperFirst(t('common.messages.otp')) }} />
+      <Stack.Screen name="signup" options={{ headerTitle: upperFirst(t('common.messages.signup')) }} />
+      <Stack.Screen name="forgot-password" options={{ headerTitle: upperFirst(t('pages.auth.forgot_password.label')) }} />
       {/* CALLBACKs */}
       <Stack.Screen name="callback" options={{ headerShown: false }} />
       <Stack.Screen name="reset-password" options={{ headerShown: false }} />
