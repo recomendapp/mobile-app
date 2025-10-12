@@ -183,6 +183,7 @@ const BottomSheetRating = React.forwardRef<
 				)}
 			</View>
 		)}
+		blurTint='dark'
 		{...props}
 		>
 			<View style={[tw`flex-row items-center justify-center`, { paddingHorizontal: PADDING_HORIZONTAL }]}>

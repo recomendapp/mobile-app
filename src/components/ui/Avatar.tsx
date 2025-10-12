@@ -3,31 +3,33 @@ import tw from '@/lib/tw';
 import React from 'react';
 import {
   Image as EImage,
+  ImageProps as EImageProps,
   type ImageErrorEventData,
   type ImageLoadEventData,
   type ImageSource
 } from 'expo-image';
 import Animated from 'react-native-reanimated';
+import { ViewProps } from 'react-native';
 
 // Types
 type AvatarState = 'loading' | 'error' | 'loaded';
 
 interface RootProps {
   alt: string;
-  style?: any;
+  style?: ViewProps['style'];
   children?: React.ReactNode;
 }
 
 interface ImageProps {
   source: ImageSource;
-  style?: any;
+  style?: EImageProps['style'];
   onLoad?: (e: ImageLoadEventData) => void;
   onError?: (e: ImageErrorEventData) => void;
   onLoadingStatusChange?: (status: 'error' | 'loaded') => void;
 }
 
 interface FallbackProps {
-  style?: any;
+  style?: ViewProps['style'];
   children?: React.ReactNode;
 }
 

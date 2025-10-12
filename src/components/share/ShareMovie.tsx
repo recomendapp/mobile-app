@@ -22,6 +22,7 @@ import { useWindowDimensions } from "react-native";
 import { clamp } from "lodash";
 import { useImagePalette } from "@/hooks/useImagePalette";
 import Color from "color";
+import { ShapeVerticalRoundedBackground, ShapeVerticalRoundedForeground } from "@/lib/icons";
 
 interface ShareMovieProps extends React.ComponentProps<typeof ViewShot> {
 	movie: MediaMovie;
@@ -55,12 +56,12 @@ const EditOptionsSelector = ({
 		style={[
 			tw`rounded-full items-center justify-center w-full aspect-square border`,
 			{
-				backgroundColor: isActive ? colors.accentYellow : undefined,
-				borderColor: isActive ? colors.accentYellow : colors.border,
+				backgroundColor: colors.muted,
+				borderColor: isActive ? colors.foreground : colors.border,
 			}
 		]}
 		>
-			<item.icon size={20} color={isActive ? colors.accentYellowForeground : colors.foreground } />
+			<item.icon size={20} color={colors.foreground} />
 		</View>
 		);
 	}, []);
@@ -104,7 +105,7 @@ const ShareMovieDefault = ({ movie, poster, scale = 1 } : { movie: MediaMovie, p
 		<View
 		style={{
 			borderRadius: BORDER_RADIUS * scale,
-			backgroundColor: Color(colors.muted).alpha(0.9).string(),
+			backgroundColor: Color(colors.muted).alpha(0.95).string(),
 			gap: GAP * scale,
 			padding: PADDING / 2 * scale
 		}}
@@ -313,12 +314,17 @@ export const ShareMovie = forwardRef<
 	const [bgType, setBgType] = useState<'color' | 'image'>(isPremium && backdrop ? 'image' : 'color');
 	const [editing, setEditing] = useState(false);
 	const editOptions = useMemo((): EditOption[] => {
-		if (!isPremium || !poster) return [{ value: 'background', icon: Icons.Wallpaper }];
-		return [
-		{ value: 'poster', icon: Icons.Image },
-		{ value: 'background', icon: Icons.Wallpaper }
-		];
-	}, [poster, isPremium]);
+		const options: EditOption[] = [];
+		const hasPoster = !!poster;
+		const hasBackground = !!poster || !!backdrop;
+		if (hasPoster) {
+			options.push({ value: 'poster', icon: ShapeVerticalRoundedForeground });
+		}
+		if (hasBackground) {
+			options.push({ value: 'background', icon: ShapeVerticalRoundedBackground });
+		}
+		return options;
+	}, [poster, backdrop]);
 	const [activeEditingOption, setActiveEditingOption] = useState(editOptions[0].value);
 
 	useImperativeHandle(ref, () => ({
@@ -326,7 +332,7 @@ export const ShareMovie = forwardRef<
 			if (!viewShotRef.current) throw new Error('ViewShot ref is not available');	
 			const uri = await viewShotRef.current.capture?.();
 
-			const backgroundImage = (isPremium && bgType === 'image' && backdrop)
+			const backgroundImage = (bgType === 'image' && backdrop)
 				? await cropImageRatio(backdrop, options?.background?.ratio ?? 9 / 16)
 				: undefined;
 
@@ -345,8 +351,16 @@ export const ShareMovie = forwardRef<
 		<ShareMovieDefault movie={movie} poster={poster} scale={scale} />
 	), [movie, poster]);
 
+	const handleEnableEditing = useCallback(() => {
+		if (isPremium) {
+			setEditing((v) => !v);
+		} else {
+			router.push('/upgrade');
+		}
+	}, [isPremium]);
+
 	const EditSelectors = useMemo(() => {
-		if (!editing || !isPremium) return null;
+		if (!editing) return null;
 		return (
 			<EditOptionsSelector
 			editOptions={editOptions}
@@ -354,16 +368,13 @@ export const ShareMovie = forwardRef<
 			setActiveEditingOption={setActiveEditingOption}
 			/>
 		);
-	}, [editing, isPremium]);
+	}, [editing, activeEditingOption, editOptions]);
 	
 	const EditButtons = useMemo(() => (
 		<View style={[tw`absolute top-2 right-2 flex-row items-center`, { gap: GAP }]}>
 			{editing && (
 				<Animated.View entering={FadeInRight} exiting={FadeOutRight} style={[tw`flex-row items-center`, { gap: GAP }]}>
-				{!isPremium && (
-					<Button variant='accent-yellow' icon={Icons.Password} size='icon' onPress={() => router.push('/upgrade')} style={tw`rounded-full`} />
-				)}
-				{backdrop && activeEditingOption === 'background' && isPremium && (
+				{backdrop && activeEditingOption === 'background' && (
 					<Button
 					variant="muted"
 					icon={bgType === 'image' && bgColor ? CircleIcon : Icons.Image}
@@ -380,10 +391,10 @@ export const ShareMovie = forwardRef<
 			icon={editing ? Icons.Check : Icons.Edit}
 			size="icon"
 			style={tw`rounded-full`}
-			onPress={() => setEditing((prev) => !prev)}
+			onPress={handleEnableEditing}
 			/>
 		</View>
-	), [editing, backdrop, activeEditingOption, isPremium, bgType, bgColor]);
+	), [editing, backdrop, activeEditingOption, handleEnableEditing, bgType, bgColor]);
 	
 	const EditOptions = useMemo(() => {
 		if (!editing) return null;
@@ -445,12 +456,11 @@ export const ShareMovie = forwardRef<
 						tw`relative items-center justify-center overflow-hidden`
 					]}
 				>
-					{isPremium && bgType === 'image' && backdrop ? (
+					{bgType === 'image' && backdrop ? (
 						<Image source={backdrop} style={tw`absolute inset-0`} />
 					) : bgType === 'color' && bgColor && (
 						<View style={[tw`absolute inset-0`, { backgroundColor: bgColor.color }]} />
 					)}
-					
 					<ScaledCapture
 					ref={viewShotRef}
 					targetWidth={SOCIAL_CARD_WIDTH}

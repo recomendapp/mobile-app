@@ -1,17 +1,9 @@
-import {useEffect} from 'react'
-import * as SplashScreen from 'expo-splash-screen'
+import { useSplashScreen } from '@/providers/SplashScreenProvider'
 
-type Props = {
-  isReady: boolean
-}
-
-export function Splash({isReady, children}: React.PropsWithChildren<Props>) {
-  useEffect(() => {
-    if (isReady) {
-      SplashScreen.hideAsync()
-    }
-  }, [isReady])
-  if (isReady) {
-    return children
-  }
+export function Splash({ children}: React.PropsWithChildren) {
+	const { isReady } = useSplashScreen();
+	if (isReady) {
+		return children
+	}
+	return null;
 }

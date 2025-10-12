@@ -18,6 +18,8 @@ if (isAndroid) {
 	)
 }
 
+type SplashScreenState = 'loading' | 'finished';
+
 interface SplashScreenContextProps {
 	auth: {
 		ready: boolean;
@@ -27,7 +29,8 @@ interface SplashScreenContextProps {
 		ready: boolean;
 		setReady: (ready: boolean) => void;
 	},
-	ready: boolean;
+	isReady: boolean;
+	state: SplashScreenState;
 }
 
 const SplashScreenContext = createContext<SplashScreenContextProps | undefined>(undefined);
@@ -42,19 +45,21 @@ const SplashScreenProvider = ({
 	const [authReady, setAuthReady] = useState(false);
 	const [i18nReady, setI18nReady] = useState(false);
 
-	const ready = useMemo(() => {
+	const isReady = useMemo(() => {
 		const isAppReady = authReady && i18nReady;
 		return isAppReady;
 	}, [
 		authReady,
 		i18nReady
 	]);
+	const [state, setState] = useState<SplashScreenState>('loading');
 
 	useEffect(() => {
-		if (ready) {
-			SplashScreen.hide();
+		if (isReady && state !== 'finished') {
+			SplashScreen.hideAsync()
+				.then(() => setState('finished'));
 		}
-	}, [ready]);
+	}, [isReady]);
 	
 	const contextValue = useMemo(() => ({
 		auth: {
@@ -65,8 +70,9 @@ const SplashScreenProvider = ({
 			ready: i18nReady,
 			setReady: setI18nReady
 		},
-		ready: ready
-	}), [authReady, i18nReady, ready]);
+		isReady: isReady,
+		state: state
+	}), [authReady, i18nReady, isReady, state]);
 
 	return (
 		<SplashScreenContext.Provider value={contextValue}>

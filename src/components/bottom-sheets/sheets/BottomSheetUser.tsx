@@ -55,18 +55,18 @@ const BottomSheetUser = React.forwardRef<
     ],
     [
       {
-        icon: Icons.User,
-        onPress: () => router.push(`/user/${user.username}`),
-        label: upperFirst(t('common.messages.go_to_user')),
-        disabled: pathname.startsWith(`/user/${user.username}`)
-      },
-      {
         icon: Icons.Share,
         onPress: () => openSheet(BottomSheetShareUser, {
           user: user,
         }),
         label: upperFirst(t('common.messages.share')),
-      }
+      },
+      {
+        icon: Icons.User,
+        onPress: () => router.push(`/user/${user.username}`),
+        label: upperFirst(t('common.messages.go_to_user')),
+        disabled: pathname.startsWith(`/user/${user.username}`)
+      },
     ],
     [
       ...additionalItemsBottom,

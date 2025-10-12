@@ -5,7 +5,7 @@ import { SupabaseProvider } from "./SupabaseProvider";
 import { ThemeProvider } from "./ThemeProvider";
 import { BottomSheetManager } from "@/components/bottom-sheets/BottomSheetManager";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
-import { SplashScreenProvider, useSplashScreen } from "./SplashScreenProvider";
+import { SplashScreenProvider } from "./SplashScreenProvider";
 import { LocaleProvider } from "./LocaleProvider";
 import { NotificationsProvider } from "./NotificationsProvider";
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -52,9 +52,8 @@ const Providers = ({ children } : ProvidersProps) => {
 };
 
 const ProvidersInner = ({ children } : PropsWithChildren<{}>) => {
-	const { ready } = useSplashScreen();
 	return (
-		<Splash isReady={ready}>
+		<Splash>
 			{children}
 		</Splash>
 	);
