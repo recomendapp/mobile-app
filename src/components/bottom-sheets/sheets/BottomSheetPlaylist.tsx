@@ -22,6 +22,7 @@ import { Text } from '@/components/ui/text';
 import richTextToPlainString from '@/utils/richTextToPlainString';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useToast } from '@/components/Toast';
+import BottomSheetSharePlaylist from './share/BottomSheetSharePlaylist';
 
 interface BottomSheetPlaylistProps extends BottomSheetProps {
   playlist: Playlist,
@@ -43,7 +44,7 @@ const BottomSheetPlaylist = React.forwardRef<
 >(({ id, playlist, additionalItemsTop = [], ...props }, ref) => {
   const { session } = useAuth();
   const toast = useToast();
-  const closeSheet = useBottomSheetStore((state) => state.closeSheet);
+  const { closeSheet, openSheet } = useBottomSheetStore((state) => state);
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const router = useRouter();
@@ -69,6 +70,13 @@ const BottomSheetPlaylist = React.forwardRef<
         ...additionalItemsTop,
       ],
       [
+        {
+          icon: Icons.Share,
+          onPress: () => openSheet(BottomSheetSharePlaylist, {
+            playlist: playlist,
+          }),
+          label: upperFirst(t('common.messages.share')),
+        },
         ...(session?.user.id && playlist.user?.id !== session.user.id ? [
           {
             icon: saved

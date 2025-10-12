@@ -1,8 +1,8 @@
 import { Skeleton } from '../ui/Skeleton';
 import Avatar from '../ui/Avatar';
-import tw from '@/lib/tw';
 import { CORNERS } from '@/theme/globals';
 import { forwardRef, memo, useMemo } from 'react';
+import { ViewProps } from 'react-native';
 
 interface UserAvatarBaseProps
 	extends Omit<React.ComponentPropsWithRef<typeof Avatar.Root>, 'alt'> {
@@ -27,8 +27,8 @@ const UserAvatar = memo(forwardRef<
 	React.ComponentRef<typeof Avatar.Root>,
 	UserAvatarProps
 >(({ full_name, avatar_url, skeleton, style, ...props }, ref) => {
-	const skeletonStyle = useMemo(() => [
-		tw`h-12 w-12`,
+	const baseStyle = useMemo((): ViewProps['style'] => [
+		{ height: 'auto', width: 40, aspectRatio: 1 / 1 },
 		style,
 	], [style]);
 
@@ -40,7 +40,7 @@ const UserAvatar = memo(forwardRef<
 		return (
 			<Skeleton
 			borderRadius={CORNERS}
-			style={skeletonStyle}
+			style={baseStyle}
 			/>
 		);
 	}
@@ -49,7 +49,7 @@ const UserAvatar = memo(forwardRef<
 		<Avatar.Root
 		ref={ref}
 		alt={full_name}
-		style={style}
+		style={baseStyle}
 		{...props}
 		>
 			<Avatar.Image source={imageSource} />

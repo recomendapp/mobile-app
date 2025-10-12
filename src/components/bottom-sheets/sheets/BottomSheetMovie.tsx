@@ -59,6 +59,13 @@ const BottomSheetMovie = React.forwardRef<
       ...additionalItemsTop,
     ],
     [
+      {
+        icon: Icons.Share,
+        onPress: () => openSheet(BottomSheetShareMovie, {
+          movie: movie!,
+        }),
+        label: upperFirst(t('common.messages.share')),
+      },
       ...((activity) ? [
         {
           icon: Icons.Feed,
@@ -108,13 +115,6 @@ const BottomSheetMovie = React.forwardRef<
           label: upperFirst(t('common.messages.send_to_friend')),
         }
       ] : []),
-      {
-        icon: Icons.Share,
-        onPress: () => openSheet(BottomSheetShareMovie, {
-          movie: movie!,
-        }),
-        label: upperFirst(t('common.messages.share')),
-      },
     ],
     [
       ...additionalItemsBottom,

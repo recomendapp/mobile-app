@@ -4,27 +4,27 @@ const IS_DEV = process.env.APP_VARIANT === 'development';
 const IS_PREVIEW = process.env.APP_VARIANT === 'preview';
 
 const getUniqueIdentifier = () => {
-  if (IS_DEV) {
-    return 'com.recomend.app.dev';
-  }
+	if (IS_DEV) {
+		return 'com.recomend.app.dev';
+	}
 
-  if (IS_PREVIEW) {
-    return 'com.recomend.app.preview';
-  }
+	if (IS_PREVIEW) {
+		return 'com.recomend.app.preview';
+	}
 
-  return 'com.recomend.app';
+	return 'com.recomend.app';
 };
 
 const getAppName = () => {
-  if (IS_DEV) {
-    return 'Recomend (Dev)';
-  }
+	if (IS_DEV) {
+		return 'Recomend (Dev)';
+	}
 
-  if (IS_PREVIEW) {
-    return 'Recomend (Preview)';
-  }
+	if (IS_PREVIEW) {
+		return 'Recomend (Preview)';
+	}
 
-  return 'Recomend';
+	return 'Recomend';
 };
 
 const getWebDomain = () => {
@@ -37,7 +37,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	slug: 'recomend',
 	version: '1.0.0',
 	orientation: 'portrait',
-	icon: './src/assets/images/icon.png',
+	icon: './src/assets/images/app/icons/icon.png',
 	scheme: 'recomend',
 	userInterfaceStyle: 'automatic',
 	newArchEnabled: true,
@@ -50,6 +50,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		associatedDomains: [
 			`applinks:${getWebDomain()}`
 		],
+		icon: {
+			light: './src/assets/images/app/icons/icon-light.png',
+			dark: './src/assets/images/app/icons/icon-dark.png',
+			tinted: './src/assets/images/app/icons/icon-tinted.png',
+		},
 		infoPlist: {
 			ITSAppUsesNonExemptEncryption: false,
 			UIDesignRequiresCompatibility: true, // Disable iOS 26 Liquid Glass effect
@@ -58,8 +63,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	},
 	android: {
 		adaptiveIcon: {
-			foregroundImage: './src/assets/images/adaptive-icon.png',
-			backgroundColor: '#ffffff',
+			foregroundImage: './src/assets/images/app/icons/adaptive-icon.png',
+			monochromeImage: './src/assets/images/app/icons/adaptive-icon-monochrome.png',
+			backgroundColor: '#0b0909',
 		},
 		edgeToEdgeEnabled: true,
 		package: getUniqueIdentifier(),
@@ -88,7 +94,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	web: {
 		bundler: 'metro',
 		output: 'static',
-		favicon: './src/assets/images/favicon.png',
+		favicon: './src/assets/images/app/icons/favicon.png',
 	},
 	plugins: [
 		'expo-router',
@@ -120,7 +126,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 					"./src/assets/sounds/notif.wav"
 				]
 			}
-      	],
+	  	],
 		[
 			"expo-web-browser",
 			{
@@ -128,32 +134,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			}
 		],
 		[
-          'expo-splash-screen',
-          {
-            ios: {
-              enableFullScreenImage_legacy: true,
-              backgroundColor: '#ffffff',
-              image: './src/assets/splash/splash.png',
-              resizeMode: 'cover',
-              dark: {
-                enableFullScreenImage_legacy: true,
-                backgroundColor: '#0b0909',
-                image: './src/assets/splash/splash-dark.png',
-                resizeMode: 'cover',
-              },
-            },
-            android: {
-              backgroundColor: '#0c7cff',
-              image: './src/assets/splash/splash-android-icon.png',
-              imageWidth: 150,
-              dark: {
-                backgroundColor: '#0c2a49',
-                image: './src/assets/splash/splash-android-icon-dark.png',
-                imageWidth: 150,
-              },
-            },
-          },
-        ],
+		  'expo-splash-screen',
+		  {
+			image: './src/assets/images/app/splash/splash-icon.png',
+			imageWidth: 200,
+			resizeMode: 'contain',
+			backgroundColor: '#0b0909',
+			dark: {
+				image: './src/assets/images/app/splash/splash-icon-dark.png',
+				backgroundColor: '#0b0909',
+			},
+		  },
+		],
 		[
 			"react-native-share",
 			{

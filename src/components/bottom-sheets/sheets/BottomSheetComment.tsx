@@ -16,6 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { View } from '@/components/ui/view';
 import { useTheme } from '@/providers/ThemeProvider';
 import { Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BottomSheetCommentProps extends BottomSheetProps {
 	comment: string | null;
@@ -30,6 +31,7 @@ export const BottomSheetComment = React.forwardRef<
   BottomSheetCommentProps
 >(({ id, comment, commentMinLength = 1, commentMaxLength = 180, onSave, isAllowedToEdit = false, ...props }, ref) => {
 	const { colors } = useTheme();
+	const insets = useSafeAreaInsets();
 	const closeSheet = useBottomSheetStore((state) => state.closeSheet);
 	const t = useTranslations();
 	const [internalComment, setInternalComment] = React.useState<string | null>(null);
@@ -84,6 +86,7 @@ export const BottomSheetComment = React.forwardRef<
 	contentContainerStyle={{
 		gap: GAP,
 		paddingHorizontal: PADDING_HORIZONTAL,
+		paddingBottom: insets.bottom,
 	}}
 	{...props}
 	>

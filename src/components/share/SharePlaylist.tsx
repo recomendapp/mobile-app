@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { View } from "@/components/ui/view";
-import { Profile, User } from "@recomendapp/types";
+import { Playlist, Profile, User } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import ViewShot from "react-native-view-shot";
@@ -16,12 +16,14 @@ import { LucideIcon } from "lucide-react-native";
 import { router } from "expo-router";
 import { ScaledCapture } from "@/components/ui/ScaledCapture";
 import { useWindowDimensions } from "react-native";
-import { clamp } from "lodash";
+import { clamp, upperFirst } from "lodash";
 import { useImagePalette } from "@/hooks/useImagePalette";
 import Color from "color";
+import UserAvatar from "../user/UserAvatar";
+import { useTranslations } from "use-intl";
 
-interface ShareUserProps extends React.ComponentProps<typeof ViewShot> {
-	user: User | Profile;
+interface SharePlaylistProps extends React.ComponentProps<typeof ViewShot> {
+	playlist: Playlist;
 	variant?: 'default';
 	isPremium?: boolean;
 };
@@ -93,7 +95,8 @@ const EditOptionsSelector = ({
 };
 
 /* -------------------------------- VARIANTS -------------------------------- */
-const ShareUserDefault = ({ user, poster, scale = 1 } : { user: User | Profile, poster: string | undefined, scale?: number }) => {
+const SharePlaylistDefault = ({ playlist, poster, scale = 1 } : { playlist: Playlist, poster: string | undefined, scale?: number }) => {
+	const t = useTranslations();
 	const { colors } = useTheme();
 	return (
 		<View
@@ -106,24 +109,25 @@ const ShareUserDefault = ({ user, poster, scale = 1 } : { user: User | Profile, 
 		>
 			<ImageWithFallback
 			source={{uri: poster ?? '' }}
-			alt={user.full_name ?? ''}
-			type={'user'}
+			alt={playlist.title ?? ''}
+			type={'playlist'}
 			style={[
 				{
 					aspectRatio: 1 / 1,
 					borderRadius: BORDER_RADIUS * scale
 				},
-				tw`w-full h-auto rounded-full`
+				tw`w-full h-auto`
 			]}
 			/>
 			<View>
-			<Text style={[tw`font-bold`, { fontSize: 16 * scale }]}>
-				{user.full_name}
-				{user?.premium && (
-					<>{' '}<Icons.premium color={colors.accentBlue} size={14} /></>
-				)}
-			</Text>
-			<Text textColor="muted" style={{ fontSize: 12 * scale }}>@{user.username}</Text>
+				<Text style={[tw`font-bold`, { fontSize: 16 * scale }]}>{playlist.title}</Text>
+				{/* {playlist.user && (
+					<View style={[tw`flex-row items-center`, { gap: 4 * scale }]}>
+						<UserAvatar style={{ width: 20 * scale }} full_name={playlist.user.full_name!} avatar_url={playlist.user.avatar_url} />
+						<Text style={{ fontSize: 12 * scale }}>{playlist.user.full_name}</Text>
+					</View>
+				)} */}
+				{playlist.user && <Text textColor="muted" style={{ fontSize: 12 * scale }}>{t('common.messages.by_name', { name: `@${playlist.user?.username}` })}</Text>}
 			</View>
 			<Icons.app.logo color={colors.accentYellow} height={10 * scale}/>
 		</View>
@@ -180,15 +184,15 @@ const ColorSelector = ({
 
 /* -------------------------------------------------------------------------- */
 
-export const ShareUser = forwardRef<
+export const SharePlaylist = forwardRef<
 	ShareViewRef,
-	ShareUserProps
->(({ user, variant = 'default', isPremium, ...props }, ref) => {
+	SharePlaylistProps
+>(({ playlist, variant = 'default', isPremium, ...props }, ref) => {
 	const viewShotRef = useRef<ViewShot>(null);
 	const { height: screenHeight } = useWindowDimensions();
 	const { colors } = useTheme();
 	// States
-	const [poster, setPoster] = useState(user.avatar_url || undefined);
+	const [poster, setPoster] = useState(playlist.poster_url || undefined);
 	const { palette } = useImagePalette(poster);
 	const [bgColor, setBgColor] = useState<{index: number, color: string } | null>(palette ? { index: 0, color: palette[0] } : null);
 	const [bgType, setBgType] = useState<'color' | 'image'>('color');
@@ -214,8 +218,8 @@ export const ShareUser = forwardRef<
 	}));
 
 	const renderSticker = useCallback((scale: number) => (
-		<ShareUserDefault user={user} poster={poster} scale={scale} />
-	), [user, poster]);
+		<SharePlaylistDefault playlist={playlist} poster={poster} scale={scale} />
+	), [playlist, poster]);
 
 	const handleEnableEditing = useCallback(() => {
 		if (isPremium) {

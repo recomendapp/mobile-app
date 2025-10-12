@@ -52,12 +52,12 @@ const EditOptionsSelector = ({
 		style={[
 			tw`rounded-full items-center justify-center w-full aspect-square border`,
 			{
-				backgroundColor: isActive ? colors.accentYellow : undefined,
-				borderColor: isActive ? colors.accentYellow : colors.border,
+				backgroundColor: colors.muted,
+				borderColor: isActive ? colors.foreground : colors.border,
 			}
 		]}
 		>
-			<item.icon size={20} color={isActive ? colors.accentYellowForeground : colors.foreground } />
+			<item.icon size={20} color={colors.foreground} />
 		</View>
 		);
 	}, []);
@@ -99,7 +99,7 @@ const SharePersonDefault = ({ person, poster, scale = 1 } : { person: MediaPerso
 		<View
 		style={{
 			borderRadius: BORDER_RADIUS * scale,
-			backgroundColor: Color(colors.muted).alpha(0.9).string(),
+			backgroundColor: Color(colors.muted).alpha(0.95).string(),
 			gap: GAP * scale,
 			padding: PADDING / 2 * scale
 		}}
