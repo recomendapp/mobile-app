@@ -19,6 +19,7 @@ import { useWindowDimensions } from "react-native";
 import { clamp } from "lodash";
 import { useImagePalette } from "@/hooks/useImagePalette";
 import Color from "color";
+import { ShapeVerticalRoundedBackground } from "@/lib/icons";
 
 interface SharePersonProps extends React.ComponentProps<typeof ViewShot> {
 	person: MediaPerson;
@@ -189,7 +190,7 @@ export const SharePerson = forwardRef<
 	const [bgType, setBgType] = useState<'color' | 'image'>('color');
 	const [editing, setEditing] = useState(false);
 	const editOptions = useMemo((): EditOption[] => {
-		return [{ value: 'background', icon: Icons.Wallpaper }];
+		return [{ value: 'background', icon: ShapeVerticalRoundedBackground }];
 	}, []);
 	const [activeEditingOption, setActiveEditingOption] = useState(editOptions[0].value);
 
