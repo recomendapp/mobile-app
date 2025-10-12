@@ -14,6 +14,7 @@ export type ColorTheme = {
   success: string;
   successForeground: string;
   tint: string;
+  toast: string;
   // Accent colors
   accentYellow: string;
   accentYellowForeground: string;
@@ -60,6 +61,7 @@ const Colors: ColorPalettes = {
     success: 'hsl(144.07 100% 39%)',
     successForeground: 'hsl(0 0% 98%)',
     tint: 'hsl(0 0% 100%)',
+    toast: 'hsl(0 0% 15%)',
     // Accent colors
     accentYellow: 'hsl(51 100% 73%)',
     accentYellowForeground: sharedColors.black,
@@ -91,6 +93,7 @@ const Colors: ColorPalettes = {
     success: 'hsl(144.07 100% 39%)',
     successForeground: 'hsl(0 0% 98%)',
     tint: 'hsl(240 5.9% 10%)',
+    toast: 'hsl(0 0% 15%)',
     // Accent colors
     accentYellow: 'hsl(51 100% 73%)',
     accentYellowForeground: sharedColors.black,

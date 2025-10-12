@@ -3,8 +3,6 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import zustandStorage from './storage';
 
-
-
 interface UIStore {
   heartPicks: { tab: UserActivityType; view: ViewType };
   setHeartPicksTab: (tab: UserActivityType) => void;

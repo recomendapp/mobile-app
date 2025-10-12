@@ -219,12 +219,13 @@ const ModalPlaylistEditGuests = () => {
 		containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}
 		>
 			<CardUser user={item.user} linked={false}>
-				<Switch
-				key={String(item.edit)}
-				value={item.edit}
-				onValueChange={() => handleToggleEdit(item.user.id!)}
-				// disabled={!user?.premium}
-				/>
+				<View>
+					<Switch
+					key={String(item.edit)}
+					value={item.edit}
+					onValueChange={() => handleToggleEdit(item.user.id!)}
+					/>
+				</View>
 			</CardUser>
 		</Swipeable>
 	), [handleToggleEdit]);

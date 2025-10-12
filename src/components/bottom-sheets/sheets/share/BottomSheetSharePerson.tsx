@@ -1,21 +1,21 @@
 import { forwardRef, useRef } from "react";
 import { BottomSheetProps } from "../../BottomSheetManager";
-import { MediaMovie } from "@recomendapp/types";
+import { MediaPerson } from "@recomendapp/types";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { ShareViewRef } from "@/components/share/type";
 import BottomSheetShareLayout from "./BottomSheetShareLayout"; // Importer le layout
-import { ShareMovie } from "@/components/share/ShareMovie";
 import { useAuth } from "@/providers/AuthProvider";
+import { SharePerson } from "@/components/share/SharePerson";
 
-interface BottomSheetShareMovieProps extends BottomSheetProps {
-    movie: MediaMovie;
+interface BottomSheetSharePersonProps extends BottomSheetProps {
+    person: MediaPerson;
 }
 
-const BottomSheetShareMovie = forwardRef<
+const BottomSheetSharePerson = forwardRef<
     React.ComponentRef<typeof TrueSheet>,
-    BottomSheetShareMovieProps
+    BottomSheetSharePersonProps
 >(({
-    movie,
+    person,
     ...props
 }, ref) => {
     const { customerInfo } = useAuth();
@@ -23,19 +23,19 @@ const BottomSheetShareMovie = forwardRef<
     return (
         <BottomSheetShareLayout
         ref={ref}
-        path={movie.url || `/film/${movie.slug || movie.id}`}
+        path={person.url || `/person/${person.slug || person.id}`}
         contentRef={shareViewRef} 
         {...props}
         >
-            <ShareMovie
-			ref={shareViewRef}
-			movie={movie}
-			isPremium={!!customerInfo?.entitlements.active['premium']}
-			/>
+            <SharePerson
+            ref={shareViewRef}
+            person={person}
+            isPremium={!!customerInfo?.entitlements.active['premium']}
+            />
         </BottomSheetShareLayout>
     );
 });
 
-BottomSheetShareMovie.displayName = "BottomSheetShareMovie";
+BottomSheetSharePerson.displayName = "BottomSheetSharePerson";
 
-export default BottomSheetShareMovie;
+export default BottomSheetSharePerson;

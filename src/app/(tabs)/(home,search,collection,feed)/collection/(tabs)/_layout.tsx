@@ -8,8 +8,7 @@ import { NavigationRoute, ParamListBase, TabNavigationState } from "@react-navig
 import { Stack, withLayoutContext } from "expo-router";
 import { upperFirst } from "lodash";
 import { useCallback, useEffect, useRef } from "react";
-import { View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import { View, FlatList } from "react-native";
 import Animated from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";

@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react';
 import tw from '@/lib/tw';
-import { useTheme } from '@/providers/ThemeProvider';
-import { View } from 'react-native';
+import { View, FlatList } from 'react-native';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
-import { FlatList } from 'react-native-gesture-handler';
 import { useUserActivityMovieFollowersRatingQuery } from '@/features/user/userQueries';
 import { useAuth } from '@/providers/AuthProvider';
 import { CardUser } from '@/components/cards/CardUser';

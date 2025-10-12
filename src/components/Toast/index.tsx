@@ -108,7 +108,7 @@ export const Toaster = () => {
 		closeButton
 		styles={{
 			toast: {
-				backgroundColor: colors.muted
+				backgroundColor: colors.toast
 			},
 			title: {
 				color: colors.foreground

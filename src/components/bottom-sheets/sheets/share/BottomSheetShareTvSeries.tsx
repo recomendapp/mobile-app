@@ -1,21 +1,21 @@
 import { forwardRef, useRef } from "react";
 import { BottomSheetProps } from "../../BottomSheetManager";
-import { MediaMovie } from "@recomendapp/types";
+import { MediaTvSeries } from "@recomendapp/types";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { ShareViewRef } from "@/components/share/type";
 import BottomSheetShareLayout from "./BottomSheetShareLayout"; // Importer le layout
-import { ShareMovie } from "@/components/share/ShareMovie";
 import { useAuth } from "@/providers/AuthProvider";
+import { ShareTvSeries } from "@/components/share/ShareTvSeries";
 
-interface BottomSheetShareMovieProps extends BottomSheetProps {
-    movie: MediaMovie;
+interface BottomSheetShareTvSeriesProps extends BottomSheetProps {
+    tvSeries: MediaTvSeries;
 }
 
-const BottomSheetShareMovie = forwardRef<
+const BottomSheetShareTvSeries = forwardRef<
     React.ComponentRef<typeof TrueSheet>,
-    BottomSheetShareMovieProps
+    BottomSheetShareTvSeriesProps
 >(({
-    movie,
+    tvSeries,
     ...props
 }, ref) => {
     const { customerInfo } = useAuth();
@@ -23,19 +23,19 @@ const BottomSheetShareMovie = forwardRef<
     return (
         <BottomSheetShareLayout
         ref={ref}
-        path={movie.url || `/film/${movie.slug || movie.id}`}
+        path={tvSeries.url || `/tv-series/${tvSeries.slug || tvSeries.id}`}
         contentRef={shareViewRef} 
         {...props}
         >
-            <ShareMovie
+            <ShareTvSeries
 			ref={shareViewRef}
-			movie={movie}
+			tvSeries={tvSeries}
 			isPremium={!!customerInfo?.entitlements.active['premium']}
 			/>
         </BottomSheetShareLayout>
     );
 });
 
-BottomSheetShareMovie.displayName = "BottomSheetShareMovie";
+BottomSheetShareTvSeries.displayName = "BottomSheetShareTvSeries";
 
-export default BottomSheetShareMovie;
+export default BottomSheetShareTvSeries;

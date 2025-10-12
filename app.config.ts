@@ -194,13 +194,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			"expo-asset",
 			{
 				"assets": [
-					// Brands
-					"./src/assets/images/brands/apple_light.png",
-					"./src/assets/images/brands/apple_dark.png",
-					"./src/assets/images/brands/facebook_colored.png",
-					"./src/assets/images/brands/github_dark.png",
-					"./src/assets/images/brands/github_light.png",
-					"./src/assets/images/brands/google_colored.png",
 				]
 			}
 		]

@@ -7,9 +7,8 @@ import Viewer from "@/lib/10tap/viewer";
 import tw from "@/lib/tw";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { View } from "react-native"
+import { RefreshControl, ScrollView, View } from "react-native"
 import { useTranslations } from "use-intl";
-import { RefreshControl, ScrollView } from "react-native-gesture-handler";
 import { Text } from "@/components/ui/text";
 import { CardUser } from "@/components/cards/CardUser";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";

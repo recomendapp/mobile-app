@@ -21,9 +21,9 @@ import { Link } from "expo-router";
 import { clamp, upperFirst } from "lodash";
 import { useCallback, useRef, memo, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useTranslations } from "use-intl";
+import { ScrollView } from "react-native";
 
 const SearchScreen = () => {
 	const search = useSearchStore(state => state.search);

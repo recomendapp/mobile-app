@@ -6,13 +6,13 @@ import { Icons } from "@/constants/Icons";
 import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
 import { LinkProps, useRouter } from "expo-router";
-import { Pressable } from "react-native-gesture-handler";
 import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Button } from "@/components/ui/Button";
 import { CollectionAction } from "./CollectionScreen";
 import { forwardRef, useCallback } from "react";
 import { MediaType, ViewType } from "@recomendapp/types";
+import { Pressable } from "react-native";
 
 interface CollectionItemProps<T> extends React.ComponentProps<typeof Animated.View> {
     item: T;

@@ -1,6 +1,5 @@
 import * as React from "react"
-import { StyleProp, TextInput, TextStyle, View, ViewStyle } from "react-native"
-import { Pressable } from "react-native-gesture-handler"
+import { Pressable, StyleProp, TextInput, TextStyle, View, ViewStyle } from "react-native"
 import { useTheme } from "@/providers/ThemeProvider"
 import tw from "@/lib/tw"
 import { Icons } from "@/constants/Icons"

@@ -128,7 +128,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 	// Render
 	const renderItems = useCallback(({ item }: { item: { user: Profile, isSelected: boolean } }) => {
 		return (
-		<CardUser user={item.user} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}>
+		<CardUser linked={false} onPress={() => handleToggleUser(item.user)} user={item.user} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}>
 			<Checkbox
 			checked={item.isSelected}
 			onCheckedChange={() => handleToggleUser(item.user)}

@@ -16,7 +16,7 @@ import { Picker } from '@react-native-picker/picker';
 import useLocalizedLanguageName from "@/hooks/useLocalizedLanguageName";
 import { useUserUpdateMutation } from "@/features/user/userMutations";
 import { useAuth } from "@/providers/AuthProvider";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 import { useToast } from "@/components/Toast";

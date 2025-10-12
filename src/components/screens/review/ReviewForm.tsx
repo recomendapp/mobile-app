@@ -12,7 +12,7 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import { CardMovie } from "@/components/cards/CardMovie";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { View } from "@/components/ui/view";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Toolbar } from "../../RichText/Toolbar";
