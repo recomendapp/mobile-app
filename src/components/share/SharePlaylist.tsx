@@ -16,11 +16,11 @@ import { LucideIcon } from "lucide-react-native";
 import { router } from "expo-router";
 import { ScaledCapture } from "@/components/ui/ScaledCapture";
 import { useWindowDimensions } from "react-native";
-import { clamp, upperFirst } from "lodash";
+import { clamp } from "lodash";
 import { useImagePalette } from "@/hooks/useImagePalette";
 import Color from "color";
-import UserAvatar from "../user/UserAvatar";
 import { useTranslations } from "use-intl";
+import { ShapeVerticalRoundedBackground } from "@/lib/icons";
 
 interface SharePlaylistProps extends React.ComponentProps<typeof ViewShot> {
 	playlist: Playlist;
@@ -198,7 +198,7 @@ export const SharePlaylist = forwardRef<
 	const [bgType, setBgType] = useState<'color' | 'image'>('color');
 	const [editing, setEditing] = useState(false);
 	const editOptions = useMemo((): EditOption[] => {
-		return [{ value: 'background', icon: Icons.Wallpaper }];
+		return [{ value: 'background', icon: ShapeVerticalRoundedBackground }];
 	}, []);
 	const [activeEditingOption, setActiveEditingOption] = useState(editOptions[0].value);
 

@@ -22,6 +22,7 @@ import { useWindowDimensions } from "react-native";
 import { clamp } from "lodash";
 import { useImagePalette } from "@/hooks/useImagePalette";
 import Color from "color";
+import { ShapeVerticalRoundedBackground, ShapeVerticalRoundedForeground } from "@/lib/icons";
 
 interface ShareTvSeriesProps extends React.ComponentProps<typeof ViewShot> {
 	tvSeries: MediaTvSeries;
@@ -317,10 +318,10 @@ export const ShareTvSeries = forwardRef<
 		const hasPoster = !!poster;
 		const hasBackground = !!poster || !!backdrop;
 		if (hasPoster) {
-			options.push({ value: 'poster', icon: Icons.Image });
+			options.push({ value: 'poster', icon: ShapeVerticalRoundedForeground });
 		}
 		if (hasBackground) {
-			options.push({ value: 'background', icon: Icons.Wallpaper });
+			options.push({ value: 'background', icon: ShapeVerticalRoundedBackground });
 		}
 		return options;
 	}, [poster, backdrop]);
