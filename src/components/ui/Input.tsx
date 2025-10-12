@@ -107,7 +107,7 @@ export const Input = forwardRef<TextInput, InputProps>(
     // Variant styles
     const getVariantStyle = (): ViewStyle => {
       const baseStyle: ViewStyle = {
-        borderRadius: type ==='textarea' ? BORDER_RADIUS : CORNERS,
+        borderRadius: BORDER_RADIUS,
         flexDirection: type ==='textarea' ? 'column' : 'row',
         alignItems: type ==='textarea' ? 'stretch' : 'center',
         minHeight: getHeight(),
@@ -254,7 +254,8 @@ export const Input = forwardRef<TextInput, InputProps>(
               }}
             >
               {/* Left section - Icon + Label (fixed width to simulate grid column) */}
-              <View
+              {icon || label ? (
+                <View
                 style={[
                   {
                     width: label ? 120 : 'auto',
@@ -263,26 +264,27 @@ export const Input = forwardRef<TextInput, InputProps>(
                   leftSectionStyle,
                 ]}
                 pointerEvents='none'
-              >
-                {icon && (
-                  <Icon name={icon} size={16} color={error ? danger : muted} />
-                )}
-                {label && (
-                  <Text
-                    numberOfLines={1}
-                    ellipsizeMode='tail'
-                    style={[
-                      {
-                        color: error ? danger : muted,
-                      },
-                      labelStyle,
-                    ]}
-                    pointerEvents='none'
-                  >
-                    {label}
-                  </Text>
-                )}
-              </View>
+                >
+                  {icon && (
+                    <Icon name={icon} size={16} color={error ? danger : muted} />
+                  )}
+                  {label && (
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode='tail'
+                      style={[
+                        {
+                          color: error ? danger : muted,
+                        },
+                        labelStyle,
+                      ]}
+                      pointerEvents='none'
+                    >
+                      {label}
+                    </Text>
+                  )}
+                </View>
+              ) : null}
 
               {/* TextInput section - takes remaining space */}
               <View style={{ flex: 1 }}>
