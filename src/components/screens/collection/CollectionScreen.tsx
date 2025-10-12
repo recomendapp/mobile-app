@@ -11,7 +11,6 @@ import tw from "@/lib/tw";
 import { Icons } from "@/constants/Icons";
 import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
-import { FlatList } from "react-native-gesture-handler";
 import { Button, ButtonProps } from "@/components/ui/Button";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { UseQueryResult } from "@tanstack/react-query";
@@ -21,6 +20,7 @@ import { ImageType } from "@/components/utils/ImageWithFallback";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { MediaType, ViewType } from "@recomendapp/types";
 import { LegendListRenderItemProps } from "@legendapp/list";
+import { FlatList } from "react-native";
 
 interface ToolbarItem {
     label?: string;

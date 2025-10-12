@@ -7,20 +7,19 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { View } from 'react-native';
+import { Pressable, View, ScrollView, FlatList } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
 import BottomSheetDefaultView from '../templates/BottomSheetDefaultView';
-import { FlatList, Pressable, ScrollView } from 'react-native-gesture-handler';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
-import BottomSheetShare from './share/BottomSheetShare';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import BottomSheetShareTvSeries from './share/BottomSheetShareTvSeries';
 
 interface BottomSheetTvSeriesProps extends BottomSheetProps {
   tvSeries?: MediaTvSeries,
@@ -111,10 +110,8 @@ const BottomSheetTvSeries = React.forwardRef<
       ] : []),
       {
         icon: Icons.Share,
-        onPress: () => openSheet(BottomSheetShare, {
-          type: 'tv_series',
-          path: tvSeries?.url!,
-          tvSeries: tvSeries,
+        onPress: () => openSheet(BottomSheetShareTvSeries, {
+          tvSeries: tvSeries!,
         }),
         label: upperFirst(t('common.messages.share')),
       }

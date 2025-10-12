@@ -1,5 +1,5 @@
 import React, { ReactNode, useRef } from 'react';
-import { StyleSheet, I18nManager, ViewStyle } from 'react-native';
+import { StyleSheet, I18nManager } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import Animated, {
   Extrapolation,

@@ -24,7 +24,7 @@ import richTextToPlainString from "@/utils/richTextToPlainString";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { useUserDeleteRequestQuery } from "@/features/user/userQueries";
 import { Separator } from "@/components/ui/separator";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 import { useToast } from "@/components/Toast";

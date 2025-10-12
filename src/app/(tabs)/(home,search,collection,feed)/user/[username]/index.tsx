@@ -12,7 +12,6 @@ import { Profile } from "@recomendapp/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { ExternalPathString, Link, Stack, useLocalSearchParams, useRouter } from "expo-router"
 import { upperFirst } from "lodash";
-import { Pressable, RefreshControl, ScrollView } from "react-native-gesture-handler";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { View } from "@/components/ui/view";
@@ -21,7 +20,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import ProfileWidgetActivitiesMovie from "@/components/screens/user/ProfileWidgetActivitiesMovie";
 import ProfileWidgetActivitiesTvSeries from "@/components/screens/user/ProfileWidgetActivitiesTvSeries";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView } from "react-native";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetUser from "@/components/bottom-sheets/sheets/BottomSheetUser";
 import { useCallback, useMemo } from "react";

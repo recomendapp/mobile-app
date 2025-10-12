@@ -10,12 +10,13 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useToast } from "../Toast";
-import { Assets } from "@/constants/Assets";
+import { Icons } from "@/constants/Icons";
+import { BrandIcon, BrandIconProps } from "@/lib/icons";
 
 type Provider = {
 	name: AuthProvider;
 	label: string;
-	img: any;
+	icon: { component: BrandIcon, variant?: BrandIconProps['variant'] };
 };
 
 interface OAuthProvidersProps extends Omit<LegendListProps<Provider>, 'data' | 'children'> {
@@ -38,22 +39,22 @@ export const OAuthProviders = ({
 		{
 			name: "google",
 			label: "Google",
-			img: Assets.brands.google.colored,
+			icon: { component: Icons.brands.google }
 		},
 		{
 			name: 'apple',
 			label: 'Apple',
-			img: mode === 'dark' ? Assets.brands.apple.dark : Assets.brands.apple.light,
+			icon: { component: Icons.brands.apple, variant: mode }
 		},
 		{
 			name: 'facebook',
 			label: 'Facebook',
-			img: Assets.brands.facebook.colored,
+			icon: { component: Icons.brands.facebook }
 		},
 		{
 			name: "github",
 			label: "GitHub",
-			img: mode === 'dark' ? Assets.brands.github.dark : Assets.brands.github.light,
+			icon: { component: Icons.brands.github, variant: mode }
 		},
 	]), [mode]);
 
@@ -70,7 +71,7 @@ export const OAuthProviders = ({
 
 	const renderItem = useCallback(({ item }: { item: Provider }) => (
 		<Button variant='muted' onPress={() => handleProviderPress(item.name)}>
-			<Image source={{ uri: item.img }} style={{ width: 18, aspectRatio: 1 }} contentFit="contain" />
+			<item.icon.component width={18} height={18} variant={item.icon.variant} />
 			<Text style={{ color: colors.foreground }}>{item.label}</Text>
 		</Button>
 	), [handleProviderPress, colors.foreground]);

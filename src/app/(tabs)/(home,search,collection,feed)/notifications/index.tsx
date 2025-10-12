@@ -24,12 +24,14 @@ import { CardNotificationFollowerCreated } from "@/components/cards/notification
 import { CardNotificationFriendCreated } from "@/components/cards/notifications/CardNotificationFriendCreated";
 import { CardNotificationFollowerRequest } from "@/components/cards/notifications/CardNotificationFollowerRequest";
 import { useToast } from "@/components/Toast";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const NotificationsScreen = () => {
 	const router = useRouter();
 	const t = useTranslations();
 	const toast = useToast();
 	const { colors } = useTheme();
+	const insets = useSafeAreaInsets();
 	const { notificationsView, setNotificationsView } = useUIStore((state) => state);
 	const viewOptions = ['all', 'unread', 'archived'] as const;
 	const {
@@ -220,8 +222,12 @@ const NotificationsScreen = () => {
 		keyExtractor={keyExtractor}
 		onEndReached={onEndReached}
 		contentContainerStyle={[
-			{ gap: GAP }
+			{
+				gap: GAP,
+				paddingBottom: insets.bottom,
+			}
 		]}
+		scrollIndicatorInsets={{ bottom: insets.bottom }}
 		ListEmptyComponent={listEmptyComponent}
 		/>
 	</>

@@ -20,8 +20,8 @@ type ProvidersProps = {
 
 const Providers = ({ children } : ProvidersProps) => {
 	return (
-	<KeyboardProvider>
-		<GestureHandlerRootView style={{ flex: 1 }}>	
+	<GestureHandlerRootView style={{ flex: 1 }}>	
+		<KeyboardProvider>
 			<SafeAreaProvider initialMetrics={initialWindowMetrics}>
 				<SplashScreenProvider>
 					<LocaleProvider>
@@ -46,8 +46,8 @@ const Providers = ({ children } : ProvidersProps) => {
 					</LocaleProvider>
 				</SplashScreenProvider>
 			</SafeAreaProvider>
-		</GestureHandlerRootView>
-	</KeyboardProvider>
+		</KeyboardProvider>
+	</GestureHandlerRootView>
 	)
 };
 

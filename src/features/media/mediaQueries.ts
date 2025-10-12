@@ -804,4 +804,84 @@ export const useMediaMovieBackdropInfiniteQuery = ({
 		enabled: !!movieId,
 	});
 };
+export const useMediaTvSeriesPosterInfiniteQuery = ({
+	tvSeriesId,
+	filters,
+} : {
+	tvSeriesId?: number;
+	filters?: {
+		perPage?: number;
+	};
+}) => {
+	const mergedFilters = {
+		perPage: 20,
+		...filters,
+	};
+	const supabase = useSupabaseClient();
+	return useInfiniteQuery({
+		queryKey: mediaKeys.posters({
+			id: tvSeriesId!,
+			type: 'tv_series',
+			filters,
+		}),
+		queryFn: async ({ pageParam = 1 }) => {
+			if (!tvSeriesId) throw new Error('No tvSeriesId provided');
+			let from = (pageParam - 1) * mergedFilters.perPage;
+	  		let to = from - 1 + mergedFilters.perPage;
+			let request = supabase
+				.from('media_tv_series_posters')
+				.select('*')
+				.eq('serie_id', tvSeriesId)
+				.range(from, to)
+			const { data, error } = await request;
+			if (error) throw error;
+			return data;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+		},
+		enabled: !!tvSeriesId,
+	});
+};
+export const useMediaTvSeriesBackdropInfiniteQuery = ({
+	tvSeriesId,
+	filters,
+} : {
+	tvSeriesId?: number;
+	filters?: {
+		perPage?: number;
+	};
+}) => {
+	const mergedFilters = {
+		perPage: 20,
+		...filters,
+	};
+	const supabase = useSupabaseClient();
+	return useInfiniteQuery({
+		queryKey: mediaKeys.backdrops({
+			id: tvSeriesId!,
+			type: 'tv_series',
+			filters,
+		}),
+		queryFn: async ({ pageParam = 1 }) => {
+			if (!tvSeriesId) throw new Error('No tvSeriesId provided');
+			let from = (pageParam - 1) * mergedFilters.perPage;
+	  		let to = from - 1 + mergedFilters.perPage;
+			let request = supabase
+				.from('media_tv_series_backdrops')
+				.select('*')
+				.eq('serie_id', tvSeriesId)
+				.range(from, to)
+			const { data, error } = await request;
+			if (error) throw error;
+			return data;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+		},
+		enabled: !!tvSeriesId,
+	});
+};
 /* -------------------------------------------------------------------------- */

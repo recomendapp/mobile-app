@@ -9,7 +9,7 @@ import { Href, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { LucideIcon } from "lucide-react-native";
 import { useCallback, useMemo } from "react";
-import { Pressable } from "react-native-gesture-handler";
+import { Pressable } from "react-native";
 import { useTranslations } from "use-intl";
 
 type Route = {

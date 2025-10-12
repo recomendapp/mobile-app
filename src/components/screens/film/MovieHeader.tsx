@@ -1,6 +1,7 @@
 import React from 'react';
 import {
 	LayoutChangeEvent,
+	Pressable,
 	View,
 } from 'react-native';
 import Animated, {
@@ -22,7 +23,6 @@ import tw from '@/lib/tw';
 import { Image } from 'expo-image';
 import { IconMediaRating } from '@/components/medias/IconMediaRating';
 import { useMediaMovieFollowersAverageRatingQuery } from '@/features/media/mediaQueries';
-import { Pressable } from 'react-native-gesture-handler';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useTranslations } from 'use-intl';
 import { Text } from '@/components/ui/text';

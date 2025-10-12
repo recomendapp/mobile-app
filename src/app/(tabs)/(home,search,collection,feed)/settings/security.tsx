@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/Input";
 import { Stack } from "expo-router";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 import { useToast } from "@/components/Toast";

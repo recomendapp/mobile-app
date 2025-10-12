@@ -15,7 +15,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { View } from '@/components/ui/view';
 import { useTheme } from '@/providers/ThemeProvider';
-import { Pressable } from 'react-native-gesture-handler';
+import { Pressable } from 'react-native';
 
 interface BottomSheetCommentProps extends BottomSheetProps {
 	comment: string | null;

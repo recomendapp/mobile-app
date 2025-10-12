@@ -104,9 +104,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
           })
         }} />
       </Stack.Protected>
-      <Stack.Protected guard={!!session}>
-        <Stack.Screen name="upgrade" options={{ presentation: 'fullScreenModal' }} />
-      </Stack.Protected>
+      <Stack.Screen name="upgrade" options={{ presentation: 'fullScreenModal' }} />
       {/* ABOUT */}
       <Stack.Screen name="about/index" options={{ headerTitle: upperFirst(t('common.messages.about')) }} />
     </Stack>

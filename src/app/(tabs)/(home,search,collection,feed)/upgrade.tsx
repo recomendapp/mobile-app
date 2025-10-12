@@ -8,7 +8,7 @@ import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import {  useQueryClient } from "@tanstack/react-query";
-import { Stack, useRouter } from "expo-router";
+import { Redirect, Stack, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo } from "react";
 import RevenueCatUI from "react-native-purchases-ui";
@@ -37,6 +37,10 @@ const UpgradeScreen = () => {
 		});
 		router.canGoBack() && router.back();
 	}, [router]);
+
+	if (!session) {
+		return <Redirect href={'/auth/login'} />;
+	}
 	return (
 	<>
 		<Stack.Screen options={screenOptions} />

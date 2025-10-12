@@ -7,18 +7,17 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
-import { ScrollView } from 'react-native-gesture-handler';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
-import BottomSheetShare from './share/BottomSheetShare';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import BottomSheetSharePerson from './share/BottomSheetSharePerson';
 
 interface BottomSheetPersonProps extends BottomSheetProps {
   person?: MediaPerson,
@@ -63,10 +62,8 @@ const BottomSheetPerson = React.forwardRef<
       },
       {
         icon: Icons.Share,
-        onPress: () => openSheet(BottomSheetShare, {
-          type: 'person',
-          path: person?.url!,
-          person: person,
+        onPress: () => openSheet(BottomSheetSharePerson, {
+          person: person!,
         }),
         label: upperFirst(t('common.messages.share')),
       }

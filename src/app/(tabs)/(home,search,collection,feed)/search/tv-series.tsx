@@ -16,7 +16,7 @@ import { MediaTvSeries } from "@recomendapp/types";
 import { useNavigation } from "expo-router";
 import { upperFirst } from "lodash";
 import { useLayoutEffect, useRef, useCallback, useMemo, memo, forwardRef } from "react";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 

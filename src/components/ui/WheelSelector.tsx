@@ -8,19 +8,18 @@ import Animated, {
   useAnimatedStyle, 
   useSharedValue 
 } from 'react-native-reanimated';
-import { Pressable } from 'react-native-gesture-handler';
 import tw from '@/lib/tw';
 import * as Haptics from 'expo-haptics';
 import { GAP } from '@/theme/globals';
-import { AnimatedLegendList, AnimatedLegendListProps } from '@legendapp/list/reanimated';
-import { LegendListRef } from '@legendapp/list';
-import { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
+import { LayoutChangeEvent, FlatList, Pressable, StyleProp, ViewStyle } from 'react-native';
 import useDebounce from '@/hooks/useDebounce';
 import { scheduleOnRN } from 'react-native-worklets';
+import { View } from './view';
 
-interface WheelSelectorItemProps<T> extends React.ComponentProps<typeof Animated.View> {
+interface WheelSelectorItemProps<T> {
   index: number;
   item: T;
+  onPress: () => void;
   scrollX: SharedValue<number>;
   renderItem: (item: T, isActive: boolean) => React.ReactNode;
   itemWidth: number;
@@ -32,6 +31,7 @@ interface WheelSelectorItemProps<T> extends React.ComponentProps<typeof Animated
 const WheelSelectorItem = <T,>({
   index,
   item,
+  onPress,
   scrollX,
   renderItem,
   itemWidth,
@@ -79,15 +79,12 @@ const WheelSelectorItem = <T,>({
   }, [scrollX, index, itemWidth, wheelAngle, wheelIntensity]);
 
   return (
-    <Animated.View
-      style={[
-        tw`relative rounded-full items-center justify-center`,
-        { width: itemWidth, height: itemWidth },
-        animatedStyle
-      ]}
-      {...props}
-    >
-      {renderItem(item, isActive)}
+    <Animated.View style={animatedStyle}>
+      <Pressable onPress={onPress}>
+        <View style={[{ width: itemWidth }, tw`relative`]}>
+          {renderItem(item, isActive)}
+        </View>
+      </Pressable>
     </Animated.View>
   );
 };
@@ -98,10 +95,9 @@ export interface WheelSelectorRef {
   getCurrentIndex: () => number;
 }
 
-interface WheelSelectorProps<T> extends Omit<AnimatedLegendListProps<T>, 'data' | 'renderItem'> {
+interface WheelSelectorProps<T> extends Omit<React.ComponentProps<typeof Animated.FlatList<T>>, 'data' | 'renderItem'> {
   data: readonly T[];
   renderItem: (item: T, isActive: boolean) => React.ReactNode;
-  keyExtractor: (item: T, index: number) => string;
   onSelectionChange?: (item: T, index: number) => void;
   initialIndex?: number;
   enableHaptics?: boolean;
@@ -116,8 +112,12 @@ function WheelSelectorInner<T>({
     data,
     renderItem: renderItemProps,
     onSelectionChange,
+    keyExtractor,
     initialIndex = 0,
     enableHaptics = true,
+    getItemLayout,
+    horizontal = true,
+    showsHorizontalScrollIndicator = false,
     itemWidth,
     itemSpacing = GAP,
     wheelAngle = 0,
@@ -125,25 +125,27 @@ function WheelSelectorInner<T>({
     style,
     contentContainerStyle,
     containerStyle,
+    decelerationRate = 'fast',
+    initialScrollIndex,
 	...props
   }: WheelSelectorProps<T>, ref: React.ForwardedRef<WheelSelectorRef>) {
-    const scrollRef = useRef<LegendListRef>(null);
-    const scrollX = useSharedValue(0);
+    const scrollRef = useRef<FlatList>(null);
+    const scrollX = useSharedValue(initialIndex);
     const activeIndex = useSharedValue(initialIndex);
     const [selectedItem, setSelectedItem] = useState<{ item: T; index: number } | null>(data[initialIndex] ? { item: data[initialIndex], index: initialIndex } : null);
     const debouncedSelectedItem = useDebounce(selectedItem, 200);
-    const [containerWidth, setContainerWidth] = useState(0);
+    const [containerWidth, setContainerWidth] = useState<number | undefined>(undefined);
 
      const finalItemWidth = useMemo(() => {
-      return itemWidth || (containerWidth > 0 ? containerWidth * 0.2 : 80); // fallback width
+      return itemWidth || (containerWidth && containerWidth > 0 ? containerWidth * 0.2 : 80); // fallback width
     }, [itemWidth, containerWidth]);
 
     const totalItemWidth = useMemo(() => finalItemWidth + itemSpacing, [finalItemWidth, itemSpacing]);
 
     useImperativeHandle(ref, () => ({
       scrollToIndex: (index: number, animated = true) => {
-        scrollRef.current?.scrollToOffset({
-          offset: index * totalItemWidth,
+        scrollRef.current?.scrollToIndex({
+          index,
           animated,
         });
       },
@@ -185,33 +187,42 @@ function WheelSelectorInner<T>({
       }
     }, [containerWidth]);
 
-    const renderItem = useCallback(({ item, index }: { item: T; index: number }) => {
-      return (
-        <Pressable
-        onPress={() => {
-          scrollRef.current?.scrollToIndex({
-            index,
-            animated: true,
-          });
-        }}
-        >
-          <WheelSelectorItem
-          index={index}
-          item={item}
-          scrollX={scrollX}
-          renderItem={renderItemProps}
-          itemWidth={finalItemWidth}
-          wheelAngle={wheelAngle}
-          wheelIntensity={wheelIntensity}
-          isActive={selectedItem?.index === index}
-          />
-        </Pressable>
-      )
-    }, [finalItemWidth, scrollX, data.length, renderItemProps, totalItemWidth, wheelAngle, wheelIntensity, selectedItem]);
+    const renderItem = useCallback(
+      ({ item, index }: { item: T; index: number }) => {
+        return (
+            <WheelSelectorItem
+            index={index}
+            item={item}
+            scrollX={scrollX}
+            onPress={() => {
+              scrollRef.current?.scrollToIndex({
+                index: index,
+                animated: true,
+              });
+            }}
+            renderItem={renderItemProps}
+            itemWidth={finalItemWidth}
+            wheelAngle={wheelAngle}
+            wheelIntensity={wheelIntensity}
+            isActive={selectedItem?.index === index}
+            />
+        )
+      },
+      [
+        finalItemWidth,
+        scrollX,
+        data.length,
+        renderItemProps,
+        totalItemWidth,
+        wheelAngle,
+        wheelIntensity,
+        selectedItem,
+      ]
+    );
 
     useEffect(() => {
-      if (debouncedSelectedItem) {
-        onSelectionChange?.(debouncedSelectedItem.item, debouncedSelectedItem.index);
+      if (debouncedSelectedItem && onSelectionChange) {
+        onSelectionChange(debouncedSelectedItem.item, debouncedSelectedItem.index);
       }
     }, [debouncedSelectedItem, onSelectionChange]);
 
@@ -220,14 +231,22 @@ function WheelSelectorInner<T>({
       style={[{ width: '100%' }, containerStyle]}
       onLayout={handleLayout}
       >
-        {finalItemWidth > 0 && (
-          <AnimatedLegendList
+        {containerWidth !== undefined && (
+          <Animated.FlatList
           ref={scrollRef}
+          onScroll={onScroll}
           data={data}
           renderItem={renderItem}
+          keyExtractor={keyExtractor}
           initialScrollIndex={initialIndex}
-          horizontal
-          showsHorizontalScrollIndicator={false}
+          getItemLayout={(_, index) => ({
+            length: totalItemWidth,
+            offset: totalItemWidth * index,
+            index,
+          })}
+          horizontal={horizontal}
+          showsHorizontalScrollIndicator={showsHorizontalScrollIndicator}
+          ItemSeparatorComponent={itemSpacing ? () => <View style={[{ width: itemSpacing }]} /> : null}
           style={[
             {
               flexGrow: 0,
@@ -235,13 +254,16 @@ function WheelSelectorInner<T>({
             },
             style
           ]}
-          contentContainerStyle={{
-            gap: itemSpacing,
-            paddingHorizontal: (containerWidth - finalItemWidth) / 2,
-          }}
-          onScroll={onScroll}
-          scrollEventThrottle={1000 / 60} // ~16ms
+          contentContainerStyle={[
+            {
+              // gap: itemSpacing,
+              paddingLeft: (containerWidth - finalItemWidth) / 2,
+              paddingRight: (containerWidth - finalItemWidth) / 2,
+            },
+            contentContainerStyle
+          ]}
           snapToInterval={totalItemWidth}
+          decelerationRate={decelerationRate}
           {...props}
           />
         )}
