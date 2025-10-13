@@ -713,7 +713,7 @@ export const useUserRecosMovieSendQuery = ({
 				.from('user_friend')
 				.select(`
 					id,
-					friend:friend_id!inner(
+					friend:profile!user_friend_friend_id_fkey!inner(
 						*,
 						user_activities_movie(count),
 						user_recos_movie!user_recos_movie_user_id_fkey(count)
@@ -736,6 +736,7 @@ export const useUserRecosMovieSendQuery = ({
 						}[];
 					};
 				})[]>();
+			console.log(error);
 			if (error) throw error;
 			const output = data?.map((userFriend) => ({
 				friend: userFriend.friend,
@@ -767,7 +768,7 @@ export const useUserRecosTvSeriesSendQuery = ({
 				.from('user_friend')
 				.select(`
 					id,
-					friend:friend_id!inner(
+					friend:profile!user_friend_friend_id_fkey!inner(
 						*,
 						user_activities_tv_series(count),
 						user_recos_tv_series!user_recos_tv_series_user_id_fkey(count)

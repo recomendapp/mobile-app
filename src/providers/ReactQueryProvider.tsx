@@ -6,6 +6,7 @@ import {
   PersistQueryClientProvider,
   PersistQueryClientProviderProps,
 } from '@tanstack/react-query-persist-client';
+import { persistKey } from '@/features';
 // import { useReactQueryDevTools } from "@dev-plugins/react-query";
 
 const queryStorage = new MMKV({
@@ -41,7 +42,7 @@ const createMMKVPersister = (key: string) => ({
 const PERSISTED_QUERY_KEYS = [
   'auth',
   'novu',
-  'cached-data',
+  persistKey,
 ];
 
 const createQueryClient = () =>

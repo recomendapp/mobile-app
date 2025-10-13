@@ -1,3 +1,5 @@
+import { withPersistKey } from "..";
+
 export const utilsKey = {
 	// Novu
 	novu: ['novu'] as const,
@@ -17,6 +19,6 @@ export const utilsKey = {
 		};
 	} = {}) => {
 		const sub = [...(view ? [view] : []), ...(filters ? [filters] : [])];
-		return ["notifications", ...sub] as const;
+		return withPersistKey(['notifications', ...sub]);
 	},
 };

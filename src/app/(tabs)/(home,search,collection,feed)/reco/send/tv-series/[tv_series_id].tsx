@@ -8,7 +8,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, ScrollViewProps } from "react-native";
+import { Alert, Pressable, ScrollViewProps } from "react-native";
 import { useTranslations } from "use-intl";
 import { z } from "zod";
 import { SelectionFooter } from "@/components/ui/SelectionFooter";
@@ -158,7 +158,8 @@ const RecoSendTvSeries = () => {
 	// Render
 	const renderItems = useCallback(({ item: { item, isSelected} }: { item: { item: { friend: Profile, as_watched: boolean, already_sent: boolean }, isSelected: boolean }}) => {
 		return (
-			<CardUser user={item.friend} linked={false} style={[{ marginHorizontal: PADDING_HORIZONTAL }]} onPress={() => handleToggleUser(item.friend)}>
+			<Pressable onPress={() => handleToggleUser(item.friend)} style={[{ marginHorizontal: PADDING_HORIZONTAL }, tw`flex-row items-center justify-between`]}>
+				<CardUser user={item.friend} linked={false} style={tw`border-0 p-0 h-auto bg-transparent`} />
 				<View style={tw`flex-row items-center gap-2`}>
 					{item.already_sent && (
 					<Badge variant="accent-yellow">
@@ -175,8 +176,8 @@ const RecoSendTvSeries = () => {
 					onCheckedChange={() => handleToggleUser(item.friend)}
 					/>
 				</View>
-			</CardUser>
-		)
+			</Pressable>
+		);
 	}, [handleToggleUser]);
 	const renderScroll = useCallback((props: ScrollViewProps) => {
         return <AnimatedContentContainer {...props} />;

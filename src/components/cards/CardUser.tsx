@@ -174,11 +174,24 @@ CardUserList.displayName = "CardUserList";
 const CardUser = React.forwardRef<
 	React.ComponentRef<typeof Animated.View>,
 	CardUserProps
->(({ variant = "default", linked = true, onPress, onLongPress, containerStyle, ...props }, ref) => {
+>(({ variant = "default", linked = true, onPress: onPressProps, onLongPress: onLongPressProps, containerStyle, ...props }, ref) => {
 	const router = useRouter();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 
-	const content = (
+	const onPress = React.useCallback(() => {
+		if (linked) router.push(`/user/${props.user?.username}`);
+		onPressProps?.();
+	}, [linked, onPressProps, props.user?.username, router]);
+
+	const onLongPress = React.useCallback(() => {
+		if (!props.user) return null;
+		openSheet(BottomSheetUser, {
+			user: props.user,
+		});
+		onLongPressProps?.();
+	}, [onLongPressProps, openSheet, props.user]);
+
+	const content = React.useMemo(() => (
 		variant === "default" ? (
 			<CardUserDefault ref={ref} {...props} />
 		) : variant === "icon" ? (
@@ -190,26 +203,21 @@ const CardUser = React.forwardRef<
 		) : variant === "list" ? (
 			<CardUserList ref={ref} {...props} />
 		) : null
-	);
+	), [variant, props, ref]);
 
 	if (props.skeleton) return content;
 
+	const Wrapper =
+		linked || onPressProps || onLongPressProps ? Pressable : View;
+
 	return (
-		<Pressable
-		onPress={() => {
-			if (linked) router.push(`/user/${props.user.username}`);
-			onPress?.();
-		}}
-		onLongPress={() => {
-			openSheet(BottomSheetUser, {
-				user: props.user,
-			});
-			onLongPress?.();
-		}}
+		<Wrapper
+		onPress={onPress}
+		onLongPress={onLongPress}
 		style={containerStyle}
 		>
 			{content}
-		</Pressable>
+		</Wrapper>
 	);
 });
 CardUser.displayName = "CardUser";
