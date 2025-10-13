@@ -1,4 +1,5 @@
 import { MediaType, PlaylistType, UserActivityType, UserRecosType, UserReviewType, UserWatchlistType } from "@recomendapp/types"
+import { withPersistKey } from "..";
 
 export const userKeys = {
 	all: ['user'] as const,
@@ -143,7 +144,7 @@ export const userKeys = {
 		filters?: any;
 	}) => {
 		const sub = [...(type ? [type] : []), ...(filters ? [filters] : [])]
-		return [...userKeys.detail(userId), 'recos', ...sub] as const;
+		return withPersistKey([...userKeys.detail(userId), 'recos', ...sub]);
 	},
 
 	recosSend: ({
@@ -166,7 +167,7 @@ export const userKeys = {
 		filters?: any;
 	}) => {
 		const sub = [type, ...(filters ? [filters] : [])]
-		return [...userKeys.detail(userId), 'watchlist', ...sub] as const
+		return withPersistKey([...userKeys.detail(userId), 'watchlist', ...sub]);
 	},
 
 	watchlistItem: ({
@@ -179,7 +180,7 @@ export const userKeys = {
 		userId: string;
 	}) => {
 		const sub = [type, id]
-		return [...userKeys.detail(userId), 'watchlist-item', ...sub] as const
+		return withPersistKey([...userKeys.detail(userId), 'watchlist-item', ...sub]);
 	},
 	/* -------------------------------------------------------------------------- */
 
@@ -194,7 +195,7 @@ export const userKeys = {
 		filters?: any;
 	}) => {
 		const sub = [...(type ? [type] : []), ...(filters ? [filters] : [])]
-		return [...userKeys.detail(userId), 'heart-picks', ...sub] as const
+		return withPersistKey([...userKeys.detail(userId), 'heart-picks', ...sub]);
 	},
 	/* -------------------------------------------------------------------------- */
 

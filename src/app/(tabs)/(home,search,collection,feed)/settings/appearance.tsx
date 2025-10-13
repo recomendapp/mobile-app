@@ -25,7 +25,7 @@ const SettingsAppearanceScreen = () => {
 	const { locale, setLocale } = useLocaleContext();
 	const { session } = useAuth();
 	const toast = useToast();
-	const { bottomOffset, tabBarHeight } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locales = useLocalizedLanguageName(locale);
@@ -123,6 +123,7 @@ const SettingsAppearanceScreen = () => {
 								label={`${locale.flag} ${locale.iso_639_1} (${locale.iso_3166_1})`}
 								value={locale.language}
 								style={{ fontSize: 16 }}
+								color={colors.foreground}
 							/>
 						))}
 					</Picker>

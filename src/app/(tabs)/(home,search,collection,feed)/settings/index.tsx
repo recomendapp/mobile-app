@@ -1,15 +1,16 @@
 import { Button } from "@/components/ui/Button";
+import { Text } from "@/components/ui/text";
+import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-import { PADDING_VERTICAL } from "@/theme/globals";
+import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { Href, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { LucideIcon } from "lucide-react-native";
 import { useCallback, useMemo } from "react";
-import { Pressable } from "react-native";
 import { useTranslations } from "use-intl";
 
 type Route = {
@@ -37,28 +38,22 @@ const SettingsScreen = () => {
 	}, [t, session]);
 
 	const renderItem = useCallback(({ item, index }: { item: Route; index: number }) => (
-		<Pressable
+		<Button
+		variant="ghost"
+		size="fit"
+		icon={item.icon}
 		onPress={() => router.push(item.route)}
 		style={[
-			{ borderColor: colors.muted },
-			tw`flex-1 flex-row justify-between items-center gap-2 p-4`,
-			index < routes.length - 1 ? tw`border-b` : null,
+			{ paddingVertical: PADDING_HORIZONTAL, paddingHorizontal: PADDING_HORIZONTAL, borderColor: colors.muted },
+			index < routes.length - 1 ? tw`border-b` : tw``,
 		]}
 		>
-			<Button
-			variant="ghost"
-			size="fit"
-			icon={item.icon}
-			>
-				{item.label}
-			</Button>
-			<Button
-			variant="ghost"
-			icon={Icons.ChevronRight}
-			size="icon"
-			/>
-		</Pressable>
-	), [colors.muted, routes.length, router]);
+			<View style={tw`flex-1 flex-row items-center gap-2 justify-between`}>
+				<Text>{item.label}</Text>
+				<Icons.ChevronRight color={colors.mutedForeground} size={16} />
+			</View>
+		</Button>
+	), [colors.muted, colors.mutedForeground, router, routes.length]);
 
 	return (
 	<>
