@@ -28,6 +28,7 @@ import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
 import { useToast } from '@/components/Toast';
 import { Assets } from '@/constants/Assets';
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
+import { logger } from '@/logger';
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -144,18 +145,15 @@ const SignupScreen = () => {
 			setShowOtp(true);
 		} catch (error) {
 			if (error instanceof AuthError) {
-				switch (error.status) {
-					case 422:
-						form.setError('email', {
-							message: t('common.form.email.error.unavailable'),
-						});
-						break;
-					default:
-						toast.error(upperFirst(t('common.messages.error')), { description: error.message });
+				if (error.code === 'email_address_invalid') {
+					form.setError('email', {
+						message: t('common.form.email.error.invalid'),
+					});
+					return;
 				}
-			} else {
-				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
+			toast.error(upperFirst(t('common.messages.an_error_occurred')));
+			logger.error('signup error', { error });
 		} finally {
 			setIsLoading(false);
 		}
@@ -166,20 +164,18 @@ const SignupScreen = () => {
 			await loginWithOtp(form.getValues('email'));
 			toast.success(upperFirst(t('common.form.code_sent')));
 		} catch (error) {
-			let errorMessage = '';
 			if (error instanceof AuthError) {
-				switch (error.status) {
-					case 429:
-						errorMessage = t('common.form.error.too_many_attempts');
-						break;
-					default:
-						errorMessage = error.message;
-						break;
+				console.log('error', error.code)
+				if (error.code === 'over_email_send_rate_limit') {
+					logger.metric('account:signupFailed', {
+						logContext: 'SignupOtpScreen',
+						reason: error.code,
+					});
+					return toast.error(t('common.form.error.too_many_attempts'));
 				}
-			} else {
-				errorMessage = upperFirst(t('common.messages.an_error_occurred'));
 			}
-			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
+			toast.error(upperFirst(t('common.messages.an_error_occurred')));
+			logger.error('resend otp error', { error });
 		} finally {
 			setIsLoading(false);
 		}
@@ -193,24 +189,26 @@ const SignupScreen = () => {
 			type: 'email',
 		  });
 		  if (error) throw error;
+		  logger.metric('account:loggedIn', {
+			logContext: 'SignupForm',
+			withPassword: false,
+		  });
 		  toast.success(upperFirst(t('common.form.email.verified')));
 		} catch (error) {
-			let errorMessage = '';
 			if (error instanceof AuthError) {
-				switch (error.status) {
-				case 403:
-					errorMessage = t('common.form.error.invalid_code');
-					break
-				default:
-					errorMessage = error.message;
-					break;
+				if (error.code === 'otp_expired') {
+					logger.metric('account:signupFailed', {
+						logContext: 'SignupOtpScreen',
+						reason: error.code,
+					});
+					return toast.error(t('common.form.error.invalid_code'));
 				}
-		  	} else {
-				errorMessage = upperFirst(t('common.messages.an_error_occurred'));
-		  	}
-			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
+			}
+			toast.error(upperFirst(t('common.messages.an_error_occurred')));
+			logger.error('otp verification error', { error });
 		} finally {
 		  setIsLoading(false);
+		  setOtp('');
 		}
 	}, [supabase, t, form]);
 

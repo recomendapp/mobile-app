@@ -1,3 +1,7 @@
+// Sentry
+import '@/logger/sentry/setup';
+import { Sentry } from '@/logger/sentry/lib'
+
 import { useRef, useState } from 'react';
 import { setAndroidNavigationBar } from '@/lib/android-navigation-bar';
 import { Providers } from '@/providers/Providers';
@@ -49,4 +53,4 @@ const RootLayout = () => {
   );
 }
 
-export default RootLayout;
+export default Sentry.wrap(RootLayout);

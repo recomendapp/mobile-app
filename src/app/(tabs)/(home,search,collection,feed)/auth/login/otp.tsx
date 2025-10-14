@@ -25,6 +25,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useToast } from '@/components/Toast';
 import { Assets } from '@/constants/Assets';
+import { logger } from '@/logger';
 
 const LoginOtpScreen = () => {
 	const supabase = useSupabaseClient();
@@ -68,25 +69,24 @@ const LoginOtpScreen = () => {
 			toast.success(upperFirst(t('common.form.code_sent')));
 			setShowOtp(true);
 		} catch (error) {
-			let errorMessage = '';
-			if (error instanceof z.ZodError) {
-				errorMessage = error.message;
-			} else if (error instanceof AuthError) {
-				switch (error.status) {
-					case 500:
-						errorMessage = t('pages.auth.login.otp.form.error.no_user_found');
-						break;
-					case 429:
-						errorMessage = t('common.form.error.too_many_attempts');
-						break;
-				default:
-					errorMessage = error.message;
-					break;
+			if (error instanceof AuthError) {
+				if (error.code === 'unexpected_failure') {
+					logger.metric('account:loginFailed', {
+						logContext: 'LoginOtpScreen',
+						reason: error.code,
+					});
+					return toast.error(t('pages.auth.login.otp.form.no_user_found'));
 				}
-			} else {
-				errorMessage = upperFirst(t('common.messages.an_error_occurred'));
+				if (error.code === 'over_email_send_rate_limit') {
+					logger.metric('account:loginFailed', {
+						logContext: 'LoginOtpScreen',
+						reason: error.code,
+					});
+					return toast.error(t('common.form.error.too_many_attempts'));
+				}
 			}
-			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
+			toast.error(upperFirst(t('common.messages.an_error_occurred')));
+			logger.error('login with otp error', { error });
 		} finally {
 			setIsLoading(false);
 		}
@@ -100,24 +100,26 @@ const LoginOtpScreen = () => {
 				type: 'email',
 			});
 			if (error) throw error;
+			logger.metric('account:loggedIn', {
+				logContext: 'LoginOtpScreen',
+				withPassword: false,
+			});
 			toast.success(upperFirst(t('common.form.code_verified')));
 		} catch (error) {
-			let errorMessage = '';
 			if (error instanceof AuthError) {
-				switch (error.status) {
-				case 400:
-					errorMessage = t('common.form.error.invalid_code');
-					break;
-				default:
-					errorMessage = error.message;
-					break;
+				if (error.code === 'otp_expired') {
+					logger.metric('account:loginFailed', {
+						logContext: 'LoginOtpScreen',
+						reason: error.code,
+					});
+					return toast.error(t('common.form.error.invalid_code'));
 				}
-			} else {
-				errorMessage = upperFirst(t('common.messages.an_error_occurred'));
 			}
-			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
+			toast.error(upperFirst(t('common.messages.an_error_occurred')));
+			logger.error('otp verification error', { error });
 		} finally {
 			setIsLoading(false);
+			setOtp('');
 		}
 	}, [supabase, form, t]);
 	return (

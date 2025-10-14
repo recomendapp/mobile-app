@@ -25,6 +25,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useToast } from '@/components/Toast';
 import { Assets } from '@/constants/Assets';
+import { logger } from '@/logger';
 
 const ForgotPasswordScreen = () => {
 	const supabase = useSupabaseClient();
@@ -68,22 +69,17 @@ const ForgotPasswordScreen = () => {
 			toast.success(upperFirst(t('common.form.code_sent')));
 			setShowOtp(true);
 		} catch (error) {
-			let errorMessage = '';
-			if (error instanceof z.ZodError) {
-				errorMessage = error.message;
-			} else if (error instanceof AuthError) {
-				switch (error.status) {
-					case 429:
-						errorMessage = t('common.form.error.too_many_attempts');
-						break;
-					default:
-						errorMessage = error.message;
-						break;
+			if (error instanceof AuthError) {
+				if (error.code === 'over_email_send_rate_limit') {
+					logger.metric('account:forgotPasswordFailed', {
+						logContext: 'ForgotPasswordScreen',
+						reason: error.code,
+					});
+					return toast.error(t('common.form.error.too_many_attempts'));
 				}
-			} else {
-				errorMessage = upperFirst(t('common.messages.an_error_occurred'));
 			}
-			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
+			toast.error(upperFirst(t('common.messages.an_error_occurred')));
+			logger.error('forgot password error', { error });
 		} finally {
 			setIsLoading(false);
 		}
@@ -99,20 +95,17 @@ const ForgotPasswordScreen = () => {
 			if (error) throw error;
 			toast.success(upperFirst(t('common.form.code_verified')));
 		} catch (error) {
-			let errorMessage = '';
 			if (error instanceof AuthError) {
-				switch (error.status) {
-				case 403:
-					errorMessage = t('common.form.error.invalid_code');
-					break;
-				default:
-					errorMessage = error.message;
-					break;
+				if (error.code === 'otp_expired') {
+					logger.metric('account:forgotPasswordFailed', {
+						logContext: 'ForgotPasswordOtpScreen',
+						reason: error.code,
+					});
+					return toast.error(t('common.form.error.invalid_code'));
 				}
-			} else {
-				errorMessage = upperFirst(t('common.messages.an_error_occurred'));
 			}
-			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
+			toast.error(upperFirst(t('common.messages.an_error_occurred')));
+			logger.error('otp verification error', { error });
 		} finally {
 			setIsLoading(false);
 		}

@@ -1,4 +1,6 @@
 import packageJson from '@/../package.json'
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 /**
  * The semver version of the app, as defined in `package.json.`
@@ -6,7 +8,13 @@ import packageJson from '@/../package.json'
  * N.B. The fallback is needed for Render.com deployments
  */
 export const RELEASE_VERSION: string =
-  process.env.EXPO_PUBLIC_RELEASE_VERSION || packageJson.version
+  process.env.EXPO_PUBLIC_RELEASE_VERSION
+  || Platform.select({
+    ios: Constants.expoConfig?.ios?.buildNumber,
+    android: Constants.expoConfig?.android?.version?.toString(),
+    web: packageJson.version,
+  })
+  || packageJson.version
 
 /**
  * The env the app is running in e.g. development, testflight, production, e2e
@@ -33,8 +41,15 @@ export const IS_INTERNAL = IS_DEV || IS_TESTFLIGHT
  * see the commit hash in the app's settings along with the other version info.
  * Useful for debugging/reporting.
  */
-export const BUNDLE_IDENTIFIER: string =
-  process.env.EXPO_PUBLIC_BUNDLE_IDENTIFIER || 'dev'
+// export const BUNDLE_IDENTIFIER: string =
+//   process.env.EXPO_PUBLIC_BUNDLE_IDENTIFIER || 'dev'
+export const BUNDLE_IDENTIFIER =
+  Platform.select({
+    ios: Constants.expoConfig?.ios?.bundleIdentifier,
+    android: Constants.expoConfig?.android?.package,
+    web: 'web',
+  })
+  || 'unknown'
 
 /**
  * This will always be in the format of YYMMDDHH, so that it always increases
@@ -63,10 +78,41 @@ export const LOG_DEBUG: string = process.env.EXPO_PUBLIC_LOG_DEBUG || ''
 export const DOMAIN_NAME: string = process.env.EXPO_PUBLIC_WEB_APP!
 
 /**
+ * Supabase
+ */
+export const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!
+export const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!
+
+/**
  * Sentry DSN for telemetry
  */
 export const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN
 export const SENTRY_PROJECT = process.env.EXPO_PUBLIC_SENTRY_PROJECT
 export const SENTRY_ORG = process.env.EXPO_PUBLIC_SENTRY_ORG
 
+/**
+ * Facebook
+ */
+export const FACEBOOK_APP_ID = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!
 
+/**
+ * RevenueCat
+ */
+export const REVENUECAT_IOS_API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY!
+export const REVENUECAT_ANDROID_API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY!
+
+/**
+ * Search
+ */
+export const SEARCH_BASE_URL = process.env.EXPO_PUBLIC_SEARCH_BASE_URL!
+
+/**
+ * Google
+ */
+export const GOOGLE_IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID!
+export const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID!
+
+/**
+ * Novu
+ */
+export const NOVU_APPLICATION_IDENTIFIER = process.env.EXPO_PUBLIC_NOVU_APPLICATION_IDENTIFIER!

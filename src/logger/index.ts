@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid/non-secure'
 import { add } from '@/logger/logDump'
 import { type MetricEvents } from '@/logger/metrics'
 import { consoleTransport } from '@/logger/transports/console'
-// import { sentryTransport } from '@/logger/transports/sentry'
+import { sentryTransport } from '@/logger/transports/sentry'
 import {
   LogContext,
   LogLevel,
@@ -10,12 +10,14 @@ import {
   type Transport,
 } from '@/logger/types'
 import { enabledLogLevels } from '@/logger/util'
-import { ENV } from '@/env'
+import * as env from '@/env'
 
 const TRANSPORTS: Transport[] = (function configureTransports() {
-  switch (ENV) {
+  switch (env.ENV) {
     case 'production': {
-      return [].filter(
+      return [
+        sentryTransport
+      ].filter(
         Boolean,
       ) as Transport[]
     }
@@ -23,7 +25,9 @@ const TRANSPORTS: Transport[] = (function configureTransports() {
       return []
     }
     default: {
-      return [consoleTransport]
+      return [
+        consoleTransport
+      ]
     }
   }
 })()
@@ -41,9 +45,9 @@ export class Logger {
 
   static create(context?: LogContext) {
     const logger = new Logger({
-      level: process.env.EXPO_PUBLIC_LOG_LEVEL as LogLevel,
+      level: env.LOG_LEVEL as LogLevel,
       context,
-      contextFilter: process.env.EXPO_PUBLIC_LOG_DEBUG || '',
+      contextFilter: env.LOG_LEVEL || '',
     })
     for (const transport of TRANSPORTS) {
       logger.addTransport(transport)

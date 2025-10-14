@@ -11,6 +11,7 @@ import { useNovuSubscriberHash } from "@/features/utils/utilsQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import { utilsKey } from "@/features/utils/utilsKey";
 import { useToast } from "@/components/Toast";
+import * as env from '@/env';
 
 type NotificationsContextType = {
   isMounted: boolean;
@@ -213,7 +214,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
 
   return (
     <NovuProvider
-    applicationIdentifier={process.env.EXPO_PUBLIC_NOVU_APPLICATION_IDENTIFIER!}
+    applicationIdentifier={env.NOVU_APPLICATION_IDENTIFIER}
     subscriberId={session.user.id}
     subscriberHash={subscriberHash}
     // useCache={true}

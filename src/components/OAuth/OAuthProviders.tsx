@@ -1,7 +1,6 @@
 import { LegendList, LegendListProps } from "@legendapp/list";
 import { Provider as AuthProvider } from "@supabase/supabase-js";
 import { Button } from "../ui/Button";
-import { Image } from "expo-image";
 import { Text } from "../ui/text";
 import { GAP } from "@/theme/globals";
 import { useCallback, useMemo } from "react";
@@ -12,6 +11,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useToast } from "../Toast";
 import { Icons } from "@/constants/Icons";
 import { BrandIcon, BrandIconProps } from "@/lib/icons";
+import { logger } from "@/logger";
 
 type Provider = {
 	name: AuthProvider;
@@ -61,11 +61,13 @@ export const OAuthProviders = ({
 	const handleProviderPress = useCallback(async (provider: AuthProvider) => {
 		try {
 			await loginWithOAuth(provider);
+			logger.metric('account:loggedInWithOAuth', { logContext: 'LoginForm', provider });
 		} catch (error) {
 			if (error instanceof Error) {
 				if (error.message === 'cancelled') return;
 			}
 			toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
+			logger.error('oauth login error', { error, provider });
 		}
 	}, [loginWithOAuth, t, toast]);
 

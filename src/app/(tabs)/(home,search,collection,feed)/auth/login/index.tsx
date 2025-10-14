@@ -21,6 +21,8 @@ import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
 import { useToast } from '@/components/Toast';
 import { Assets } from '@/constants/Assets';
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
+import { AuthError } from '@supabase/supabase-js';
+import { logger } from '@/logger';
 
 const LoginScreen = () => {
 	const { login } = useAuth();
@@ -38,8 +40,22 @@ const LoginScreen = () => {
 		try {
 			setIsLoading(true);
 			await login({ email: email, password: password });
+			logger.metric('account:loggedIn', {
+				logContext: 'LoginForm',
+				withPassword: true,
+			})
 		} catch (error) {
-			toast.error(t('pages.auth.login.form.wrong_credentials'));
+			if (error instanceof AuthError) {
+				if (error.code === 'invalid_credentials') {
+					logger.metric('account:loginFailed', {
+						logContext: 'LoginForm',
+						reason: error.code,
+					})
+					return toast.error(t('pages.auth.login.form.wrong_credentials'));
+				}
+			}
+			logger.error('login error', { error });
+			toast.error(upperFirst(t('common.messages.an_error_occurred')));
 		} finally {
 			setIsLoading(false);
 		}
