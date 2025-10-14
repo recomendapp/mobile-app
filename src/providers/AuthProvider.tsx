@@ -18,6 +18,7 @@ import { CustomerInfo } from "react-native-purchases";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { randomUUID } from "expo-crypto";
 import * as AppleAuthentication from 'expo-apple-authentication';
+import * as env from '@/env';
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -111,8 +112,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			case "google":
 				GoogleSignin.configure({
 					scopes: ["https://www.googleapis.com/auth/drive.readonly"],
-					iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-					webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+					iosClientId: env.GOOGLE_IOS_CLIENT_ID,
+					webClientId: env.GOOGLE_WEB_CLIENT_ID,
 				})
 				await GoogleSignin.hasPlayServices();
 				const userInfo = await GoogleSignin.signIn();

@@ -3,9 +3,7 @@ import { MMKV } from "react-native-mmkv";
 import * as SecureStore from "expo-secure-store";
 import { getRandomValues } from "expo-crypto";
 import { Database } from "@recomendapp/types";
-
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+import * as env from '@/env';
 
 async function getOrCreateEncryptionKey(): Promise<string> {
 	const KEY_NAME = "mmkv_encryption_key";
@@ -71,7 +69,7 @@ class MMKVStore {
 }
 
 export const createClient = (locale?: string) => {
-	return createClientSupabase<Database>(supabaseUrl, supabaseKey, {
+	return createClientSupabase<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
 		auth: {
 			storage: new MMKVStore(),
 			autoRefreshToken: true,

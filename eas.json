@@ -11,13 +11,13 @@
         "simulator": true
       },
       "env": {
-        "APP_VARIANT:": "development"
+        "APP_VARIANT": "development"
       }
     },
     "preview": {
       "distribution": "internal",
       "env": {
-        "APP_VARIANT:": "preview"
+        "APP_VARIANT": "preview"
       },
       "autoIncrement": true
     },

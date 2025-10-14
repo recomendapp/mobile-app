@@ -9,6 +9,7 @@ import { Redirect } from "expo-router";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { useToast } from "@/components/Toast";
+import { logger } from "@/logger";
 
 const AuthCallbackScreen = () => {
 	const url = useLinkingURL();
@@ -27,6 +28,7 @@ const AuthCallbackScreen = () => {
 					} else if (error instanceof Error) {
 						errorMessage = error.message;
 					}
+					logger.error('auth callback error', { error });
 					toast.error(upperFirst(t('common.messages.error')), {
 						description: upperFirst(errorMessage),
 					});

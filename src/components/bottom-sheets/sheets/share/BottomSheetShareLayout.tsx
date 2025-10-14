@@ -22,6 +22,7 @@ import { View } from "@/components/ui/view";
 import { BrandIcon, BrandIconProps } from "@/lib/icons";
 import { useTheme } from "@/providers/ThemeProvider";
 import { ScrollView } from "react-native";
+import * as env from '@/env';
 
 type SharePlatform = {
 	label: string;
@@ -74,7 +75,7 @@ const BottomSheetShareLayout = forwardRef<
                 if (!data) return;
                 await Share.shareSingle({
                     social: Social.InstagramStories,
-                    appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
+                    appId: env.FACEBOOK_APP_ID,
                     title: "Recomend",
                     stickerImage: data.sticker,
                     backgroundImage: data.backgroundImage,
@@ -90,7 +91,7 @@ const BottomSheetShareLayout = forwardRef<
             onPress: async () => {
                 await Share.shareSingle({
                     social: Social.Whatsapp,
-                    appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
+                    appId: env.FACEBOOK_APP_ID,
                     title: "Recomend",
                     message: '', // Isn't optional
                     url: url,
@@ -103,7 +104,7 @@ const BottomSheetShareLayout = forwardRef<
             onPress: async () => {
                 await Share.shareSingle({
                     social: Social.Instagram,
-                    appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
+                    appId: env.FACEBOOK_APP_ID,
                     title: "Recomend",
                     message: url,
                 });
@@ -126,7 +127,7 @@ const BottomSheetShareLayout = forwardRef<
             onPress: async () => {
                 await Share.shareSingle({
                     social: Social.Messenger,
-                    appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
+                    appId: env.FACEBOOK_APP_ID,
                     title: "Recomend",
                     url: url,
                 });
@@ -138,7 +139,7 @@ const BottomSheetShareLayout = forwardRef<
             onPress: async () => {
                 await Share.shareSingle({
                     social: Social.Facebook,
-                    appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID!,
+                    appId: env.FACEBOOK_APP_ID,
                     title: "Recomend",
                     url: url,
                 });

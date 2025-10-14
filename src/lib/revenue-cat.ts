@@ -1,9 +1,10 @@
 import { Platform } from "react-native";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
+import * as env from '@/env';
 
 export const REVENUECAT_API_KEY = Platform.select({
-	ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY!,
-	android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY!,
+	ios: env.REVENUECAT_IOS_API_KEY,
+	android: env.REVENUECAT_ANDROID_API_KEY,
 });
 
 let revenueCatInitialized: Promise<void> | null = null;
