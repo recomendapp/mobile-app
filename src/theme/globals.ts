@@ -4,6 +4,7 @@ export const PADDING_VERTICAL = PADDING / 2;
 // GAP
 export const GAP = 8;
 export const GAP_XS = GAP / 2;
+export const GAP_LG = GAP * 2;
 export const GAP_XL = GAP * 4;
 
 export const HEIGHT = 36;

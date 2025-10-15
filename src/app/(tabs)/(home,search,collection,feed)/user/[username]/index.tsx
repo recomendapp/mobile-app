@@ -135,8 +135,8 @@ const ProfileScreen = () => {
 
 	const refresh = () => {
 		refetch();
-		profile?.id && queryClient.invalidateQueries({
-			queryKey: userKeys.detail(profile?.id)
+		profile?.id === session?.user.id && queryClient.invalidateQueries({
+			queryKey: userKeys.session()
 		});
 	};
 

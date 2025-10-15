@@ -1,6 +1,4 @@
 import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/text";
-import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
 import { authKeys } from "@/features/auth/authKeys";
 import { userKeys } from "@/features/user/userKeys";
@@ -33,7 +31,7 @@ const UpgradeScreen = () => {
 			queryKey: authKeys.customerInfo(),
 		});
 		session?.user.id && await queryClient.invalidateQueries({
-			queryKey: userKeys.detail(session.user.id),
+			queryKey: userKeys.session(),
 		});
 		router.canGoBack() && router.back();
 	}, [router]);
