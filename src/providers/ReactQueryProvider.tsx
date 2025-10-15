@@ -132,8 +132,8 @@ function QueryProviderInner({
 
   return (
     <PersistQueryClientProvider
-	client={queryClient}
-	persistOptions={persistOptions}
+    client={queryClient}
+    persistOptions={persistOptions}
     >
       {children}
     </PersistQueryClientProvider>

@@ -427,6 +427,10 @@ export const usePlaylistMovieInsertMutation = ({
 					type: 'movie',
 				}),
 			});
+			queryClient.invalidateQueries({
+				queryKey: playlistKeys.addTo({ id: movieId, type: 'movie' })
+			});
+
 			// Update each playlists
 			data.forEach((playlist) => {
 				queryClient.setQueryData(playlistKeys.detail(playlist.id), (oldData: Playlist) => {
@@ -468,11 +472,6 @@ export const usePlaylistMovieInsertMutation = ({
 					});
 				});
 			}
-		},
-		meta: {
-			invalidates: [
-				playlistKeys.addTo({ id: movieId, type: 'movie' }),
-			]
 		}
 	});
 };
@@ -497,7 +496,7 @@ export const usePlaylistMovieDeleteMutation = () => {
 		},
 		onSuccess: (data) => {
 			queryClient.invalidateQueries({
-				queryKey: playlistKeys.addTo({ id: data.id, type: 'movie' }),
+				queryKey: playlistKeys.addTo({ id: data.movie_id, type: 'movie' }),
 			});
 			queryClient.invalidateQueries({
 				queryKey: mediaKeys.playlists({
@@ -618,6 +617,10 @@ export const usePlaylistTvSeriesInsertMutation = ({
 				}),
 			});
 
+			queryClient.invalidateQueries({
+				queryKey: playlistKeys.addTo({ id: tvSeriesId, type: 'tv_series' })
+			});
+
 			// Update each playlists
 			data.forEach((playlist) => {
 				queryClient.setQueryData(playlistKeys.detail(playlist.id), (oldData: Playlist) => {
@@ -659,11 +662,6 @@ export const usePlaylistTvSeriesInsertMutation = ({
 					});
 				});
 			}
-		},
-		meta: {
-			invalidates: [
-				playlistKeys.addTo({ id: tvSeriesId, type: 'tv_series' }),
-			]
 		}
 	});
 };
@@ -688,7 +686,7 @@ export const usePlaylistTvSeriesDeleteMutation = () => {
 		},
 		onSuccess: (data) => {
 			queryClient.invalidateQueries({
-				queryKey: playlistKeys.addTo({ id: data.id, type: 'tv_series' }),
+				queryKey: playlistKeys.addTo({ id: data.tv_series_id, type: 'tv_series' }),
 			});
 			queryClient.invalidateQueries({
 				queryKey: mediaKeys.playlists({
