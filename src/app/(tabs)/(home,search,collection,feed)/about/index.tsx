@@ -1,10 +1,13 @@
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import tw from '@/lib/tw';
+import { useTheme } from '@/providers/ThemeProvider';
+import { Link } from 'expo-router';
 import { useMemo } from 'react';
 
 
 const AboutScreen = () => {
+  const { colors, bottomOffset } = useTheme();
 	const resources = useMemo(() => [
 		{
 			name: 'Eyecandy',
@@ -73,8 +76,8 @@ const AboutScreen = () => {
 	], []);
 
   return (
-    <View style={tw`flex-1 items-center justify-center`}>
-		  <Text>made by @lxup</Text>
+    <View style={[tw`flex-1 items-center justify-center`, { marginBottom: bottomOffset}]}>
+		  <Text>made by <Link href="https://github.com/lxup" style={{ color: colors.accentPink }}>@lxup</Link></Text>
     </View>
   );
 };

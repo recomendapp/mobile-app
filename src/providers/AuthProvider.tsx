@@ -2,7 +2,7 @@ import { User } from "@recomendapp/types";
 import { Provider, Session } from "@supabase/supabase-js";
 import { createContext, use, useCallback, useEffect, useState, useMemo } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
-import { useUserQuery } from "@/features/user/userQueries";
+import { useUserSessionQuery } from "@/features/user/userQueries";
 import { AppState, Platform } from "react-native";
 import { supabase } from "@/lib/supabase/client";
 import { useSplashScreen } from "./SplashScreenProvider";
@@ -19,6 +19,8 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { randomUUID } from "expo-crypto";
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as env from '@/env';
+import { useQueryClient } from "@tanstack/react-query";
+import { userKeys } from "@/features/user/userKeys";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -66,6 +68,7 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
 	const { auth } = useSplashScreen();
+	const queryClient = useQueryClient();
 	const { setLocale } = useLocaleContext();
 	const supabase = useSupabaseClient();
 	const redirectUri = AuthSession.makeRedirectUri();
@@ -73,7 +76,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [pushToken, setPushToken] = useState<string | null>(null);
 	const {
 		data: user,
-	} = useUserQuery({
+	} = useUserSessionQuery({
 		userId: session?.user.id,
 	});
 	const { customerInfo: initCustomerInfo } = useRevenueCat(session);
@@ -204,7 +207,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		const { error } = await supabase.auth.signOut();
 		if (error) throw error;
 		setSession(null);
-	}, [supabase, pushToken]);
+		queryClient.removeQueries({
+			queryKey: userKeys.session(),
+		})
+	}, [supabase, pushToken, queryClient]);
 
 	const signup = useCallback(async (
 		credentials: {

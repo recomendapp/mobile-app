@@ -1,4 +1,4 @@
-import { MediaType, PlaylistType, UserActivityType, UserRecosType, UserReviewType, UserWatchlistType } from "@recomendapp/types"
+import { UserActivityType, UserRecosType, UserReviewType, UserWatchlistType } from "@recomendapp/types"
 import { withPersistKey } from "..";
 
 export const userKeys = {
@@ -7,6 +7,9 @@ export const userKeys = {
 		search?: string | null;
 	}) => filters ? [...userKeys.all, 'search', filters] as const : [...userKeys.all, 'search'] as const,
 	details: () => [...userKeys.all, 'details'] as const,
+
+	session: () => withPersistKey([...userKeys.all, 'session']),
+
 	/**
 	 * Fetches details of a user
 	 * @param userId The user id

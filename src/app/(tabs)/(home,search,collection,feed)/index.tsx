@@ -20,11 +20,14 @@ import Animated, { AnimatedStyle, useAnimatedScrollHandler, useSharedValue } fro
 import AnimatedStackScreen from '@/components/ui/AnimatedStackScreen';
 import { View } from '@/components/ui/view';
 import { AnimatedScrollView } from 'react-native-reanimated/lib/typescript/component/ScrollView';
-import { memo, useCallback, useMemo, useRef } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
-import { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
+import { LayoutChangeEvent, RefreshControl, StyleProp, ViewStyle } from 'react-native';
 import { WidgetMostPopular } from '@/components/widgets/WidgetMostPopular';
 import { useHeaderHeight } from '@react-navigation/elements';
+import { useQueryClient } from '@tanstack/react-query';
+import { widgetKeys } from '@/features/widget/widgetKeys';
+import { userKeys } from '@/features/user/userKeys';
 
 const HeaderLeft = () => {
   const { session, user } = useAuth();
@@ -130,9 +133,12 @@ UnauthenticatedContent.displayName = 'UnauthenticatedContent';
 
 const HomeScreen = () => {
   const t = useTranslations();
+  const queryClient = useQueryClient();
   const { bottomOffset, tabBarHeight } = useTheme();
   const { session } = useAuth();
   const navigationHeaderHeight = useHeaderHeight();
+  // States
+  const [isRefetching, setIsRefetching] = useState(false);
   // REFs
   const scrollRef = useRef<AnimatedScrollView>(null);
   // useSharedValues
@@ -167,6 +173,22 @@ const HomeScreen = () => {
     paddingBottom: bottomOffset + PADDING_VERTICAL,
   }), [bottomOffset]);
 
+  const refetch = useCallback(async () => {
+    setIsRefetching(true);
+    try {
+      queryClient.invalidateQueries({ queryKey: widgetKeys.widget({ name: 'most-recommended' })}); // WidgetMostRecommended
+      queryClient.invalidateQueries({ queryKey: widgetKeys.widget({ name: 'most-popular' })}); // WidgetMostPopular
+      if (session?.user.id) {
+        queryClient.invalidateQueries({ queryKey: userKeys.recos({ userId: session.user.id, type: 'all' })}); // WidgetUserRecos
+        queryClient.invalidateQueries({ queryKey: userKeys.watchlist({ userId: session.user.id, type: 'all' })}); // WidgetUserWatchlist
+        queryClient.invalidateQueries({ queryKey: userKeys.playlistsFriends({ userId: session.user.id })}); // WidgetUserFriendsPlaylists
+        queryClient.invalidateQueries({ queryKey: userKeys.discovery({}) }); // WidgetUserDiscovery
+      }
+    } finally {
+      setIsRefetching(false);
+    }
+  }, [queryClient, session]);
+
   useScrollToTop(scrollRef);
 
   return (
@@ -183,6 +205,7 @@ const HomeScreen = () => {
       scrollIndicatorInsets={{
         bottom: tabBarHeight
       }}
+      refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
       nestedScrollEnabled
       >
         <WidgetMostRecommended scrollY={scrollY} onLayout={onLayoutWidgetMostRecommended} />

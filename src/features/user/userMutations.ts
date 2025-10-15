@@ -53,7 +53,7 @@ export const useUserUpdateMutation = ({
 				return data;
 			},
 		onSuccess: (data) => {
-			queryClient.setQueryData(userKeys.detail(data.id), data);
+			queryClient.setQueryData(userKeys.session(), data);
 			queryClient.setQueryData(userKeys.profile(data.username), (oldData: User | undefined) => {
 				if (!oldData) return oldData;
 				return {

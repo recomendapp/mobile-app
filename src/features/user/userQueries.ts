@@ -3,23 +3,14 @@ import { userKeys } from "./userKeys"
 import { Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserWatchlist, Profile, UserWatchlistTvSeries, UserWatchlistMovie, UserReviewMovie, UserReviewTvSeries, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserActivityMovie, UserActivityTvSeries, UserFeedItem } from "@recomendapp/types";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 
-/* ---------------------------------- USER ---------------------------------- */
-
-/**
- * Fetches the user details
- * @param userId The user id
- * @returns The user details
-*/
-export const useUserQuery = ({
+export const useUserSessionQuery = ({
 	userId,
-	enabled,
 } : {
-	userId?: string
-	enabled?: boolean
+	userId?: string;
 }) => {
 	const supabase = useSupabaseClient();
 	return useQuery({
-		queryKey: userKeys.detail(userId as string),
+		queryKey: userKeys.session(),
 		queryFn: async () => {
 			if (!userId) return null;
 			const { data, error } = await supabase
@@ -30,9 +21,11 @@ export const useUserQuery = ({
 			if (error) throw error;
 			return data;	
 		},
-		enabled: enabled ? enabled : userId !== undefined,
+		enabled: !!userId,
 	});
 };
+
+/* ---------------------------------- USER ---------------------------------- */
 
 export const useUserProfileQuery = ({
 	username,
