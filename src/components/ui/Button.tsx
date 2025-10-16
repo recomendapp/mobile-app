@@ -9,9 +9,8 @@ import { LucideProps } from 'lucide-react-native';
 import { forwardRef } from 'react';
 import {
   Pressable,
+  PressableProps,
   TextStyle,
-  TouchableOpacity,
-  TouchableOpacityProps,
   View,
   ViewStyle,
 } from 'react-native';
@@ -34,14 +33,13 @@ export type ButtonVariant =
 
 export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon' | 'fit';
 
-export interface ButtonProps extends Omit<TouchableOpacityProps, 'style'> {
+export interface ButtonProps extends PressableProps {
   label?: string;
   children?: React.ReactNode;
   animation?: boolean;
   haptic?: boolean;
   icon?: React.ComponentType<LucideProps>;
   iconProps?: LucideProps;
-  onPress?: () => void;
   variant?: ButtonVariant;
   size?: ButtonSize;
   disabled?: boolean;
@@ -239,7 +237,7 @@ export const Button = forwardRef<View, ButtonProps>(
     };
 
     // Improved animation handlers for liquid glass effect
-    const handlePressIn = (ev?: any) => {
+    const handlePressIn: PressableProps['onPressIn'] = (ev) => {
       'worklet';
       // Trigger haptic feedback
       // triggerHapticFeedback();
@@ -261,7 +259,7 @@ export const Button = forwardRef<View, ButtonProps>(
       props.onPressIn?.(ev);
     };
 
-    const handlePressOut = (ev?: any) => {
+    const handlePressOut: PressableProps['onPressOut'] = (ev) => {
       'worklet';
       // Return to original size with smooth spring
       scale.value = withSpring(1, {
@@ -282,16 +280,16 @@ export const Button = forwardRef<View, ButtonProps>(
     };
 
     // Handle actual press action
-    const handlePress = () => {
+    const handlePress: PressableProps['onPress'] = (e) => {
       triggerHapticFeedback();
       if (onPress && !disabled && !loading) {
-        onPress();
+        onPress(e);
       }
     };
 
     // Handle press for TouchableOpacity (non-animated version)
-    const handleTouchablePress = () => {
-      handlePress();
+    const handleTouchablePress: PressableProps['onPress'] = (e) => {
+      handlePress(e);
     };
 
     // Animated styles using useAnimatedStyle
@@ -366,57 +364,62 @@ export const Button = forwardRef<View, ButtonProps>(
         {...props}
       >
         <Animated.View style={[animatedStyle, buttonStyle, styleWithoutFlex]}>
-          {loading ? (
-            <ButtonSpinner
-              size={size}
-              variant={loadingVariant}
-              color={contentColor}
-            />
-          ) : typeof children === 'string' ? (
-            <View
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
-            >
-              {icon && (
-                <Icon name={icon} color={contentColor} size={iconSize} {...iconProps} />
-              )}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, opacity: loading ? 0.5 : 1 }}>
+            {icon && (
+              <Icon name={icon} color={contentColor} size={iconSize} {...iconProps} />
+            )}
+            {typeof children === 'string' ? (
               <Text style={[finalTextStyle, textStyle]}>{children}</Text>
-            </View>
-          ) : (
+            ) : (
+              children
+            )}
+
+          </View>
+          {loading && (
             <View
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+              style={[
+                tw`absolute inset-0 items-center justify-center`,
+              ]}
             >
-              {icon && (
-                <Icon name={icon} color={contentColor} size={iconSize} {...iconProps} />
-              )}
-              {children}
+              <ButtonSpinner
+                size={size}
+                variant={loadingVariant}
+                color={contentColor}
+              />
             </View>
           )}
         </Animated.View>
       </Pressable>
     ) : (
-      <TouchableOpacity
+      <Pressable
         ref={ref}
         style={[buttonStyle, disabled && { opacity: 0.5 }, styleWithoutFlex]}
         onPress={handleTouchablePress}
         disabled={disabled || loading}
-        activeOpacity={0.8}
         {...props}
       >
-        {loading ? (
-          <ButtonSpinner
-            size={size}
-            variant={loadingVariant}
-            color={contentColor}
-          />
-        ) : typeof children === 'string' ? (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            {icon && <Icon name={icon} color={contentColor} size={iconSize} {...iconProps} />}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, opacity: loading ? 0.5 : 1 }}>
+          {icon && <Icon name={icon} color={contentColor} size={iconSize} {...iconProps} />}
+          {typeof children === 'string' ? (
             <Text style={[finalTextStyle, textStyle]}>{children}</Text>
+          ) : (
+            children
+          )}
+        </View>
+        {loading && (
+          <View
+            style={[
+              tw`absolute inset-0 items-center justify-center`,
+            ]}
+          >
+            <ButtonSpinner
+              size={size}
+              variant={loadingVariant}
+              color={contentColor}
+            />
           </View>
-        ) : (
-          children
         )}
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 );

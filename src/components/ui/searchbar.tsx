@@ -39,6 +39,8 @@ export function SearchBar({
   debounceMs = 300,
   placeholder = 'Search...',
   returnKeyType = 'search',
+  autoCorrect = false,
+  selectionColor,
   value,
   onChangeText,
   ...props
@@ -119,6 +121,8 @@ export function SearchBar({
         value={displayValue}
         onChangeText={handleTextChange}
         returnKeyType={returnKeyType}
+        autoCorrect={autoCorrect}
+        selectionColor={selectionColor || colors.accentYellow}
         {...props}
       />
 

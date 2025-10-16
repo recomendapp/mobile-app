@@ -29,7 +29,13 @@ const getAppName = () => {
 
 const getWebDomain = () => {
 	return process.env.EXPO_PUBLIC_WEB_APP;
-}
+};
+
+const getGoogleServicesFilePath = () => {
+	if (IS_DEV) return './google-services.dev.json';
+	if (IS_PREVIEW) return './google-services.preview.json';
+	return './google-services.json';
+};
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
@@ -89,7 +95,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		permissions: [
 			'android.permission.RECORD_AUDIO',
 		],
-		googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
+		googleServicesFile: process.env.GOOGLE_SERVICES_JSON || getGoogleServicesFilePath(),
 	},
 	web: {
 		bundler: 'metro',

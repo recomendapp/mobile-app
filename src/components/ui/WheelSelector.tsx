@@ -11,7 +11,7 @@ import Animated, {
 import tw from '@/lib/tw';
 import * as Haptics from 'expo-haptics';
 import { GAP } from '@/theme/globals';
-import { LayoutChangeEvent, FlatList, Pressable, StyleProp, ViewStyle } from 'react-native';
+import { LayoutChangeEvent, FlatList, StyleProp, ViewStyle, Pressable } from 'react-native';
 import useDebounce from '@/hooks/useDebounce';
 import { scheduleOnRN } from 'react-native-worklets';
 import { View } from './view';
