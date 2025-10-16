@@ -121,6 +121,28 @@ const BottomSheetMovie = React.forwardRef<
     ],
   ]), [movie, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, activity, session]);
 
+  const renderDirector = React.useCallback(({ item }: { item: MediaPerson }) => {
+    if (!movie?.directors) return null;
+    return (
+    <Button
+		variant="ghost"
+		size="fit"
+		onPress={() => {
+      BottomSheetMainCreditsRef.current?.dismiss();
+      closeSheet(id);
+      router.push(item.url as LinkProps['href']);
+    }}
+		style={[
+			{ paddingVertical: PADDING_HORIZONTAL, paddingHorizontal: PADDING_HORIZONTAL },
+		]}
+		>
+			<View style={tw`flex-1 flex-row items-center gap-2 justify-between`}>
+				<Text>{item.name}</Text>
+				<Icons.ChevronRight color={colors.mutedForeground} size={16} />
+			</View>
+		</Button>
+    );
+  }, [movie?.directors, closeSheet, id, router, colors.muted, colors.mutedForeground]);
   return (
     <ThemedTrueSheet
     ref={ref}
@@ -191,33 +213,9 @@ const BottomSheetMovie = React.forwardRef<
         >
           <FlatList
           ref={creditsScrollRef}
-          data={movie?.directors || []}
-          renderItem={({ item }) => (
-            <Pressable
-            onPress={() => {
-              BottomSheetMainCreditsRef.current?.dismiss();
-              closeSheet(id);
-              router.push(item.url as LinkProps['href']);
-            }}
-            style={[
-              {
-                paddingHorizontal: PADDING_HORIZONTAL,
-                paddingVertical: PADDING_VERTICAL,
-                gap: GAP
-              },
-              tw`flex-row justify-between items-center`,
-            ]}
-            >
-              <Text>
-                {item.name}
-              </Text>
-              <Button
-              variant="ghost"
-              icon={Icons.ChevronRight}
-              size="icon"
-              />
-            </Pressable>
-          )}
+          data={movie.directors || []}
+          renderItem={renderDirector}
+          keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{
             paddingTop: PADDING_VERTICAL,
           }}

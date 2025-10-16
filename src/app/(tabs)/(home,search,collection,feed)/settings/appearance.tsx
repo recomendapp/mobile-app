@@ -20,11 +20,14 @@ import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 import { useToast } from "@/components/Toast";
+import { Platform } from "react-native";
+import { useQueryClient } from "@tanstack/react-query";
 
 const SettingsAppearanceScreen = () => {
 	const { locale, setLocale } = useLocaleContext();
 	const { session } = useAuth();
 	const toast = useToast();
+	const queryClient = useQueryClient();
 	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
@@ -59,6 +62,7 @@ const SettingsAppearanceScreen = () => {
 			setLocale(data.locale);
 			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 			form.reset();
+			queryClient.clear();
 		} catch (error) {
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof AuthError) {
@@ -111,18 +115,21 @@ const SettingsAppearanceScreen = () => {
 				name="locale"
 				control={form.control}
 				render={({ field: { onChange, onBlur, value } }) => (
-				<View>
+				<View style={{ gap: GAP }}>
 					<Label>{upperFirst(t('pages.settings.appearance.language.label'))}</Label>
 					<Picker
 					selectedValue={value}
 					onValueChange={(itemValue) => onChange(itemValue)}
+					style={{ backgroundColor: Platform.OS === 'android' ? colors.muted : undefined}}
+					dropdownIconColor={colors.foreground}
+					dropdownIconRippleColor={colors.foreground}
 					>
 						{locales.map((locale, index) => (
 							<Picker.Item
 								key={index}
 								label={`${locale.flag} ${locale.iso_639_1} (${locale.iso_3166_1})`}
 								value={locale.language}
-								style={{ fontSize: 16 }}
+								style={{ fontSize: 16, backgroundColor: colors.muted }}
 								color={colors.foreground}
 							/>
 						))}

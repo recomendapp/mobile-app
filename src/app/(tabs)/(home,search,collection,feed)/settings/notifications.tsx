@@ -3,10 +3,9 @@ import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
 import { useNotifications } from "@/providers/NotificationsProvider";
 import { View } from "@/components/ui/view";
-import { Linking, Platform, ScrollView } from "react-native";
+import { Linking, Platform, Pressable, ScrollView } from "react-native";
 import { GAP, GAP_LG, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Text } from "@/components/ui/text";
-import { Pressable } from "react-native-gesture-handler";
 import { Icons } from "@/constants/Icons";
 import { Separator } from "@/components/ui/separator";
 import Constants from 'expo-constants';
@@ -67,9 +66,7 @@ const SettingsNotificationsScreen = () => {
 					<Icons.Bell color={colors.foreground} />
 					<View>
 						<Text textColor='muted'>{t('pages.settings.notifications.push_notifications.no_enabled')}</Text>
-						<Pressable onPress={openAppSettings}>
-							<Text style={[{ color: colors.accentYellow }, tw`underline`]}>{t('pages.settings.notifications.push_notifications.open_settings')}</Text>
-						</Pressable>
+						<Text style={[{ color: colors.accentYellow }, tw`underline`]}>{t('pages.settings.notifications.push_notifications.open_settings')}</Text>
 					</View>
 				</Pressable>
 				<Separator />

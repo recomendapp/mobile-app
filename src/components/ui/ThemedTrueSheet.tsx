@@ -1,6 +1,7 @@
 import { useTheme } from '@/providers/ThemeProvider';
 import { TrueSheet, TrueSheetProps } from '@lodev09/react-native-true-sheet';
 import { forwardRef } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ThemedTrueSheetProps extends TrueSheetProps {
@@ -11,7 +12,7 @@ interface ThemedTrueSheetProps extends TrueSheetProps {
 const ThemedTrueSheet = forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   ThemedTrueSheetProps
->(({ backgroundColor, contentContainerStyle, cornerRadius = 24, sizes = ["auto"], ...props }, ref) => {
+>(({ backgroundColor, contentContainerStyle, cornerRadius = 24, sizes = ["auto"], children, ...props }, ref) => {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   return (
@@ -28,7 +29,11 @@ const ThemedTrueSheet = forwardRef<
     contentContainerStyle,
   ]}
   {...props}
-  />
+  >
+    <GestureHandlerRootView style={{ flexGrow: 1 }}>
+      {children}
+    </GestureHandlerRootView>
+  </TrueSheet>
   )
 });
 

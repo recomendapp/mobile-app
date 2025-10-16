@@ -202,6 +202,7 @@ const BottomSheetShareLayout = forwardRef<
                 <LegendList
 				data={sharePlatform}
 				renderItem={renderItem}
+                extraData={loadingPlatform}
 				contentContainerStyle={{
 					paddingHorizontal: PADDING_HORIZONTAL,
 					gap: GAP_XL,
