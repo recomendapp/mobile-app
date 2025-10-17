@@ -123,7 +123,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
 				extraData={value}
 				horizontal
 				style={tw`w-full`}
-				contentContainerStyle={tw`gap-2`}
+				contentContainerStyle={{ gap: GAP }}
 				renderItem={useCallback(({ item } : { item: { key: string; label: string } }) => (
 					<Button
 					variant={value === item.key ? 'accent-yellow' : 'outline'}
