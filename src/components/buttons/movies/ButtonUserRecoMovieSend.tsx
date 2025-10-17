@@ -25,7 +25,7 @@ const ButtonUserRecoMovieSend = React.forwardRef<
 		variant={variant}
 		icon={icon}
 		size={size}
-		onPress={() => {
+		onPress={(e) => {
 			if (session) {
 				movie.id && router.push({
 					pathname: '/reco/send/movie/[movie_id]',
@@ -42,7 +42,7 @@ const ButtonUserRecoMovieSend = React.forwardRef<
 					},
 				});
 			}
-			onPressProps?.();
+			onPressProps?.(e);
 		}}
 		iconProps={{
 			size: ICON_ACTION_SIZE,

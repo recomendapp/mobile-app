@@ -80,9 +80,9 @@ const ButtonUserReviewMovieLike = React.forwardRef<
 			color: like ? colors.accentPink : colors.foreground,
 			fill: like ? colors.accentPink : 'transparent',
 		}}
-		onPress={() => {
+		onPress={(e) => {
 			like ? handleUnlike() : handleLike();
-			onPress?.();
+			onPress?.(e);
 		}}
 		{...props}
 		>

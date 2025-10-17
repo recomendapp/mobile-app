@@ -99,9 +99,9 @@ const ButtonUserFollow = React.forwardRef<
   return (
     <Button
     ref={ref}
-    onPress={() => {
+    onPress={(e) => {
       isFollow ? unfollowUser() : followUser();
-      onPress?.();
+      onPress?.(e);
     }}
     variant={isFollow ? "muted" : "accent-yellow"}
     style={[

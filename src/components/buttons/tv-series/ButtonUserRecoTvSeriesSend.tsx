@@ -25,7 +25,7 @@ const ButtonUserRecoTvSeriesSend = React.forwardRef<
 		variant={variant}
 		icon={icon}
 		size={size}
-		onPress={() => {
+		onPress={(e) => {
 			if (session) {
 				tvSeries.id && router.push({
 					pathname: '/reco/send/tv-series/[tv_series_id]',
@@ -42,7 +42,7 @@ const ButtonUserRecoTvSeriesSend = React.forwardRef<
 					},
 				});
 			}
-			onPressProps?.();
+			onPressProps?.(e);
 		}}
 		iconProps={{
 			size: ICON_ACTION_SIZE,

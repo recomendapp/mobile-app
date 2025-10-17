@@ -91,7 +91,7 @@ const ButtonUserActivityMovieRating = React.forwardRef<
 		}}
 		size={size}
 		icon={!activity?.rating ? Icons.Star : undefined}
-		onPress={() => {
+		onPress={(e) => {
 			if (session) {
 				openSheet(BottomSheetRating, {
 					media: {
@@ -116,7 +116,7 @@ const ButtonUserActivityMovieRating = React.forwardRef<
 					},
 				});
 			}
-			onPressProps?.();
+			onPressProps?.(e);
 		}}
 		{...props}
 		>
