@@ -8,8 +8,6 @@ export const userKeys = {
 	}) => filters ? [...userKeys.all, 'search', filters] as const : [...userKeys.all, 'search'] as const,
 	details: () => [...userKeys.all, 'details'] as const,
 
-	session: () => withPersistKey([...userKeys.all, 'session']),
-
 	/**
 	 * Fetches details of a user
 	 * @param userId The user id

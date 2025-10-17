@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import UserAvatar from "@/components/user/UserAvatar";
 import { Icons } from "@/constants/Icons";
-import { userKeys } from "@/features/user/userKeys";
 import { useUserActivitiesMovieInfiniteQuery, useUserActivitiesTvSeriesInfiniteQuery, useUserPlaylistsInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
@@ -24,6 +23,7 @@ import { ActivityIndicator, Pressable, RefreshControl, ScrollView } from "react-
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetUser from "@/components/bottom-sheets/sheets/BottomSheetUser";
 import { useCallback, useMemo } from "react";
+import { authKeys } from "@/features/auth/authKeys";
 
 const ProfileHeader = ({
 	profile,
@@ -136,7 +136,7 @@ const ProfileScreen = () => {
 	const refresh = () => {
 		refetch();
 		profile?.id === session?.user.id && queryClient.invalidateQueries({
-			queryKey: userKeys.session()
+			queryKey: authKeys.user()
 		});
 	};
 

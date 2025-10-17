@@ -2,7 +2,6 @@ import { User } from "@recomendapp/types";
 import { Provider, Session } from "@supabase/supabase-js";
 import { createContext, use, useCallback, useEffect, useState, useMemo } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
-import { useUserSessionQuery } from "@/features/user/userQueries";
 import { AppState, Platform } from "react-native";
 import { supabase } from "@/lib/supabase/client";
 import { useSplashScreen } from "./SplashScreenProvider";
@@ -13,14 +12,14 @@ import * as QueryParams from "expo-auth-session/build/QueryParams";
 import { makeRedirectUri } from "expo-auth-session";
 import { defaultLocale, SupportedLocale, supportedLocales } from "@/translations/locales";
 import { useRevenueCat } from "@/hooks/useRevenueCat";
-import { useAuthCustomerInfo } from "@/features/auth/authQueries";
+import { useAuthCustomerInfo, useAuthUser } from "@/features/auth/authQueries";
 import { CustomerInfo } from "react-native-purchases";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { randomUUID } from "expo-crypto";
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as env from '@/env';
 import { useQueryClient } from "@tanstack/react-query";
-import { userKeys } from "@/features/user/userKeys";
+import { authKeys } from "@/features/auth/authKeys";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -76,7 +75,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [pushToken, setPushToken] = useState<string | null>(null);
 	const {
 		data: user,
-	} = useUserSessionQuery({
+	} = useAuthUser({
 		userId: session?.user.id,
 	});
 	const { customerInfo: initCustomerInfo } = useRevenueCat(session);
@@ -208,7 +207,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		if (error) throw error;
 		setSession(null);
 		queryClient.removeQueries({
-			queryKey: userKeys.session(),
+			queryKey: authKeys.user(),
 		})
 	}, [supabase, pushToken, queryClient]);
 

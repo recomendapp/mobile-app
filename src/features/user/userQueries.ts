@@ -1,29 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query"
 import { userKeys } from "./userKeys"
-import { Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserWatchlist, Profile, UserWatchlistTvSeries, UserWatchlistMovie, UserReviewMovie, UserReviewTvSeries, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserActivityMovie, UserActivityTvSeries, UserFeedItem } from "@recomendapp/types";
+import { Playlist, UserActivity, UserFollower, UserFriend, UserRecosAggregated, UserWatchlist, Profile, UserWatchlistTvSeries, UserWatchlistMovie, UserReviewMovie, UserReviewTvSeries, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserActivityMovie, UserActivityTvSeries } from "@recomendapp/types";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-
-export const useUserSessionQuery = ({
-	userId,
-} : {
-	userId?: string;
-}) => {
-	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: userKeys.session(),
-		queryFn: async () => {
-			if (!userId) return null;
-			const { data, error } = await supabase
-				.from('user')
-				.select('*')
-				.eq('id', userId)
-				.single();
-			if (error) throw error;
-			return data;	
-		},
-		enabled: !!userId,
-	});
-};
 
 /* ---------------------------------- USER ---------------------------------- */
 

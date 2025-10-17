@@ -1,7 +1,6 @@
 import { useTheme } from '@/providers/ThemeProvider';
 import { TrueSheet, TrueSheetProps } from '@lodev09/react-native-true-sheet';
 import { forwardRef } from 'react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ThemedTrueSheetProps extends TrueSheetProps {
@@ -30,9 +29,14 @@ const ThemedTrueSheet = forwardRef<
   ]}
   {...props}
   >
-    <GestureHandlerRootView style={{ flexGrow: 1 }}>
+    {/* <GestureHandlerRootView // break content style and isn't working with Pressable from 'react-native' either
+    style={[
+      { flexGrow: 1 },
+      contentContainerStyle
+    ]}
+    > */}
       {children}
-    </GestureHandlerRootView>
+    {/* </GestureHandlerRootView> */}
   </TrueSheet>
   )
 });
