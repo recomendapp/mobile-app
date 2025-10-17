@@ -41,7 +41,7 @@ export const useImagePalette = (imageUrl?: string): { palette: string[] | null |
 		  result.muted,
 		].filter(c => c !== undefined);
 	  }
-	  setPalette(colors);
+	  setPalette([...new Set(colors)]);
 	} catch (e) {
 	  console.error('[useImagePalette]', e);
 	  setError(e as Error);
