@@ -6,7 +6,6 @@ import { StyleProp, Text, TextStyle, View, ViewStyle } from "react-native";
 import UserAvatar from "@/components/user/UserAvatar";
 import { useTheme } from "@/providers/ThemeProvider";
 import { ThemedView } from "@/components/ui/ThemedView";
-import { LegendList } from "@legendapp/list";
 import { Icons } from "@/constants/Icons";
 import { ThemedText } from "../ui/ThemedText";
 import { useTranslations } from "use-intl";
@@ -16,6 +15,7 @@ import { MediaMovie, MediaTvSeries, UserRecosAggregated } from "@recomendapp/typ
 import { CardMovie } from "../cards/CardMovie";
 import { CardTvSeries } from "../cards/CardTvSeries";
 import { GAP } from "@/theme/globals";
+import { GridView } from "../ui/GridView";
 
 interface WidgetUserRecosProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -131,14 +131,9 @@ export const WidgetUserRecos = ({
 
   const sendersShow = 3;
 
-  const renderItem = useCallback(({ item }: { item: UserRecosAggregated }) => (
+  const renderItem = useCallback((item: UserRecosAggregated) => (
     <RecoItem item={item} sendersShow={sendersShow} />
   ), [sendersShow]);
-
-  const keyExtractor = useCallback((item: UserRecosAggregated) => 
-    item.media_id?.toString() || '', 
-    []
-  );
 
   if (!recos?.length) {
     return null;
@@ -147,14 +142,12 @@ export const WidgetUserRecos = ({
   return (
     <View style={[{ gap: GAP }, style]}>
       <WidgetHeader labelStyle={labelStyle} />
-      <LegendList
-      data={recos}
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
-      numColumns={2}
-      contentContainerStyle={[{ gap: GAP }, containerStyle]}
-      nestedScrollEnabled
-      />
+      <View style={containerStyle}>
+        <GridView
+        data={recos}
+        renderItem={renderItem}
+        />
+      </View>
     </View>
   );
 };
