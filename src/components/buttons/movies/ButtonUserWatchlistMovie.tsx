@@ -77,7 +77,7 @@ export const ButtonUserWatchlistMovie = React.forwardRef<
 	variant={variant}
 	icon={icon}
 	size={size}
-	onPress={() => {
+	onPress={(e) => {
 		if (session) {
 			watchlist ? handleUnwatchlist() : handleWatchlist();
 		} else {
@@ -88,7 +88,7 @@ export const ButtonUserWatchlistMovie = React.forwardRef<
 				},
 			});
 		}
-		onPressProps?.();
+		onPressProps?.(e);
 	}}
 	onLongPress={(e) => {
 		watchlist?.id && openSheet(BottomSheetWatchlistMovieComment, {

@@ -83,7 +83,7 @@ const ButtonUserActivityTvSeriesWatch = React.forwardRef<
 		<Button
 		variant={variant}
 		size={size}
-		onPress={() => {
+		onPress={(e) => {
 			if (session) {
 				activity ? handleUnwatch() : handleWatch();
 			} else {
@@ -94,7 +94,7 @@ const ButtonUserActivityTvSeriesWatch = React.forwardRef<
 					},
 				});
 			}
-			onPressProps?.();
+			onPressProps?.(e);
 		}}
 		>
 			<View style={[{ backgroundColor: activity ? colors.accentBlue : undefined, borderColor: activity ? colors.accentBlue : colors.foreground, width: ICON_ACTION_SIZE, height: ICON_ACTION_SIZE }, tw`rounded-full border-2 items-center justify-center`]}>

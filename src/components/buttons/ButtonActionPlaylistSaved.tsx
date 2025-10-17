@@ -65,9 +65,9 @@ const ButtonActionPlaylistSaved = React.forwardRef<
 			fill: saved ? colors.foreground : 'transparent',
 			...iconProps
 		}}
-		onPress={() => {
+		onPress={(e) => {
 			saved ? handleUnlike() : handleLike();
-			onPress?.();
+			onPress?.(e);
 		}}
 		{...props}
 		/>

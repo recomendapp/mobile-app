@@ -66,9 +66,9 @@ const ButtonActionPlaylistLike = React.forwardRef<
 			fill: like ? colors.accentPink : 'transparent',
 			...iconProps
 		}}
-		onPress={() => {
+		onPress={(e) => {
 			like ? handleUnlike() : handleLike();
-			onPress?.();
+			onPress?.(e);
 		}}
 		{...props}
 		/>

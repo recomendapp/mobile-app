@@ -78,7 +78,7 @@ export const ButtonUserWatchlistTvSeries = React.forwardRef<
 		variant={variant}
 		icon={icon}
 		size={size}
-		onPress={() => {
+		onPress={(e) => {
 			if (session) {
 				watchlist ? handleUnwatchlist() : handleWatchlist();
 			} else {
@@ -89,7 +89,7 @@ export const ButtonUserWatchlistTvSeries = React.forwardRef<
 					},
 				});
 			}
-			onPressProps?.();
+			onPressProps?.(e);
 		}}
 		onLongPress={(e) => {
 			watchlist?.id && openSheet(BottomSheetWatchlistTvSeriesComment, {

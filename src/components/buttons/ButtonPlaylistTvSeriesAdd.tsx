@@ -25,7 +25,7 @@ export const ButtonPlaylistTvSeriesAdd = React.forwardRef<
 		variant={variant}
 		icon={icon}
 		size={size}
-		onPress={() => {
+		onPress={(e) => {
 			if (session) {
 				tvSeries.id && router.push({
 					pathname: '/playlist/add/tv-series/[tv_series_id]',
@@ -42,7 +42,7 @@ export const ButtonPlaylistTvSeriesAdd = React.forwardRef<
 					},
 				});
 			}
-			onPressProps?.();
+			onPressProps?.(e);
 		}}
 		iconProps={{
 			size: ICON_ACTION_SIZE,

@@ -105,7 +105,7 @@ const ButtonUserActivityTvSeriesLike = React.forwardRef<
 		variant={variant}
 		icon={icon}
 		size={size}
-		onPress={() => {
+		onPress={(e) => {
 			if (session) {
 				activity?.is_liked ? handleUnlike() : handleLike();
 			} else {
@@ -116,7 +116,7 @@ const ButtonUserActivityTvSeriesLike = React.forwardRef<
 					},
 				});
 			}
-			onPressProps?.();
+			onPressProps?.(e);
 		}}
 		iconProps={{
 			color: activity?.is_liked ? colors.accentPink : colors.foreground,

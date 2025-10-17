@@ -34,7 +34,7 @@ const PlaylistSortScreen = () => {
 				<Button
 				variant="ghost"
 				size="fit"
-				onPress={router.dismiss}
+				onPress={() => router.dismiss()}
 				>
 					{upperFirst(t('common.messages.close'))}
 				</Button>
