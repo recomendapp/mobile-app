@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { View } from "./view";
 import { StyleProp, ViewStyle } from "react-native";
+import { GAP } from "@/theme/globals";
 
 interface GridViewProps<T> extends React.ComponentProps<typeof View> {
 	data: T[];
@@ -16,7 +17,7 @@ function GridViewInner<T>({
 	renderItem, 
 	columns = 2,
 	columnStyle,
-	gap = 0, 
+	gap = GAP, 
 	style, 
 	...props 
 }: GridViewProps<T>, ref: React.Ref<React.ComponentRef<typeof View>>) {

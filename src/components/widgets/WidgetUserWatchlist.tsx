@@ -4,7 +4,6 @@ import tw from "@/lib/tw";
 import { Link } from "expo-router";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { useTheme } from "@/providers/ThemeProvider";
-import { LegendList } from "@legendapp/list";
 import { ThemedText } from "../ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
@@ -14,6 +13,7 @@ import { MediaMovie, MediaTvSeries, UserWatchlist } from "@recomendapp/types";
 import { CardTvSeries } from "../cards/CardTvSeries";
 import { useCallback } from "react";
 import { GAP } from "@/theme/globals";
+import { GridView } from "../ui/GridView";
 
 interface WidgetUserWatchlistProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -68,14 +68,9 @@ export const WidgetUserWatchlist = ({
     }
   });
 
-  const renderItem = useCallback(({ item }: { item: UserWatchlist }) => (
+  const renderItem = useCallback((item: UserWatchlist) => (
     <WatchlistItem item={item} />
   ), []);
-
-  const keyExtractor = useCallback((item: UserWatchlist) => 
-    item.media_id?.toString() || '', 
-    []
-  );
 
   if (!watchlist?.length) {
     return null;
@@ -84,14 +79,12 @@ export const WidgetUserWatchlist = ({
   return (
     <View style={[{ gap: GAP }, style]}>
       <WidgetHeader labelStyle={labelStyle} />
-      <LegendList
+      <View style={containerStyle}>
+        <GridView
         data={watchlist}
         renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        numColumns={2}
-        contentContainerStyle={[{ gap: GAP }, containerStyle]}
-        nestedScrollEnabled
-      />
+        />
+      </View>
     </View>
   );
 };

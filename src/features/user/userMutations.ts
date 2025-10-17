@@ -1,5 +1,5 @@
 
-import { JSONContent, Profile, User, UserActivityMovie, UserActivityTvSeries, UserFollower, UserRecosAggregated, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserReviewMovie, UserReviewTvSeries, UserWatchlist, UserWatchlistMovie, UserWatchlistTvSeries } from '@recomendapp/types';
+import { JSONContent, Profile, User, UserActivityMovie, UserActivityTvSeries, UserFollower, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserReviewMovie, UserReviewTvSeries, UserWatchlist, UserWatchlistMovie, UserWatchlistTvSeries } from '@recomendapp/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { userKeys } from './userKeys';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
@@ -309,6 +309,13 @@ export const useUserActivityMovieInsertMutation = () => {
 			}), data);
 
 			// Watchlist
+			queryClient.setQueryData(userKeys.watchlist({
+				userId: data.user_id,
+				type: 'movie',
+			}), (oldData: UserWatchlistMovie[] | undefined) => {
+				if (!oldData) return oldData;
+				return oldData.filter((item) => item.movie_id !== data.movie_id);
+			});
 			queryClient.setQueryData(userKeys.watchlistItem({
 				id: data.movie_id,
 				type: 'movie',
@@ -325,11 +332,14 @@ export const useUserActivityMovieInsertMutation = () => {
 				});
 			}
 
-			// TODO: Remove media from recommendations
-			// queryClient.setQueryData(userKeys.recos({userId: data.user_id}), (oldData: UserRecosAggregated[]) => {
-			// 	if (!oldData) return oldData;
-			// 	return oldData.filter((reco: any) => !(reco.media_id === data.media_id && reco.media_type === data.media_type));
-			// });
+			// Reco
+			queryClient.invalidateQueries({
+				queryKey: userKeys.recos({userId: data.user_id, type: 'all'})
+			});
+			queryClient.setQueryData(userKeys.recos({userId: data.user_id, type: 'movie' }), (oldData: UserRecosMovieAggregated[] | undefined) => {
+				if (!oldData) return oldData;
+				return oldData.filter((reco) => reco.movie_id !== data.movie_id);
+			});
 
 			queryClient.invalidateQueries({
 				queryKey: userKeys.feed({ userId: data.user_id })
@@ -405,21 +415,24 @@ export const useUserActivityMovieUpdateMutation = () => {
 				.select(`*, review:user_reviews_movie(*)`)
 				.single()
 			if (error) throw error;
-			return {
-				...data,
-				isLikedChange: isLiked,
-			};
+			return data;
 		},
-		onSuccess: ({ isLikedChange, ...data}) => {
+		onSuccess: (data) => {
+			let isLikedChange: boolean | undefined = undefined;
 			queryClient.setQueryData(userKeys.activity({
 				id: data.movie_id,
 				type: 'movie',
 				userId: data.user_id,
-			}), data);
+			}), (oldData: UserActivityMovie | undefined) => {
+				if (oldData && oldData.is_liked !== data.is_liked) {
+					isLikedChange = data.is_liked;
+				}
+				return data;
+			});
 
 			// Heart picks
-			if (isLikedChange !== undefined) {
-				if (isLikedChange) {
+			if (isLikedChange) {
+				if (data.is_liked) {
 					queryClient.invalidateQueries({
 						queryKey: userKeys.heartPicks({
 							userId: data.user_id,
@@ -427,7 +440,6 @@ export const useUserActivityMovieUpdateMutation = () => {
 						})
 					})
 				} else {
-					// Remove from heart pick
 					queryClient.setQueryData(userKeys.heartPicks({
 						userId: data.user_id,
 						type: 'movie',
@@ -482,6 +494,13 @@ export const useUserActivityTvSeriesInsertMutation = () => {
 			}), data);
 
 			// Watchlist
+			queryClient.setQueryData(userKeys.watchlist({
+				userId: data.user_id,
+				type: 'tv_series',
+			}), (oldData: UserWatchlistTvSeries[] | undefined) => {
+				if (!oldData) return oldData;
+				return oldData.filter((item) => item.tv_series_id !== data.tv_series_id);
+			});
 			queryClient.setQueryData(userKeys.watchlistItem({
 				id: data.tv_series_id,
 				type: 'tv_series',
@@ -498,11 +517,14 @@ export const useUserActivityTvSeriesInsertMutation = () => {
 				});
 			}
 
-			// TODO: Remove media from recommendations
-			// queryClient.setQueryData(userKeys.recos({userId: data.user_id}), (oldData: UserRecosAggregated[]) => {
-			// 	if (!oldData) return oldData;
-			// 	return oldData.filter((reco: any) => !(reco.media_id === data.media_id && reco.media_type === data.media_type));
-			// });
+			// Reco
+			queryClient.invalidateQueries({
+				queryKey: userKeys.recos({userId: data.user_id, type: 'all'})
+			});
+			queryClient.setQueryData(userKeys.recos({userId: data.user_id, type: 'tv_series' }), (oldData: UserRecosTvSeriesAggregated[] | undefined) => {
+				if (!oldData) return oldData;
+				return oldData.filter((reco) => reco.tv_series_id !== data.tv_series_id);
+			});
 
 			queryClient.invalidateQueries({
 				queryKey: userKeys.feed({ userId: data.user_id })
@@ -578,21 +600,24 @@ export const useUserActivityTvSeriesUpdateMutation = () => {
 				.select(`*, review:user_reviews_tv_series(*)`)
 				.single()
 			if (error) throw error;
-			return {
-				...data,
-				isLikedChange: isLiked,
-			};
+			return data;
 		},
-		onSuccess: ({ isLikedChange, ...data}) => {
+		onSuccess: (data) => {
+			let isLikedChange: boolean | undefined = undefined;
 			queryClient.setQueryData(userKeys.activity({
 				id: data.tv_series_id,
 				type: 'tv_series',
 				userId: data.user_id,
-			}), data);
+			}), (oldData: UserActivityTvSeries | undefined) => {
+				if (oldData && oldData.is_liked !== data.is_liked) {
+					isLikedChange = data.is_liked;
+				}
+				return data;
+			});
 
 			// Heart picks
-			if (isLikedChange !== undefined) {
-				if (isLikedChange) {
+			if (isLikedChange) {
+				if (data.is_liked) {
 					queryClient.invalidateQueries({
 						queryKey: userKeys.heartPicks({
 							userId: data.user_id,
@@ -1250,6 +1275,12 @@ export const useUserWatchlistMovieInsertMutation = () => {
 			queryClient.invalidateQueries({
 				queryKey: userKeys.watchlist({
 					userId: data.user_id,
+					type: 'all',
+				})
+			});
+			queryClient.invalidateQueries({
+				queryKey: userKeys.watchlist({
+					userId: data.user_id,
 					type: 'movie',
 				})
 			});
@@ -1281,6 +1312,12 @@ export const useUserWatchlistMovieDeleteMutation = () => {
 				userId: data.user_id,
 			}), null);
 
+			queryClient.invalidateQueries({
+				queryKey: userKeys.watchlist({
+					userId: data.user_id,
+					type: 'all',
+				})
+			});
 			/* -------------- Delete the item in all the watchlist queries -------------- */
 			const baseKey = userKeys.watchlist({ userId: data.user_id, type: 'movie' });
 			const watchlistQueries = queryClient.getQueriesData<UserWatchlistMovie[]>({
@@ -1403,6 +1440,12 @@ export const useUserWatchlistTvSeriesInsertMutation = () => {
 			queryClient.invalidateQueries({
 				queryKey: userKeys.watchlist({
 					userId: data.user_id,
+					type: 'all',
+				})
+			});
+			queryClient.invalidateQueries({
+				queryKey: userKeys.watchlist({
+					userId: data.user_id,
 					type: 'tv_series',
 				})
 			});
@@ -1434,6 +1477,12 @@ export const useUserWatchlistTvSeriesDeleteMutation = () => {
 				userId: data.user_id,
 			}), null);
 
+			queryClient.invalidateQueries({
+				queryKey: userKeys.watchlist({
+					userId: data.user_id,
+					type: 'all',
+				})
+			});
 			/* -------------- Delete the item in all the watchlist queries -------------- */
 			const baseKey = userKeys.watchlist({ userId: data.user_id, type: 'tv_series' });
 			const watchlistQueries = queryClient.getQueriesData<UserWatchlistTvSeries[]>({
