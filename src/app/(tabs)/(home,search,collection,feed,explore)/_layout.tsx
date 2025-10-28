@@ -20,6 +20,8 @@ const AppLayout = ({ segment } : { segment: string }) => {
         return 'feed';
       case '(collection)':
         return 'collection/(tabs)';
+      case '(explore)':
+        return 'explore';
       default:
         return 'index';
     }

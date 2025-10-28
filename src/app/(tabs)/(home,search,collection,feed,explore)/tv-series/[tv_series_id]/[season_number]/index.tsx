@@ -18,7 +18,7 @@ import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Icons } from "@/constants/Icons";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { IconMediaRating } from "@/components/medias/IconMediaRating";
-import { useLocale, useTranslations } from "use-intl";
+import { useFormatter, useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -187,7 +187,7 @@ const TvSeriesSeasonScreen = () => {
 	const { tv_series_id, season_number } = useLocalSearchParams<{ tv_series_id: string, season_number: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
 	const { colors, bottomOffset, tabBarHeight } = useTheme();
-	const locale = useLocale();
+	const formatter = useFormatter();
 	const t = useTranslations();
 	const {
 		data: season,
@@ -255,12 +255,12 @@ const TvSeriesSeasonScreen = () => {
 							{item.overview ?? upperFirst(t('common.messages.no_overview'))}
 						</ThemedText>
 						<ThemedText numberOfLines={1} style={[tw`text-sm`, { color: colors.mutedForeground }]}>
-							{item.air_date ? new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(item.air_date)) : upperFirst(t('common.messages.unknown'))}
+							{item.air_date ? formatter.dateTime(new Date(item.air_date), { year: 'numeric', month: 'long', day: 'numeric' }) : upperFirst(t('common.messages.unknown'))}
 						</ThemedText>
 					</View>
 				</View>
 			</Animated.View>
-		), [colors, locale, season, t])}
+		), [colors, season, t, formatter])}
 		onScroll={scrollHandler}
 		ListHeaderComponent={
 			<TvSeriesSeasonHeader

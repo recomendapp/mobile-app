@@ -3,9 +3,9 @@ import Colors, { TColors } from "@/constants/Colors";
 import { useKeyboardToolbarOffset } from "@/hooks/useKeyboardToolbarOffset";
 import { getModeFromColor } from "@/utils/getModeFromColor";
 import { DefaultTheme } from "@react-navigation/native";
-import { Stack } from "expo-router";
 import { createContext, use, useCallback, useEffect, useMemo, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 
 type ThemeMode = "light" | "dark";
 
@@ -15,7 +15,7 @@ type ThemeContextType = {
 	tabBarHeight: number;
 	setTabBarHeight: (height: number) => void;
 	bottomOffset: number;
-	defaultScreenOptions: React.ComponentProps<typeof Stack.Screen>['options'];
+	defaultScreenOptions: NativeStackNavigationOptions;
 	mode: ThemeMode;
 	keyboardOffset: number;
 	setKeyboardToolbarOffset: (offset: number) => void;
@@ -37,7 +37,7 @@ export const ThemeProvider = ({children}: ThemeProviderProps) => {
 		return tabBarHeight + insets.bottom;
 	}, [tabBarHeight, insets.bottom]);
 
-	const defaultScreenOptions = useMemo((): React.ComponentProps<typeof Stack.Screen>['options'] => ({
+	const defaultScreenOptions = useMemo((): NativeStackNavigationOptions => ({
 		animation: 'ios_from_right',
 		headerShown: true,
 		headerTintColor: colors.foreground,

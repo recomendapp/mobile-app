@@ -120,7 +120,7 @@ const ButtonUserActivityTvSeriesLike = React.forwardRef<
 		}}
 		iconProps={{
 			color: activity?.is_liked ? colors.accentPink : colors.foreground,
-			fill: activity?.is_liked ? colors.accentPink : undefined,
+			fill: activity?.is_liked ? colors.accentPink : 'transparent',
 			size: ICON_ACTION_SIZE,
 			...iconProps,
 		}}

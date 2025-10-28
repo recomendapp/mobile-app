@@ -127,7 +127,7 @@ const SearchFilmsScreen = memo(() => {
 	
 	// REFs
 	const scrollRef = useRef<LegendListRef>(null);
-	const filtersRef = useRef<TrueSheet>(null);
+	// const filtersRef = useRef<TrueSheet>(null);
 	
 	// Memoized values
 	const moviesData = useMemo(() => 
@@ -151,23 +151,23 @@ const SearchFilmsScreen = memo(() => {
 		}
 	}, [hasNextPage, fetchNextPage]);
 
-	const handleFiltersPress = useCallback(() => {
-		filtersRef.current?.present();
-	}, []);
+	// const handleFiltersPress = useCallback(() => {
+	// 	filtersRef.current?.present();
+	// }, []);
 	
 	useScrollToTop(scrollRef);
 	
-	useLayoutEffect(() => {
-		navigation.getParent()?.setOptions({
-			headerRight: () => <FiltersButton onPress={handleFiltersPress} />
-		});
+	// useLayoutEffect(() => {
+	// 	navigation.getParent()?.setOptions({
+	// 		headerRight: () => <FiltersButton onPress={handleFiltersPress} />
+	// 	});
 
-		return () => {
-			navigation.getParent()?.setOptions({
-				headerRight: undefined,
-			});
-		};
-	}, [navigation, handleFiltersPress]);
+	// 	return () => {
+	// 		navigation.getParent()?.setOptions({
+	// 			headerRight: undefined,
+	// 		});
+	// 	};
+	// }, [navigation, handleFiltersPress]);
 
 	return (
 		<>
@@ -195,7 +195,7 @@ const SearchFilmsScreen = memo(() => {
 				}
 				onEndReached={onEndReached}
 			/>
-			<FiltersSheet ref={filtersRef} />
+			{/* <FiltersSheet ref={filtersRef} /> */}
 		</>
 	);
 });

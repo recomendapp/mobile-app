@@ -98,7 +98,7 @@ export const ButtonUserWatchlistTvSeries = React.forwardRef<
 			onLongPressProps?.(e);
 		}}
 		iconProps={{
-			fill: watchlist ? colors.foreground : undefined,
+			fill: watchlist ? colors.foreground : 'transparent',
 			size: ICON_ACTION_SIZE,
 			...iconProps
 		}}

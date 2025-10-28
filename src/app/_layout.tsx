@@ -2,7 +2,7 @@
 import '@/logger/sentry/setup';
 import { Sentry } from '@/logger/sentry/lib'
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { setAndroidNavigationBar } from '@/lib/android-navigation-bar';
 import { Providers } from '@/providers/Providers';
 import Drawer from 'expo-router/drawer';
@@ -10,6 +10,7 @@ import CustomDrawerContent from '@/components/drawer/CustomDrawerContent';
 import StatusBar from '@/components/StatusBar';
 import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+import { startAppCheck } from '@/lib/firebase/appCheck';
 
 export {
   ErrorBoundary,
@@ -32,6 +33,10 @@ const RootLayout = () => {
     setAndroidNavigationBar('dark');
     setIsColorSchemeLoaded(true);
     hasMounted.current = true;
+  }, []);
+
+  useEffect(() => {
+    startAppCheck();
   }, []);
 
   if (!isColorSchemeLoaded) {

@@ -3,7 +3,7 @@ import { View } from "./view";
 import { StyleProp, ViewStyle } from "react-native";
 import { GAP } from "@/theme/globals";
 
-interface GridViewProps<T> extends React.ComponentProps<typeof View> {
+export interface GridViewProps<T> extends React.ComponentProps<typeof View> {
 	data: T[];
 	renderItem: (item: T, index: number) => React.ReactNode;
 	columns?: number;
