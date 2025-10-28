@@ -13,6 +13,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Splash } from "@/components/Splash/Splash";
 import { PropsWithChildren } from "react";
 import { ToastProvider } from "@/components/Toast";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -31,12 +32,14 @@ const Providers = ({ children } : ProvidersProps) => {
 									<SupabaseProvider>
 										<ReactQueryProvider>
 											<AuthProvider>
-												<NotificationsProvider>
-													<ProvidersInner>
-														{children}
-													</ProvidersInner>
-													<BottomSheetManager />
-												</NotificationsProvider>
+												<BottomSheetModalProvider>
+													<NotificationsProvider>
+														<ProvidersInner>
+															{children}
+														</ProvidersInner>
+														<BottomSheetManager />
+													</NotificationsProvider>
+												</BottomSheetModalProvider>
 											</AuthProvider>
 										</ReactQueryProvider>
 									</SupabaseProvider>

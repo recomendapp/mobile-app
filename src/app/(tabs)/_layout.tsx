@@ -1,4 +1,4 @@
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs, useRouter, useSegments } from 'expo-router';
 // import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 import { Icons } from "@/constants/Icons";
 import { Platform } from 'react-native';
@@ -14,6 +14,8 @@ const TabsLayout = () => {
 	const { colors } = useTheme();
 	const t = useTranslations();
 	const router = useRouter();
+	const segment = useSegments();
+	const hideTabBarRoutes = ['(explore)'];
 	// return (
 	// 	<NativeTabs iconColor={colors.muted} tintColor={colors.tint}>
 	// 		<NativeTabs.Trigger name='(home)'>
@@ -54,11 +56,14 @@ const TabsLayout = () => {
 			headerShown: false,
 			tabBarButton: HapticTab,
 			tabBarBackground: TabBarBackground,
-			tabBarStyle: Platform.select({
-				ios: { position: 'absolute' },
-				android: { backgroundColor: colors.background },
-				default: {},
-			}),
+			tabBarStyle: {
+				...Platform.select({
+					ios: { position: 'absolute' },
+					android: { backgroundColor: colors.background },
+					default: {},
+				}),
+				display: hideTabBarRoutes.includes(segment[segment.length - 1]) ? 'none' : 'flex',
+			},
 			tabBarItemStyle: {
 				paddingTop: 4,
 			},
@@ -79,6 +84,14 @@ const TabsLayout = () => {
 				title: upperFirst(t('common.messages.search')),
 				tabBarIcon: ({ color }) => <Icons.Search size={28} color={color} />,
 			}}
+		/>
+
+		<Tabs.Screen
+		name='(explore)'
+		options={{
+			title: upperFirst(t('common.messages.explore')),
+			tabBarIcon: ({ color }) => <Icons.Explore size={28} color={color} />,
+		}}
 		/>
 
 		{/* LOGIN ONLY */}

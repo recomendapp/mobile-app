@@ -24,7 +24,7 @@ import { Image } from 'expo-image';
 import { IconMediaRating } from '@/components/medias/IconMediaRating';
 import { useMediaMovieFollowersAverageRatingQuery } from '@/features/media/mediaQueries';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { useTranslations } from 'use-intl';
+import { useLocale, useTranslations } from 'use-intl';
 import { Text } from '@/components/ui/text';
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import BottomSheetUserActivityMovieFollowersRating from '@/components/bottom-sheets/sheets/BottomSheetUserActivityMovieFollowersRating';
@@ -35,6 +35,7 @@ import ButtonUserActivityMovieWatch from '@/components/buttons/movies/ButtonUser
 import ButtonUserActivityMovieRating from '@/components/buttons/movies/ButtonUserActivityMovieRating';
 import ButtonUserRecoMovieSend from '@/components/buttons/movies/ButtonUserRecoMovieSend';
 import { useHeaderHeight } from '@react-navigation/elements';
+import { MovieHeaderInfo } from './MovieHeaderInfo';
 
 interface MovieHeaderProps {
 	movie?: MediaMovie | null;
@@ -188,12 +189,7 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 			]}
 			>
 				{/* GENRES */}
-				{movie ? <Text>
-					<Text style={{ color: colors.accentYellow }}>
-						{upperFirst(t('common.messages.film', { count: 1 }))}
-					</Text>
-					{movie?.genres ? <Genres genres={movie.genres} /> : null}
-				</Text> : loading ? <Skeleton style={tw`w-32 h-8`} /> : null}
+				{movie ? <MovieHeaderInfo movie={movie} /> : loading ? <Skeleton style={tw`w-32 h-8`} /> : null}
 				{/* TITLE */}
 				{!loading ? (
 					<Text
@@ -238,41 +234,28 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 	);
 };
 
-const Genres = ({
-	genres,
-  } : {
-	genres: {
-	  id: number;
-	  name: string;
-	}[];
-  }) => {
-	return (
-	  	<>
-			{" | "}
-			{genres.map((genre, index) => (
-				<React.Fragment key={index}>
-					{index !== 0 ? ", " : null}
-					<Link href={`/genre/${genre.id}`}>{genre.name}</Link>
-				</React.Fragment>
-			))}
-		</>
-	);
-};
-
-const Directors = ({
-	directors,
-} : {
-	directors: MediaPerson[];
-}) => {
+const Directors = ({ directors }: { directors: MediaPerson[] }) => {
+	const locale = useLocale();
+	const listFormatter = new Intl.ListFormat(locale, {
+		style: 'long',
+		type: 'conjunction',
+	});
+	const names = directors.map(d => d.name!);
+	const formatted = listFormatter.formatToParts(names);
 	return (
 		<>
-			{directors.map((director, index) => (
-				<React.Fragment key={index}>
-					{index !== 0 ? ", " : null}
-					<Link href={`/person/${director.id}`}>{director.name}</Link>
-				</React.Fragment>
-			))}
+		{formatted.map((part, i) => {
+			const director = directors.find(d => d.name === part.value);
+			if (part.type === 'element') {
+				return (
+					<Link key={i} href={`/person/${director?.slug || director?.id}`}>
+					{director?.name}
+					</Link>
+				);
+			}
+			return part.value;
+		})}
 		</>
-	)
+	);
 };
 export default MovieHeader;

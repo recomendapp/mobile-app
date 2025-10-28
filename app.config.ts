@@ -37,6 +37,12 @@ const getGoogleServicesFilePath = () => {
 	return './google-services.json';
 };
 
+const getGoogleServiceInfoFile = () => {
+	// if (IS_DEV) return './GoogleService-Info.dev.plist';
+	// if (IS_PREVIEW) return './GoogleService-Info.preview.plist';
+	return './GoogleService-Info.plist';
+};
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
 	name: getAppName(),
@@ -52,6 +58,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	],
 	ios: {
 		supportsTablet: true,
+		googleServicesFile: getGoogleServiceInfoFile(),
 		bundleIdentifier: getUniqueIdentifier(),
 		associatedDomains: [
 			`applinks:${getWebDomain()}`
@@ -110,6 +117,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			{
 				ios: {
 					deploymentTarget: '15.1',
+					useFrameworks: 'static',
+					forceStaticLinking: [
+						'RNFBApp',
+						// 'RNFBAppCheck'
+					],
 				},
 				android: {
 					"compileSdkVersion": 35,
@@ -202,7 +214,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				"project": process.env.EXPO_PUBLIC_SENTRY_PROJECT,
 				"organization": process.env.EXPO_PUBLIC_SENTRY_ORG,
 			}
-		]
+		],
+		"@maplibre/maplibre-react-native",
+		"@react-native-firebase/app",
+      	"@react-native-firebase/app-check",
 	],
 	experiments: {
 		typedRoutes: true,

@@ -12,10 +12,11 @@ import { Skeleton } from "../ui/Skeleton";
 import { Text } from "../ui/text";
 import BottomSheetPerson from "../bottom-sheets/sheets/BottomSheetPerson";
 import { GAP } from "@/theme/globals";
+import UserAvatar, { UserAvatarProps } from "../user/UserAvatar";
 
 interface CardPersonBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
-		variant?: "default" | "poster" | "list" | "vertical";
+		variant?: "default" | "poster" | "list" | "vertical" | "inline";
 		linked?: boolean;
 		children?: React.ReactNode;
 		onPress?: () => void;
@@ -45,6 +46,13 @@ type VariantMap = {
 	list: VariantBaseProps & {
 		variant: "list";
 		hideKnownForDepartment?: boolean;
+	};
+	vertical: VariantBaseProps & {
+		variant: "vertical"
+	};
+	inline: VariantBaseProps & {
+		variant: "inline";
+		avatarStyle?: UserAvatarProps["style"];
 	};
 };
 
@@ -108,6 +116,19 @@ React.ComponentRef<typeof Animated.View>,
 	);
 });
 CardPersonPoster.displayName = "CardPersonPoster";
+
+const CardPersonInline = React.forwardRef<
+	React.ComponentRef<typeof Animated.View>,
+	FixedOmit<VariantMap['inline'], "variant" | "linked" | "onPress" | "onLongPress">
+>(({ person, avatarStyle, children, skeleton, style, ...props }, ref) => {
+	return (
+		<Animated.View ref={ref} style={[tw.style('flex-row items-center gap-1'), style]}>
+			{!skeleton ? <UserAvatar full_name={person.name!} avatar_url={person.profile_url} style={avatarStyle} /> : <UserAvatar skeleton />}
+			{!skeleton ? <Text>{person.name}</Text> : <Skeleton style={tw.style('w-12 h-4')} />}
+		</Animated.View>
+	);
+});
+CardPersonInline.displayName = "CardPersonInline";
 
 
 const CardPersonList = React.forwardRef<
@@ -204,6 +225,8 @@ const CardPerson = React.forwardRef<
 			<CardPersonList ref={ref} {...props} />
 		) : variant == "vertical" ? (
 			<CardPersonVertical ref={ref} {...props} />
+		) : variant == "inline" ? (
+			<CardPersonInline ref={ref} {...props} />
 		) : null
 	)
 
