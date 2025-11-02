@@ -1,4 +1,3 @@
-import React, { useCallback, useMemo } from 'react';
 import tw from '@/lib/tw';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
@@ -20,6 +19,7 @@ import { Input } from "@/components/ui/Input";
 import { GAP, PADDING_HORIZONTAL } from '@/theme/globals';
 import { LegendList } from '@legendapp/list';
 import { Label } from '@/components/ui/Label';
+import { forwardRef } from 'react';
 
 interface BottomSheetPlaylistCreateProps extends BottomSheetProps {
 	onCreate?: (playlist: Playlist) => void;
@@ -30,33 +30,33 @@ interface BottomSheetPlaylistCreateProps extends BottomSheetProps {
 const TITLE_MIN_LENGTH = 1;
 const TITLE_MAX_LENGTH = 100;
 
-const BottomSheetPlaylistCreate = React.forwardRef<
+const BottomSheetPlaylistCreate = forwardRef<
 	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetPlaylistCreateProps
->(({ id, onCreate, placeholder, playlistType, ...props }, ref) => {
+>(({ id, onCreate,  placeholder, playlistType, ...props }, ref) => {
 	const { session } = useAuth();
 	const toast = useToast();
 	const closeSheet = useBottomSheetStore((state) => state.closeSheet);
 	const t = useTranslations();
 	const createPlaylistMutation = usePlaylistInsertMutation();
 
-	const typeOptions = useMemo(() => ([
+	const typeOptions: { key: PlaylistType; label: string }[] = [
 		{ key: 'movie', label: upperFirst(t('common.messages.film', { count: 2 })) },
 		{ key: 'tv_series', label: upperFirst(t('common.messages.tv_series', { count: 2 })) },
-	]), [t]);
+	];
 
 	/* ---------------------------------- FORM ---------------------------------- */
-	const playlistSchema = useMemo(() => z.object({
+	const playlistSchema = z.object({
 		title: z.string()
 			.min(TITLE_MIN_LENGTH, { message: upperFirst(t('common.form.length.char_min', { count: TITLE_MIN_LENGTH }))})
 			.max(TITLE_MAX_LENGTH, { message: upperFirst(t('common.form.length.char_max', { count: TITLE_MIN_LENGTH }))}),
 		type: z.enum(['movie', 'tv_series']),
-	}), [t]);
+	});
 	type PlaylistFormValues = z.infer<typeof playlistSchema>;
-	const defaultValues = useMemo((): Partial<PlaylistFormValues> => ({
+	const defaultValues: Partial<PlaylistFormValues> = {
 		title: '',
 		type: playlistType || 'movie',
-	}), [playlistType]);
+	};
 	const form = useForm<PlaylistFormValues>({
 		resolver: zodResolver(playlistSchema),
 		defaultValues: defaultValues,
@@ -64,7 +64,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
 	});
 	/* -------------------------------------------------------------------------- */
 
-	const onSubmit = useCallback(async (values: PlaylistFormValues) => {
+	const onSubmit = async (values: PlaylistFormValues) => {
 		if (!session) return;
 		await createPlaylistMutation.mutateAsync({
 			title: values.title,
@@ -81,7 +81,7 @@ const BottomSheetPlaylistCreate = React.forwardRef<
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [session, createPlaylistMutation, toast, t, form, onCreate, closeSheet, id]);
+	};
 
 	return (
 		<ThemedTrueSheet
@@ -124,14 +124,15 @@ const BottomSheetPlaylistCreate = React.forwardRef<
 				horizontal
 				style={tw`w-full`}
 				contentContainerStyle={{ gap: GAP }}
-				renderItem={useCallback(({ item } : { item: { key: string; label: string } }) => (
+				renderItem={({ item } : { item: { key: string; label: string } }) => (
 					<Button
 					variant={value === item.key ? 'accent-yellow' : 'outline'}
 					onPress={() => onChange(item.key)}
+					disabled={playlistType && item.key !== playlistType}
 					>
 						{item.label}
 					</Button>
-				), [onChange, value])}
+				)}
 				/>
 			</View>
 			)}

@@ -8,13 +8,12 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
 import { useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardMovie } from "@/components/cards/CardMovie";
 import { FadeInDown } from "react-native-reanimated";
-import { UserActivityMovie } from "@recomendapp/types";
 
 interface sortBy {
 	label: string;
@@ -28,14 +27,14 @@ const UserCollectionMovieScreen = () => {
 	const { colors, tabBarHeight, bottomOffset } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
-	const sortByOptions = useMemo((): sortBy[] => [
+	const sortByOptions: sortBy[] = [
 		{ label: upperFirst(t('common.messages.watched_date')), value: 'watched_date' },
 		{ label: upperFirst(t('common.messages.rating')), value: 'rating' },
-	], [t]);
+	];
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	const {
-		data,
+		data: movies,
 		isLoading,
 		fetchNextPage,
 		hasNextPage,
@@ -48,10 +47,9 @@ const UserCollectionMovieScreen = () => {
 			sortOrder,
 		}
 	});
-	const loading = data === undefined || isLoading;
-	const movies = useMemo(() => data?.pages.flat() || [], [data]);
+	const loading = movies === undefined || isLoading;
 	// Handlers
-	const handleSortBy = useCallback(() => {
+	const handleSortBy = () => {
 		const sortByOptionsWithCancel = [
 			...sortByOptions,
 			{ label: upperFirst(t('common.messages.cancel')), value: 'cancel' },
@@ -65,13 +63,13 @@ const UserCollectionMovieScreen = () => {
 			if (selectedIndex === undefined || selectedIndex === cancelIndex) return;
 			setSortBy(sortByOptionsWithCancel[selectedIndex] as sortBy);
 		});
-	}, [sortByOptions, showActionSheetWithOptions]);
+	};
 	
 	return (
 	<>
 		<LegendList
-		data={movies}
-		renderItem={useCallback(({ item } : { item: UserActivityMovie }) => (
+		data={movies?.pages.flat() || []}
+		renderItem={({ item }) => (
 			<CardMovie
 			variant="poster"
 			movie={item.movie!}
@@ -79,7 +77,7 @@ const UserCollectionMovieScreen = () => {
 			style={tw`w-full`}
 			entering={FadeInDown}
 			/>
-		), [])}
+		)}
 		ListHeaderComponent={
 			<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
 				<Button
@@ -113,8 +111,8 @@ const UserCollectionMovieScreen = () => {
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,
 		}}
-		keyExtractor={useCallback((item: UserActivityMovie) => item.id.toString(), [])}
-		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
+		keyExtractor={(item) => item.id.toString()}
+		onEndReached={() => hasNextPage && fetchNextPage()}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		/>

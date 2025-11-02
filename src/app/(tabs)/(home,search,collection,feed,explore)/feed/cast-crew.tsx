@@ -34,10 +34,8 @@ const CastCrewFeedScreen = () => {
 	});
 	const loading = isLoading || data === undefined;
 	const feed = useMemo(() => data?.pages.flat() || [], [data]);
-
 	// Render
 	const renderItem = ({ item } : { item: Database['public']['Functions']['get_feed_cast_crew']['Returns'][number], index: number }) => {
-		item.jobs
 		switch (item.media_type) {
 			case 'movie':
 				return <CardFeedCastCrewMovie movie={item.media} person={item.person} jobs={item.jobs} />;

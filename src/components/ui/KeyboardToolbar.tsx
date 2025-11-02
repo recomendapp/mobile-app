@@ -19,12 +19,12 @@ export const KeyboardToolbar = ({
 		...DefaultKeyboardToolbarTheme,
 		dark: {
 			...DefaultKeyboardToolbarTheme.dark,
-			background: colors.muted,
+			background: colors.keyboardToolbarBackground,
 			primary: colors.foreground,
 		},
 		light: {
-			...DefaultKeyboardToolbarTheme.dark,
-			background: colors.muted,
+			...DefaultKeyboardToolbarTheme.light,
+			background: colors.keyboardToolbarBackground,
 			primary: colors.foreground,
 		},
 		...theme,

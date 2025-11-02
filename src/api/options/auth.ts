@@ -1,18 +1,18 @@
-import { useQuery } from "@tanstack/react-query"
-import { authKeys } from "./authKeys"
-import Purchases, { CustomerInfo } from "react-native-purchases"
-import { useSupabaseClient } from "@/providers/SupabaseProvider";
+import { useSupabaseClient } from '@/providers/SupabaseProvider';
+import { queryOptions } from '@tanstack/react-query'
+import { Keys } from '../keys';
+import Purchases, { CustomerInfo } from 'react-native-purchases';
 
-export const useAuthUser = ({
+export const AuthUserOptions = ({
 	userId,
 } : {
 	userId?: string;
 }) => {
 	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: authKeys.user(),
+	return queryOptions({
+		queryKey: Keys.auth.user(),
 		queryFn: async () => {
-			if (!userId) return null;
+			if (!userId) throw new Error('userId is required');
 			const { data, error } = await supabase
 				.from('user')
 				.select('*')
@@ -25,15 +25,15 @@ export const useAuthUser = ({
 	});
 };
 
-export const useAuthCustomerInfo = ({
+export const AuthCustomerInfoOptions = ({
 	initialData,
 	enabled = true,
 } : {
 	initialData?: CustomerInfo;
 	enabled?: boolean;
-}) => {
-	return useQuery({
-		queryKey: authKeys.customerInfo(),
+} = {}) => {
+	return queryOptions({
+		queryKey: Keys.auth.customerInfo(),
 		queryFn: async () => {
 			return await Purchases.getCustomerInfo();
 		},

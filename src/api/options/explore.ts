@@ -4,7 +4,31 @@ import { Keys } from '../keys';
 import { useLocale } from 'use-intl';
 import { ExploreTile } from '@recomendapp/types';
 
-export const exploreTileOptions = ({
+export const ExploreTileMetaOptions = ({
+	exploreId,
+} : {
+	exploreId: number;
+}) => {
+	const supabase = useSupabaseClient();
+	const locale = useLocale();
+	return queryOptions({
+		queryKey: Keys.explore.tileMeta({
+			exploreId: exploreId,
+			locale: locale,
+		}),
+		queryFn: async () => {
+			const { data, error } = await supabase
+				.from('explore')
+				.select('*')
+				.eq('id', exploreId)
+				.single();
+			if (error) throw error;
+			return data;
+		},
+	})
+};
+
+export const ExploreTileOptions = ({
 	exploreId,
 } : {
 	exploreId: number;
@@ -13,7 +37,7 @@ export const exploreTileOptions = ({
 	const locale = useLocale();
 	return queryOptions({
 		queryKey: Keys.explore.tile({
-			exploreId: exploreId.toString(),
+			exploreId: exploreId,
 			locale: locale,
 		}),
 		queryFn: async () => {
@@ -24,5 +48,10 @@ export const exploreTileOptions = ({
 			if (error) throw error;
 			return data as ExploreTile;
 		},
+		staleTime: Infinity,
+		gcTime: Infinity,
+		refetchOnMount: false,
+		refetchOnReconnect: false,
+		refetchOnWindowFocus: false,
 	});
 };

@@ -23,7 +23,7 @@ import { ActivityIndicator, Pressable, RefreshControl, ScrollView } from "react-
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetUser from "@/components/bottom-sheets/sheets/BottomSheetUser";
 import { useCallback, useMemo } from "react";
-import { authKeys } from "@/features/auth/authKeys";
+import { Keys } from "@/api/keys";
 
 const ProfileHeader = ({
 	profile,
@@ -118,7 +118,6 @@ const ProfileScreen = () => {
 	const {
 		data: profile,
 		isLoading,
-		isError,
 		isRefetching,
 		refetch,
 	} = useUserProfileQuery({
@@ -136,7 +135,7 @@ const ProfileScreen = () => {
 	const refresh = () => {
 		refetch();
 		profile?.id === session?.user.id && queryClient.invalidateQueries({
-			queryKey: authKeys.user()
+			queryKey: Keys.auth.user()
 		});
 	};
 

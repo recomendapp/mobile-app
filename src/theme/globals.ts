@@ -10,7 +10,9 @@ export const GAP_XL = GAP * 4;
 export const HEIGHT = 36;
 export const FONT_SIZE = 16;
 export const BORDER_RADIUS = 8;
-export const BORDER_RADIUS_ROUNDED = 999;
+export const BORDER_RADIUS_XS = BORDER_RADIUS / 2;
+export const BORDER_RADIUS_LG = BORDER_RADIUS * 2;
+export const BORDER_RADIUS_FULL = 999;
 export const CORNERS = 999;
 
 export const ICON_ACTION_SIZE = 24;

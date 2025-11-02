@@ -12,14 +12,14 @@ import * as QueryParams from "expo-auth-session/build/QueryParams";
 import { makeRedirectUri } from "expo-auth-session";
 import { defaultLocale, SupportedLocale, supportedLocales } from "@/translations/locales";
 import { useRevenueCat } from "@/hooks/useRevenueCat";
-import { useAuthCustomerInfo, useAuthUser } from "@/features/auth/authQueries";
 import { CustomerInfo } from "react-native-purchases";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { randomUUID } from "expo-crypto";
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as env from '@/env';
-import { useQueryClient } from "@tanstack/react-query";
-import { authKeys } from "@/features/auth/authKeys";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AuthCustomerInfoOptions, AuthUserOptions } from "@/api/options/auth";
+import { Keys } from "@/api/keys";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -75,16 +75,16 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [pushToken, setPushToken] = useState<string | null>(null);
 	const {
 		data: user,
-	} = useAuthUser({
+	} = useQuery(AuthUserOptions({
 		userId: session?.user.id,
-	});
+	}));
 	const { customerInfo: initCustomerInfo } = useRevenueCat(session);
 	const {
 		data: customerInfo,
-	} = useAuthCustomerInfo({
+	} = useQuery(AuthCustomerInfoOptions({
 		enabled: !!initCustomerInfo,
 		initialData: initCustomerInfo,
-	});
+	}));
 
 	// Functions
 	const createSessionFromUrl = useCallback(async (url: string) => {
@@ -207,7 +207,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		if (error) throw error;
 		setSession(null);
 		queryClient.removeQueries({
-			queryKey: authKeys.user(),
+			queryKey: Keys.auth.user(),
 		})
 	}, [supabase, pushToken, queryClient]);
 
