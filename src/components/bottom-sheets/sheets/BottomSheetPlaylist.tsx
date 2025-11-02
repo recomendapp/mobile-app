@@ -1,4 +1,3 @@
-import React from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
 import { Playlist } from '@recomendapp/types';
@@ -7,7 +6,7 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Alert, ScrollView, View } from 'react-native';
+import { Alert, FlatList } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAuth } from '@/providers/AuthProvider';
 import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
@@ -23,10 +22,15 @@ import richTextToPlainString from '@/utils/richTextToPlainString';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useToast } from '@/components/Toast';
 import BottomSheetSharePlaylist from './share/BottomSheetSharePlaylist';
+import { GAP, GAP_XS } from '@/theme/globals';
+import { View } from '@/components/ui/view';
+import ButtonActionPlaylistLike from '@/components/buttons/ButtonActionPlaylistLike';
+import ButtonActionPlaylistSaved from '@/components/buttons/ButtonActionPlaylistSaved';
+import { forwardRef, useRef } from 'react';
 
 interface BottomSheetPlaylistProps extends BottomSheetProps {
-  playlist: Playlist,
-  additionalItemsTop?: Item[];
+	playlist: Playlist,
+	additionalItemsTop?: Item[];
 };
 
 interface Item {
@@ -34,25 +38,25 @@ interface Item {
 	label: string;
 	onPress: () => void;
 	submenu?: Item[];
-  closeSheet?: boolean;
-  disabled?: boolean;
+	closeSheet?: boolean;
+	disabled?: boolean;
 }
 
-const BottomSheetPlaylist = React.forwardRef<
-  React.ComponentRef<typeof TrueSheet>,
-  BottomSheetPlaylistProps
+const BottomSheetPlaylist = forwardRef<
+	React.ComponentRef<typeof TrueSheet>,
+	BottomSheetPlaylistProps
 >(({ id, playlist, additionalItemsTop = [], ...props }, ref) => {
-  const { session } = useAuth();
-  const toast = useToast();
-  const { closeSheet, openSheet } = useBottomSheetStore((state) => state);
-  const insets = useSafeAreaInsets();
-  const { colors } = useTheme();
-  const router = useRouter();
-  const pathname = usePathname();
-  const t = useTranslations();
-  // REFs
-  const scrollRef = React.useRef<ScrollView>(null);
-  const {
+	const { session } = useAuth();
+	const toast = useToast();
+	const { closeSheet, openSheet } = useBottomSheetStore((state) => state);
+	const insets = useSafeAreaInsets();
+	const { colors } = useTheme();
+	const router = useRouter();
+	const pathname = usePathname();
+	const t = useTranslations();
+	// REFs
+	const scrollRef = useRef<FlatList>(null);
+	const {
 		data: saved,
 		isLoading: isLoadingSaved,
 	} = useUserPlaylistSavedQuery({
@@ -62,180 +66,178 @@ const BottomSheetPlaylist = React.forwardRef<
 	const insertPlaylistSaved = useUserPlaylistSavedInsertMutation();
 	const deletePlaylistSaved = useUserPlaylistSavedDeleteMutation();
 
-  const playlistDeleteMutation = usePlaylistDeleteMutation();
+	const playlistDeleteMutation = usePlaylistDeleteMutation();
 
-  const items: Item[][] = React.useMemo(() => {
-    return [
-      [
-        ...additionalItemsTop,
-      ],
-      [
-        {
-          icon: Icons.Share,
-          onPress: () => openSheet(BottomSheetSharePlaylist, {
-            playlist: playlist,
-          }),
-          label: upperFirst(t('common.messages.share')),
-        },
-        ...(session?.user.id && playlist.user?.id !== session.user.id ? [
-          {
-            icon: saved
-              ? Icons.Check
-              : Icons.Add,
-            onPress: async () => {
-              if (saved) {
-                await deletePlaylistSaved.mutateAsync({
-                  savedId: saved.id,
-                }, {
-                  onError: () => {
-                    toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
-                  }
-                });
-              } else {
-                await insertPlaylistSaved.mutateAsync({
-                  userId: session.user.id,
-                  playlistId: playlist.id,
-                }, {
-                  onError: () => {
-                    toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
-                  }
-                });
+	const items: Item[] = [
+		...additionalItemsTop,
+		{
+			icon: Icons.Share,
+			onPress: () => openSheet(BottomSheetSharePlaylist, {
+				playlist: playlist,
+			}),
+			label: upperFirst(t('common.messages.share')),
+		},
+		...(session?.user.id && playlist.user?.id !== session.user.id ? [
+			{
+				icon: saved
+					? Icons.Check
+					: Icons.Add,
+				onPress: async () => {
+					if (saved) {
+						await deletePlaylistSaved.mutateAsync({
+							savedId: saved.id,
+						}, {
+							onError: () => {
+								toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
+							}
+						});
+					} else {
+						await insertPlaylistSaved.mutateAsync({
+							userId: session.user.id,
+							playlistId: playlist.id,
+						}, {
+							onError: () => {
+								toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
+							}
+						});
 
-              }
-            },
-            label: saved ? upperFirst(t('common.messages.remove_from_library')) : upperFirst(t('common.messages.save_to_library')),
-            closeSheet: false,
-            disabled: isLoadingSaved,
-          }
-        ] : []),
-        {
-          icon: Icons.Playlist,
-          onPress: () => router.push(`/playlist/${playlist.id}`),
-          label: upperFirst(t('common.messages.go_to_playlist')),
-          disabled: pathname.startsWith(`/playlist/${playlist.id}`),
-        },
-        ...(playlist.user ? [
-          {
-            icon: Icons.User,
-            onPress: () => router.push(`/user/${playlist.user?.username}`),
-            label: upperFirst(t('common.messages.go_to_user')),
-          }
-        ] : []),
-        ...(session?.user.id === playlist.user_id ? [
-          {
-            icon: Icons.Users,
-            onPress: () => router.push(`/playlist/${playlist.id}/edit/guests`),
-            label: upperFirst(t('common.messages.manage_guests', { gender: 'male', count: 2 })),
-          },
-          {
-            icon: Icons.settings,
-            onPress: () => router.push(`/playlist/${playlist.id}/edit`),
-            label: upperFirst(t('common.messages.edit_playlist')),
-          },
-          {
-            icon: Icons.Delete,
-            onPress: async () => {
-              Alert.alert(
-                upperFirst(t('common.messages.are_u_sure')),
-                upperFirst(richTextToPlainString(t.rich('pages.playlist.actions.delete.description', { title: playlist.title, important: (chunk) => `"${chunk}"` }))),
-                [
-                  {
-                    text: upperFirst(t('common.messages.cancel')),
-                    style: 'cancel',
-                  },
-                  {
-                    text: upperFirst(t('common.messages.delete')),
-                    onPress: async () => {
-                      await playlistDeleteMutation.mutateAsync(
-                        { playlistId: playlist.id, userId: session.user.id },
-                        {
-                          onSuccess: () => {
-                            toast.success(upperFirst(t('common.messages.deleted')));
-                            if (pathname.startsWith(`/playlist/${playlist.id}`)) {
-                              router.replace('/collection');
-                            }
-                            closeSheet(id);
-                          },
-                          onError: () => {
-                            toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
-                          },
-                        }
-                      );
-                    },
-                    style: 'destructive',
-                  }
-                ]
-              )
-            },
-            label: upperFirst(t('common.messages.delete')),
-            closeSheet: false,
-          }
-        ] : []),
-      ]
-    ]
-  }, [playlist, session, saved, additionalItemsTop, colors, t, router, closeSheet, id, playlistDeleteMutation, insertPlaylistSaved, deletePlaylistSaved]);
-  return (
-  <ThemedTrueSheet
-  ref={ref}
-  scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
-  contentContainerStyle={tw`p-0`}
-  {...props}
-  >
-    <ScrollView
-    ref={scrollRef}
-    bounces={false}
-    contentContainerStyle={{ paddingBottom: insets.bottom }}
-    stickyHeaderIndices={[0]}
-    >
-      <View
-      style={[
-        { backgroundColor: colors.muted, borderColor: colors.mutedForeground },
-        tw`border-b p-4`,
-      ]}
-      >
-        <View style={tw`flex-row items-center gap-2 `}>
-          <ImageWithFallback
-          alt={playlist.title ?? ''}
-          source={{ uri: playlist.poster_url ?? '' }}
-          style={[
-            { aspectRatio: 1 / 1, height: 'fit-content' },
-            tw.style('rounded-md w-12'),
-          ]}
-          type={"playlist"}
-          />
-          <View style={tw`shrink`}>
-            <Text numberOfLines={2} style={tw`shrink`}>{playlist.title}</Text>
-            {playlist.user && <Text textColor='muted' numberOfLines={1} style={tw`shrink`}>
-              {t('common.messages.by_name', { name: playlist.user?.username! })}
-            </Text>}
-          </View>
-        </View>
-      </View>
-      {items.map((group, i) => (
-        <React.Fragment key={i}>
-          {group.map((item, j) => (
-            <Button
-            key={j}
-            variant='ghost'
-            icon={item.icon}
-            iconProps={{
-              color: colors.mutedForeground,
-            }}
-            disabled={item.disabled}
-            style={tw`justify-start h-auto py-4`}
-            onPress={() => {
-              (item.closeSheet === undefined || item.closeSheet === true) && closeSheet(id);
-              item.onPress();
-            }}
-            >
-              {item.label}
-            </Button>
-          ))}
-        </React.Fragment>
-      ))}
-    </ScrollView>
-  </ThemedTrueSheet>
-  );
+					}
+				},
+				label: saved ? upperFirst(t('common.messages.remove_from_library')) : upperFirst(t('common.messages.save_to_library')),
+				closeSheet: false,
+				disabled: isLoadingSaved,
+			}
+		] : []),
+		{
+			icon: Icons.Playlist,
+			onPress: () => router.push(`/playlist/${playlist.id}`),
+			label: upperFirst(t('common.messages.go_to_playlist')),
+			disabled: pathname.startsWith(`/playlist/${playlist.id}`),
+		},
+		...(playlist.user ? [
+			{
+				icon: Icons.User,
+				onPress: () => router.push(`/user/${playlist.user?.username}`),
+				label: upperFirst(t('common.messages.go_to_user')),
+			}
+		] : []),
+		...(session?.user.id === playlist.user_id ? [
+			{
+				icon: Icons.Users,
+				onPress: () => router.push(`/playlist/${playlist.id}/edit/guests`),
+				label: upperFirst(t('common.messages.manage_guests', { gender: 'male', count: 2 })),
+			},
+			{
+				icon: Icons.settings,
+				onPress: () => router.push(`/playlist/${playlist.id}/edit`),
+				label: upperFirst(t('common.messages.edit_playlist')),
+			},
+			{
+				icon: Icons.Delete,
+				onPress: async () => {
+					Alert.alert(
+						upperFirst(t('common.messages.are_u_sure')),
+						upperFirst(richTextToPlainString(t.rich('pages.playlist.actions.delete.description', { title: playlist.title, important: (chunk) => `"${chunk}"` }))),
+						[
+							{
+								text: upperFirst(t('common.messages.cancel')),
+								style: 'cancel',
+							},
+							{
+								text: upperFirst(t('common.messages.delete')),
+								onPress: async () => {
+									await playlistDeleteMutation.mutateAsync(
+										{ playlistId: playlist.id, userId: session.user.id },
+										{
+											onSuccess: () => {
+												toast.success(upperFirst(t('common.messages.deleted')));
+												if (pathname.startsWith(`/playlist/${playlist.id}`)) {
+													router.replace('/collection');
+												}
+												closeSheet(id);
+											},
+											onError: () => {
+												toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
+											},
+										}
+									);
+								},
+								style: 'destructive',
+							}
+						]
+					)
+				},
+				label: upperFirst(t('common.messages.delete')),
+				closeSheet: false,
+			}
+		] : []),
+	];
+
+	return (
+	<ThemedTrueSheet
+	ref={ref}
+	scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
+	contentContainerStyle={tw`p-0`}
+	{...props}
+	>
+		<FlatList
+		ref={scrollRef}
+		data={items}
+		renderItem={({ item }) => (
+			<Button
+			variant='ghost'
+			icon={item.icon}
+			iconProps={{
+				color: colors.mutedForeground,
+			}}
+			disabled={item.disabled}
+			style={tw`justify-start h-auto py-4`}
+			onPress={() => {
+				(item.closeSheet === undefined || item.closeSheet === true) && closeSheet(id);
+				item.onPress();
+			}}
+			>
+				{item.label}
+			</Button>
+		)}
+		ListHeaderComponent={
+			<View
+			style={[
+				{ backgroundColor: colors.muted, borderColor: colors.mutedForeground, gap: GAP },
+				tw`flex-row items-center justify-between border-b p-4`,
+			]}
+			>
+				<View style={[tw`flex-row items-center`, { gap: GAP }]}>
+					<ImageWithFallback
+					alt={playlist.title ?? ''}
+					source={{ uri: playlist.poster_url ?? '' }}
+					style={[
+						{ aspectRatio: 1 / 1 },
+						tw.style('rounded-md w-12'),
+					]}
+					type={"playlist"}
+					/>
+					<View>
+						<Text numberOfLines={2}>{playlist.title}</Text>
+						{playlist.user && <Text textColor='muted' numberOfLines={1}>
+							{t('common.messages.by_name', { name: playlist.user?.username! })}
+						</Text>}
+					</View>
+				</View>
+				<View style={tw`flex-row items-center`}>
+					<ButtonActionPlaylistLike playlist={playlist} />
+					<ButtonActionPlaylistSaved playlist={playlist} />
+				</View>
+			</View>
+		}
+		stickyHeaderIndices={[0]}
+		keyExtractor={(_, index) => index.toString()}
+		nestedScrollEnabled
+		bounces={false}
+		contentContainerStyle={{ paddingBottom: insets.bottom }}
+		/>
+	</ThemedTrueSheet>
+	);
 });
 BottomSheetPlaylist.displayName = 'BottomSheetPlaylist';
 

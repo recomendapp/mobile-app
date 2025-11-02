@@ -1,3 +1,4 @@
+import { withPersistKey } from "@/features";
 import { MediaType } from "@recomendapp/types";
 
 export const mediaKeys = {
@@ -17,7 +18,7 @@ export const mediaKeys = {
 	},
 
 	genres: () => {
-		return [...mediaKeys.base, 'genres'] as const;
+		return withPersistKey([...mediaKeys.base, 'genres'] as const);
 	},
 
 

@@ -1,4 +1,4 @@
-import {createContext, useContext, useMemo} from 'react'
+import {createContext, use, useMemo} from 'react'
 import {type ScrollHandlers} from 'react-native-reanimated'
 
 const ScrollContext = createContext<ScrollHandlers<any>>({
@@ -10,7 +10,7 @@ const ScrollContext = createContext<ScrollHandlers<any>>({
 ScrollContext.displayName = 'ScrollContext'
 
 export function useScrollHandlers(): ScrollHandlers<any> {
-  return useContext(ScrollContext)
+  return use(ScrollContext)
 }
 
 type ProviderProps = {children: React.ReactNode} & ScrollHandlers<any>

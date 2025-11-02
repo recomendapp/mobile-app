@@ -28,8 +28,6 @@ const ThemedBottomSheetModal = ({ backgroundStyle, handleIndicatorStyle, ...prop
       backgroundStyle,
     ]}
     {...props}
-    >
-      {props.children}
-    </GBottomSheetModal>
+    />
   );
 }

@@ -14,7 +14,8 @@
     "build:android": "eas build -p android",
     "build": "eas build --platform all",
     "android": "expo run:android",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "lint": "expo lint"
   },
   "dependencies": {
     "@10play/tentap-editor": "^0.7.5-alpha.0",
@@ -46,7 +47,7 @@
     "@react-navigation/material-top-tabs": "^7.3.5",
     "@react-navigation/native": "^7.1.6",
     "@recomendapp/search-client": "^1.0.4",
-    "@recomendapp/types": "^1.0.21",
+    "@recomendapp/types": "^1.0.24",
     "@sentry/react-native": "^7.3.0",
     "@shopify/flash-list": "2.0.2",
     "@supabase/supabase-js": "^2.53.0",
@@ -131,6 +132,9 @@
     "@types/d3-interpolate": "^3.0.4",
     "@types/lodash": "^4.17.20",
     "@types/react": "^19.1.13",
+    "eslint": "^9.38.0",
+    "eslint-config-expo": "~10.0.0",
+    "eslint-plugin-react-compiler": "^19.1.0-rc.2",
     "typescript": "~5.9.2"
   },
   "private": true

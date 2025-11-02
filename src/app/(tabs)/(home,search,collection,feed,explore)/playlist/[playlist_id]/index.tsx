@@ -1,4 +1,3 @@
-import { useAuth } from "@/providers/AuthProvider";
 import { Icons } from "@/constants/Icons";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useLocalSearchParams } from "expo-router";
@@ -17,7 +16,6 @@ import { PlaylistTvSeries } from "@/components/screens/playlist/PlaylistTvSeries
 import { useUIStore } from "@/stores/useUIStore";
 
 const PlaylistScreen = () => {
-	const { session } = useAuth();
 	const { playlist_id } = useLocalSearchParams();
 	const playlistId = Number(playlist_id) || undefined;
 	const { playlistView, setPlaylistView } = useUIStore((state) => state);
@@ -37,12 +35,8 @@ const PlaylistScreen = () => {
 			headerTitle: playlist?.title ?? '',
 			headerRight: playlist ? () => (
 				<View style={tw`flex-row items-center`}>
-					{session && playlist && session.user.id !== playlist.user_id && (
-						<>
-						<ButtonActionPlaylistLike playlistId={playlist.id} />
-						<ButtonActionPlaylistSaved playlistId={playlist.id} />
-						</>
-					)}
+					<ButtonActionPlaylistLike playlist={playlist} />
+					<ButtonActionPlaylistSaved playlist={playlist} />
 					<Button
 					variant="ghost"
 					size="icon"

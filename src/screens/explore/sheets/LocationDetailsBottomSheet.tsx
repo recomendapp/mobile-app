@@ -1,31 +1,27 @@
-import React, { useEffect, useMemo } from 'react';
-import { BottomSheetModal, BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import {
   forwardRef,
-  useCallback,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
 } from 'react';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { SharedValue } from 'react-native-reanimated';
-import BlurredHandle from './components/BlurredHandle';
-import BlurredBackground from './components/BlurredBackground';
 import { Text } from '@/components/ui/text';
 import { ExploreTile, MediaPerson } from '@recomendapp/types';
 import { Button } from '@/components/ui/Button';
 import { View } from '@/components/ui/view';
 import tw from '@/lib/tw';
-import { BORDER_RADIUS_ROUNDED, GAP, GAP_LG, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
+import { BORDER_RADIUS_FULL, GAP, GAP_LG, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { Icons } from '@/constants/Icons';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { MovieHeaderInfo } from '@/components/screens/film/MovieHeaderInfo';
-import { StyleProp, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocale, useTranslations } from 'use-intl';
-import { Link } from 'expo-router';
+import { Href, Link } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
-import { mediaMovieDetailsOptions } from '@/api/options/medias';
+import { MediaMovieDetailsOptions } from '@/api/options/medias';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
@@ -47,8 +43,6 @@ export interface LocationDetailsBottomSheetMethods {
   present: (item: ExploreTile['features'][number]['properties']) => void;
 }
 
-// const SNAP_POINTS = ['100%'];
-
 export const LocationDetailsBottomSheet = forwardRef<
   LocationDetailsBottomSheetMethods,
   LocationDetailsBottomSheetProps
@@ -67,7 +61,7 @@ export const LocationDetailsBottomSheet = forwardRef<
   const {
     data: movie,
     isLoading,
-  } = useQuery(mediaMovieDetailsOptions({ mediaId: selectedLocation?.movie.id }))
+  } = useQuery(MediaMovieDetailsOptions({ mediaId: selectedLocation?.movie.id }))
   const loading = isLoading || movie === undefined;
 
   //#region hooks
@@ -75,26 +69,14 @@ export const LocationDetailsBottomSheet = forwardRef<
   //#endregion
 
   //#region callbacks
-  const handleCloseLocationDetails = useCallback(async () => {
+  const handleCloseLocationDetails = async () => {
     bottomSheetRef.current?.dismiss();
-  }, [onClose]);
-  const handleOnDismiss = useCallback(() => {
+  };
+  const handleOnDismiss = () => {
     setSelectedLocation(undefined);
     onClose?.();
-  }, []);
+  };
   //#endregion
-
-  const scrollViewContentContainer = useMemo(
-    (): StyleProp<ViewStyle> => [
-      {
-        paddingHorizontal: PADDING_HORIZONTAL,
-        gap: GAP,
-        paddingBottom: insets.bottom,
-
-      },
-    ],
-    [insets.bottom]
-  );
 
   //#region effects
   useImperativeHandle(ref, () => ({
@@ -115,7 +97,6 @@ export const LocationDetailsBottomSheet = forwardRef<
   key="PoiDetailsSheet"
   name="PoiDetailsSheet"
   snapPoints={['35%']}
-  // snapPoints={SNAP_POINTS}
   topInset={headerHeight}
   animatedIndex={index}
   animatedPosition={position}
@@ -123,11 +104,11 @@ export const LocationDetailsBottomSheet = forwardRef<
   backgroundStyle={{ backgroundColor: colors.muted }}
   onDismiss={handleOnDismiss}
   >
-	  <BottomSheetScrollView contentContainerStyle={scrollViewContentContainer} bounces={false}>
+	  <BottomSheetScrollView contentContainerStyle={{ paddingHorizontal: PADDING_HORIZONTAL, gap: GAP, paddingBottom: insets.bottom }} bounces={false}>
       <View style={[tw`flex-row justify-between items-center`, { gap: GAP }]}>
         {!loading ? <MovieHeaderInfo movie={movie} numberOfLines={1} /> : <Skeleton color={colors.background} style={tw`w-32 h-8`}/>}
         <View style={[tw`flex-row items-center`, { gap: GAP }]}>
-          <Button onPress={handleCloseLocationDetails} variant='muted' icon={Icons.X} size='icon' style={{ borderRadius: BORDER_RADIUS_ROUNDED, backgroundColor: colors.background }}/>
+          <Button onPress={handleCloseLocationDetails} variant='muted' icon={Icons.X} size='icon' style={{ borderRadius: BORDER_RADIUS_FULL, backgroundColor: colors.background }}/>
         </View>
       </View>
       <View style={[tw`flex-row items-center`, { gap: GAP }]}>
@@ -143,7 +124,7 @@ export const LocationDetailsBottomSheet = forwardRef<
           />
         ) : <Skeleton color={colors.background} style={[{ aspectRatio: 2 / 3 }, tw`w-20 h-auto rounded-md`]}/>}
         <View>
-          {!loading ? <Text variant='title'>{movie.title}</Text> : <Skeleton color={colors.background} style={tw`w-32 h-8`}/>}
+          {!loading ? <Link href={{ pathname: '/(tabs)/(home)/film/[film_id]', params: { film_id: movie.slug || movie.id }}}><Text variant='title'>{movie.title}</Text></Link> : <Skeleton color={colors.background} style={tw`w-32 h-8`}/>}
           {movie?.directors && movie.directors.length > 0 && (
             <Text>
               <Directors directors={movie.directors} />
@@ -177,6 +158,7 @@ export const LocationDetailsBottomSheet = forwardRef<
   </BottomSheetModal>
   );
 });
+LocationDetailsBottomSheet.displayName = 'LocationDetailsBottomSheet';
 
 const Directors = ({ directors }: { directors: MediaPerson[] }) => {
   const locale = useLocale();

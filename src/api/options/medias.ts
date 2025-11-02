@@ -1,16 +1,16 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { queryOptions } from "@tanstack/react-query";
-import { mediaKeys } from "../keys/medias";
 import { MediaMovie } from "@recomendapp/types";
+import { Keys } from "../keys";
 
-export const mediaMovieDetailsOptions = ({
+export const MediaMovieDetailsOptions = ({
 	mediaId,
 } : {
 	mediaId?: number;
 }) => {
 	const supabase = useSupabaseClient();
 	return queryOptions({
-		queryKey: mediaKeys.details({ mediaId: mediaId!, mediaType: 'movie' }),
+		queryKey: Keys.medias.details({ mediaId: mediaId!, mediaType: 'movie' }),
 		queryFn: async () => {
 			if (!mediaId) throw new Error('mediaId is required');
 			// fake delay to simulate loading
@@ -28,10 +28,10 @@ export const mediaMovieDetailsOptions = ({
 	});
 };
 
-export const mediaGenresOptions = () => {
+export const MediaGenresOptions = () => {
 	const supabase = useSupabaseClient();
 	return queryOptions({
-		queryKey: mediaKeys.genres(),
+		queryKey: Keys.medias.genres(),
 		queryFn: async () => {
 			const { data, error } = await supabase
 				.from('media_genre')

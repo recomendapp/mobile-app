@@ -8,13 +8,12 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
 import { useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { FadeInDown } from "react-native-reanimated";
-import { UserActivityTvSeries } from "@recomendapp/types";
 
 interface sortBy {
 	label: string;
@@ -28,10 +27,10 @@ const UserCollectionTvSeries = () => {
 	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
-	const sortByOptions = useMemo((): sortBy[] => [
+	const sortByOptions: sortBy[] = [
 		{ label: upperFirst(t('common.messages.watched_date')), value: 'watched_date' },
 		{ label: upperFirst(t('common.messages.rating')), value: 'rating' },
-	], [t]);
+	];
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	const {
@@ -50,7 +49,7 @@ const UserCollectionTvSeries = () => {
 	});
 	const loading = tvSeries === undefined || isLoading;
 	// Handlers
-	const handleSortBy = useCallback(() => {
+	const handleSortBy = () => {
 		const sortByOptionsWithCancel = [
 			...sortByOptions,
 			{ label: upperFirst(t('common.messages.cancel')), value: 'cancel' },
@@ -64,14 +63,14 @@ const UserCollectionTvSeries = () => {
 			if (selectedIndex === undefined || selectedIndex === cancelIndex) return;
 			setSortBy(sortByOptionsWithCancel[selectedIndex] as sortBy);
 		});
-	}, [sortByOptions, showActionSheetWithOptions]);
+	};
 
 
 	return (
 	<>
 		<LegendList
-		data={tvSeries?.pages.flatMap((page) => page) ?? []}
-		renderItem={useCallback(({ item } : { item: UserActivityTvSeries }) => (
+		data={tvSeries?.pages.flat() || []}
+		renderItem={({ item }) => (
 			<CardTvSeries
 			key={item.id}
 			variant="poster"
@@ -80,7 +79,7 @@ const UserCollectionTvSeries = () => {
 			style={tw`w-full`}
 			entering={FadeInDown}
 			/>
-		), [])}
+		)}
 		ListHeaderComponent={
 			<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
 				<Button
@@ -114,8 +113,8 @@ const UserCollectionTvSeries = () => {
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,
 		}}
-		keyExtractor={useCallback((item: UserActivityTvSeries) => item.id.toString(), [])}
-		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
+		keyExtractor={(item) => item.id.toString()}
+		onEndReached={() => hasNextPage && fetchNextPage()}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		/>

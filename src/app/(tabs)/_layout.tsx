@@ -1,5 +1,5 @@
 import { Tabs, useRouter, useSegments } from 'expo-router';
-// import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
+import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 import { Icons } from "@/constants/Icons";
 import { Platform } from 'react-native';
 import { useAuth } from '@/providers/AuthProvider';
@@ -25,6 +25,11 @@ const TabsLayout = () => {
 	// 		<NativeTabs.Trigger name='(search)'>
 	// 			<Label>{upperFirst(t('common.messages.search'))}</Label>
 	// 			<Icon sf={'magnifyingglass'} drawable='ic_menu_mylocation' />
+	// 		</NativeTabs.Trigger>
+
+	// 		<NativeTabs.Trigger name='(explore)'>
+	// 			<Label>{upperFirst(t('common.messages.explore'))}</Label>
+	// 			<Icon sf={'map.fill'} drawable='ic_menu_mylocation' />
 	// 		</NativeTabs.Trigger>
 
 	// 		{/* LOGIN ONLY */}
@@ -62,7 +67,7 @@ const TabsLayout = () => {
 					android: { backgroundColor: colors.background },
 					default: {},
 				}),
-				display: hideTabBarRoutes.includes(segment[segment.length - 1]) ? 'none' : 'flex',
+				display: segment.some((seg) => hideTabBarRoutes.includes(seg)) ? 'none' : 'flex',
 			},
 			tabBarItemStyle: {
 				paddingTop: 4,
