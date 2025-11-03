@@ -288,19 +288,19 @@ const ExploreScreen = () => {
 					/>
 				</ShapeSource>
 			)}
-			{selectedMovie && (
-				<MarkerView
-				coordinate={[selectedMovie.geometry.coordinates[0] || 0, selectedMovie.geometry.coordinates[1] || 0]}
-				anchor={{ x: 0.5, y: 1 }} // Anchor at bottom center
-				>
-					<View style={{ alignItems: 'center', justifyContent: 'center' }}>
-						<View style={{ backgroundColor: colors.muted, padding: PADDING_VERTICAL, borderRadius: BORDER_RADIUS, opacity: 0.9 }}>
-							<Text>{selectedMovie.properties.movie.title}</Text>
-						</View>
-						<Icons.MapPin color={'rgba(136, 0, 0, 1)'} fill={'rgba(255, 0, 0, 1)'} size={32} />
+			<MarkerView
+			coordinate={[selectedMovie?.geometry.coordinates[0] || userPosition.longitude, selectedMovie?.geometry.coordinates[1] || userPosition.latitude]}
+			anchor={{ x: 0.5, y: 1 }}
+			style={{ opacity: selectedMovie ? 1 : 0 }}
+			pointerEvents="none"
+			>
+				<View style={{ alignItems: 'center', justifyContent: 'center' }}>
+					<View style={{ backgroundColor: colors.muted, padding: PADDING_VERTICAL, borderRadius: BORDER_RADIUS, opacity: 0.9 }}>
+						<Text>{selectedMovie?.properties.movie.title}</Text>
 					</View>
-				</MarkerView>
-			)}
+					<Icons.MapPin color={'rgba(136, 0, 0, 1)'} fill={'rgba(255, 0, 0, 1)'} size={32} />
+				</View>
+			</MarkerView>
 		</MapView>
 
 		<SearchBottomSheet
@@ -313,7 +313,7 @@ const ExploreScreen = () => {
         ref={locationDetailsRef}
         index={animatedPOIDetailsIndex}
         position={animatedPOIDetailsPosition}
-		// onClose={handleOnLocationClose}
+		onClose={handleOnLocationClose}
       	/>
 
 		<Animated.View onLayout={(e) => optionsHeight.value = e.nativeEvent.layout.height} style={[{ position: 'absolute', bottom: insets.bottom + PADDING_VERTICAL, right: PADDING_HORIZONTAL, gap: GAP }, animatedOptionsStyle]}>

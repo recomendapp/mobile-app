@@ -5,7 +5,6 @@ import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { CardUser } from "@/components/cards/CardUser";
 import FeaturedPlaylists from "@/components/screens/search/FeaturedPlaylists";
-import KeyboardAwareView from "@/components/ui/KeyboardAwareView";
 import { MultiRowHorizontalList } from "@/components/ui/MultiRowHorizontalList";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
@@ -20,10 +19,9 @@ import { BestResultsSearchResponse, MediaMovie, MediaPerson, MediaTvSeries, Play
 import { Link } from "expo-router";
 import { clamp, upperFirst } from "lodash";
 import { useCallback, useRef, memo, useMemo } from "react";
-import { useWindowDimensions } from "react-native";
+import { useWindowDimensions, ScrollView } from "react-native";
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useTranslations } from "use-intl";
-import { ScrollView } from "react-native";
 
 const SearchScreen = () => {
 	const search = useSearchStore(state => state.search);
@@ -46,6 +44,7 @@ interface SearchResultsProps extends React.ComponentPropsWithoutRef<typeof Scrol
 
 export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => {
 	const { bottomOffset, tabBarHeight } = useTheme();
+	const t = useTranslations();
 
 	const {
 		data,
@@ -94,10 +93,43 @@ export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => 
 		{data.users.data.length > 0 && (
 			<SearchResultsUsers users={data.users.data} search={search} />
 		)}
+		{(data.movies.data.length === 0 && data.tv_series.data.length === 0 &&
+		  data.persons.data.length === 0 && data.playlists.data.length === 0 &&
+		  data.users.data.length === 0) && (
+			<EmptyComponent
+				isLoading={isLoading}
+				search={search}
+				noResultsText={upperFirst(t('common.messages.no_results'))}
+			/>
+		)}
 	</KeyboardAwareScrollView>
 	);
 });
 SearchResults.displayName = 'SearchResults';
+
+const EmptyComponent = memo(({ 
+	isLoading, 
+	search,
+	noResultsText 
+}: { 
+	isLoading: boolean; 
+	search: string | null;
+	noResultsText: string;
+}) => {
+	if (isLoading) return <Icons.Loader />;
+	
+	if (search) {
+		return (
+			<View style={tw`flex-1 items-center justify-center`}>
+				<Text textColor='muted'>{noResultsText}</Text>
+			</View>
+		);
+	}
+	
+	return null;
+});
+EmptyComponent.displayName = 'EmptyComponent';
+
 /* --------------------------------- WIDGETS -------------------------------- */
 const SearchBestResult = memo(({
 	best,
