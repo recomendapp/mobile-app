@@ -21,6 +21,9 @@ import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/providers/ThemeProvider';
 import { LegendList } from '@legendapp/list';
 import { useExploreStore } from '@/stores/useExploreStore';
+import { Icons } from '@/constants/Icons';
+import { upperFirst } from 'lodash';
+import { useTranslations } from 'use-intl';
 
 interface SearchBottomSheetProps {
   index: SharedValue<number>;
@@ -29,7 +32,6 @@ interface SearchBottomSheetProps {
 }
 
 export const MIDDLE_SNAP_POINT = 300;
-const PAGE_SIZE = 20;
 
 const SNAP_POINTS = [96, MIDDLE_SNAP_POINT, '100%'];
 
@@ -38,10 +40,14 @@ export const SearchBottomSheet = forwardRef<
   SearchBottomSheetProps
 >(({ index, position, onItemPress }, ref) => {
   // Hooks
+  const t = useTranslations();
   const { colors } = useTheme();
   const headerHeight = useHeaderHeight();
   const { bottom: bottomSafeArea } = useSafeAreaInsets();
   const filters = useExploreStore((state) => state.filters);
+
+  // States
+  const [isLoading, setIsLoading] = useState(true);
 
   // Queries
   const {
@@ -89,13 +95,20 @@ export const SearchBottomSheet = forwardRef<
     });
   }, [filters]);
   const handleOnSearch = (query: string) => {
+    setIsLoading(true);
     if (query) {
       const fuseResults = fuse.search(query).map((r) => r.item);
       setResults(applyFilters(fuseResults));
     } else {
       setResults(applyFilters(locations));
     }
+    setIsLoading(false);
   };
+
+  const init = useCallback(() => {
+    setResults(applyFilters(locations));
+    setIsLoading(false);
+  }, [locations, applyFilters]);
 
   // Styles
   const scrollViewAnimatedStyle = useAnimatedStyle(() => ({
@@ -105,8 +118,8 @@ export const SearchBottomSheet = forwardRef<
   const BottomSheetLegendListScrollable = useBottomSheetScrollableCreator();
 
   useEffect(() => {
-    setResults(applyFilters(locations));
-  }, [locations, applyFilters]);
+    init();
+  }, [init]);
 
   return (
     <BottomSheetModal
@@ -149,6 +162,16 @@ export const SearchBottomSheet = forwardRef<
         </Button>
       )}
       keyExtractor={(item) => item.properties.id.toString()}
+      ListEmptyComponent={
+        isLoading ? <Icons.Loader />
+        : (
+          <View style={tw`flex-1 items-center justify-center p-4`}>
+            <Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
+              {upperFirst(t('common.messages.no_results'))}
+            </Text>
+          </View>
+        )
+      }
       scrollIndicatorInsets={{
         bottom: bottomSafeArea,
       }}

@@ -8,14 +8,17 @@ import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/TabBar/TabBarBackground';
 import { useTranslations } from 'use-intl';
 import { upperFirst } from 'lodash';
+import { useEffect } from 'react';
+import { useUIStore } from '@/stores/useUIStore';
 
 const TabsLayout = () => {
 	const { session } = useAuth();
 	const { colors } = useTheme();
 	const t = useTranslations();
 	const router = useRouter();
+	const hasOnboarded = useUIStore(state => state.hasOnboarded);
 	const segment = useSegments();
-	const hideTabBarRoutes = ['(explore)'];
+	const hideTabBarRoutes = ['(explore)', 'onboarding'];
 	// return (
 	// 	<NativeTabs iconColor={colors.muted} tintColor={colors.tint}>
 	// 		<NativeTabs.Trigger name='(home)'>
@@ -53,6 +56,13 @@ const TabsLayout = () => {
 	// 		</Tabs.Protected>
 	// 	</NativeTabs>
 	// )
+
+	useEffect(() => {
+		if (!hasOnboarded && !segment.some((seg) => seg === 'onboarding')) {
+			router.replace({ pathname: '/onboarding'});
+		}
+	}, [hasOnboarded, router, segment]);
+
 	return (
 	<Tabs
 		initialRouteName='(home)'

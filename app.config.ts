@@ -24,14 +24,10 @@ const getWebDomain = () => {
 };
 
 const getGoogleServicesFilePath = () => {
-	if (IS_DEV) return './google-services.dev.json';
-	if (IS_PREVIEW) return './google-services.preview.json';
 	return './google-services.json';
 };
 
 const getGoogleServiceInfoFile = () => {
-	// if (IS_DEV) return './GoogleService-Info.dev.plist';
-	// if (IS_PREVIEW) return './GoogleService-Info.preview.plist';
 	return './GoogleService-Info.plist';
 };
 
@@ -108,7 +104,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			'expo-build-properties',
 			{
 				ios: {
-					deploymentTarget: '15.1',
+					deploymentTarget: '15.4',
 					useFrameworks: 'static',
 					forceStaticLinking: [
 						'RNFBApp',
@@ -207,9 +203,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				"organization": process.env.EXPO_PUBLIC_SENTRY_ORG,
 			}
 		],
-		"@maplibre/maplibre-react-native",
-		"@react-native-firebase/app",
-      	"@react-native-firebase/app-check",
+		"@maplibre/maplibre-react-native"
 	],
 	experiments: {
 		typedRoutes: true,

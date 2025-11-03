@@ -26,6 +26,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
         return 'index';
     }
   }, [segment]);
+
   return (
   <>
     <ThemeUpdater />
@@ -109,6 +110,9 @@ const AppLayout = ({ segment } : { segment: string }) => {
       <Stack.Screen name="upgrade" options={{ presentation: 'fullScreenModal' }} />
       {/* ABOUT */}
       <Stack.Screen name="about/index" options={{ headerTitle: upperFirst(t('common.messages.about')) }} />
+
+      {/* ONBOARDING */}
+      <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'slide_from_bottom', animationDuration: 250 }} />
     </Stack>
   </>
   );

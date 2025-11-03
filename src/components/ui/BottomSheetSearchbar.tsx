@@ -44,6 +44,7 @@ export function BottomSheetSearchbar({
   selectionColor,
   value,
   onChangeText,
+  keyboardAppearance: keyboardAppearanceProp,
   ...props
 }: BottomSheetSearchbarProps) {
   const [internalValue, setInternalValue] = useState(value || '');
@@ -51,7 +52,7 @@ export function BottomSheetSearchbar({
   const inputRef = useRef<TextInput>(null);
 
   // Theme colors
-  const { colors } = useTheme();
+  const { colors, mode } = useTheme();
   const cardColor = colors.card;
   const textColor = colors.foreground;
   const muted = colors.mutedForeground;
@@ -124,6 +125,7 @@ export function BottomSheetSearchbar({
         returnKeyType={returnKeyType}
         autoCorrect={autoCorrect}
         selectionColor={selectionColor || colors.accentYellow}
+        keyboardAppearance={keyboardAppearanceProp || mode}
         {...props}
       />
 
@@ -172,10 +174,11 @@ export function BottomSheetSearchbarWithSuggestions({
   maxSuggestions = 5,
   showSuggestions = true,
   containerStyle,
+  keyboardAppearance: keyboardAppearanceProp,
   ...searchBarProps
 }: BottomSheetSearchbarWithSuggestionsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { colors } = useTheme();
+  const { colors, mode } = useTheme();
   const cardColor = colors.card;
   const borderColor = colors.border;
 
@@ -202,6 +205,7 @@ export function BottomSheetSearchbarWithSuggestions({
     <View style={[{ width: '100%' }, containerStyle]}>
       <BottomSheetSearchbar
         {...searchBarProps}
+        keyboardAppearance={keyboardAppearanceProp || mode}
         onFocus={(e) => {
           setIsExpanded(true);
           searchBarProps.onFocus?.(e);
