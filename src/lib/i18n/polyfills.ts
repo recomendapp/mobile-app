@@ -52,14 +52,6 @@ export const loadPolyfills = async (locale: SupportedLocale) => {
         import("@formatjs/intl-listformat/locale-data/br"),
       ]);
       break;
-    case "br":
-      await Promise.all([
-        import("@formatjs/intl-pluralrules/locale-data/br"),
-        import("@formatjs/intl-datetimeformat/locale-data/br"),
-        import("@formatjs/intl-displaynames/locale-data/br"),
-        import("@formatjs/intl-listformat/locale-data/br"),
-      ]);
-      break;
     case "ca":
       await Promise.all([
         import("@formatjs/intl-pluralrules/locale-data/ca"),

@@ -37,6 +37,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="feed" options={{ headerTitle: upperFirst(t('common.messages.feed')) }} />
       </Stack.Protected>
+      <Stack.Screen name="explore" options={{ title: 'Paradise Pictures' }} />
       {/* NOTIFICATIONS */}
       <Stack.Protected guard={!!isMounted}>
         <Stack.Screen name="notifications" options={{ headerShown: false, presentation: "modal", headerTitle: upperFirst(t('common.messages.notification', { count: 2 })) }} />
