@@ -59,7 +59,7 @@ const TabsLayout = () => {
 
 	useEffect(() => {
 		if (!hasOnboarded && !segment.some((seg) => seg === 'onboarding')) {
-			router.replace({ pathname: '/onboarding'});
+			router.replace({ pathname: '/onboarding' });
 		}
 	}, [hasOnboarded, router, segment]);
 

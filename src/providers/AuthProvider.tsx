@@ -18,8 +18,8 @@ import { randomUUID } from "expo-crypto";
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as env from '@/env';
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { AuthCustomerInfoOptions, AuthUserOptions } from "@/api/options/auth";
 import { Keys } from "@/api/keys";
+import { AuthCustomerInfoOptions, AuthUserOptions } from "@/api/options";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue

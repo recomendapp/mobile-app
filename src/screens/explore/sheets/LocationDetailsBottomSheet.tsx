@@ -19,9 +19,8 @@ import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { MovieHeaderInfo } from '@/components/screens/film/MovieHeaderInfo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocale, useTranslations } from 'use-intl';
-import { Href, Link } from 'expo-router';
+import { Link } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
-import { MediaMovieDetailsOptions } from '@/api/options/medias';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
@@ -32,6 +31,7 @@ import { ButtonUserWatchlistMovie } from '@/components/buttons/movies/ButtonUser
 import { ButtonPlaylistMovieAdd } from '@/components/buttons/ButtonPlaylistMovieAdd';
 import ButtonUserRecoMovieSend from '@/components/buttons/movies/ButtonUserRecoMovieSend';
 import { useAuth } from '@/providers/AuthProvider';
+import { MediaMovieDetailsOptions } from '@/api/options';
 
 interface LocationDetailsBottomSheetProps {
   index: SharedValue<number>;
@@ -124,7 +124,7 @@ export const LocationDetailsBottomSheet = forwardRef<
           />
         ) : <Skeleton color={colors.background} style={[{ aspectRatio: 2 / 3 }, tw`w-20 h-auto rounded-md`]}/>}
         <View>
-          {!loading ? <Link href={{ pathname: '/(tabs)/(home)/film/[film_id]', params: { film_id: movie.slug || movie.id }}}><Text variant='title'>{movie.title}</Text></Link> : <Skeleton color={colors.background} style={tw`w-32 h-8`}/>}
+          {!loading ? <Link href={{ pathname: '/film/[film_id]', params: { film_id: movie.slug || movie.id }}}><Text variant='title'>{movie.title}</Text></Link> : <Skeleton color={colors.background} style={tw`w-32 h-8`}/>}
           {movie?.directors && movie.directors.length > 0 && (
             <Text>
               <Directors directors={movie.directors} />
