@@ -12,12 +12,13 @@ const AuthLayout = () => {
     screenOptions={{
       animation: 'ios_from_right',
       headerTintColor: colors.foreground,
+      headerTransparent: true,
       headerStyle: {
         backgroundColor: 'transparent',
       },
     }}
     >
-      <Stack.Screen name="index" options={{ headerTitle: upperFirst(t('common.messages.welcome')) }} />
+      <Stack.Screen name="index" options={{ title: upperFirst(t('common.messages.welcome')) }} />
       <Stack.Screen name="login/index" options={{ headerTitle: upperFirst(t('common.messages.login')) }} />
       <Stack.Screen name="login/otp" options={{ headerTitle: upperFirst(t('common.messages.otp')) }} />
       <Stack.Screen name="signup" options={{ headerTitle: upperFirst(t('common.messages.signup')) }} />

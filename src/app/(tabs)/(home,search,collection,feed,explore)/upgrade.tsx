@@ -1,5 +1,5 @@
 import { Keys } from "@/api/keys";
-import { AuthCustomerInfoOptions } from "@/api/options/auth";
+import { AuthCustomerInfoOptions } from "@/api/options";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import tw from "@/lib/tw";

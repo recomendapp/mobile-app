@@ -14,10 +14,12 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import {OnboardingData} from '../data';
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { useUIStore } from '@/stores/useUIStore';
 import { Icons } from '@/constants/Icons';
 import { useAuth } from '@/providers/AuthProvider';
+import { useTranslations } from 'use-intl';
+import { upperFirst } from 'lodash';
 
 type Props = {
 	dataLength: number;
@@ -28,9 +30,13 @@ type Props = {
 
 const CustomButton = ({flatListRef, flatListIndex, dataLength, x}: Props) => {
 	const { session } = useAuth();
+	const t = useTranslations();
 	const setHasOnboarded = useUIStore(state => state.setHasOnboarded);
 	const {width: SCREEN_WIDTH} = useWindowDimensions();
 	const router = useRouter();
+	const navigation = useNavigation();
+	const routes = navigation.getState()?.routes;
+	const prevRoute = routes ? routes[routes.length - 2] : null;
 
 	const buttonAnimationStyle = useAnimatedStyle(() => {
 		return {
@@ -95,14 +101,18 @@ const CustomButton = ({flatListRef, flatListIndex, dataLength, x}: Props) => {
 				if (router.canGoBack()) {
 					router.back();
 				} else {
-					router.replace({ pathname: '/(tabs)/(home)'});
+					router.replace({ pathname: '/(tabs)/(home)' });
+				}
+
+				if (!session && (!prevRoute || !prevRoute.name.includes('auth'))) {
+					router.push({ pathname: '/(tabs)/(home)/auth' });
 				}
 			}
 		}}>
 		<Animated.View
 			style={[styles.container, buttonAnimationStyle, animatedColor]}>
 			<Animated.Text style={[styles.textButton, textAnimationStyle]}>
-			Get Started
+				{upperFirst(t('common.messages.get_started'))}
 			</Animated.Text>
 			<Animated.View style={[styles.arrow, arrowAnimationStyle]}>
 				<Icons.ChevronLeft color="white" size={30} style={{transform: [{rotate: '180deg'}]}}/>
