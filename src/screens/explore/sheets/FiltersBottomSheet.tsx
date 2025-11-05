@@ -229,6 +229,15 @@ export const FiltersBottomSheet = forwardRef<
             step={15}
             defaultMin={filters.runtime.min || undefined}
             defaultMax={filters.runtime.max || undefined}
+            formatLabel={(v) => {
+              'worklet'
+
+              const hours = Math.floor(v / 60);
+              const minutes = Math.round(v % 60);
+              return `${hours.toString().padStart(2, '0')}:${minutes
+                .toString()
+                .padStart(2, '0')}`;
+            }}
             onValueChange={(v) => setFilters({ runtime: { min: v.min, max: v.max }})}
             />
           ) : <Skeleton color={colors.background} style={tw`h-10 w-full`} />}

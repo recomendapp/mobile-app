@@ -56,8 +56,6 @@ export const ThemeProvider = ({children}: ThemeProviderProps) => {
 		return getModeFromColor(colors.background);
 	}, [colors]);
 
-	DefaultTheme.colors.background = colors.background;
-
 	const contextValue = useMemo(() => ({
 		applyColors,
 		colors,
@@ -69,6 +67,10 @@ export const ThemeProvider = ({children}: ThemeProviderProps) => {
 		keyboardOffset,
 		setKeyboardToolbarOffset,
 	}), [applyColors, colors, tabBarHeight, setTabBarHeight, bottomOffset, defaultScreenOptions, mode, keyboardOffset, setKeyboardToolbarOffset]);
+
+	useEffect(() => {
+		DefaultTheme.colors.background = colors.background;
+	}, [colors]);
 
 	return (
 		<ThemeContext.Provider value={contextValue}>
