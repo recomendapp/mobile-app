@@ -24,6 +24,9 @@ interface UIStore {
 
   notificationsView: 'all' | 'unread' | 'archived';
   setNotificationsView: (view: 'all' | 'unread' | 'archived') => void;
+
+  hasOnboarded: boolean;
+  setHasOnboarded: (hasOnboarded: boolean) => void;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -71,6 +74,9 @@ export const useUIStore = create<UIStore>()(
 			// Notifications
 			notificationsView: 'all',
 			setNotificationsView: (view) => set({ notificationsView: view }),
+			// Onboarding
+			hasOnboarded: false,
+			setHasOnboarded: (hasOnboarded) => set({ hasOnboarded }),
 		}),
 		{
 			name: 'ui-storage',

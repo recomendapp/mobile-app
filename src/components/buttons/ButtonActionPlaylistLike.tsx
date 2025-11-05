@@ -8,16 +8,17 @@ import { Button } from "@/components/ui/Button";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "../Toast";
+import { Playlist } from "@recomendapp/types";
 
 interface ButtonActionPlaylistLikeProps
 	extends React.ComponentProps<typeof Button> {
-		playlistId: number;
+		playlist: Playlist;
 	}
 
 const ButtonActionPlaylistLike = React.forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonActionPlaylistLikeProps
->(({ playlistId, variant = "ghost", size = "icon", icon = Icons.like, onPress, iconProps, ...props }, ref) => {
+>(({ playlist, variant = "ghost", size = "icon", icon = Icons.like, onPress, iconProps, ...props }, ref) => {
 	const toast = useToast();
 	const { colors } = useTheme();
 	const { session } = useAuth();
@@ -26,16 +27,16 @@ const ButtonActionPlaylistLike = React.forwardRef<
 		data: like,
 	} = useUserPlaylistLikeQuery({
 		userId: session?.user.id,
-		playlistId: playlistId,
+		playlistId: playlist.id,
 	});
 	const insertLike = useUserPlaylistLikeInsertMutation();
 	const deleteLike = useUserPlaylistLikeDeleteMutation();
 
 	const handleLike = async () => {
-		if (!session?.user.id || !playlistId) return;
+		if (!session?.user.id || !playlist.id) return;
 		await insertLike.mutateAsync({
 			userId: session.user.id,
-			playlistId: playlistId,
+			playlistId: playlist.id,
 		}, {
 			onError: (error) => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
@@ -67,7 +68,11 @@ const ButtonActionPlaylistLike = React.forwardRef<
 			...iconProps
 		}}
 		onPress={(e) => {
-			like ? handleUnlike() : handleLike();
+			if (like) {
+				handleUnlike();
+			} else {
+				handleLike();
+			}
 			onPress?.(e);
 		}}
 		{...props}

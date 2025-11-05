@@ -11,7 +11,7 @@ interface ThemedTrueSheetProps extends TrueSheetProps {
 const ThemedTrueSheet = forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   ThemedTrueSheetProps
->(({ backgroundColor, contentContainerStyle, cornerRadius = 24, sizes = ["auto"], children, ...props }, ref) => {
+>(({ backgroundColor, contentContainerStyle, cornerRadius = 24, sizes = ["auto"], edgeToEdge = true, children, ...props }, ref) => {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   return (
@@ -27,6 +27,7 @@ const ThemedTrueSheet = forwardRef<
     },
     contentContainerStyle,
   ]}
+  edgeToEdge={edgeToEdge}
   {...props}
   >
     {/* <GestureHandlerRootView // break content style and isn't working with Pressable from 'react-native' either

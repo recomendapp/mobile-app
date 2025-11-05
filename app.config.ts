@@ -4,14 +4,6 @@ const IS_DEV = process.env.APP_VARIANT === 'development';
 const IS_PREVIEW = process.env.APP_VARIANT === 'preview';
 
 const getUniqueIdentifier = () => {
-	if (IS_DEV) {
-		return 'com.recomend.app.dev';
-	}
-
-	if (IS_PREVIEW) {
-		return 'com.recomend.app.preview';
-	}
-
 	return 'com.recomend.app';
 };
 
@@ -32,9 +24,11 @@ const getWebDomain = () => {
 };
 
 const getGoogleServicesFilePath = () => {
-	if (IS_DEV) return './google-services.dev.json';
-	if (IS_PREVIEW) return './google-services.preview.json';
 	return './google-services.json';
+};
+
+const getGoogleServiceInfoFile = () => {
+	return './GoogleService-Info.plist';
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
@@ -52,6 +46,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	],
 	ios: {
 		supportsTablet: true,
+		googleServicesFile: getGoogleServiceInfoFile(),
 		bundleIdentifier: getUniqueIdentifier(),
 		associatedDomains: [
 			`applinks:${getWebDomain()}`
@@ -64,6 +59,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		infoPlist: {
 			ITSAppUsesNonExemptEncryption: false,
 			UIDesignRequiresCompatibility: true, // Disable iOS 26 Liquid Glass effect
+			NSLocationWhenInUseUsageDescription: 'Your location is used to show relevant content based on where you are.',
 		},
 		usesAppleSignIn: true,
 	},
@@ -109,7 +105,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			'expo-build-properties',
 			{
 				ios: {
-					deploymentTarget: '15.1',
+					deploymentTarget: '15.4',
+					useFrameworks: 'static',
+					forceStaticLinking: [
+						'RNFBApp',
+						// 'RNFBAppCheck'
+					],
 				},
 				android: {
 					"compileSdkVersion": 35,
@@ -202,7 +203,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				"project": process.env.EXPO_PUBLIC_SENTRY_PROJECT,
 				"organization": process.env.EXPO_PUBLIC_SENTRY_ORG,
 			}
-		]
+		],
+		"@maplibre/maplibre-react-native"
 	],
 	experiments: {
 		typedRoutes: true,

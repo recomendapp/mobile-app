@@ -45,7 +45,7 @@ const RootLayout = () => {
       initialRouteName='(tabs)'
       screenOptions={{
         drawerPosition: 'right',
-        headerShown: false
+        headerShown: false,
       }}
       drawerContent={CustomDrawerContent}
       />

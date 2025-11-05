@@ -1,5 +1,5 @@
 import { isNative } from '@/platform/detection'
-import React, {useContext} from 'react'
+import React, {use} from 'react'
 import {type SharedValue} from 'react-native-reanimated'
 
 export const PagerHeaderContext = React.createContext<{
@@ -35,7 +35,7 @@ export function PagerHeaderProvider({
 }
 
 export function usePagerHeaderContext() {
-  const ctx = useContext(PagerHeaderContext)
+  const ctx = use(PagerHeaderContext)
   if (isNative) {
     if (!ctx) {
       throw new Error(

@@ -15,7 +15,7 @@ import Color from "color";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Text } from "../ui/text";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { BORDER_RADIUS_ROUNDED, GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { BORDER_RADIUS_FULL, GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { BadgeMedia } from "../badges/BadgeMedia";
 import { useTranslations } from "use-intl";
 import { useRouter } from "expo-router";
@@ -87,8 +87,8 @@ const WidgetMostRecommended = ({
 			<Pagination.Basic
 			progress={progress}
 			data={data}
-			dotStyle={{ backgroundColor: colors.muted, borderRadius: BORDER_RADIUS_ROUNDED }}
-			activeDotStyle={{ backgroundColor: colors.accentYellow, borderRadius: BORDER_RADIUS_ROUNDED }}
+			dotStyle={{ backgroundColor: colors.muted, borderRadius: BORDER_RADIUS_FULL }}
+			activeDotStyle={{ backgroundColor: colors.accentYellow, borderRadius: BORDER_RADIUS_FULL }}
 			containerStyle={{ gap: 5, marginTop: 10 }}
 			onPress={onPressPagination}
 			/>

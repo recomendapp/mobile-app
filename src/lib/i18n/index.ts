@@ -3,6 +3,7 @@ import * as Localization from "expo-localization";
 import deepmerge from "deepmerge";
 import { defaultLocale, SupportedLocale } from "@/translations/locales";
 import { getFallbackLocale } from "@/translations/utils/getFallbackLocale";
+import { loadPolyfills } from "./polyfills";
 
 export const getLocale = async (): Promise<string> => {
   let saved = await AsyncStorage.getItem("language");
@@ -20,7 +21,7 @@ export const setLocale = async (locale: string): Promise<void> => {
   await AsyncStorage.setItem("language", locale);
 };
 
-export const loadMessages = async (locale: SupportedLocale): Promise<Record<string, any>> => {
+const loadMessages = async (locale: SupportedLocale): Promise<Record<string, any>> => {
   const getMessagesForLocale = (loc: SupportedLocale) => {
     switch (loc) {
       case 'fr-FR':
@@ -36,4 +37,12 @@ export const loadMessages = async (locale: SupportedLocale): Promise<Record<stri
   const fallbackMessages = await loadMessages(fallback); // Recursive call
   const userMessages = getMessagesForLocale(locale);
   return deepmerge(fallbackMessages, userMessages);
+};
+
+export const initI18n = async (locale: SupportedLocale) => {
+  const messages = await loadMessages(locale);
+  await loadPolyfills(locale);
+  return {
+    messages,
+  };
 };
