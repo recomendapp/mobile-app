@@ -30,6 +30,22 @@ export interface SliderRangeProps {
   haptics?: boolean;
   defaultMin?: number;
   defaultMax?: number;
+  /**
+   * A function to format the label values displayed above the thumbs.
+   * @worklet
+   * 
+   * ⚠️ IMPORTANT: This function runs on the UI thread as a worklet.
+   * Add 'worklet'; as the first line of the function.
+   * 
+   * @example
+   * ```tsx
+   * formatLabel={(value) => {
+   *   'worklet';
+   *   return `${value}€`;
+   * }}
+   * ```
+   */
+  formatLabel?: (value: number) => string;
 }
 
 const SliderRange = forwardRef<
@@ -46,6 +62,7 @@ const SliderRange = forwardRef<
     haptics = true,
     defaultMin,
     defaultMax,
+    formatLabel,
   },
   ref
 ) => {
@@ -177,18 +194,20 @@ const SliderRange = forwardRef<
   const minLabelText = useAnimatedProps(() => {
     const isThumb1Left = position.value <= position2.value;
     const value = isThumb1Left ? minValue.value : maxValue.value;
+    const formattedValue = formatLabel ? formatLabel(value) : value.toString();
     return {
-      text: `${value}`,
-      defaultValue: `${value}`,
+      text: formattedValue,
+      defaultValue: formattedValue,
     };
   });
 
   const maxLabelText = useAnimatedProps(() => {
     const isThumb1Left = position.value <= position2.value;
     const value = isThumb1Left ? maxValue.value : minValue.value;
+    const formattedValue = formatLabel ? formatLabel(value) : value.toString();
     return {
-      text: `${value}`,
-      defaultValue: `${value}`,
+      text: formattedValue,
+      defaultValue: formattedValue,
     };
   });
 
