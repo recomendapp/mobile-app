@@ -1,4 +1,4 @@
-import { authKeys } from "@/features/auth/authKeys";
+import { Keys } from "@/api/keys";
 import { REVENUECAT_API_KEY } from "@/lib/revenue-cat";
 import { Session } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
@@ -36,10 +36,10 @@ export const useRevenueCat = (session: Session | null | undefined) => {
     if (session?.user.id) {
       login(session.user.id);
       queryClient.invalidateQueries({
-        queryKey: authKeys.customerInfo(),
+        queryKey: Keys.auth.customerInfo(),
       });
     } else {
-      queryClient.setQueryData(authKeys.customerInfo(), null);
+      queryClient.setQueryData(Keys.auth.customerInfo(), null);
       setCustomerInfo(undefined);
     }
   }, [session, isInitialized]);

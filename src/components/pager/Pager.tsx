@@ -1,8 +1,8 @@
 import {
   type JSX,
   memo,
+  use,
   useCallback,
-  useContext,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -167,7 +167,7 @@ export function Pager({
 }
 
 function DrawerGestureRequireFail({children}: {children: React.ReactNode}) {
-  const drawerGesture = useContext(DrawerGestureContext)
+  const drawerGesture = use(DrawerGestureContext)
 
   const nativeGesture = useMemo(() => {
     const gesture = Gesture.Native()

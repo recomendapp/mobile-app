@@ -15,7 +15,7 @@ type TextVariant =
   | 'heading'
   | 'link';
 
-interface TextProps extends RNTextProps {
+export interface TextProps extends RNTextProps {
   variant?: TextVariant;
   /**
    * The color variant of the text.

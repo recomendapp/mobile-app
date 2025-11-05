@@ -5,7 +5,7 @@ import { userKeys } from './userKeys';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { useAuth } from '@/providers/AuthProvider';
 import { mediaKeys } from '../media/mediaKeys';
-import { authKeys } from '../auth/authKeys';
+import { Keys } from '@/api/keys';
 
 export const useUserUpdateMutation = ({
 	userId,
@@ -54,7 +54,7 @@ export const useUserUpdateMutation = ({
 				return data;
 			},
 		onSuccess: (data) => {
-			queryClient.setQueryData(authKeys.user(), data);
+			queryClient.setQueryData(Keys.auth.user(), data);
 			queryClient.setQueryData(userKeys.profile(data.username), (oldData: User | undefined) => {
 				if (!oldData) return oldData;
 				return {

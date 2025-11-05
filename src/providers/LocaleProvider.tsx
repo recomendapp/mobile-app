@@ -1,26 +1,16 @@
 /* -------------------------------- POLYFILL -------------------------------- */
 import '@formatjs/intl-getcanonicallocales/polyfill';
 import '@formatjs/intl-locale/polyfill';
-
-// (2) Requis pour Intl.DateTimeFormat
 import '@formatjs/intl-pluralrules/polyfill';
-import '@formatjs/intl-pluralrules/locale-data/en';
-import '@formatjs/intl-pluralrules/locale-data/fr';
-
 import '@formatjs/intl-datetimeformat/polyfill';
-import '@formatjs/intl-datetimeformat/locale-data/en';
-import '@formatjs/intl-datetimeformat/locale-data/fr';
-
-// (3) Requis pour Intl.DisplayNames
 import '@formatjs/intl-displaynames/polyfill';
-import '@formatjs/intl-displaynames/locale-data/en';
-import '@formatjs/intl-displaynames/locale-data/fr';
+import '@formatjs/intl-listformat/polyfill';
+import '@formatjs/intl-durationformat/polyfill';
 /* -------------------------------------------------------------------------- */
-
 
 import { IntlProvider } from "use-intl";
 import { createContext, use, useCallback, useEffect, useState } from "react";
-import { getLocale, loadMessages, setLocale as setLocaleHook } from "@/lib/i18n"; // à toi d’implémenter
+import { getLocale, initI18n, setLocale as setLocaleHook } from "@/lib/i18n"; // à toi d’implémenter
 import { useSplashScreen } from "./SplashScreenProvider";
 import { getCalendars } from 'expo-localization';
 import { defaultLocale, SupportedLocale, supportedLocales } from '@/translations/locales';
@@ -50,18 +40,18 @@ export const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
       throw new Error(`Unsupported locale: ${newLocale}`);
     }
     setLocaleHook(newLocale);
-    const msgs = await loadMessages(newLocale as SupportedLocale);
+    const { messages } = await initI18n(newLocale as SupportedLocale);
     setLocaleState(newLocale as SupportedLocale);
-    setMessages(msgs);
+    setMessages(messages);
   }, [locale]);
 
   useEffect(() => {
     (async () => {
       let initial = await getLocale();
       initial = supportedLocales.includes(initial as SupportedLocale) ? initial : defaultLocale; 
-      const msgs = await loadMessages(initial as SupportedLocale);
+      const { messages } = await initI18n(initial as SupportedLocale);
       setLocaleState(initial as SupportedLocale);
-      setMessages(msgs);
+      setMessages(messages);
       i18n.setReady(true);
     })();
   }, []);

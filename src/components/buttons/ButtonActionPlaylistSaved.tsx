@@ -8,16 +8,17 @@ import { Button } from "@/components/ui/Button";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "../Toast";
+import { Playlist } from "@recomendapp/types";
 
 interface ButtonActionPlaylistSavedProps
 	extends React.ComponentProps<typeof Button> {
-		playlistId: number;
+		playlist: Playlist;
 	}
 
 const ButtonActionPlaylistSaved = React.forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonActionPlaylistSavedProps
->(({ playlistId, variant = "ghost", size = "icon", icon = Icons.Watchlist, onPress, iconProps, ...props }, ref) => {
+>(({ playlist, variant = "ghost", size = "icon", icon = Icons.Watchlist, onPress, iconProps, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session } = useAuth();
 	const toast = useToast();
@@ -26,16 +27,16 @@ const ButtonActionPlaylistSaved = React.forwardRef<
 		data: saved,
 	} = useUserPlaylistSavedQuery({
 		userId: session?.user.id,
-		playlistId: playlistId,
+		playlistId: playlist.id,
 	});
 	const insertSaved = useUserPlaylistSavedInsertMutation();
 	const deleteSaved = useUserPlaylistSavedDeleteMutation();
 
 	const handleLike = async () => {
-		if (!session?.user.id || !playlistId) return;
+		if (!session?.user.id || !playlist.id) return;
 		await insertSaved.mutateAsync({
 			userId: session.user.id,
-			playlistId: playlistId,
+			playlistId: playlist.id,
 		}, {
 			onError: (error) => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
@@ -53,7 +54,7 @@ const ButtonActionPlaylistSaved = React.forwardRef<
 		});
 	};
 
-	if (!session) return null;
+	if (!session || session.user.id === playlist.user_id) return null;
 
 	return (
 		<Button
@@ -66,7 +67,11 @@ const ButtonActionPlaylistSaved = React.forwardRef<
 			...iconProps
 		}}
 		onPress={(e) => {
-			saved ? handleUnlike() : handleLike();
+			if (saved) {
+				handleUnlike();
+			} else {
+				handleLike();
+			}
 			onPress?.(e);
 		}}
 		{...props}
