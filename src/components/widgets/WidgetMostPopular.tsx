@@ -1,6 +1,5 @@
 import tw from "@/lib/tw";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { LegendList } from "@legendapp/list";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
@@ -10,6 +9,7 @@ import { useWidgetMostPopular } from "@/features/widget/widgetQueries";
 import { CardMovie } from "../cards/CardMovie";
 import { CardTvSeries } from "../cards/CardTvSeries";
 import { GAP, WIDTH_CARD_XS } from "@/theme/globals";
+import { Text } from "../ui/text";
 
 interface WidgetMostPopularProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -62,9 +62,9 @@ export const WidgetMostPopular = ({
 
   return (
     <View style={[tw`flex-1 gap-2`, style]}>
-      <ThemedText style={[tw`font-semibold text-xl`, labelStyle]}>
+      <Text style={[tw`font-semibold text-xl`, labelStyle]}>
         {upperFirst(t('common.messages.most_popular', { count: 2 }))}
-      </ThemedText>
+      </Text>
       <LegendList
         data={medias}
         renderItem={renderItem}

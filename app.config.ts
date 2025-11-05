@@ -204,7 +204,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				"organization": process.env.EXPO_PUBLIC_SENTRY_ORG,
 			}
 		],
-		"@maplibre/maplibre-react-native"
+		"@maplibre/maplibre-react-native",
+		[
+			"expo-media-library",
+			{
+				"photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+				"savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+				"isAccessMediaLocationEnabled": true,
+				"granularPermissions": ["audio", "photo"]
+			}
+		]
 	],
 	experiments: {
 		typedRoutes: true,

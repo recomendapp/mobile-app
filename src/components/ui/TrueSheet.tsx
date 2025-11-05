@@ -1,21 +1,21 @@
 import { useTheme } from '@/providers/ThemeProvider';
-import { TrueSheet, TrueSheetProps } from '@lodev09/react-native-true-sheet';
+import { TrueSheet as RNTrueSheet, TrueSheetProps as RNTrueSheetProps } from '@lodev09/react-native-true-sheet';
 import { forwardRef } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-interface ThemedTrueSheetProps extends TrueSheetProps {
+interface TrueSheetProps extends RNTrueSheetProps {
   lightColor?: string;
   darkColor?: string;
 };
 
-const ThemedTrueSheet = forwardRef<
-  React.ComponentRef<typeof TrueSheet>,
-  ThemedTrueSheetProps
+const TrueSheet = forwardRef<
+  React.ComponentRef<typeof RNTrueSheet>,
+  TrueSheetProps
 >(({ backgroundColor, contentContainerStyle, cornerRadius = 24, sizes = ["auto"], edgeToEdge = true, children, ...props }, ref) => {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   return (
-  <TrueSheet
+  <RNTrueSheet
   ref={ref}
   sizes={sizes}
   cornerRadius={cornerRadius}
@@ -38,12 +38,13 @@ const ThemedTrueSheet = forwardRef<
     > */}
       {children}
     {/* </GestureHandlerRootView> */}
-  </TrueSheet>
+  </RNTrueSheet>
   )
 });
+TrueSheet.displayName = 'TrueSheet';
 
 export {
-  ThemedTrueSheetProps,
+  TrueSheetProps,
 }
 
-export default ThemedTrueSheet;
+export default TrueSheet;

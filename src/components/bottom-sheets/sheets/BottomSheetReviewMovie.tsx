@@ -7,8 +7,7 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
@@ -115,7 +114,7 @@ export const BottomSheetReviewMovie = React.forwardRef<
   ]), [review, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, session]);
 
   return (
-    <ThemedTrueSheet
+    <TrueSheet
     ref={ref}
     scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
     contentContainerStyle={tw`p-0`}
@@ -149,7 +148,7 @@ export const BottomSheetReviewMovie = React.forwardRef<
           </React.Fragment>
         ))}
       </ScrollView>
-    </ThemedTrueSheet>
+    </TrueSheet>
   );
 });
 BottomSheetReviewMovie.displayName = 'BottomSheetReviewMovie';

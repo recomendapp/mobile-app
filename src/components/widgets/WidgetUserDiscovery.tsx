@@ -1,13 +1,13 @@
 import { useUserDiscoveryInfinite } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { CardUser } from "../cards/CardUser";
 import { LegendList } from "@legendapp/list";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo } from "react";
 import { Profile } from "@recomendapp/types";
+import { Text } from "../ui/text";
 
 interface WidgetUserDiscoveryProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -61,9 +61,9 @@ export const WidgetUserDiscovery = ({
 
   return (
     <View style={[tw`gap-2`, style]}>
-      <ThemedText style={[tw`font-semibold text-xl`, labelStyle]}>
+      <Text style={[tw`font-semibold text-xl`, labelStyle]}>
         {upperFirst(t('common.messages.discover_users'))}
-      </ThemedText>
+      </Text>
       <LegendList
         data={userData}
         renderItem={renderItem}

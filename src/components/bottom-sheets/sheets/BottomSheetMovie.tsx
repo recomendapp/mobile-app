@@ -7,17 +7,17 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { FlatList, Pressable, ScrollView, View } from 'react-native';
+import { FlatList, ScrollView, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
-import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import { TrueSheet as RNTrueSheet } from '@lodev09/react-native-true-sheet';
+import TrueSheet from '@/components/ui/TrueSheet';
 import BottomSheetDefaultView from '../templates/BottomSheetDefaultView';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
-import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
+import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import BottomSheetShareMovie from './share/BottomSheetShareMovie';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -51,7 +51,7 @@ const BottomSheetMovie = React.forwardRef<
   const pathname = usePathname();
   // REFs
   const scrollRef = React.useRef<ScrollView>(null);
-  const BottomSheetMainCreditsRef = React.useRef<TrueSheet>(null);
+  const BottomSheetMainCreditsRef = React.useRef<RNTrueSheet>(null);
   const creditsScrollRef = React.useRef<FlatList<MediaPerson>>(null);
   // States
   const items: Item[][] = React.useMemo(() => ([
@@ -144,7 +144,7 @@ const BottomSheetMovie = React.forwardRef<
     );
   }, [movie?.directors, closeSheet, id, router, colors.muted, colors.mutedForeground]);
   return (
-    <ThemedTrueSheet
+    <TrueSheet
     ref={ref}
     scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
     contentContainerStyle={tw`p-0`}
@@ -222,7 +222,7 @@ const BottomSheetMovie = React.forwardRef<
           />
         </BottomSheetDefaultView>
       )}
-    </ThemedTrueSheet>
+    </TrueSheet>
   );
 });
 BottomSheetMovie.displayName = 'BottomSheetMovie';

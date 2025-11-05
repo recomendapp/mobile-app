@@ -4,9 +4,9 @@ import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaTvSeriesSeason } from "@recomendapp/types";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { CardTvSeriesSeason } from "@/components/cards/CardTvSeriesSeason";
 import { useTranslations } from "use-intl";
+import { Text } from "@/components/ui/text";
 
 interface TvSeriesWidgetSeasonsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	seasons: MediaTvSeriesSeason[];
@@ -27,12 +27,12 @@ const TvSeriesWidgetSeasons = ({
 
 	return (
 	<View style={[tw`gap-1`, style]}>
-		<ThemedText style={[tw`font-medium text-lg`, labelStyle]}>
+		<Text style={[tw`font-medium text-lg`, labelStyle]}>
 			{upperFirst(t('common.messages.tv_season', { count: seasons.length }))}
-			<ThemedText style={[{ color: colors.mutedForeground }, tw`font-medium text-sm`]}>
+			<Text style={[{ color: colors.mutedForeground }, tw`font-medium text-sm`]}>
 				{` ${seasons.length}`}
-			</ThemedText>
-		</ThemedText>
+			</Text>
+		</Text>
 		<LegendList
 		data={seasons}
 		renderItem={({ item }) => (

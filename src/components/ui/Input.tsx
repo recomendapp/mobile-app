@@ -2,7 +2,7 @@ import { Icon } from '@/components/ui/icon';
 import { Icons } from '@/constants/Icons';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
-import { BORDER_RADIUS, CORNERS, FONT_SIZE, HEIGHT } from '@/theme/globals';
+import { BORDER_RADIUS, FONT_SIZE, HEIGHT } from '@/theme/globals';
 import { upperFirst } from 'lodash';
 import { LucideProps } from 'lucide-react-native';
 import React, { forwardRef, ReactElement, useState } from 'react';
@@ -13,14 +13,12 @@ import {
   TextStyle,
   View,
   ViewStyle,
-  Text,
-  NativeSyntheticEvent,
   FocusEvent,
   BlurEvent,
   StyleProp,
 } from 'react-native';
-import { ThemedText } from './ThemedText';
 import { useTranslations } from 'use-intl';
+import { Text } from './text';
 
 export interface InputProps extends TextInputProps {
   label?: string | null;
@@ -367,14 +365,14 @@ export const GroupedInput = ({
   const renderGroupedContent = () => (
     <View style={containerStyle}>
       {!!title && (
-        <ThemedText
+        <Text
           style={[
             tw`ml-2 mb-2 font-semibold`,
             titleStyle
           ]}
         >
           {title}
-        </ThemedText>
+        </Text>
       )}
 
       <View

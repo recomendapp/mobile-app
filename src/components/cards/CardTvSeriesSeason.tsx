@@ -1,6 +1,5 @@
 import * as React from "react"
 import { MediaTvSeriesSeason } from "@recomendapp/types";
-import { ThemedText } from "../ui/ThemedText";
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "../utils/ImageWithFallback";
 import { Href, useRouter } from "expo-router";
@@ -11,6 +10,7 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { upperFirst } from "lodash";
 import { IconMediaRating } from "../medias/IconMediaRating";
 import { useTranslations } from "use-intl";
+import { Text } from "../ui/text";
 
 interface CardTvSeriesSeasonProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -62,8 +62,8 @@ const CardTvSeriesSeasonDefault = React.forwardRef<
 			</ImageWithFallback>
 			
 			<View style={tw`shrink px-2 py-1 gap-1`}>
-				<ThemedText numberOfLines={1} style={tw`text-center`}>{upperFirst(t('common.messages.tv_season_value', { number: season.season_number! }))}</ThemedText>
-				<ThemedText numberOfLines={1} style={[tw`text-center`, { color: colors.mutedForeground }]}>{upperFirst(t('common.messages.tv_episode_count', { count: season.episode_count! }))}</ThemedText>
+				<Text numberOfLines={1} style={tw`text-center`}>{upperFirst(t('common.messages.tv_season_value', { number: season.season_number! }))}</Text>
+				<Text numberOfLines={1} style={[tw`text-center`, { color: colors.mutedForeground }]}>{upperFirst(t('common.messages.tv_episode_count', { count: season.episode_count! }))}</Text>
 				{children}
 			</View>
 		</Animated.View>

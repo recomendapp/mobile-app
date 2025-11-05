@@ -47,5 +47,6 @@ const Skeleton = React.forwardRef<
     />
   );
 });
+Skeleton.displayName = 'Skeleton';
 
 export { Skeleton };

@@ -3,8 +3,7 @@ import tw from '@/lib/tw';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { Button } from '@/components/ui/Button';
-import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { BORDER_RADIUS, GAP, PADDING_HORIZONTAL } from '@/theme/globals';
@@ -81,7 +80,7 @@ export const BottomSheetComment = React.forwardRef<
 	}, [comment, isAllowedToEdit]);
 
 	return (
-    <ThemedTrueSheet
+    <TrueSheet
 	ref={ref}
 	contentContainerStyle={{
 		gap: GAP,
@@ -137,7 +136,7 @@ export const BottomSheetComment = React.forwardRef<
 				)}
 			</Pressable>
 		)}
-    </ThemedTrueSheet>
+    </TrueSheet>
   );
 });
 BottomSheetComment.displayName = 'BottomSheetComment';

@@ -28,7 +28,8 @@ export const Logo = React.forwardRef<Svg, LucideProps>((props: LucideProps, ref)
 	return (
 		<Icons.app.icon ref={ref} color={props.fill || colors.accentYellow} width={width} />
 	);
-})
+});
+Logo.displayName = 'Logo';
 
 export function Splash({children}: React.PropsWithChildren) {
 	'use no memo'

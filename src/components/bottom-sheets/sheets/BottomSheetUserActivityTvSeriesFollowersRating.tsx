@@ -1,9 +1,7 @@
 import React, { useMemo } from 'react';
 import tw from '@/lib/tw';
-import { useTheme } from '@/providers/ThemeProvider';
 import { FlatList, View } from 'react-native';
-import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useUserActivityTvSeriesFollowersRatingQuery } from '@/features/user/userQueries';
 import { useAuth } from '@/providers/AuthProvider';
@@ -52,7 +50,7 @@ const BottomSheetUserActivityTvSeriesFollowersRating = React.forwardRef<
   }, [followersRating]);
 
   return (
-    <ThemedTrueSheet
+    <TrueSheet
     ref={ref}
     sizes={sizes}
     scrollRef={refFlatList as React.RefObject<React.Component<unknown, {}, any>>}
@@ -112,7 +110,7 @@ const BottomSheetUserActivityTvSeriesFollowersRating = React.forwardRef<
       nestedScrollEnabled
       showsVerticalScrollIndicator={false}
       />
-    </ThemedTrueSheet>
+    </TrueSheet>
   );
 });
 BottomSheetUserActivityTvSeriesFollowersRating.displayName = 'BottomSheetUserActivityTvSeriesFollowersRating';

@@ -1,4 +1,3 @@
-import { ThemedText } from "@/components/ui/ThemedText"
 import { useMediaPersonFilmsInfiniteQuery, useMediaPersonQuery } from "@/features/media/mediaQueries";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import { Stack, useLocalSearchParams } from "expo-router";

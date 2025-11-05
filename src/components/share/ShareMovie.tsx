@@ -474,3 +474,4 @@ export const ShareMovie = forwardRef<
 		</View>
 	);
 });
+ShareMovie.displayName = 'ShareMovie';

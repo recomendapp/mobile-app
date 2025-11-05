@@ -1,7 +1,6 @@
 import { forwardRef, useCallback, useMemo, useRef, useState } from "react";
 import { BottomSheetProps } from "../../BottomSheetManager";
-import { TrueSheet } from "@lodev09/react-native-true-sheet";
-import ThemedTrueSheet from "@/components/ui/ThemedTrueSheet";
+import TrueSheet from "@/components/ui/TrueSheet";
 import tw from "@/lib/tw";
 import Share, { Social } from "react-native-share"
 import Constants from 'expo-constants';
@@ -23,6 +22,10 @@ import { BrandIcon, BrandIconProps } from "@/lib/icons";
 import { useTheme } from "@/providers/ThemeProvider";
 import { ScrollView } from "react-native";
 import * as env from '@/env';
+import * as MediaLibrary from 'expo-media-library';
+import { File, Directory, Paths } from 'expo-file-system';
+
+const SHARE_DIRECTORY = new Directory(Paths.cache, 'share_temp');
 
 type SharePlatform = {
 	label: string;
@@ -146,6 +149,69 @@ const BottomSheetShareLayout = forwardRef<
             }
         },
         {
+            label: upperFirst(t('common.messages.download')),
+            icon: { component: Icons.Download, props: { color: colors.foreground } },
+            onPress: async () => {
+                let downloaded = 0;
+                const data = await contentRef.current?.capture();
+                if (!data) return;
+
+                const { status, canAskAgain } = await MediaLibrary.getPermissionsAsync(true);
+                if (status !== 'granted' && canAskAgain) {
+                    const { status: newStatus } = await MediaLibrary.requestPermissionsAsync();
+                    if (newStatus !== 'granted') {
+                        toast.error(upperFirst(t('common.messages.photo_library_permission_denied')));
+                        return;
+                    }
+                } else if (status !== 'granted' && !canAskAgain) {
+                    toast.error(upperFirst(t('common.messages.photo_library_permission_denied')));
+                    return;
+                }
+
+               const saveTempImage = async (uri: string, name: string) => {
+                    if (!uri) return;
+
+                    if (!SHARE_DIRECTORY.exists) {
+                        SHARE_DIRECTORY.create({ intermediates: true });
+                    }
+                    const entries = SHARE_DIRECTORY.list();
+                    entries.forEach(entry => {
+                        console.log(`- ${entry.name} (isFile: ${entry instanceof File})`);
+                        if (entry instanceof File) {
+                            entry.delete();
+                        }
+                    });
+
+                    if (uri.startsWith('data:image')) {
+                        const matches = uri.match(/data:image\/(\w+);base64,/);
+                        const extension = matches ? matches[1] : 'png';
+                        
+                        const fileName = `share_temp_${name}_${Date.now()}.${extension}`;
+                        const file = new File(SHARE_DIRECTORY, fileName);
+                    
+                        const base64Data = uri.split(',')[1];
+                        const bytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+                        file.write(bytes);                        
+                        await MediaLibrary.saveToLibraryAsync(file.uri);
+                        file.delete();
+                    } else {
+                        await MediaLibrary.saveToLibraryAsync(uri);
+                    }
+                };
+
+                if (data.sticker) {
+                    await saveTempImage(data.sticker, 'sticker');
+                    downloaded += 1;
+                }
+                if (data.backgroundImage) {
+                    await saveTempImage(data.backgroundImage, 'backgroundImage');
+                    downloaded += 1;
+                }
+
+                toast.success(upperFirst(t('common.messages.downloaded', { count: downloaded, gender: 'female' })));
+            }
+        },
+        {
             label: upperFirst(t('common.messages.more')),
             icon: { component: Icons.EllipsisHorizontal, props: { color: colors.foreground } },
             onPress: async () => {
@@ -156,7 +222,7 @@ const BottomSheetShareLayout = forwardRef<
                 })
             }
         }
-    ]), [colors, mode, mode, contentRef, url, t, toast]);
+    ]), [colors, mode, contentRef, url, t, toast]);
 
     // Handlers
     const handlePlatformPress = useCallback((item: SharePlatform, index: number) => async () => {
@@ -185,7 +251,7 @@ const BottomSheetShareLayout = forwardRef<
     ), [handlePlatformPress, loadingPlatform]);
 
     return (
-        <ThemedTrueSheet
+        <TrueSheet
         ref={ref}
         scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
         contentContainerStyle={tw`p-0`}
@@ -212,7 +278,7 @@ const BottomSheetShareLayout = forwardRef<
 				showsHorizontalScrollIndicator={false}
                 />
             </ScrollView>
-        </ThemedTrueSheet>
+        </TrueSheet>
     );
 });
 

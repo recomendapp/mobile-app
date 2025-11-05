@@ -6,7 +6,6 @@ import { upperFirst } from "lodash";
 import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useMediaPlaylistsTvSeriesInfiniteQuery } from "@/features/media/mediaQueries";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
@@ -43,9 +42,9 @@ const TvSeriesWidgetPlaylists = ({
 	<View style={[tw`gap-1`, style]}>
 		<Link href={urlPlaylists} style={labelStyle}>
 			<View style={tw`flex-row items-center`}>
-				<ThemedText style={tw`font-medium text-lg`} numberOfLines={1}>
+				<Text style={tw`font-medium text-lg`} numberOfLines={1}>
 					{upperFirst(t('common.messages.playlist', { count: 2 }))}
-				</ThemedText>
+				</Text>
 				<Icons.ChevronRight color={colors.mutedForeground} />
 			</View>
 		</Link>

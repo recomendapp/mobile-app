@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/Button';
-import { ThemedText } from '@/components/ui/ThemedText';
+import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -17,7 +17,7 @@ const NotFoundScreen = () => {
       { paddingBottom: tabBarHeight },
     ]}
     >
-      <ThemedText style={tw.style("text-3xl font-bold")}>This screen doesn't exist.</ThemedText>
+      <Text style={tw.style("text-3xl font-bold")}>This screen doesn't exist.</Text>
 
       <Button onPress={() => router.back()}>Go back!</Button>
     </View>

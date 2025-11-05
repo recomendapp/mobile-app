@@ -62,8 +62,7 @@ const BadgeText = React.forwardRef<
     );
   }
 );
-
-
+BadgeText.displayName = 'BadgeText';
 
 interface BadgeProps
   extends React.ComponentPropsWithoutRef<typeof Animated.View> {

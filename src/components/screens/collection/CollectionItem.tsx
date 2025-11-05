@@ -68,11 +68,6 @@ const CollectionItem = forwardRef<
     //         </Animated.View>
     //     );
     // }, [swipeActions, handleActionWithConfirmation]);
-    
-    // Custom rendering
-    if (renderCustom) {
-        return renderCustom(item);
-    }
 
 	const itemSubtitle = getItemSubtitle?.(item);
     // Default rendering
@@ -158,6 +153,11 @@ const CollectionItem = forwardRef<
     //         </Swipeable>
     //     );
     // }
+
+    // Custom rendering
+    if (renderCustom) {
+        return renderCustom(item);
+    }
 
     // If no swipe actions, we return the content directly
     return itemWithContainer();

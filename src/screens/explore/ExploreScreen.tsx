@@ -269,10 +269,9 @@ const ExploreScreen = () => {
 						textHaloBlur: 1,
 						// ICON
 						iconImage: [
-							'match',
-							['get', 'id', ['at', 0, ['get', 'genres', ['get', 'movie']]]],
-							...genres.flatMap(({ id }) => [id, `genres/${id}`]),
-							'none'
+							'coalesce',
+							['image', ['concat', 'genres/', ['to-string', ['get', 'id', ['at', 0, ['get', 'genres', ['get', 'movie']]]]]]],
+							'genres/default'
 						],
 						iconSize: [
 							"interpolate",

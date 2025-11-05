@@ -474,3 +474,4 @@ export const ShareTvSeries = forwardRef<
 		</View>
 	);
 });
+ShareTvSeries.displayName = 'ShareTvSeries';
