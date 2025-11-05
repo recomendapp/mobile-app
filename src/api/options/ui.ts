@@ -16,8 +16,7 @@ export const UIBackgroundsOptions = () => {
 				.rpc('get_ui_backgrounds');
 			if (error) throw error;
 			
-			const bgInfo = UI_BACKGROUND_DIRECTORY.info();
-			if (!bgInfo.exists) {
+			if (!UI_BACKGROUND_DIRECTORY.exists) {
 				UI_BACKGROUND_DIRECTORY.create({
 					intermediates: true,
 				});
@@ -40,9 +39,7 @@ export const UIBackgroundsOptions = () => {
 			const cached = await Promise.all(
 				data.map(async (item) => {
 				const file = new File(UI_BACKGROUND_DIRECTORY, `${item.id}.jpg`);
-				const info = file.info();
-
-				if (!info.exists) {
+				if (!file.exists) {
 					try {
 						await File.downloadFileAsync(item.url, file);
 						logger.log(`✅ Cached UI background ${item.id}`);

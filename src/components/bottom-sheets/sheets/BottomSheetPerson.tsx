@@ -9,8 +9,7 @@ import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { ScrollView, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
-import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
@@ -74,7 +73,7 @@ const BottomSheetPerson = React.forwardRef<
   ]), [person, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, session]);
   
   return (
-    <ThemedTrueSheet
+    <TrueSheet
     ref={ref}
     scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
     contentContainerStyle={tw`p-0`}
@@ -135,7 +134,7 @@ const BottomSheetPerson = React.forwardRef<
           </React.Fragment>
         ))}
       </ScrollView>
-    </ThemedTrueSheet>
+    </TrueSheet>
   );
 });
 BottomSheetPerson.displayName = 'BottomSheetPerson';

@@ -1,7 +1,7 @@
 import { useTheme } from '@/providers/ThemeProvider';
 import { View, ViewStyle } from 'react-native';
-import { ThemedText } from '../ui/ThemedText';
 import tw from '@/lib/tw';
+import { Text } from '../ui/text';
 
 type Props = {
   title?: string;
@@ -31,14 +31,14 @@ export const ChartContainer = ({
       ]}
     >
       {title && (
-        <ThemedText style={[tw`text-lg font-semibold`, { marginBottom: 4 }]}>
+        <Text style={[tw`text-lg font-semibold`, { marginBottom: 4 }]}>
           {title}
-        </ThemedText>
+        </Text>
       )}
       {description && (
-        <ThemedText style={[{ color: colors.mutedForeground, marginBottom: 16 }]}>
+        <Text style={[{ color: colors.mutedForeground, marginBottom: 16 }]}>
           {description}
-        </ThemedText>
+        </Text>
       )}
       {children}
     </View>

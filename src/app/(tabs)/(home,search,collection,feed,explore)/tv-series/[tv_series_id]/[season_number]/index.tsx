@@ -1,8 +1,7 @@
-import { ThemedText } from "@/components/ui/ThemedText";
 import { useMediaTvSeriesSeasonDetailsQuery } from "@/features/media/mediaQueries";
 import { useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
-import { LayoutChangeEvent, Text, View } from "react-native";
+import { LayoutChangeEvent, View } from "react-native";
 import { MediaTvSeriesEpisode, MediaTvSeriesSeason } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -23,6 +22,7 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useCallback } from "react";
+import { Text } from "@/components/ui/text";
 
 interface MediaHeaderProps {
 	season?: MediaTvSeriesSeason | null;
@@ -149,15 +149,15 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 				tw`w-full`,
 			]}
 			>
-				{season ? <ThemedText>
-					<ThemedText style={{ color: colors.accentYellow }}>
+				{season ? <Text>
+					<Text style={{ color: colors.accentYellow }}>
 						{upperFirst(t(`common.messages.tv_season`, { count: 1 }))}
-					</ThemedText>
+					</Text>
 					{` | ${season.serie?.name}`}
-				</ThemedText> : loading ? <Skeleton style={tw`w-32 h-8`} /> : null}
+				</Text> : loading ? <Skeleton style={tw`w-32 h-8`} /> : null}
 				{/* TITLE */}
 				{!loading ? (
-					<ThemedText
+					<Text
 					numberOfLines={2}
 					style={[
 						tw`text-4xl font-bold`,
@@ -165,17 +165,17 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 					]}
 					>
 						{title ?? upperFirst(t('common.messages.media_not_found'))}
-					</ThemedText>
+					</Text>
 				) : <Skeleton style={tw`w-64 h-12`} />}
 				{season?.name && (
-					<ThemedText numberOfLines={1} style={[ { color: colors.mutedForeground }, tw`text-lg font-semibold`]}>
+					<Text numberOfLines={1} style={[ { color: colors.mutedForeground }, tw`text-lg font-semibold`]}>
 						{season.name}
-					</ThemedText>
+					</Text>
 				)}
 				{season?.episode_count ? (
-					<ThemedText numberOfLines={1}>
+					<Text numberOfLines={1}>
 						{upperFirst(t('common.messages.tv_episode_count', { count: season.episode_count }))}
-					</ThemedText>
+					</Text>
 				) : undefined}
 			</Animated.View>
 		</Animated.View>
@@ -242,21 +242,21 @@ const TvSeriesSeasonScreen = () => {
 						/>
 					</ImageWithFallback>
 					<View style={tw`shrink px-2 py-1 gap-1`}>
-						<ThemedText numberOfLines={1}>
-							<ThemedText style={{ color: colors.accentYellow }}>
+						<Text numberOfLines={1}>
+							<Text style={{ color: colors.accentYellow }}>
 								{upperFirst(t('common.messages.tv_episode_short', { seasonNumber: season?.season_number!, episodeNumber: item.episode_number! }))}
-							</ThemedText>
-							<ThemedText style={tw`font-bold`}>
+							</Text>
+							<Text style={tw`font-bold`}>
 								{" • "}
 								{item.name ?? upperFirst(t('common.messages.tv_episode_value', { number: item.episode_number! }))}
-							</ThemedText>
-						</ThemedText>
-						<ThemedText numberOfLines={2}>
+							</Text>
+						</Text>
+						<Text numberOfLines={2}>
 							{item.overview ?? upperFirst(t('common.messages.no_overview'))}
-						</ThemedText>
-						<ThemedText numberOfLines={1} style={[tw`text-sm`, { color: colors.mutedForeground }]}>
+						</Text>
+						<Text numberOfLines={1} style={[tw`text-sm`, { color: colors.mutedForeground }]}>
 							{item.air_date ? formatter.dateTime(new Date(item.air_date), { year: 'numeric', month: 'long', day: 'numeric' }) : upperFirst(t('common.messages.unknown'))}
-						</ThemedText>
+						</Text>
 					</View>
 				</View>
 			</Animated.View>

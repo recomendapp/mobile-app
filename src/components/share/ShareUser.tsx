@@ -309,3 +309,4 @@ export const ShareUser = forwardRef<
 		</View>
 	);
 });
+ShareUser.displayName = 'ShareUser';

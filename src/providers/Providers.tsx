@@ -14,6 +14,8 @@ import { Splash } from "@/components/Splash/Splash";
 import { PropsWithChildren } from "react";
 import { ToastProvider } from "@/components/Toast";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { useQuery } from "@tanstack/react-query";
+import { UIBackgroundsOptions } from "@/api/options";
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -55,6 +57,7 @@ const Providers = ({ children } : ProvidersProps) => {
 };
 
 const ProvidersInner = ({ children } : PropsWithChildren<{}>) => {
+	useQuery(UIBackgroundsOptions()); // Preload UI backgrounds
 	return (
 		<Splash>
 			{children}

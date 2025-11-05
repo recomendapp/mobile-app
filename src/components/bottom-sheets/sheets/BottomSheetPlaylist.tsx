@@ -12,8 +12,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
 import { useUserPlaylistSavedQuery } from '@/features/user/userQueries';
 import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation } from '@/features/user/userMutations';
-import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
@@ -22,7 +21,7 @@ import richTextToPlainString from '@/utils/richTextToPlainString';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useToast } from '@/components/Toast';
 import BottomSheetSharePlaylist from './share/BottomSheetSharePlaylist';
-import { GAP, GAP_XS } from '@/theme/globals';
+import { GAP } from '@/theme/globals';
 import { View } from '@/components/ui/view';
 import ButtonActionPlaylistLike from '@/components/buttons/ButtonActionPlaylistLike';
 import ButtonActionPlaylistSaved from '@/components/buttons/ButtonActionPlaylistSaved';
@@ -174,7 +173,7 @@ const BottomSheetPlaylist = forwardRef<
 	];
 
 	return (
-	<ThemedTrueSheet
+	<TrueSheet
 	ref={ref}
 	scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
 	contentContainerStyle={tw`p-0`}
@@ -236,7 +235,7 @@ const BottomSheetPlaylist = forwardRef<
 		bounces={false}
 		contentContainerStyle={{ paddingBottom: insets.bottom }}
 		/>
-	</ThemedTrueSheet>
+	</TrueSheet>
 	);
 });
 BottomSheetPlaylist.displayName = 'BottomSheetPlaylist';

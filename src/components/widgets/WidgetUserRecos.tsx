@@ -2,12 +2,11 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useUserRecosQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Link } from "expo-router";
-import { StyleProp, Text, TextStyle, View, ViewStyle } from "react-native";
+import { StyleProp, TextStyle, ViewStyle } from "react-native";
+import { View } from "@/components/ui/view";
 import UserAvatar from "@/components/user/UserAvatar";
 import { useTheme } from "@/providers/ThemeProvider";
-import { ThemedView } from "@/components/ui/ThemedView";
 import { Icons } from "@/constants/Icons";
-import { ThemedText } from "../ui/ThemedText";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo } from "react";
@@ -16,6 +15,7 @@ import { CardMovie } from "../cards/CardMovie";
 import { CardTvSeries } from "../cards/CardTvSeries";
 import { GAP } from "@/theme/globals";
 import { GridView } from "../ui/GridView";
+import { Text } from "../ui/text";
 
 interface WidgetUserRecosProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -52,11 +52,11 @@ const SendersAvatars = ({
         />
       ))}
       {remainingCount > 0 && (
-        <ThemedView style={tw`h-4 flex items-center justify-center rounded-full`}>
+        <View style={tw`h-4 flex items-center justify-center rounded-full`}>
           <Text style={[{ color: colors.mutedForeground }, tw`text-xs`]}>
             +{remainingCount}
           </Text>
-        </ThemedView>
+        </View>
       )}
     </View>
   );
@@ -104,9 +104,9 @@ const WidgetHeader = ({
   return (
     <Link href="/collection/my-recos" style={labelStyle}>
       <View style={tw`flex-row items-center`}>
-        <ThemedText style={tw`font-semibold text-xl`} numberOfLines={1}>
+        <Text style={tw`font-semibold text-xl`} numberOfLines={1}>
           {upperFirst(t('common.messages.reco_by_your_friends'))}
-        </ThemedText>
+        </Text>
         <Icons.ChevronRight color={colors.mutedForeground} />
       </View>
     </Link>

@@ -9,8 +9,8 @@ import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { Pressable, View, ScrollView, FlatList } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
-import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import { TrueSheet as RNTrueSheet } from '@lodev09/react-native-true-sheet';
+import TrueSheet from '@/components/ui/TrueSheet';
 import BottomSheetDefaultView from '../templates/BottomSheetDefaultView';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
@@ -51,7 +51,7 @@ const BottomSheetTvSeries = React.forwardRef<
   const pathname = usePathname();
   // REFs
   const scrollRef = React.useRef<ScrollView>(null);
-  const BottomSheetMainCreditsRef = React.useRef<TrueSheet>(null);
+  const BottomSheetMainCreditsRef = React.useRef<RNTrueSheet>(null);
   const creditsScrollRef = React.useRef<FlatList<MediaPerson>>(null);
   // States
   const items: Item[][] = React.useMemo(() => ([
@@ -122,7 +122,7 @@ const BottomSheetTvSeries = React.forwardRef<
   ]), [tvSeries, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, activity, session]);
 
   return (
-    <ThemedTrueSheet
+    <TrueSheet
     ref={ref}
     scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
     contentContainerStyle={tw`p-0`}
@@ -224,7 +224,7 @@ const BottomSheetTvSeries = React.forwardRef<
           />
         </BottomSheetDefaultView>
       )}
-    </ThemedTrueSheet>
+    </TrueSheet>
   );
 });
 BottomSheetTvSeries.displayName = 'BottomSheetTvSeries';

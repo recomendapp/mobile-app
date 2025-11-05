@@ -1,6 +1,5 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import useCollectionStaticRoutes, { CollectionStaticRoute } from "@/components/screens/collection/useCollectionStaticRoutes";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistsInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
@@ -11,6 +10,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useCallback, useMemo } from "react";
 import { Playlist } from "@recomendapp/types";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { Text } from "@/components/ui/text";
 
 const CollectionScreen = () => {
 	const { user } = useAuth();
@@ -39,7 +39,7 @@ const CollectionScreen = () => {
 					<Link href={item.href} style={tw`p-1`}>
 						{item.icon}
 						<View style={tw`w-full items-center`}>
-							<ThemedText>{item.label}</ThemedText>
+							<Text>{item.label}</Text>
 						</View>
 					</Link>
 				);

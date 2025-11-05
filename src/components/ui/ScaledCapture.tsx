@@ -1,4 +1,4 @@
-import { useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { useState, forwardRef } from "react";
 import { View } from "react-native";
 import ViewShot from "react-native-view-shot";
 
@@ -38,3 +38,4 @@ export const ScaledCapture = forwardRef<
     );
   }
 );
+ScaledCapture.displayName = 'ScaledCapture';

@@ -1,8 +1,6 @@
 import { Button } from '@/components/ui/Button';
-import { ThemedText } from '@/components/ui/ThemedText';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
-import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { upperFirst } from 'lodash';
 import React from 'react';
 import { Dimensions, FlatList, Pressable, TouchableOpacity, View } from 'react-native';
@@ -11,11 +9,12 @@ import * as Haptics from 'expo-haptics';
 import { Icons } from '@/constants/Icons';
 import { ImageType, ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { PADDING_HORIZONTAL } from '@/theme/globals';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Text } from '@/components/ui/text';
 
 const { width } = Dimensions.get('screen');
 const ITEM_WIDTH = width * 0.2;
@@ -72,9 +71,9 @@ const RatingItem = React.forwardRef<
 		{...props}
 		>
 			{/* <Icons.Star width={ITEM_WIDTH} height={ITEM_WIDTH} color={'red'} /> */}
-			<ThemedText style={tw`text-white text-4xl font-bold`}>
+			<Text style={tw`text-white text-4xl font-bold`}>
 				{rating}
-			</ThemedText>
+			</Text>
 		</Animated.View>
 	)
 });
@@ -162,7 +161,7 @@ const BottomSheetRating = React.forwardRef<
 	}, []);
 
 	return (
-		<ThemedTrueSheet
+		<TrueSheet
 		ref={ref}
 		sizes={sizes}
 		FooterComponent={() => (
@@ -270,7 +269,7 @@ const BottomSheetRating = React.forwardRef<
 			scrollEventThrottle={1000 / 60} // ~16ms
 			snapToInterval={ITEM_TOTAL_SIZE}
 			/>
-		</ThemedTrueSheet>
+		</TrueSheet>
 	);
 });
 BottomSheetRating.displayName = 'BottomSheetRating';

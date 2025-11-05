@@ -1,6 +1,5 @@
 import tw from "@/lib/tw";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { Href, Link } from "expo-router";
@@ -43,9 +42,9 @@ const MovieWidgetReviews = ({
 	<View style={[tw`gap-1`, style]}>
 		<Link href={urlReviews} style={labelStyle}>
 			<View style={tw`flex-row items-center`}>
-				<ThemedText style={tw`font-medium text-lg`} numberOfLines={1}>
+				<Text style={tw`font-medium text-lg`} numberOfLines={1}>
 					{upperFirst(t('common.messages.review', { count: 2 }))}
-				</ThemedText>
+				</Text>
 				<Icons.ChevronRight color={colors.mutedForeground} />
 			</View>
 		</Link>

@@ -1,6 +1,5 @@
 import React from 'react';
-import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 
 interface BottomSheetDefaultViewProps extends BottomSheetProps {
@@ -12,9 +11,9 @@ const BottomSheetDefaultView = React.forwardRef<
 	BottomSheetDefaultViewProps
 >(({ id, children, ...props }, ref) => {
   return (
-    <ThemedTrueSheet ref={ref} {...props}>
+    <TrueSheet ref={ref} {...props}>
       {children}
-    </ThemedTrueSheet>
+    </TrueSheet>
   );
 });
 BottomSheetDefaultView.displayName = 'BottomSheetDefaultView';

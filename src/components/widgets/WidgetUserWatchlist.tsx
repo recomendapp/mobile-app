@@ -4,7 +4,6 @@ import tw from "@/lib/tw";
 import { Link } from "expo-router";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { useTheme } from "@/providers/ThemeProvider";
-import { ThemedText } from "../ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
@@ -14,6 +13,7 @@ import { CardTvSeries } from "../cards/CardTvSeries";
 import { useCallback } from "react";
 import { GAP } from "@/theme/globals";
 import { GridView } from "../ui/GridView";
+import { Text } from "../ui/text";
 
 interface WidgetUserWatchlistProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -44,9 +44,9 @@ const WidgetHeader = ({
   return (
     <Link href="/collection/watchlist" style={labelStyle}>
       <View style={tw`flex-row items-center`}>
-        <ThemedText style={tw`font-semibold text-xl`} numberOfLines={1}>
+        <Text style={tw`font-semibold text-xl`} numberOfLines={1}>
           {upperFirst(t('common.messages.to_watch'))}
-        </ThemedText>
+        </Text>
         <Icons.ChevronRight color={colors.mutedForeground} />
       </View>
     </Link>

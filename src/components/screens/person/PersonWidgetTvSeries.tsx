@@ -4,7 +4,6 @@ import { clamp, upperFirst } from "lodash";
 import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useMediaPersonTvSeriesInfiniteQuery } from "@/features/media/mediaQueries";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
@@ -41,9 +40,9 @@ const PersonWidgetTvSeries = ({
 	<View style={[tw`gap-1`, style]}>
 		<Link href={url} style={{ paddingHorizontal: PADDING_HORIZONTAL }}>
 			<View style={tw`flex-row items-center`}>
-				<ThemedText style={tw`font-medium text-lg`} numberOfLines={1}>
+				<Text style={tw`font-medium text-lg`} numberOfLines={1}>
 					{upperFirst(t('common.messages.tv_series', { count: 2 }))}
-				</ThemedText>
+				</Text>
 				<Icons.ChevronRight color={colors.mutedForeground} />
 			</View>
 		</Link>

@@ -1,7 +1,8 @@
 import { CardMovie } from "@/components/cards/CardMovie";
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
-import ThemedTrueSheet from "@/components/ui/ThemedTrueSheet";
+import TrueSheet from "@/components/ui/TrueSheet";
+import { TrueSheet as RNTrueSheet } from "@lodev09/react-native-true-sheet";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
 import { useSearchMoviesInfiniteQuery } from "@/features/search/searchQueries";
@@ -10,7 +11,6 @@ import { useTheme } from "@/providers/ThemeProvider";
 import useSearchStore from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList, LegendListRef } from "@legendapp/list";
-import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { useScrollToTop } from "@react-navigation/native";
 import { MediaMovie } from "@recomendapp/types";
 import { useNavigation } from "expo-router";
@@ -67,13 +67,13 @@ const EmptyComponent = memo(({
 });
 EmptyComponent.displayName = 'EmptyComponent';
 
-const FiltersSheet = memo(forwardRef<TrueSheet>((_, ref) => {
+const FiltersSheet = memo(forwardRef<RNTrueSheet>((_, ref) => {
 	const insets = useSafeAreaInsets();
 	const t = useTranslations();
 	const filtersScrollViewRef = useRef<ScrollView>(null);
 
 	return (
-		<ThemedTrueSheet
+		<TrueSheet
 			ref={ref}
 			sizes={['auto']}
 			scrollRef={filtersScrollViewRef as React.RefObject<React.Component<unknown, {}, any>>}
@@ -96,7 +96,7 @@ const FiltersSheet = memo(forwardRef<TrueSheet>((_, ref) => {
 					<Text>{upperFirst(t('common.messages.release_date'))}</Text>
 				</View>
 			</ScrollView>
-		</ThemedTrueSheet>
+		</TrueSheet>
 	);
 }));
 FiltersSheet.displayName = 'FiltersSheet';

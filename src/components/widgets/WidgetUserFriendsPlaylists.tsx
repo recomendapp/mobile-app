@@ -2,13 +2,13 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistsFriendsInfinite } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
-import { ThemedText } from "@/components/ui/ThemedText";
 import { CardPlaylist } from "../cards/CardPlaylist";
 import { LegendList } from "@legendapp/list";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo } from "react";
 import { Playlist } from "@recomendapp/types";
+import { Text } from "../ui/text";
 
 interface WidgetUserFriendsPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -51,9 +51,9 @@ export const WidgetUserFriendsPlaylists = ({
 
   return (
     <View style={[tw`flex-1 gap-2`, style]}>
-      <ThemedText style={[tw`font-semibold text-xl`, labelStyle]}>
+      <Text style={[tw`font-semibold text-xl`, labelStyle]}>
         {upperFirst(t('common.messages.friends_playlists'))}
-      </ThemedText>
+      </Text>
       <LegendList
         data={playlistData}
         renderItem={renderItem}

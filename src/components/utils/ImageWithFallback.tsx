@@ -76,6 +76,7 @@ export const ImageWithFallback = React.forwardRef<
     </Animated.View>
   );
 });
+ImageWithFallback.displayName = 'ImageWithFallback';
 
 const Fallback = ({
   type,

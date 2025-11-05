@@ -1,6 +1,7 @@
 import Svg, { Ellipse, Path, Polygon } from "react-native-svg";
 import { LucideProps } from "lucide-react-native";
 import { forwardRef } from "react";
+
 const RecomendLogo = forwardRef<Svg, LucideProps>((props, ref) => {
 	const { color = "currentColor", width: widthProps, height: heightProps, ...otherProps } = props;
 	const ratio = 2000 / 317.6;

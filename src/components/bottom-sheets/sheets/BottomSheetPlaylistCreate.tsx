@@ -1,5 +1,4 @@
 import tw from '@/lib/tw';
-import { ThemedText } from '@/components/ui/ThemedText';
 import { upperFirst } from 'lodash';
 import { Button } from '@/components/ui/Button';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
@@ -10,9 +9,8 @@ import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { View } from 'react-native';
-import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { BottomSheetProps } from '../BottomSheetManager';
-import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import TrueSheet from '@/components/ui/TrueSheet';
 import { useTranslations } from 'use-intl';
 import { useToast } from '@/components/Toast';
 import { Input } from "@/components/ui/Input";
@@ -20,6 +18,7 @@ import { GAP, PADDING_HORIZONTAL } from '@/theme/globals';
 import { LegendList } from '@legendapp/list';
 import { Label } from '@/components/ui/Label';
 import { forwardRef } from 'react';
+import { Text } from '@/components/ui/text';
 
 interface BottomSheetPlaylistCreateProps extends BottomSheetProps {
 	onCreate?: (playlist: Playlist) => void;
@@ -84,7 +83,7 @@ const BottomSheetPlaylistCreate = forwardRef<
 	};
 
 	return (
-		<ThemedTrueSheet
+		<TrueSheet
 		ref={ref}
 		contentContainerStyle={[
 			{ paddingHorizontal: PADDING_HORIZONTAL },
@@ -92,7 +91,7 @@ const BottomSheetPlaylistCreate = forwardRef<
 		]}
 		{...props}
 		>
-			<ThemedText style={tw`text-lg font-bold`}>{upperFirst(t('common.messages.new_playlist'))}</ThemedText>
+			<Text style={tw`text-lg font-bold`}>{upperFirst(t('common.messages.new_playlist'))}</Text>
 			<Controller
 			name='title'
 			control={form.control}
@@ -150,7 +149,7 @@ const BottomSheetPlaylistCreate = forwardRef<
 			>
 				{upperFirst(t('common.messages.create'))}
 			</Button>
-		</ThemedTrueSheet>
+		</TrueSheet>
 	);
 });
 BottomSheetPlaylistCreate.displayName = 'BottomSheetPlaylistCreate';

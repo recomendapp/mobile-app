@@ -2,13 +2,12 @@ import React from 'react';
 import tw from '@/lib/tw';
 import { UserRecosAggregated } from '@recomendapp/types';
 import { useTheme } from '@/providers/ThemeProvider';
-import { ThemedText } from '@/components/ui/ThemedText';
+import { Text } from '@/components/ui/text';
 import { upperFirst } from 'lodash';
 import { View } from 'react-native';
 import { CardUser } from '@/components/cards/CardUser';
-import { TrueSheet } from '@lodev09/react-native-true-sheet';
 import { FlashList, FlashListRef } from '@shopify/flash-list';
-import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,7 +25,7 @@ const BottomSheetMyRecosSenders = React.forwardRef<
 	const t = useTranslations();
 	const flashlistRef = React.useRef<FlashListRef<UserRecosAggregated['senders'][number]>>(null);
 	return (
-    <ThemedTrueSheet
+    <TrueSheet
     ref={ref}
 	sizes={['large']}
 	// scrollRef={flashlistRef as React.RefObject<React.Component<unknown, {}, any>>}
@@ -43,13 +42,13 @@ const BottomSheetMyRecosSenders = React.forwardRef<
 				</View>
 				{item.comment ? (
 					<View style={[{ backgroundColor: colors.background }, tw`ml-6 p-2 rounded-md`]}>
-						<ThemedText>{item.comment}</ThemedText>
+						<Text>{item.comment}</Text>
 					</View>
 				) : null}
 			</View>
 		)}
 		ListHeaderComponent={
-			<ThemedText style={tw`text-center text-xl font-bold`}>{upperFirst(t('common.messages.reco', { count: comments.length }))}</ThemedText>
+			<Text style={tw`text-center text-xl font-bold`}>{upperFirst(t('common.messages.reco', { count: comments.length }))}</Text>
   		}
 		keyExtractor={(item) => item.user.id!}
 		contentContainerStyle={{
@@ -60,7 +59,7 @@ const BottomSheetMyRecosSenders = React.forwardRef<
 		}}
 		ItemSeparatorComponent={() => <View style={tw`h-2`} />}
 		/>
-    </ThemedTrueSheet>
+    </TrueSheet>
 	);
 });
 BottomSheetMyRecosSenders.displayName = 'BottomSheetMyRecosSenders';

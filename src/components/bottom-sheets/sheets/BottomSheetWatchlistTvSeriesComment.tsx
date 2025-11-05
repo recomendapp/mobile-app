@@ -5,8 +5,7 @@ import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useUserWatchlistTvSeriesUpdateMutation } from '@/features/user/userMutations';
 import { Button } from '@/components/ui/Button';
-import { TrueSheet } from '@lodev09/react-native-true-sheet';
-import ThemedTrueSheet from '@/components/ui/ThemedTrueSheet';
+import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { GAP, PADDING_HORIZONTAL } from '@/theme/globals';
@@ -78,7 +77,7 @@ export const BottomSheetWatchlistTvSeriesComment = React.forwardRef<
 	};
 
 	return (
-    <ThemedTrueSheet
+    <TrueSheet
 	ref={ref}
 	contentContainerStyle={{
 		gap: GAP,
@@ -116,7 +115,7 @@ export const BottomSheetWatchlistTvSeriesComment = React.forwardRef<
 		>
 			{upperFirst(t('common.messages.save'))}
 		</Button>
-    </ThemedTrueSheet>
+    </TrueSheet>
   );
 });
 BottomSheetWatchlistTvSeriesComment.displayName = 'BottomSheetWatchlistTvSeriesComment';

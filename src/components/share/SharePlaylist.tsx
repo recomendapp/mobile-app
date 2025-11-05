@@ -312,3 +312,4 @@ export const SharePlaylist = forwardRef<
 		</View>
 	);
 });
+SharePlaylist.displayName = 'SharePlaylist';

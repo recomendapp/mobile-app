@@ -1,18 +1,17 @@
 import tw from '@/lib/tw';
 import * as React from 'react';
-import { TextProps } from 'react-native';
-import { ThemedText } from './ThemedText';
+import { Text, TextProps } from './text';
 
-const Label = React.forwardRef<React.ComponentRef<typeof ThemedText>, TextProps>(
+const Label = React.forwardRef<React.ComponentRef<typeof Text>, TextProps>(
 	({ style, ...props }, ref) => {
 		return (
-			<ThemedText
-				ref={ref}
-				style={[
-					tw.style('text-sm native:text-base font-medium leading-none web:peer-disabled:cursor-not-allowed web:peer-disabled:opacity-70'),
-					style,
-				]}
-				{...props}
+			<Text
+			ref={ref}
+			style={[
+				tw.style('text-sm native:text-base font-medium leading-none web:peer-disabled:cursor-not-allowed web:peer-disabled:opacity-70'),
+				style,
+			]}
+			{...props}
 			/>
 		);
 	}
