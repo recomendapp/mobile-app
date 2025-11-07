@@ -31,11 +31,22 @@ const getGoogleServiceInfoFile = () => {
 	return './GoogleService-Info.plist';
 };
 
+const getProjectId = () => {
+	return 'cc8f56b7-1052-4648-8e65-43fb7acbf4d8';
+}
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
 	name: getAppName(),
 	slug: 'recomend',
 	version: '1.0.0',
+	runtimeVersion: {
+		policy: 'appVersion',
+	},
+	updates: {
+		checkAutomatically: 'ON_LOAD',
+		url: `https://u.expo.dev/${getProjectId()}`,
+	},
 	orientation: 'portrait',
 	icon: './src/assets/images/app/icons/icon.png',
 	scheme: 'recomend',
@@ -224,7 +235,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			origin: false,
 		},
 		eas: {
-			projectId: 'cc8f56b7-1052-4648-8e65-43fb7acbf4d8',
+			projectId: getProjectId(),
 		},
 	},
 	owner: 'lxup',
