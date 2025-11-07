@@ -7,8 +7,10 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import {OnboardingData} from '../data';
-import LottieView from 'lottie-react-native';
-// import { DotLottie } from '@lottiefiles/dotlottie-react-native';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import tw from '@/lib/tw';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BORDER_RADIUS_LG, PADDING_HORIZONTAL } from '@/theme/globals';
 
 type Props = {
   index: number;
@@ -17,9 +19,15 @@ type Props = {
 };
 
 const RenderItem = ({index, x, item}: Props) => {
+  const insets = useSafeAreaInsets();
   const {width: SCREEN_WIDTH} = useWindowDimensions();
+  const player = useVideoPlayer(item.video, player => {
+    player.loop = true;
+    player.muted = true;
+    player.play();
+  });
 
-  const lottieAnimationStyle = useAnimatedStyle(() => {
+  const videoAnimationStyle = useAnimatedStyle(() => {
     const translateYAnimation = interpolate(
       x.value,
       [
@@ -54,8 +62,8 @@ const RenderItem = ({index, x, item}: Props) => {
   });
 
   return (
-    <View style={[styles.itemContainer, {width: SCREEN_WIDTH}]}>
-      <View style={styles.circleContainer}>
+    <View style={[styles.itemContainer, {width: SCREEN_WIDTH, paddingTop: insets.top,}]}>
+      <View style={tw`absolute inset-0 items-center justify-end`}>
         <Animated.View
           style={[
             {
@@ -68,18 +76,22 @@ const RenderItem = ({index, x, item}: Props) => {
           ]}
         />
       </View>
-      <Animated.View style={lottieAnimationStyle}>
-        <LottieView
-          source={item.animation}
+      <Animated.View style={[videoAnimationStyle, tw`items-center justify-center`]}>
+        <VideoView
+          player={player}
           style={{
-            width: SCREEN_WIDTH * 0.9,
-            height: SCREEN_WIDTH * 0.9,
+            width: SCREEN_WIDTH * 0.8,
+            aspectRatio: 2 / 3,
+            borderRadius: BORDER_RADIUS_LG,
+            overflow: 'hidden',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
-          autoPlay
-          loop
+          contentFit="cover"
+          nativeControls={false}
         />
       </Animated.View>
-      <Text style={[styles.itemText, {color: item.textColor}]}>
+      <Text style={[tw`text-center text-xl font-bold`, { color: item.textColor, marginHorizontal: PADDING_HORIZONTAL }]}>
         {item.text}
       </Text>
     </View>
@@ -94,17 +106,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     marginBottom: 120,
-  },
-  itemText: {
-    textAlign: 'center',
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    marginHorizontal: 20,
-  },
-  circleContainer: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
   },
 });

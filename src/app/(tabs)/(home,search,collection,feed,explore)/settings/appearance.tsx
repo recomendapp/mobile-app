@@ -37,13 +37,13 @@ const SettingsAppearanceScreen = () => {
 	})
 
 	// Form
-	const profileFormSchema = useMemo(() => z.object({
+	const profileFormSchema = z.object({
 		locale: z.enum(supportedLocales)
-	}), [supportedLocales]);
+	});
 	type ProfileFormValues = z.infer<typeof profileFormSchema>;
-	const defaultValues = useMemo((): Partial<ProfileFormValues> => ({
+	const defaultValues: Partial<ProfileFormValues> = {
 		locale: locale,
-	}), [locale]);
+	};
 	const form = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues,
@@ -63,6 +63,7 @@ const SettingsAppearanceScreen = () => {
 			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 			form.reset();
 			queryClient.clear();
+			queryClient.invalidateQueries();
 		} catch (error) {
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof AuthError) {
@@ -72,7 +73,7 @@ const SettingsAppearanceScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [session, t, setLocale, updateUser, form]);
+	}, [session, t, setLocale, updateUser, form, toast, queryClient]);
 
 	// useEffects
 	useEffect(() => {

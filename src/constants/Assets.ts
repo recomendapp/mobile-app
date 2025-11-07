@@ -1,4 +1,23 @@
+import { Platform } from 'react-native';
+
 export const Assets = {
+	onboarding: {
+		tracking: Platform.select({
+			ios: require('@/assets/onboarding/onboarding_tracking_ios.mp4'),
+			android: require('@/assets/onboarding/onboarding_tracking_ios.mp4'),
+			default: require('@/assets/onboarding/onboarding_tracking_ios.mp4'),
+		}),
+		recos: Platform.select({
+			ios: require('@/assets/onboarding/onboarding_recos_ios.mp4'),
+			android: require('@/assets/onboarding/onboarding_recos_ios.mp4'),
+			default: require('@/assets/onboarding/onboarding_recos_ios.mp4'),
+		}),
+		playlists: Platform.select({
+			ios: require('@/assets/onboarding/onboarding_playlists_ios.mp4'),
+			android: require('@/assets/onboarding/onboarding_playlists_ios.mp4'),
+			default: require('@/assets/onboarding/onboarding_playlists_ios.mp4'),
+		}),
+	},
 	screens: {
 		auth: {
 			login: {
