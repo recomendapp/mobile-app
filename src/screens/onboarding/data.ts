@@ -10,7 +10,7 @@ export interface OnboardingData {
   backgroundColor: string;
 }
 
-const useData = ((): OnboardingData[] => {
+const useOnboardingData = ((): OnboardingData[] => {
   const t = useTranslations();
   return [
     {
@@ -36,7 +36,7 @@ const useData = ((): OnboardingData[] => {
     },
     {
       id: 4,
-      video: Assets.onboarding.tracking,
+      video: Assets.onboarding.social,
       text: upperFirst(t('pages.onboarding.social.description')),
       textColor: '#004f91',
       backgroundColor: '#d5afff',
@@ -44,4 +44,4 @@ const useData = ((): OnboardingData[] => {
   ];
 });
 
-export default useData;
+export default useOnboardingData;

@@ -26,9 +26,10 @@ type Props = {
 	flatListIndex: SharedValue<number>;
 	flatListRef: AnimatedRef<FlatList<OnboardingData>>;
 	x: SharedValue<number>;
+	colors: string[];
 };
 
-const CustomButton = ({flatListRef, flatListIndex, dataLength, x}: Props) => {
+const CustomButton = ({flatListRef, flatListIndex, dataLength, x, colors}: Props) => {
 	const { session } = useAuth();
 	const t = useTranslations();
 	const setHasOnboarded = useUIStore(state => state.setHasOnboarded);
@@ -82,8 +83,8 @@ const CustomButton = ({flatListRef, flatListIndex, dataLength, x}: Props) => {
 	const animatedColor = useAnimatedStyle(() => {
 		const backgroundColor = interpolateColor(
 		x.value,
-		[0, SCREEN_WIDTH, 2 * SCREEN_WIDTH],
-		['#005b4f', '#1e2169', '#F15937'],
+		colors.map((_, i) => i * SCREEN_WIDTH),
+		colors,
 		);
 
 		return {
