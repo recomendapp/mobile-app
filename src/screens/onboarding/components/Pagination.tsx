@@ -9,10 +9,11 @@ type Props = {
   x: SharedValue<number>;
 };
 const Pagination = ({data, x}: Props) => {
+  const colors = data.map(item => item.textColor);
   return (
     <View style={styles.paginationContainer}>
       {data.map((_, index) => {
-        return <Dot index={index} x={x} key={index} />;
+        return <Dot index={index} x={x} key={index} colors={colors} />;
       })}
     </View>
   );

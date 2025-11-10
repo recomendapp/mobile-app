@@ -8,13 +8,13 @@ import Animated, {
 import Pagination from './components/Pagination';
 import CustomButton from './components/CustomButton';
 import RenderItem from './components/RenderItem';
-import useData, { OnboardingData } from './data';
+import useOnboardingData, { OnboardingData } from './data';
 
 const OnboardingScreen = () => {
   const flatListRef = useAnimatedRef<FlatList<OnboardingData>>();
   const x = useSharedValue(0);
   const flatListIndex = useSharedValue(0);
-  const data = useData();
+  const data = useOnboardingData();
 
   const onViewableItemsChanged = ({
     viewableItems,
@@ -60,6 +60,7 @@ const OnboardingScreen = () => {
           flatListIndex={flatListIndex}
           dataLength={data.length}
           x={x}
+          colors={data.map(d => d.textColor)}
         />
       </View>
     </View>
