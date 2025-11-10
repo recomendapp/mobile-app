@@ -78,7 +78,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
 			return id;
 			},
-		[renderAction, triggerHaptic]
+		[renderAction, triggerHaptic, dismiss]
 	);
 
 	return (
@@ -99,13 +99,20 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 	);
 };
 
-export const Toaster = () => {
+export const Toaster = ({
+	pauseWhenPageIsHidden = true,
+	closeButton = true,
+	duration = 2000,
+	styles,
+	...props
+} : React.ComponentProps<typeof SNToaster>) => {
 	const { colors } = useTheme();
 
 	return (
 		<SNToaster
-		pauseWhenPageIsHidden
-		closeButton
+		pauseWhenPageIsHidden={pauseWhenPageIsHidden}
+		closeButton={closeButton}
+		duration={duration}
 		styles={{
 			toast: {
 				backgroundColor: colors.toast
@@ -115,8 +122,10 @@ export const Toaster = () => {
 			},
 			description: {
 				color: colors.foreground
-			}, 
+			},
+			...styles,
 		}}
+		{...props}
 		/>
 	);
 };

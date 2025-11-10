@@ -16,6 +16,7 @@ import { CardFeedReviewMovieLike } from "@/components/cards/feed/CardFeedReviewM
 import { CardFeedReviewTvSeriesLike } from "@/components/cards/feed/CardFeedReviewTvSeriesLike";
 import { useScrollToTop } from "@react-navigation/native";
 import { useCallback, useMemo, useRef } from "react";
+import { Icons } from "@/constants/Icons";
 
 const FeedScreen = () => {
 	const { user } = useAuth();
@@ -24,7 +25,6 @@ const FeedScreen = () => {
 	const {
 		data,
 		isLoading,
-		isFetching,
 		fetchNextPage,
 		hasNextPage,
 		refetch,
@@ -65,11 +65,12 @@ const FeedScreen = () => {
 			default:
 				return <View style={[{ backgroundColor: colors.muted}, tw`p-4 rounded-md`]}><Text textColor="muted" style={tw`text-center`}>Unsupported activity type</Text></View>;
 		}
-	}, []);
+	}, [colors.muted]);
 	const renderEmpty = useCallback(() => (
-		!loading ? (
+		loading ? <Icons.Loader />
+		: (
 			<Text style={tw`text-center`} textColor='muted'>{upperFirst(t('common.messages.no_activity'))}</Text>
-		) : null
+		)
 	), [t, loading]);
 
 	return (
@@ -88,7 +89,6 @@ const FeedScreen = () => {
 		}}
 		numColumns={1}
 		keyExtractor={keyExtractor}
-		refreshing={isFetching}
 		onEndReached={onEndReached}
 		onEndReachedThreshold={0.3}
 		nestedScrollEnabled

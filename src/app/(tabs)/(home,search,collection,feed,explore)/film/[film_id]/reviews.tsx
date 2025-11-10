@@ -1,4 +1,4 @@
-import { StyleProp, Text, View, ViewStyle } from "react-native";
+import { Text, View } from "react-native";
 import { useMediaMovieQuery, useMediaReviewsMovieInfiniteQuery } from "@/features/media/mediaQueries";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import { Stack, useLocalSearchParams } from "expo-router";

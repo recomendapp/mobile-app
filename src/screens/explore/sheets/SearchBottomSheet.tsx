@@ -59,7 +59,7 @@ export const SearchBottomSheet = forwardRef<
   );
 
   // Search
-  const [results, setResults] = useState<ExploreTile['features']>([]);
+  const [results, setResults] = useState<ExploreTile['features'] | undefined>(undefined);
   const fuse = useMemo(() => {
     return new Fuse(locations, {
       keys: ['properties.movie.title'],
@@ -148,7 +148,7 @@ export const SearchBottomSheet = forwardRef<
     >
       <BottomSheetSearchbar onSearch={handleOnSearch} containerStyle={{ marginHorizontal: PADDING_HORIZONTAL, marginBottom: GAP, backgroundColor: colors.background }} />
       <LegendList
-      data={results}
+      data={results || []}
       renderItem={({ item }) => (
         <Button variant='ghost' size='fit' onPress={() => onItemPress(item)}>
           <View style={tw`w-full flex-row items-center`}>
@@ -163,7 +163,7 @@ export const SearchBottomSheet = forwardRef<
       )}
       keyExtractor={(item) => item.properties.id.toString()}
       ListEmptyComponent={
-        isLoading ? <Icons.Loader />
+        (isLoading || !results) ? <Icons.Loader />
         : (
           <View style={tw`flex-1 items-center justify-center p-4`}>
             <Text style={[tw`text-center`, { color: colors.mutedForeground }]}>

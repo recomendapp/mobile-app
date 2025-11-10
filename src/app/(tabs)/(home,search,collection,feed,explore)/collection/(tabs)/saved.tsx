@@ -19,8 +19,6 @@ const CollectionSavedScreen = () => {
 	const {
 		data,
 		isLoading,
-		isFetching,
-		isRefetching,
 		fetchNextPage,
 		refetch,
 		hasNextPage,
@@ -50,7 +48,6 @@ const CollectionSavedScreen = () => {
 				</View>
 			)
 		}
-		refreshing={isRefetching}
 		onRefresh={refetch}
 		numColumns={3}
 		contentContainerStyle={{

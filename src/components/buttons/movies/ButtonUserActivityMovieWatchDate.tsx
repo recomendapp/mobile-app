@@ -1,0 +1,110 @@
+import React from "react"
+import { useAuth } from "@/providers/AuthProvider";
+import { useUserActivityMovieQuery } from "@/features/user/userQueries";
+import { Icons } from "@/constants/Icons";
+import { MediaMovie } from "@recomendapp/types";
+import { Button } from "@/components/ui/Button";
+import { ICON_ACTION_SIZE } from "@/theme/globals";
+import { useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
+import { upperFirst } from "lodash";
+import { useFormatter, useTranslations } from "use-intl";
+import { useToast } from "@/components/Toast";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { useTheme } from "@/providers/ThemeProvider";
+
+interface ButtonUserActivityMovieWatchDateProps
+	extends React.ComponentProps<typeof Button> {
+		movie: MediaMovie;
+	}
+
+const ButtonUserActivityMovieWatchDate = React.forwardRef<
+	React.ComponentRef<typeof Button>,
+	ButtonUserActivityMovieWatchDateProps
+>(({ movie, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
+	const { session } = useAuth();
+	const { colors } = useTheme();
+	const toast = useToast();
+	const format = useFormatter();
+	const t = useTranslations();
+	// States
+	const [isDatePickerVisible, setDatePickerVisibility] = React.useState(false);
+	// Requests
+	const {
+		data: activity,
+	} = useUserActivityMovieQuery({
+		userId: session?.user.id,
+		movieId: movie.id,
+	});
+	// Mutations
+	const updateActivity = useUserActivityMovieUpdateMutation();
+	// Handlers
+	const showDatePicker = () => {
+		setDatePickerVisibility(true);
+	};
+	
+	const hideDatePicker = () => {
+		setDatePickerVisibility(false);
+	};
+	const handleUpdateDate = async (date: Date) => {
+		if (!session) return;
+		if (!activity) return;
+		await updateActivity.mutateAsync({
+			activityId: activity.id,
+			watchedDate: date,
+		}, {
+			onSuccess: () => {
+				hideDatePicker();
+				toast.success(upperFirst(t('common.messages.saved', { gender: 'male', count: 1 })));
+			},
+			onError: (error) => {
+				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
+				throw error;
+			}
+		});
+	};
+
+	if (!activity) return null;
+
+	return (
+	<>
+		<Button
+		ref={ref}
+		variant={variant}
+		iconProps={{
+			size: ICON_ACTION_SIZE,
+			...iconProps
+		}}
+		size={size}
+		icon={Icons.Calendar}
+		onPress={(e) => {
+			showDatePicker();
+			onPressProps?.(e);
+		}}
+		{...props}
+		>
+			{format.dateTime(new Date(activity.watched_date), {
+				year: 'numeric',
+				month: 'short',
+				day: 'numeric',
+			})}
+		</Button>
+		<DateTimePickerModal
+		isVisible={isDatePickerVisible}
+		mode="date"
+		date={activity.watched_date ? new Date(activity.watched_date) : undefined}
+		display="inline"
+		onConfirm={handleUpdateDate}
+		onCancel={hideDatePicker}
+		textColor={colors.foreground}
+		accentColor={colors.accentYellow}
+		pickerStyleIOS={{
+			backgroundColor: colors.muted,
+		}}
+		buttonTextColorIOS={colors.foreground}
+		/>
+	</>
+	);
+});
+ButtonUserActivityMovieWatchDate.displayName = 'ButtonUserActivityMovieWatchDate';
+
+export default ButtonUserActivityMovieWatchDate;

@@ -18,8 +18,6 @@ const CollectionScreen = () => {
 	const staticRoutes = useCollectionStaticRoutes();
 	const {
 		data: playlists,
-		isLoading,
-		isRefetching,
 		fetchNextPage,
 		refetch,
 		hasNextPage,
@@ -63,7 +61,6 @@ const CollectionScreen = () => {
 		<LegendList
 		data={combinedItems}
 		renderItem={renderItem}
-		refreshing={isRefetching}
 		onRefresh={refetch}
 		numColumns={3}
 		contentContainerStyle={{

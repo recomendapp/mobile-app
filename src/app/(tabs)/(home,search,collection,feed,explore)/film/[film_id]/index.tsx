@@ -6,7 +6,6 @@ import { MediaMoviePerson } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
-import { LegendList } from "@legendapp/list";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useState, useCallback, useMemo, memo } from "react";
@@ -34,8 +33,6 @@ const FilmScreen = () => {
 	const {
 		data: movie,
 		isLoading,
-		isRefetching,
-		refetch,
 	} = useMediaMovieDetailsQuery({
 		id: movieId,
 		locale: locale,
@@ -171,5 +168,6 @@ const FilmCast = memo(({
 		/>
 	)
 });
+FilmCast.displayName = 'FilmCast';
 
 export default FilmScreen;

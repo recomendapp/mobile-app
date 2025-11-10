@@ -7,7 +7,7 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { FlatList, ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { TrueSheet as RNTrueSheet } from '@lodev09/react-native-true-sheet';
 import TrueSheet from '@/components/ui/TrueSheet';
@@ -20,6 +20,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import BottomSheetShareMovie from './share/BottomSheetShareMovie';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FlashList, FlashListRef } from '@shopify/flash-list';
 
 interface BottomSheetMovieProps extends BottomSheetProps {
   movie?: MediaMovie,
@@ -50,171 +51,166 @@ const BottomSheetMovie = React.forwardRef<
   const t = useTranslations();
   const pathname = usePathname();
   // REFs
-  const scrollRef = React.useRef<ScrollView>(null);
+  const scrollRef = React.useRef<FlashListRef<Item | string>>(null);
   const BottomSheetMainCreditsRef = React.useRef<RNTrueSheet>(null);
-  const creditsScrollRef = React.useRef<FlatList<MediaPerson>>(null);
+  const creditsScrollRef = React.useRef<FlashListRef<MediaPerson>>(null);
   // States
-  const items: Item[][] = React.useMemo(() => ([
-    [
-      ...additionalItemsTop,
-    ],
-    [
+  const items: Item[] = React.useMemo(() => ([
+    ...additionalItemsTop,
+    {
+      icon: Icons.Share,
+      onPress: () => openSheet(BottomSheetShareMovie, {
+        movie: movie!,
+      }),
+      label: upperFirst(t('common.messages.share')),
+    },
+    ...((activity) ? [
       {
-        icon: Icons.Share,
-        onPress: () => openSheet(BottomSheetShareMovie, {
-          movie: movie!,
+        icon: Icons.Feed,
+        onPress: () => router.push(`/user/${activity.user?.username}`),
+        label: upperFirst(t('common.messages.go_to_activity')),
+      },
+    ] : []),
+    {
+      icon: Icons.Movie,
+      onPress: () => router.push(movie?.url as LinkProps['href']),
+      label: upperFirst(t('common.messages.go_to_film')),
+      disabled: movie?.url ? pathname.startsWith(movie.url) : false
+    },
+    ...((movie?.directors && movie.directors.length > 0) ? [
+      movie.directors.length > 1 ? {
+        icon: Icons.Users,
+        onPress: () => BottomSheetMainCreditsRef.current?.present(),
+        label: upperFirst(t('common.messages.show_director', { gender: 'male', count: movie.directors.length })),
+        closeOnPress: false,
+      } : {
+        icon: Icons.User,
+        onPress: () => router.push(movie.directors?.[0].url as LinkProps['href']),
+        label: upperFirst(t('common.messages.go_to_director', { gender: movie.directors![0].gender === 1 ? 'female' : 'male', count: 1 }))
+      },
+    ] : []),
+    ...(session ? [
+      {
+        icon: Icons.AddPlaylist,
+        onPress: () => movie?.id && router.push({
+          pathname: '/playlist/add/movie/[movie_id]',
+          params: {
+            movie_id: movie?.id,
+            movie_title: movie?.title,
+          }
         }),
-        label: upperFirst(t('common.messages.share')),
+        label: upperFirst(t('common.messages.add_to_playlist')),
       },
-      ...((activity) ? [
-        {
-          icon: Icons.Feed,
-          onPress: () => router.push(`/user/${activity.user?.username}`),
-          label: upperFirst(t('common.messages.go_to_activity')),
-        },
-      ] : []),
       {
-        icon: Icons.Movie,
-        onPress: () => router.push(movie?.url as LinkProps['href']),
-        label: upperFirst(t('common.messages.go_to_film')),
-        disabled: movie?.url ? pathname.startsWith(movie.url) : false
-      },
-      ...((movie?.directors && movie.directors.length > 0) ? [
-        movie.directors.length > 1 ? {
-          icon: Icons.Users,
-          onPress: () => BottomSheetMainCreditsRef.current?.present(),
-          label: upperFirst(t('common.messages.show_director', { gender: 'male', count: movie.directors.length })),
-          closeOnPress: false,
-        } : {
-          icon: Icons.User,
-          onPress: () => router.push(movie.directors?.[0].url as LinkProps['href']),
-          label: upperFirst(t('common.messages.go_to_director', { gender: movie.directors![0].gender === 1 ? 'female' : 'male', count: 1 }))
-        },
-      ] : []),
-      ...(session ? [
-        {
-          icon: Icons.AddPlaylist,
-          onPress: () => movie?.id && router.push({
-            pathname: '/playlist/add/movie/[movie_id]',
-            params: {
-              movie_id: movie?.id,
-              movie_title: movie?.title,
-            }
-          }),
-          label: upperFirst(t('common.messages.add_to_playlist')),
-        },
-        {
-          icon: Icons.Reco,
-          onPress: () => movie?.id && router.push({
-            pathname: '/reco/send/movie/[movie_id]',
-            params: {
-              movie_id: movie?.id,
-              movie_title: movie?.title,
-            }
-          }),
-          label: upperFirst(t('common.messages.send_to_friend')),
-        }
-      ] : []),
-    ],
-    [
-      ...additionalItemsBottom,
-    ],
+        icon: Icons.Reco,
+        onPress: () => movie?.id && router.push({
+          pathname: '/reco/send/movie/[movie_id]',
+          params: {
+            movie_id: movie?.id,
+            movie_title: movie?.title,
+          }
+        }),
+        label: upperFirst(t('common.messages.send_to_friend')),
+      }
+    ] : []),
+    ...additionalItemsBottom,
   ]), [movie, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, activity, session]);
 
-  const renderDirector = React.useCallback(({ item }: { item: MediaPerson }) => {
-    if (!movie?.directors) return null;
-    return (
-    <Button
-		variant="ghost"
-		size="fit"
-		onPress={() => {
-      BottomSheetMainCreditsRef.current?.dismiss();
-      closeSheet(id);
-      router.push(item.url as LinkProps['href']);
-    }}
-		style={[
-			{ paddingVertical: PADDING_HORIZONTAL, paddingHorizontal: PADDING_HORIZONTAL },
-		]}
-		>
-			<View style={tw`flex-1 flex-row items-center gap-2 justify-between`}>
-				<Text>{item.name}</Text>
-				<Icons.ChevronRight color={colors.mutedForeground} size={16} />
-			</View>
-		</Button>
-    );
-  }, [movie?.directors, closeSheet, id, router, colors.muted, colors.mutedForeground]);
   return (
     <TrueSheet
     ref={ref}
-    scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
+    scrollRef={scrollRef as unknown as React.RefObject<React.Component<unknown, {}, any>>}
     contentContainerStyle={tw`p-0`}
     {...props}
     >
-      <ScrollView
+      <FlashList
       ref={scrollRef}
+      data={[
+        'header',
+        ...items,
+      ]}
       bounces={false}
       contentContainerStyle={{ paddingBottom: insets.bottom }}
+      keyExtractor={(_, i) => i.toString()}
       stickyHeaderIndices={[0]}
-      >
-        <View
-        style={[
-          { backgroundColor: colors.muted, borderColor: colors.mutedForeground },
-          tw`border-b p-4`,
-        ]}
-        >
-          <View style={tw`flex-row items-center gap-2 `}>
-            <ImageWithFallback
-            alt={movie?.title ?? ''}
-            source={{ uri: movie?.poster_url ?? '' }}
-            style={[
-              { aspectRatio: 2 / 3, height: 'fit-content' },
-              tw.style('rounded-md w-12'),
-            ]}
-            type={'movie'}
-            />
-            <View style={tw`shrink`}>
-              <Text numberOfLines={2} style={tw`shrink`}>{movie?.title}</Text>
-              {movie?.directors && movie?.directors.length > 0 && (
-                <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
-                {movie.directors?.map((director) => director.name).join(', ')}
-                </Text>
-              )}
+      renderItem={({ item }) => (
+        typeof item === 'string' ? (
+          <View
+          style={[
+            { backgroundColor: colors.muted, borderColor: colors.mutedForeground },
+            tw`border-b p-4`,
+          ]}
+          >
+            <View style={tw`flex-row items-center gap-2 `}>
+              <ImageWithFallback
+              alt={movie?.title ?? ''}
+              source={{ uri: movie?.poster_url ?? '' }}
+              style={[
+                { aspectRatio: 2 / 3, height: 'fit-content' },
+                tw.style('rounded-md w-12'),
+              ]}
+              type={'movie'}
+              />
+              <View style={tw`shrink`}>
+                <Text numberOfLines={2} style={tw`shrink`}>{movie?.title}</Text>
+                {movie?.directors && movie?.directors.length > 0 && (
+                  <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
+                  {movie.directors?.map((director) => director.name).join(', ')}
+                  </Text>
+                )}
+              </View>
             </View>
           </View>
-        </View>
-        {items.map((group, i) => (
-          <React.Fragment key={i}>
-            {group.map((item, j) => (
-              <Button
-              key={j}
-              variant='ghost'
-              icon={item.icon}
-              iconProps={{
-                color: colors.mutedForeground,
-              }}
-              disabled={item.disabled}
-              style={tw`justify-start h-auto py-4`}
-              onPress={() => {
-                (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
-                item.onPress();
-              }}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </React.Fragment>
-        ))}
-      </ScrollView>
+        ) : (
+          <Button
+          variant='ghost'
+          icon={item.icon}
+          iconProps={{
+            color: colors.mutedForeground,
+          }}
+          disabled={item.disabled}
+          style={tw`justify-start h-auto py-4`}
+          onPress={() => {
+            (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
+            item.onPress();
+          }}
+          >
+            {item.label}
+          </Button>
+        )
+      )}
+      nestedScrollEnabled
+      />
       {movie?.directors && (
         <BottomSheetDefaultView
         ref={BottomSheetMainCreditsRef}
         id={`${id}-credits`}
-        scrollRef={creditsScrollRef as React.RefObject<React.Component<unknown, {}, any>>}
+        scrollRef={creditsScrollRef as unknown as React.RefObject<React.Component<unknown, {}, any>>}
         >
-          <FlatList
+          <FlashList
           ref={creditsScrollRef}
           data={movie.directors || []}
-          renderItem={renderDirector}
+          bounces={false}
+          renderItem={({ item }) => (
+              <Button
+              variant="ghost"
+              size="fit"
+              onPress={() => {
+                BottomSheetMainCreditsRef.current?.dismiss();
+                closeSheet(id);
+                router.push(item.url as LinkProps['href']);
+              }}
+              style={[
+                { paddingVertical: PADDING_HORIZONTAL, paddingHorizontal: PADDING_HORIZONTAL },
+              ]}
+              >
+                <View style={tw`flex-1 flex-row items-center gap-2 justify-between`}>
+                  <Text>{item.name}</Text>
+                  <Icons.ChevronRight color={colors.mutedForeground} size={16} />
+                </View>
+              </Button>
+          )}
+          nestedScrollEnabled
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{
             paddingTop: PADDING_VERTICAL,

@@ -105,6 +105,7 @@ const SearchLayout = () => {
 					layout={LinearTransition.springify().delay(100)}
 					>
 						<SearchBar
+						defaultValue={search}
 						onSearch={setSearch}
 						placeholder={type === 'movies' ? upperFirst(t('common.messages.search_film', { count: 2 })) : t('pages.search.placeholder')}
 						/>
