@@ -7,16 +7,16 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
-import { useAuth } from '@/providers/AuthProvider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomSheetSharePerson from './share/BottomSheetSharePerson';
+import { FlashList, FlashListRef } from '@shopify/flash-list';
 
 interface BottomSheetPersonProps extends BottomSheetProps {
   person?: MediaPerson,
@@ -41,99 +41,95 @@ const BottomSheetPerson = React.forwardRef<
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
-  const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
   const pathname = usePathname();
   // REFs
-  const scrollRef = React.useRef<ScrollView>(null);
+  const scrollRef = React.useRef<FlashListRef<Item | string>>(null);
   // States
-  const items: Item[][] = React.useMemo(() => ([
-    [
-      ...additionalItemsTop,
-    ],
-    [
-      {
-        icon: Icons.Share,
-        onPress: () => openSheet(BottomSheetSharePerson, {
-          person: person!,
-        }),
-        label: upperFirst(t('common.messages.share')),
-      },
-      {
-        icon: Icons.User,
-        onPress: () => router.push(person?.url as LinkProps['href']),
-        label: upperFirst(t('common.messages.go_to_person')),
-        disabled: person?.url ? pathname.startsWith(person.url) : false
-      },
-    ],
-    [
-      ...additionalItemsBottom,
-    ],
-  ]), [person, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, session]);
+  const items: Item[] = React.useMemo(() => ([
+    ...additionalItemsTop,
+    {
+      icon: Icons.Share,
+      onPress: () => openSheet(BottomSheetSharePerson, {
+        person: person!,
+      }),
+      label: upperFirst(t('common.messages.share')),
+    },
+    {
+      icon: Icons.User,
+      onPress: () => router.push(person?.url as LinkProps['href']),
+      label: upperFirst(t('common.messages.go_to_person')),
+      disabled: person?.url ? pathname.startsWith(person.url) : false
+    },
+    ...additionalItemsBottom,
+  ]), [person, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname]);
   
   return (
     <TrueSheet
     ref={ref}
-    scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
+    scrollRef={scrollRef as unknown as React.RefObject<React.Component<unknown, {}, any>>}
     contentContainerStyle={tw`p-0`}
     {...props}
     >
-      <ScrollView
+      <FlashList
       ref={scrollRef}
       bounces={false}
       contentContainerStyle={{ paddingBottom: insets.bottom }}
+      data={[
+        'header',
+        ...items,
+      ]}
+      keyExtractor={(_, i) => i.toString()}
       stickyHeaderIndices={[0]}
-      >
-        <View
-        style={[
-          { backgroundColor: colors.muted, borderColor: colors.mutedForeground },
-          tw`border-b p-4`,
-        ]}
-        >
-          <View style={tw`flex-row items-center gap-2 `}>
-            <ImageWithFallback
-            alt={person?.name ?? ''}
-            source={{ uri: person?.profile_url ?? '' }}
-            style={[
-              { aspectRatio: 2 / 3, height: 'fit-content' },
-              tw.style('rounded-md w-12'),
-            ]}
-            type={'person'}
-            />
-            <View style={tw`shrink`}>
-              <Text numberOfLines={2} style={tw`shrink`}>{person?.name}</Text>
-              {person?.known_for_department && (
-                <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
-                  {person.known_for_department}
-                </Text>
-              )}
+      renderItem={({ item }) => (
+        typeof item === 'string' ? (
+          <View
+          style={[
+            { backgroundColor: colors.muted, borderColor: colors.mutedForeground },
+            tw`border-b p-4`,
+          ]}
+          >
+            <View style={tw`flex-row items-center gap-2 `}>
+              <ImageWithFallback
+              alt={person?.name ?? ''}
+              source={{ uri: person?.profile_url ?? '' }}
+              style={[
+                { aspectRatio: 2 / 3, height: 'fit-content' },
+                tw.style('rounded-md w-12'),
+              ]}
+              type={'person'}
+              />
+              <View style={tw`shrink`}>
+                <Text numberOfLines={2} style={tw`shrink`}>{person?.name}</Text>
+                {person?.known_for_department && (
+                  <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
+                    {person.known_for_department}
+                  </Text>
+                )}
+              </View>
             </View>
           </View>
-        </View>
-        {items.map((group, i) => (
-          <React.Fragment key={i}>
-            {group.map((item, j) => (
-              <Button
-              key={j}
-              variant='ghost'
-              icon={item.icon}
-              iconProps={{
-                color: colors.mutedForeground,
-              }}
-              disabled={item.disabled}
-              style={tw`justify-start h-auto py-4`}
-              onPress={() => {
-                (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
-                item.onPress();
-              }}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </React.Fragment>
-        ))}
-      </ScrollView>
+        ) : (
+          <Button
+          variant='ghost'
+          icon={item.icon}
+          iconProps={{
+            color: colors.mutedForeground,
+          }}
+          disabled={item.disabled}
+          style={tw`justify-start h-auto py-4`}
+          onPress={() => {
+            (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
+            item.onPress();
+          }}
+          >
+            {item.label}
+          </Button>
+        )
+      )}
+      nestedScrollEnabled
+      />
     </TrueSheet>
   );
 });

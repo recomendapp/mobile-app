@@ -25,7 +25,6 @@ const CastCrewFeedScreen = () => {
 	const {
 		data,
 		isLoading,
-		isRefetching,
 		fetchNextPage,
 		hasNextPage,
 		refetch,
@@ -45,12 +44,14 @@ const CastCrewFeedScreen = () => {
 				return <View style={[{ backgroundColor: colors.muted}, { borderRadius: BORDER_RADIUS, paddingVertical: PADDING_VERTICAL, paddingHorizontal: PADDING_HORIZONTAL }]}><Text textColor="muted" style={tw`text-center`}>Unsupported media type</Text></View>;
 		};
 	};
-	const renderEmpty = useCallback(() => {
-		if (loading) return null;
-		return (
-			<Text style={tw`text-center`} textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
+	const renderEmpty = useCallback(() => (
+		loading ? <Icons.Loader />
+		: (
+			<Text style={tw`text-center`} textColor='muted'>
+				{upperFirst(t('common.messages.no_results'))}
+			</Text>
 		)
-	}, [loading, t]);
+	), [loading, t]);
 	const keyExtractor = useCallback((item: Database['public']['Functions']['get_feed_cast_crew']['Returns'][number], index: number) => (
 		`${item.media.id}:${item.media_type}-${item.person.id}`
 	), []);
@@ -98,7 +99,6 @@ const CastCrewFeedScreen = () => {
 			bottom: tabBarHeight,
 		}}
 		keyExtractor={keyExtractor}
-		refreshing={isRefetching}
 		onEndReached={onEndReached}
 		onEndReachedThreshold={0.3}
 		nestedScrollEnabled

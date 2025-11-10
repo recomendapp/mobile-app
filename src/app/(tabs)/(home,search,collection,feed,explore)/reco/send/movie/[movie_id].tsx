@@ -242,6 +242,7 @@ const RecoSendMovie = () => {
 			animatedFooterStyle
 		]}
 		renderScrollComponent={renderScroll}
+		keyboardShouldPersistTaps='handled'
 		/>
 		<SelectionFooter
 		data={selected}

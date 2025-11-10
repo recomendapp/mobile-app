@@ -6,7 +6,7 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Alert, FlatList } from 'react-native';
+import { Alert } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAuth } from '@/providers/AuthProvider';
 import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
@@ -26,6 +26,7 @@ import { View } from '@/components/ui/view';
 import ButtonActionPlaylistLike from '@/components/buttons/ButtonActionPlaylistLike';
 import ButtonActionPlaylistSaved from '@/components/buttons/ButtonActionPlaylistSaved';
 import { forwardRef, useRef } from 'react';
+import { FlashList, FlashListRef } from '@shopify/flash-list';
 
 interface BottomSheetPlaylistProps extends BottomSheetProps {
 	playlist: Playlist,
@@ -54,7 +55,7 @@ const BottomSheetPlaylist = forwardRef<
 	const pathname = usePathname();
 	const t = useTranslations();
 	// REFs
-	const scrollRef = useRef<FlatList>(null);
+	const scrollRef = useRef<FlashListRef<Item | string>>(null);
 	const {
 		data: saved,
 		isLoading: isLoadingSaved,
@@ -175,65 +176,69 @@ const BottomSheetPlaylist = forwardRef<
 	return (
 	<TrueSheet
 	ref={ref}
-	scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
+	scrollRef={scrollRef as unknown as React.RefObject<React.Component<unknown, {}, any>>}
 	contentContainerStyle={tw`p-0`}
 	{...props}
 	>
-		<FlatList
+		<FlashList
 		ref={scrollRef}
-		data={items}
-		renderItem={({ item }) => (
-			<Button
-			variant='ghost'
-			icon={item.icon}
-			iconProps={{
-				color: colors.mutedForeground,
-			}}
-			disabled={item.disabled}
-			style={tw`justify-start h-auto py-4`}
-			onPress={() => {
-				(item.closeSheet === undefined || item.closeSheet === true) && closeSheet(id);
-				item.onPress();
-			}}
-			>
-				{item.label}
-			</Button>
-		)}
-		ListHeaderComponent={
-			<View
-			style={[
-				{ backgroundColor: colors.muted, borderColor: colors.mutedForeground, gap: GAP },
-				tw`flex-row items-center justify-between border-b p-4`,
-			]}
-			>
-				<View style={[tw`flex-row items-center`, { gap: GAP }]}>
-					<ImageWithFallback
-					alt={playlist.title ?? ''}
-					source={{ uri: playlist.poster_url ?? '' }}
-					style={[
-						{ aspectRatio: 1 / 1 },
-						tw.style('rounded-md w-12'),
-					]}
-					type={"playlist"}
-					/>
-					<View>
-						<Text numberOfLines={2}>{playlist.title}</Text>
-						{playlist.user && <Text textColor='muted' numberOfLines={1}>
-							{t('common.messages.by_name', { name: playlist.user?.username! })}
-						</Text>}
-					</View>
-				</View>
-				<View style={tw`flex-row items-center`}>
-					<ButtonActionPlaylistLike playlist={playlist} />
-					<ButtonActionPlaylistSaved playlist={playlist} />
-				</View>
-			</View>
-		}
-		stickyHeaderIndices={[0]}
-		keyExtractor={(_, index) => index.toString()}
-		nestedScrollEnabled
 		bounces={false}
 		contentContainerStyle={{ paddingBottom: insets.bottom }}
+		data={[
+			'header',
+			...items,
+		]}
+		keyExtractor={(_, i) => i.toString()}
+		stickyHeaderIndices={[0]}
+		renderItem={({ item }) => (
+			typeof item === 'string' ? (
+				<View
+				style={[
+					{ backgroundColor: colors.muted, borderColor: colors.mutedForeground, gap: GAP },
+					tw`flex-row items-center justify-between border-b p-4`,
+				]}
+				>
+					<View style={[tw`flex-row items-center`, { gap: GAP }]}>
+						<ImageWithFallback
+						alt={playlist.title ?? ''}
+						source={{ uri: playlist.poster_url ?? '' }}
+						style={[
+							{ aspectRatio: 1 / 1 },
+							tw.style('rounded-md w-12'),
+						]}
+						type={"playlist"}
+						/>
+						<View>
+							<Text numberOfLines={2}>{playlist.title}</Text>
+							{playlist.user && <Text textColor='muted' numberOfLines={1}>
+								{t('common.messages.by_name', { name: playlist.user?.username! })}
+							</Text>}
+						</View>
+					</View>
+					<View style={tw`flex-row items-center`}>
+						<ButtonActionPlaylistLike playlist={playlist} />
+						<ButtonActionPlaylistSaved playlist={playlist} />
+					</View>
+				</View>
+			) : (
+				<Button
+				variant='ghost'
+				icon={item.icon}
+				iconProps={{
+					color: colors.mutedForeground,
+				}}
+				disabled={item.disabled}
+				style={tw`justify-start h-auto py-4`}
+				onPress={() => {
+					(item.closeSheet === undefined || item.closeSheet === true) && closeSheet(id);
+					item.onPress();
+				}}
+				>
+					{item.label}
+				</Button>
+			)
+		)}
+		nestedScrollEnabled
 		/>
 	</TrueSheet>
 	);

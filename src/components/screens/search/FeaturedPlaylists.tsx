@@ -8,6 +8,10 @@ import { useCallback, useMemo, useRef } from "react";
 import { useScrollToTop } from "@react-navigation/native";
 import { Playlist } from "@recomendapp/types";
 import { GAP, PADDING_VERTICAL } from "@/theme/globals";
+import { Icons } from "@/constants/Icons";
+import { Text } from "@/components/ui/text";
+import { upperFirst } from "lodash";
+import { useTranslations } from "use-intl";
 
 const GRID_COLUMNS = 3;
 interface FeaturedPlaylistsProps {
@@ -17,12 +21,13 @@ interface FeaturedPlaylistsProps {
 const FeaturedPlaylists = ({
 	contentContainerStyle,
 } : FeaturedPlaylistsProps) => {
-	const { bottomOffset } = useTheme();
+	const t = useTranslations();
+	const { colors, bottomOffset } = useTheme();
 	const {
 		data,
+		isLoading,
 		fetchNextPage,
 		hasNextPage,
-		isRefetching,
 		refetch,
 	} = usePlaylistFeaturedInfiniteQuery();
 	const playlists = useMemo(() => data?.pages.flat() || [], [data]);
@@ -61,10 +66,19 @@ const FeaturedPlaylists = ({
 			},
 			contentContainerStyle,
 		]}
+		ListEmptyComponent={
+			isLoading ? <Icons.Loader />
+			: (
+				<View style={tw`flex-1 items-center justify-center p-4`}>
+					<Text style={[tw`text-center`, { color: colors.mutedForeground }]}>
+						{upperFirst(t('common.messages.no_results'))}
+					</Text>
+				</View>
+			)
+		}
 		keyExtractor={keyExtractor}
 		showsVerticalScrollIndicator={false}
 		ItemSeparatorComponent={itemSeparator}
-		refreshing={isRefetching}
 		onRefresh={refetch}
 		keyboardShouldPersistTaps='always'
 		/>

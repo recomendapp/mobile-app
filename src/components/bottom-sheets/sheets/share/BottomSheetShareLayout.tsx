@@ -261,6 +261,7 @@ const BottomSheetShareLayout = forwardRef<
             ref={scrollRef}
             bounces={false}
             contentContainerStyle={{ paddingTop: PADDING_VERTICAL * 2, paddingBottom: insets.bottom, gap: GAP }}
+            nestedScrollEnabled
             >
                 <Text variant="title" style={tw`text-center`}>{upperFirst(t('common.messages.share'))}</Text>
                 {children}

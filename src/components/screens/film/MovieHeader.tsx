@@ -36,6 +36,7 @@ import ButtonUserActivityMovieRating from '@/components/buttons/movies/ButtonUse
 import ButtonUserRecoMovieSend from '@/components/buttons/movies/ButtonUserRecoMovieSend';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { MovieHeaderInfo } from './MovieHeaderInfo';
+import ButtonUserActivityMovieWatchDate from '@/components/buttons/movies/ButtonUserActivityMovieWatchDate';
 
 interface MovieHeaderProps {
 	movie?: MediaMovie | null;
@@ -223,6 +224,7 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 				<ButtonUserActivityMovieLike movie={movie} />
 				<ButtonUserActivityMovieWatch movie={movie} />
 				<ButtonUserWatchlistMovie movie={movie} />
+				<ButtonUserActivityMovieWatchDate movie={movie} />
 			</View>
 			<View style={tw`flex-row items-center gap-4`}>
 				<ButtonPlaylistMovieAdd movie={movie} />

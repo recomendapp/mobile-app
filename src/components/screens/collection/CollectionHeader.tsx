@@ -129,7 +129,7 @@ const CollectionHeader = forwardRef<
 				bgAnim,
 			]}
 			>
-				<Image style={tw`absolute inset-0`} source={bgBackdrop ?? 'https://media.giphy.com/media/Ic0IOSkS23UAw/giphy.gif'} />
+				{bgBackdrop && <Image style={tw`absolute inset-0`} source={bgBackdrop} />}
 				<LinearGradient
 				style={tw`absolute inset-0`}
 				colors={[

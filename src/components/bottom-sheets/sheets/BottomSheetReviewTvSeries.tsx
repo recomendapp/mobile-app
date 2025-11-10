@@ -13,10 +13,11 @@ import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/providers/AuthProvider';
 import { PADDING_VERTICAL } from '@/theme/globals';
-import { Alert, ScrollView } from 'react-native';
+import { Alert } from 'react-native';
 import { useUserReviewTvSeriesDeleteMutation } from '@/features/user/userMutations';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useToast } from '@/components/Toast';
+import { FlashList, FlashListRef } from '@shopify/flash-list';
 
 interface BottomSheetReviewTvSeriesProps extends BottomSheetProps {
   review: UserReviewTvSeries,
@@ -38,7 +39,6 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
   BottomSheetReviewTvSeriesProps
 >(({ id, review, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const toast = useToast();
-  const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -47,107 +47,102 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
   const t = useTranslations();
   const pathname = usePathname();
   // REFs
-  const scrollRef = React.useRef<ScrollView>(null);
+  const scrollRef = React.useRef<FlashListRef<Item>>(null);
   // Mutations
   const reviewDeleteMutation = useUserReviewTvSeriesDeleteMutation();
   // States
-  const items = React.useMemo((): Item[][] => ([
-    [
-      ...additionalItemsTop,
-    ],
-    [
+  const items: Item[] = [
+    ...additionalItemsTop,
+    {
+      icon: Icons.Movie,
+      onPress: () => router.push(`/tv-series/${review.activity?.tv_series?.slug || review.activity?.tv_series_id}/review/${review.id}`),
+      label: upperFirst(t('common.messages.go_to_review')),
+      disabled: review.activity?.tv_series?.url ? pathname.startsWith(review.activity?.tv_series?.url) : false
+    },
+    ...(session?.user.id === review.activity?.user_id ? [
       {
-        icon: Icons.Movie,
-        onPress: () => router.push(`/tv-series/${review.activity?.tv_series?.slug || review.activity?.tv_series_id}/review/${review.id}`),
-        label: upperFirst(t('common.messages.go_to_review')),
-        disabled: review.activity?.tv_series?.url ? pathname.startsWith(review.activity?.tv_series?.url) : false
+        icon: Icons.Edit,
+        onPress: () => router.push(`/tv-series/${review.activity?.tv_series?.slug || review.activity?.tv_series_id}/review/${review.id}/edit`),
+        label: upperFirst(t('common.messages.edit_review')),
       },
-      ...(session?.user.id === review.activity?.user_id ? [
-        {
-          icon: Icons.Edit,
-          onPress: () => router.push(`/tv-series/${review.activity?.tv_series?.slug || review.activity?.tv_series_id}/review/${review.id}/edit`),
-          label: upperFirst(t('common.messages.edit_review')),
-        },
-        {
-          icon: Icons.Delete,
-          onPress: async () => {
-            Alert.alert(
-              upperFirst(t('common.messages.are_u_sure')),
-              undefined,
-              [
-                {
-                  text: upperFirst(t('common.messages.cancel')),
-                  style: 'cancel',
-                },
-                {
-                  text: upperFirst(t('common.messages.delete')),
-                  onPress: async () => {
-                    await reviewDeleteMutation.mutateAsync(
-                      { id: review.id, tvSeriesId: review.activity?.tv_series_id! },
-                      {
-                        onSuccess: () => {
-                          toast.success(upperFirst(t('common.messages.deleted')));
-                          if (pathname.startsWith(`/tv-series/${review.activity?.tv_series?.slug || review.activity?.tv_series_id}/review/${review.id}`)) {
-                            router.canGoBack() ? router.back() : router.replace(`/tv-series/${review.activity?.tv_series?.slug || review.activity?.tv_series_id}`);
+      {
+        icon: Icons.Delete,
+        onPress: async () => {
+          Alert.alert(
+            upperFirst(t('common.messages.are_u_sure')),
+            undefined,
+            [
+              {
+                text: upperFirst(t('common.messages.cancel')),
+                style: 'cancel',
+              },
+              {
+                text: upperFirst(t('common.messages.delete')),
+                onPress: async () => {
+                  await reviewDeleteMutation.mutateAsync(
+                    { id: review.id, tvSeriesId: review.activity?.tv_series_id! },
+                    {
+                      onSuccess: () => {
+                        toast.success(upperFirst(t('common.messages.deleted')));
+                        if (pathname.startsWith(`/tv-series/${review.activity?.tv_series?.slug || review.activity?.tv_series_id}/review/${review.id}`)) {
+                          if (router.canGoBack()) {
+                            router.back()
+                          } else {
+                            router.replace(`/tv-series/${review.activity?.tv_series?.slug || review.activity?.tv_series_id}`);
                           }
-                          closeSheet(id);
-                        },
-                        onError: () => {
-                          toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
-                        },
-                      }
-                    );
-                  },
-                  style: 'destructive',
-                }
-              ]
-            )
-          },
-          label: upperFirst(t('common.messages.delete')),
-          closeOnPress: false,
-        }
-      ] : []),
-    ],
-    [
-      ...additionalItemsBottom,
-    ],
-  ]), [review, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, session]);
-
+                        }
+                        closeSheet(id);
+                      },
+                      onError: () => {
+                        toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
+                      },
+                    }
+                  );
+                },
+                style: 'destructive',
+              }
+            ]
+          )
+        },
+        label: upperFirst(t('common.messages.delete')),
+        closeOnPress: false,
+      }
+    ] : []),
+    ...additionalItemsBottom,
+  ];
   return (
     <TrueSheet
     ref={ref}
-    scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
+    scrollRef={scrollRef as unknown as React.RefObject<React.Component<unknown, {}, any>>}
     contentContainerStyle={tw`p-0`}
     {...props}
     >
-      <ScrollView
+      <FlashList
       ref={scrollRef}
       bounces={false}
       contentContainerStyle={{ paddingTop: PADDING_VERTICAL, paddingBottom: insets.bottom }}
-      >
-        {items.map((group, i) => (
-          <React.Fragment key={i}>
-            {group.map((item, j) => (
-              <Button
-              key={j}
-              variant='ghost'
-              icon={item.icon}
-              iconProps={{
-                color: colors.mutedForeground,
-              }}
-              disabled={item.disabled}
-              style={tw`justify-start h-auto py-4`}
-              onPress={() => {
-                (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
-                item.onPress();
-              }}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </React.Fragment>
-        ))}
-      </ScrollView>
+      data={items}
+      keyExtractor={(_, i) => i.toString()}
+      stickyHeaderIndices={[0]}
+      renderItem={({ item }) => (
+        <Button
+        variant='ghost'
+        icon={item.icon}
+        iconProps={{
+          color: colors.mutedForeground,
+        }}
+        disabled={item.disabled}
+        style={tw`justify-start h-auto py-4`}
+        onPress={() => {
+          (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
+          item.onPress();
+        }}
+        >
+          {item.label}
+        </Button>
+      )}
+      nestedScrollEnabled
+      />
     </TrueSheet>
   );
 });

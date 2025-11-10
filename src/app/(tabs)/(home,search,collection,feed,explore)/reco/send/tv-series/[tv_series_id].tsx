@@ -242,6 +242,7 @@ const RecoSendTvSeries = () => {
 			animatedFooterStyle
 		]}
 		renderScrollComponent={renderScroll}
+		keyboardShouldPersistTaps='handled'
 		/>
 		<SelectionFooter
 		data={selected}

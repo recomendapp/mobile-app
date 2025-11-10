@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, useWindowDimensions} from 'react-native';
+import {StyleSheet, View, useWindowDimensions} from 'react-native';
 import React from 'react';
 import Animated, {
   Extrapolation,
@@ -61,6 +61,21 @@ const RenderItem = ({index, x, item}: Props) => {
     };
   });
 
+  const textAnimationStyle = useAnimatedStyle(() => {
+    const progress = interpolate(
+      x.value,
+      [
+        (index - 1) * SCREEN_WIDTH,
+        index * SCREEN_WIDTH,
+        (index + 1) * SCREEN_WIDTH,
+      ],
+      [0, 1, 0],
+      Extrapolation.CLAMP,
+    );
+    return {
+      opacity: progress,
+    };
+  });
   return (
     <View style={[styles.itemContainer, {width: SCREEN_WIDTH, paddingTop: insets.top,}]}>
       <View style={tw`absolute inset-0 items-center justify-end`}>
@@ -91,9 +106,9 @@ const RenderItem = ({index, x, item}: Props) => {
           nativeControls={false}
         />
       </Animated.View>
-      <Text style={[tw`text-center text-xl font-bold`, { color: item.textColor, marginHorizontal: PADDING_HORIZONTAL }]}>
+      <Animated.Text style={[tw`text-center text-xl font-bold`, { color: item.textColor, marginHorizontal: PADDING_HORIZONTAL }, textAnimationStyle]}>
         {item.text}
-      </Text>
+      </Animated.Text>
     </View>
   );
 };
