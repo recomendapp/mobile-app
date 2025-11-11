@@ -11,6 +11,8 @@ import { useFormatter, useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useTheme } from "@/providers/ThemeProvider";
+import tw from "@/lib/tw";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ButtonUserActivityMovieWatchDateProps
 	extends React.ComponentProps<typeof Button> {
@@ -22,7 +24,8 @@ const ButtonUserActivityMovieWatchDate = React.forwardRef<
 	ButtonUserActivityMovieWatchDateProps
 >(({ movie, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
 	const { session } = useAuth();
-	const { colors } = useTheme();
+	const insets = useSafeAreaInsets();
+	const { colors, mode } = useTheme();
 	const toast = useToast();
 	const format = useFormatter();
 	const t = useTranslations();
@@ -101,6 +104,21 @@ const ButtonUserActivityMovieWatchDate = React.forwardRef<
 			backgroundColor: colors.muted,
 		}}
 		buttonTextColorIOS={colors.foreground}
+		pickerContainerStyleIOS={{
+			backgroundColor: colors.muted,
+		}}
+		themeVariant={mode}
+		confirmTextIOS={upperFirst(t('common.messages.save'))}
+		cancelTextIOS={upperFirst(t('common.messages.cancel'))}
+		customCancelButtonIOS={({ onPress, label, ...props }) => (
+			<Button onPress={onPress} size="lg" variant="muted" textStyle={tw`text-lg`}>{label}</Button>
+		)}
+		customConfirmButtonIOS={({ onPress, label, ...props }) => (
+			<Button onPress={onPress} size="lg" variant="accent-yellow" style={tw`rounded-none`} textStyle={tw`text-lg`}>{label}</Button>
+		)}
+		modalStyleIOS={{
+			paddingBottom: insets.bottom,
+		}}
 		/>
 	</>
 	);
