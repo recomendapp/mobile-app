@@ -15,10 +15,12 @@ import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie
 import { useUIStore } from "@/stores/useUIStore";
 import BottomSheetMyRecosSenders from "@/components/bottom-sheets/sheets/BottomSheetMyRecosSenders";
 import { useToast } from "@/components/Toast";
+import { useTheme } from "@/providers/ThemeProvider";
 
 export const CollectionMyRecosMovie = () => {
 	const toast = useToast();
 	const t = useTranslations();
+	const { mode } = useTheme();
     const { user } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.myRecos.view);
@@ -60,9 +62,11 @@ export const CollectionMyRecosMovie = () => {
 					},
 					style: 'destructive',
 				}
-			]
+			], {
+				userInterfaceStyle: mode,
+			}
 		)
-	}, [deleteReco, t, user, toast]);
+	}, [deleteReco, t, user, toast, mode]);
 	const handleCompleteReco = React.useCallback((data: UserRecosMovieAggregated) => {
 		Alert.alert(
 			upperFirst(t('common.messages.are_u_sure')),
@@ -89,9 +93,11 @@ export const CollectionMyRecosMovie = () => {
 					},
 					style: 'destructive',
 				}
-			]
+			], {
+				userInterfaceStyle: mode,
+			}
 		)
-	}, [completeReco, deleteReco, t, user, toast]);
+	}, [completeReco, t, user, toast, mode]);
 
     const sortByOptions = React.useMemo((): SortByOption<UserRecosMovieAggregated>[] => ([
         {

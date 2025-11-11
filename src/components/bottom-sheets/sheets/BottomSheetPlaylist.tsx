@@ -50,7 +50,7 @@ const BottomSheetPlaylist = forwardRef<
 	const toast = useToast();
 	const { closeSheet, openSheet } = useBottomSheetStore((state) => state);
 	const insets = useSafeAreaInsets();
-	const { colors } = useTheme();
+	const { colors, mode } = useTheme();
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations();
@@ -164,7 +164,9 @@ const BottomSheetPlaylist = forwardRef<
 								},
 								style: 'destructive',
 							}
-						]
+						], {
+							userInterfaceStyle: mode,
+						}
 					)
 				},
 				label: upperFirst(t('common.messages.delete')),

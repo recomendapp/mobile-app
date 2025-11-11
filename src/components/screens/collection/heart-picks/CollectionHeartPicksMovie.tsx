@@ -14,11 +14,13 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { useUIStore } from "@/stores/useUIStore";
 import { useToast } from "@/components/Toast";
+import { useTheme } from "@/providers/ThemeProvider";
 
 export const CollectionHeartPicksMovie = () => {
 	const t = useTranslations();
 	const toast = useToast();
     const { user } = useAuth();
+	const { mode } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.heartPicks.view);
     const queryData = useUserHeartPicksMovieQuery({
@@ -58,9 +60,11 @@ export const CollectionHeartPicksMovie = () => {
 					},
 					style: 'destructive',
 				}
-			]
+			], {
+				userInterfaceStyle: mode,
+			}
 		)
-	}, [updateActivity, t]);
+	}, [updateActivity, t, mode, toast]);
 
     const sortByOptions = React.useMemo((): SortByOption<UserActivityMovie>[] => ([
         {
@@ -131,7 +135,7 @@ export const CollectionHeartPicksMovie = () => {
 			additionalItemsTop: additionalItems.filter(action => action.position === 'top'),
 			additionalItemsBottom: additionalItems.filter(action => action.position === 'bottom'),
 		})
-	}, [bottomSheetActions]);
+	}, [bottomSheetActions, openSheet]);
 
     return (
 	<>

@@ -15,11 +15,13 @@ import { useUIStore } from "@/stores/useUIStore";
 import { BottomSheetWatchlistTvSeriesComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistTvSeriesComment";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 import { useToast } from "@/components/Toast";
+import { useTheme } from "@/providers/ThemeProvider";
 
 export const CollectionWatchlistTvSeries = () => {
 	const t = useTranslations();
 	const toast = useToast();
     const { user } = useAuth();
+	const { mode } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.watchlist.view);
     const queryData = useUserWatchlistTvSeriesQuery({
@@ -58,9 +60,11 @@ export const CollectionWatchlistTvSeries = () => {
 					},
 					style: 'destructive',
 				}
-			]
+			], {
+				userInterfaceStyle: mode,
+			}
 		)
-	}, [deleteWatchlistMutation, t, toast]);
+	}, [deleteWatchlistMutation, t, toast, mode]);
 	const handleOpenSheet = React.useCallback((data: UserWatchlistTvSeries) => {
 		openSheet(BottomSheetWatchlistTvSeriesComment, {
 			watchlistItem: data,

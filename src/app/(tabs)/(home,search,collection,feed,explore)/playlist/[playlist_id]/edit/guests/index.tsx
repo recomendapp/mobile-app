@@ -24,6 +24,7 @@ import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-nati
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const ModalPlaylistEditGuests = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
@@ -33,6 +34,7 @@ const ModalPlaylistEditGuests = () => {
 	const toast = useToast();
 	const { customerInfo } = useAuth();
 	const t = useTranslations();
+	const { mode } = useTheme();
 	const {
 		data: playlist,
 	} = usePlaylistQuery({
@@ -168,7 +170,7 @@ const ModalPlaylistEditGuests = () => {
 						onPress: () => router.dismiss(),
 						style: 'destructive',
 					},
-				]
+				], { userInterfaceStyle: mode }
 			);
 		} else {
 			router.dismiss();

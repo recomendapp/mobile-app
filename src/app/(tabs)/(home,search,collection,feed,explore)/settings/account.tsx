@@ -391,7 +391,7 @@ const SettingsAccountScreen = () => {
 
 const DeleteAccountSection = () => {
 	const { user } = useAuth();
-	const { colors } = useTheme();
+	const { colors, mode } = useTheme();
 	const toast = useToast();
 	const format = useFormatter();
 	const t = useTranslations();
@@ -422,7 +422,7 @@ const DeleteAccountSection = () => {
 					style: 'destructive',
 				},
 			],
-			{ cancelable: true }
+			{ cancelable: true, userInterfaceStyle: mode }
 		);
 	};
 	const handleInsertRequest = () => {

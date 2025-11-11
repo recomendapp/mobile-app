@@ -87,7 +87,7 @@ const RouteItem = memo(({
     const handlePress = useCallback(() => {
         route.onPress();
         closeDrawer();
-    }, [route.onPress, closeDrawer]);
+    }, [route, closeDrawer]);
 
     return (
         <DrawerItem
@@ -106,7 +106,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     const router = useRouter();
     const toast = useToast();
     const t = useTranslations();
-    const { colors } = useTheme();
+    const { colors, mode } = useTheme();
     const { session, customerInfo, logout } = useAuth();
 
     const routes = useMemo(() => [
@@ -139,7 +139,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             onPress: () => router.push('/about'),
             visible: true,
         }
-    ], [t, router, session, customerInfo?.entitlements.active['premium'], colors.accentBlue]);
+    ], [t, router, session, customerInfo?.entitlements.active, colors.accentBlue]);
 
     const visibleRoutes = useMemo(
         () => routes.filter(route => route.visible),
@@ -161,7 +161,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             }
             toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
         }
-    }, [logout, closeDrawer, t]);
+    }, [logout, closeDrawer, t, toast]);
 
     const handleLogoutButtonPress = useCallback(() => {
         Alert.alert(
@@ -177,9 +177,11 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                     style: 'destructive',
                     onPress: handleLogout,
                 },
-            ]
+            ], {
+                userInterfaceStyle: mode,
+            }
         );
-    }, [handleLogout, t]);
+    }, [handleLogout, t, mode]);
 
     return (
         <SafeAreaView

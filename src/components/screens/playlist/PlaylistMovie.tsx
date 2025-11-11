@@ -18,28 +18,30 @@ import { CardUser } from "@/components/cards/CardUser";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import tw from "@/lib/tw";
-import { SharedValue, useSharedValue } from "react-native-reanimated";
+import { SharedValue } from "react-native-reanimated";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { useUIStore } from "@/stores/useUIStore";
 import { BottomSheetComment } from "@/components/bottom-sheets/sheets/BottomSheetComment";
 import { useToast } from "@/components/Toast";
+import { useTheme } from "@/providers/ThemeProvider";
 
 interface PlaylistMovieProps {
 	playlist: Playlist;
-	scrollY?: SharedValue<number>;
-	headerHeight?: SharedValue<number>;
+	scrollY: SharedValue<number>;
+	headerHeight: SharedValue<number>;
 }
 
 export const PlaylistMovie = ({
 	playlist,
-	scrollY = useSharedValue(0),
-	headerHeight = useSharedValue(0),
+	scrollY,
+	headerHeight,
 } : PlaylistMovieProps) => {
 	const t = useTranslations();
 	const toast = useToast();
 	const router = useRouter();
 	const supabase = useSupabaseClient();
 	const { session } = useAuth();
+	const { mode } = useTheme();
 	const view = useUIStore((state) => state.playlistView);
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const [shouldRefresh, setShouldRefresh] = useState(false);
@@ -83,9 +85,11 @@ export const PlaylistMovie = ({
 					},
 					style: 'destructive',
 				}
-			]
+			], {
+				userInterfaceStyle: mode,
+			}
 		)
-	}, [t, deletePlaylistItemMutation, toast]);
+	}, [t, deletePlaylistItemMutation, toast, mode]);
 	const handlePlaylistItemComment = useCallback((data: PlaylistItemMovie) => {
 		openSheet(BottomSheetComment, {
 			comment: data.comment || '',
@@ -154,7 +158,7 @@ export const PlaylistMovie = ({
 				position: 'top',
 			}
         ];
-    }, [handleDeletePlaylistItem, handlePlaylistItemComment, t]);
+    }, [handleDeletePlaylistItem, handlePlaylistItemComment, t, isAllowedToEdit]);
 	const swipeActions = useMemo((): CollectionAction<PlaylistItemMovie>[] => [
 		{
 			icon: Icons.Comment,
@@ -170,7 +174,7 @@ export const PlaylistMovie = ({
 			variant: 'destructive',
 			position: 'right',
 		}] as const : []),
-	], [handlePlaylistItemComment, handleDeletePlaylistItem, t]);
+	], [handlePlaylistItemComment, handleDeletePlaylistItem, t, isAllowedToEdit]);
 
 	const onItemAction = useCallback((data: PlaylistItemMovie) => {
 		if (!bottomSheetActions?.length) return;
@@ -185,7 +189,7 @@ export const PlaylistMovie = ({
 			additionalItemsTop: additionalItems.filter(action => action.position === 'top'),
 			additionalItemsBottom: additionalItems.filter(action => action.position === 'bottom'),
 		})
-	}, [bottomSheetActions]);
+	}, [bottomSheetActions, openSheet]);
 
 	// useEffects
 	useEffect(() => {

@@ -43,7 +43,7 @@ const PlaylistMovieAdd = () => {
 	const queryClient = useQueryClient();
 	const insets = useSafeAreaInsets();
 	const toast = useToast();
-	const { colors } = useTheme();
+	const { colors, mode } = useTheme();
 	const { session } = useAuth();
 	const { movie_id, movie_title } = useLocalSearchParams();
 	const movieId = Number(movie_id);
@@ -165,7 +165,7 @@ const PlaylistMovieAdd = () => {
 						onPress: () => router.dismiss(),
 						style: 'destructive',
 					},
-				]
+				], { userInterfaceStyle: mode }
 			);
 		} else {
 			router.dismiss();
@@ -195,7 +195,7 @@ const PlaylistMovieAdd = () => {
 			</View>
         </Pressable>
 		);
-	}, [handleTogglePlaylist]);
+	}, [handleTogglePlaylist, t]);
 	const renderScroll = useCallback((props: ScrollViewProps) => {
         return <AnimatedContentContainer {...props} />;
     }, []);
