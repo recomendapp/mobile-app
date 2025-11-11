@@ -15,11 +15,13 @@ import { useUIStore } from "@/stores/useUIStore";
 import BottomSheetMyRecosSenders from "@/components/bottom-sheets/sheets/BottomSheetMyRecosSenders";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 import { useToast } from "@/components/Toast";
+import { useTheme } from "@/providers/ThemeProvider";
 
 export const CollectionMyRecosTvSeries = () => {
 	const t = useTranslations();
 	const toast = useToast();
     const { user } = useAuth();
+	const { mode } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.myRecos.view);
     const queryData = useUserRecosTvSeriesQuery({
@@ -60,9 +62,11 @@ export const CollectionMyRecosTvSeries = () => {
 					},
 					style: 'destructive',
 				}
-			]
+			], {
+				userInterfaceStyle: mode,
+			}
 		)
-	}, [deleteReco, t, user, toast]);
+	}, [deleteReco, t, user, toast, mode]);
 	const handleCompleteReco = React.useCallback((data: UserRecosTvSeriesAggregated) => {
 		Alert.alert(
 			upperFirst(t('common.messages.are_u_sure')),
@@ -89,9 +93,11 @@ export const CollectionMyRecosTvSeries = () => {
 					},
 					style: 'destructive',
 				}
-			]
+			], {
+				userInterfaceStyle: mode,
+			}
 		)
-	}, [completeReco, deleteReco, t, user, toast]);
+	}, [completeReco, t, user, toast, mode]);
 
     const sortByOptions = React.useMemo((): SortByOption<UserRecosTvSeriesAggregated>[] => ([
         {

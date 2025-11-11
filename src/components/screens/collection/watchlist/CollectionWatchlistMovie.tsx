@@ -15,11 +15,13 @@ import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie
 import { useUIStore } from "@/stores/useUIStore";
 import { BottomSheetWatchlistMovieComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistMovieComment";
 import { useToast } from "@/components/Toast";
+import { useTheme } from "@/providers/ThemeProvider";
 
 export const CollectionWatchlistMovie = () => {
 	const toast = useToast();
 	const t = useTranslations();
     const { user } = useAuth();
+	const { mode } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.watchlist.view);
     const queryData = useUserWatchlistMoviesQuery({
@@ -58,9 +60,11 @@ export const CollectionWatchlistMovie = () => {
 					},
 					style: 'destructive',
 				}
-			]
+			], {
+				userInterfaceStyle: mode,
+			}
 		)
-	}, [deleteWatchlistMutation, t, toast]);
+	}, [deleteWatchlistMutation, t, toast, mode]);
 	const handleOpenSheet = React.useCallback((data: UserWatchlistMovie) => {
 		openSheet(BottomSheetWatchlistMovieComment, {
 			watchlistItem: data,

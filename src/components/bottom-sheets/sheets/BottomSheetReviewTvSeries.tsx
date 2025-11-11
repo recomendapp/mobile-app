@@ -41,7 +41,7 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
   const toast = useToast();
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const insets = useSafeAreaInsets();
-  const { colors } = useTheme();
+  const { colors, mode } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -101,7 +101,9 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
                 },
                 style: 'destructive',
               }
-            ]
+            ], {
+              userInterfaceStyle: mode,
+            }
           )
         },
         label: upperFirst(t('common.messages.delete')),

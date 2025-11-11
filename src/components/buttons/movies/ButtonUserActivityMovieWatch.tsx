@@ -23,7 +23,7 @@ const ButtonUserActivityMovieWatch = React.forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserActivityMovieWatchProps
 >(({ movie, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, style, ...props }, ref) => {
-	const { colors } = useTheme();
+	const { colors, mode } = useTheme();
 	const toast = useToast();
 	const { session } = useAuth();
 	const router = useRouter();
@@ -75,7 +75,9 @@ const ButtonUserActivityMovieWatch = React.forwardRef<
 					},
 					style: 'destructive',
 				},
-			]
+			], {
+				userInterfaceStyle: mode,
+			}
 		);
 	};
 

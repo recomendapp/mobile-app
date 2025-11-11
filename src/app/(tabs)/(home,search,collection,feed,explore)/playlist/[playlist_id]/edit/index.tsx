@@ -43,7 +43,7 @@ const ModalPlaylistEdit = () => {
     const playlistId = Number(playlist_id);
 	const insets = useSafeAreaInsets();
 	const toast = useToast();
-	const { colors } = useTheme();
+	const { colors, mode } = useTheme();
 	const router = useRouter();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const t = useTranslations();
@@ -104,7 +104,7 @@ const ModalPlaylistEdit = () => {
 		{ label: upperFirst(t('common.messages.choose_from_the_library')), value: "library" },
 		{ label: upperFirst(t('common.messages.take_a_photo')), value: "camera" },
 		{ label: upperFirst(t('common.messages.delete_current_image')), value: "delete", disable: !playlist?.poster_url && !newPoster },
-	], [ newPoster, t]);
+	], [ newPoster, t, playlist]);
 
 	// Handlers
 	const handlePosterOptions = () => {
@@ -216,7 +216,7 @@ const ModalPlaylistEdit = () => {
 						onPress: () => router.dismiss(),
 						style: 'destructive',
 					},
-				]
+				], { userInterfaceStyle: mode }
 			);
 		} else {
 			router.dismiss();

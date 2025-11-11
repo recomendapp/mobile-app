@@ -23,6 +23,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const ModalPlaylistEditGuestsAdd = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
@@ -32,6 +33,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 	const { session } = useAuth();
 	const insets = useSafeAreaInsets();
 	const router = useRouter();
+	const { mode } = useTheme();
 	// SharedValues
 	const footerHeight = useSharedValue(0);
 
@@ -46,9 +48,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 		data,
 		isLoading,
 		isRefetching,
-		isError,
 		fetchNextPage,
-		isFetchingNextPage,
 		hasNextPage,
 		refetch,
 	} = usePlaylistGuestsSearchInfiniteQuery({
@@ -118,12 +118,12 @@ const ModalPlaylistEditGuestsAdd = () => {
 						onPress: () => router.dismiss(),
 						style: 'destructive',
 					},
-				]
+				], { userInterfaceStyle: mode }
 			);
 		} else {
 			router.dismiss();
 		}
-	}, [canSave, router, t]);
+	}, [canSave, router, t, mode]);
 
 	// Render
 	const renderItems = useCallback(({ item }: { item: { user: Profile, isSelected: boolean } }) => {

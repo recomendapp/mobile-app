@@ -37,11 +37,10 @@ const RecoSendMovie = () => {
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const toast = useToast();
-	const { colors } = useTheme();
+	const { colors, mode } = useTheme();
 	const { session } = useAuth();
-	const { movie_id, movie_title } = useLocalSearchParams();
+	const { movie_id } = useLocalSearchParams();
 	const movieId = Number(movie_id);
-	const movieTitle = movie_title;
 
 	// Form
 	const sendRecoMovieFormSchema = useMemo(() => z.object({
@@ -133,7 +132,7 @@ const RecoSendMovie = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [router, sendReco, session?.user.id, selected, t, movieId]);
+	}, [router, sendReco, session?.user.id, selected, t, movieId, toast]);
 	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
@@ -148,12 +147,12 @@ const RecoSendMovie = () => {
 						onPress: () => router.dismiss(),
 						style: 'destructive',
 					},
-				]
+				], { userInterfaceStyle: mode }
 			);
 		} else {
 			router.dismiss();
 		}
-	}, [canSave, router, t]);
+	}, [canSave, router, t, mode]);
 
 	// Render
 	const renderItems = useCallback(({ item: { item, isSelected} }: { item: { item: { friend: Profile, as_watched: boolean, already_sent: boolean }, isSelected: boolean }}) => {
@@ -178,7 +177,7 @@ const RecoSendMovie = () => {
 				</View>
 			</Pressable>
 		);
-	}, [handleToggleUser]);
+	}, [handleToggleUser, t]);
 	const renderScroll = useCallback((props: ScrollViewProps) => {
         return <AnimatedContentContainer {...props} />;
     }, []);

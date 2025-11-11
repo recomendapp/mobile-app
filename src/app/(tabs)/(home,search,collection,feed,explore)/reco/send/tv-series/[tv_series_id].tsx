@@ -37,11 +37,10 @@ const RecoSendTvSeries = () => {
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const toast = useToast();
-	const { colors } = useTheme();
+	const { colors, mode } = useTheme();
 	const { session } = useAuth();
-	const { tv_series_id, tv_series_name } = useLocalSearchParams();
+	const { tv_series_id } = useLocalSearchParams();
 	const tvSeriesId = Number(tv_series_id);
-	const tvSeriesName = tv_series_name;
 
 	// Form
 	const sendRecoTvSeriesFormSchema = useMemo(() => z.object({
@@ -133,7 +132,7 @@ const RecoSendTvSeries = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [router, sendReco, session?.user.id, selected, t, tvSeriesId]);
+	}, [router, sendReco, session?.user.id, selected, t, tvSeriesId, toast]);
 	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
@@ -148,12 +147,12 @@ const RecoSendTvSeries = () => {
 						onPress: () => router.dismiss(),
 						style: 'destructive',
 					},
-				]
+				], { userInterfaceStyle: mode }
 			);
 		} else {
 			router.dismiss();
 		}
-	}, [canSave, router, t]);
+	}, [canSave, router, t, mode]);
 
 	// Render
 	const renderItems = useCallback(({ item: { item, isSelected} }: { item: { item: { friend: Profile, as_watched: boolean, already_sent: boolean }, isSelected: boolean }}) => {
@@ -178,7 +177,7 @@ const RecoSendTvSeries = () => {
 				</View>
 			</Pressable>
 		);
-	}, [handleToggleUser]);
+	}, [handleToggleUser, t]);
 	const renderScroll = useCallback((props: ScrollViewProps) => {
         return <AnimatedContentContainer {...props} />;
     }, []);

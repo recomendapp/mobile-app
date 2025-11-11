@@ -24,7 +24,7 @@ const ButtonUserActivityTvSeriesWatch = React.forwardRef<
 	ButtonUserActivityTvSeriesWatchProps
 >(({ tvSeries, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, style, ...props }, ref) => {
 	const toast = useToast();
-	const { colors } = useTheme();
+	const { colors, mode } = useTheme();
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -75,7 +75,9 @@ const ButtonUserActivityTvSeriesWatch = React.forwardRef<
 					},
 					style: 'destructive',
 				},
-			]
+			], {
+				userInterfaceStyle: mode,
+			}
 		);
 	};
 

@@ -8,6 +8,7 @@ import { useUserFollowPersonInsertMutation, useUserFollowPersonDeleteMutation } 
 import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
 import { useToast } from "../Toast";
+import { useTheme } from "@/providers/ThemeProvider";
 
 interface ButtonPersonFollowBaseProps
   extends React.ComponentProps<typeof Button> {
@@ -33,6 +34,7 @@ const ButtonPersonFollow = React.forwardRef<
   const toast = useToast();
   const t = useTranslations();
   const { session } = useAuth();
+  const { mode } = useTheme();
 
   const {
     data: isFollow,
@@ -88,7 +90,9 @@ const ButtonPersonFollow = React.forwardRef<
           },
           style: 'destructive',
         }
-      ]
+      ], {
+        userInterfaceStyle: mode,
+      }
     );
   }
 

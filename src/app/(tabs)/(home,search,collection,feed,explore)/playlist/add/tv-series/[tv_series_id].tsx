@@ -43,7 +43,7 @@ const PlaylistTvSeriesAdd = () => {
 	const toast = useToast();
 	const queryClient = useQueryClient();
 	const insets = useSafeAreaInsets();
-	const { colors } = useTheme();
+	const { colors, mode } = useTheme();
 	const { session } = useAuth();
 	const { tv_series_id, tv_series_name } = useLocalSearchParams();
 	const tvSeriesId = Number(tv_series_id);
@@ -166,7 +166,7 @@ const PlaylistTvSeriesAdd = () => {
 						onPress: () => router.dismiss(),
 						style: 'destructive',
 					},
-				]
+				], { userInterfaceStyle: mode }
 			);
 		} else {
 			router.dismiss();
@@ -196,7 +196,7 @@ const PlaylistTvSeriesAdd = () => {
 			</View>
         </Pressable>
 		);
-	}, [handleTogglePlaylist]);
+	}, [handleTogglePlaylist, t]);
 	const renderScroll = useCallback((props: ScrollViewProps) => {
         return <AnimatedContentContainer {...props} />;
     }, []);

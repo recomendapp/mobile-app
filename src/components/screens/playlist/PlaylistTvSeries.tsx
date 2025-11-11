@@ -18,28 +18,30 @@ import { CardUser } from "@/components/cards/CardUser";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import tw from "@/lib/tw";
-import { SharedValue, useSharedValue } from "react-native-reanimated";
+import { SharedValue } from "react-native-reanimated";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 import { useUIStore } from "@/stores/useUIStore";
 import { BottomSheetComment } from "@/components/bottom-sheets/sheets/BottomSheetComment";
 import { useToast } from "@/components/Toast";
+import { useTheme } from "@/providers/ThemeProvider";
 
 interface PlaylistTvSeriesProps {
 	playlist: Playlist;
-	scrollY?: SharedValue<number>;
-	headerHeight?: SharedValue<number>;
+	scrollY: SharedValue<number>;
+	headerHeight: SharedValue<number>;
 }
 
 export const PlaylistTvSeries = ({
 	playlist,
-	scrollY = useSharedValue(0),
-	headerHeight = useSharedValue(0),
+	scrollY,
+	headerHeight,
 } : PlaylistTvSeriesProps) => {
 	const toast = useToast();
 	const t = useTranslations();
 	const router = useRouter();
 	const supabase = useSupabaseClient();
 	const { session } = useAuth();
+	const { mode } = useTheme();
 	const view = useUIStore((state) => state.playlistView);
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const [shouldRefresh, setShouldRefresh] = useState(false);
@@ -83,9 +85,11 @@ export const PlaylistTvSeries = ({
 					},
 					style: 'destructive',
 				}
-			]
+			], {
+				userInterfaceStyle: mode,
+			}
 		)
-	}, [t, deletePlaylistItemMutation, toast]);
+	}, [t, deletePlaylistItemMutation, toast, mode]);
 	const handlePlaylistItemComment = useCallback((data: PlaylistItemTvSeries) => {
 		openSheet(BottomSheetComment, {
 			comment: data.comment || '',
@@ -152,7 +156,7 @@ export const PlaylistTvSeries = ({
 				position: 'top',
 			}
         ];
-    }, [handleDeletePlaylistItem, handlePlaylistItemComment, t]);
+    }, [handleDeletePlaylistItem, handlePlaylistItemComment, t, isAllowedToEdit]);
 	const swipeActions = useMemo((): CollectionAction<PlaylistItemTvSeries>[] => [
 		{
 			icon: Icons.Comment,
@@ -168,7 +172,7 @@ export const PlaylistTvSeries = ({
 			variant: 'destructive',
 			position: 'right',
 		}] as const : []),
-	], [handlePlaylistItemComment, handleDeletePlaylistItem, t]);
+	], [handlePlaylistItemComment, handleDeletePlaylistItem, t, isAllowedToEdit]);
 
 	const onItemAction = useCallback((data: PlaylistItemTvSeries) => {
 		if (!bottomSheetActions?.length) return;
@@ -183,7 +187,7 @@ export const PlaylistTvSeries = ({
 			additionalItemsTop: additionalItems.filter(action => action.position === 'top'),
 			additionalItemsBottom: additionalItems.filter(action => action.position === 'bottom'),
 		})
-	}, [bottomSheetActions]);
+	}, [bottomSheetActions, openSheet]);
 
 	// useEffects
 	useEffect(() => {

@@ -10,6 +10,7 @@ import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
 import { CORNERS } from "@/theme/globals";
 import { useToast } from "../Toast";
+import { useTheme } from "@/providers/ThemeProvider";
 
 interface ButtonUserFollowBaseProps
   extends React.ComponentProps<typeof Button> {
@@ -35,6 +36,7 @@ const ButtonUserFollow = React.forwardRef<
   const t = useTranslations();
   const toast = useToast();
   const { user } = useAuth();
+  const { mode } = useTheme();
 
   const {
     data: isFollow,
@@ -84,7 +86,9 @@ const ButtonUserFollow = React.forwardRef<
           },
           style: 'destructive',
         }
-      ]
+      ], {
+        userInterfaceStyle: mode,
+      }
     );
   }
 
