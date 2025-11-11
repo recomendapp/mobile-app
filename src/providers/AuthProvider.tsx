@@ -201,7 +201,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	const logout = useCallback(async () => {
 		if (pushToken) {
-			await supabase.from("user_notification_tokens").delete().match({ token: pushToken });
+			const provider =
+				Platform.OS === "ios" || Platform.OS === "macos"
+					? "apns"
+					: "fcm";
+			await supabase.from("user_notification_tokens").delete().match({ token: pushToken, provider: provider });
 		}
 		const { error } = await supabase.auth.signOut();
 		if (error) throw error;
