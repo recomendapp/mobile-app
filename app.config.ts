@@ -204,6 +204,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			"expo-asset",
 			{
 				"assets": [
+					"./src/assets/images/screens/onboarding/"
 				]
 			}
 		],

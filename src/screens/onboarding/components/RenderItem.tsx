@@ -7,10 +7,10 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import {OnboardingData} from '../data';
-import { useVideoPlayer, VideoView } from 'expo-video';
 import tw from '@/lib/tw';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BORDER_RADIUS_LG, PADDING_HORIZONTAL } from '@/theme/globals';
+import AnimatedImage from '@/components/ui/AnimatedImage';
 
 type Props = {
   index: number;
@@ -21,11 +21,6 @@ type Props = {
 const RenderItem = ({index, x, item}: Props) => {
   const insets = useSafeAreaInsets();
   const {width: SCREEN_WIDTH} = useWindowDimensions();
-  const player = useVideoPlayer(item.video, player => {
-    player.loop = true;
-    player.muted = true;
-    player.play();
-  });
 
   const circleAnimation = useAnimatedStyle(() => {
     const scale = interpolate(
@@ -74,24 +69,20 @@ const RenderItem = ({index, x, item}: Props) => {
           ]}
         />
       </View>
-      <Animated.View style={[ tw`items-center justify-center`]}>
-        <VideoView
-          player={player}
-          style={{
-            width: SCREEN_WIDTH * 0.8,
-            aspectRatio: 2 / 3,
-            borderRadius: BORDER_RADIUS_LG,
-            overflow: 'hidden',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          contentFit="cover"
-          nativeControls={false}
-        />
-      </Animated.View>
       <Animated.Text style={[tw`text-center text-xl font-bold`, { color: item.textColor, marginHorizontal: PADDING_HORIZONTAL }, textAnimationStyle]}>
         {item.text}
       </Animated.Text>
+      <Animated.View style={[ tw`items-center justify-center`]}>
+        <AnimatedImage
+        source={{ uri: item.image}}
+        style={{
+          width: SCREEN_WIDTH * 0.8,
+          aspectRatio: 9 / 16,
+          borderRadius: BORDER_RADIUS_LG,
+        }}
+        contentFit={'contain'}
+        />
+      </Animated.View>
     </View>
   );
 };
