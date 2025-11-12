@@ -9,6 +9,7 @@ import Animated, {
   AnimatedRef,
   SharedValue,
   interpolateColor,
+  useAnimatedProps,
   useAnimatedStyle,
   withSpring,
   withTiming,
@@ -20,16 +21,18 @@ import { Icons } from '@/constants/Icons';
 import { useAuth } from '@/providers/AuthProvider';
 import { useTranslations } from 'use-intl';
 import { upperFirst } from 'lodash';
+import tw from '@/lib/tw';
+
+const AnimatedChevron = Animated.createAnimatedComponent(Icons.ChevronRight);
 
 type Props = {
-	dataLength: number;
+	data: OnboardingData[];
 	flatListIndex: SharedValue<number>;
 	flatListRef: AnimatedRef<FlatList<OnboardingData>>;
 	x: SharedValue<number>;
-	colors: string[];
 };
 
-const CustomButton = ({flatListRef, flatListIndex, dataLength, x, colors}: Props) => {
+const CustomButton = ({data, flatListRef, flatListIndex, x}: Props) => {
 	const { session } = useAuth();
 	const t = useTranslations();
 	const setHasOnboarded = useUIStore(state => state.setHasOnboarded);
@@ -42,7 +45,7 @@ const CustomButton = ({flatListRef, flatListIndex, dataLength, x, colors}: Props
 	const buttonAnimationStyle = useAnimatedStyle(() => {
 		return {
 		width:
-			flatListIndex.value === dataLength - 1
+			flatListIndex.value === data.length - 1
 			? withSpring(140)
 			: withSpring(60),
 		height: 60,
@@ -54,11 +57,11 @@ const CustomButton = ({flatListRef, flatListIndex, dataLength, x, colors}: Props
 		width: 30,
 		height: 30,
 		opacity:
-			flatListIndex.value === dataLength - 1 ? withTiming(0) : withTiming(1),
+			flatListIndex.value === data.length - 1 ? withTiming(0) : withTiming(1),
 		transform: [
 			{
 			translateX:
-				flatListIndex.value === dataLength - 1
+				flatListIndex.value === data.length - 1
 				? withTiming(100)
 				: withTiming(0),
 			},
@@ -67,35 +70,49 @@ const CustomButton = ({flatListRef, flatListIndex, dataLength, x, colors}: Props
 	});
 
 	const textAnimationStyle = useAnimatedStyle(() => {
+		const color = interpolateColor(
+			x.value,
+			data.map((_, i) => i * SCREEN_WIDTH),
+			data.map(d => d.backgroundColor),
+		);
 		return {
-		opacity:
-			flatListIndex.value === dataLength - 1 ? withTiming(1) : withTiming(0),
-		transform: [
-			{
-			translateX:
-				flatListIndex.value === dataLength - 1
-				? withTiming(0)
-				: withTiming(-100),
-			},
-		],
+			opacity:
+				flatListIndex.value === data.length - 1 ? withTiming(1) : withTiming(0),
+			transform: [
+				{
+				translateX:
+					flatListIndex.value === data.length - 1
+					? withTiming(0)
+					: withTiming(-100),
+				},
+			],
+			color: color,
 		};
 	});
 	const animatedColor = useAnimatedStyle(() => {
 		const backgroundColor = interpolateColor(
-		x.value,
-		colors.map((_, i) => i * SCREEN_WIDTH),
-		colors,
+			x.value,
+			data.map((_, i) => i * SCREEN_WIDTH),
+			data.map(d => d.textColor),
 		);
 
 		return {
-		backgroundColor: backgroundColor,
+			backgroundColor: backgroundColor,
 		};
+	});
+	const arrowIconAnimationProps = useAnimatedProps(() => {
+		const color = interpolateColor(
+			x.value,
+			data.map((_, i) => i * SCREEN_WIDTH),
+			data.map(d => d.textColor),
+		);
+		return { color };
 	});
 
 	return (
 		<TouchableWithoutFeedback
 		onPress={() => {
-			if (flatListIndex.value < dataLength - 1) {
+			if (flatListIndex.value < data.length - 1) {
 				flatListRef.current?.scrollToIndex({index: flatListIndex.value + 1});
 			} else {
 				setHasOnboarded(true);
@@ -112,11 +129,14 @@ const CustomButton = ({flatListRef, flatListIndex, dataLength, x, colors}: Props
 		}}>
 		<Animated.View
 			style={[styles.container, buttonAnimationStyle, animatedColor]}>
-			<Animated.Text style={[styles.textButton, textAnimationStyle]}>
+			<Animated.Text style={[tw`absolute font-semibold`, textAnimationStyle]}>
 				{upperFirst(t('common.messages.get_started'))}
 			</Animated.Text>
-			<Animated.View style={[styles.arrow, arrowAnimationStyle]}>
-				<Icons.ChevronLeft color="white" size={30} style={{transform: [{rotate: '180deg'}]}}/>
+			<Animated.View style={[tw`absolute`, arrowAnimationStyle]}>
+				<AnimatedChevron
+				size={30}
+				animatedProps={arrowIconAnimationProps}
+				/>
 			</Animated.View>
 		</Animated.View>
 		</TouchableWithoutFeedback>
@@ -134,8 +154,4 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		overflow: 'hidden',
 	},
-	arrow: {
-		position: 'absolute',
-	},
-	textButton: {color: 'white', fontSize: 16, position: 'absolute'},
 });
