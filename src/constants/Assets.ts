@@ -3,24 +3,29 @@ import { Platform } from 'react-native';
 export const Assets = {
 	onboarding: {
 		tracking: Platform.select({
-			ios: require('@/assets/onboarding/onboarding_tracking_ios.mp4'),
-			// android: require('@/assets/onboarding/onboarding_tracking_android.mp4'),
-			default: require('@/assets/onboarding/onboarding_tracking_ios.mp4'),
+			ios: 'onboarding_tracking_ios.png',
+			// android: 'onboarding_tracking_android.png',
+			default: 'onboarding_tracking_ios.png',
 		}),
 		recos: Platform.select({
-			ios: require('@/assets/onboarding/onboarding_recos_ios.mp4'),
-			// android: require('@/assets/onboarding/onboarding_recos_android.mp4'),
-			default: require('@/assets/onboarding/onboarding_recos_ios.mp4'),
+			ios: 'onboarding_recos_ios.png',
+			// android: 'onboarding_recos_android.png',
+			default: 'onboarding_recos_ios.png',
 		}),
 		playlists: Platform.select({
-			ios: require('@/assets/onboarding/onboarding_playlists_ios.mp4'),
-			// android: require('@/assets/onboarding/onboarding_playlists_android.mp4'),
-			default: require('@/assets/onboarding/onboarding_playlists_ios.mp4'),
+			ios: 'onboarding_playlists_ios.png',
+			// android: 'onboarding_playlists_android.png',
+			default: 'onboarding_playlists_ios.png',
 		}),
-		social: Platform.select({
-			ios: require('@/assets/onboarding/onboarding_social_ios.mp4'),
-			// android: require('@/assets/onboarding/onboarding_social_android.mp4'),
-			default: require('@/assets/onboarding/onboarding_social_ios.mp4'),
+		feed: Platform.select({
+			ios: 'onboarding_feed_ios.png',
+			// android: 'onboarding_feed_android.png',
+			default: 'onboarding_feed_ios.png',
+		}),
+		socialSharing: Platform.select({
+			ios: 'onboarding_social_sharing_ios.png',
+			// android: 'onboarding_social_sharing_android.png',
+			default: 'onboarding_social_sharing_ios.png',
 		}),
 	},
 	screens: {

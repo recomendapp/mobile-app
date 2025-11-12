@@ -5,7 +5,7 @@ import { useTranslations } from 'use-intl';
 
 export interface OnboardingData {
   id: number;
-  video: string;
+  image: string;
   text: string;
   textColor: string;
   backgroundColor: string;
@@ -17,32 +17,39 @@ const useOnboardingData = ((): OnboardingData[] => {
   return [
     {
       id: 1,
-      video: Assets.onboarding.tracking,
+      image: Assets.onboarding.tracking,
       text: upperFirst(t('pages.onboarding.tracking.description')),
       textColor: colors.foreground,
       backgroundColor: colors.background,
     },
     {
       id: 2,
-      video: Assets.onboarding.recos,
+      image: Assets.onboarding.recos,
       text: upperFirst(t('pages.onboarding.recos.description')),
       textColor: colors.accentYellowForeground,
       backgroundColor: colors.accentYellow,
     },
     {
       id: 3,
-      video: Assets.onboarding.playlists,
+      image: Assets.onboarding.playlists,
       text: upperFirst(t('pages.onboarding.playlists.description')),
       textColor: colors.foreground,
       backgroundColor: colors.background,
     },
     {
       id: 4,
-      video: Assets.onboarding.social,
-      text: upperFirst(t('pages.onboarding.social.description')),
+      image: Assets.onboarding.feed,
+      text: upperFirst(t('pages.onboarding.feed.description')),
       textColor: colors.accentYellowForeground,
       backgroundColor: colors.accentYellow,
-    }
+    },
+    {
+      id: 5,
+      image: Assets.onboarding.socialSharing,
+      text: upperFirst(t('pages.onboarding.social_sharing.description')),
+      textColor: colors.foreground,
+      backgroundColor: colors.background,
+    },
   ];
 });
 
