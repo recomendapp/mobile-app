@@ -58,9 +58,8 @@ const OnboardingScreen = () => {
         <CustomButton
           flatListRef={flatListRef}
           flatListIndex={flatListIndex}
-          dataLength={data.length}
           x={x}
-          colors={data.map(d => d.textColor)}
+          data={data}
         />
       </View>
     </View>

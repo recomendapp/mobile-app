@@ -27,23 +27,6 @@ const RenderItem = ({index, x, item}: Props) => {
     player.play();
   });
 
-  const videoAnimationStyle = useAnimatedStyle(() => {
-    const translateYAnimation = interpolate(
-      x.value,
-      [
-        (index - 1) * SCREEN_WIDTH,
-        index * SCREEN_WIDTH,
-        (index + 1) * SCREEN_WIDTH,
-      ],
-      [200, 0, -200],
-      Extrapolation.CLAMP,
-    );
-
-    return {
-      transform: [{translateY: translateYAnimation}],
-    };
-  });
-
   const circleAnimation = useAnimatedStyle(() => {
     const scale = interpolate(
       x.value,
@@ -77,7 +60,7 @@ const RenderItem = ({index, x, item}: Props) => {
     };
   });
   return (
-    <View style={[styles.itemContainer, {width: SCREEN_WIDTH, paddingTop: insets.top,}]}>
+    <View style={[styles.itemContainer, {width: SCREEN_WIDTH, paddingTop: insets.top }]}>
       <View style={tw`absolute inset-0 items-center justify-end`}>
         <Animated.View
           style={[
@@ -91,7 +74,7 @@ const RenderItem = ({index, x, item}: Props) => {
           ]}
         />
       </View>
-      <Animated.View style={[videoAnimationStyle, tw`items-center justify-center`]}>
+      <Animated.View style={[ tw`items-center justify-center`]}>
         <VideoView
           player={player}
           style={{
