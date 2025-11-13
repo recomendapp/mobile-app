@@ -52,6 +52,7 @@ const OnboardingScreen = () => {
           minimumViewTime: 300,
           viewAreaCoveragePercentThreshold: 10,
         }}
+        style={{ paddingTop: 20, paddingBottom: 100 }}
       />
       <View style={styles.bottomContainer}>
         <Pagination data={data} x={x} />
