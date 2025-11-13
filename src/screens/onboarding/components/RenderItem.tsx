@@ -9,7 +9,7 @@ import Animated, {
 import {OnboardingData} from '../data';
 import tw from '@/lib/tw';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BORDER_RADIUS_LG, PADDING_HORIZONTAL } from '@/theme/globals';
+import { BORDER_RADIUS_LG, GAP_LG, PADDING_HORIZONTAL } from '@/theme/globals';
 import AnimatedImage from '@/components/ui/AnimatedImage';
 
 type Props = {
@@ -69,17 +69,19 @@ const RenderItem = ({index, x, item}: Props) => {
           ]}
         />
       </View>
-      <Animated.Text style={[tw`text-center text-xl font-bold`, { color: item.textColor, marginHorizontal: PADDING_HORIZONTAL }, textAnimationStyle]}>
-        {item.text}
-      </Animated.Text>
-      <Animated.View style={[ tw`items-center justify-center`]}>
+      <Animated.View style={[ tw`items-center justify-center w-full`, { gap: GAP_LG }]}>
+        <Animated.Text style={[tw`text-center text-xl font-bold`, { color: item.textColor, marginHorizontal: PADDING_HORIZONTAL }, textAnimationStyle]}>
+          {item.text}
+        </Animated.Text>
         <AnimatedImage
         source={{ uri: item.image}}
-        style={{
-          width: SCREEN_WIDTH * 0.8,
-          aspectRatio: 9 / 16,
-          borderRadius: BORDER_RADIUS_LG,
-        }}
+        style={[
+          tw`w-full h-full max-w-lg`,
+          {
+            maxHeight: 700,
+            borderRadius: BORDER_RADIUS_LG,
+          }
+        ]}
         contentFit={'contain'}
         />
       </Animated.View>

@@ -17,13 +17,13 @@ import Animated, {
 import {OnboardingData} from '../data';
 import { useNavigation, useRouter } from 'expo-router';
 import { useUIStore } from '@/stores/useUIStore';
-import { Icons } from '@/constants/Icons';
 import { useAuth } from '@/providers/AuthProvider';
 import { useTranslations } from 'use-intl';
 import { upperFirst } from 'lodash';
 import tw from '@/lib/tw';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-const AnimatedChevron = Animated.createAnimatedComponent(Icons.ChevronRight);
+const AnimatedChevron = Animated.createAnimatedComponent(Ionicons);
 
 type Props = {
 	data: OnboardingData[];
@@ -104,7 +104,7 @@ const CustomButton = ({data, flatListRef, flatListIndex, x}: Props) => {
 		const color = interpolateColor(
 			x.value,
 			data.map((_, i) => i * SCREEN_WIDTH),
-			data.map(d => d.textColor),
+			data.map(d => d.backgroundColor),
 		);
 		return { color };
 	});
@@ -134,6 +134,7 @@ const CustomButton = ({data, flatListRef, flatListIndex, x}: Props) => {
 			</Animated.Text>
 			<Animated.View style={[tw`absolute`, arrowAnimationStyle]}>
 				<AnimatedChevron
+				name='chevron-forward'
 				size={30}
 				animatedProps={arrowIconAnimationProps}
 				/>
