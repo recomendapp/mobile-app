@@ -4,7 +4,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistsInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Link } from "expo-router";
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { LegendList } from "@legendapp/list";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useCallback, useMemo } from "react";
@@ -14,6 +14,7 @@ import { Text } from "@/components/ui/text";
 
 const CollectionScreen = () => {
 	const { user } = useAuth();
+	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { bottomOffset, tabBarHeight } = useTheme();
 	const staticRoutes = useCollectionStaticRoutes();
 	const {
@@ -51,7 +52,7 @@ const CollectionScreen = () => {
 			default:
 				return null;
 		}
-	}, [staticRoutes, playlists]);
+	}, []);
 	const keyExtractor = useCallback((item: CollectionStaticRoute | Playlist, index: number) => {
 		if (item.type === 'static') return `static-${item.label}`;
 		return item.id.toString();
@@ -62,7 +63,12 @@ const CollectionScreen = () => {
 		data={combinedItems}
 		renderItem={renderItem}
 		onRefresh={refetch}
-		numColumns={3}
+		numColumns={
+			SCREEN_WIDTH < 360 ? 2 :
+			SCREEN_WIDTH < 414 ? 3 :
+			SCREEN_WIDTH < 600 ? 4 :
+			SCREEN_WIDTH < 768 ? 5 : 6
+		}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
 			paddingBottom: bottomOffset + PADDING_VERTICAL,

@@ -9,7 +9,7 @@ import { LegendList } from "@legendapp/list";
 import { useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
@@ -23,6 +23,7 @@ interface sortBy {
 
 const UserCollectionTvSeries = () => {
 	const t = useTranslations();
+	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data: profile } = useUserProfileQuery({ username: username });
 	const { colors, bottomOffset } = useTheme();
@@ -65,7 +66,7 @@ const UserCollectionTvSeries = () => {
 			if (selectedIndex === undefined || selectedIndex === cancelIndex) return;
 			setSortBy(sortByOptionsWithCancel[selectedIndex] as sortBy);
 		});
-	}, [sortByOptions, showActionSheetWithOptions]);
+	}, [sortByOptions, showActionSheetWithOptions, sortBy.value, t]);
 	const handleSortOrder = useCallback(() => {
 		setSortOrder((prev) => prev === 'asc' ? 'desc' : 'asc');
 	}, []);
@@ -107,7 +108,12 @@ const UserCollectionTvSeries = () => {
 				</View>
 			) 
 		}
-		numColumns={3}
+		numColumns={
+			SCREEN_WIDTH < 360 ? 2 :
+			SCREEN_WIDTH < 414 ? 3 :
+			SCREEN_WIDTH < 600 ? 4 :
+			SCREEN_WIDTH < 768 ? 5 : 6
+		}
 		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={{

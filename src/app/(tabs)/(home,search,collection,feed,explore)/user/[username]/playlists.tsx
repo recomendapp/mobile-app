@@ -9,7 +9,7 @@ import { LegendList } from "@legendapp/list";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { PADDING_VERTICAL } from "@/theme/globals";
@@ -22,6 +22,7 @@ interface sortBy {
 
 const UserPlaylistsScreen = () => {
 	const t = useTranslations();
+	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data, } = useUserProfileQuery({ username: username });
 	const { colors, bottomOffset } = useTheme();
@@ -111,7 +112,12 @@ const UserPlaylistsScreen = () => {
 				</View>
 			) 
 		}
-		numColumns={3}
+		numColumns={
+			SCREEN_WIDTH < 360 ? 2 :
+			SCREEN_WIDTH < 414 ? 3 :
+			SCREEN_WIDTH < 600 ? 4 :
+			SCREEN_WIDTH < 768 ? 5 : 6
+		}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[

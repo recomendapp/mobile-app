@@ -9,7 +9,7 @@ import { LegendList } from "@legendapp/list";
 import { useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
@@ -22,6 +22,7 @@ interface sortBy {
 
 const UserCollectionTvSeries = () => {
 	const t = useTranslations();
+	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data, } = useUserProfileQuery({ username: username });
 	const { colors, bottomOffset, tabBarHeight } = useTheme();
@@ -103,7 +104,12 @@ const UserCollectionTvSeries = () => {
 				</View>
 			) 
 		}
-		numColumns={3}
+		numColumns={
+			SCREEN_WIDTH < 360 ? 2 :
+			SCREEN_WIDTH < 414 ? 3 :
+			SCREEN_WIDTH < 600 ? 4 :
+			SCREEN_WIDTH < 768 ? 5 : 6
+		}
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={{
 			gap: GAP,

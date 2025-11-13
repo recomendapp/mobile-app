@@ -4,7 +4,7 @@ import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { upperFirst } from "lodash";
 import { useAuth } from "@/providers/AuthProvider";
-import { Text, View } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 import { useMediaPlaylistsTvSeriesInfiniteQuery, useMediaTvSeriesQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -26,6 +26,7 @@ interface sortBy {
 
 const TvSeriesPlaylists = () => {
 	const t = useTranslations();
+	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { session } = useAuth();
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
@@ -121,7 +122,12 @@ const TvSeriesPlaylists = () => {
 				</View>
 			)
 		}
-		numColumns={3}
+		numColumns={
+			SCREEN_WIDTH < 360 ? 2 :
+			SCREEN_WIDTH < 414 ? 3 :
+			SCREEN_WIDTH < 600 ? 4 :
+			SCREEN_WIDTH < 768 ? 5 : 6
+		}
 		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={{

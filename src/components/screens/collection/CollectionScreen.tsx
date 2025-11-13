@@ -20,7 +20,7 @@ import { ImageType } from "@/components/utils/ImageWithFallback";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { MediaType, ViewType } from "@recomendapp/types";
 import { LegendListRenderItemProps } from "@legendapp/list";
-import { FlatList } from "react-native";
+import { FlatList, useWindowDimensions } from "react-native";
 
 interface ToolbarItem {
     label?: string;
@@ -45,8 +45,8 @@ export interface CollectionAction<T> {
 
 interface CollectionScreenConfig<T> extends Omit<React.ComponentProps<typeof AnimatedLegendList<T>>, 'data'> {
 	queryData: UseQueryResult<T[] | undefined>;
-    scrollY?: SharedValue<number>;
-    headerHeight?: SharedValue<number>;
+    scrollY: SharedValue<number>;
+    headerHeight: SharedValue<number>;
     screenTitle: string;
     hideHeader?: boolean;
     hideTitle?: boolean;
@@ -78,8 +78,8 @@ interface CollectionScreenConfig<T> extends Omit<React.ComponentProps<typeof Ani
 
 const CollectionScreen = <T extends {}>({
     queryData,
-    scrollY = useSharedValue(0),
-    headerHeight = useSharedValue(0),
+    scrollY,
+    headerHeight,
     screenTitle,
     hideHeader,
     hideTitle,
@@ -113,7 +113,7 @@ const CollectionScreen = <T extends {}>({
     const { colors, bottomOffset } = useTheme();
     const t = useTranslations();
     const { showActionSheetWithOptions } = useActionSheet();
-
+    const { width: SCREEN_WIDTH } = useWindowDimensions();
     const { data, isLoading, isRefetching, refetch } = queryData;
     const loading = data === undefined || isLoading;
 
@@ -293,7 +293,13 @@ const CollectionScreen = <T extends {}>({
                 paddingBottom: bottomOffset + PADDING_VERTICAL,
                 gap: GAP,
 			}}
-            numColumns={view === 'grid' ? numColumns : 1}
+            numColumns={
+                view === 'grid' ? (
+                    SCREEN_WIDTH < 360 ? numColumns - 1 :
+                    SCREEN_WIDTH < 414 ? numColumns :
+                    SCREEN_WIDTH < 600 ? numColumns + 1 :
+                    SCREEN_WIDTH < 768 ? numColumns + 2 : numColumns + 3
+                ) : 1}
 			{...props}
             />
         </>

@@ -4,8 +4,8 @@ import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { upperFirst } from "lodash";
 import { useAuth } from "@/providers/AuthProvider";
-import { Text, View } from "react-native";
-import { useMediaMovieQuery, useMediaPlaylistsMovieInfiniteQuery, useMediaReviewsTvSeriesInfiniteQuery } from "@/features/media/mediaQueries";
+import { Text, useWindowDimensions, View } from "react-native";
+import { useMediaMovieQuery, useMediaPlaylistsMovieInfiniteQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
@@ -26,6 +26,7 @@ interface sortBy {
 
 const FilmPlaylists = () => {
 	const t = useTranslations();
+	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { session } = useAuth();
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
@@ -87,7 +88,7 @@ const FilmPlaylists = () => {
 			headerRight: (session && movie) ? () => (
 				<ButtonPlaylistMovieAdd movie={movie} />
 			) : undefined,
-		}), [movie?.title, session, t])}
+		}), [movie, session, t])}
 		/>
 		<LegendList
 		data={playlists}
@@ -120,7 +121,12 @@ const FilmPlaylists = () => {
 				</View>
 			)
 		}
-		numColumns={3}
+		numColumns={
+			SCREEN_WIDTH < 360 ? 2 :
+			SCREEN_WIDTH < 414 ? 3 :
+			SCREEN_WIDTH < 600 ? 4 :
+			SCREEN_WIDTH < 768 ? 5 : 6
+		}
 		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={{

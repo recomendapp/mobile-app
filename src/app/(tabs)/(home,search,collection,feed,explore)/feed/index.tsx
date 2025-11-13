@@ -87,7 +87,6 @@ const FeedScreen = () => {
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,
 		}}
-		numColumns={1}
 		keyExtractor={keyExtractor}
 		onEndReached={onEndReached}
 		onEndReachedThreshold={0.3}
