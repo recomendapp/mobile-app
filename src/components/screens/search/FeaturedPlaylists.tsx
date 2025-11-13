@@ -2,7 +2,7 @@ import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { useTheme } from "@/providers/ThemeProvider";
 import { usePlaylistFeaturedInfiniteQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
-import { StyleProp, View, ViewStyle } from "react-native";
+import { StyleProp, useWindowDimensions, View, ViewStyle } from "react-native";
 import { LegendList, LegendListRef } from "@legendapp/list";
 import { useCallback, useMemo, useRef } from "react";
 import { useScrollToTop } from "@react-navigation/native";
@@ -13,7 +13,6 @@ import { Text } from "@/components/ui/text";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 
-const GRID_COLUMNS = 3;
 interface FeaturedPlaylistsProps {
 	contentContainerStyle?: StyleProp<ViewStyle>;
 }
@@ -22,6 +21,7 @@ const FeaturedPlaylists = ({
 	contentContainerStyle,
 } : FeaturedPlaylistsProps) => {
 	const t = useTranslations();
+	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { colors, bottomOffset } = useTheme();
 	const {
 		data,
@@ -56,7 +56,12 @@ const FeaturedPlaylists = ({
 		ref={scrollRef}
 		data={playlists}
 		renderItem={renderItem}
-		numColumns={GRID_COLUMNS}
+		numColumns={
+			SCREEN_WIDTH < 360 ? 2 :
+			SCREEN_WIDTH < 414 ? 3 :
+			SCREEN_WIDTH < 600 ? 4 :
+			SCREEN_WIDTH < 768 ? 5 : 6
+		}
 		onEndReached={onEndReached}
 		onEndReachedThreshold={0.3}
 		contentContainerStyle={[

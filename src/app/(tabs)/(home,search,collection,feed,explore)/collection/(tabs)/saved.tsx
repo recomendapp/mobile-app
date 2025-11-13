@@ -2,7 +2,7 @@ import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistsSavedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { Text, View } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 import { LegendList } from "@legendapp/list";
 import { Icons } from "@/constants/Icons";
 import { upperFirst } from "lodash";
@@ -15,6 +15,7 @@ import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 const CollectionSavedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
+	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const {
 		data,
@@ -49,7 +50,12 @@ const CollectionSavedScreen = () => {
 			)
 		}
 		onRefresh={refetch}
-		numColumns={3}
+		numColumns={
+			SCREEN_WIDTH < 360 ? 2 :
+			SCREEN_WIDTH < 414 ? 3 :
+			SCREEN_WIDTH < 600 ? 4 :
+			SCREEN_WIDTH < 768 ? 5 : 6
+		}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
 			paddingBottom: bottomOffset + PADDING_VERTICAL,
