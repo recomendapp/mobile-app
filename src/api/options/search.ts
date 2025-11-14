@@ -1,29 +1,32 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { searchKeys } from "./searchKeys";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { useLocale } from "use-intl";
+import { Keys } from "../keys";
 import { searchClient } from "@/lib/search";
 import { MovieSearchQuery, PersonSearchQuery, PlaylistSearchQuery, TvSeriesSearchQuery, UserSearchQuery } from "@recomendapp/types";
 
-const PER_PAGE = 10;
-
-export const useSearchMultiQuery = ({
+export const useSearchMultiOptions = ({
 	query,
+	filters,
 } : {
 	query: string;
+	filters?: {
+		perPage?: number;
+	}
 }) => {
+	const mergedFilters = {
+		perPage: 10,
+		...filters
+	}
 	const locale = useLocale();
 	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: searchKeys.multi({
-			locale: locale,
-			query: query,
-		}),
+	return queryOptions({
+		queryKey: Keys.search.multi({ locale: locale, query: query, filters: filters }),
 		queryFn: async () => {
 			const token = (await supabase.auth.getSession()).data.session?.access_token;
 			return await searchClient.searchBestResults({
 				query: query,
-				results_per_type: PER_PAGE,
+				results_per_type: mergedFilters.perPage,
 			}, {
 				accessToken: token,
 				locale: locale,
@@ -33,10 +36,10 @@ export const useSearchMultiQuery = ({
 	})
 };
 
-export const useSearchMoviesInfiniteQuery = ({
+export const useSearchMoviesOptions = ({
 	query,
 	filters = {
-		per_page: PER_PAGE,
+		per_page: 10,
 		sort_by: 'popularity',
 	},
 } : {
@@ -45,8 +48,8 @@ export const useSearchMoviesInfiniteQuery = ({
 }) => {
 	const locale = useLocale();
 	const supabase = useSupabaseClient();
-	return useInfiniteQuery({
-		queryKey: searchKeys.movies({
+	return infiniteQueryOptions({
+		queryKey: Keys.search.movies({
 			locale: locale,
 			query: query!,
 			filters: filters,
@@ -73,10 +76,10 @@ export const useSearchMoviesInfiniteQuery = ({
 	})
 };
 
-export const useSearchTvSeriesInfiniteQuery = ({
+export const useSearchTvSeriesOptions = ({
 	query,
 	filters = {
-		per_page: PER_PAGE,
+		per_page: 10,
 		sort_by: 'popularity',
 	},
 } : {
@@ -85,8 +88,8 @@ export const useSearchTvSeriesInfiniteQuery = ({
 }) => {
 	const locale = useLocale();
 	const supabase = useSupabaseClient();
-	return useInfiniteQuery({
-		queryKey: searchKeys.tv_series({
+	return infiniteQueryOptions({
+		queryKey: Keys.search.tvSeries({
 			locale: locale,
 			query: query!,
 			filters: filters,
@@ -113,10 +116,10 @@ export const useSearchTvSeriesInfiniteQuery = ({
 	})
 };
 
-export const useSearchPersonsInfiniteQuery = ({
+export const useSearchPersonsOptions = ({
 	query,
 	filters = {
-		per_page: PER_PAGE,
+		per_page: 10,
 		sort_by: 'popularity',
 	},
 } : {
@@ -125,8 +128,8 @@ export const useSearchPersonsInfiniteQuery = ({
 }) => {
 	const locale = useLocale();
 	const supabase = useSupabaseClient();
-	return useInfiniteQuery({
-		queryKey: searchKeys.persons({
+	return infiniteQueryOptions({
+		queryKey: Keys.search.persons({
 			locale: locale,
 			query: query!,
 			filters: filters,
@@ -153,10 +156,10 @@ export const useSearchPersonsInfiniteQuery = ({
 	})
 };
 
-export const useSearchUsersInfiniteQuery = ({
+export const useSearchUsersOptions = ({
 	query,
 	filters = {
-		per_page: PER_PAGE,
+		per_page: 10,
 	},
 } : {
 	query?: string;
@@ -164,8 +167,8 @@ export const useSearchUsersInfiniteQuery = ({
 }) => {
 	const locale = useLocale();
 	const supabase = useSupabaseClient();
-	return useInfiniteQuery({
-		queryKey: searchKeys.users({
+	return infiniteQueryOptions({
+		queryKey: Keys.search.users({
 			locale: locale,
 			query: query!,
 			filters: filters,
@@ -192,10 +195,10 @@ export const useSearchUsersInfiniteQuery = ({
 	})
 };
 
-export const useSearchPlaylistsInfiniteQuery = ({
+export const useSearchPlaylistsOptions = ({
 	query,
 	filters = {
-		per_page: PER_PAGE,
+		per_page: 10,
 		sort_by: 'likes_count',
 	},
 } : {
@@ -204,8 +207,8 @@ export const useSearchPlaylistsInfiniteQuery = ({
 }) => {
 	const locale = useLocale();
 	const supabase = useSupabaseClient();
-	return useInfiniteQuery({
-		queryKey: searchKeys.playlists({
+	return infiniteQueryOptions({
+		queryKey: Keys.search.playlists({
 			locale: locale,
 			query: query!,
 			filters: filters,

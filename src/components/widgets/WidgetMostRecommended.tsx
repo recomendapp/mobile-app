@@ -1,14 +1,12 @@
 import { View, ViewProps, useWindowDimensions, ViewStyle, StyleProp, StyleSheet, Pressable } from "react-native";
-import { useWidgetMostRecommended } from "@/features/widget/widgetQueries";
 import { Skeleton } from "../ui/Skeleton";
 import { useCallback, useMemo, useRef } from "react";
 import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
 import Animated, { SharedValue, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import tw from "@/lib/tw";
 import { Image } from "expo-image";
-import { Database } from "@recomendapp/types";
+import { Database, MediaMovie, MediaTvSeries } from "@recomendapp/types";
 import { getMediaDetails } from "../utils/getMediaDetails";
-import { MediaMovie, MediaTvSeries } from "@recomendapp/types";
 import { clamp, upperFirst } from "lodash";
 import { LinearGradient } from "expo-linear-gradient";
 import Color from "color";
@@ -22,7 +20,8 @@ import { useRouter } from "expo-router";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "../bottom-sheets/sheets/BottomSheetMovie";
 import BottomSheetTvSeries from "../bottom-sheets/sheets/BottomSheetTvSeries";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useQuery } from "@tanstack/react-query";
+import { useWidgetMostRecommendedOptions } from "@/api/options";
 
 interface WidgetMostRecommendedProps extends ViewProps {
 	scrollY?: SharedValue<number>;
@@ -34,15 +33,15 @@ const WidgetMostRecommended = ({
 	...props
 } : WidgetMostRecommendedProps) => {
 	const { colors } = useTheme();
-	const insets = useSafeAreaInsets();
 	const navigationHeaderHeight = useHeaderHeight();
 	// Dimensions
 	const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+	// Queries
 	const {
 		data,
 		isLoading,
 		isError
-	} = useWidgetMostRecommended();
+	} = useQuery(useWidgetMostRecommendedOptions());
 	const ref = useRef<ICarouselInstance>(null);
 	const progress = useSharedValue<number>(0);
 	

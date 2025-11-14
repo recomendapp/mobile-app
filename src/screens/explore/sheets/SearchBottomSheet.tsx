@@ -14,7 +14,7 @@ import { GAP, PADDING_HORIZONTAL } from '@/theme/globals';
 import { ExploreTile } from '@recomendapp/types';
 import tw from '@/lib/tw';
 import { useQuery } from '@tanstack/react-query';
-import { ExploreTileOptions } from '@/api/options';
+import { useExploreTileOptions } from '@/api/options';
 import Fuse from 'fuse.js';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { Button } from '@/components/ui/Button';
@@ -52,7 +52,7 @@ export const SearchBottomSheet = forwardRef<
   // Queries
   const {
 		data: tile,
-	} = useQuery(ExploreTileOptions({ exploreId: 1 }));
+	} = useQuery(useExploreTileOptions({ exploreId: 1 }));
   const locations = useMemo(
     () => tile?.features || [],
     [tile]

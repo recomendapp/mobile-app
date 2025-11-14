@@ -5,11 +5,12 @@ import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo } from "react";
 import { Database } from "@recomendapp/types";
-import { useWidgetMostPopular } from "@/features/widget/widgetQueries";
 import { CardMovie } from "../cards/CardMovie";
 import { CardTvSeries } from "../cards/CardTvSeries";
 import { GAP, WIDTH_CARD_XS } from "@/theme/globals";
 import { Text } from "../ui/text";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useWidgetMostPopularOptions } from "@/api/options";
 
 interface WidgetMostPopularProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -22,12 +23,13 @@ export const WidgetMostPopular = ({
   containerStyle,
 }: WidgetMostPopularProps) => {
   const t = useTranslations();
+
+  // Queries
   const {
     data,
-    isLoading,
     hasNextPage,
     fetchNextPage,
-   } = useWidgetMostPopular();
+  } = useInfiniteQuery(useWidgetMostPopularOptions());
   const medias = useMemo(() => data?.pages.flat() || [], [data]);
 
   const renderItem = useCallback(({ item }: { item: Database['public']['Functions']['get_widget_most_popular']['Returns'][number] }) => {

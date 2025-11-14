@@ -4,7 +4,7 @@ import * as z from 'zod';
 import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
@@ -32,7 +32,7 @@ const SettingsAppearanceScreen = () => {
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locales = useLocalizedLanguageName(locale);
-	const updateUser = useUserUpdateMutation({
+	const { mutateAsync: updateUser } = useUserUpdateMutation({
 		userId: session?.user.id
 	})
 
@@ -51,11 +51,11 @@ const SettingsAppearanceScreen = () => {
 	});
 
 	// Handlers
-	const handleSubmit = useCallback(async (data: ProfileFormValues) => {
+	const handleSubmit = async (data: ProfileFormValues) => {
 		try {
 			setIsLoading(true);
 			if (session) {
-				await updateUser.mutateAsync({
+				await updateUser({
 					language: data.locale,
 				});
 			}
@@ -73,7 +73,7 @@ const SettingsAppearanceScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [session, t, setLocale, updateUser, form, toast, queryClient]);
+	};
 
 	// useEffects
 	useEffect(() => {
@@ -85,20 +85,20 @@ const SettingsAppearanceScreen = () => {
 	return (
 		<>
 			<Stack.Screen
-				options={useMemo(() => ({
-					headerTitle: upperFirst(t('pages.settings.appearance.label')),
-					headerRight: () => (
-						<Button
-						variant="ghost"
-						size="fit"
-						loading={isLoading}
-						onPress={form.handleSubmit(handleSubmit)}
-						disabled={!form.formState.isValid || isLoading}
-						>
-							{upperFirst(t('common.messages.save'))}
-						</Button>
-					),
-				}), [t, isLoading, form, handleSubmit])}
+			options={{
+				headerTitle: upperFirst(t('pages.settings.appearance.label')),
+				headerRight: () => (
+					<Button
+					variant="ghost"
+					size="fit"
+					loading={isLoading}
+					onPress={form.handleSubmit(handleSubmit)}
+					disabled={!form.formState.isValid || isLoading}
+					>
+						{upperFirst(t('common.messages.save'))}
+					</Button>
+				),
+			}}
 			/>
 			<KeyboardAwareScrollView
 			contentContainerStyle={{

@@ -1,4 +1,3 @@
-import React from "react"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
@@ -14,13 +13,14 @@ import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { ICON_ACTION_SIZE } from "@/theme/globals";
 import { useToast } from "@/components/Toast";
+import { forwardRef } from "react";
 
 interface ButtonUserActivityMovieLikeProps
 	extends React.ComponentProps<typeof Button> {
 		movie: MediaMovie;
 	}
 
-const ButtonUserActivityMovieLike = React.forwardRef<
+const ButtonUserActivityMovieLike = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserActivityMovieLikeProps
 >(({ movie, icon = Icons.like, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
@@ -33,21 +33,19 @@ const ButtonUserActivityMovieLike = React.forwardRef<
 	const queryClient = useQueryClient();
 	const {
 		data: activity,
-		isLoading,
-		isError,
 	} = useUserActivityMovieQuery({
 		userId: session?.user.id,
 		movieId: movie.id,
 	});
-	const insertActivity = useUserActivityMovieInsertMutation();
-	const updateActivity = useUserActivityMovieUpdateMutation();
+	const { mutateAsync: insertActivity } = useUserActivityMovieInsertMutation();
+	const { mutateAsync: updateActivity } = useUserActivityMovieUpdateMutation();
 	const isLiked = useSharedValue(activity?.is_liked ? 1 : 0);
 
 	const handleLike = async () => {
 		if (!session) return;
 		isLiked.value = 1;
 		if (activity) {
-			await updateActivity.mutateAsync({
+			await updateActivity({
 				activityId: activity.id,
 				isLiked: true,
 			}, {
@@ -62,7 +60,7 @@ const ButtonUserActivityMovieLike = React.forwardRef<
 				}
 			});
 		} else {
-			await insertActivity.mutateAsync({
+			await insertActivity({
 				userId: session?.user.id,
 				movieId: movie.id,
 				isLiked: true,
@@ -83,7 +81,7 @@ const ButtonUserActivityMovieLike = React.forwardRef<
 		if (!session) return;
 		if (!activity) return;
 		isLiked.value = 0;
-		await updateActivity.mutateAsync({
+		await updateActivity({
 			activityId: activity.id,
 			isLiked: false,
 		}, {
@@ -105,9 +103,13 @@ const ButtonUserActivityMovieLike = React.forwardRef<
 		variant={variant}
 		icon={icon}
 		size={size}
-		onPress={(e) => {
+		onPress={async (e) => {
 			if (session) {
-				activity?.is_liked ? handleUnlike() : handleLike();
+				if (activity?.is_liked) {
+					await handleUnlike()
+				 } else {
+					await handleLike();
+				 }
 			} else {
 				router.push({
 					pathname: '/auth',

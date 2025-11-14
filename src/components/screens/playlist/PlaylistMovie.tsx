@@ -53,8 +53,8 @@ export const PlaylistMovie = ({
 	const playlistItems = usePlaylistItemsMovieQuery({
 		playlistId: playlist.id,
 	});
-	const deletePlaylistItemMutation = usePlaylistMovieDeleteMutation();
-	const updatePlaylistItemMutation = usePlaylistMovieUpdateMutation();
+	const { mutateAsync: deletePlaylistItemMutation } = usePlaylistMovieDeleteMutation();
+	const { mutateAsync: updatePlaylistItemMutation } = usePlaylistMovieUpdateMutation();
 	const { mutate: updatePlaylistItemChanges } = usePlaylistItemsMovieRealtimeMutation({
 		playlistId: playlist?.id,
 	});
@@ -72,7 +72,7 @@ export const PlaylistMovie = ({
 				{
 					text: upperFirst(t('common.messages.delete')),
 					onPress: async () => {
-						await deletePlaylistItemMutation.mutateAsync({
+						await deletePlaylistItemMutation({
 							itemId: data.id,
 						}, {
 							onSuccess: () => {
@@ -95,7 +95,7 @@ export const PlaylistMovie = ({
 			comment: data.comment || '',
 			isAllowedToEdit: isAllowedToEdit,
 			onSave: async (newComment) => {
-				await updatePlaylistItemMutation.mutateAsync({
+				await updatePlaylistItemMutation({
 					itemId: data.id,
 					comment: newComment?.replace(/\s+/g, ' ').trimStart() || null,
 				}, {

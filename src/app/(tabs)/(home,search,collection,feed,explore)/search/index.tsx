@@ -9,7 +9,6 @@ import { MultiRowHorizontalList } from "@/components/ui/MultiRowHorizontalList";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
-import { useSearchMultiQuery } from "@/features/search/searchQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import useSearchStore from "@/stores/useSearchStore";
@@ -18,42 +17,37 @@ import { useScrollToTop } from "@react-navigation/native";
 import { BestResultsSearchResponse, MediaMovie, MediaPerson, MediaTvSeries, Playlist, Profile } from "@recomendapp/types";
 import { Link } from "expo-router";
 import { clamp, upperFirst } from "lodash";
-import { useCallback, useRef, memo, useMemo } from "react";
+import { useRef } from "react";
 import { useWindowDimensions, ScrollView } from "react-native";
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useTranslations } from "use-intl";
+import { useQuery } from "@tanstack/react-query";
+import { useSearchMultiOptions } from "@/api/options";
 
 const SearchScreen = () => {
 	const search = useSearchStore(state => state.search);
-	
-	const content = useMemo(() => {
-		if (search) {
-			return <SearchResults search={search} />
-		} else {
-			return <FeaturedPlaylists contentContainerStyle={tw`px-4`} />
-		}
-	}, [search]);
 
-	return content;
+	if (search && search.length > 0) {
+		return <SearchResults search={search} />
+	}
+
+	return <FeaturedPlaylists contentContainerStyle={tw`px-4`} />
 };
-SearchScreen.displayName = 'SearchScreen';
 
 interface SearchResultsProps extends React.ComponentPropsWithoutRef<typeof ScrollView> {
 	search: string;
 };
 
-export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => {
+export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
 	const { bottomOffset, tabBarHeight } = useTheme();
 	const t = useTranslations();
 
 	const {
 		data,
 		isLoading,
-		isError,
-		error,
-	} = useSearchMultiQuery({
+	} = useQuery(useSearchMultiOptions({
 		query: search,
-	});
+	}));
 	
 	const loading = data === undefined || isLoading;
 	const scrollRef = useRef<ScrollView>(null);
@@ -96,76 +90,45 @@ export const SearchResults = memo<SearchResultsProps>(({ search, ...props }) => 
 		{(data.movies.data.length === 0 && data.tv_series.data.length === 0 &&
 		  data.persons.data.length === 0 && data.playlists.data.length === 0 &&
 		  data.users.data.length === 0) && (
-			<EmptyComponent
-				isLoading={isLoading}
-				search={search}
-				noResultsText={upperFirst(t('common.messages.no_results'))}
-			/>
+			isLoading ? <Icons.Loader />
+			: search ? (
+				<View style={tw`flex-1 items-center justify-center`}>
+					<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
+				</View>
+			) : null
 		)}
 	</KeyboardAwareScrollView>
 	);
-});
-SearchResults.displayName = 'SearchResults';
-
-const EmptyComponent = memo(({ 
-	isLoading, 
-	search,
-	noResultsText 
-}: { 
-	isLoading: boolean; 
-	search: string | null;
-	noResultsText: string;
-}) => {
-	if (isLoading) return <Icons.Loader />;
-	
-	if (search) {
-		return (
-			<View style={tw`flex-1 items-center justify-center`}>
-				<Text textColor='muted'>{noResultsText}</Text>
-			</View>
-		);
-	}
-	
-	return null;
-});
-EmptyComponent.displayName = 'EmptyComponent';
+};
 
 /* --------------------------------- WIDGETS -------------------------------- */
-const SearchBestResult = memo(({
+const SearchBestResult = ({
 	best,
 } : {
 	best: BestResultsSearchResponse['bestResult']
 }) => {
 	const t = useTranslations();
-
-	const renderBestResult = useCallback(() => {
-		if (!best) return null;
-		switch (best?.type) {
-			case 'movie':
-				return <CardMovie variant="list" movie={best.data as MediaMovie} />;
-			case 'tv_series':
-				return <CardTvSeries variant="list" tvSeries={best.data as MediaTvSeries} />;
-			case 'person':
-				return <CardPerson variant="list" person={best.data as MediaPerson} />;
-			case 'playlist':
-				return <CardPlaylist variant="list" playlist={best.data as Playlist} />;
-			case 'user':
-				return <CardUser variant="list" user={best.data as Profile} />;
-			default:
-				return null;
-		}
-	}, [best]);
-
 	return (
 		<View style={{ marginHorizontal: PADDING_HORIZONTAL, gap: GAP }}>
 			<Text style={tw`font-semibold text-xl`}>
 				{upperFirst(t('common.messages.top_result'))}
 			</Text>
-			{renderBestResult()}
+			{
+				best?.type === 'movie'
+					? <CardMovie variant="list" movie={best.data as MediaMovie} />
+				: best?.type === 'tv_series'
+					? <CardTvSeries variant="list" tvSeries={best.data as MediaTvSeries} />
+				: best?.type === 'person'
+					? <CardPerson variant="list" person={best.data as MediaPerson} />
+				: best?.type === 'playlist'
+					? <CardPlaylist variant="list" playlist={best.data as Playlist} />
+				: best?.type === 'user'
+					? <CardUser variant="list" user={best.data as Profile} />
+				: null
+			}
 		</View>
 	);
-});
-SearchBestResult.displayName = 'SearchBestResult';
+};
 
 const SearchResultSection = <T,>({
 	title,
@@ -184,7 +147,7 @@ const SearchResultSection = <T,>({
 }) => {
 	const { colors } = useTheme();
 	const { width: screenWidth } = useWindowDimensions();
-	const width = useMemo(() => clamp(screenWidth - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
+	const width = clamp(screenWidth - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400);
 
 	return (
 		<View style={{ gap: GAP }}>
@@ -218,7 +181,7 @@ const SearchResultSection = <T,>({
 	);
 };
 
-const SearchResultsMovies = memo(({
+const SearchResultsMovies = ({
 	movies,
 	search,
 } : {
@@ -226,29 +189,19 @@ const SearchResultsMovies = memo(({
 	search: string;
 }) => {
 	const t = useTranslations();
-	
-	const renderItem = useCallback((item: MediaMovie) => (
-		<CardMovie movie={item} variant="list" />
-	), []);
-	
-	const keyExtractor = useCallback((item: MediaMovie) => 
-		item.id.toString(), []
-	);
-
 	return (
 		<SearchResultSection<MediaMovie>
 			title={upperFirst(t('common.messages.film', { count: 2 }))}
 			data={movies}
 			search={search}
 			pathname="/search/films"
-			renderItem={renderItem}
-			keyExtractor={keyExtractor}
+			renderItem={(item) => <CardMovie movie={item} variant="list" /> }
+			keyExtractor={(item) => item.id.toString()}
 		/>
 	);
-});
-SearchResultsMovies.displayName = 'SearchResultsMovies';
+};
 
-const SearchResultsTvSeries = memo(({
+const SearchResultsTvSeries = ({
 	tvSeries,
 	search,
 } : {
@@ -256,29 +209,19 @@ const SearchResultsTvSeries = memo(({
 	search: string;
 }) => {
 	const t = useTranslations();
-	
-	const renderItem = useCallback((item: MediaTvSeries) => (
-		<CardTvSeries tvSeries={item} variant="list" />
-	), []);
-	
-	const keyExtractor = useCallback((item: MediaTvSeries) => 
-		item.id.toString(), []
-	);
-
 	return (
 		<SearchResultSection<MediaTvSeries>
 			title={upperFirst(t('common.messages.tv_series', { count: 2 }))}
 			data={tvSeries}
 			search={search}
 			pathname="/search/tv-series"
-			renderItem={renderItem}
-			keyExtractor={keyExtractor}
+			renderItem={(item) => <CardTvSeries tvSeries={item} variant="list" /> }
+			keyExtractor={(item) => item.id.toString()}
 		/>
 	);
-});
-SearchResultsTvSeries.displayName = 'SearchResultsTvSeries';
+};
 
-const SearchResultsPersons = memo(({
+const SearchResultsPersons = ({
 	persons,
 	search,
 } : {
@@ -286,29 +229,19 @@ const SearchResultsPersons = memo(({
 	search: string;
 }) => {
 	const t = useTranslations();
-	
-	const renderItem = useCallback((item: MediaPerson) => (
-		<CardPerson person={item} variant="list" />
-	), []);
-	
-	const keyExtractor = useCallback((item: MediaPerson) => 
-		item.id.toString(), []
-	);
-
 	return (
 		<SearchResultSection<MediaPerson>
 			title={upperFirst(t('common.messages.person', { count: 2 }))}
 			data={persons}
 			search={search}
 			pathname="/search/persons"
-			renderItem={renderItem}
-			keyExtractor={keyExtractor}
+			renderItem={(item) => <CardPerson person={item} variant="list" /> }
+			keyExtractor={(item) => item.id.toString()}
 		/>
 	);
-});
-SearchResultsPersons.displayName = 'SearchResultsPersons';
+};
 
-const SearchResultsPlaylists = memo(({
+const SearchResultsPlaylists = ({
 	playlists,
 	search,
 } : {
@@ -316,29 +249,19 @@ const SearchResultsPlaylists = memo(({
 	search: string;
 }) => {
 	const t = useTranslations();
-	
-	const renderItem = useCallback((item: Playlist) => (
-		<CardPlaylist playlist={item} variant="list" />
-	), []);
-	
-	const keyExtractor = useCallback((item: Playlist) => 
-		item.id.toString(), []
-	);
-
 	return (
 		<SearchResultSection<Playlist>
 			title={upperFirst(t('common.messages.playlist', { count: 2 }))}
 			data={playlists}
 			search={search}
 			pathname="/search/playlists"
-			renderItem={renderItem}
-			keyExtractor={keyExtractor}
+			renderItem={(item) => <CardPlaylist playlist={item} variant="list" /> }
+			keyExtractor={(item) => item.id.toString()}
 		/>
 	);
-});
-SearchResultsPlaylists.displayName = 'SearchResultsPlaylists';
+};
 
-const SearchResultsUsers = memo(({
+const SearchResultsUsers = ({
 	users,
 	search,
 } : {
@@ -346,27 +269,17 @@ const SearchResultsUsers = memo(({
 	search: string;
 }) => {
 	const t = useTranslations();
-	
-	const renderItem = useCallback((item: Profile) => (
-		<CardUser user={item} variant="list" />
-	), []);
-	
-	const keyExtractor = useCallback((item: Profile) => 
-		item.id!.toString(), []
-	);
-
 	return (
 		<SearchResultSection<Profile>
 			title={upperFirst(t('common.messages.user', { count: 2 }))}
 			data={users}
 			search={search}
 			pathname="/search/users"
-			renderItem={renderItem}
-			keyExtractor={keyExtractor}
+			renderItem={(item) => <CardUser user={item} variant="list" /> }
+			keyExtractor={(item) => item.id!.toString()}
 		/>
 	);
-});
-SearchResultsUsers.displayName = 'SearchResultsUsers';
+};
 /* -------------------------------------------------------------------------- */
 
 export default SearchScreen;

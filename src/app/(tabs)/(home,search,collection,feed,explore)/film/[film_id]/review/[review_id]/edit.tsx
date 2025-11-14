@@ -3,13 +3,12 @@ import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserReviewMovieQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native"
 import { useUserReviewMovieUpsertMutation } from "@/features/user/userMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
-import { useCallback } from "react";
 
 const ReviewMovieEditScreen = () => {
 	const { session }	= useAuth();
@@ -26,14 +25,14 @@ const ReviewMovieEditScreen = () => {
 	});
 	const loading = reviewLoading || review === undefined;
 	// Mutations
-	const updateReview = useUserReviewMovieUpsertMutation({
+	const { mutateAsync: updateReview} = useUserReviewMovieUpsertMutation({
 		userId: session?.user.id,
 		movieId: review?.activity?.movie_id,
 	})
 	// Handlers
-	const handleSave = useCallback(async (data: { title: string; body: object }) => {
+	const handleSave = async (data: { title: string; body: object }) => {
 		if (!review) return;
-		await updateReview.mutateAsync({
+		await updateReview({
 			activityId: review?.id,
 			title: data.title || null,
 			body: data.body,
@@ -45,7 +44,7 @@ const ReviewMovieEditScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		})
-	}, [updateReview, review, router, t, toast]);
+	};
 
 	if (loading) {
 		return (
@@ -54,8 +53,16 @@ const ReviewMovieEditScreen = () => {
 			</View>
 		);
 	};
-	if (!review) return router.replace('/+not-found');
-	if (review?.activity?.user_id !== session?.user.id) return router.replace(`/review/${review?.id}`);
+	if (!review) {
+		return (
+			<Redirect href={{ pathname: '/+not-found', params: { }}} />
+		)
+	}
+	if (review?.activity?.user_id !== session?.user.id) {
+		return (
+			<Redirect href={{ pathname: '/film/[film_id]/review/[review_id]', params: { film_id: review.activity?.movie?.slug || review.activity?.movie?.id!, review_id: review.id }}} />
+		)
+	};
 	return (
 	<ReviewForm
 	type='movie'

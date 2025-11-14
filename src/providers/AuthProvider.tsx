@@ -19,7 +19,7 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import * as env from '@/env';
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Keys } from "@/api/keys";
-import { AuthCustomerInfoOptions, AuthUserOptions } from "@/api/options";
+import { useAuthCustomerInfoOptions, useAuthUserOptions } from "@/api/options";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -75,13 +75,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [pushToken, setPushToken] = useState<string | null>(null);
 	const {
 		data: user,
-	} = useQuery(AuthUserOptions({
+	} = useQuery(useAuthUserOptions({
 		userId: session?.user.id,
 	}));
 	const { customerInfo: initCustomerInfo } = useRevenueCat(session);
 	const {
 		data: customerInfo,
-	} = useQuery(AuthCustomerInfoOptions({
+	} = useQuery(useAuthCustomerInfoOptions({
 		enabled: !!initCustomerInfo,
 		initialData: initCustomerInfo,
 	}));

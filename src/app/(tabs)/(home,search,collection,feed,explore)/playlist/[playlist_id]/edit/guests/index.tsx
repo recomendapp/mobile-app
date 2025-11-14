@@ -1,6 +1,6 @@
 import { useAuth } from "@/providers/AuthProvider";
 import tw from "@/lib/tw";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
@@ -11,7 +11,7 @@ import { View } from "@/components/ui/view";
 import { usePlaylistGuestsQuery, usePlaylistQuery } from "@/features/playlist/playlistQueries";
 import Switch from "@/components/ui/Switch";
 import { Alert } from "react-native";
-import { usePlaylistGuestsDeleteMutation, usePlaylistGuestsUpsertMutation, usePlaylistUpdateMutation } from "@/features/playlist/playlistMutations";
+import { usePlaylistGuestsDeleteMutation, usePlaylistGuestsUpsertMutation } from "@/features/playlist/playlistMutations";
 import { Profile } from "@recomendapp/types";
 import Fuse from "fuse.js";
 import { SearchBar } from "@/components/ui/searchbar";
@@ -25,6 +25,53 @@ import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
+
+const RightActions = ({
+	drag,
+	item,
+	swipeable,
+	onDelete,
+}: {
+	drag: SharedValue<number>,
+	item: Profile,
+	swipeable: SwipeableMethods,
+	onDelete: (userId: string) => void
+}) => {
+	const actionWidth = 50;
+	const swipeActions = [
+		{
+			icon: Icons.X,
+			onPress: () => onDelete(item.id!),
+		},
+	];
+	const styleAnimation = useAnimatedStyle(() => {
+		return {
+			transform: [{ translateX: (drag.value - PADDING_HORIZONTAL + actionWidth) * swipeActions.length }],
+			opacity: interpolate(drag.value, [0, -actionWidth * swipeActions.length], [0, 1]),
+		};
+	});
+
+	return (
+	<Animated.View style={[tw`rounded-r-md overflow-hidden flex-row`, styleAnimation]}>
+		{swipeActions.map((action, index) => (
+			<Button
+				key={index}
+				variant={"ghost"}
+				icon={action.icon}
+				style={[
+					tw`h-full rounded-none`,
+					{ width: actionWidth },
+				]}
+				size="icon"
+				onPress={() => {
+					action.onPress();
+					swipeable.close();
+				}}
+			/>
+		))}
+	</Animated.View>
+	);
+};
 
 const ModalPlaylistEditGuests = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
@@ -51,8 +98,8 @@ const ModalPlaylistEditGuests = () => {
 	const loading = guestsRequest === undefined || guestsRequestLoading;
 	
 	// Mutations
-	const upsertGuestsMutation = usePlaylistGuestsUpsertMutation();
-	const deleteGuestsMutation = usePlaylistGuestsDeleteMutation();
+	const { mutateAsync: upsertGuestsMutation } = usePlaylistGuestsUpsertMutation();
+	const { mutateAsync: deleteGuestsMutation } = usePlaylistGuestsDeleteMutation();
 
 	// States
 	const [ guests, setGuests ] = useState<{ user: Profile, edit: boolean }[] | undefined>(undefined);
@@ -62,25 +109,25 @@ const ModalPlaylistEditGuests = () => {
 		}
 	}, [guestsRequest]);
 	const [ isLoading, setIsLoading ] = useState(false);
-	const canSave = useMemo((): boolean => {
-		if (!guests || !guestsRequest) return false;
-		if (guestsRequest.length !== guests.length) return true;
-		return guestsRequest.some((initial, index) => {
-			const current = guests[index];
-			return (
-				initial.user!.id !== current.user.id ||
-				initial.edit !== current.edit
-			);
-		});
-	}, [guests]);
+	const canSave: boolean = (
+		!!guestsRequest &&
+		!!guests &&
+		(
+			guestsRequest.length !== guests.length ||
+			guestsRequest.some((initial) => {
+				const current = guests.find((g) => g.user.id === initial.user?.id);
+				return !current || initial.edit !== current.edit;
+			})
+		)
+	);
 
 	// Search
 	const [search, setSearch] = useState('');
 	const [filteredGuests, setFilteredGuests] = useState<typeof guests>([]);
 	const fuse = useMemo(() => {
 		return new Fuse(guests || [], {
-		keys: ['user.username', 'user.full_name'],
-		threshold: 0.5,
+			keys: ['user.username', 'user.full_name'],
+			threshold: 0.5,
 		});
 	}, [guests]);
 	useEffect(() => {
@@ -90,11 +137,12 @@ const ModalPlaylistEditGuests = () => {
 			setFilteredGuests(guests);
 		}
 	}, [search, guests, fuse]);
+	const hasResults = filteredGuests && filteredGuests.length > 0;
 	/* -------------------------------------------------------------------------- */
 
 
 	// Handlers
-	const handleToggleEdit = useCallback((userId: string) => {
+	const handleToggleEdit = (userId: string) => {
 		if (!customerInfo?.entitlements.active['premium']) {
 			router.push({ pathname: '/upgrade', params: { feature: app.features.playlist_collaborators } });
 			return;
@@ -108,13 +156,7 @@ const ModalPlaylistEditGuests = () => {
 				return guest;
 			});
 		});
-	}, [customerInfo?.entitlements.active, router]);
-	const handleDeleteGuest = useCallback(async (userId: string) => {
-		setGuests((prev) => {
-			if (!prev) return prev;
-			return prev.filter((guest) => guest.user.id !== userId);
-		});
-	}, []);
+	};
 	const handleSubmit = async () => {
 		try {
 			if (!playlist) return;
@@ -126,7 +168,7 @@ const ModalPlaylistEditGuests = () => {
 			});
 			const guestsToDelete = guestsRequest?.filter((guest) => !guests?.some((g) => g.user.id === guest.user?.id));
 			if (guestsToUpsert?.length) {
-				await upsertGuestsMutation.mutateAsync({
+				await upsertGuestsMutation({
 					playlistId: playlist.id,
 					guests: guestsToUpsert.map((guest) => ({
 						user_id: guest.user.id!,
@@ -135,7 +177,7 @@ const ModalPlaylistEditGuests = () => {
 				}, { onError: (error) => { throw error } })
 			}
 			if (guestsToDelete?.length) {
-				await deleteGuestsMutation.mutateAsync({
+				await deleteGuestsMutation({
 					playlistId: playlist.id,
 					ids: guestsToDelete.map((guest) => guest.id),
 				}, { onError: (error) => { throw error } })
@@ -155,6 +197,12 @@ const ModalPlaylistEditGuests = () => {
 		} finally {
 			setIsLoading(false);
 		}
+	};
+	const handleDeleteGuest = async (userId: string) => {
+		setGuests((prev) => {
+			if (!prev) return prev;
+			return prev.filter((guest) => guest.user.id !== userId);
+		});
 	};
 	const handleCancel = () => {
 		if (canSave) {
@@ -176,80 +224,7 @@ const ModalPlaylistEditGuests = () => {
 			router.dismiss();
 		}
 	};
-	const RightActions = useCallback((prog: SharedValue<number>, drag: SharedValue<number>, item: { user: Profile, edit: boolean }, swipeable: SwipeableMethods) => {
-		const actionWidth = 50;
-		const swipeActions = [
-			{
-				icon: Icons.X,
-				onPress: () => handleDeleteGuest(item.user.id!),
-			},
-		];
-		const styleAnimation = useAnimatedStyle(() => {
-			return {
-				transform: [{ translateX: (drag.value - PADDING_HORIZONTAL + actionWidth) * swipeActions.length }],
-				opacity: interpolate(drag.value, [0, -actionWidth * swipeActions.length], [0, 1]),
-			};
-		});
-
-		return (
-		<Animated.View style={[tw`rounded-r-md overflow-hidden flex-row`, styleAnimation]}>
-			{swipeActions.map((action, index) => (
-				<Button
-					key={index}
-					variant={"ghost"}
-					icon={action.icon}
-					style={[
-						tw`h-full rounded-none`,
-						{ width: actionWidth },
-					]}
-					size="icon"
-					onPress={() => {
-						action.onPress();
-						swipeable.close();
-					}}
-				/>
-			))}
-		</Animated.View>
-		);
-	}, [])
-	// Render
-	const renderItems = useCallback(({ item }: { item: { user: Profile, edit: boolean } }) => (
-		<Swipeable
-		friction={2}
-		enableTrackpadTwoFingerGesture
-		renderRightActions={(prog, drag, swipeable) => RightActions(prog, drag, item, swipeable)}
-		containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}
-		>
-			<CardUser user={item.user} linked={false}>
-				<View>
-					<Switch
-					key={String(item.edit)}
-					value={item.edit}
-					onValueChange={() => handleToggleEdit(item.user.id!)}
-					/>
-				</View>
-			</CardUser>
-		</Swipeable>
-	), [handleToggleEdit]);
-	const renderToolbar = useCallback(() => {
-		const hasResults = filteredGuests && filteredGuests.length > 0;
-		return (
-			<View
-			style={
-				hasResults ? tw`flex-row items-center justify-between gap-2` : undefined
-			}>
-				<Button
-				variant="muted"
-				icon={Icons.Add}
-				onPress={() => router.push(`/playlist/${playlistId}/edit/guests/add`)}
-				>
-					{upperFirst(t('common.messages.add_guest', { count: 2 }))}
-				</Button>
-				{hasResults && <Text textColor="muted" style={tw`text-right`}>{upperFirst(t('common.messages.can_edit'))}</Text>}
-			</View>
-		)
-	}, [filteredGuests])
-
+	
 	return (
 	<>
 		<Stack.Screen
@@ -286,11 +261,47 @@ const ModalPlaylistEditGuests = () => {
 			autoCapitalize="none"
 			placeholder={upperFirst(t('common.messages.search_user', { count: 1 }))}
 			/>
-			{renderToolbar()}
+			<View
+			style={
+				hasResults ? tw`flex-row items-center justify-between gap-2` : undefined
+			}>
+				<Button
+				variant="muted"
+				icon={Icons.Add}
+				onPress={() => router.push(`/playlist/${playlistId}/edit/guests/add`)}
+				>
+					{upperFirst(t('common.messages.add_guest', { count: 2 }))}
+				</Button>
+				{hasResults && <Text textColor="muted" style={tw`text-right`}>{upperFirst(t('common.messages.can_edit'))}</Text>}
+			</View>
 		</View>
 		<LegendList
 		data={filteredGuests || []}
-		renderItem={renderItems}
+		renderItem={({ item }) => (
+			<Swipeable
+			friction={2}
+			enableTrackpadTwoFingerGesture
+			renderRightActions={(_, drag, swipeable) => (
+				<RightActions
+				drag={drag}
+				item={item.user}
+				swipeable={swipeable}
+				onDelete={handleDeleteGuest}
+				/>
+			)}
+			containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}
+			>
+				<CardUser user={item.user} linked={false}>
+					<View>
+						<Switch
+						key={String(item.edit)}
+						value={item.edit}
+						onValueChange={() => handleToggleEdit(item.user.id!)}
+						/>
+					</View>
+				</CardUser>
+			</Swipeable>
+		)}
 		ListEmptyComponent={
 			loading ? <Icons.Loader />
 			: (

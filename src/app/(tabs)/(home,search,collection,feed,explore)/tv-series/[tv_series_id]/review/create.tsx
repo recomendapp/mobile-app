@@ -5,13 +5,12 @@ import { useMediaTvSeriesQuery } from "@/features/media/mediaQueries";
 import { useUserActivityTvSeriesQuery } from "@/features/user/userQueries";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import tw from "@/lib/tw";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native"
 import { useUserReviewTvSeriesUpsertMutation } from "@/features/user/userMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
-import { useCallback } from "react";
 
 const ReviewTvSeriesCreateScreen = () => {
 	const { user } = useAuth();
@@ -36,14 +35,14 @@ const ReviewTvSeriesCreateScreen = () => {
 	});
 	const loading = tvSeriesLoading || tvSeries === undefined || activityLoading || activity === undefined;
 	// Mutations
-	const insertReview = useUserReviewTvSeriesUpsertMutation({
+	const { mutateAsync: insertReview } = useUserReviewTvSeriesUpsertMutation({
 		userId: user?.id,
 		tvSeriesId: tvSeries?.id,
 	});
 
 	// Handlers
-	const handleSave = useCallback(async (data: { title: string; body: object }) => {
-		await insertReview.mutateAsync({
+	const handleSave = async (data: { title: string; body: object }) => {
+		await insertReview({
 			activityId: activity?.id,
 			title: data.title || null,
 			body: data.body,
@@ -55,10 +54,19 @@ const ReviewTvSeriesCreateScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [insertReview, activity?.id, tvSeries?.id, tvSeries?.slug, tvSeries?.id, router, t, toast]);
+	};
 
-	if (tvSeries === null) return router.back();
-	if (activity?.review) return router.replace(`/tv-series/${tvSeries?.slug || tvSeries?.id}/review/${activity?.review?.id}`);
+	if (tvSeries === null) {
+		return (
+			<Redirect href={'..'} />
+		)
+	}
+	if (activity?.review) {
+		return (
+			<Redirect href={{ pathname: '/tv-series/[tv_series_id]/review/[review_id]', params: { tv_series_id: tvSeries?.slug || tvSeries?.id!, review_id: activity.review.id }}} />
+		)
+
+	 }
 	if (loading) {
 		return (
 			<View style={tw`flex-1 items-center justify-center`}>

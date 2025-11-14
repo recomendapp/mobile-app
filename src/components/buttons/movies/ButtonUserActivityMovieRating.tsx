@@ -1,4 +1,3 @@
-import React from "react"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
@@ -14,13 +13,14 @@ import { useUserActivityMovieInsertMutation, useUserActivityMovieUpdateMutation 
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
+import { forwardRef } from "react";
 
 interface ButtonUserActivityMovieRatingProps
 	extends React.ComponentProps<typeof Button> {
 		movie: MediaMovie;
 	}
 
-const ButtonUserActivityMovieRating = React.forwardRef<
+const ButtonUserActivityMovieRating = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserActivityMovieRatingProps
 >(({ movie, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
@@ -33,20 +33,18 @@ const ButtonUserActivityMovieRating = React.forwardRef<
 	// Requests
 	const {
 		data: activity,
-		isLoading,
-		isError,
 	} = useUserActivityMovieQuery({
 		userId: session?.user.id,
 		movieId: movie.id,
 	});
 	// Mutations
-	const insertActivity = useUserActivityMovieInsertMutation();
-	const updateActivity = useUserActivityMovieUpdateMutation();
+	const { mutateAsync: insertActivity } = useUserActivityMovieInsertMutation();
+	const { mutateAsync: updateActivity } = useUserActivityMovieUpdateMutation();
 	// Handlers
 	const handleRate = async (rating: number) => {
 		if (!session) return;
 		if (activity) {
-			await updateActivity.mutateAsync({
+			await updateActivity({
 				activityId: activity.id,
 				rating: rating,
 			}, {
@@ -55,7 +53,7 @@ const ButtonUserActivityMovieRating = React.forwardRef<
 				}
 			});
 		} else {
-			await insertActivity.mutateAsync({
+			await insertActivity({
 				userId: session.user.id,
 				movieId: movie.id,
 				rating: rating,
@@ -71,7 +69,7 @@ const ButtonUserActivityMovieRating = React.forwardRef<
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: 'You cannot unrate a media with a review.' });
 			return;
 		}
-		await updateActivity.mutateAsync({
+		await updateActivity({
 			activityId: activity!.id!,
 			rating: null,
 		}, {
