@@ -6,9 +6,9 @@ import { Profile } from "@recomendapp/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Pressable, ScrollViewProps } from "react-native";
+import { Alert, Pressable } from "react-native";
 import { useTranslations } from "use-intl";
 import { z } from "zod";
 import { SelectionFooter } from "@/components/ui/SelectionFooter";
@@ -43,17 +43,17 @@ const RecoSendTvSeries = () => {
 	const tvSeriesId = Number(tv_series_id);
 
 	// Form
-	const sendRecoTvSeriesFormSchema = useMemo(() => z.object({
+	const sendRecoTvSeriesFormSchema = z.object({
 		comment: z.string()
 			.max(COMMENT_MAX_LENGTH, { message: upperFirst(t('common.form.length.char_max', { count: COMMENT_MAX_LENGTH }))})
 			.regex(/^(?!\s+$)(?!.*\n\s*\n)[\s\S]*$/)
 			.optional()
 			.nullable(),
-	}), [t]);
+	});
 	type SendRecoTvSeriesFormValues = z.infer<typeof sendRecoTvSeriesFormSchema>;
-	const defaultValues = useMemo((): Partial<SendRecoTvSeriesFormValues> => ({
+	const defaultValues: Partial<SendRecoTvSeriesFormValues> = {
 		comment: '',
-	}), []);
+	};
 	const form = useForm<SendRecoTvSeriesFormValues>({
 		resolver: zodResolver(sendRecoTvSeriesFormSchema),
 		defaultValues,
@@ -61,7 +61,7 @@ const RecoSendTvSeries = () => {
 	});
 
 	// Mutations
-	const sendReco = useUserRecosTvSeriesInsertMutation();
+	const { mutateAsync: sendReco, isPending: isSendingReco } = useUserRecosTvSeriesInsertMutation();
 
 	// SharedValues
 	const footerHeight = useSharedValue(0);
@@ -70,15 +70,8 @@ const RecoSendTvSeries = () => {
 	const [search, setSearch] = useState('');
 	const [results, setResults] = useState<typeof friends>([]);
 	const [selected, setSelected] = useState<Profile[]>([]);
-	const resultsRender = useMemo(() => (
-		results?.map((item) => ({
-			item: item,
-			isSelected: selected.some((selectedItem) => selectedItem.id === item.friend.id),
-		})) || []
-	), [results, selected]);
-	const canSave = useMemo(() => {
-		return selected.length > 0 && form.formState.isValid;
-	}, [selected, form.formState.isValid]);
+	const resultsRender = results?.map((item) => ({ item: item, isSelected: selected.some((selectedItem) => selectedItem.id === item.friend.id) }));
+	const canSave = selected.length > 0 && form.formState.isValid;
 
 	// Queries
 	const {
@@ -106,7 +99,7 @@ const RecoSendTvSeries = () => {
 	}, [search, friends, fuse]);
 
 	// Handlers
-	const handleToggleUser = useCallback((user: Profile) => {
+	const handleToggleUser = (user: Profile) => {
 		setSelected((prev) => {
 			const isSelected = prev.some((p) => p.id === user.id);
 			if (isSelected) {
@@ -114,11 +107,11 @@ const RecoSendTvSeries = () => {
 			}
 			return [...prev, user];
 		});
-	}, []);
-	const handleSubmit = useCallback(async (values: SendRecoTvSeriesFormValues) => {
+	};
+	const handleSubmit = async (values: SendRecoTvSeriesFormValues) => {
 		if (!session?.user.id) return;
 		if (selected.length === 0) return;
-		await sendReco.mutateAsync({
+		await sendReco({
 			senderId: session.user.id,
 			tvSeriesId: tvSeriesId,
 			receivers: selected,
@@ -132,8 +125,8 @@ const RecoSendTvSeries = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [router, sendReco, session?.user.id, selected, t, tvSeriesId, toast]);
-	const handleCancel = useCallback(() => {
+	};
+	const handleCancel = () => {
 		if (canSave) {
 			Alert.alert(
 				upperFirst(t('common.messages.are_u_sure')),
@@ -152,35 +145,7 @@ const RecoSendTvSeries = () => {
 		} else {
 			router.dismiss();
 		}
-	}, [canSave, router, t, mode]);
-
-	// Render
-	const renderItems = useCallback(({ item: { item, isSelected} }: { item: { item: { friend: Profile, as_watched: boolean, already_sent: boolean }, isSelected: boolean }}) => {
-		return (
-			<Pressable onPress={() => handleToggleUser(item.friend)} style={[{ marginHorizontal: PADDING_HORIZONTAL }, tw`flex-row items-center justify-between`]}>
-				<CardUser user={item.friend} linked={false} style={tw`border-0 p-0 h-auto bg-transparent`} />
-				<View style={tw`flex-row items-center gap-2`}>
-					{item.already_sent && (
-					<Badge variant="accent-yellow">
-						{upperFirst(t('common.messages.already_sent'))}
-					</Badge>
-					)}
-					{item.as_watched && (
-					<Badge variant="destructive">
-						{upperFirst(t('common.messages.already_watched'))}
-					</Badge>
-					)}
-					<Checkbox
-					checked={isSelected}
-					onCheckedChange={() => handleToggleUser(item.friend)}
-					/>
-				</View>
-			</Pressable>
-		);
-	}, [handleToggleUser, t]);
-	const renderScroll = useCallback((props: ScrollViewProps) => {
-        return <AnimatedContentContainer {...props} />;
-    }, []);
+	};
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
@@ -199,7 +164,7 @@ const RecoSendTvSeries = () => {
 					<Button
 					variant="ghost"
 					size="fit"
-					disabled={sendReco.isPending}
+					disabled={isSendingReco}
 					onPress={handleCancel}
 					>
 						{upperFirst(t('common.messages.cancel'))}
@@ -221,9 +186,29 @@ const RecoSendTvSeries = () => {
 		</View>
 		<AnimatedLegendList
 		data={resultsRender}
-		renderItem={renderItems}
+		renderItem={({ item: { item, isSelected } }) => (
+			<Pressable onPress={() => handleToggleUser(item.friend)} style={[{ marginHorizontal: PADDING_HORIZONTAL }, tw`flex-row items-center justify-between`]}>
+				<CardUser user={item.friend} linked={false} style={tw`border-0 p-0 h-auto bg-transparent`} />
+				<View style={tw`flex-row items-center gap-2`}>
+					{item.already_sent && (
+					<Badge variant="accent-yellow">
+						{upperFirst(t('common.messages.already_sent'))}
+					</Badge>
+					)}
+					{item.as_watched && (
+					<Badge variant="destructive">
+						{upperFirst(t('common.messages.already_watched'))}
+					</Badge>
+					)}
+					<Checkbox
+					checked={isSelected}
+					onCheckedChange={() => handleToggleUser(item.friend)}
+					/>
+				</View>
+			</Pressable>
+		)}
 		ListEmptyComponent={
-			sendReco.isPending ? <Icons.Loader />
+			isSendingReco ? <Icons.Loader />
 			: (
 				<View style={tw`p-4`}>
 					<Text textColor="muted" style={tw`text-center`}>
@@ -240,7 +225,7 @@ const RecoSendTvSeries = () => {
 			tw`gap-2`,
 			animatedFooterStyle
 		]}
-		renderScrollComponent={renderScroll}
+		renderScrollComponent={(props) => <AnimatedContentContainer {...props} />}
 		keyboardShouldPersistTaps='handled'
 		/>
 		<SelectionFooter
@@ -263,13 +248,13 @@ const RecoSendTvSeries = () => {
 				value={value || ''}
 				onChangeText={onChange}
 				onBlur={onBlur}
-				disabled={sendReco.isPending}
+				disabled={isSendingReco}
 				error={form.formState.errors.comment?.message}
 				/>
 				<Button
 				variant="accent-yellow"
 				onPress={form.handleSubmit(handleSubmit)}
-				disabled={sendReco.isPending}
+				disabled={isSendingReco}
 				>
 					{upperFirst(t('common.messages.add'))}
 				</Button>

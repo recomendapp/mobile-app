@@ -1,8 +1,8 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { widgetKeys } from "./widgetKeys";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
+import { Keys } from "../keys";
 
-export const useWidgetMostRecommended = ({
+export const useWidgetMostRecommendedOptions = ({
 	filters,
 } : {
 	filters?: {
@@ -10,11 +10,8 @@ export const useWidgetMostRecommended = ({
 	}
 } = {}) => {
 	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: widgetKeys.widget({
-			name: 'most-recommended',
-			filters,
-		}),
+	return queryOptions({
+		queryKey: Keys.widget.mostRecommended({ filters: filters }),
 		queryFn: async () => {
 			let request = supabase
 				.rpc('get_widget_most_recommended')
@@ -32,26 +29,23 @@ export const useWidgetMostRecommended = ({
 			if (error) throw error;
 			return data;
 		},
-	});
+	})
 };
 
-export const useWidgetMostPopular = ({
+export const useWidgetMostPopularOptions = ({
 	filters,
 } : {
 	filters?: {
 		perPage?: number,
 	}
 } = {}) => {
+	const supabase = useSupabaseClient();
 	const mergedFilters = {
 		perPage: 10,
 		...filters
-	};
-	const supabase = useSupabaseClient();
-	return useInfiniteQuery({
-		queryKey: widgetKeys.widget({
-			name: 'most-popular',
-			filters,
-		}),
+	}
+	return infiniteQueryOptions({
+		queryKey: Keys.widget.mostPopular({ filters: filters }),
 		queryFn: async ({ pageParam = 1 }) => {
 			const from = (pageParam - 1) * mergedFilters.perPage;
 			const to = from - 1 + mergedFilters.perPage;
@@ -66,7 +60,7 @@ export const useWidgetMostPopular = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
-	});
+	})
 };

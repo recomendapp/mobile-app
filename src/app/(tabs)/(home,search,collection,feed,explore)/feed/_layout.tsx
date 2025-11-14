@@ -1,7 +1,7 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { Href, Redirect, Stack, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useMemo, useCallback, memo } from "react";
+import { useMemo, useCallback } from "react";
 import { useTranslations } from "use-intl";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useUIStore } from "@/stores/useUIStore";
@@ -16,7 +16,7 @@ type SegmentedOption = {
   route: string;
 };
 
-const FeedHeader = memo(({
+const FeedHeader = ({
   segmentedOptions,
   feedView,
   onValueChange,
@@ -42,10 +42,9 @@ const FeedHeader = memo(({
       />
     </View>
   );
-});
-FeedHeader.displayName = 'FeedHeader';
+};
 
-const FeedLayout = memo(() => {
+const FeedLayout = () => {
   const t = useTranslations();
   const router = useRouter();
   const { session } = useAuth();
@@ -106,7 +105,6 @@ const FeedLayout = memo(() => {
       </Stack>
     </>
   );
-});
-FeedLayout.displayName = 'FeedLayout';
+};
 
 export default FeedLayout;

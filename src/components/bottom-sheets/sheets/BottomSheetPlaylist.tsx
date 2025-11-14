@@ -63,10 +63,9 @@ const BottomSheetPlaylist = forwardRef<
 		userId: session?.user.id,
 		playlistId: playlist.id,
 	});
-	const insertPlaylistSaved = useUserPlaylistSavedInsertMutation();
-	const deletePlaylistSaved = useUserPlaylistSavedDeleteMutation();
-
-	const playlistDeleteMutation = usePlaylistDeleteMutation();
+	const { mutateAsync: insertPlaylistSaved } = useUserPlaylistSavedInsertMutation();
+	const { mutateAsync: deletePlaylistSaved } = useUserPlaylistSavedDeleteMutation();
+	const { mutateAsync: playlistDeleteMutation} = usePlaylistDeleteMutation();
 
 	const items: Item[] = [
 		...additionalItemsTop,
@@ -84,7 +83,7 @@ const BottomSheetPlaylist = forwardRef<
 					: Icons.Add,
 				onPress: async () => {
 					if (saved) {
-						await deletePlaylistSaved.mutateAsync({
+						await deletePlaylistSaved({
 							savedId: saved.id,
 						}, {
 							onError: () => {
@@ -92,7 +91,7 @@ const BottomSheetPlaylist = forwardRef<
 							}
 						});
 					} else {
-						await insertPlaylistSaved.mutateAsync({
+						await insertPlaylistSaved({
 							userId: session.user.id,
 							playlistId: playlist.id,
 						}, {
@@ -146,7 +145,7 @@ const BottomSheetPlaylist = forwardRef<
 							{
 								text: upperFirst(t('common.messages.delete')),
 								onPress: async () => {
-									await playlistDeleteMutation.mutateAsync(
+									await playlistDeleteMutation(
 										{ playlistId: playlist.id, userId: session.user.id },
 										{
 											onSuccess: () => {

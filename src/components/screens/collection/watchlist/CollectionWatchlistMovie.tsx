@@ -29,7 +29,7 @@ export const CollectionWatchlistMovie = () => {
     });
 	const screenTitle = upperFirst(t('common.messages.watchlist'));
 	// Mutations
-	const deleteWatchlistMutation = useUserWatchlistMovieDeleteMutation();
+	const { mutateAsync: deleteWatchlistMutation } = useUserWatchlistMovieDeleteMutation();
 	// SharedValues
 	const scrollY = useSharedValue(0);
 	const headerHeight = useSharedValue(0);
@@ -47,7 +47,7 @@ export const CollectionWatchlistMovie = () => {
 				{
 					text: upperFirst(t('common.messages.delete')),
 					onPress: async () => {
-						await deleteWatchlistMutation.mutateAsync({
+						await deleteWatchlistMutation({
 							watchlistId: data.id,
 						}, {
 							onSuccess: () => {
@@ -153,7 +153,7 @@ export const CollectionWatchlistMovie = () => {
 			additionalItemsTop: additionalItems.filter(action => action.position === 'top'),
 			additionalItemsBottom: additionalItems.filter(action => action.position === 'bottom'),
 		})
-	}, [bottomSheetActions]);
+	}, [bottomSheetActions, openSheet]);
 
     return (
 	<>

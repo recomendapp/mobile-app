@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Pressable, ScrollViewProps } from "react-native";
 import { useTranslations } from "use-intl";
@@ -68,7 +68,7 @@ const PlaylistTvSeriesAdd = () => {
 	});
 
 	// Mutations
-	const addToPlaylistMutation = usePlaylistTvSeriesInsertMutation({
+	const { mutateAsync: addToPlaylistMutation, isPending: isAddingToPlaylist } = usePlaylistTvSeriesInsertMutation({
 		tvSeriesId: tvSeriesId,
 	});
 
@@ -83,10 +83,8 @@ const PlaylistTvSeriesAdd = () => {
 	const [search, setSearch] = useState('');
 	const [results, setResults] = useState<typeof playlists>([]);
 	const [selected, setSelected] = useState<Playlist[]>([]);
-	const canSave = useMemo(() => {
-		return selected.length > 0 && form.formState.isValid;
-	}, [selected, form.formState.isValid]);
-	const segmentedOptions = useMemo((): { label: string, value: PlaylistSource }[] => [
+	const canSave = selected.length > 0 && form.formState.isValid;
+	const segmentedOptions: { label: string, value: PlaylistSource }[] = [
 		{
 			label: upperFirst(t('common.messages.my_playlist', { count: 2 })),
 			value: 'personal',
@@ -95,7 +93,7 @@ const PlaylistTvSeriesAdd = () => {
 			label: upperFirst(t('common.messages.saved', { gender: 'female', count: 2 })),
 			value: 'saved',
 		},
-	], [t]);
+	];
 
 
 	// Queries
@@ -125,7 +123,7 @@ const PlaylistTvSeriesAdd = () => {
 	}, [search, playlists, fuse]);
 
 	// Handlers
-	const handleTogglePlaylist = useCallback((playlist: Playlist) => {
+	const handleTogglePlaylist = (playlist: Playlist) => {
 		setSelected((prev) => {
 			const isSelected = prev.some((p) => p.id === playlist.id);
 			if (isSelected) {
@@ -133,11 +131,11 @@ const PlaylistTvSeriesAdd = () => {
 			}
 			return [...prev, playlist];
 		});
-	}, []);
+	};
 	const handleSubmit = async (values: AddTvSeriesToPlaylistFormValues) => {
 		if (!session) return;
 		if (selected.length === 0) return;
-		await addToPlaylistMutation.mutateAsync({
+		await addToPlaylistMutation({
 			userId: session?.user.id,
 			tvSeriesId: tvSeriesId,
 			playlists: selected,
@@ -172,34 +170,21 @@ const PlaylistTvSeriesAdd = () => {
 			router.dismiss();
 		}
 	};
-
-	// Render
-	const renderItems = useCallback(({ item: { item, isSelected} }: { item: { item: { playlist: Playlist, already_added: boolean }, isSelected: boolean }}) => {
-		return (
-		<Pressable onPress={() => handleTogglePlaylist(item.playlist)} style={[tw`flex-row items-center justify-between gap-2`, { paddingHorizontal: PADDING_HORIZONTAL }]}>
-			<View style={tw`shrink flex-row items-center gap-2`}>
-				<ImageWithFallback
-				source={{ uri: item.playlist.poster_url ?? '' }}
-				alt={item.playlist.title}
-				style={tw`rounded-md w-14 h-14`}
-				type="playlist"
-				/>
-				<Text style={tw`shrink`} numberOfLines={1}>{item.playlist.title}</Text>
-			</View>
-			<View style={tw`flex-row items-center gap-2 shrink-0`}>
-				{item.already_added && (
-				<Badge variant="destructive">
-					{upperFirst(t('common.messages.already_added', { count: 1, gender: 'male' }))}
-				</Badge>
-				)}
-				<Checkbox checked={isSelected} onCheckedChange={() => handleTogglePlaylist(item.playlist)} />
-			</View>
-        </Pressable>
-		);
-	}, [handleTogglePlaylist, t]);
-	const renderScroll = useCallback((props: ScrollViewProps) => {
-        return <AnimatedContentContainer {...props} />;
-    }, []);
+	const onCreatePlaylist = (playlist: Playlist) => {
+		BottomSheetPlaylistCreateRef.current?.dismiss();
+		queryClient.setQueryData(playlistKeys.addToSource({
+			id: tvSeriesId,
+			type: 'tv_series',
+			source: 'personal',
+		}), (prev: { playlist: Playlist; already_added: boolean }[] | undefined) => {
+			if (!prev) return [{ playlist, already_added: false }];
+			return [
+				{ playlist, already_added: false },
+				...prev,
+			];
+		});
+		setSelected((prev) => [...prev, playlist]);
+	};
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
@@ -225,7 +210,7 @@ const PlaylistTvSeriesAdd = () => {
 					<Button
 					variant="ghost"
 					size="fit"
-					disabled={addToPlaylistMutation.isPending}
+					disabled={isAddingToPlaylist}
 					onPress={handleCancel}
 					>
 						{upperFirst(t('common.messages.cancel'))}
@@ -271,9 +256,29 @@ const PlaylistTvSeriesAdd = () => {
 			item: item,
 			isSelected: selected.some((selectedItem) => selectedItem.id === item.playlist.id),
 		})) || []}
-		renderItem={renderItems}
+		renderItem={({ item: { item, isSelected } }) => (
+			<Pressable onPress={() => handleTogglePlaylist(item.playlist)} style={[tw`flex-row items-center justify-between gap-2`, { paddingHorizontal: PADDING_HORIZONTAL }]}>
+				<View style={tw`shrink flex-row items-center gap-2`}>
+					<ImageWithFallback
+					source={{ uri: item.playlist.poster_url ?? '' }}
+					alt={item.playlist.title}
+					style={tw`rounded-md w-14 h-14`}
+					type="playlist"
+					/>
+					<Text style={tw`shrink`} numberOfLines={1}>{item.playlist.title}</Text>
+				</View>
+				<View style={tw`flex-row items-center gap-2 shrink-0`}>
+					{item.already_added && (
+					<Badge variant="destructive">
+						{upperFirst(t('common.messages.already_added', { count: 1, gender: 'male' }))}
+					</Badge>
+					)}
+					<Checkbox checked={isSelected} onCheckedChange={() => handleTogglePlaylist(item.playlist)} />
+				</View>
+			</Pressable>
+		)}
 		ListEmptyComponent={
-			addToPlaylistMutation.isPending ? <Icons.Loader />
+			isAddingToPlaylist ? <Icons.Loader />
 			: (
 				<View style={tw`p-4`}>
 					<Text textColor="muted" style={tw`text-center`}>
@@ -290,7 +295,7 @@ const PlaylistTvSeriesAdd = () => {
 			tw`gap-2`,
 			animatedFooterStyle
 		]}
-		renderScrollComponent={renderScroll}
+		renderScrollComponent={(props) => <AnimatedContentContainer {...props} />}
 		/>
 		<SelectionFooter
 		data={selected}
@@ -324,13 +329,13 @@ const PlaylistTvSeriesAdd = () => {
 				value={value || ''}
 				onChangeText={onChange}
 				onBlur={onBlur}
-				disabled={addToPlaylistMutation.isPending}
+				disabled={isAddingToPlaylist}
 				error={form.formState.errors.comment?.message}
 				/>
 				<Button
 				variant="accent-yellow"
 				onPress={form.handleSubmit(handleSubmit)}
-				disabled={addToPlaylistMutation.isPending}
+				disabled={isAddingToPlaylist}
 				>
 					{upperFirst(t('common.messages.add'))}
 				</Button>
@@ -342,21 +347,7 @@ const PlaylistTvSeriesAdd = () => {
 		<BottomSheetPlaylistCreate
 		ref={BottomSheetPlaylistCreateRef}
 		id={`${tvSeriesId}-create-playlist`}
-		onCreate={(playlist) => {
-			BottomSheetPlaylistCreateRef.current?.dismiss();
-			queryClient.setQueryData(playlistKeys.addToSource({
-				id: tvSeriesId,
-				type: 'tv_series',
-				source: 'personal',
-			}), (prev: { playlist: Playlist; already_added: boolean }[] | undefined) => {
-				if (!prev) return [{ playlist, already_added: false }];
-				return [
-					{ playlist, already_added: false },
-					...prev,
-				];
-			});
-			setSelected((prev) => [...prev, playlist]);
-		}}
+		onCreate={onCreatePlaylist}
 		placeholder={String(tvSeriesName)}
 		playlistType='tv_series'
 		/>

@@ -1,8 +1,7 @@
 import { Stack } from "expo-router";
-import { forwardRef, memo, useCallback, useMemo } from "react";
-import { StyleSheet } from "react-native";
+import { forwardRef, useCallback, useMemo } from "react";
+import { StyleSheet, StyleProp, ViewStyle } from "react-native";
 import Animated, { SharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
-import { StyleProp, ViewStyle } from "react-native";
 import { Button } from "./Button";
 import { Icons } from "@/constants/Icons";
 import { HeaderTitle, useHeaderHeight } from '@react-navigation/elements';
@@ -35,7 +34,7 @@ export interface AnimatedStackScreenProps extends React.ComponentProps<typeof St
 
 const ReanimatedHeaderTitle = Animated.createAnimatedComponent(HeaderTitle);
 
-const AnimatedStackScreen = memo(forwardRef<
+const AnimatedStackScreen = forwardRef<
 	React.ComponentRef<typeof Stack.Screen>,
 	AnimatedStackScreenProps
 >(({ onMenuPress, scrollY, triggerHeight, animationStartRatio = 0.25, scaleStartRatio = 0.90, ...props }, ref) => {
@@ -163,7 +162,7 @@ const AnimatedStackScreen = memo(forwardRef<
 	options={screenOptions}
 	/>
 	);
-}));
+});
 AnimatedStackScreen.displayName = "AnimatedStackScreen";
 
 export default AnimatedStackScreen;

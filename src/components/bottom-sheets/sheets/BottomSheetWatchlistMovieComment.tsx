@@ -1,4 +1,3 @@
-import React, { useMemo } from 'react';
 import tw from '@/lib/tw';
 import { UserWatchlistMovie } from '@recomendapp/types';
 import { upperFirst } from 'lodash';
@@ -17,6 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { View } from '@/components/ui/view';
 import { useTheme } from '@/providers/ThemeProvider';
 import { useToast } from '@/components/Toast';
+import { forwardRef } from 'react';
 
 interface BottomSheetWatchlistMovieCommentProps extends BottomSheetProps {
 	watchlistItem: UserWatchlistMovie
@@ -25,7 +25,7 @@ interface BottomSheetWatchlistMovieCommentProps extends BottomSheetProps {
 const COMMENT_MIN_LENGTH = 0;
 const COMMENT_MAX_LENGTH = 180;
 
-export const BottomSheetWatchlistMovieComment = React.forwardRef<
+export const BottomSheetWatchlistMovieComment = forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetWatchlistMovieCommentProps
 >(({ id, watchlistItem, ...props }, ref) => {
@@ -33,7 +33,7 @@ export const BottomSheetWatchlistMovieComment = React.forwardRef<
 	const toast = useToast();
 	const closeSheet = useBottomSheetStore((state) => state.closeSheet);
 	const t = useTranslations();
-	const updateWatchlist = useUserWatchlistMovieUpdateMutation();
+	const { mutateAsync: updateWatchlist, isPending: isUpdatingWatchlist } = useUserWatchlistMovieUpdateMutation();
 
 	/* ---------------------------------- FORM ---------------------------------- */
 	const watchlistSchema = z.object({
@@ -42,9 +42,9 @@ export const BottomSheetWatchlistMovieComment = React.forwardRef<
 			.max(COMMENT_MAX_LENGTH, { message: upperFirst(t('common.form.length.char_max', { count: COMMENT_MAX_LENGTH }))}),
 	});
 	type WatchlistFormValues = z.infer<typeof watchlistSchema>;
-	const defaultValues = useMemo((): Partial<WatchlistFormValues> => ({
+	const defaultValues: Partial<WatchlistFormValues> = {
 		comment: watchlistItem.comment || '',
-	}), [watchlistItem.comment]);
+	};
 	const form = useForm<WatchlistFormValues>({
 		resolver: zodResolver(watchlistSchema),
 		defaultValues: defaultValues,
@@ -54,7 +54,7 @@ export const BottomSheetWatchlistMovieComment = React.forwardRef<
 
 	// Handlers
 	const handleUpdateComment = async (values: WatchlistFormValues) => {
-		if (values.comment == watchlistItem?.comment) {
+		if (values.comment === watchlistItem?.comment) {
 			closeSheet(id);
 			return;
 		}
@@ -62,7 +62,7 @@ export const BottomSheetWatchlistMovieComment = React.forwardRef<
 			toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			return;
 		}
-		await updateWatchlist.mutateAsync({
+		await updateWatchlist({
 			watchlistId: watchlistItem.id,
 			comment: values.comment.replace(/\s+/g, ' ').trimStart(),
 		}, {
@@ -109,9 +109,9 @@ export const BottomSheetWatchlistMovieComment = React.forwardRef<
 		)}
 		/>
 		<Button
-		loading={updateWatchlist.isPending}
+		loading={isUpdatingWatchlist}
 		onPress={form.handleSubmit(handleUpdateComment)}
-		disabled={updateWatchlist.isPending || !form.formState.isValid}
+		disabled={isUpdatingWatchlist || !form.formState.isValid}
 		>
 			{upperFirst(t('common.messages.save'))}
 		</Button>

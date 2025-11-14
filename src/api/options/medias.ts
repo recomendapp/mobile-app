@@ -3,7 +3,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { MediaMovie } from "@recomendapp/types";
 import { Keys } from "../keys";
 
-export const MediaMovieDetailsOptions = ({
+export const useMediaMovieDetailsOptions = ({
 	mediaId,
 } : {
 	mediaId?: number;
@@ -28,7 +28,7 @@ export const MediaMovieDetailsOptions = ({
 	});
 };
 
-export const MediaGenresOptions = () => {
+export const useMediaGenresOptions = () => {
 	const supabase = useSupabaseClient();
 	return queryOptions({
 		queryKey: Keys.medias.genres(),

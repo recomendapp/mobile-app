@@ -1,5 +1,5 @@
 import { Keys } from "@/api/keys";
-import { AuthCustomerInfoOptions } from "@/api/options";
+import { useAuthCustomerInfoOptions } from "@/api/options";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import tw from "@/lib/tw";
@@ -18,9 +18,10 @@ const UpgradeScreen = () => {
 	const queryClient = useQueryClient();
 	const t = useTranslations();
 	const { defaultScreenOptions } = useTheme();
+	const authCustomerInfoOptions = useAuthCustomerInfoOptions();
 
 	const onSuccess = async ({ customerInfo } : { customerInfo: CustomerInfo }) => {
-		queryClient.setQueryData(AuthCustomerInfoOptions().queryKey, customerInfo);
+		queryClient.setQueryData(authCustomerInfoOptions.queryKey, customerInfo);
 		session?.user.id && await queryClient.invalidateQueries({
 			queryKey: Keys.auth.user(),
 		});

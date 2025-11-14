@@ -34,7 +34,7 @@ export const PlaylistSortTvSeries = () => {
 		playlistId: playlistId,
 		userId: session?.user.id,
 	});
-	const updatePlaylistItem = usePlaylistTvSeriesUpdateMutation();
+	const { mutateAsync: updatePlaylistItem } = usePlaylistTvSeriesUpdateMutation();
 
 	// States
 	const [playlistItems, setPlaylistItems] = useState<PlaylistItemTvSeries[] | undefined>(undefined);
@@ -43,7 +43,7 @@ export const PlaylistSortTvSeries = () => {
 	// Handlers
 	const handleSaveItem = useCallback(async (item: PlaylistItemTvSeries) => {
 		try {
-			await updatePlaylistItem.mutateAsync({
+			await updatePlaylistItem({
 				itemId: item.id,
 				rank: item.rank,
 			});

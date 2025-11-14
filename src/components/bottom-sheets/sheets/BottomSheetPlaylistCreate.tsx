@@ -37,7 +37,7 @@ const BottomSheetPlaylistCreate = forwardRef<
 	const toast = useToast();
 	const closeSheet = useBottomSheetStore((state) => state.closeSheet);
 	const t = useTranslations();
-	const createPlaylistMutation = usePlaylistInsertMutation();
+	const { mutateAsync: createPlaylistMutation, isPending: isPlaylistCreating } = usePlaylistInsertMutation();
 
 	const typeOptions: { key: PlaylistType; label: string }[] = [
 		{ key: 'movie', label: upperFirst(t('common.messages.film', { count: 2 })) },
@@ -65,7 +65,7 @@ const BottomSheetPlaylistCreate = forwardRef<
 
 	const onSubmit = async (values: PlaylistFormValues) => {
 		if (!session) return;
-		await createPlaylistMutation.mutateAsync({
+		await createPlaylistMutation({
 			title: values.title,
 			type: values.type,
 			userId: session.user.id
@@ -105,7 +105,7 @@ const BottomSheetPlaylistCreate = forwardRef<
 					onBlur={onBlur}
 					placeholder={placeholder ?? upperFirst(t('pages.playlist.form.title.placeholder'))}
 					autoCorrect={false}
-					disabled={createPlaylistMutation.isPending}
+					disabled={isPlaylistCreating}
 					error={form.formState.errors.title?.message}
 					/>
 				</View>
@@ -145,7 +145,7 @@ const BottomSheetPlaylistCreate = forwardRef<
 				}
 			}}
 			containerStyle={tw`w-full`}
-			disabled={createPlaylistMutation.isPending}
+			disabled={isPlaylistCreating}
 			>
 				{upperFirst(t('common.messages.create'))}
 			</Button>

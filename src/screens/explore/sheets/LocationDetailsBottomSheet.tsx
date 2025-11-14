@@ -31,7 +31,7 @@ import { ButtonUserWatchlistMovie } from '@/components/buttons/movies/ButtonUser
 import { ButtonPlaylistMovieAdd } from '@/components/buttons/ButtonPlaylistMovieAdd';
 import ButtonUserRecoMovieSend from '@/components/buttons/movies/ButtonUserRecoMovieSend';
 import { useAuth } from '@/providers/AuthProvider';
-import { MediaMovieDetailsOptions } from '@/api/options';
+import { useMediaMovieDetailsOptions } from '@/api/options';
 
 interface LocationDetailsBottomSheetProps {
   index: SharedValue<number>;
@@ -61,7 +61,7 @@ export const LocationDetailsBottomSheet = forwardRef<
   const {
     data: movie,
     isLoading,
-  } = useQuery(MediaMovieDetailsOptions({ mediaId: selectedLocation?.movie.id }))
+  } = useQuery(useMediaMovieDetailsOptions({ mediaId: selectedLocation?.movie.id }))
   const loading = isLoading || movie === undefined;
 
   //#region hooks

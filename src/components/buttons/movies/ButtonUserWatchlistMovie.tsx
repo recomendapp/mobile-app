@@ -1,4 +1,3 @@
-import React from "react"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserWatchlistMovieItemQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
@@ -13,12 +12,13 @@ import { ICON_ACTION_SIZE } from "@/theme/globals";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { BottomSheetWatchlistMovieComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistMovieComment";
 import { useToast } from "@/components/Toast";
+import { forwardRef } from "react";
 interface ButtonUserWatchlistMovieProps
 	extends React.ComponentProps<typeof Button> {
 		movie: MediaMovie;
 	}
 
-export const ButtonUserWatchlistMovie = React.forwardRef<
+export const ButtonUserWatchlistMovie = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserWatchlistMovieProps
 >(({ movie, icon = Icons.Watchlist, variant = "ghost", size = "fit", onPress: onPressProps, onLongPress: onLongPressProps, iconProps, ...props }, ref) => {
@@ -31,15 +31,13 @@ export const ButtonUserWatchlistMovie = React.forwardRef<
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const {
 		data: watchlist,
-		isLoading,
-		isError,
 	} = useUserWatchlistMovieItemQuery({
 		userId: session?.user.id,
 		movieId: movie.id,
 	});
 	// Mutations
-	const insertWatchlist = useUserWatchlistMovieInsertMutation();
-	const deleteWatchlist = useUserWatchlistMovieDeleteMutation();
+	const { mutateAsync: insertWatchlist } = useUserWatchlistMovieInsertMutation();
+	const { mutateAsync: deleteWatchlist } = useUserWatchlistMovieDeleteMutation();
 
 	const handleWatchlist = async () => {
 		if (watchlist) return;
@@ -47,7 +45,7 @@ export const ButtonUserWatchlistMovie = React.forwardRef<
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			return;
 		}
-		await insertWatchlist.mutateAsync({
+		await insertWatchlist({
 			userId: session.user.id,
 			movieId: movie.id,
 		}, {
@@ -62,7 +60,7 @@ export const ButtonUserWatchlistMovie = React.forwardRef<
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			return;
 		}
-		await deleteWatchlist.mutateAsync({
+		await deleteWatchlist({
 		  watchlistId: watchlist.id,
 		}, {
 		  onError: () => {
@@ -77,9 +75,13 @@ export const ButtonUserWatchlistMovie = React.forwardRef<
 	variant={variant}
 	icon={icon}
 	size={size}
-	onPress={(e) => {
+	onPress={async (e) => {
 		if (session) {
-			watchlist ? handleUnwatchlist() : handleWatchlist();
+			if (watchlist) {
+				await handleUnwatchlist()
+			} else {
+				await handleWatchlist()
+			}
 		} else {
 			router.push({
 				pathname: '/auth',

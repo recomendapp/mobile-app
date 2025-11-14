@@ -1,7 +1,7 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
 import { Button } from "@/components/ui/Button";
@@ -53,7 +53,7 @@ const ModalPlaylistEdit = () => {
 	} = usePlaylistQuery({
 		playlistId: playlistId,
 	});
-	const updatePlaylistMutation = usePlaylistUpdateMutation();
+	const { mutateAsync: updatePlaylistMutation} = usePlaylistUpdateMutation();
 
 	// States
 	const [ isLoading, setIsLoading ] = useState(false);
@@ -74,11 +74,11 @@ const ModalPlaylistEdit = () => {
 		private: z.boolean(),
 	});
 	type PlaylistFormValues = z.infer<typeof playlistFormSchema>;
-	const defaultValues = useMemo((): Partial<PlaylistFormValues> => ({
+	const defaultValues: Partial<PlaylistFormValues> = {
 		title: playlist?.title ?? '',
 		description: playlist?.description ?? null,
 		private: playlist?.private ?? false,
-	}), [playlist]);
+	};
 	const form = useForm<PlaylistFormValues>({
 		resolver: zodResolver(playlistFormSchema),
 		defaultValues,
@@ -86,26 +86,23 @@ const ModalPlaylistEdit = () => {
 	});
 
 	const [ hasFormChanged, setHasFormChanged ] = useState(false);
-	const canSave = useMemo(() => {
-		return (hasFormChanged || newPoster !== undefined) && form.formState.isValid;
-	}, [hasFormChanged, newPoster, form.formState.isValid]);
+	const canSave = (hasFormChanged || newPoster !== undefined) && form.formState.isValid;
 
 	// Routes
-	const routes = useMemo((): { label: string, icon: LucideIcon, route: Href }[] => ([
+	const routes: { label: string, icon: LucideIcon, route: Href }[] = [
 		{
 			label: upperFirst(t('common.messages.manage_guests', { count: 2 })),
 			icon: Icons.Users,
 			route: `/playlist/${playlistId}/edit/guests`,
 		}
-	]), [t, playlistId]);
+	];
 
 	// Poster
-	const posterOptions = useMemo(() => [
+	const posterOptions: { label: string, value: "library" | "camera" | "delete", disable?: boolean }[] = [
 		{ label: upperFirst(t('common.messages.choose_from_the_library')), value: "library" },
 		{ label: upperFirst(t('common.messages.take_a_photo')), value: "camera" },
 		{ label: upperFirst(t('common.messages.delete_current_image')), value: "delete", disable: !playlist?.poster_url && !newPoster },
-	], [ newPoster, t, playlist]);
-
+	];
 	// Handlers
 	const handlePosterOptions = () => {
 		const options = [
@@ -181,7 +178,7 @@ const ModalPlaylistEdit = () => {
 			} else if (newPoster === null) {
 				poster_url = null;
 			}
-			await updatePlaylistMutation.mutateAsync({
+			await updatePlaylistMutation({
 				playlistId: playlist.id,
 				title: values.title.trim(),
 				description: values.description?.trim() || null,

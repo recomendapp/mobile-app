@@ -8,7 +8,7 @@ import { Stack, useRouter } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useQuery } from "@tanstack/react-query";
-import { ExploreTileMetaOptions, ExploreTileOptions, MediaGenresOptions } from "@/api/options";
+import { useExploreTileMetaOptions, useExploreTileOptions, useMediaGenresOptions } from "@/api/options";
 import { ExploreTile } from "@recomendapp/types";
 import Color from "color";
 import { Button } from "@/components/ui/Button";
@@ -62,13 +62,13 @@ const ExploreScreen = () => {
 
 	const {
 		data: genres,
-	} = useQuery(MediaGenresOptions());
+	} = useQuery(useMediaGenresOptions());
 
 	const {
 		data: tile,
 		refetch: refetchTile
-	} = useQuery(ExploreTileOptions({ exploreId: 1 }));
-	const { data: tileMeta } = useQuery(ExploreTileMetaOptions({ exploreId: 1 }));
+	} = useQuery(useExploreTileOptions({ exploreId: 1 }));
+	const { data: tileMeta } = useQuery(useExploreTileMetaOptions({ exploreId: 1 }));
 
 	const handleOnLocationPress = useCallback((e: OnPressEvent) => {
 		const location = e.features.at(0) as ExploreTile['features'][number];

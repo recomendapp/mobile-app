@@ -46,13 +46,13 @@ const NotificationsScreen = () => {
 	const notifications = useMemo(() => data?.pages.flatMap(page => page.notifications) || [], [data]);
 
 	// Mutations
-	const archiveMutation = useNotificationArchiveMutation();
-	const unarchiveMutation = useNotificationUnarchiveMutation();
-	const readMutation = useNotificationReadMutation();
-	const unreadMutation = useNotificationUnreadMutation();
+	const { mutateAsync: archiveMutation} = useNotificationArchiveMutation();
+	const { mutateAsync: unarchiveMutation} = useNotificationUnarchiveMutation();
+	const { mutateAsync: readMutation} = useNotificationReadMutation();
+	const { mutateAsync: unreadMutation} = useNotificationUnreadMutation();
 
-	const handleArchive = useCallback(async (notification: typeof notifications[number]) => {
-		await archiveMutation.mutateAsync(notification, {
+	const handleArchive = async (notification: typeof notifications[number]) => {
+		await archiveMutation(notification, {
 			onSuccess: () => {
 				toast.success(upperFirst(t('common.messages.notification_archived', { count: 1 })));
 			},
@@ -60,9 +60,9 @@ const NotificationsScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [archiveMutation]);
-	const handleUnarchive = useCallback(async (notification: typeof notifications[number]) => {
-		await unarchiveMutation.mutateAsync(notification, {
+	};
+	const handleUnarchive = async (notification: typeof notifications[number]) => {
+		await unarchiveMutation(notification, {
 			onSuccess: () => {
 				toast.success(upperFirst(t('common.messages.notification_unarchived', { count: 1 })));
 			},
@@ -70,9 +70,9 @@ const NotificationsScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [unarchiveMutation]);
-	const handleRead = useCallback(async (notification: typeof notifications[number]) => {
-		await readMutation.mutateAsync(notification, {
+	};
+	const handleRead = async (notification: typeof notifications[number]) => {
+		await readMutation(notification, {
 			onSuccess: () => {
 				toast.success(upperFirst(t('common.messages.notification_marked_as_read', { count: 1 })));
 			},
@@ -80,9 +80,9 @@ const NotificationsScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [readMutation]);
-	const handleUnread = useCallback(async (notification: typeof notifications[number]) => {
-		await unreadMutation.mutateAsync(notification, {
+	};
+	const handleUnread = async (notification: typeof notifications[number]) => {
+		await unreadMutation(notification, {
 			onSuccess: () => {
 				toast.success(upperFirst(t('common.messages.notification_marked_as_unread', { count: 1 })));
 			},
@@ -90,7 +90,7 @@ const NotificationsScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [unreadMutation]);
+	};
 	const renderItemContent = useCallback(({ item }: { item: typeof notifications[number] }) => {
 		const notif = item.content;
 		const onPress = () => {
@@ -179,21 +179,11 @@ const NotificationsScreen = () => {
 			</ReusableAppleStyleSwipeableRow>
 		)
 	}, [renderItemContent, notificationsView, colors, handleArchive, handleUnarchive, handleRead, handleUnread]);
-	const keyExtractor = useCallback((item: Notification) => item.id.toString(), []);
-	const onEndReached = useCallback(() => {
-		if (hasNextPage) {
-			fetchNextPage();
-		}
-	}, [hasNextPage, fetchNextPage]);
-	const listEmptyComponent = useCallback(() => (
-		loading ? <Icons.Loader />
-		: <Text textColor="muted" style={tw`text-center p-4`}>{upperFirst(t('common.messages.no_notifications'))}</Text>
-	), [loading]);
 
 	return (
 	<>
 		<Stack.Screen
-		options={useMemo(() => ({
+		options={{
 			headerRight: () => (
 				<View style={[tw`flex-row items-center`]}>
 					<Button
@@ -214,13 +204,13 @@ const NotificationsScreen = () => {
 					</Button>
 				</View>
 			),
-		}), [router, notificationsView, setNotificationsView, colors])}
+		}}
 		/>
 		<LegendList
 		data={notifications}
 		renderItem={renderItem}
-		keyExtractor={keyExtractor}
-		onEndReached={onEndReached}
+		keyExtractor={(item) => item.id.toString()}
+		onEndReached={() => hasNextPage && fetchNextPage()}
 		contentContainerStyle={[
 			{
 				gap: GAP,
@@ -228,7 +218,10 @@ const NotificationsScreen = () => {
 			}
 		]}
 		scrollIndicatorInsets={{ bottom: insets.bottom }}
-		ListEmptyComponent={listEmptyComponent}
+		ListEmptyComponent={
+			loading ? <Icons.Loader />
+			: <Text textColor="muted" style={tw`text-center p-4`}>{upperFirst(t('common.messages.no_notifications'))}</Text>
+		}
 		/>
 	</>
 	)

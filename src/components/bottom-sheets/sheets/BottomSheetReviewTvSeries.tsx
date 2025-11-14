@@ -49,7 +49,7 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
   // REFs
   const scrollRef = React.useRef<FlashListRef<Item>>(null);
   // Mutations
-  const reviewDeleteMutation = useUserReviewTvSeriesDeleteMutation();
+  const { mutateAsync: reviewDeleteMutation } = useUserReviewTvSeriesDeleteMutation();
   // States
   const items: Item[] = [
     ...additionalItemsTop,
@@ -79,7 +79,7 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
               {
                 text: upperFirst(t('common.messages.delete')),
                 onPress: async () => {
-                  await reviewDeleteMutation.mutateAsync(
+                  await reviewDeleteMutation(
                     { id: review.id, tvSeriesId: review.activity?.tv_series_id! },
                     {
                       onSuccess: () => {
