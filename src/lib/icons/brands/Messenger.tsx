@@ -4,7 +4,7 @@ import { BrandIconProps } from "./type";
 
 const Messenger = forwardRef<Svg, BrandIconProps>((props, ref) => {
 	const { variant = 'colored', size = 24, ...otherProps } = props;
-	const fill = variant === 'dark' ? '#FFFFFF' : variant === 'light' ? '#000000' : undefined;
+	(void variant);
 	return (
 		<Svg
 		ref={ref}

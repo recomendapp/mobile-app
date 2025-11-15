@@ -6,7 +6,7 @@ import { Profile } from "@recomendapp/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Pressable } from "react-native";
 import { useTranslations } from "use-intl";
@@ -99,7 +99,7 @@ const RecoSendMovie = () => {
 	}, [search, friends, fuse]);
 
 	// Handlers
-	const handleToggleUser = (user: Profile) => {
+	const handleToggleUser = useCallback((user: Profile) => {
 		setSelected((prev) => {
 			const isSelected = prev.some((p) => p.id === user.id);
 			if (isSelected) {
@@ -107,8 +107,8 @@ const RecoSendMovie = () => {
 			}
 			return [...prev, user];
 		});
-	};
-	const handleSubmit = async (values: SendRecoMovieFormValues) => {
+	}, []);
+	const handleSubmit = useCallback(async (values: SendRecoMovieFormValues) => {
 		if (!session?.user.id) return;
 		if (selected.length === 0) return;
 		await sendReco({
@@ -125,8 +125,8 @@ const RecoSendMovie = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
-	const handleCancel = () => {
+	}, [session, selected, movieId, sendReco, toast, router, t]);
+	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
 				upperFirst(t('common.messages.are_u_sure')),
@@ -145,7 +145,7 @@ const RecoSendMovie = () => {
 		} else {
 			router.dismiss();
 		}
-	};
+	}, [canSave, router, t, mode]);
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {

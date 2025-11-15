@@ -1,12 +1,10 @@
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { useTranslations } from "use-intl";
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { Icons } from "@/constants/Icons";
 import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
 import { LinkProps, useRouter } from "expo-router";
-import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Button } from "@/components/ui/Button";
 import { CollectionAction } from "./CollectionScreen";
@@ -34,7 +32,6 @@ const CollectionItem = forwardRef<
     React.ComponentRef<typeof Animated.View>,
     CollectionItemProps<any>
 >(({ style, item, swipeActions, bottomSheetActions, renderCustom, getItemId, getItemTitle, getItemSubtitle, getItemImageUrl, getItemUrl, onItemAction, view = 'list', type, index, ...props }, ref) => {
-    const t = useTranslations();
     const router = useRouter();
     const { colors } = useTheme();
 
@@ -112,7 +109,7 @@ const CollectionItem = forwardRef<
                     </Animated.View>
                 );
         }
-    }, [view, item, colors]);
+    }, [view, item, colors, getItemTitle, getItemImageUrl, itemSubtitle, ref, style, props, type]);
 	const pressableContent = useCallback(() => (
         <Pressable
             onPress={() => {
@@ -124,7 +121,7 @@ const CollectionItem = forwardRef<
         >
             {itemContent()}
         </Pressable>
-    ), [getItemUrl, item, onItemAction, router]);
+    ), [getItemUrl, item, onItemAction, router, itemContent]);
 	const itemWithContainer = useCallback(() => (
 		<Animated.View style={tw`flex-row items-center justify-between gap-2`} entering={FadeInDown}>
 			{pressableContent()}

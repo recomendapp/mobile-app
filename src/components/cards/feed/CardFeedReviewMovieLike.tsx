@@ -1,13 +1,12 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaMovie, Profile, UserReviewMovieLike } from "@recomendapp/types";
+import { MediaMovie, Profile, UserReviewMovieLike, FixedOmit } from "@recomendapp/types";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Pressable, View } from "react-native";
 import { Href, useRouter } from "expo-router";
 import { Text } from "@/components/ui/text";
-import { FixedOmit } from "@recomendapp/types";
 import { useTranslations } from "use-intl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";

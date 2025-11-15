@@ -16,7 +16,7 @@ interface CollectionStaticRoute {
 const useCollectionStaticRoutes = () => {
 	const t = useTranslations();
 	const { colors } = useTheme();
-	const routes: CollectionStaticRoute[] = useMemo(() => [
+	const routes = useMemo((): CollectionStaticRoute[] => [
 		{
 			type: 'static',
 			icon: (
@@ -47,7 +47,7 @@ const useCollectionStaticRoutes = () => {
 			label: capitalize(t('common.messages.heart_pick', { count: 2 })),
 			href: '/collection/heart-picks',
 		},
-	], [t]);
+	], [t, colors]);
 	return routes;
 };
 

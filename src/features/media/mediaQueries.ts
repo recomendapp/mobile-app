@@ -329,7 +329,7 @@ export const useMediaPersonFilmsInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!personId,
 	});
@@ -419,7 +419,7 @@ export const useMediaPersonTvSeriesInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!personId,
 	});
@@ -481,7 +481,7 @@ export const useMediaReviewsMovieInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!movieId,
 	});
@@ -540,7 +540,7 @@ export const useMediaReviewsTvSeriesInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!tvSeriesId,
 	});
@@ -605,7 +605,7 @@ export const useMediaPlaylistsMovieInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!movieId,
 	});
@@ -667,7 +667,7 @@ export const useMediaPlaylistsTvSeriesInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!tvSeriesId,
 	});
@@ -759,7 +759,7 @@ export const useMediaMoviePosterInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!movieId,
 	});
@@ -799,7 +799,7 @@ export const useMediaMovieBackdropInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!movieId,
 	});
@@ -839,7 +839,7 @@ export const useMediaTvSeriesPosterInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!tvSeriesId,
 	});
@@ -879,7 +879,7 @@ export const useMediaTvSeriesBackdropInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!tvSeriesId,
 	});

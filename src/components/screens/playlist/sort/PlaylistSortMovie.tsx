@@ -69,7 +69,7 @@ export const PlaylistSortMovie = () => {
 	}, [handleSaveItem]);
 	const handleQuickMove = useCallback((item: PlaylistItemMovie) => {
 
-	}, [handleSaveItem]);
+	}, []);
 
 	// Render
 	const renderItem = useCallback(({ item, drag, isActive }: RenderItemParams<PlaylistItemMovie>) => {
@@ -109,7 +109,7 @@ export const PlaylistSortMovie = () => {
 				</View>
 			</ScaleDecorator>
 		);
-	}, [colors]);
+	}, [colors, handleQuickMove]);
 
 	// useEffects
 	useEffect(() => {

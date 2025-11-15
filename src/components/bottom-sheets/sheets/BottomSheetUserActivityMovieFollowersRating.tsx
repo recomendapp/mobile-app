@@ -53,7 +53,7 @@ const BottomSheetUserActivityMovieFollowersRating = React.forwardRef<
     <TrueSheet
     ref={ref}
     sizes={sizes}
-    scrollRef={refFlatList as React.RefObject<React.Component<unknown, {}, any>>}
+    scrollRef={refFlatList as React.RefObject<React.Component>}
     {...props}
     >
       <FlatList

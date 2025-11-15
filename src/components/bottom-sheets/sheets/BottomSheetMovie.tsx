@@ -119,7 +119,7 @@ const BottomSheetMovie = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
-    scrollRef={scrollRef as unknown as React.RefObject<React.Component<unknown, {}, any>>}
+    scrollRef={scrollRef as unknown as React.RefObject<React.Component>}
     contentContainerStyle={tw`p-0`}
     {...props}
     >
@@ -185,7 +185,7 @@ const BottomSheetMovie = React.forwardRef<
         <BottomSheetDefaultView
         ref={BottomSheetMainCreditsRef}
         id={`${id}-credits`}
-        scrollRef={creditsScrollRef as unknown as React.RefObject<React.Component<unknown, {}, any>>}
+        scrollRef={creditsScrollRef as unknown as React.RefObject<React.Component>}
         >
           <FlashList
           ref={creditsScrollRef}

@@ -6,9 +6,8 @@ import { CardPlaylist } from "../cards/CardPlaylist";
 import { LegendList } from "@legendapp/list";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
-import { useCallback, useMemo } from "react";
-import { Playlist } from "@recomendapp/types";
 import { Text } from "../ui/text";
+import { GAP } from "@/theme/globals";
 
 interface WidgetUserFriendsPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -29,21 +28,7 @@ export const WidgetUserFriendsPlaylists = ({
     },
   });
 
-  const playlistData = useMemo(() => playlists?.pages.flat() || [], [playlists]);
-
-  const renderItem = useCallback(({ item }: { item: Playlist }) => (
-    <CardPlaylist playlist={item} style={tw`w-36`} />
-  ), []);
-
-  const keyExtractor = useCallback((item: Playlist) => 
-    item.id.toString(), 
-    []
-  );
-
-  const ItemSeparatorComponent = useCallback(() => 
-    <View style={tw`w-2`} />, 
-    []
-  );
+  const playlistData = playlists?.pages.flat() || [];
 
   if (!playlistData.length) {
     return null;
@@ -56,13 +41,15 @@ export const WidgetUserFriendsPlaylists = ({
       </Text>
       <LegendList
         data={playlistData}
-        renderItem={renderItem}
+        renderItem={({ item }) => (
+          <CardPlaylist playlist={item} style={tw`w-36`} />
+        )}
         snapToInterval={152}
         decelerationRate="fast"
-        keyExtractor={keyExtractor}
+        keyExtractor={(item) => item.id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
-        ItemSeparatorComponent={ItemSeparatorComponent}
+        ItemSeparatorComponent={() => <View style={{ width: GAP }} />}
         contentContainerStyle={containerStyle}
         nestedScrollEnabled
       />

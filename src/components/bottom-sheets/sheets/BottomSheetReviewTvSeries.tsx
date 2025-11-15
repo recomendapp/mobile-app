@@ -115,7 +115,7 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
-    scrollRef={scrollRef as unknown as React.RefObject<React.Component<unknown, {}, any>>}
+    scrollRef={scrollRef as unknown as React.RefObject<React.Component>}
     contentContainerStyle={tw`p-0`}
     {...props}
     >

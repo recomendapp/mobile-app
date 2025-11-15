@@ -4,7 +4,7 @@ import { StyleSheet, StyleProp, ViewStyle } from "react-native";
 import Animated, { SharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { Button } from "./Button";
 import { Icons } from "@/constants/Icons";
-import { HeaderTitle, useHeaderHeight } from '@react-navigation/elements';
+import { HeaderTitle } from '@react-navigation/elements';
 import { useTheme } from "@/providers/ThemeProvider";
 import { LinearGradient } from "expo-linear-gradient";
 import Color from "color";
@@ -38,7 +38,6 @@ const AnimatedStackScreen = forwardRef<
 	React.ComponentRef<typeof Stack.Screen>,
 	AnimatedStackScreenProps
 >(({ onMenuPress, scrollY, triggerHeight, animationStartRatio = 0.25, scaleStartRatio = 0.90, ...props }, ref) => {
-	const navigationHeaderHeight = useHeaderHeight();
 	const { colors } = useTheme();
 	const defaultOptions = useMemo(() => ({
 		headerTransparent: true,
@@ -154,7 +153,7 @@ const AnimatedStackScreen = forwardRef<
 		title: headerTitle,
 		...options,
 		headerTitle: renderHeaderTitle
-	}), [onMenuPress, renderHeaderBackground, headerTitle, options]);
+	}), [onMenuPress, headerTitle, options, renderHeaderBackground, renderHeaderTitle, renderHeaderRight]);
 
 	return (
 	<Stack.Screen

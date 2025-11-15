@@ -64,7 +64,7 @@ const EditOptionsSelector = ({
 			<item.icon size={20} color={colors.foreground} />
 		</View>
 		);
-	}, []);
+	}, [colors.border, colors.foreground, colors.muted]);
 
 	const handleSelectionChange = useCallback((item: EditOption) => {
 		setActiveEditingOption(item.value);
@@ -153,7 +153,7 @@ const PosterSelector = ({
 	const initialIndex = useMemo(() => {
 		const isFind = posters.findIndex(p => p.poster_url === poster);
 		return isFind === -1 ? 0 : isFind;
-	}, [posters]);
+	}, [posters, poster]);
 	const renderItem = useCallback((item: MediaMoviePoster, isActive: boolean) => (
 		<ImageWithFallback
 		source={{ uri: item.poster_url ?? '' }}
@@ -436,7 +436,7 @@ export const ShareMovie = forwardRef<
 				{content}
 			</View>
 		)
-	}, [editing, activeEditingOption, bgType]);
+	}, [editing, activeEditingOption, bgType, palette, bgColor, movie, poster, backdrop]);
 
 	// useEffects
 	useEffect(() => {

@@ -1,5 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button } from '@/components/ui/Button';
 import { Link, useNavigation } from 'expo-router';
@@ -45,16 +45,16 @@ const LoginOtpScreen = () => {
 	const [otp, setOtp] = useState('');
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
-	const forgotPasswordSchema = useMemo(() => z.object({
+	const forgotPasswordSchema = z.object({
 		email: z.email({
 			error: t('common.form.email.error.invalid')
 		})
-	}), [t]);
+	});
 	type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
-	const defaultValues = useMemo((): Partial<ForgotPasswordFormValues> => ({
+	const defaultValues: Partial<ForgotPasswordFormValues> = {
 		email: '',
-	}), []);
-	const form = useForm<ForgotPasswordFormValues>({
+	};
+	const { getValues: formGetValues, ...form} = useForm<ForgotPasswordFormValues>({
 		resolver: zodResolver(forgotPasswordSchema),
 		defaultValues: defaultValues,
 		mode: 'onChange',
@@ -90,12 +90,12 @@ const LoginOtpScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [loginWithOtp, t]);
+	}, [loginWithOtp, t, toast]);
 	const handleVerifyOtp = useCallback(async (otp: string) => {
 		try {
 			setIsLoading(true);
 			const { error } = await supabase.auth.verifyOtp({
-				email: form.getValues('email'),
+				email: formGetValues('email'),
 				token: otp,
 				type: 'email',
 			});
@@ -121,7 +121,7 @@ const LoginOtpScreen = () => {
 			setIsLoading(false);
 			setOtp('');
 		}
-	}, [supabase, form, t]);
+	}, [supabase, formGetValues, t, toast]);
 	return (
 		<ImageBackground source={bgImage} style={{ flex: 1 }}>
 			<LinearGradient
@@ -184,7 +184,7 @@ const LoginOtpScreen = () => {
 								{t('pages.auth.login.otp.confirm_form.label')}
 							</Text>
 							<Text textColor='muted'>
-								{t('pages.auth.login.otp.confirm_form.description', { email: form.getValues('email') })}
+								{t('pages.auth.login.otp.confirm_form.description', { email: formGetValues('email') })}
 							</Text>
 						</View>
 						<InputOTP

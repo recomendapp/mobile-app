@@ -1,7 +1,6 @@
-import { UserActivityType, UserRecosType, UserWatchlistType, ViewType } from '@recomendapp/types';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import zustandStorage from './storage';
+import { zustandStorage } from './storage';
 
 type DeepPartial<T> = {
   [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];

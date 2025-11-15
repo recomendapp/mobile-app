@@ -3,7 +3,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useUserUpdateMutation } from "@/features/user/userMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
 import { Button } from "@/components/ui/Button";
@@ -79,7 +79,7 @@ const SettingsProfileScreen = () => {
 		bio: user?.bio,
 		website: user?.website,
 	};
-	const form = useForm<ProfileFormValues>({
+	const { watch: formWatch, reset: formReset, ...form} = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues,
 		mode: 'onChange',
@@ -89,13 +89,23 @@ const SettingsProfileScreen = () => {
 	const canSave = (hasFormChanged || newAvatar !== undefined) && form.formState.isValid;
 
 	// Avatar
-	const avatarOptions = [
+	const avatarOptions = useMemo(() => [
 		{ label: upperFirst(t('common.messages.choose_from_the_library')), value: "library" },
 		{ label: upperFirst(t('common.messages.take_a_photo')), value: "camera" },
 		{ label: upperFirst(t('common.messages.delete_current_image')), value: "delete", disable: !user?.avatar_url && !newAvatar },
-	];
+	], [t, user?.avatar_url, newAvatar]);
 	// Handlers
-	const handleAvatarOptions = () => {
+	const handleProcessImage = useCallback(async (image: ImagePickerAsset) => {
+		const processedImage = await ImageManipulator.manipulate(image.uri)
+			.resize({ width: 1024, height: 1024 })
+			.renderAsync()
+		return await processedImage.saveAsync({
+			compress: 0.8,
+			format: SaveFormat.JPEG,
+			base64: true,
+		})
+	}, []);
+	const handleAvatarOptions = useCallback(() => {
 		const options = [
 			...avatarOptions,
 			{ label: upperFirst(t('common.messages.cancel')), value: 'cancel' },
@@ -148,8 +158,8 @@ const SettingsProfileScreen = () => {
 					break;
 			};
 		});
-	};
-	const handleSubmit = async (values: ProfileFormValues) => {
+	}, [showActionSheetWithOptions, toast, t, user?.avatar_url, avatarOptions, handleProcessImage]);
+	const handleSubmit = useCallback(async (values: ProfileFormValues) => {
 		try {
 			if (!user) return;
 			setIsLoading(true);
@@ -190,31 +200,21 @@ const SettingsProfileScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
-	const handleProcessImage = async (image: ImagePickerAsset) => {
-		const processedImage = await ImageManipulator.manipulate(image.uri)
-			.resize({ width: 1024, height: 1024 })
-			.renderAsync()
-		return await processedImage.saveAsync({
-			compress: 0.8,
-			format: SaveFormat.JPEG,
-			base64: true,
-		})
-	};
+	}, [user, newAvatar, supabase, updateProfileMutation, toast, t]);
 
 	// useEffects
 	useEffect(() => {
 		if (user) {
-			form.reset({
+			formReset({
 				full_name: user.full_name,
 				bio: user.bio,
 				website: user.website,
 			});
 		}
-	}, [user]);
+	}, [user, formReset]);
 	// Track form changes
 	useEffect(() => {
-		const subscription = form.watch((value) => {
+		const subscription = formWatch((value) => {
 			const isFormChanged =
 				value.full_name !== defaultValues.full_name ||
 				(value.bio?.trim() || null) !== defaultValues.bio ||
@@ -222,7 +222,7 @@ const SettingsProfileScreen = () => {
 			setHasFormChanged(isFormChanged);
 		});
 		return () => subscription.unsubscribe();
-	}, [form.watch, defaultValues.full_name, defaultValues.bio, defaultValues.website]);
+	}, [formWatch, defaultValues.full_name, defaultValues.bio, defaultValues.website]);
 
 	return (
 	<>

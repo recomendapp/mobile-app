@@ -24,7 +24,7 @@ export const useRevenueCat = (session: Session | null | undefined) => {
     setIsInitialized(true);
   }, []);
 	const login = useCallback(async (userId: string) => {
-		const { customerInfo, created } = await Purchases.logIn(userId);
+		const { customerInfo } = await Purchases.logIn(userId);
 		setCustomerInfo(customerInfo);
 	}, []);
 
@@ -42,7 +42,7 @@ export const useRevenueCat = (session: Session | null | undefined) => {
       queryClient.setQueryData(Keys.auth.customerInfo(), null);
       setCustomerInfo(undefined);
     }
-  }, [session, isInitialized]);
+  }, [session, isInitialized, init, login, queryClient]);
 
   return { customerInfo, isInitialized, login };
 };

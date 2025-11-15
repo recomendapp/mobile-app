@@ -2,7 +2,7 @@ import { Camera, CameraRef, MapView, MapViewRef, MarkerView, OnPressEvent, Shape
 import styleJSON from "@/assets/map/style.json";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { BORDER_RADIUS, BORDER_RADIUS_FULL, GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Stack, useRouter } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -30,11 +30,11 @@ const ExploreScreen = () => {
 	const filters = useExploreStore((state) => state.filters);
 	const { colors } = useTheme();
 	const insets = useSafeAreaInsets();
-	const [userPosition, setUserPosition] = useState({
+	const userPosition = useMemo(() => ({
 		latitude: 48.5,
 		longitude: 2.5,
 		zoomLevel: 8,
-	});
+	}), []);
 	
 	const headerHeight = useHeaderHeight();
 	const { height: screenHeight } = useWindowDimensions();

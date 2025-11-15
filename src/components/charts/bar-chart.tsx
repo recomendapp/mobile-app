@@ -2,6 +2,7 @@ import { useTheme } from '@/providers/ThemeProvider';
 import { useEffect, useState } from 'react';
 import { LayoutChangeEvent, View, ViewStyle } from 'react-native';
 import Animated, {
+  SharedValue,
   useAnimatedProps,
   useSharedValue,
   withTiming,
@@ -31,6 +32,77 @@ type Props = {
   data: ChartDataPoint[];
   config?: ChartConfig;
   style?: ViewStyle;
+};
+
+const BarChartItem = ({
+  item,
+  index,
+  maxValue,
+  chartHeight,
+  barWidth,
+  barSpacing,
+  padding,
+  height,
+  colors,
+  showLabels,
+  animationProgress,
+} : {
+  item: ChartDataPoint;
+  index: number;
+  maxValue: number;
+  chartHeight: number;
+  barWidth: number;
+  barSpacing: number;
+  padding: number;
+  height: number;
+  colors: ReturnType<typeof useTheme>['colors'];
+  showLabels: boolean;
+  animationProgress: SharedValue<number>;
+}) => {
+  const barHeight = (item.value / maxValue) * chartHeight;
+  const x = padding + index * (barWidth + barSpacing) + barSpacing / 2;
+  const y = height - padding - barHeight;
+
+  const barAnimatedProps = useAnimatedProps(() => ({
+    height: animationProgress.value * barHeight,
+    y: height - padding - animationProgress.value * barHeight,
+  }));
+
+  return (
+    <G key={`bar-${index}`}>
+      <AnimatedRect
+        x={x}
+        width={barWidth}
+        fill={item.color || colors.accentYellow}
+        rx={4}
+        animatedProps={barAnimatedProps}
+      />
+
+      {showLabels && (
+        <>
+          <SvgText
+            x={x + barWidth / 2}
+            y={height - 5}
+            textAnchor='middle'
+            fontSize={12}
+            fill={colors.mutedForeground}
+          >
+            {item.label}
+          </SvgText>
+          <SvgText
+            x={x + barWidth / 2}
+            y={y - 5}
+            textAnchor='middle'
+            fontSize={11}
+            fill={colors.mutedForeground}
+            fontWeight='600'
+          >
+            {item.value}
+          </SvgText>
+        </>
+      )}
+    </G>
+  );
 };
 
 export const BarChart = ({ data, config = {}, style }: Props) => {
@@ -77,52 +149,22 @@ export const BarChart = ({ data, config = {}, style }: Props) => {
   return (
     <View style={[{ width: '100%', height }, style]} onLayout={handleLayout}>
       <Svg width={chartWidth} height={height}>
-        {data.map((item, index) => {
-          const barHeight = (item.value / maxValue) * chartHeight;
-          const x = padding + index * (barWidth + barSpacing) + barSpacing / 2;
-          const y = height - padding - barHeight;
-
-          const barAnimatedProps = useAnimatedProps(() => ({
-            height: animationProgress.value * barHeight,
-            y: height - padding - animationProgress.value * barHeight,
-          }));
-
-          return (
-            <G key={`bar-${index}`}>
-              <AnimatedRect
-                x={x}
-                width={barWidth}
-                fill={item.color || colors.accentYellow}
-                rx={4}
-                animatedProps={barAnimatedProps}
-              />
-
-              {showLabels && (
-                <>
-                  <SvgText
-                    x={x + barWidth / 2}
-                    y={height - 5}
-                    textAnchor='middle'
-                    fontSize={12}
-                    fill={colors.mutedForeground}
-                  >
-                    {item.label}
-                  </SvgText>
-                  <SvgText
-                    x={x + barWidth / 2}
-                    y={y - 5}
-                    textAnchor='middle'
-                    fontSize={11}
-                    fill={colors.mutedForeground}
-                    fontWeight='600'
-                  >
-                    {item.value}
-                  </SvgText>
-                </>
-              )}
-            </G>
-          );
-        })}
+        {data.map((item, index) => (
+          <BarChartItem
+          key={`bar-item-${index}`}
+          item={item}
+          index={index}
+          maxValue={maxValue}
+          chartHeight={chartHeight}
+          barWidth={barWidth}
+          barSpacing={barSpacing}
+          padding={padding}
+          height={height}
+          colors={colors}
+          showLabels={showLabels}
+          animationProgress={animationProgress}
+          />
+        ))}
       </Svg>
     </View>
   );

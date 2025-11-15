@@ -8,7 +8,7 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
 import { useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Text, useWindowDimensions, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
@@ -28,10 +28,10 @@ const UserCollectionMovieScreen = () => {
 	const { colors, tabBarHeight, bottomOffset } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
-	const sortByOptions: sortBy[] = [
+	const sortByOptions = useMemo((): sortBy[] => ([
 		{ label: upperFirst(t('common.messages.watched_date')), value: 'watched_date' },
 		{ label: upperFirst(t('common.messages.rating')), value: 'rating' },
-	];
+	]), [t]);
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	const {
@@ -50,7 +50,7 @@ const UserCollectionMovieScreen = () => {
 	});
 	const loading = movies === undefined || isLoading;
 	// Handlers
-	const handleSortBy = () => {
+	const handleSortBy = useCallback(() => {
 		const sortByOptionsWithCancel = [
 			...sortByOptions,
 			{ label: upperFirst(t('common.messages.cancel')), value: 'cancel' },
@@ -64,7 +64,7 @@ const UserCollectionMovieScreen = () => {
 			if (selectedIndex === undefined || selectedIndex === cancelIndex) return;
 			setSortBy(sortByOptionsWithCancel[selectedIndex] as sortBy);
 		});
-	};
+	}, [sortByOptions, showActionSheetWithOptions, sortBy.value, t]);
 	
 	return (
 	<>

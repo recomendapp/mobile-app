@@ -4,7 +4,7 @@ import * as z from 'zod';
 import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
@@ -44,14 +44,14 @@ const SettingsAppearanceScreen = () => {
 	const defaultValues: Partial<ProfileFormValues> = {
 		locale: locale,
 	};
-	const form = useForm<ProfileFormValues>({
+	const { reset: formReset, ...form} = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues,
 		mode: 'onChange',
 	});
 
 	// Handlers
-	const handleSubmit = async (data: ProfileFormValues) => {
+	const handleSubmit = useCallback(async (data: ProfileFormValues) => {
 		try {
 			setIsLoading(true);
 			if (session) {
@@ -61,7 +61,7 @@ const SettingsAppearanceScreen = () => {
 			}
 			setLocale(data.locale);
 			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
-			form.reset();
+			formReset();
 			queryClient.clear();
 			queryClient.invalidateQueries();
 		} catch (error) {
@@ -73,14 +73,14 @@ const SettingsAppearanceScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, [setLocale, session, updateUser, t, toast, queryClient, formReset]);
 
 	// useEffects
 	useEffect(() => {
-		form.reset({
+		formReset({
 			locale: locale,
 		});
-	}, [locale]);
+	}, [locale, formReset]);
 
 	return (
 		<>

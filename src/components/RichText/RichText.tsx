@@ -1,5 +1,5 @@
 import { RichText as RNRichText } from "@10play/tentap-editor";
-import { forwardRef, useCallback } from "react";
+import { useCallback } from "react";
 import { Linking } from "react-native";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import Constants from "expo-constants";
@@ -29,7 +29,7 @@ export const RichText = (props: React.ComponentProps<typeof RNRichText>) => {
 		}
 		
 		return false;
-	}, []);
+	}, [appDomain, router]);
 
 	return (
 		<RNRichText

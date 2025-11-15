@@ -13,6 +13,7 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
+import { useCallback } from "react";
 
 const FollowRequestsScreen = () => {
 	const t = useTranslations();
@@ -38,7 +39,7 @@ const FollowRequestsScreen = () => {
 	});
 
 	// Handlers
-	const handleAcceptRequest = async (requestId: number) => {
+	const handleAcceptRequest = useCallback(async (requestId: number) => {
 		await acceptRequest({
 			requestId
 		}, {
@@ -49,8 +50,8 @@ const FollowRequestsScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
-	const handleDeclineRequest = async (requestId: number) => {
+	}, [acceptRequest, toast, t]);
+	const handleDeclineRequest = useCallback(async (requestId: number) => {
 		await declineRequest({
 			requestId
 		}, {
@@ -61,7 +62,7 @@ const FollowRequestsScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
+	}, [declineRequest, toast, t]);
 
 	return (
 	<>

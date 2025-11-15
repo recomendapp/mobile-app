@@ -10,7 +10,7 @@ import { useTranslations } from 'use-intl';
 import { GAP, PADDING_HORIZONTAL } from '@/theme/globals';
 import { Input } from '@/components/ui/Input';
 import { Text } from '@/components/ui/text';
-import z from 'zod';
+import { z } from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { View } from '@/components/ui/view';

@@ -1,5 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button } from '@/components/ui/Button';
 import { Link, useNavigation } from 'expo-router';
@@ -45,15 +45,15 @@ const ForgotPasswordScreen = () => {
 	const [otp, setOtp] = useState('');
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
-	const forgotPasswordSchema = useMemo(() => z.object({
+	const forgotPasswordSchema = z.object({
 		email: z.email({
 			error: t('common.form.email.error.invalid')
 		})
-	}), [t]);
+	});
 	type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
-	const defaultValues = useMemo((): Partial<ForgotPasswordFormValues> => ({
+	const defaultValues: Partial<ForgotPasswordFormValues> = {
 		email: '',
-	}), []);
+	};
 	const form = useForm<ForgotPasswordFormValues>({
 		resolver: zodResolver(forgotPasswordSchema),
 		defaultValues: defaultValues,
@@ -83,7 +83,7 @@ const ForgotPasswordScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [resetPasswordForEmail, t]);
+	}, [resetPasswordForEmail, t, toast]);
 	const handleVerifyOtp = useCallback(async (otp: string) => {
 		try {
 			setIsLoading(true);
@@ -109,7 +109,7 @@ const ForgotPasswordScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [supabase, t, form]);
+	}, [supabase, form, t, toast]);
 	return (
 		<ImageBackground source={bgImage} style={{ flex: 1 }}>
 			<LinearGradient

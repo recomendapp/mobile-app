@@ -34,12 +34,12 @@ const HeaderLeft = () => {
   const t = useTranslations();
   const now = useNow();
 
-   const hour = now.getHours();
-    const timeOfDay =
-      hour < 5 ? 'night' :
-      hour < 12 ? 'morning' :
-      hour < 18 ? 'afternoon' :
-      'evening';
+  const hour = now.getHours();
+  const timeOfDay =
+    hour < 5 ? 'night' :
+    hour < 12 ? 'morning' :
+    hour < 18 ? 'afternoon' :
+    'evening';
 
   if (session) {
     return user ? (

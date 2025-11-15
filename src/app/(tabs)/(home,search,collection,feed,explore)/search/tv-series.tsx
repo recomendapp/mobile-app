@@ -1,6 +1,5 @@
 import { useSearchTvSeriesOptions } from "@/api/options";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
-import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import TrueSheet from "@/components/ui/TrueSheet";
 import { View } from "@/components/ui/view";
@@ -14,30 +13,30 @@ import { TrueSheet as RNTrueSheet } from "@lodev09/react-native-true-sheet";
 import { useScrollToTop } from "@react-navigation/native";
 import { MediaTvSeries } from "@recomendapp/types";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useNavigation } from "expo-router";
+// import { useNavigation } from "expo-router";
 import { upperFirst } from "lodash";
 import { useRef, forwardRef } from "react";
 import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
-const FiltersButton = ({ onPress }: { onPress: () => void }) => {
-	return (
-		<View
-		style={[
-			tw`flex-row items-center`, 
-			{ gap: GAP }
-		]}
-		>
-			<Button
-				variant="ghost"
-				icon={Icons.Filters}
-				size="icon"
-				onPress={onPress}
-			/>
-		</View>
-	);
-};
+// const FiltersButton = ({ onPress }: { onPress: () => void }) => {
+// 	return (
+// 		<View
+// 		style={[
+// 			tw`flex-row items-center`, 
+// 			{ gap: GAP }
+// 		]}
+// 		>
+// 			<Button
+// 				variant="ghost"
+// 				icon={Icons.Filters}
+// 				size="icon"
+// 				onPress={onPress}
+// 			/>
+// 		</View>
+// 	);
+// };
 
 const FiltersSheet = forwardRef<RNTrueSheet>((_, ref) => {
 	const insets = useSafeAreaInsets();
@@ -46,9 +45,9 @@ const FiltersSheet = forwardRef<RNTrueSheet>((_, ref) => {
 
 	return (
 		<TrueSheet
-			ref={ref}
-			sizes={['auto']}
-			scrollRef={filtersScrollViewRef as React.RefObject<React.Component<unknown, {}, any>>}
+		ref={ref}
+		sizes={['auto']}
+		scrollRef={filtersScrollViewRef as React.RefObject<React.Component>}
 		>
 			<ScrollView
 				ref={filtersScrollViewRef}
@@ -76,7 +75,7 @@ FiltersSheet.displayName = 'FiltersSheet';
 const SearchTvSeriesScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { tabBarHeight, bottomOffset } = useTheme();
-	const navigation = useNavigation();
+	// const navigation = useNavigation();
 	const t = useTranslations();
 	const search = useSearchStore(state => state.search);
 	

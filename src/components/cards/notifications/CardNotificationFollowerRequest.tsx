@@ -1,17 +1,17 @@
 import tw from "@/lib/tw";
-import { Database, Profile } from "@recomendapp/types";
+import { Database, Profile, FixedOmit } from "@recomendapp/types";
 import * as React from "react"
-import Animated, { runOnJS } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { View } from "react-native";
 import { useRouter } from "expo-router";
 import { Text } from "@/components/ui/text";
-import { FixedOmit } from "@recomendapp/types";
 import { useTranslations } from "use-intl";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { CardUser } from "../CardUser";
 import { useTheme } from "@/providers/ThemeProvider";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { scheduleOnRN } from "react-native-worklets";
 
 interface CardNotificationFollowerRequestBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -49,7 +49,7 @@ const CardNotificationFollowerRequestDefault = React.forwardRef<
 			params: { username: follower.username }
 		});
 		onPress?.();
-	}, [router, follower?.username]);
+	}, [router, follower?.username, onPress]);
 	return (
 		<Animated.View
 			ref={ref}
@@ -88,22 +88,20 @@ const CardNotificationFollowerRequest = React.forwardRef<
 	CardNotificationFollowerRequestProps
 >(({ variant = "default", ...props }, ref) => {
 	const router = useRouter();
-	const navigate = React.useCallback(() => {
+	const navigate = () => {
 		if (props.skeleton) return;
 		router.push({
 			pathname: '/notifications/follow-requests',
 		})
 		props.onPress?.();
-	}, [router, props.follower?.username, props.onPress]);
-	const tapGesture = React.useMemo(() => (
-		Gesture.Tap()
-			.maxDuration(250)
-			.onEnd((_e, success) => {
-				if (success) {
-					runOnJS(navigate)();
-				}
-			})
-	), [navigate]);
+	};
+	const tapGesture = Gesture.Tap()
+		.maxDuration(250)
+		.onEnd((_e, success) => {
+			if (success) {
+				scheduleOnRN(navigate);
+			}
+		});
 	const content = (
 		variant === "default" ? (
 			<CardNotificationFollowerRequestDefault ref={ref} {...props} />

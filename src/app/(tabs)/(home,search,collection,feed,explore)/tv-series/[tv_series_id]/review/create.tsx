@@ -11,6 +11,7 @@ import { useUserReviewTvSeriesUpsertMutation } from "@/features/user/userMutatio
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
+import { useCallback } from "react";
 
 const ReviewTvSeriesCreateScreen = () => {
 	const { user } = useAuth();
@@ -41,7 +42,7 @@ const ReviewTvSeriesCreateScreen = () => {
 	});
 
 	// Handlers
-	const handleSave = async (data: { title: string; body: object }) => {
+	const handleSave = useCallback(async (data: { title: string; body: object }) => {
 		await insertReview({
 			activityId: activity?.id,
 			title: data.title || null,
@@ -54,7 +55,7 @@ const ReviewTvSeriesCreateScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
+	}, [activity?.id, insertReview, router, tvSeries?.slug, tvSeries?.id, toast, t]);
 
 	if (tvSeries === null) {
 		return (

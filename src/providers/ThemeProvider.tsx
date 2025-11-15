@@ -33,11 +33,9 @@ export const ThemeProvider = ({children}: ThemeProviderProps) => {
 	const [tabBarHeight, setTabBarHeight] = useState(0);
 	const [keyboardOffset, setKeyboardToolbarOffset] = useState(0);
 
-	const bottomOffset = useMemo(() => {
-		return tabBarHeight + insets.bottom;
-	}, [tabBarHeight, insets.bottom]);
+	const bottomOffset = useMemo(() => tabBarHeight + insets.bottom, [tabBarHeight, insets.bottom]);
 
-	const defaultScreenOptions = useMemo((): NativeStackNavigationOptions => ({
+	const defaultScreenOptions: NativeStackNavigationOptions = {
 		animation: 'ios_from_right',
 		headerShown: true,
 		headerTintColor: colors.foreground,
@@ -46,34 +44,32 @@ export const ThemeProvider = ({children}: ThemeProviderProps) => {
 		},
 		headerShadowVisible: false,
 		headerTitleAlign: 'center',
-	}), [colors]);
+	};
 
 	const applyColors = useCallback((colorTheme: TColors) => {
 		setColors(colorTheme);
 	}, []);
 
-	const mode = useMemo((): ThemeMode => {
-		return getModeFromColor(colors.background);
-	}, [colors]);
-
-	const contextValue = useMemo(() => ({
-		applyColors,
-		colors,
-		tabBarHeight,
-		setTabBarHeight,
-		bottomOffset,
-		defaultScreenOptions,
-		mode,
-		keyboardOffset,
-		setKeyboardToolbarOffset,
-	}), [applyColors, colors, tabBarHeight, setTabBarHeight, bottomOffset, defaultScreenOptions, mode, keyboardOffset, setKeyboardToolbarOffset]);
+	const mode = useMemo((): ThemeMode => getModeFromColor(colors.background), [colors.background]);
 
 	useEffect(() => {
 		DefaultTheme.colors.background = colors.background;
 	}, [colors]);
 
 	return (
-		<ThemeContext.Provider value={contextValue}>
+		<ThemeContext.Provider
+		value={{
+			applyColors,
+			colors,
+			tabBarHeight,
+			setTabBarHeight,
+			bottomOffset,
+			defaultScreenOptions,
+			mode,
+			keyboardOffset,
+			setKeyboardToolbarOffset,
+		}}
+		>
 			{children}
 		</ThemeContext.Provider>
 	);

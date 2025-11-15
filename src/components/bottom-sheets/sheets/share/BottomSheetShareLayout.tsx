@@ -253,7 +253,7 @@ const BottomSheetShareLayout = forwardRef<
     return (
         <TrueSheet
         ref={ref}
-        scrollRef={scrollRef as React.RefObject<React.Component<unknown, {}, any>>}
+        scrollRef={scrollRef as React.RefObject<React.Component>}
         contentContainerStyle={tw`p-0`}
         {...props}
         >

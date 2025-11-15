@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert, Pressable } from "react-native";
 import { useTranslations } from "use-intl";
@@ -122,7 +122,7 @@ const PlaylistMovieAdd = () => {
 	}, [search, playlists, fuse]);
 
 	// Handlers
-	const handleTogglePlaylist = (playlist: Playlist) => {
+	const handleTogglePlaylist = useCallback((playlist: Playlist) => {
 		setSelected((prev) => {
 			const isSelected = prev.some((p) => p.id === playlist.id);
 			if (isSelected) {
@@ -130,8 +130,8 @@ const PlaylistMovieAdd = () => {
 			}
 			return [...prev, playlist];
 		});
-	};
-	const handleSubmit = async (values: AddMovieToPlaylistFormValues) => {
+	}, []);
+	const handleSubmit = useCallback(async (values: AddMovieToPlaylistFormValues) => {
 		if (!session) return;
 		if (selected.length === 0) return;
 		await addToPlaylistMutation({
@@ -148,8 +148,8 @@ const PlaylistMovieAdd = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
-	const handleCancel = () => {
+	}, [session, selected, movieId, addToPlaylistMutation, toast, router, t]);
+	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
 				upperFirst(t('common.messages.are_u_sure')),
@@ -168,8 +168,8 @@ const PlaylistMovieAdd = () => {
 		} else {
 			router.dismiss();
 		}
-	};
-	const onCreatePlaylist = (playlist: Playlist) => {
+	}, [canSave, router, t, mode]);
+	const onCreatePlaylist = useCallback((playlist: Playlist) => {
 		BottomSheetPlaylistCreateRef.current?.dismiss();
 		queryClient.setQueryData(playlistKeys.addToSource({
 			id: movieId,
@@ -183,7 +183,7 @@ const PlaylistMovieAdd = () => {
 			];
 		});
 		setSelected((prev) => [...prev, playlist]);
-	};
+	}, [queryClient, movieId]);
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {

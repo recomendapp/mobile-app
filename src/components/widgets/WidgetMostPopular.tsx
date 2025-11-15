@@ -3,8 +3,6 @@ import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { LegendList } from "@legendapp/list";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
-import { useCallback, useMemo } from "react";
-import { Database } from "@recomendapp/types";
 import { CardMovie } from "../cards/CardMovie";
 import { CardTvSeries } from "../cards/CardTvSeries";
 import { GAP, WIDTH_CARD_XS } from "@/theme/globals";
@@ -30,33 +28,7 @@ export const WidgetMostPopular = ({
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery(useWidgetMostPopularOptions());
-  const medias = useMemo(() => data?.pages.flat() || [], [data]);
-
-  const renderItem = useCallback(({ item }: { item: Database['public']['Functions']['get_widget_most_popular']['Returns'][number] }) => {
-    switch (item.type) {
-      case 'movie':
-        return <CardMovie variant="poster" movie={item.media} style={{ width: WIDTH_CARD_XS }} />;
-      case 'tv_series':
-        return <CardTvSeries variant="poster" tvSeries={item.media} style={{ width: WIDTH_CARD_XS }} />;
-      default:
-        return null;
-    }
-  }, []);
-
-  const keyExtractor = useCallback((item: Database['public']['Functions']['get_widget_most_popular']['Returns'][number]) => 
-    `${item.type}-${item.media_id}`, 
-    []
-  );
-  const onEndReached = useCallback(() => {
-    if (hasNextPage) {
-      fetchNextPage();
-    }
-  }, [fetchNextPage, hasNextPage]);
-
-  const ItemSeparatorComponent = useCallback(() => 
-    <View style={{ width: GAP }} />, 
-    []
-  );
+  const medias = data?.pages.flat() || [];
 
   if (!medias.length) {
     return null;
@@ -69,14 +41,20 @@ export const WidgetMostPopular = ({
       </Text>
       <LegendList
         data={medias}
-        renderItem={renderItem}
+        renderItem={({ item }) => (
+          item.type === 'movie'
+            ? <CardMovie variant="poster" movie={item.media} style={{ width: WIDTH_CARD_XS }} />
+          : item.type === 'tv_series'
+            ? <CardTvSeries variant="poster" tvSeries={item.media} style={{ width: WIDTH_CARD_XS }} />
+          : null
+        )}
         snapToInterval={WIDTH_CARD_XS + GAP}
         decelerationRate="fast"
-        keyExtractor={keyExtractor}
-        onEndReached={onEndReached}
+        keyExtractor={(item) =>  `${item.type}-${item.media_id}`}
+        onEndReached={() => hasNextPage && fetchNextPage()}
         horizontal
         showsHorizontalScrollIndicator={false}
-        ItemSeparatorComponent={ItemSeparatorComponent}
+        ItemSeparatorComponent={() => <View style={{ width: GAP }} />}
         contentContainerStyle={containerStyle}
         nestedScrollEnabled
       />
