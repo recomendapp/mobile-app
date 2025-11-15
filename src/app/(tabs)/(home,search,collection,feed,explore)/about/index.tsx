@@ -3,77 +3,77 @@ import { View } from '@/components/ui/view';
 import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
 import { Link } from 'expo-router';
-import { useMemo } from 'react';
+// import { useMemo } from 'react';
 
 
 const AboutScreen = () => {
   const { colors, bottomOffset } = useTheme();
-	const resources = useMemo(() => [
-		{
-			name: 'Eyecandy',
-			link: 'https://eycndy.co',
-		},
-		{
-			name: 'Are.na',
-			link: 'https://www.are.na',
-		},
-		{
-			name: 'Savee',
-			link: 'https://savee.it',
-		},
-		{
-			name: 'Flimgrab',
-			link: 'https://film-grab.com/',
-		},
-		{
-			name: 'Flim',
-			link: 'https://flim.ai/',
-		},
-		{
-			name: 'Directors Library',
-			link: 'https://directorslibrary.com/',
-		},
-		{
-			name: 'Shotdeck',
-			link: 'https://shotdeck.com/',
-		},
-		{
-			name: 'Kive',
-			link: 'https://www.kive.ai',
-		},
-		{
-			name: 'Mymind',
-			link: 'https://mymind.com/',
-		},
-		{
-			name: 'My 2000s TV',
-			link: 'https://www.my00stv.com/',
-		},
-		{
-			name: 'Art of the title',
-			link: 'https://www.artofthetitle.com/',
-		},
-		{
-			name: 'Short of the Week',
-			link: 'https://www.shortoftheweek.com',
-		},
-		{
-			name: 'Frame Set',
-			link: 'https://frameset.app',
-		},
-		{
-			name: 'Infomaniak',
-			link: 'https://www.infomaniak.com',
-		},
-		{
-			name: 'Pousse ta fonte',
-			link: 'https://www.poussetafonte.com/',
-		},
-		{
-			name: 'FontBrief',
-			link: 'https://www.fontbrief.com',
-		},
-	], []);
+	// const resources = useMemo(() => [
+	// 	{
+	// 		name: 'Eyecandy',
+	// 		link: 'https://eycndy.co',
+	// 	},
+	// 	{
+	// 		name: 'Are.na',
+	// 		link: 'https://www.are.na',
+	// 	},
+	// 	{
+	// 		name: 'Savee',
+	// 		link: 'https://savee.it',
+	// 	},
+	// 	{
+	// 		name: 'Flimgrab',
+	// 		link: 'https://film-grab.com/',
+	// 	},
+	// 	{
+	// 		name: 'Flim',
+	// 		link: 'https://flim.ai/',
+	// 	},
+	// 	{
+	// 		name: 'Directors Library',
+	// 		link: 'https://directorslibrary.com/',
+	// 	},
+	// 	{
+	// 		name: 'Shotdeck',
+	// 		link: 'https://shotdeck.com/',
+	// 	},
+	// 	{
+	// 		name: 'Kive',
+	// 		link: 'https://www.kive.ai',
+	// 	},
+	// 	{
+	// 		name: 'Mymind',
+	// 		link: 'https://mymind.com/',
+	// 	},
+	// 	{
+	// 		name: 'My 2000s TV',
+	// 		link: 'https://www.my00stv.com/',
+	// 	},
+	// 	{
+	// 		name: 'Art of the title',
+	// 		link: 'https://www.artofthetitle.com/',
+	// 	},
+	// 	{
+	// 		name: 'Short of the Week',
+	// 		link: 'https://www.shortoftheweek.com',
+	// 	},
+	// 	{
+	// 		name: 'Frame Set',
+	// 		link: 'https://frameset.app',
+	// 	},
+	// 	{
+	// 		name: 'Infomaniak',
+	// 		link: 'https://www.infomaniak.com',
+	// 	},
+	// 	{
+	// 		name: 'Pousse ta fonte',
+	// 		link: 'https://www.poussetafonte.com/',
+	// 	},
+	// 	{
+	// 		name: 'FontBrief',
+	// 		link: 'https://www.fontbrief.com',
+	// 	},
+	// ], []);
 
   return (
     <View style={[tw`flex-1 items-center justify-center`, { marginBottom: bottomOffset}]}>

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { MediaTvSeries, UserActivityTvSeries } from "@recomendapp/types";
+import { MediaTvSeries, UserActivityTvSeries, FixedOmit } from "@recomendapp/types";
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "../utils/ImageWithFallback";
 import { Href, useRouter } from "expo-router";
@@ -8,7 +8,6 @@ import { Pressable, View } from "react-native";
 import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { IconMediaRating } from "../medias/IconMediaRating";
-import { FixedOmit } from "@recomendapp/types";
 import { Skeleton } from "../ui/Skeleton";
 import BottomSheetTvSeries from "../bottom-sheets/sheets/BottomSheetTvSeries";
 import { Text } from "../ui/text";
@@ -206,7 +205,7 @@ const CardTvSeries = React.forwardRef<
 	const content = (
 		variant === "default" ? (
 			<CardTvSeriesDefault ref={ref} {...props} />
-		) : variant == "poster" ? (
+		) : variant === "poster" ? (
 			<CardTvSeriesPoster ref={ref} {...props} />
 		) : variant === "list" ? (
 			<CardTvSeriesList ref={ref} {...props} />

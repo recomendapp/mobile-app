@@ -15,7 +15,7 @@ import { Profile } from "@recomendapp/types";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Alert } from "react-native";
 import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
@@ -69,7 +69,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 	const { mutateAsync: upsertGuestsMutation, isPending: isUpsertingGuests } = usePlaylistGuestsUpsertMutation();
 
 	// Handlers
-	const handleToggleUser = (user: Profile) => {
+	const handleToggleUser = useCallback((user: Profile) => {
 		setSelectedUsers((prev) => {
 			const isSelected = prev.some((u) => u.id === user.id);
 			if (isSelected) {
@@ -77,8 +77,8 @@ const ModalPlaylistEditGuestsAdd = () => {
 			}
 			return [...prev, user];
 		});
-	};
-	const handleSubmit = async () => {
+	}, []);
+	const handleSubmit = useCallback(async () => {
 		try {
 			if (selectedUsers.length === 0) return;
 			await upsertGuestsMutation({
@@ -100,8 +100,8 @@ const ModalPlaylistEditGuestsAdd = () => {
 			}
 			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		}
-	};
-	const handleCancel = () => {
+	}, [playlistId, selectedUsers, upsertGuestsMutation, toast, router, t]);
+	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
 				upperFirst(t('common.messages.are_u_sure')),
@@ -120,7 +120,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 		} else {
 			router.dismiss();
 		}
-	};
+	}, [canSave, router, t, mode]);
 
 
 	// AnimatedStyles

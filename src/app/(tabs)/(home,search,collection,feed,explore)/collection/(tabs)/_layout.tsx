@@ -26,10 +26,6 @@ const MaterialTopTabs = withLayoutContext<
 
 const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => {
 	const flatListRef = useRef<FlatList>(null);
-	
-	useEffect(() => {
-		onPressTab(state.routes[state.index], state.index, true);
-	}, [state.index]);
 
 	const onPressTab = useCallback((item: typeof state.routes[0], index: number, isFocused: boolean) => {
 		const event = navigation.emit({
@@ -43,7 +39,7 @@ const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => 
 		}
 
 		flatListRef.current?.scrollToIndex({ index, animated: true });
-	}, [navigation]);
+	}, [navigation, state]);
 
 	const renderItem = useCallback(({ item, index } : { item: NavigationRoute<ParamListBase, string>, index: number }) => {
 		const { options } = descriptors[item.key];
@@ -73,15 +69,19 @@ const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => 
 				{upperFirst(label)}
 			</Button>
 		);
-	}, [descriptors, navigation, state.index]);
-	const keyExtractor = useCallback((item: NavigationRoute<ParamListBase, string>) => item.key, []);
+	}, [descriptors, navigation, state]);
+
+	useEffect(() => {
+		onPressTab(state.routes[state.index], state.index, true);
+	}, [onPressTab, state.index, state.routes]);
+
 	return (
 		<View>
 			<Animated.FlatList
 			ref={flatListRef}
 			data={state.routes}
 			renderItem={renderItem}
-			keyExtractor={keyExtractor}
+			keyExtractor={(item) => item.key}
 			contentContainerStyle={{
 				gap: GAP,
 				paddingHorizontal: PADDING_HORIZONTAL,

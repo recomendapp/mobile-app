@@ -114,7 +114,7 @@ const FilmCreditsScreen = () => {
 			default:
 				return null;
 		}
-	}, []);
+	}, [colors.muted]);
 	const getItemType = useCallback((item: typeof flatCredits[number]) => {
 		if (typeof item === "string") return "department";
 		if (item.type === "job") return "job";

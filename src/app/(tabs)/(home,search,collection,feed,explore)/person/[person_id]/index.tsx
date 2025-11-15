@@ -17,21 +17,17 @@ import { useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
 import { View } from "react-native"
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
-import { useTranslations } from "use-intl";
 
 const PersonScreen = () => {
 	const { person_id } = useLocalSearchParams<{ person_id: string }>();
 	const { id: personId } = getIdFromSlug(person_id);
 	const { bottomOffset, tabBarHeight } = useTheme();
 	const { session } = useAuth();
-	const t = useTranslations();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	// Queries
 	const {
 		data: person,
 		isLoading,
-		isRefetching,
-		refetch
 	} = useMediaPersonQuery({
 		personId: personId,
 	});

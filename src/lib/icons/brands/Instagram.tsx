@@ -4,7 +4,6 @@ import { BrandIconProps } from "./type";
 
 const Instagram = forwardRef<Svg, BrandIconProps>((props, ref) => {
 	const { variant = 'colored', size = 24, ...otherProps } = props;
-	const fill = variant === 'dark' ? '#FFFFFF' : variant === 'light' ? '#000000' : undefined;
 	if (variant !== 'colored') {
 	}
 	return (
@@ -14,7 +13,7 @@ const Instagram = forwardRef<Svg, BrandIconProps>((props, ref) => {
 		height={size}
 		viewBox="0 0 24.01 24"
 		fill="none"
-		{...props}
+		{...otherProps}
 		>
 		<Defs>
 			<RadialGradient

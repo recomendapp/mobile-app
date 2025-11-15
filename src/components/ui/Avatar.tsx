@@ -1,6 +1,5 @@
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
-import React from 'react';
 import {
   Image as EImage,
   ImageProps as EImageProps,
@@ -10,6 +9,7 @@ import {
 } from 'expo-image';
 import Animated from 'react-native-reanimated';
 import { ViewProps } from 'react-native';
+import { createContext, forwardRef, use, useCallback, useEffect, useState } from 'react';
 
 // Types
 type AvatarState = 'loading' | 'error' | 'loaded';
@@ -34,19 +34,19 @@ interface FallbackProps {
 }
 
 // Context
-interface RootContext {
+interface AvatarRootContext {
   alt: string;
   status: AvatarState;
   setStatus: (status: AvatarState) => void;
   containerSize: { width: number; height: number };
 }
 
-const RootContext = React.createContext<RootContext | null>(null);
+const RootContext = createContext<AvatarRootContext | null>(null);
 
 // Root Component
-const Root = React.forwardRef<Animated.View, RootProps>(({ alt, style, children }, ref) => {
-  const [status, setStatus] = React.useState<AvatarState>('error');
-  const [containerSize, setContainerSize] = React.useState<{ width: number; height: number }>({
+const Root = forwardRef<Animated.View, RootProps>(({ alt, style, children }, ref) => {
+  const [status, setStatus] = useState<AvatarState>('error');
+  const [containerSize, setContainerSize] = useState<{ width: number; height: number }>({
     width: 40,
     height: 40,
   });
@@ -76,7 +76,7 @@ Root.displayName = 'RootAvatar';
 
 // Hook pour utiliser le contexte
 function useRootContext() {
-  const context = React.use(RootContext);
+  const context = use(RootContext);
   if (!context) {
     throw new Error('Avatar components must be used within Avatar.Root');
   }
@@ -84,11 +84,11 @@ function useRootContext() {
 }
 
 // Image Component
-const Image = React.forwardRef<EImage, ImageProps>(
+const Image = forwardRef<EImage, ImageProps>(
   ({ source, style, onLoad: onLoadProp, onError: onErrorProp, onLoadingStatusChange }, ref) => {
     const { alt, setStatus, status } = useRootContext();
 
-    React.useEffect(() => {
+    useEffect(() => {
       if (isValidSource(source)) {
         setStatus('loading');
       }
@@ -97,23 +97,17 @@ const Image = React.forwardRef<EImage, ImageProps>(
       };
     }, [source, setStatus]);
 
-    const onLoad = React.useCallback(
-      (e: ImageLoadEventData) => {
-        setStatus('loaded');
-        onLoadingStatusChange?.('loaded');
-        onLoadProp?.(e);
-      },
-      [onLoadProp, onLoadingStatusChange, setStatus]
-    );
+    const onLoad = useCallback((e: ImageLoadEventData) => {
+      setStatus('loaded');
+      onLoadingStatusChange?.('loaded');
+      onLoadProp?.(e);
+    }, [onLoadProp, onLoadingStatusChange, setStatus]);
 
-    const onError = React.useCallback(
-      (e: ImageErrorEventData) => {
-        setStatus('error');
-        onLoadingStatusChange?.('error');
-        onErrorProp?.(e);
-      },
-      [onErrorProp, onLoadingStatusChange, setStatus]
-    );
+    const onError = useCallback((e: ImageErrorEventData) => {
+      setStatus('error');
+      onLoadingStatusChange?.('error');
+      onErrorProp?.(e);
+    }, [onErrorProp, onLoadingStatusChange, setStatus]);
 
     if (status === 'error') {
       return null;
@@ -138,7 +132,7 @@ const Image = React.forwardRef<EImage, ImageProps>(
 Image.displayName = 'ImageAvatar';
 
 // Fallback Component
-const Fallback = React.forwardRef<Animated.View, FallbackProps>(({ style }, ref) => {
+const Fallback = forwardRef<Animated.View, FallbackProps>(({ style }, ref) => {
   const { colors } = useTheme();
   const { alt, status, containerSize } = useRootContext();
 

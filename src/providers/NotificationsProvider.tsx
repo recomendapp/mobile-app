@@ -1,4 +1,4 @@
-import { createContext, use, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, use, useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
 import { useAuth } from "./AuthProvider";
 import { useSupabaseClient } from "./SupabaseProvider";
@@ -44,7 +44,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
   const notificationsListener = useRef<Notifications.EventSubscription | null>(null);
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
 
-  const handleRegisterForPushNotificationsAsync = useCallback(async () => {
+  const handleRegisterForPushNotificationsAsync = async () => {
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('default', {
         name: 'default',
@@ -76,8 +76,8 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     } else {
       throw new Error('Must use physical device for push notifications');
     }
-  }, []);
-  const handleSaveToken = useCallback(async (token: string) => {
+  };
+  const handleSaveToken = async (token: string) => {
     try {
       if (!session) return;
       const provider = (Platform.OS === 'ios' || Platform.OS === 'macos') ? 'apns' : 'fcm';
@@ -94,9 +94,9 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     } catch (err) {
       console.error("Error saving push token:", err);
     }
-  }, [session, supabase]);
+  };
   
-  const handleRedirect = useCallback((data: NotificationPayload) => {
+  const handleRedirect = (data: NotificationPayload) => {
     switch (data.type) {
       case 'reco_sent_movie':
         router.push({
@@ -119,8 +119,8 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
       default:
         break;
     }
-  }, [router]);
-  const handleResponse = useCallback((response: Notifications.NotificationResponse) => {
+  };
+  const handleResponse = (response: Notifications.NotificationResponse) => {
     // iOS APNs : data in response.notification.request.trigger.payload.data
     // Android FCM : data in response.notification.request.content.data
     const data = (
@@ -130,9 +130,9 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     if (data) {
       handleRedirect(data);
     }
-  }, [handleRedirect]);
+  };
 
-  const handleToast = useCallback((notification: Notifications.Notification) => {
+  const handleToast = (notification: Notifications.Notification) => {
     const data = (
       notification.request.content.data ||
       (notification.request.trigger as any).payload.data
@@ -141,7 +141,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
       description: notification.request.content.body ?? undefined,
       onPress: (data && data.type) ? () => handleRedirect(data) : undefined,
     });
-  }, [handleRedirect, toast]);
+  };
 
   useEffect(() => {
     if (!session) return;
@@ -196,19 +196,19 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     }
   }, [session, subscriberHash, isMounted]);
 
-  const contextValue = useMemo(() => ({
-    isMounted,
-    permissionStatus,
-    pushToken,
-    notifications,
-    error
-  }), [isMounted, permissionStatus, pushToken, notifications, error]);
-
-  const defaultProvider = useMemo(() => (
-    <NotificationsContext.Provider value={contextValue}>
+  const defaultProvider = (
+    <NotificationsContext.Provider
+    value={{
+      isMounted,
+      permissionStatus,
+      pushToken,
+      notifications,
+      error
+    }}
+    >
       {children}
     </NotificationsContext.Provider>
-  ), [contextValue, children]);
+  );
 
   if (!session || !subscriberHash) return defaultProvider;
 

@@ -10,9 +10,9 @@ import useSearchStore from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList, LegendListRef } from "@legendapp/list";
 import { useScrollToTop } from "@react-navigation/native";
-import { useNavigation } from "expo-router";
+// import { useNavigation } from "expo-router";
 import { upperFirst } from "lodash";
-import { useRef, useState, forwardRef } from "react";
+import { useRef, forwardRef } from "react";
 import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
@@ -29,7 +29,7 @@ const FiltersSheet = forwardRef<RNTrueSheet>((_, ref) => {
 		<TrueSheet
 			ref={ref}
 			sizes={['auto']}
-			scrollRef={filtersScrollViewRef as React.RefObject<React.Component<unknown, {}, any>>}
+			scrollRef={filtersScrollViewRef as React.RefObject<React.Component>}
 		>
 			<ScrollView
 				ref={filtersScrollViewRef}
@@ -57,15 +57,15 @@ FiltersSheet.displayName = 'FiltersSheet';
 const SearchFilmsScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { tabBarHeight, bottomOffset } = useTheme();
-	const navigation = useNavigation();
+	// const navigation = useNavigation();
 	const t = useTranslations();
 	const search = useSearchStore(state => state.search);
 	
 	// States
-	const [runtimeFilter, setRuntimeFilter] = useState<{ min?: number; max?: number }>({ 
-		min: undefined, 
-		max: undefined 
-	});
+	// const [runtimeFilter, setRuntimeFilter] = useState<{ min?: number; max?: number }>({ 
+	// 	min: undefined, 
+	// 	max: undefined 
+	// });
 	
 	// Queries
 	const {

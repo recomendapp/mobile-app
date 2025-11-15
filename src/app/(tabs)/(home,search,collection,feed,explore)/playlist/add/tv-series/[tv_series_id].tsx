@@ -9,9 +9,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Pressable, ScrollViewProps } from "react-native";
+import { Alert, Pressable } from "react-native";
 import { useTranslations } from "use-intl";
 import { z } from "zod";
 import { SelectionFooter } from "@/components/ui/SelectionFooter";
@@ -123,7 +123,7 @@ const PlaylistTvSeriesAdd = () => {
 	}, [search, playlists, fuse]);
 
 	// Handlers
-	const handleTogglePlaylist = (playlist: Playlist) => {
+	const handleTogglePlaylist = useCallback((playlist: Playlist) => {
 		setSelected((prev) => {
 			const isSelected = prev.some((p) => p.id === playlist.id);
 			if (isSelected) {
@@ -131,8 +131,8 @@ const PlaylistTvSeriesAdd = () => {
 			}
 			return [...prev, playlist];
 		});
-	};
-	const handleSubmit = async (values: AddTvSeriesToPlaylistFormValues) => {
+	}, []);
+	const handleSubmit = useCallback(async (values: AddTvSeriesToPlaylistFormValues) => {
 		if (!session) return;
 		if (selected.length === 0) return;
 		await addToPlaylistMutation({
@@ -149,8 +149,8 @@ const PlaylistTvSeriesAdd = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
-	const handleCancel = () => {
+	}, [session, selected, tvSeriesId, addToPlaylistMutation, toast, router, t]);
+	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
 				upperFirst(t('common.messages.are_u_sure')),
@@ -169,8 +169,8 @@ const PlaylistTvSeriesAdd = () => {
 		} else {
 			router.dismiss();
 		}
-	};
-	const onCreatePlaylist = (playlist: Playlist) => {
+	}, [canSave, router, t, mode]);
+	const onCreatePlaylist = useCallback((playlist: Playlist) => {
 		BottomSheetPlaylistCreateRef.current?.dismiss();
 		queryClient.setQueryData(playlistKeys.addToSource({
 			id: tvSeriesId,
@@ -184,7 +184,7 @@ const PlaylistTvSeriesAdd = () => {
 			];
 		});
 		setSelected((prev) => [...prev, playlist]);
-	};
+	}, [queryClient, tvSeriesId]);
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {

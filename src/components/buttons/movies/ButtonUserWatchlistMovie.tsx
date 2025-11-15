@@ -1,7 +1,7 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserWatchlistMovieItemQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
-import { useUserWatchlistMovieDeleteMutation, useUserWatchlistMovieInsertMutation, useUserWatchlistMovieUpdateMutation } from "@/features/user/userMutations";
+import { useUserWatchlistMovieDeleteMutation, useUserWatchlistMovieInsertMutation } from "@/features/user/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaMovie } from "@recomendapp/types";
 import { upperFirst } from "lodash";

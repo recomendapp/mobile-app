@@ -9,7 +9,6 @@ import { GAP } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
-import { Notification } from "@novu/react-native";
 import { useNotificationArchiveMutation, useNotificationReadMutation, useNotificationUnarchiveMutation, useNotificationUnreadMutation } from "@/features/utils/utilsMutations";
 import ReusableAppleStyleSwipeableRow from "@/components/ui/swippeable/ReusableAppleStyleSwipeableRow";
 import { useUIStore } from "@/stores/useUIStore";
@@ -51,7 +50,7 @@ const NotificationsScreen = () => {
 	const { mutateAsync: readMutation} = useNotificationReadMutation();
 	const { mutateAsync: unreadMutation} = useNotificationUnreadMutation();
 
-	const handleArchive = async (notification: typeof notifications[number]) => {
+	const handleArchive = useCallback(async (notification: typeof notifications[number]) => {
 		await archiveMutation(notification, {
 			onSuccess: () => {
 				toast.success(upperFirst(t('common.messages.notification_archived', { count: 1 })));
@@ -60,8 +59,8 @@ const NotificationsScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
-	const handleUnarchive = async (notification: typeof notifications[number]) => {
+	}, [archiveMutation, toast, t]);
+	const handleUnarchive = useCallback(async (notification: typeof notifications[number]) => {
 		await unarchiveMutation(notification, {
 			onSuccess: () => {
 				toast.success(upperFirst(t('common.messages.notification_unarchived', { count: 1 })));
@@ -70,8 +69,8 @@ const NotificationsScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
-	const handleRead = async (notification: typeof notifications[number]) => {
+	}, [unarchiveMutation, toast, t]);
+	const handleRead = useCallback(async (notification: typeof notifications[number]) => {
 		await readMutation(notification, {
 			onSuccess: () => {
 				toast.success(upperFirst(t('common.messages.notification_marked_as_read', { count: 1 })));
@@ -80,8 +79,8 @@ const NotificationsScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
-	const handleUnread = async (notification: typeof notifications[number]) => {
+	}, [readMutation, toast, t]);
+	const handleUnread = useCallback(async (notification: typeof notifications[number]) => {
 		await unreadMutation(notification, {
 			onSuccess: () => {
 				toast.success(upperFirst(t('common.messages.notification_marked_as_unread', { count: 1 })));
@@ -90,7 +89,7 @@ const NotificationsScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
+	}, [unreadMutation, toast, t]);
 	const renderItemContent = useCallback(({ item }: { item: typeof notifications[number] }) => {
 		const notif = item.content;
 		const onPress = () => {

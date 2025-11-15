@@ -1,5 +1,5 @@
 import { ImageWithFallback } from '../utils/ImageWithFallback';
-import { Playlist } from '@recomendapp/types';
+import { Playlist, FixedOmit } from '@recomendapp/types';
 import React from 'react';
 import Animated from 'react-native-reanimated';
 import { Pressable, View } from 'react-native';
@@ -11,7 +11,6 @@ import BottomSheetPlaylist from '../bottom-sheets/sheets/BottomSheetPlaylist';
 import { useTranslations } from 'use-intl';
 import { Skeleton } from '../ui/Skeleton';
 import { Text } from '../ui/text';
-import { FixedOmit } from '@recomendapp/types';
 
 interface CardPlaylistBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -162,7 +161,7 @@ const CardPlaylist = React.forwardRef<
 	const content = (
 		variant === "default" ? (
 			<CardPlaylistDefault ref={ref} {...props} />
-		) : variant == "list" ? (
+		) : variant === "list" ? (
 			<CardPlaylistList ref={ref} {...props} />
 		) : null
 	);

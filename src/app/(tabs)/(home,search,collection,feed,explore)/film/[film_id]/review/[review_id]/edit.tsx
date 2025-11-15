@@ -9,6 +9,7 @@ import { useUserReviewMovieUpsertMutation } from "@/features/user/userMutations"
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
+import { useCallback } from "react";
 
 const ReviewMovieEditScreen = () => {
 	const { session }	= useAuth();
@@ -30,7 +31,7 @@ const ReviewMovieEditScreen = () => {
 		movieId: review?.activity?.movie_id,
 	})
 	// Handlers
-	const handleSave = async (data: { title: string; body: object }) => {
+	const handleSave = useCallback(async (data: { title: string; body: object }) => {
 		if (!review) return;
 		await updateReview({
 			activityId: review?.id,
@@ -44,7 +45,7 @@ const ReviewMovieEditScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		})
-	};
+	}, [review, updateReview, router, toast, t]);
 
 	if (loading) {
 		return (

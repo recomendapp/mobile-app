@@ -1,6 +1,6 @@
 
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 const useUsernameAvailability = () => {
 	const supabase = useSupabaseClient();
@@ -12,7 +12,7 @@ const useUsernameAvailability = () => {
 		setIsLoading(false);
 	}
 
-	const check = useCallback(async (username: string) => {
+	const check = async (username: string) => {
 		try {
 			setIsAvailable(undefined);
 			setIsLoading(true);
@@ -24,7 +24,7 @@ const useUsernameAvailability = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [supabase]);
+	};
 
 	return { isAvailable, reset, isLoading, check };	
 };

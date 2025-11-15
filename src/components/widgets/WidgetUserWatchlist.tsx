@@ -10,7 +10,6 @@ import { upperFirst } from "lodash";
 import { CardMovie } from "../cards/CardMovie";
 import { MediaMovie, MediaTvSeries, UserWatchlist } from "@recomendapp/types";
 import { CardTvSeries } from "../cards/CardTvSeries";
-import { useCallback } from "react";
 import { GAP } from "@/theme/globals";
 import { GridView } from "../ui/GridView";
 import { Text } from "../ui/text";
@@ -59,7 +58,6 @@ export const WidgetUserWatchlist = ({
   containerStyle,
 }: WidgetUserWatchlistProps) => {
   const { session } = useAuth();
-  const { colors } = useTheme();
   const { data: watchlist } = useUserWatchlistQuery({
     userId: session?.user.id,
     filters: {
@@ -67,10 +65,6 @@ export const WidgetUserWatchlist = ({
       limit: 6,
     }
   });
-
-  const renderItem = useCallback((item: UserWatchlist) => (
-    <WatchlistItem item={item} />
-  ), []);
 
   if (!watchlist?.length) {
     return null;
@@ -82,7 +76,9 @@ export const WidgetUserWatchlist = ({
       <View style={containerStyle}>
         <GridView
         data={watchlist}
-        renderItem={renderItem}
+        renderItem={(item) => (
+          <WatchlistItem item={item} />
+        )}
         />
       </View>
     </View>

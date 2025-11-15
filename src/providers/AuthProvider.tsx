@@ -1,6 +1,6 @@
 import { User } from "@recomendapp/types";
 import { Provider, Session } from "@supabase/supabase-js";
-import { createContext, use, useCallback, useEffect, useState, useMemo } from "react";
+import { createContext, use, useCallback, useEffect, useState } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
 import { AppState, Platform } from "react-native";
 import { supabase } from "@/lib/supabase/client";
@@ -312,42 +312,26 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		auth.setReady(true);
 	}, [session, user, auth]);
 
-	const contextValue = useMemo(() => ({
-		session,
-		user,
-		customerInfo,
-		login,
-		loginWithOAuth,
-		loginWithOtp,
-		logout,
-		signup,
-		resetPasswordForEmail,
-		updateEmail,
-		verifyEmailChange,
-		cancelPendingEmailChange,
-		createSessionFromUrl,
-		pushToken,
-		setPushToken,
-	}), [
-		session,
-		user,
-		customerInfo,
-		login,
-		loginWithOAuth,
-		loginWithOtp,
-		logout,
-		signup,
-		resetPasswordForEmail,
-		updateEmail,
-		verifyEmailChange,
-		cancelPendingEmailChange,
-		createSessionFromUrl,
-		pushToken,
-		setPushToken,
-	]);
-
 	return (
-		<AuthContext.Provider value={contextValue}>
+		<AuthContext.Provider
+		value={{
+			session,
+			user,
+			customerInfo,
+			login,
+			loginWithOAuth,
+			loginWithOtp,
+			logout,
+			signup,
+			resetPasswordForEmail,
+			updateEmail,
+			verifyEmailChange,
+			cancelPendingEmailChange,
+			createSessionFromUrl,
+			pushToken,
+			setPushToken,
+		}}
+		>
 			{children}
 		</AuthContext.Provider>
 	);

@@ -77,7 +77,6 @@ const RightAction = ({
   }));
   const pressHandler = () => {
     swipeableRef.current?.close();
-    // eslint-disable-next-line no-alert
     window.alert(text);
   };
 

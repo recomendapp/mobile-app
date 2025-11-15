@@ -69,7 +69,7 @@ export const PlaylistSortTvSeries = () => {
 	}, [handleSaveItem]);
 	const handleQuickMove = useCallback((item: PlaylistItemTvSeries) => {
 		// Implement quick move logic here
-	}, [handleSaveItem]);
+	}, []);
 
 	// Render
 	const renderItem = useCallback(({ item, drag, isActive }: RenderItemParams<PlaylistItemTvSeries>) => {
@@ -109,7 +109,7 @@ export const PlaylistSortTvSeries = () => {
 				</View>
 			</ScaleDecorator>
 		);
-	}, [colors]);
+	}, [colors, handleQuickMove]);
 
 	// useEffects
 	useEffect(() => {

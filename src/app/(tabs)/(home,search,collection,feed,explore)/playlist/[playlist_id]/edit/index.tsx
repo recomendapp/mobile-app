@@ -1,7 +1,7 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
 import { Button } from "@/components/ui/Button";
@@ -74,12 +74,12 @@ const ModalPlaylistEdit = () => {
 		private: z.boolean(),
 	});
 	type PlaylistFormValues = z.infer<typeof playlistFormSchema>;
-	const defaultValues: Partial<PlaylistFormValues> = {
+	const defaultValues = useMemo((): Partial<PlaylistFormValues> => ({
 		title: playlist?.title ?? '',
 		description: playlist?.description ?? null,
 		private: playlist?.private ?? false,
-	};
-	const form = useForm<PlaylistFormValues>({
+	}), [playlist]);
+	const { watch: formWatch, reset: formReset, ...form} = useForm<PlaylistFormValues>({
 		resolver: zodResolver(playlistFormSchema),
 		defaultValues,
 		mode: 'onChange',
@@ -98,13 +98,23 @@ const ModalPlaylistEdit = () => {
 	];
 
 	// Poster
-	const posterOptions: { label: string, value: "library" | "camera" | "delete", disable?: boolean }[] = [
+	const posterOptions = useMemo((): { label: string, value: "library" | "camera" | "delete", disable?: boolean }[] => ([
 		{ label: upperFirst(t('common.messages.choose_from_the_library')), value: "library" },
 		{ label: upperFirst(t('common.messages.take_a_photo')), value: "camera" },
 		{ label: upperFirst(t('common.messages.delete_current_image')), value: "delete", disable: !playlist?.poster_url && !newPoster },
-	];
+	]), [playlist?.poster_url, newPoster, t]);
 	// Handlers
-	const handlePosterOptions = () => {
+	const handleProcessImage = useCallback(async (image: ImagePickerAsset) => {
+		const processedImage = await ImageManipulator.manipulate(image.uri)
+			.resize({ width: 1024, height: 1024 })
+			.renderAsync()
+		return await processedImage.saveAsync({
+			compress: 0.8,
+			format: SaveFormat.JPEG,
+			base64: true,
+		})
+	}, []);
+	const handlePosterOptions = useCallback(() => {
 		const options = [
 			...posterOptions,
 			{ label: upperFirst(t('common.messages.cancel')), value: 'cancel' },
@@ -155,8 +165,8 @@ const ModalPlaylistEdit = () => {
 					break;
 			};
 		});
-	};
-	const handleSubmit = async (values: PlaylistFormValues) => {
+	}, [playlist, showActionSheetWithOptions, toast, t, posterOptions, handleProcessImage]);
+	const handleSubmit = useCallback(async (values: PlaylistFormValues) => {
 		try {
 			if (!playlist) return;
 			setIsLoading(true);
@@ -198,8 +208,8 @@ const ModalPlaylistEdit = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
-	const handleCancel = () => {
+	}, [playlist, newPoster, supabase, updatePlaylistMutation, toast, router, t]);
+	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
 				upperFirst(t('common.messages.are_u_sure')),
@@ -218,32 +228,22 @@ const ModalPlaylistEdit = () => {
 		} else {
 			router.dismiss();
 		}
-	};
-	const handleProcessImage = async (image: ImagePickerAsset) => {
-		const processedImage = await ImageManipulator.manipulate(image.uri)
-			.resize({ width: 1024, height: 1024 })
-			.renderAsync()
-		return await processedImage.saveAsync({
-			compress: 0.8,
-			format: SaveFormat.JPEG,
-			base64: true,
-		})
-	};
+	}, [canSave, router, t, mode]);
 
 	// useEffects
 	useEffect(() => {
 		if (playlist) {
-			form.reset({
+			formReset({
 				title: playlist.title,
 				description: playlist.description,
 				private: playlist.private,
 			});
 		}
-	}, [playlist]);
+	}, [playlist, formReset]);
 
 	// Track form changes
 	useEffect(() => {
-		const subscription = form.watch((value) => {
+		const subscription = formWatch((value) => {
 			const isFormChanged =
 				value.title !== defaultValues.title ||
 				(value.description?.trim() || null) !== defaultValues.description ||
@@ -251,7 +251,7 @@ const ModalPlaylistEdit = () => {
 			setHasFormChanged(isFormChanged);
 		});
 		return () => subscription.unsubscribe();
-	}, [form.watch, defaultValues]);
+	}, [formWatch, defaultValues]);
 
 	return (
 	<>

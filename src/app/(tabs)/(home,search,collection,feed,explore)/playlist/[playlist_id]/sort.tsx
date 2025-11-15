@@ -9,12 +9,6 @@ import { Button } from "@/components/ui/Button";
 import { PlaylistSortMovie } from "@/components/screens/playlist/sort/PlaylistSortMovie";
 import { PlaylistSortTvSeries } from "@/components/screens/playlist/sort/PlaylistSortTvSeries";
 
-interface Task {
-  id: string;
-  title: string;
-  completed: boolean;
-}
-
 const PlaylistSortScreen = () => {
 	const t = useTranslations();
 	const router = useRouter();

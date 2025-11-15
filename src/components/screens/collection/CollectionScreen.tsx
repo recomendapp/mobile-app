@@ -1,5 +1,5 @@
 import { upperFirst } from "lodash";
-import { SharedValue, useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+import { SharedValue, useAnimatedScrollHandler } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import { useTheme } from "@/providers/ThemeProvider";
 import React, { useCallback } from "react";

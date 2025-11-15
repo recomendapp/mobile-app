@@ -8,6 +8,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import {  useQueryClient } from "@tanstack/react-query";
 import { Redirect, Stack, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
+import { useCallback } from "react";
 import { CustomerInfo } from "react-native-purchases";
 import RevenueCatUI from "react-native-purchases-ui";
 import { useTranslations } from "use-intl";
@@ -20,13 +21,13 @@ const UpgradeScreen = () => {
 	const { defaultScreenOptions } = useTheme();
 	const authCustomerInfoOptions = useAuthCustomerInfoOptions();
 
-	const onSuccess = async ({ customerInfo } : { customerInfo: CustomerInfo }) => {
+	const onSuccess = useCallback(async ({ customerInfo } : { customerInfo: CustomerInfo }) => {
 		queryClient.setQueryData(authCustomerInfoOptions.queryKey, customerInfo);
 		session?.user.id && await queryClient.invalidateQueries({
 			queryKey: Keys.auth.user(),
 		});
 		router.canGoBack() && router.back();
-	};
+	}, [queryClient, authCustomerInfoOptions.queryKey, router, session?.user.id]);
 
 	if (!session) return <Redirect href={'/auth/login'} />
 	

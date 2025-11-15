@@ -1,5 +1,5 @@
 import * as React from "react"
-import { MediaMovie, UserActivityMovie } from "@recomendapp/types";
+import { MediaMovie, UserActivityMovie, FixedOmit } from "@recomendapp/types";
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "../utils/ImageWithFallback";
 import { Href, useRouter } from "expo-router";
@@ -8,7 +8,6 @@ import { Pressable, View } from "react-native";
 import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { IconMediaRating } from "../medias/IconMediaRating";
-import { FixedOmit } from "@recomendapp/types";
 import { Skeleton } from "../ui/Skeleton";
 import BottomSheetMovie from "../bottom-sheets/sheets/BottomSheetMovie";
 import { Text } from "../ui/text";
@@ -207,7 +206,7 @@ const CardMovie = React.forwardRef<
 	const content = (
 		variant === "default" ? (
 			<CardMovieDefault ref={ref} {...props} />
-		) : variant == "poster" ? (
+		) : variant === "poster" ? (
 			<CardMoviePoster ref={ref} {...props} />
 		) : variant === "list" ? (
 			<CardMovieList ref={ref} {...props} />

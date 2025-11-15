@@ -54,7 +54,7 @@ export const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
       setMessages(messages);
       i18n.setReady(true);
     })();
-  }, []);
+  }, [i18n]);
 
   if (!messages || !locale) return null;
 
