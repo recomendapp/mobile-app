@@ -13,7 +13,7 @@ import { createContext, use, useCallback, useEffect, useState } from "react";
 import { getLocale, initI18n, setLocale as setLocaleHook } from "@/lib/i18n"; // à toi d’implémenter
 import { useSplashScreen } from "./SplashScreenProvider";
 import { getCalendars } from 'expo-localization';
-import { defaultLocale, SupportedLocale, supportedLocales } from '@/translations/locales';
+import { defaultSupportedLocale, SupportedLocale, supportedLocales } from '@/translations/locales';
 
 type LocaleContextType = {
   locale: SupportedLocale;
@@ -48,7 +48,7 @@ export const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     (async () => {
       let initial = await getLocale();
-      initial = supportedLocales.includes(initial as SupportedLocale) ? initial : defaultLocale; 
+      initial = supportedLocales.includes(initial as SupportedLocale) ? initial : defaultSupportedLocale; 
       const { messages } = await initI18n(initial as SupportedLocale);
       setLocaleState(initial as SupportedLocale);
       setMessages(messages);

@@ -10,7 +10,7 @@ import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import { makeRedirectUri } from "expo-auth-session";
-import { defaultLocale, SupportedLocale, supportedLocales } from "@/translations/locales";
+import { defaultSupportedLocale, SupportedLocale, supportedLocales } from "@/translations/locales";
 import { useRevenueCat } from "@/hooks/useRevenueCat";
 import { CustomerInfo } from "react-native-purchases";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -282,7 +282,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			if (supportedLocales.includes(data.language as SupportedLocale)) {
 				setLocale(data.language);
 			} else {
-				setLocale(defaultLocale);
+				setLocale(defaultSupportedLocale);
 			}
 		}
 	}, [setLocale]);
