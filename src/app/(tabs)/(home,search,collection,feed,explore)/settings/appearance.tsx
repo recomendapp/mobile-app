@@ -119,6 +119,7 @@ const SettingsAppearanceScreen = () => {
 				<View style={{ gap: GAP }}>
 					<Label>{upperFirst(t('pages.settings.appearance.language.label'))}</Label>
 					<Picker
+					key={`selected-${locale}`}
 					selectedValue={value}
 					onValueChange={(itemValue) => onChange(itemValue)}
 					style={{ backgroundColor: Platform.OS === 'android' ? colors.muted : undefined}}
