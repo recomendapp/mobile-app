@@ -5,9 +5,8 @@ import { CardUser } from "../cards/CardUser";
 import { LegendList } from "@legendapp/list";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
-import { useCallback, useMemo } from "react";
-import { Profile } from "@recomendapp/types";
 import { Text } from "../ui/text";
+import { GAP } from "@/theme/globals";
 
 interface WidgetUserDiscoveryProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -31,29 +30,7 @@ export const WidgetUserDiscovery = ({
     }
   });
 
-  const userData = useMemo(() => users?.pages.flat() || [], [users]);
-
-  const renderItem = useCallback(({ item }: { item: Profile }) => (
-    <View style={tw`max-h-24`}>
-      <CardUser user={item} style={tw`h-full w-48`} />
-    </View>
-  ), []);
-
-  const keyExtractor = useCallback((item: Profile) => 
-    item.id!.toString(), 
-    []
-  );
-
-  const onEndReached = useCallback(() => {
-    if (hasNextPage) {
-      fetchNextPage();
-    }
-  }, [hasNextPage, fetchNextPage]);
-
-  const ItemSeparatorComponent = useCallback(() => 
-    <View style={tw`w-2`} />, 
-    []
-  );
+  const userData = users?.pages.flat() || [];
 
   if (!userData.length) {
     return null;
@@ -66,15 +43,19 @@ export const WidgetUserDiscovery = ({
       </Text>
       <LegendList
         data={userData}
-        renderItem={renderItem}
+        renderItem={({ item }) => (
+          <View style={tw`max-h-24`}>
+            <CardUser user={item} style={tw`h-full w-48`} />
+          </View>
+        )}
         snapToInterval={200}
         decelerationRate="fast"
-        keyExtractor={keyExtractor}
+        keyExtractor={(item) => item.id!.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
-        onEndReached={onEndReached}
+        onEndReached={() => hasNextPage && fetchNextPage()}
         onEndReachedThreshold={0.2}
-        ItemSeparatorComponent={ItemSeparatorComponent}
+        ItemSeparatorComponent={() => <View style={{ width: GAP }} />}
         contentContainerStyle={containerStyle}
         nestedScrollEnabled
       />

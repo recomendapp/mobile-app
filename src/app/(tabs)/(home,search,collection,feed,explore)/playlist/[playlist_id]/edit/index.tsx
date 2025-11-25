@@ -1,7 +1,7 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
 import { Button } from "@/components/ui/Button";
@@ -53,7 +53,7 @@ const ModalPlaylistEdit = () => {
 	} = usePlaylistQuery({
 		playlistId: playlistId,
 	});
-	const updatePlaylistMutation = usePlaylistUpdateMutation();
+	const { mutateAsync: updatePlaylistMutation} = usePlaylistUpdateMutation();
 
 	// States
 	const [ isLoading, setIsLoading ] = useState(false);
@@ -79,35 +79,42 @@ const ModalPlaylistEdit = () => {
 		description: playlist?.description ?? null,
 		private: playlist?.private ?? false,
 	}), [playlist]);
-	const form = useForm<PlaylistFormValues>({
+	const { watch: formWatch, reset: formReset, ...form} = useForm<PlaylistFormValues>({
 		resolver: zodResolver(playlistFormSchema),
 		defaultValues,
 		mode: 'onChange',
 	});
 
 	const [ hasFormChanged, setHasFormChanged ] = useState(false);
-	const canSave = useMemo(() => {
-		return (hasFormChanged || newPoster !== undefined) && form.formState.isValid;
-	}, [hasFormChanged, newPoster, form.formState.isValid]);
+	const canSave = (hasFormChanged || newPoster !== undefined) && form.formState.isValid;
 
 	// Routes
-	const routes = useMemo((): { label: string, icon: LucideIcon, route: Href }[] => ([
+	const routes: { label: string, icon: LucideIcon, route: Href }[] = [
 		{
 			label: upperFirst(t('common.messages.manage_guests', { count: 2 })),
 			icon: Icons.Users,
 			route: `/playlist/${playlistId}/edit/guests`,
 		}
-	]), [t, playlistId]);
+	];
 
 	// Poster
-	const posterOptions = useMemo(() => [
+	const posterOptions = useMemo((): { label: string, value: "library" | "camera" | "delete", disable?: boolean }[] => ([
 		{ label: upperFirst(t('common.messages.choose_from_the_library')), value: "library" },
 		{ label: upperFirst(t('common.messages.take_a_photo')), value: "camera" },
 		{ label: upperFirst(t('common.messages.delete_current_image')), value: "delete", disable: !playlist?.poster_url && !newPoster },
-	], [ newPoster, t, playlist]);
-
+	]), [playlist?.poster_url, newPoster, t]);
 	// Handlers
-	const handlePosterOptions = () => {
+	const handleProcessImage = useCallback(async (image: ImagePickerAsset) => {
+		const processedImage = await ImageManipulator.manipulate(image.uri)
+			.resize({ width: 1024, height: 1024 })
+			.renderAsync()
+		return await processedImage.saveAsync({
+			compress: 0.8,
+			format: SaveFormat.JPEG,
+			base64: true,
+		})
+	}, []);
+	const handlePosterOptions = useCallback(() => {
 		const options = [
 			...posterOptions,
 			{ label: upperFirst(t('common.messages.cancel')), value: 'cancel' },
@@ -158,8 +165,8 @@ const ModalPlaylistEdit = () => {
 					break;
 			};
 		});
-	};
-	const handleSubmit = async (values: PlaylistFormValues) => {
+	}, [playlist, showActionSheetWithOptions, toast, t, posterOptions, handleProcessImage]);
+	const handleSubmit = useCallback(async (values: PlaylistFormValues) => {
 		try {
 			if (!playlist) return;
 			setIsLoading(true);
@@ -181,7 +188,7 @@ const ModalPlaylistEdit = () => {
 			} else if (newPoster === null) {
 				poster_url = null;
 			}
-			await updatePlaylistMutation.mutateAsync({
+			await updatePlaylistMutation({
 				playlistId: playlist.id,
 				title: values.title.trim(),
 				description: values.description?.trim() || null,
@@ -201,8 +208,8 @@ const ModalPlaylistEdit = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
-	const handleCancel = () => {
+	}, [playlist, newPoster, supabase, updatePlaylistMutation, toast, router, t]);
+	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
 				upperFirst(t('common.messages.are_u_sure')),
@@ -221,32 +228,22 @@ const ModalPlaylistEdit = () => {
 		} else {
 			router.dismiss();
 		}
-	};
-	const handleProcessImage = async (image: ImagePickerAsset) => {
-		const processedImage = await ImageManipulator.manipulate(image.uri)
-			.resize({ width: 1024, height: 1024 })
-			.renderAsync()
-		return await processedImage.saveAsync({
-			compress: 0.8,
-			format: SaveFormat.JPEG,
-			base64: true,
-		})
-	};
+	}, [canSave, router, t, mode]);
 
 	// useEffects
 	useEffect(() => {
 		if (playlist) {
-			form.reset({
+			formReset({
 				title: playlist.title,
 				description: playlist.description,
 				private: playlist.private,
 			});
 		}
-	}, [playlist]);
+	}, [playlist, formReset]);
 
 	// Track form changes
 	useEffect(() => {
-		const subscription = form.watch((value) => {
+		const subscription = formWatch((value) => {
 			const isFormChanged =
 				value.title !== defaultValues.title ||
 				(value.description?.trim() || null) !== defaultValues.description ||
@@ -254,7 +251,7 @@ const ModalPlaylistEdit = () => {
 			setHasFormChanged(isFormChanged);
 		});
 		return () => subscription.unsubscribe();
-	}, [form.watch, defaultValues]);
+	}, [formWatch, defaultValues]);
 
 	return (
 	<>

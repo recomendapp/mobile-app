@@ -4,7 +4,7 @@ import * as z from 'zod';
 import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
@@ -32,7 +32,7 @@ const SettingsAppearanceScreen = () => {
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locales = useLocalizedLanguageName(locale);
-	const updateUser = useUserUpdateMutation({
+	const { mutateAsync: updateUser } = useUserUpdateMutation({
 		userId: session?.user.id
 	})
 
@@ -44,7 +44,7 @@ const SettingsAppearanceScreen = () => {
 	const defaultValues: Partial<ProfileFormValues> = {
 		locale: locale,
 	};
-	const form = useForm<ProfileFormValues>({
+	const { reset: formReset, ...form} = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues,
 		mode: 'onChange',
@@ -55,13 +55,13 @@ const SettingsAppearanceScreen = () => {
 		try {
 			setIsLoading(true);
 			if (session) {
-				await updateUser.mutateAsync({
+				await updateUser({
 					language: data.locale,
 				});
 			}
 			setLocale(data.locale);
 			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
-			form.reset();
+			formReset();
 			queryClient.clear();
 			queryClient.invalidateQueries();
 		} catch (error) {
@@ -73,32 +73,32 @@ const SettingsAppearanceScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [session, t, setLocale, updateUser, form, toast, queryClient]);
+	}, [setLocale, session, updateUser, t, toast, queryClient, formReset]);
 
 	// useEffects
 	useEffect(() => {
-		form.reset({
+		formReset({
 			locale: locale,
 		});
-	}, [locale]);
+	}, [locale, formReset]);
 
 	return (
 		<>
 			<Stack.Screen
-				options={useMemo(() => ({
-					headerTitle: upperFirst(t('pages.settings.appearance.label')),
-					headerRight: () => (
-						<Button
-						variant="ghost"
-						size="fit"
-						loading={isLoading}
-						onPress={form.handleSubmit(handleSubmit)}
-						disabled={!form.formState.isValid || isLoading}
-						>
-							{upperFirst(t('common.messages.save'))}
-						</Button>
-					),
-				}), [t, isLoading, form, handleSubmit])}
+			options={{
+				headerTitle: upperFirst(t('pages.settings.appearance.label')),
+				headerRight: () => (
+					<Button
+					variant="ghost"
+					size="fit"
+					loading={isLoading}
+					onPress={form.handleSubmit(handleSubmit)}
+					disabled={!form.formState.isValid || isLoading}
+					>
+						{upperFirst(t('common.messages.save'))}
+					</Button>
+				),
+			}}
 			/>
 			<KeyboardAwareScrollView
 			contentContainerStyle={{
@@ -119,6 +119,7 @@ const SettingsAppearanceScreen = () => {
 				<View style={{ gap: GAP }}>
 					<Label>{upperFirst(t('pages.settings.appearance.language.label'))}</Label>
 					<Picker
+					key={`selected-${locale}`}
 					selectedValue={value}
 					onValueChange={(itemValue) => onChange(itemValue)}
 					style={{ backgroundColor: Platform.OS === 'android' ? colors.muted : undefined}}

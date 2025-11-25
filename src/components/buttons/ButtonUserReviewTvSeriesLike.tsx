@@ -1,4 +1,3 @@
-import * as React from "react"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserReviewTvSeriesLikeQuery } from "@/features/user/userQueries";
 import { useUserReviewTvSeriesLikeInsertMutation, useUserReviewTvSeriesLikeDeleteMutation } from "@/features/user/userMutations";
@@ -9,6 +8,7 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 import { useToast } from "../Toast";
+import { forwardRef, useEffect, useState } from "react";
 
 interface ButtonUserReviewTvSeriesLikeProps
 	extends React.ComponentProps<typeof Button> {
@@ -16,7 +16,7 @@ interface ButtonUserReviewTvSeriesLikeProps
 		reviewLikesCount?: number;
 	}
 
-const ButtonUserReviewTvSeriesLike = React.forwardRef<
+const ButtonUserReviewTvSeriesLike = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserReviewTvSeriesLikeProps
 >(({ reviewId, reviewLikesCount, variant = "ghost", size, icon = Icons.like, onPress, ...props }, ref) => {
@@ -26,19 +26,17 @@ const ButtonUserReviewTvSeriesLike = React.forwardRef<
 	const toast = useToast();
 	const {
 		data: like,
-		isLoading,
-		isError,
 	} = useUserReviewTvSeriesLikeQuery({
 		reviewId: reviewId,
 		userId: session?.user.id,
 	});
-	const [likeCount, setLikeCount] = React.useState<number | undefined>(reviewLikesCount);
-	const insertLike = useUserReviewTvSeriesLikeInsertMutation();
-	const deleteLike = useUserReviewTvSeriesLikeDeleteMutation();
+	const [likeCount, setLikeCount] = useState<number | undefined>(reviewLikesCount);
+	const { mutateAsync: insertLike } = useUserReviewTvSeriesLikeInsertMutation();
+	const { mutateAsync: deleteLike } = useUserReviewTvSeriesLikeDeleteMutation();
 
 	const handleLike = async () => {
 		if (!session?.user.id || !reviewId) return;
-		await insertLike.mutateAsync({
+		await insertLike({
 			userId: session.user.id,
 			reviewId: reviewId,
 		}, {
@@ -52,7 +50,7 @@ const ButtonUserReviewTvSeriesLike = React.forwardRef<
 	};
 	const handleUnlike = async () => {
 		if (!like) return;
-		await deleteLike.mutateAsync({
+		await deleteLike({
 			likeId: like.id
 		}, {
 			onSuccess: () => {
@@ -64,7 +62,7 @@ const ButtonUserReviewTvSeriesLike = React.forwardRef<
 		});
 	};
 
-	React.useEffect(() => {
+	useEffect(() => {
 		setLikeCount(reviewLikesCount);
 	}, [reviewLikesCount]);
 
@@ -80,8 +78,12 @@ const ButtonUserReviewTvSeriesLike = React.forwardRef<
 			color: like ? colors.accentPink : colors.foreground,
 			fill: like ? colors.accentPink : 'transparent',
 		}}
-		onPress={(e) => {
-			like ? handleUnlike() : handleLike();
+		onPress={async (e) => {
+			if (like) {
+				await handleUnlike()
+			} else {
+				await handleLike()
+			}
 			onPress?.(e);
 		}}
 		{...props}

@@ -2,13 +2,13 @@ import { Camera, CameraRef, MapView, MapViewRef, MarkerView, OnPressEvent, Shape
 import styleJSON from "@/assets/map/style.json";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { BORDER_RADIUS, BORDER_RADIUS_FULL, GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Stack, useRouter } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useQuery } from "@tanstack/react-query";
-import { ExploreTileMetaOptions, ExploreTileOptions, MediaGenresOptions } from "@/api/options";
+import { useExploreTileMetaOptions, useExploreTileOptions, useMediaGenresOptions } from "@/api/options";
 import { ExploreTile } from "@recomendapp/types";
 import Color from "color";
 import { Button } from "@/components/ui/Button";
@@ -30,11 +30,11 @@ const ExploreScreen = () => {
 	const filters = useExploreStore((state) => state.filters);
 	const { colors } = useTheme();
 	const insets = useSafeAreaInsets();
-	const [userPosition, setUserPosition] = useState({
+	const userPosition = useMemo(() => ({
 		latitude: 48.5,
 		longitude: 2.5,
 		zoomLevel: 8,
-	});
+	}), []);
 	
 	const headerHeight = useHeaderHeight();
 	const { height: screenHeight } = useWindowDimensions();
@@ -62,13 +62,13 @@ const ExploreScreen = () => {
 
 	const {
 		data: genres,
-	} = useQuery(MediaGenresOptions());
+	} = useQuery(useMediaGenresOptions());
 
 	const {
 		data: tile,
 		refetch: refetchTile
-	} = useQuery(ExploreTileOptions({ exploreId: 1 }));
-	const { data: tileMeta } = useQuery(ExploreTileMetaOptions({ exploreId: 1 }));
+	} = useQuery(useExploreTileOptions({ exploreId: 1 }));
+	const { data: tileMeta } = useQuery(useExploreTileMetaOptions({ exploreId: 1 }));
 
 	const handleOnLocationPress = useCallback((e: OnPressEvent) => {
 		const location = e.features.at(0) as ExploreTile['features'][number];

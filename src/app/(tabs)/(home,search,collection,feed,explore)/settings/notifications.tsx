@@ -44,7 +44,7 @@ const SettingsNotificationsScreen = () => {
 		} else {
 			await Linking.openSettings();
 		}
-    }, [Linking]);
+    }, []);
 	return (
 	<>
 		<ScrollView

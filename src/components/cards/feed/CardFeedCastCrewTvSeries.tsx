@@ -1,13 +1,12 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaPerson, MediaTvSeries } from "@recomendapp/types";
+import { MediaPerson, MediaTvSeries, FixedOmit } from "@recomendapp/types";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Pressable, View } from "react-native";
 import { Href, Link, useRouter } from "expo-router";
 import { Text } from "@/components/ui/text";
-import { FixedOmit } from "@recomendapp/types";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import UserAvatar from "@/components/user/UserAvatar";

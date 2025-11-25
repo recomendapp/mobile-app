@@ -5,7 +5,7 @@ import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
 import { CORNERS, FONT_SIZE, HEIGHT } from '@/theme/globals';
 import { Search, X } from 'lucide-react-native';
-import React, { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   TextInput,
@@ -58,24 +58,21 @@ export function SearchBar({
   const icon = colors.mutedForeground;
 
   // Handle text change with debouncing
-  const handleTextChange = useCallback(
-    (text: string) => {
-      setInternalValue(text);
-      onChangeText?.(text);
+  const handleTextChange = useCallback((text: string) => {
+    setInternalValue(text);
+    onChangeText?.(text);
 
-      if (onSearch && debounceMs > 0) {
-        if (debounceRef.current) {
-          clearTimeout(debounceRef.current);
-        }
-        (debounceRef.current as any) = setTimeout(() => {
-          onSearch(text);
-        }, debounceMs);
-      } else if (onSearch) {
-        onSearch(text);
+    if (onSearch && debounceMs > 0) {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
       }
-    },
-    [onChangeText, onSearch, debounceMs]
-  );
+      (debounceRef.current as any) = setTimeout(() => {
+        onSearch(text);
+      }, debounceMs);
+    } else if (onSearch) {
+      onSearch(text);
+    }
+  }, [onChangeText, onSearch, debounceMs]);
 
   // Handle clear button press
   const handleClear = useCallback(() => {

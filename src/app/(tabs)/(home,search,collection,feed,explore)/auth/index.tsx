@@ -13,7 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Color from "color";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuery } from "@tanstack/react-query";
-import { UIBackgroundsOptions } from "@/api/options";
+import { useUIBackgroundsOptions } from "@/api/options";
 import { useRotatingItem } from "@/hooks/useRotatingItem";
 import { Text } from "@/components/ui/text";
 import { getMediaDetails } from "@/components/utils/getMediaDetails";
@@ -61,7 +61,7 @@ const AuthScreen = () => {
 
   const {
     data,
-  } = useQuery(UIBackgroundsOptions());
+  } = useQuery(useUIBackgroundsOptions());
   const {
     active 
   } = useRotatingItem({ items: data });

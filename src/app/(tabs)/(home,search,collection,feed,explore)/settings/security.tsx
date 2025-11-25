@@ -56,7 +56,7 @@ const SettingsSecurityScreen = () => {
 		confirmnewpassword: '',
 	}), []);
 
-	const form = useForm<ProfileFormValues>({
+	const { reset: formReset, ...form} = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues,
 		mode: 'onChange',
@@ -72,7 +72,7 @@ const SettingsSecurityScreen = () => {
 			if (error) throw error;
 			await supabase.auth.signOut({ scope: "others" });
 			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
-			form.reset();
+			formReset();
 		} catch (error) {
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
 			if (error instanceof AuthError) {
@@ -82,7 +82,7 @@ const SettingsSecurityScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [supabase, t, form]);
+	}, [supabase, t, formReset, toast]);
 
 	return (
 		<>

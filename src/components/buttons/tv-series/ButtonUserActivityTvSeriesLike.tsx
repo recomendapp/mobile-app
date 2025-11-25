@@ -1,4 +1,3 @@
-import React from "react"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityTvSeriesQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
@@ -14,13 +13,14 @@ import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { ICON_ACTION_SIZE } from "@/theme/globals";
 import { useToast } from "@/components/Toast";
+import { forwardRef } from "react";
 
 interface ButtonUserActivityTvSeriesLikeProps
 	extends React.ComponentProps<typeof Button> {
 		tvSeries: MediaTvSeries;
 	}
 
-const ButtonUserActivityTvSeriesLike = React.forwardRef<
+const ButtonUserActivityTvSeriesLike = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserActivityTvSeriesLikeProps
 >(({ tvSeries, icon = Icons.like, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
@@ -33,21 +33,19 @@ const ButtonUserActivityTvSeriesLike = React.forwardRef<
 	const queryClient = useQueryClient();
 	const {
 		data: activity,
-		isLoading,
-		isError,
 	} = useUserActivityTvSeriesQuery({
 		userId: session?.user.id,
 		tvSeriesId: tvSeries.id,
 	});
-	const insertActivity = useUserActivityTvSeriesInsertMutation();
-	const updateActivity = useUserActivityTvSeriesUpdateMutation();
+	const { mutateAsync: insertActivity } = useUserActivityTvSeriesInsertMutation();
+	const { mutateAsync: updateActivity } = useUserActivityTvSeriesUpdateMutation();
 	const isLiked = useSharedValue(activity?.is_liked ? 1 : 0);
 
 	const handleLike = async () => {
 		if (!session) return;
 		isLiked.value = 1;
 		if (activity) {
-			await updateActivity.mutateAsync({
+			await updateActivity({
 				activityId: activity.id,
 				isLiked: true,
 			}, {
@@ -62,7 +60,7 @@ const ButtonUserActivityTvSeriesLike = React.forwardRef<
 				}
 			});
 		} else {
-			await insertActivity.mutateAsync({
+			await insertActivity({
 				userId: session?.user.id,
 				tvSeriesId: tvSeries.id,
 				isLiked: true,
@@ -83,7 +81,7 @@ const ButtonUserActivityTvSeriesLike = React.forwardRef<
 		if (!session) return;
 		if (!activity) return;
 		isLiked.value = 0;
-		await updateActivity.mutateAsync({
+		await updateActivity({
 			activityId: activity.id,
 			isLiked: false,
 		}, {
@@ -105,9 +103,13 @@ const ButtonUserActivityTvSeriesLike = React.forwardRef<
 		variant={variant}
 		icon={icon}
 		size={size}
-		onPress={(e) => {
+		onPress={async (e) => {
 			if (session) {
-				activity?.is_liked ? handleUnlike() : handleLike();
+				if (activity?.is_liked) {
+					await handleUnlike()
+				} else {
+					await handleLike()
+				}
 			} else {
 				router.push({
 					pathname: '/auth',

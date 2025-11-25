@@ -1,4 +1,3 @@
-import React from "react"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserWatchlistTvSeriesItemQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
@@ -13,13 +12,14 @@ import { ICON_ACTION_SIZE } from "@/theme/globals";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { BottomSheetWatchlistTvSeriesComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistTvSeriesComment";
 import { useToast } from "@/components/Toast";
+import { forwardRef } from "react";
 
 interface ButtonUserWatchlistTvSeriesProps
 	extends React.ComponentProps<typeof Button> {
 		tvSeries: MediaTvSeries;
 	}
 
-export const ButtonUserWatchlistTvSeries = React.forwardRef<
+export const ButtonUserWatchlistTvSeries = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserWatchlistTvSeriesProps
 >(({ tvSeries, icon = Icons.Watchlist, variant = "ghost", size = "fit", onPress: onPressProps, onLongPress: onLongPressProps, iconProps, ...props }, ref) => {
@@ -32,15 +32,13 @@ export const ButtonUserWatchlistTvSeries = React.forwardRef<
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const {
 		data: watchlist,
-		isLoading,
-		isError,
 	} = useUserWatchlistTvSeriesItemQuery({
 		userId: session?.user.id,
 		tvSeriesId: tvSeries.id,
 	});
 
-	const insertWatchlist = useUserWatchlistTvSeriesInsertMutation();
-	const deleteWatchlist = useUserWatchlistTvSeriesDeleteMutation();
+	const { mutateAsync: insertWatchlist } = useUserWatchlistTvSeriesInsertMutation();
+	const { mutateAsync: deleteWatchlist } = useUserWatchlistTvSeriesDeleteMutation();
 
 	const handleWatchlist = async () => {
 		if (watchlist) return;
@@ -48,7 +46,7 @@ export const ButtonUserWatchlistTvSeries = React.forwardRef<
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			return;
 		}
-		await insertWatchlist.mutateAsync({
+		await insertWatchlist({
 			userId: session.user.id,
 			tvSeriesId: tvSeries.id,
 		}, {
@@ -63,7 +61,7 @@ export const ButtonUserWatchlistTvSeries = React.forwardRef<
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			return;
 		}
-		await deleteWatchlist.mutateAsync({
+		await deleteWatchlist({
 		  watchlistId: watchlist.id,
 		}, {
 		  onError: () => {
@@ -78,9 +76,13 @@ export const ButtonUserWatchlistTvSeries = React.forwardRef<
 		variant={variant}
 		icon={icon}
 		size={size}
-		onPress={(e) => {
+		onPress={async (e) => {
 			if (session) {
-				watchlist ? handleUnwatchlist() : handleWatchlist();
+				if (watchlist) {
+					await handleUnwatchlist()
+				} else {
+					await handleWatchlist()
+				}
 			} else {
 				router.push({
 					pathname: '/auth',

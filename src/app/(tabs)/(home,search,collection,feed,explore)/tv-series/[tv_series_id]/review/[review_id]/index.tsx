@@ -5,7 +5,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useUserReviewTvSeriesQuery } from "@/features/user/userQueries";
 import Viewer from "@/lib/10tap/viewer";
 import tw from "@/lib/tw";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { Redirect, Stack, useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
 import { RefreshControl, ScrollView, View } from "react-native"
 import { useTranslations } from "use-intl";
@@ -21,7 +21,6 @@ const ReviewTvSeriesScreen = () => {
 	const { bottomOffset, colors } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
-	const router = useRouter();
 	const { review_id } = useLocalSearchParams();
 	const {
 		data: review,
@@ -39,8 +38,12 @@ const ReviewTvSeriesScreen = () => {
 				<Icons.Loader />
 			</View>
 		);
-	};
-	if (!review) return router.replace('/+not-found');
+	}
+	if (!review) {
+		return (
+			<Redirect href={{ pathname: '/+not-found', params: { }}} />
+		)
+	}
 	return (
 	<>
 		<Stack.Screen

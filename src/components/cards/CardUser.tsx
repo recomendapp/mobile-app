@@ -2,14 +2,13 @@ import * as React from "react"
 import { useRouter } from "expo-router";
 import { Pressable, View, StyleProp, ViewStyle } from "react-native";
 import Animated from "react-native-reanimated";
-import { Profile, User } from "@recomendapp/types";
+import { Profile, User, FixedOmit } from "@recomendapp/types";
 import UserAvatar from "../user/UserAvatar";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Icons } from "@/constants/Icons";
 import { Skeleton } from "../ui/Skeleton";
 import { Text } from "../ui/text";
-import { FixedOmit } from "@recomendapp/types";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetUser from "../bottom-sheets/sheets/BottomSheetUser";
 

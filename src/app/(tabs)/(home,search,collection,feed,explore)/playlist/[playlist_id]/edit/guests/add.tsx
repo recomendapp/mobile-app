@@ -15,8 +15,8 @@ import { Profile } from "@recomendapp/types";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import {  useCallback, useMemo, useState } from "react";
-import { Alert, ScrollViewProps } from "react-native";
+import { useCallback, useState } from "react";
+import { Alert } from "react-native";
 import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import { PostgrestError } from "@supabase/supabase-js";
@@ -40,9 +40,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 	// States
 	const [ search, setSearch ] = useState('');
 	const [ selectedUsers, setSelectedUsers ] = useState<Profile[]>([]);
-	const canSave = useMemo((): boolean => {
-		return selectedUsers.length > 0;
-	}, [selectedUsers]);
+	const canSave: boolean = selectedUsers.length > 0;
 	const { data: guests } = usePlaylistGuestsQuery({ playlistId });
 	const {
 		data,
@@ -61,15 +59,14 @@ const ModalPlaylistEditGuestsAdd = () => {
 			]
 		}
 	});
-	const users = useMemo(() => (
+	const users = (
 		data?.pages.flatMap((page) => page.data.map((user) => ({
 			user,
 			isSelected: selectedUsers.some((u) => u.id === user.id),
 		}))) || []
-	), [data, selectedUsers]);
-
+	);
 	// Mutations
-	const upsertGuestsMutation = usePlaylistGuestsUpsertMutation();
+	const { mutateAsync: upsertGuestsMutation, isPending: isUpsertingGuests } = usePlaylistGuestsUpsertMutation();
 
 	// Handlers
 	const handleToggleUser = useCallback((user: Profile) => {
@@ -81,10 +78,10 @@ const ModalPlaylistEditGuestsAdd = () => {
 			return [...prev, user];
 		});
 	}, []);
-	const handleSubmit = async () => {
+	const handleSubmit = useCallback(async () => {
 		try {
 			if (selectedUsers.length === 0) return;
-			await upsertGuestsMutation.mutateAsync({
+			await upsertGuestsMutation({
 				playlistId: playlistId,
 				guests: selectedUsers.map((guest) => ({
 					user_id: guest.id!,
@@ -103,7 +100,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 			}
 			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		}
-	};
+	}, [playlistId, selectedUsers, upsertGuestsMutation, toast, router, t]);
 	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
@@ -125,21 +122,6 @@ const ModalPlaylistEditGuestsAdd = () => {
 		}
 	}, [canSave, router, t, mode]);
 
-	// Render
-	const renderItems = useCallback(({ item }: { item: { user: Profile, isSelected: boolean } }) => {
-		return (
-		<CardUser linked={false} onPress={() => handleToggleUser(item.user)} user={item.user} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}>
-			<Checkbox
-			checked={item.isSelected}
-			onCheckedChange={() => handleToggleUser(item.user)}
-			/>
-		</CardUser>
-		);
-	}, [handleToggleUser]);
-	const renderScroll = useCallback((props: ScrollViewProps) => {
-        return <AnimatedContentContainer {...props} />;
-    }, []);
-
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
@@ -158,7 +140,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 					<Button
 					variant="ghost"
 					size="fit"
-					disabled={upsertGuestsMutation.isPending}
+					disabled={isUpsertingGuests}
 					onPress={handleCancel}
 					>
 						{upperFirst(t('common.messages.cancel'))}
@@ -168,9 +150,9 @@ const ModalPlaylistEditGuestsAdd = () => {
 					<Button
 					variant="ghost"
 					size="fit"
-					loading={upsertGuestsMutation.isPending}
+					loading={isUpsertingGuests}
 					onPress={handleSubmit}
-					disabled={!canSave || upsertGuestsMutation.isPending}
+					disabled={!canSave || isUpsertingGuests}
 					>
 						{upperFirst(t('common.messages.save'))}
 					</Button>
@@ -188,7 +170,14 @@ const ModalPlaylistEditGuestsAdd = () => {
 		</View>
 		<AnimatedLegendList
 		data={users}
-		renderItem={renderItems}
+		renderItem={({ item }) => (
+			<CardUser linked={false} onPress={() => handleToggleUser(item.user)} user={item.user} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}>
+				<Checkbox
+				checked={item.isSelected}
+				onCheckedChange={() => handleToggleUser(item.user)}
+				/>
+			</CardUser>
+		)}
 		ListEmptyComponent={
 			isLoading ? <Icons.Loader />
 			: search.length ? (
@@ -205,23 +194,23 @@ const ModalPlaylistEditGuestsAdd = () => {
 				</View>
 			)
 		}
-		keyExtractor={useCallback((item: { user: Profile }) => item.user.id!.toString(), [])}
+		keyExtractor={(item) => item.user.id!.toString()}
 		refreshing={isRefetching}
 		onRefresh={refetch}
-		onEndReached={useCallback(() => hasNextPage && fetchNextPage(), [hasNextPage, fetchNextPage])}
+		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[
 			{ gap: GAP },
 			animatedFooterStyle
 		]}
-		renderScrollComponent={renderScroll}
+		renderScrollComponent={(props) => <AnimatedContentContainer {...props} />}
 		/>
 		<SelectionFooter
 		data={selectedUsers}
 		height={footerHeight}
-		renderItem={useCallback(({ item } : { item: Profile}) => (
+		renderItem={({ item }) => (
 			<CardUser variant="icon" linked={false} onPress={() => handleToggleUser(item)} user={item} width={50} height={50}/>
-		), [handleToggleUser])}
+		)}
 		keyExtractor={(user) => user.id!}
 		/>
 	</>

@@ -35,7 +35,7 @@ const AuthCallbackScreen = () => {
 					setError(errorMessage);
 				});
 		}
-	}, [url]);
+	}, [url]); 
 
 	if (error) return <Redirect href="/auth/login" />;
 

@@ -34,7 +34,7 @@ export const PlaylistSortMovie = () => {
 		playlistId: playlistId,
 		userId: session?.user.id,
 	});
-	const updatePlaylistItem = usePlaylistMovieUpdateMutation();
+	const { mutateAsync: updatePlaylistItem } = usePlaylistMovieUpdateMutation();
 
 	// States
 	const [playlistItems, setPlaylistItems] = useState<PlaylistItemMovie[] | undefined>(undefined);
@@ -43,7 +43,7 @@ export const PlaylistSortMovie = () => {
 	// Handlers
 	const handleSaveItem = useCallback(async (item: PlaylistItemMovie) => {
 		try {
-			await updatePlaylistItem.mutateAsync({
+			await updatePlaylistItem({
 				itemId: item.id,
 				rank: item.rank,
 			});
@@ -69,7 +69,7 @@ export const PlaylistSortMovie = () => {
 	}, [handleSaveItem]);
 	const handleQuickMove = useCallback((item: PlaylistItemMovie) => {
 
-	}, [handleSaveItem]);
+	}, []);
 
 	// Render
 	const renderItem = useCallback(({ item, drag, isActive }: RenderItemParams<PlaylistItemMovie>) => {
@@ -109,7 +109,7 @@ export const PlaylistSortMovie = () => {
 				</View>
 			</ScaleDecorator>
 		);
-	}, [colors]);
+	}, [colors, handleQuickMove]);
 
 	// useEffects
 	useEffect(() => {

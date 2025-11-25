@@ -3,7 +3,7 @@ import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserReviewTvSeriesQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native"
 import { useUserReviewTvSeriesUpsertMutation } from "@/features/user/userMutations";
 import { upperFirst } from "lodash";
@@ -26,14 +26,14 @@ const ReviewTvSeriesEditScreen = () => {
 	});
 	const loading = reviewLoading || review === undefined;
 	// Mutations
-	const updateReview = useUserReviewTvSeriesUpsertMutation({
+	const { mutateAsync: updateReview } = useUserReviewTvSeriesUpsertMutation({
 		userId: session?.user.id,
 		tvSeriesId: review?.activity?.tv_series_id,
 	})
 	// Handlers
 	const handleSave = useCallback(async (data: { title: string; body: object }) => {
 		if (!review) return;
-		await updateReview.mutateAsync({
+		await updateReview({
 			activityId: review?.id,
 			title: data.title || null,
 			body: data.body,
@@ -46,7 +46,7 @@ const ReviewTvSeriesEditScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		})
-	}, [updateReview, review, router, t, toast]);
+	}, [review, updateReview, router, toast, t]);
 
 	if (loading) {
 		return (
@@ -55,8 +55,16 @@ const ReviewTvSeriesEditScreen = () => {
 			</View>
 		);
 	};
-	if (!review) return router.replace('/+not-found');
-	if (review?.activity?.user_id !== session?.user.id) return router.replace(`/review/${review?.id}`);
+	if (!review) {
+		return (
+			<Redirect href={{ pathname: '/+not-found', params: { }}} />
+		)
+	}
+	if (review?.activity?.user_id !== session?.user.id) {
+		return (
+			<Redirect href={{ pathname: '/tv-series/[tv_series_id]/review/[review_id]', params: { tv_series_id: review.activity?.tv_series?.slug || review.activity?.tv_series?.id!, review_id: review.id }}} />
+		)
+	}
 	return (
 	<ReviewForm
 	type='tv_series'

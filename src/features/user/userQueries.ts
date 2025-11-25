@@ -124,7 +124,7 @@ export const useUserActivitiesInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});
@@ -186,7 +186,7 @@ export const useUserActivitiesMovieInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});
@@ -248,7 +248,7 @@ export const useUserActivitiesTvSeriesInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});
@@ -1092,7 +1092,7 @@ export const useUserFeedInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});
@@ -1129,7 +1129,7 @@ export const useUserFeedCastCrewInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});
@@ -1193,7 +1193,7 @@ export const useUserPlaylistsInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});
@@ -1280,7 +1280,7 @@ export const useUserPlaylistsSavedInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});
@@ -1415,7 +1415,7 @@ export const useUserPlaylistsFriendsInfinite = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});
@@ -1460,7 +1460,7 @@ export const useUserFollowersInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (data, pages) => {
-			return data?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return data?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});
@@ -1524,7 +1524,7 @@ export const useUserFolloweesInfiniteQuery = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (data, pages) => {
-			return data?.length == mergedFilters.perPage ? pages.length + 1 : undefined;
+			return data?.length === mergedFilters.perPage ? pages.length + 1 : undefined;
 		},
 		enabled: !!userId,
 	});
@@ -1640,7 +1640,7 @@ export const useUserDiscoveryInfinite = ({
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length == mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
+			return lastPage?.length === mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
 		},
 	});
 };

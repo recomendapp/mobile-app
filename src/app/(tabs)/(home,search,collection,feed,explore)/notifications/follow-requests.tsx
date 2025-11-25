@@ -8,13 +8,12 @@ import { useUserFollowersRequestsQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { UserFollower } from "@recomendapp/types";
 import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useCallback } from "react";
 import { useToast } from "@/components/Toast";
+import { useCallback } from "react";
 
 const FollowRequestsScreen = () => {
 	const t = useTranslations();
@@ -24,7 +23,6 @@ const FollowRequestsScreen = () => {
 	const {
 		data: requests,
 		isLoading,
-		isError,
 		isRefetching,
 		refetch,
 	} = useUserFollowersRequestsQuery({
@@ -33,16 +31,16 @@ const FollowRequestsScreen = () => {
 	const loading = requests === undefined || isLoading;
 
 	// Mutations
-	const acceptRequest = useUserAcceptFollowerRequestMutation({
+	const { mutateAsync: acceptRequest} = useUserAcceptFollowerRequestMutation({
 		userId: session?.user.id,
 	});
-	const declineRequest = useUserDeclineFollowerRequestMutation({
+	const { mutateAsync: declineRequest} = useUserDeclineFollowerRequestMutation({
 		userId: session?.user.id,
 	});
 
 	// Handlers
 	const handleAcceptRequest = useCallback(async (requestId: number) => {
-		await acceptRequest.mutateAsync({
+		await acceptRequest({
 			requestId
 		}, {
 			onSuccess: () => {
@@ -52,9 +50,9 @@ const FollowRequestsScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [acceptRequest, t, toast]);
+	}, [acceptRequest, toast, t]);
 	const handleDeclineRequest = useCallback(async (requestId: number) => {
-		await declineRequest.mutateAsync({
+		await declineRequest({
 			requestId
 		}, {
 			onSuccess: () => {
@@ -64,11 +62,13 @@ const FollowRequestsScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [declineRequest, t, toast]);
+	}, [declineRequest, toast, t]);
 
-	// Renders
-	const renderItems = useCallback(({ item } : { item: UserFollower }) => {
-		return (
+	return (
+	<>
+		<LegendList
+		data={requests || []}
+		renderItem={({ item }) => (
 			<CardUser user={item.user} style={tw`bg-transparent border-0 p-0 h-auto`}>
 				<View style={tw`flex-row items-center justify-between gap-2`}>
 					<Button icon={Icons.Check} size="fit" variant="accent-blue" onPress={() => handleAcceptRequest(item.id)} style={tw`py-1 px-2`}>
@@ -79,16 +79,8 @@ const FollowRequestsScreen = () => {
 					</Button>
 				</View>
 			</CardUser>
-		)
-	}, [handleAcceptRequest, handleDeclineRequest, t]);
-
-
-	return (
-	<>
-		<LegendList
-		data={requests || []}
-		renderItem={renderItems}
-		keyExtractor={useCallback((item: UserFollower) => item.id.toString(), [])}
+		)}
+		keyExtractor={(item) => item.id.toString()}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		ListEmptyComponent={

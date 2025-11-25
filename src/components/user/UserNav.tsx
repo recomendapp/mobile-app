@@ -4,21 +4,19 @@ import { GestureResponderEvent, TouchableOpacity } from "react-native";
 import { useNavigation } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
 import UserAvatar from "./UserAvatar";
-import { forwardRef, memo, useCallback } from "react";
+import { forwardRef } from "react";
 
-interface UserNavProps extends React.ComponentPropsWithoutRef<typeof TouchableOpacity> {}
-
-export const UserNav = memo(forwardRef<
+export const UserNav = forwardRef<
 	React.ComponentRef<typeof TouchableOpacity>,
-	UserNavProps
+	React.ComponentPropsWithoutRef<typeof TouchableOpacity>
 >(({ onPress, ...props}, ref) => {
 	const navigation = useNavigation();
 	const { session, user } = useAuth();
 	
-	const handlePress = useCallback((event: GestureResponderEvent) => {
+	const handlePress = (event: GestureResponderEvent) => {
 		navigation.dispatch(DrawerActions.openDrawer());
 		onPress?.(event);
-	}, [navigation]);
+	};
 
 	if (!session) return null;
 	
@@ -31,5 +29,5 @@ export const UserNav = memo(forwardRef<
 			<UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} />
 		</TouchableOpacity>
 	);
-}));
+});
 UserNav.displayName = 'UserNav';

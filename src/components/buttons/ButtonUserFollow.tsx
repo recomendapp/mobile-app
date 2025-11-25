@@ -1,4 +1,3 @@
-import * as React from "react"
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuth } from '@/providers/AuthProvider';
@@ -11,10 +10,7 @@ import { useTranslations } from "use-intl";
 import { CORNERS } from "@/theme/globals";
 import { useToast } from "../Toast";
 import { useTheme } from "@/providers/ThemeProvider";
-
-interface ButtonUserFollowBaseProps
-  extends React.ComponentProps<typeof Button> {
-  }
+import { forwardRef } from 'react';
 
 type ButtonUserFollowSkeletonProps = {
   skeleton: true;
@@ -26,10 +22,10 @@ type ButtonUserFollowDataProps = {
   profileId: string;
 }
 
-export type ButtonUserFollowProps = ButtonUserFollowBaseProps &
+export type ButtonUserFollowProps = React.ComponentProps<typeof Button> &
   (ButtonUserFollowSkeletonProps | ButtonUserFollowDataProps);
 
-const ButtonUserFollow = React.forwardRef<
+const ButtonUserFollow = forwardRef<
   React.ComponentRef<typeof Button>,
   ButtonUserFollowProps
 >(({ profileId, onPress, skeleton, style, ...props }, ref) => {
@@ -47,12 +43,12 @@ const ButtonUserFollow = React.forwardRef<
   });
   const loading = skeleton || !profileId || isLoading || isFollow === undefined;
 
-  const insertFollow = useUserFollowProfileInsertMutation();
-  const deleteFollowerMutation = useUserFollowProfileDeleteMutation();
+  const { mutateAsync: insertFollow } = useUserFollowProfileInsertMutation();
+  const { mutateAsync: deleteFollowerMutation } = useUserFollowProfileDeleteMutation();
 
   const followUser = async () => {
     if (!user || !profileId) return;
-    await insertFollow.mutateAsync({
+    await insertFollow({
       userId: user?.id,
       followeeId: profileId,
     }, {
@@ -75,7 +71,7 @@ const ButtonUserFollow = React.forwardRef<
         {
           text: isFollow?.is_pending ? upperFirst(t('common.messages.cancel_request')) : upperFirst(t('common.messages.unfollow')),
           onPress: async () => {
-            await deleteFollowerMutation.mutateAsync({
+            await deleteFollowerMutation({
               userId: user?.id,
               followeeId: profileId,
             }, {
@@ -92,7 +88,7 @@ const ButtonUserFollow = React.forwardRef<
     );
   }
 
-  if (!user || user.id == profileId) return null;
+  if (!user || user.id === profileId) return null;
 
   if (loading) {
     return (
@@ -103,8 +99,12 @@ const ButtonUserFollow = React.forwardRef<
   return (
     <Button
     ref={ref}
-    onPress={(e) => {
-      isFollow ? unfollowUser() : followUser();
+    onPress={async (e) => {
+      if (isFollow) {
+        await  unfollowUser()
+      } else {
+        await followUser()
+      }
       onPress?.(e);
     }}
     variant={isFollow ? "muted" : "accent-yellow"}

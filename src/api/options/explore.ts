@@ -4,7 +4,7 @@ import { Keys } from '../keys';
 import { useLocale } from 'use-intl';
 import { ExploreTile } from '@recomendapp/types';
 
-export const ExploreTileMetaOptions = ({
+export const useExploreTileMetaOptions = ({
 	exploreId,
 } : {
 	exploreId: number;
@@ -28,7 +28,7 @@ export const ExploreTileMetaOptions = ({
 	})
 };
 
-export const ExploreTileOptions = ({
+export const useExploreTileOptions = ({
 	exploreId,
 } : {
 	exploreId: number;

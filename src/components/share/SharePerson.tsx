@@ -61,7 +61,7 @@ const EditOptionsSelector = ({
 			<item.icon size={20} color={colors.foreground} />
 		</View>
 		);
-	}, []);
+	}, [colors.border, colors.foreground, colors.muted]);
 
 	const handleSelectionChange = useCallback((item: EditOption) => {
 		setActiveEditingOption(item.value);

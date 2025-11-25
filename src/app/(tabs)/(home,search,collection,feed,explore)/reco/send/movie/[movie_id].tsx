@@ -8,7 +8,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Pressable, ScrollViewProps } from "react-native";
+import { Alert, Pressable } from "react-native";
 import { useTranslations } from "use-intl";
 import { z } from "zod";
 import { SelectionFooter } from "@/components/ui/SelectionFooter";
@@ -43,17 +43,17 @@ const RecoSendMovie = () => {
 	const movieId = Number(movie_id);
 
 	// Form
-	const sendRecoMovieFormSchema = useMemo(() => z.object({
+	const sendRecoMovieFormSchema = z.object({
 		comment: z.string()
 			.max(COMMENT_MAX_LENGTH, { message: upperFirst(t('common.form.length.char_max', { count: COMMENT_MAX_LENGTH }))})
 			.regex(/^(?!\s+$)(?!.*\n\s*\n)[\s\S]*$/)
 			.optional()
 			.nullable(),
-	}), [t]);
+	});
 	type SendRecoMovieFormValues = z.infer<typeof sendRecoMovieFormSchema>;
-	const defaultValues = useMemo((): Partial<SendRecoMovieFormValues> => ({
+	const defaultValues: Partial<SendRecoMovieFormValues> = {
 		comment: '',
-	}), []);
+	};
 	const form = useForm<SendRecoMovieFormValues>({
 		resolver: zodResolver(sendRecoMovieFormSchema),
 		defaultValues,
@@ -61,7 +61,7 @@ const RecoSendMovie = () => {
 	});
 
 	// Mutations
-	const sendReco = useUserRecosMovieInsertMutation();
+	const { mutateAsync: sendReco, isPending: isSendingReco } = useUserRecosMovieInsertMutation();
 
 	// SharedValues
 	const footerHeight = useSharedValue(0);
@@ -70,15 +70,8 @@ const RecoSendMovie = () => {
 	const [search, setSearch] = useState('');
 	const [results, setResults] = useState<typeof friends>([]);
 	const [selected, setSelected] = useState<Profile[]>([]);
-	const resultsRender = useMemo(() => (
-		results?.map((item) => ({
-			item: item,
-			isSelected: selected.some((selectedItem) => selectedItem.id === item.friend.id),
-		})) || []
-	), [results, selected]);
-	const canSave = useMemo(() => {
-		return selected.length > 0 && form.formState.isValid;
-	}, [selected, form.formState.isValid]);
+	const resultsRender = results?.map((item) => ({ item: item, isSelected: selected.some((selectedItem) => selectedItem.id === item.friend.id) }))
+	const canSave = selected.length > 0 && form.formState.isValid;
 
 	// Queries
 	const {
@@ -118,7 +111,7 @@ const RecoSendMovie = () => {
 	const handleSubmit = useCallback(async (values: SendRecoMovieFormValues) => {
 		if (!session?.user.id) return;
 		if (selected.length === 0) return;
-		await sendReco.mutateAsync({
+		await sendReco({
 			senderId: session.user.id,
 			movieId: movieId,
 			receivers: selected,
@@ -132,7 +125,7 @@ const RecoSendMovie = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [router, sendReco, session?.user.id, selected, t, movieId, toast]);
+	}, [session, selected, movieId, sendReco, toast, router, t]);
 	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
@@ -154,34 +147,6 @@ const RecoSendMovie = () => {
 		}
 	}, [canSave, router, t, mode]);
 
-	// Render
-	const renderItems = useCallback(({ item: { item, isSelected} }: { item: { item: { friend: Profile, as_watched: boolean, already_sent: boolean }, isSelected: boolean }}) => {
-		return (
-			<Pressable onPress={() => handleToggleUser(item.friend)} style={[{ marginHorizontal: PADDING_HORIZONTAL }, tw`flex-row items-center justify-between`]}>
-				<CardUser user={item.friend} linked={false} style={tw`border-0 p-0 h-auto bg-transparent`} />
-				<View style={tw`flex-row items-center gap-2`}>
-					{item.already_sent && (
-					<Badge variant="accent-yellow">
-						{upperFirst(t('common.messages.already_sent'))}
-					</Badge>
-					)}
-					{item.as_watched && (
-					<Badge variant="destructive">
-						{upperFirst(t('common.messages.already_watched'))}
-					</Badge>
-					)}
-					<Checkbox
-					checked={isSelected}
-					onCheckedChange={() => handleToggleUser(item.friend)}
-					/>
-				</View>
-			</Pressable>
-		);
-	}, [handleToggleUser, t]);
-	const renderScroll = useCallback((props: ScrollViewProps) => {
-        return <AnimatedContentContainer {...props} />;
-    }, []);
-
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
 		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : insets.bottom);
@@ -199,7 +164,7 @@ const RecoSendMovie = () => {
 					<Button
 					variant="ghost"
 					size="fit"
-					disabled={sendReco.isPending}
+					disabled={isSendingReco}
 					onPress={handleCancel}
 					>
 						{upperFirst(t('common.messages.cancel'))}
@@ -221,9 +186,29 @@ const RecoSendMovie = () => {
 		</View>
 		<AnimatedLegendList
 		data={resultsRender}
-		renderItem={renderItems}
+		renderItem={({ item: { item, isSelected } }) => (
+			<Pressable onPress={() => handleToggleUser(item.friend)} style={[{ marginHorizontal: PADDING_HORIZONTAL }, tw`flex-row items-center justify-between`]}>
+				<CardUser user={item.friend} linked={false} style={tw`border-0 p-0 h-auto bg-transparent`} />
+				<View style={tw`flex-row items-center gap-2`}>
+					{item.already_sent && (
+					<Badge variant="accent-yellow">
+						{upperFirst(t('common.messages.already_sent'))}
+					</Badge>
+					)}
+					{item.as_watched && (
+					<Badge variant="destructive">
+						{upperFirst(t('common.messages.already_watched'))}
+					</Badge>
+					)}
+					<Checkbox
+					checked={isSelected}
+					onCheckedChange={() => handleToggleUser(item.friend)}
+					/>
+				</View>
+			</Pressable>
+		)}
 		ListEmptyComponent={
-			sendReco.isPending ? <Icons.Loader />
+			isSendingReco ? <Icons.Loader />
 			: (
 				<View style={tw`p-4`}>
 					<Text textColor="muted" style={tw`text-center`}>
@@ -240,7 +225,7 @@ const RecoSendMovie = () => {
 			tw`gap-2`,
 			animatedFooterStyle
 		]}
-		renderScrollComponent={renderScroll}
+		renderScrollComponent={(props) => <AnimatedContentContainer {...props} />}
 		keyboardShouldPersistTaps='handled'
 		/>
 		<SelectionFooter
@@ -263,13 +248,13 @@ const RecoSendMovie = () => {
 				value={value || ''}
 				onChangeText={onChange}
 				onBlur={onBlur}
-				disabled={sendReco.isPending}
+				disabled={isSendingReco}
 				error={form.formState.errors.comment?.message}
 				/>
 				<Button
 				variant="accent-yellow"
 				onPress={form.handleSubmit(handleSubmit)}
-				disabled={sendReco.isPending}
+				disabled={isSendingReco}
 				>
 					{upperFirst(t('common.messages.add'))}
 				</Button>

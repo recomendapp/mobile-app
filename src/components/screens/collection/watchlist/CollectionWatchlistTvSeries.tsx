@@ -29,7 +29,7 @@ export const CollectionWatchlistTvSeries = () => {
     });
 	const screenTitle = upperFirst(t('common.messages.watchlist'));
 	// Mutations
-	const deleteWatchlistMutation = useUserWatchlistTvSeriesDeleteMutation();
+	const { mutateAsync: deleteWatchlistMutation } = useUserWatchlistTvSeriesDeleteMutation();
 	// SharedValues
 	const scrollY = useSharedValue(0);
 	const headerHeight = useSharedValue(0);
@@ -47,7 +47,7 @@ export const CollectionWatchlistTvSeries = () => {
 				{
 					text: upperFirst(t('common.messages.delete')),
 					onPress: async () => {
-						await deleteWatchlistMutation.mutateAsync({
+						await deleteWatchlistMutation({
 							watchlistId: data.id,
 						}, {
 							onSuccess: () => {
@@ -151,7 +151,7 @@ export const CollectionWatchlistTvSeries = () => {
 			additionalItemsTop: additionalItems.filter(action => action.position === 'top'),
 			additionalItemsBottom: additionalItems.filter(action => action.position === 'bottom'),
 		})
-	}, [bottomSheetActions]);
+	}, [bottomSheetActions, openSheet]);
 
     return (
 	<>
