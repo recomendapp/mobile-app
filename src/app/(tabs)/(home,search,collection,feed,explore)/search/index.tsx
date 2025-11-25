@@ -173,6 +173,7 @@ const SearchResultSection = <T,>({
 					paddingHorizontal: PADDING_HORIZONTAL,
 					gap: GAP,
 				}}
+				keyboardShouldPersistTaps='handled'
 				columnStyle={{ width: width, gap: GAP }}
 				snapToInterval={width + GAP}
 				decelerationRate="fast"

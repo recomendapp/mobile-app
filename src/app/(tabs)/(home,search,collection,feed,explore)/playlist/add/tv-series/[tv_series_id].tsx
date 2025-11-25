@@ -295,6 +295,7 @@ const PlaylistTvSeriesAdd = () => {
 			tw`gap-2`,
 			animatedFooterStyle
 		]}
+		keyboardShouldPersistTaps='handled'
 		renderScrollComponent={(props) => <AnimatedContentContainer {...props} />}
 		/>
 		<SelectionFooter
