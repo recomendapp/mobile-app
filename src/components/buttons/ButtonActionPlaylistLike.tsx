@@ -1,4 +1,4 @@
-import * as React from "react"
+import { forwardRef } from "react";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistLikeQuery } from "@/features/user/userQueries";
 import { useUserPlaylistLikeDeleteMutation, useUserPlaylistLikeInsertMutation } from "@/features/user/userMutations";
@@ -15,7 +15,7 @@ interface ButtonActionPlaylistLikeProps
 		playlist: Playlist;
 	}
 
-const ButtonActionPlaylistLike = React.forwardRef<
+const ButtonActionPlaylistLike = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonActionPlaylistLikeProps
 >(({ playlist, variant = "ghost", size = "icon", icon = Icons.like, onPress, iconProps, ...props }, ref) => {
@@ -29,12 +29,12 @@ const ButtonActionPlaylistLike = React.forwardRef<
 		userId: session?.user.id,
 		playlistId: playlist.id,
 	});
-	const insertLike = useUserPlaylistLikeInsertMutation();
-	const deleteLike = useUserPlaylistLikeDeleteMutation();
+	const { mutateAsync: insertLike } = useUserPlaylistLikeInsertMutation();
+	const { mutateAsync: deleteLike } = useUserPlaylistLikeDeleteMutation();
 
 	const handleLike = async () => {
 		if (!session?.user.id || !playlist.id) return;
-		await insertLike.mutateAsync({
+		await insertLike({
 			userId: session.user.id,
 			playlistId: playlist.id,
 		}, {
@@ -45,7 +45,7 @@ const ButtonActionPlaylistLike = React.forwardRef<
 	};
 	const handleUnlike = async () => {
 		if (!like) return;
-		await deleteLike.mutateAsync({
+		await deleteLike({
 			likeId: like.id
 		}, {
 			onError: () => {

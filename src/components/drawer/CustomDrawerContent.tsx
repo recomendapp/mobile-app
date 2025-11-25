@@ -3,7 +3,6 @@ import { DrawerContentComponentProps, DrawerContentScrollView, DrawerItem } from
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { Icons } from "@/constants/Icons";
-import { useCallback, useMemo, memo } from "react";
 import UserAvatar from "@/components/user/UserAvatar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -24,7 +23,7 @@ type Route = {
     color?: string;
 }
 
-const ProfileHeader = memo(({
+const ProfileHeader = ({
     closeDrawer,
 }: {
     closeDrawer: () => void;
@@ -34,11 +33,11 @@ const ProfileHeader = memo(({
     const router = useRouter();
     const t = useTranslations();
     
-    const handleProfilePress = useCallback(() => {
+    const handleProfilePress = () => {
         if (!user) return;
         router.push(`/user/${user.username}`);
         closeDrawer();
-    }, [user, router, closeDrawer]);
+    };
 
     return (
         <DrawerItem
@@ -72,10 +71,9 @@ const ProfileHeader = memo(({
             onPress={handleProfilePress}
         />
     );
-});
-ProfileHeader.displayName = 'ProfileHeader';
+};
 
-const RouteItem = memo(({ 
+const RouteItem = ({ 
     route, 
     closeDrawer 
 }: { 
@@ -84,10 +82,10 @@ const RouteItem = memo(({
 }) => {
     const { colors } = useTheme();
     
-    const handlePress = useCallback(() => {
+    const handlePress = () => {
         route.onPress();
         closeDrawer();
-    }, [route, closeDrawer]);
+    };
 
     return (
         <DrawerItem
@@ -99,8 +97,7 @@ const RouteItem = memo(({
             onPress={handlePress}
         />
     );
-});
-RouteItem.displayName = 'RouteItem';
+};
 
 const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     const router = useRouter();
@@ -109,7 +106,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     const { colors, mode } = useTheme();
     const { session, customerInfo, logout } = useAuth();
 
-    const routes = useMemo(() => [
+    const routes = [
         {
             id: 'login',
             name: upperFirst(t('common.messages.login')),
@@ -139,18 +136,15 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             onPress: () => router.push('/about'),
             visible: true,
         }
-    ], [t, router, session, customerInfo?.entitlements.active, colors.accentBlue]);
+    ];
 
-    const visibleRoutes = useMemo(
-        () => routes.filter(route => route.visible),
-        [routes]
-    );
+    const visibleRoutes = routes.filter(route => route.visible);
 
-    const closeDrawer = useCallback(() => {
+    const closeDrawer = () => {
         props.navigation.closeDrawer();
-    }, [props.navigation]);
+    };
 
-    const handleLogout = useCallback(async () => {
+    const handleLogout = async () => {
         try {
             await logout();
             closeDrawer();
@@ -161,9 +155,9 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             }
             toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
         }
-    }, [logout, closeDrawer, t, toast]);
+    };
 
-    const handleLogoutButtonPress = useCallback(() => {
+    const handleLogoutButtonPress = () => {
         Alert.alert(
             upperFirst(t('common.messages.are_u_sure')),
             undefined,
@@ -181,7 +175,7 @@ const CustomDrawerContent = (props: DrawerContentComponentProps) => {
                 userInterfaceStyle: mode,
             }
         );
-    }, [handleLogout, t, mode]);
+    };
 
     return (
         <SafeAreaView

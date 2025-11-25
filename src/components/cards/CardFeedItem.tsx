@@ -1,13 +1,11 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaMovie, MediaTvSeries, UserActivityType } from "@recomendapp/types";
+import { MediaMovie, MediaTvSeries, UserActivityType, FixedOmit } from "@recomendapp/types";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Pressable, View } from "react-native";
-import { useRouter } from "expo-router";
 import { Text } from "@/components/ui/text";
-import { FixedOmit } from "@recomendapp/types";
 import { Skeleton } from "../ui/Skeleton";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
@@ -56,7 +54,6 @@ const CardFeedItemDefault = React.forwardRef<
 >(({ style, children, media, type, content, footer, onPosterPress, onLongPress, skeleton, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
-	const router = useRouter();
 	const details = React.useMemo(() => {
 		switch (type) {
 			case 'movie':

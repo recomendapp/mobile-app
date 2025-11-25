@@ -6,7 +6,7 @@ import { useTheme } from '@/providers/ThemeProvider';
 import { CORNERS, FONT_SIZE, HEIGHT } from '@/theme/globals';
 import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import { Search, X } from 'lucide-react-native';
-import React, { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   TextInputProps,
@@ -59,27 +59,24 @@ export function BottomSheetSearchbar({
   const icon = colors.mutedForeground;
 
   // Handle text change with debouncing
-  const handleTextChange = useCallback(
-    (text: string) => {
-      setInternalValue(text);
-      onChangeText?.(text);
+  const handleTextChange = (text: string) => {
+    setInternalValue(text);
+    onChangeText?.(text);
 
-      if (onSearch && debounceMs > 0) {
-        if (debounceRef.current) {
-          clearTimeout(debounceRef.current);
-        }
-        (debounceRef.current as any) = setTimeout(() => {
-          onSearch(text);
-        }, debounceMs);
-      } else if (onSearch) {
-        onSearch(text);
+    if (onSearch && debounceMs > 0) {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
       }
-    },
-    [onChangeText, onSearch, debounceMs]
-  );
+      (debounceRef.current as any) = setTimeout(() => {
+        onSearch(text);
+      }, debounceMs);
+    } else if (onSearch) {
+      onSearch(text);
+    }
+  };
 
   // Handle clear button press
-  const handleClear = useCallback(() => {
+  const handleClear = () => {
     setInternalValue('');
     onChangeText?.('');
     onClear?.();
@@ -87,7 +84,7 @@ export function BottomSheetSearchbar({
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
-  }, [onChangeText, onClear, onSearch]);
+  };
 
   // Get container style based on variant and size
   const baseStyle: ViewStyle = {

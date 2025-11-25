@@ -8,7 +8,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { useState, useCallback, useMemo, memo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useLocale, useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
@@ -123,7 +123,7 @@ const FilmScreen = () => {
 	)
 };
 
-const FilmCast = memo(({
+const FilmCast = ({
 	cast,
 } : {
 	cast: MediaMoviePerson[]
@@ -167,7 +167,6 @@ const FilmCast = memo(({
 		decelerationRate={"fast"}
 		/>
 	)
-});
-FilmCast.displayName = 'FilmCast';
+};
 
 export default FilmScreen;

@@ -1,6 +1,6 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { userKeys } from "../user/userKeys";
-import { InfiniteData, matchQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Playlist, PlaylistGuest, PlaylistItemMovie, PlaylistItemTvSeries, PlaylistType } from "@recomendapp/types";
 import { playlistKeys } from "./playlistKeys";
 import { mediaKeys } from "../media/mediaKeys";
@@ -595,7 +595,7 @@ export const usePlaylistTvSeriesInsertMutation = ({
 		}) => {
 			if (!userId) throw Error('User id is missing');
 			if (playlists.length === 0) throw Error('You must select at least one playlist');
-			const { data, error } = await supabase
+			const { error } = await supabase
 				.from('playlist_items_tv_series')
 				.insert(
 					playlists.map((playlist) => ({

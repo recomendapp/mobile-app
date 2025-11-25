@@ -40,13 +40,13 @@ const SettingsProfileScreen = () => {
 	const { bottomOffset, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const { showActionSheetWithOptions } = useActionSheet();
-	const updateProfileMutation = useUserUpdateMutation({
+	const { mutateAsync: updateProfileMutation } = useUserUpdateMutation({
 		userId: user?.id,
 	});
 	const [ isLoading, setIsLoading ] = useState(false);
 	const [ newAvatar, setNewAvatar ] = useState<ImagePickerAsset | null | undefined>(undefined);
 	// Form
-	const profileFormSchema = useMemo(() => z.object({
+	const profileFormSchema = z.object({
 		full_name: z
 		  .string()
 		  .min(FULL_NAME_MIN_LENGTH, {
@@ -72,32 +72,39 @@ const SettingsProfileScreen = () => {
 		  })
 		  .optional()
 		  .nullable(),
-	}), [t]);
+	});
 	type ProfileFormValues = z.infer<typeof profileFormSchema>;
-	const defaultValues = useMemo((): Partial<ProfileFormValues> => ({
+	const defaultValues: Partial<ProfileFormValues> = {
 		full_name: user?.full_name ?? '',
 		bio: user?.bio,
 		website: user?.website,
-	}), [user]);
-	const form = useForm<ProfileFormValues>({
+	};
+	const { watch: formWatch, reset: formReset, ...form} = useForm<ProfileFormValues>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues,
 		mode: 'onChange',
 	});
 
 	const [ hasFormChanged, setHasFormChanged ] = useState(false);
-	const canSave = useMemo(() => {
-		return (hasFormChanged || newAvatar !== undefined) && form.formState.isValid;
-	}, [hasFormChanged, newAvatar, form.formState.isValid]);
+	const canSave = (hasFormChanged || newAvatar !== undefined) && form.formState.isValid;
 
 	// Avatar
 	const avatarOptions = useMemo(() => [
 		{ label: upperFirst(t('common.messages.choose_from_the_library')), value: "library" },
 		{ label: upperFirst(t('common.messages.take_a_photo')), value: "camera" },
 		{ label: upperFirst(t('common.messages.delete_current_image')), value: "delete", disable: !user?.avatar_url && !newAvatar },
-	], [user?.avatar_url, newAvatar, t]);
-
+	], [t, user?.avatar_url, newAvatar]);
 	// Handlers
+	const handleProcessImage = useCallback(async (image: ImagePickerAsset) => {
+		const processedImage = await ImageManipulator.manipulate(image.uri)
+			.resize({ width: 1024, height: 1024 })
+			.renderAsync()
+		return await processedImage.saveAsync({
+			compress: 0.8,
+			format: SaveFormat.JPEG,
+			base64: true,
+		})
+	}, []);
 	const handleAvatarOptions = useCallback(() => {
 		const options = [
 			...avatarOptions,
@@ -151,7 +158,7 @@ const SettingsProfileScreen = () => {
 					break;
 			};
 		});
-	}, [avatarOptions, showActionSheetWithOptions, user?.avatar_url, t]);
+	}, [showActionSheetWithOptions, toast, t, user?.avatar_url, avatarOptions, handleProcessImage]);
 	const handleSubmit = useCallback(async (values: ProfileFormValues) => {
 		try {
 			if (!user) return;
@@ -174,7 +181,7 @@ const SettingsProfileScreen = () => {
 			} else if (newAvatar === null) {
 				avatar_url = null; // Delete avatar
 			}
-			await updateProfileMutation.mutateAsync({
+			await updateProfileMutation({
 				fullName: values.full_name,
 				bio: values.bio?.trim() || null,
 				website: values.website?.trim() || null,
@@ -193,31 +200,21 @@ const SettingsProfileScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [user, newAvatar, supabase, updateProfileMutation, t]);
-	const handleProcessImage = useCallback(async (image: ImagePickerAsset) => {
-		const processedImage = await ImageManipulator.manipulate(image.uri)
-			.resize({ width: 1024, height: 1024 })
-			.renderAsync()
-		return await processedImage.saveAsync({
-			compress: 0.8,
-			format: SaveFormat.JPEG,
-			base64: true,
-		})
-	}, []);
+	}, [user, newAvatar, supabase, updateProfileMutation, toast, t]);
 
 	// useEffects
 	useEffect(() => {
 		if (user) {
-			form.reset({
+			formReset({
 				full_name: user.full_name,
 				bio: user.bio,
 				website: user.website,
 			});
 		}
-	}, [user]);
+	}, [user, formReset]);
 	// Track form changes
 	useEffect(() => {
-		const subscription = form.watch((value) => {
+		const subscription = formWatch((value) => {
 			const isFormChanged =
 				value.full_name !== defaultValues.full_name ||
 				(value.bio?.trim() || null) !== defaultValues.bio ||
@@ -225,12 +222,12 @@ const SettingsProfileScreen = () => {
 			setHasFormChanged(isFormChanged);
 		});
 		return () => subscription.unsubscribe();
-	}, [form.watch, defaultValues]);
+	}, [formWatch, defaultValues.full_name, defaultValues.bio, defaultValues.website]);
 
 	return (
 	<>
 		<Stack.Screen
-			options={useMemo(() => ({
+			options={{
 				headerTitle: upperFirst(t('pages.settings.profile.label')),
 				headerRight: () => (
 					<Button
@@ -243,7 +240,7 @@ const SettingsProfileScreen = () => {
 						{upperFirst(t('common.messages.save'))}
 					</Button>
 				),
-			}), [t, isLoading, canSave, form, handleSubmit])}
+			}}
 		/>
 		<KeyboardAwareScrollView
 		contentContainerStyle={{

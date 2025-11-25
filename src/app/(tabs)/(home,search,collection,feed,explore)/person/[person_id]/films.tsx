@@ -68,7 +68,7 @@ const PersonFilmsScreen = () => {
 			if (selectedIndex === undefined || selectedIndex === cancelIndex) return;
 			setSortBy(sortByOptionsWithCancel[selectedIndex] as sortBy);
 		});
-	}, [sortByOptions, showActionSheetWithOptions]);
+	}, [sortByOptions, showActionSheetWithOptions, sortBy.value, t]);
 	return (
 	<>
 		<Stack.Screen

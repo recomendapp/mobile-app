@@ -1,4 +1,3 @@
-import React from "react"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityTvSeriesQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
@@ -14,13 +13,14 @@ import { useUserActivityTvSeriesInsertMutation, useUserActivityTvSeriesUpdateMut
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
+import { forwardRef } from "react";
 
 interface ButtonUserActivityTvSeriesRatingProps
 	extends React.ComponentProps<typeof Button> {
 		tvSeries: MediaTvSeries;
 	}
 
-const ButtonUserActivityTvSeriesRating = React.forwardRef<
+const ButtonUserActivityTvSeriesRating = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserActivityTvSeriesRatingProps
 >(({ tvSeries, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
@@ -33,20 +33,18 @@ const ButtonUserActivityTvSeriesRating = React.forwardRef<
 	// Requests
 	const {
 		data: activity,
-		isLoading,
-		isError,
 	} = useUserActivityTvSeriesQuery({
 		userId: session?.user.id,
 		tvSeriesId: tvSeries.id,
 	});
 	// Mutations
-	const insertActivity = useUserActivityTvSeriesInsertMutation();
-	const updateActivity = useUserActivityTvSeriesUpdateMutation();
+	const { mutateAsync: insertActivity } = useUserActivityTvSeriesInsertMutation();
+	const { mutateAsync: updateActivity } = useUserActivityTvSeriesUpdateMutation();
 	// Handlers
 	const handleRate = async (rating: number) => {
 		if (!session) return;
 		if (activity) {
-			await updateActivity.mutateAsync({
+			await updateActivity({
 				activityId: activity.id,
 				rating: rating,
 			}, {
@@ -55,7 +53,7 @@ const ButtonUserActivityTvSeriesRating = React.forwardRef<
 				}
 			});
 		} else {
-			await insertActivity.mutateAsync({
+			await insertActivity({
 				userId: session.user.id,
 				tvSeriesId: tvSeries.id,
 				rating: rating,
@@ -71,7 +69,7 @@ const ButtonUserActivityTvSeriesRating = React.forwardRef<
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: 'You cannot unrate a media with a review.' });
 			return;
 		}
-		await updateActivity.mutateAsync({
+		await updateActivity({
 			activityId: activity!.id!,
 			rating: null,
 		}, {

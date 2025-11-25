@@ -1,11 +1,9 @@
 import { Component } from "react";
 import { useTheme } from "@/providers/ThemeProvider";
 import GBottomSheet, {
-  BottomSheetProps as GBottomSheetProps,
+  BottomSheetProps,
 } from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-export interface BottomSheetProps extends GBottomSheetProps {}
 
 export default class BottomSheet extends Component<BottomSheetProps> {
   render() {

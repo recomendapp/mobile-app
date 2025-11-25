@@ -1,7 +1,6 @@
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import * as React from 'react';
-import { Pressable } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 type Variant =

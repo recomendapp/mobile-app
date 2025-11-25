@@ -1,15 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Localization from "expo-localization";
 import deepmerge from "deepmerge";
-import { defaultLocale, SupportedLocale } from "@/translations/locales";
+import { defaultSupportedLocale, SupportedLocale } from "@/translations/locales";
 import { getFallbackLocale } from "@/translations/utils/getFallbackLocale";
 import { loadPolyfills } from "./polyfills";
+import { getDictionary } from "@/translations/utils/getDictionary";
 
 export const getLocale = async (): Promise<string> => {
   let saved = await AsyncStorage.getItem("language");
 
   if (!saved) {
-    const deviceLocale = Localization.getLocales()[0]?.languageTag ?? defaultLocale;
+    const deviceLocale = Localization.getLocales()[0]?.languageTag ?? defaultSupportedLocale;
     saved = deviceLocale;
     await AsyncStorage.setItem("language", saved);
   }
@@ -22,20 +23,15 @@ export const setLocale = async (locale: string): Promise<void> => {
 };
 
 const loadMessages = async (locale: SupportedLocale): Promise<Record<string, any>> => {
-  const getMessagesForLocale = (loc: SupportedLocale) => {
-    switch (loc) {
-      case 'fr-FR':
-        return require('@/translations/fr-FR.json');
-      default:
-        return require('@/translations/en-US.json');
-    }
-  };
   const fallback = getFallbackLocale({ locale });
-  if (!fallback) {
-    return getMessagesForLocale(locale);
+
+  const userMessages = await getDictionary(locale);
+
+  if (!fallback || fallback === locale) {
+    return userMessages;
   }
-  const fallbackMessages = await loadMessages(fallback); // Recursive call
-  const userMessages = getMessagesForLocale(locale);
+
+  const fallbackMessages = await loadMessages(fallback);
   return deepmerge(fallbackMessages, userMessages);
 };
 

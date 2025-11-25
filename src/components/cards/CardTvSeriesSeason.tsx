@@ -6,7 +6,6 @@ import { Href, useRouter } from "expo-router";
 import tw from "@/lib/tw";
 import { Pressable, View } from "react-native";
 import { useTheme } from "@/providers/ThemeProvider";
-import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { upperFirst } from "lodash";
 import { IconMediaRating } from "../medias/IconMediaRating";
 import { useTranslations } from "use-intl";
@@ -76,7 +75,6 @@ const CardTvSeriesSeason = React.forwardRef<
 	CardTvSeriesSeasonProps
 >(({ hideMediaType = true, showRating = true, linked = true, variant = "default", ...props }, ref) => {
 	const router = useRouter();
-	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const onPress = () => {
 		if (linked && props.season.url) {
 			router.push(props.season.url as Href);

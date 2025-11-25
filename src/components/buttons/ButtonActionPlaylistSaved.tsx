@@ -1,4 +1,3 @@
-import * as React from "react"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistSavedQuery } from "@/features/user/userQueries";
 import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation } from "@/features/user/userMutations";
@@ -9,13 +8,14 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "../Toast";
 import { Playlist } from "@recomendapp/types";
+import { forwardRef } from "react";
 
 interface ButtonActionPlaylistSavedProps
 	extends React.ComponentProps<typeof Button> {
 		playlist: Playlist;
 	}
 
-const ButtonActionPlaylistSaved = React.forwardRef<
+const ButtonActionPlaylistSaved = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonActionPlaylistSavedProps
 >(({ playlist, variant = "ghost", size = "icon", icon = Icons.Watchlist, onPress, iconProps, ...props }, ref) => {
@@ -29,12 +29,12 @@ const ButtonActionPlaylistSaved = React.forwardRef<
 		userId: session?.user.id,
 		playlistId: playlist.id,
 	});
-	const insertSaved = useUserPlaylistSavedInsertMutation();
-	const deleteSaved = useUserPlaylistSavedDeleteMutation();
+	const { mutateAsync: insertSaved } = useUserPlaylistSavedInsertMutation();
+	const { mutateAsync: deleteSaved } = useUserPlaylistSavedDeleteMutation();
 
 	const handleLike = async () => {
 		if (!session?.user.id || !playlist.id) return;
-		await insertSaved.mutateAsync({
+		await insertSaved({
 			userId: session.user.id,
 			playlistId: playlist.id,
 		}, {
@@ -45,7 +45,7 @@ const ButtonActionPlaylistSaved = React.forwardRef<
 	};
 	const handleUnlike = async () => {
 		if (!saved) return;
-		await deleteSaved.mutateAsync({
+		await deleteSaved({
 			savedId: saved.id
 		}, {
 			onError: () => {

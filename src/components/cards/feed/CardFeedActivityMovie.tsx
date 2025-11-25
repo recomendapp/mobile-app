@@ -1,6 +1,6 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
-import { MediaMovie, Profile, UserActivityMovie } from "@recomendapp/types";
+import { MediaMovie, Profile, UserActivityMovie, FixedOmit } from "@recomendapp/types";
 import * as React from "react"
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
@@ -8,7 +8,6 @@ import { Pressable, View } from "react-native";
 import FeedUserActivity from "@/components/screens/feed/FeedUserActivity";
 import { Href, useRouter } from "expo-router";
 import { Text } from "@/components/ui/text";
-import { FixedOmit } from "@recomendapp/types";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { Skeleton } from "@/components/ui/Skeleton";

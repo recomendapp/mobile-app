@@ -29,8 +29,8 @@ export const CollectionMyRecosMovie = () => {
     });
 	const screenTitle = upperFirst(t('common.messages.my_recos', { count: 2 }));
 	// Mutations
-	const deleteReco = useUserRecosMovieDeleteMutation();
-	const completeReco = useUserRecosMovieCompleteMutation();
+	const { mutateAsync: deleteReco } = useUserRecosMovieDeleteMutation();
+	const { mutateAsync: completeReco } = useUserRecosMovieCompleteMutation();
 	// SharedValues
 	const scrollY = useSharedValue(0);
 	const headerHeight = useSharedValue(0);
@@ -48,7 +48,7 @@ export const CollectionMyRecosMovie = () => {
 				{
 					text: upperFirst(t('common.messages.delete')),
 					onPress: async () => {
-						await deleteReco.mutateAsync({
+						await deleteReco({
 							userId: user!.id,
 							movieId: data.movie!.id,
 						}, {
@@ -79,7 +79,7 @@ export const CollectionMyRecosMovie = () => {
 				{
 					text: upperFirst(t('common.messages.complete')),
 					onPress: async () => {
-						await completeReco.mutateAsync({
+						await completeReco({
 							userId: user!.id,
 							movieId: data.movie!.id,
 						}, {
@@ -189,7 +189,7 @@ export const CollectionMyRecosMovie = () => {
 			additionalItemsTop: additionalItems.filter(action => action.position === 'top'),
 			additionalItemsBottom: additionalItems.filter(action => action.position === 'bottom'),
 		})
-	}, [bottomSheetActions]);
+	}, [bottomSheetActions, openSheet]);
 
     return (
 	<>

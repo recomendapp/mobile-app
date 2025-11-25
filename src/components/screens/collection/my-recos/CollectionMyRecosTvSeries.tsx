@@ -29,8 +29,8 @@ export const CollectionMyRecosTvSeries = () => {
     });
 	const screenTitle = upperFirst(t('common.messages.my_recos', { count: 2 }));
 	// Mutations
-	const deleteReco = useUserRecosTvSeriesDeleteMutation();
-	const completeReco = useUserRecosTvSeriesCompleteMutation();
+	const { mutateAsync: deleteReco } = useUserRecosTvSeriesDeleteMutation();
+	const { mutateAsync: completeReco } = useUserRecosTvSeriesCompleteMutation();
 	// SharedValues
 	const scrollY = useSharedValue(0);
 	const headerHeight = useSharedValue(0);
@@ -48,7 +48,7 @@ export const CollectionMyRecosTvSeries = () => {
 				{
 					text: upperFirst(t('common.messages.delete')),
 					onPress: async () => {
-						await deleteReco.mutateAsync({
+						await deleteReco({
 							userId: user!.id,
 							tvSeriesId: data.tv_series!.id,
 						}, {
@@ -79,7 +79,7 @@ export const CollectionMyRecosTvSeries = () => {
 				{
 					text: upperFirst(t('common.messages.complete')),
 					onPress: async () => {
-						await completeReco.mutateAsync({
+						await completeReco({
 							userId: user!.id,
 							tvSeriesId: data.tv_series!.id,
 						}, {
@@ -187,7 +187,7 @@ export const CollectionMyRecosTvSeries = () => {
 			additionalItemsTop: additionalItems.filter(action => action.position === 'top'),
 			additionalItemsBottom: additionalItems.filter(action => action.position === 'bottom'),
 		})
-	}, [bottomSheetActions]);
+	}, [bottomSheetActions, openSheet]);
 
     return (
 	<>

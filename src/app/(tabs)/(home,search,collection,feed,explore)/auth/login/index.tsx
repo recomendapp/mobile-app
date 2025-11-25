@@ -59,7 +59,7 @@ const LoginScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [email, password, login, t]);
+	}, [email, password, login, t, toast]);
 
 	return (
 	<>

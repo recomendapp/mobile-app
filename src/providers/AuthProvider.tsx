@@ -1,6 +1,6 @@
 import { User } from "@recomendapp/types";
 import { Provider, Session } from "@supabase/supabase-js";
-import { createContext, use, useCallback, useEffect, useState, useMemo } from "react";
+import { createContext, use, useCallback, useEffect, useState } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
 import { AppState, Platform } from "react-native";
 import { supabase } from "@/lib/supabase/client";
@@ -10,7 +10,7 @@ import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import { makeRedirectUri } from "expo-auth-session";
-import { defaultLocale, SupportedLocale, supportedLocales } from "@/translations/locales";
+import { defaultSupportedLocale, SupportedLocale, supportedLocales } from "@/translations/locales";
 import { useRevenueCat } from "@/hooks/useRevenueCat";
 import { CustomerInfo } from "react-native-purchases";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -19,7 +19,7 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import * as env from '@/env';
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Keys } from "@/api/keys";
-import { AuthCustomerInfoOptions, AuthUserOptions } from "@/api/options";
+import { useAuthCustomerInfoOptions, useAuthUserOptions } from "@/api/options";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -75,13 +75,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [pushToken, setPushToken] = useState<string | null>(null);
 	const {
 		data: user,
-	} = useQuery(AuthUserOptions({
+	} = useQuery(useAuthUserOptions({
 		userId: session?.user.id,
 	}));
 	const { customerInfo: initCustomerInfo } = useRevenueCat(session);
 	const {
 		data: customerInfo,
-	} = useQuery(AuthCustomerInfoOptions({
+	} = useQuery(useAuthCustomerInfoOptions({
 		enabled: !!initCustomerInfo,
 		initialData: initCustomerInfo,
 	}));
@@ -282,7 +282,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			if (supportedLocales.includes(data.language as SupportedLocale)) {
 				setLocale(data.language);
 			} else {
-				setLocale(defaultLocale);
+				setLocale(defaultSupportedLocale);
 			}
 		}
 	}, [setLocale]);
@@ -312,42 +312,26 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		auth.setReady(true);
 	}, [session, user, auth]);
 
-	const contextValue = useMemo(() => ({
-		session,
-		user,
-		customerInfo,
-		login,
-		loginWithOAuth,
-		loginWithOtp,
-		logout,
-		signup,
-		resetPasswordForEmail,
-		updateEmail,
-		verifyEmailChange,
-		cancelPendingEmailChange,
-		createSessionFromUrl,
-		pushToken,
-		setPushToken,
-	}), [
-		session,
-		user,
-		customerInfo,
-		login,
-		loginWithOAuth,
-		loginWithOtp,
-		logout,
-		signup,
-		resetPasswordForEmail,
-		updateEmail,
-		verifyEmailChange,
-		cancelPendingEmailChange,
-		createSessionFromUrl,
-		pushToken,
-		setPushToken,
-	]);
-
 	return (
-		<AuthContext.Provider value={contextValue}>
+		<AuthContext.Provider
+		value={{
+			session,
+			user,
+			customerInfo,
+			login,
+			loginWithOAuth,
+			loginWithOtp,
+			logout,
+			signup,
+			resetPasswordForEmail,
+			updateEmail,
+			verifyEmailChange,
+			cancelPendingEmailChange,
+			createSessionFromUrl,
+			pushToken,
+			setPushToken,
+		}}
+		>
 			{children}
 		</AuthContext.Provider>
 	);

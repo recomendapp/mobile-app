@@ -49,7 +49,7 @@ export const BottomSheetReviewMovie = React.forwardRef<
   // REFs
   const scrollRef = React.useRef<FlashListRef<Item>>(null);
   // Mutations
-  const reviewDeleteMutation = useUserReviewMovieDeleteMutation();
+  const { mutateAsync: reviewDeleteMutation } = useUserReviewMovieDeleteMutation();
   // States
   const items: Item[] = [
     ...additionalItemsTop,
@@ -79,7 +79,7 @@ export const BottomSheetReviewMovie = React.forwardRef<
               {
                 text: upperFirst(t('common.messages.delete')),
                 onPress: async () => {
-                  await reviewDeleteMutation.mutateAsync(
+                  await reviewDeleteMutation(
                     { id: review.id, movieId: review.activity?.movie_id! },
                     {
                       onSuccess: () => {
@@ -116,7 +116,7 @@ export const BottomSheetReviewMovie = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
-    scrollRef={scrollRef as unknown as React.RefObject<React.Component<unknown, {}, any>>}
+    scrollRef={scrollRef as unknown as React.RefObject<React.Component>}
     contentContainerStyle={tw`p-0`}
     {...props}
     >

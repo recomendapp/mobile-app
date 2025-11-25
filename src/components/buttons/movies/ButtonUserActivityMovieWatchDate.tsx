@@ -1,4 +1,3 @@
-import React from "react"
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
@@ -13,13 +12,14 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { forwardRef, useState } from "react";
 
 interface ButtonUserActivityMovieWatchDateProps
 	extends React.ComponentProps<typeof Button> {
 		movie: MediaMovie;
 	}
 
-const ButtonUserActivityMovieWatchDate = React.forwardRef<
+const ButtonUserActivityMovieWatchDate = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserActivityMovieWatchDateProps
 >(({ movie, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
@@ -30,7 +30,7 @@ const ButtonUserActivityMovieWatchDate = React.forwardRef<
 	const format = useFormatter();
 	const t = useTranslations();
 	// States
-	const [isDatePickerVisible, setDatePickerVisibility] = React.useState(false);
+	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 	// Requests
 	const {
 		data: activity,
@@ -39,7 +39,7 @@ const ButtonUserActivityMovieWatchDate = React.forwardRef<
 		movieId: movie.id,
 	});
 	// Mutations
-	const updateActivity = useUserActivityMovieUpdateMutation();
+	const { mutateAsync: updateActivity } = useUserActivityMovieUpdateMutation();
 	// Handlers
 	const showDatePicker = () => {
 		setDatePickerVisibility(true);
@@ -51,7 +51,7 @@ const ButtonUserActivityMovieWatchDate = React.forwardRef<
 	const handleUpdateDate = async (date: Date) => {
 		if (!session) return;
 		if (!activity) return;
-		await updateActivity.mutateAsync({
+		await updateActivity({
 			activityId: activity.id,
 			watchedDate: date,
 		}, {

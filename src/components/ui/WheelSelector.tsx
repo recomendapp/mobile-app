@@ -43,7 +43,7 @@ const WheelSelectorItem = <T,>({
 
   const animatedStyle = useAnimatedStyle(() => {
     const inputRange = [index - 1, index, index + 1];
-    const opacityRange = [0.65, 1, 0.65];
+    // const opacityRange = [0.65, 1, 0.65];
     
     // Calcul de l'effet wheel
     let transformations: any[] = [];
@@ -158,7 +158,7 @@ function WheelSelectorInner<T>({
       getCurrentIndex: () => {
         return Math.round(scrollX.value);
       },
-    }), [scrollX, totalItemWidth]);
+    }), [scrollX]);
 
     const vibrate = useCallback(() => {
       if (enableHaptics && process.env.EXPO_OS === 'ios') {
@@ -211,9 +211,7 @@ function WheelSelectorInner<T>({
       [
         finalItemWidth,
         scrollX,
-        data.length,
         renderItemProps,
-        totalItemWidth,
         wheelAngle,
         wheelIntensity,
         selectedItem,

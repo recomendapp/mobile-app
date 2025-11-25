@@ -1,8 +1,8 @@
+import { useSearchPersonsOptions } from "@/api/options";
 import { CardPerson } from "@/components/cards/CardPerson";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
-import { useSearchPersonsInfiniteQuery } from "@/features/search/searchQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import useSearchStore from "@/stores/useSearchStore";
@@ -10,40 +10,13 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList, LegendListRef } from "@legendapp/list";
 import { useScrollToTop } from "@react-navigation/native";
 import { MediaPerson } from "@recomendapp/types";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { upperFirst } from "lodash";
-import { useRef, useCallback, useMemo, memo } from "react";
+import { useRef } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
-const PersonItem = memo(({ item }: { item: MediaPerson }) => (
-	<CardPerson variant="list" person={item} />
-));
-PersonItem.displayName = 'PersonItem';
-
-const EmptyComponent = memo(({ 
-	isLoading, 
-	search,
-	noResultsText 
-}: { 
-	isLoading: boolean; 
-	search: string | null;
-	noResultsText: string;
-}) => {
-	if (isLoading) return <Icons.Loader />;
-	
-	if (search) {
-		return (
-			<View style={tw`flex-1 items-center justify-center`}>
-				<Text textColor='muted'>{noResultsText}</Text>
-			</View>
-		);
-	}
-	
-	return null;
-});
-EmptyComponent.displayName = 'EmptyComponent';
-
-const SearchPersonsScreen = memo(() => {
+const SearchPersonsScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { tabBarHeight, bottomOffset} = useTheme();
 	const t = useTranslations();
@@ -55,34 +28,12 @@ const SearchPersonsScreen = memo(() => {
 		isLoading,
 		hasNextPage,
 		fetchNextPage,
-	} = useSearchPersonsInfiniteQuery({
+	} = useInfiniteQuery(useSearchPersonsOptions({
 		query: search,
-	});
+	}));
 	
 	// REFs
 	const scrollRef = useRef<LegendListRef>(null);
-	
-	// Memoized values
-	const personsData = useMemo(() => 
-		data?.pages.flatMap(page => page.data as MediaPerson[]) || [], 
-		[data]
-	);
-
-	// Callbacks
-	const renderItem = useCallback(({ item }: { item: MediaPerson }) => (
-		<PersonItem item={item} />
-	), []);
-
-	const keyExtractor = useCallback((item: MediaPerson) => 
-		item.id.toString(), 
-		[]
-	);
-
-	const onEndReached = useCallback(() => {
-		if (hasNextPage) {
-			fetchNextPage();
-		}
-	}, [hasNextPage, fetchNextPage]);
 
 	useScrollToTop(scrollRef);
 
@@ -90,8 +41,8 @@ const SearchPersonsScreen = memo(() => {
 		<LegendList
 			key={search}
 			ref={scrollRef}
-			data={personsData}
-			renderItem={renderItem}
+			data={data?.pages.flatMap(page => page.data) as MediaPerson[] || []}
+			renderItem={({ item }) => <CardPerson variant="list" person={item} /> }
 			contentContainerStyle={{
 				paddingLeft: insets.left + PADDING_HORIZONTAL,
 				paddingRight: insets.right + PADDING_HORIZONTAL,
@@ -101,18 +52,18 @@ const SearchPersonsScreen = memo(() => {
 			scrollIndicatorInsets={{
 				bottom: tabBarHeight,
 			}}
-			keyExtractor={keyExtractor}
+			keyExtractor={(item) => item.id.toString()}
 			ListEmptyComponent={
-				<EmptyComponent
-				isLoading={isLoading}
-				search={search}
-				noResultsText={upperFirst(t('common.messages.no_results'))}
-				/>
+				isLoading ? <Icons.Loader />
+				: search ? (
+					<View style={tw`flex-1 items-center justify-center`}>
+						<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
+					</View>
+				) : null
 			}
-			onEndReached={onEndReached}
+			onEndReached={() => hasNextPage && fetchNextPage()}
 		/>
 	);
-});
-SearchPersonsScreen.displayName = 'SearchPersonsScreen';
+};
 
 export default SearchPersonsScreen;

@@ -1,14 +1,12 @@
 import { View, ViewProps, useWindowDimensions, ViewStyle, StyleProp, StyleSheet, Pressable } from "react-native";
-import { useWidgetMostRecommended } from "@/features/widget/widgetQueries";
 import { Skeleton } from "../ui/Skeleton";
-import { useCallback, useMemo, useRef } from "react";
+import { useRef } from "react";
 import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
 import Animated, { SharedValue, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import tw from "@/lib/tw";
 import { Image } from "expo-image";
-import { Database } from "@recomendapp/types";
+import { Database, MediaMovie, MediaTvSeries } from "@recomendapp/types";
 import { getMediaDetails } from "../utils/getMediaDetails";
-import { MediaMovie, MediaTvSeries } from "@recomendapp/types";
 import { clamp, upperFirst } from "lodash";
 import { LinearGradient } from "expo-linear-gradient";
 import Color from "color";
@@ -22,7 +20,8 @@ import { useRouter } from "expo-router";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "../bottom-sheets/sheets/BottomSheetMovie";
 import BottomSheetTvSeries from "../bottom-sheets/sheets/BottomSheetTvSeries";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useQuery } from "@tanstack/react-query";
+import { useWidgetMostRecommendedOptions } from "@/api/options";
 
 interface WidgetMostRecommendedProps extends ViewProps {
 	scrollY?: SharedValue<number>;
@@ -34,15 +33,15 @@ const WidgetMostRecommended = ({
 	...props
 } : WidgetMostRecommendedProps) => {
 	const { colors } = useTheme();
-	const insets = useSafeAreaInsets();
 	const navigationHeaderHeight = useHeaderHeight();
 	// Dimensions
 	const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+	// Queries
 	const {
 		data,
 		isLoading,
 		isError
-	} = useWidgetMostRecommended();
+	} = useQuery(useWidgetMostRecommendedOptions());
 	const ref = useRef<ICarouselInstance>(null);
 	const progress = useSharedValue<number>(0);
 	
@@ -52,14 +51,10 @@ const WidgetMostRecommended = ({
 		animated: true,
 		});
 	};
-	const height = useMemo(() => {
-		return clamp(screenHeight / 2, 200, 400);
-	}, [screenHeight]);
+	const height = clamp(screenHeight / 2, 200, 400);
 
 	// Render
-	const renderItem = useCallback(({ item, index }: { item: Database['public']['Functions']['get_widget_most_recommended']['Returns'][number], index: number }) => (
-		<WidgetMostRecommendedItem item={item} position={index + 1} style={[style]} scrollY={scrollY} baseHeight={height} />
-	), [style, scrollY, height]);
+
 
 	if (data === undefined || isLoading) {
 		return <Skeleton style={[{ height: height }, tw`w-full`, style]} />
@@ -79,7 +74,9 @@ const WidgetMostRecommended = ({
 			height={height}
 			data={data}
 			onProgressChange={progress}
-			renderItem={renderItem}
+			renderItem={({ item, index }) => (
+				<WidgetMostRecommendedItem item={item} position={index + 1} style={[style]} scrollY={scrollY} baseHeight={height} />
+			)}
 			autoPlay={true}
 			autoPlayInterval={6000}
 			style={{ overflow: 'visible'}}
@@ -114,21 +111,16 @@ const WidgetMostRecommendedItem = ({
 	const { colors } = useTheme();
 	const t = useTranslations();
 	const navigationHeaderHeight = useHeaderHeight();
-	const details = useMemo(() => {
-		switch (item.type) {
-			case 'movie':
-				return getMediaDetails({ type: 'movie', media: item.media as MediaMovie });
-			case 'tv_series':
-				return getMediaDetails({ type: 'tv_series', media: item.media as MediaTvSeries });
-			default:
-				return null;
-		}
-	}, [item]);
-	const handleOnPress = useCallback(() => {
+	const details = (
+		item.type === 'movie' ? getMediaDetails({ type: 'movie', media: item.media as MediaMovie }) :
+		item.type === 'tv_series' ? getMediaDetails({ type: 'tv_series', media: item.media as MediaTvSeries }) :
+		null
+	)
+	const handleOnPress = () => {
 		if (!details?.url) return;
 		router.push(details.url);
-	}, [details]);
-	const handleOnLongPress = useCallback(() => {
+	};
+	const handleOnLongPress = () => {
 		switch (item.type) {
 			case 'movie':
 				return openSheet(BottomSheetMovie, { movie: item.media });
@@ -137,7 +129,7 @@ const WidgetMostRecommendedItem = ({
 			default:
 				return null;
 		}
-	}, [details]);
+	};
 
 	const bgAnim = useAnimatedStyle(() => {
 		if (!scrollY) return {};

@@ -21,7 +21,6 @@ import { RichText } from "@/components/RichText/RichText";
 import { useToast } from "@/components/Toast";
 
 const MAX_TITLE_LENGTH = 50;
-const MAX_BODY_LENGTH = 5000;
 
 interface ReviewFormBaseProps {
 	onSave?: (review: { title: string; body: object }) => void;

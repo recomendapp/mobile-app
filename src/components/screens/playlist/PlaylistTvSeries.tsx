@@ -53,8 +53,8 @@ export const PlaylistTvSeries = ({
 	const playlistItems = usePlaylistItemsTvSeriesQuery({
 		playlistId: playlist.id,
 	});
-	const deletePlaylistItemMutation = usePlaylistTvSeriesDeleteMutation();
-	const updatePlaylistItemMutation = usePlaylistTvSeriesUpdateMutation();
+	const { mutateAsync: deletePlaylistItemMutation } = usePlaylistTvSeriesDeleteMutation();
+	const { mutateAsync: updatePlaylistItemMutation } = usePlaylistTvSeriesUpdateMutation();
 	const { mutate: updatePlaylistItemChanges } = usePlaylistItemsTvSeriesRealtimeMutation({
 		playlistId: playlist?.id,
 	});
@@ -72,7 +72,7 @@ export const PlaylistTvSeries = ({
 				{
 					text: upperFirst(t('common.messages.delete')),
 					onPress: async () => {
-						await deletePlaylistItemMutation.mutateAsync({
+						await deletePlaylistItemMutation({
 							itemId: data.id,
 						}, {
 							onSuccess: () => {
@@ -95,7 +95,7 @@ export const PlaylistTvSeries = ({
 			comment: data.comment || '',
 			isAllowedToEdit: isAllowedToEdit,
 			onSave: async (newComment) => {
-				await updatePlaylistItemMutation.mutateAsync({
+				await updatePlaylistItemMutation({
 					itemId: data.id,
 					comment: newComment?.replace(/\s+/g, ' ').trimStart() || null,
 				}, {

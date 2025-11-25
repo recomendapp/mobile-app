@@ -9,7 +9,6 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
-import { useCallback, useMemo } from "react";
 import { MediaMovie, MediaTvSeries, UserRecosAggregated } from "@recomendapp/types";
 import { CardMovie } from "../cards/CardMovie";
 import { CardTvSeries } from "../cards/CardTvSeries";
@@ -31,15 +30,9 @@ const SendersAvatars = ({
 }) => {
   const { colors } = useTheme();
 
-  const visibleSenders = useMemo(() => 
-    senders?.slice(0, sendersShow) || [], 
-    [senders, sendersShow]
-  );
+  const visibleSenders = senders?.slice(0, sendersShow) || [];
 
-  const remainingCount = useMemo(() => 
-    (senders?.length || 0) - sendersShow, 
-    [senders?.length, sendersShow]
-  );
+  const remainingCount = (senders?.length || 0) - sendersShow;
 
   return (
     <View style={tw`flex-row -gap-2 overflow-hidden`}>
@@ -70,14 +63,11 @@ const RecoItem = ({
   item: UserRecosAggregated; 
   sendersShow: number; 
 }) => {
-  const sendersContent = useMemo(() => (
-    <SendersAvatars senders={item.senders} sendersShow={sendersShow} />
-  ), [item.senders, sendersShow]);
 
   if (item.type === 'movie') {
     return (
       <CardMovie variant='list' hideReleaseDate hideDirectors movie={item.media as MediaMovie}>
-        {sendersContent}
+        <SendersAvatars senders={item.senders} sendersShow={sendersShow} />
       </CardMovie>
     );
   }
@@ -85,7 +75,7 @@ const RecoItem = ({
   if (item.type === 'tv_series') {
     return (
       <CardTvSeries variant='list' hideReleaseDate hideCreator tvSeries={item.media as MediaTvSeries}>
-        {sendersContent}
+        <SendersAvatars senders={item.senders} sendersShow={sendersShow} />
       </CardTvSeries>
     );
   }
@@ -120,7 +110,6 @@ export const WidgetUserRecos = ({
   containerStyle
 }: WidgetUserRecosProps) => {
   const { session } = useAuth();
-  const { colors } = useTheme();
   const { data: recos } = useUserRecosQuery({
     userId: session?.user.id,
     filters: {
@@ -130,10 +119,6 @@ export const WidgetUserRecos = ({
   });
 
   const sendersShow = 3;
-
-  const renderItem = useCallback((item: UserRecosAggregated) => (
-    <RecoItem item={item} sendersShow={sendersShow} />
-  ), [sendersShow]);
 
   if (!recos?.length) {
     return null;
@@ -145,7 +130,9 @@ export const WidgetUserRecos = ({
       <View style={containerStyle}>
         <GridView
         data={recos}
-        renderItem={renderItem}
+        renderItem={(item) => (
+          <RecoItem item={item} sendersShow={sendersShow} />
+        )}
         />
       </View>
     </View>

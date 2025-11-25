@@ -1,7 +1,6 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { Href, Redirect, Stack, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
-import { useMemo, useCallback, memo } from "react";
 import { useTranslations } from "use-intl";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useUIStore } from "@/stores/useUIStore";
@@ -16,7 +15,7 @@ type SegmentedOption = {
   route: string;
 };
 
-const FeedHeader = memo(({
+const FeedHeader = ({
   segmentedOptions,
   feedView,
   onValueChange,
@@ -42,16 +41,15 @@ const FeedHeader = memo(({
       />
     </View>
   );
-});
-FeedHeader.displayName = 'FeedHeader';
+};
 
-const FeedLayout = memo(() => {
+const FeedLayout = () => {
   const t = useTranslations();
   const router = useRouter();
   const { session } = useAuth();
   const { feedView, setFeedView } = useUIStore((state) => state);
 
-  const segmentedOptions = useMemo((): SegmentedOption[] => [
+  const segmentedOptions: SegmentedOption[] = [
     {
       label: upperFirst(t('common.messages.community')),
       value: 'community',
@@ -64,15 +62,15 @@ const FeedLayout = memo(() => {
       href: '/feed/cast-crew',
       route: 'cast-crew'
     },
-  ], [t]);
+  ];
 
-  const handleValueChange = useCallback((value: string) => {
+  const handleValueChange = (value: string) => {
     const selectedOption = segmentedOptions.find(option => option.label === value);
     if (selectedOption) {
       setFeedView(selectedOption.value);
       router.replace(selectedOption.href);
     }
-  }, [segmentedOptions, setFeedView, router]);
+  };
 
   if (session === null) {
     return <Redirect href="/auth/login" />;
@@ -106,7 +104,6 @@ const FeedLayout = memo(() => {
       </Stack>
     </>
   );
-});
-FeedLayout.displayName = 'FeedLayout';
+};
 
 export default FeedLayout;

@@ -1,4 +1,4 @@
-import { Notification, useNovu } from "@novu/react-native";
+import { useNovu } from "@novu/react-native";
 import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
 import { utilsKey } from "./utilsKey";
 import { NotificationWithContent } from "./utilsQueries";

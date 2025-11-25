@@ -1,4 +1,4 @@
-import { Pressable, View } from 'react-native';
+import { Pressable } from 'react-native';
 
 export function ThemeToggle() {
   // const { isDarkColorScheme, setColorScheme } = useColorScheme();

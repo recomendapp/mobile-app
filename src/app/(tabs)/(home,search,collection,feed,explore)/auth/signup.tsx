@@ -1,5 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AuthError } from '@supabase/supabase-js';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button } from '@/components/ui/Button';
@@ -48,7 +48,7 @@ const SignupScreen = () => {
 	const bgImage = useRandomImage(Assets.screens.auth.signup.background);
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
-	const signupSchema = useMemo(() => z.object({
+	const signupSchema = z.object({
 		email: z.email({
 			error: t('common.form.email.error.invalid')
 		}),
@@ -105,20 +105,20 @@ const SignupScreen = () => {
 	}).refine(data => data.password === data.confirm_password, {
 		message: t('common.form.password.schema.match'),
 		path: ['confirm_password'],
-	}), [t]);
+	});
 
 	type SignupFormValues = z.infer<typeof signupSchema>;
 
-	const defaultValues = useMemo((): Partial<SignupFormValues> => ({
+	const defaultValues: Partial<SignupFormValues> = {
 		email: '',
 		full_name: '',
 		username: '',
 		password: '',
 		confirm_password: '',
-	}), []);
+	};
 	/* -------------------------------------------------------------------------- */
 
-	const form = useForm<SignupFormValues>({
+	const { setError: formSetError, getValues: formGetValues, ...form} = useForm<SignupFormValues>({
 		resolver: zodResolver(signupSchema),
 		defaultValues: defaultValues,
 		mode: 'onChange',
@@ -146,7 +146,7 @@ const SignupScreen = () => {
 		} catch (error) {
 			if (error instanceof AuthError) {
 				if (error.code === 'email_address_invalid') {
-					form.setError('email', {
+					formSetError('email', {
 						message: t('common.form.email.error.invalid'),
 					});
 					return;
@@ -157,11 +157,11 @@ const SignupScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [signup, t, locale, form]);
+	}, [signup, locale, t, toast, formSetError]);
 	const handleResendOtp = useCallback(async () => {
 		try {
 			setIsLoading(true);
-			await loginWithOtp(form.getValues('email'));
+			await loginWithOtp(formGetValues('email'));
 			toast.success(upperFirst(t('common.form.code_sent')));
 		} catch (error) {
 			if (error instanceof AuthError) {
@@ -179,12 +179,12 @@ const SignupScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [loginWithOtp, t]);
+	}, [loginWithOtp, formGetValues, t, toast]);
 	const handleVerifyOtp = useCallback(async (otp: string) => {
 		try {
 		  setIsLoading(true);
 		  const { error } = await supabase.auth.verifyOtp({
-			email: form.getValues('email'),
+			email: formGetValues('email'),
 			token: otp,
 			type: 'email',
 		  });
@@ -210,7 +210,7 @@ const SignupScreen = () => {
 		  setIsLoading(false);
 		  setOtp('');
 		}
-	}, [supabase, t, form]);
+	}, [supabase, formGetValues, t, toast]);
 
 	// useEffects
 	useEffect(() => {
@@ -220,7 +220,7 @@ const SignupScreen = () => {
 	}, [usernameToCheck]);
 	useEffect(() => {
 		if (usernameAvailability.isAvailable === false) {
-			form.setError('username', {
+			formSetError('username', {
 				message: t('common.form.username.schema.unavailable'),
 			});
 		}
@@ -385,7 +385,7 @@ const SignupScreen = () => {
 								{t('pages.auth.signup.confirm_form.label')}
 							</Text>
 							<Text textColor='muted'>
-								{t('pages.auth.signup.confirm_form.description', { email: form.getValues('email') })}
+								{t('pages.auth.signup.confirm_form.description', { email: formGetValues('email') })}
 							</Text>
 						</View>
 						<InputOTP

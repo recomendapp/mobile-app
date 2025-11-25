@@ -17,17 +17,17 @@ export type SheetState<T = any> = {
   parentId?: string;
 };
 
-const generateSheetId = <T>(
-  content: BottomSheetContentComponent<T>,
-  props: Omit<T, 'id' | 'open' | 'onOpenChange'>
-): string => {
-  const contentName = content.displayName || content.name || 'unknown';
-  const propsString = JSON.stringify(props, (key, value) => {
-    if (typeof value === 'function') return undefined;
-    return value;
-  });
-  return `${contentName}-${propsString}`;
-};
+// const generateSheetId = <T>(
+//   content: BottomSheetContentComponent<T>,
+//   props: Omit<T, 'id' | 'open' | 'onOpenChange'>
+// ): string => {
+//   const contentName = content.displayName || content.name || 'unknown';
+//   const propsString = JSON.stringify(props, (key, value) => {
+//     if (typeof value === 'function') return undefined;
+//     return value;
+//   });
+//   return `${contentName}-${propsString}`;
+// };
 
 type BottomSheetStore = {
   sheets: SheetState[];

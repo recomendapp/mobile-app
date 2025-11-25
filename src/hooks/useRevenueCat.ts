@@ -23,8 +23,13 @@ export const useRevenueCat = (session: Session | null | undefined) => {
     });
     setIsInitialized(true);
   }, []);
-	const login = useCallback(async (userId: string) => {
-		const { customerInfo, created } = await Purchases.logIn(userId);
+	const login = useCallback(async (session: Session) => {
+		const { customerInfo } = await Purchases.logIn(session.user.id);
+    if (session.user.email) {
+      await Purchases.setAttributes({
+        $email: session.user.email,
+      })
+    }
 		setCustomerInfo(customerInfo);
 	}, []);
 
@@ -33,8 +38,8 @@ export const useRevenueCat = (session: Session | null | undefined) => {
       init(session?.user.id).catch(console.error);
       return;
     }
-    if (session?.user.id) {
-      login(session.user.id);
+    if (session) {
+      login(session);
       queryClient.invalidateQueries({
         queryKey: Keys.auth.customerInfo(),
       });
@@ -42,7 +47,7 @@ export const useRevenueCat = (session: Session | null | undefined) => {
       queryClient.setQueryData(Keys.auth.customerInfo(), null);
       setCustomerInfo(undefined);
     }
-  }, [session, isInitialized]);
+  }, [session, isInitialized, init, login, queryClient]);
 
   return { customerInfo, isInitialized, login };
 };

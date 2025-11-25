@@ -42,6 +42,10 @@ const CustomButton = ({data, flatListRef, flatListIndex, x}: Props) => {
 	const routes = navigation.getState()?.routes;
 	const prevRoute = routes ? routes[routes.length - 2] : null;
 
+	const inputRange = data.map((_, i) => i * SCREEN_WIDTH);
+	const bgColors = data.map(d => d.backgroundColor);
+	const textColors = data.map(d => d.textColor);
+
 	const buttonAnimationStyle = useAnimatedStyle(() => {
 		return {
 		width:
@@ -70,42 +74,28 @@ const CustomButton = ({data, flatListRef, flatListIndex, x}: Props) => {
 	});
 
 	const textAnimationStyle = useAnimatedStyle(() => {
-		const color = interpolateColor(
-			x.value,
-			data.map((_, i) => i * SCREEN_WIDTH),
-			data.map(d => d.backgroundColor),
-		);
+		const color = interpolateColor(x.value, inputRange, bgColors);
+
 		return {
-			opacity:
-				flatListIndex.value === data.length - 1 ? withTiming(1) : withTiming(0),
+			opacity: flatListIndex.value === data.length - 1 ? withTiming(1) : withTiming(0),
 			transform: [
-				{
+			{
 				translateX:
-					flatListIndex.value === data.length - 1
+				flatListIndex.value === data.length - 1
 					? withTiming(0)
 					: withTiming(-100),
-				},
+			},
 			],
-			color: color,
+			color,
 		};
 	});
 	const animatedColor = useAnimatedStyle(() => {
-		const backgroundColor = interpolateColor(
-			x.value,
-			data.map((_, i) => i * SCREEN_WIDTH),
-			data.map(d => d.textColor),
-		);
+		const backgroundColor = interpolateColor(x.value, inputRange, textColors);
 
-		return {
-			backgroundColor: backgroundColor,
-		};
+		return { backgroundColor };
 	});
 	const arrowIconAnimationProps = useAnimatedProps(() => {
-		const color = interpolateColor(
-			x.value,
-			data.map((_, i) => i * SCREEN_WIDTH),
-			data.map(d => d.backgroundColor),
-		);
+		const color = interpolateColor(x.value, inputRange, bgColors);
 		return { color };
 	});
 

@@ -1,17 +1,15 @@
 import * as React from "react"
-import { JSONContent, Profile, UserActivityTvSeries, UserReviewTvSeries } from "@recomendapp/types";
+import { JSONContent, Profile, UserActivityTvSeries, UserReviewTvSeries, FixedOmit } from "@recomendapp/types";
 import Animated from "react-native-reanimated";
 import { Pressable, View } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, Href } from "expo-router";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
-import { FixedOmit } from "@recomendapp/types";
 import { IconMediaRating } from "@/components/medias/IconMediaRating";
 import { CardUser } from "../CardUser";
 import { Text } from "@/components/ui/text";
 import { Skeleton } from "@/components/ui/Skeleton";
 import ButtonUserReviewTvSeriesLike from "@/components/buttons/ButtonUserReviewTvSeriesLike";
-import { Href } from "expo-router";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { BottomSheetReviewTvSeries } from "@/components/bottom-sheets/sheets/BottomSheetReviewTvSeries";
 

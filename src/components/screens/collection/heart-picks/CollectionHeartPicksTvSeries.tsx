@@ -28,7 +28,7 @@ export const CollectionHeartPicksTvSeries = () => {
     });
 	const screenTitle = upperFirst(t('common.messages.heart_pick', { count: 2 }));
 	// Mutations
-	const updateActivity = useUserActivityTvSeriesUpdateMutation();
+	const { mutateAsync: updateActivity} = useUserActivityTvSeriesUpdateMutation();
 	// SharedValues
 	const scrollY = useSharedValue(0);
 	const headerHeight = useSharedValue(0);
@@ -46,7 +46,7 @@ export const CollectionHeartPicksTvSeries = () => {
 				{
 					text: upperFirst(t('common.messages.delete')),
 					onPress: async () => {
-						await updateActivity.mutateAsync({
+						await updateActivity({
 							activityId: data.id,
 							isLiked: false,
 						}, {

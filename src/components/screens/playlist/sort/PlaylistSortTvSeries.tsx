@@ -34,7 +34,7 @@ export const PlaylistSortTvSeries = () => {
 		playlistId: playlistId,
 		userId: session?.user.id,
 	});
-	const updatePlaylistItem = usePlaylistTvSeriesUpdateMutation();
+	const { mutateAsync: updatePlaylistItem } = usePlaylistTvSeriesUpdateMutation();
 
 	// States
 	const [playlistItems, setPlaylistItems] = useState<PlaylistItemTvSeries[] | undefined>(undefined);
@@ -43,7 +43,7 @@ export const PlaylistSortTvSeries = () => {
 	// Handlers
 	const handleSaveItem = useCallback(async (item: PlaylistItemTvSeries) => {
 		try {
-			await updatePlaylistItem.mutateAsync({
+			await updatePlaylistItem({
 				itemId: item.id,
 				rank: item.rank,
 			});
@@ -69,7 +69,7 @@ export const PlaylistSortTvSeries = () => {
 	}, [handleSaveItem]);
 	const handleQuickMove = useCallback((item: PlaylistItemTvSeries) => {
 		// Implement quick move logic here
-	}, [handleSaveItem]);
+	}, []);
 
 	// Render
 	const renderItem = useCallback(({ item, drag, isActive }: RenderItemParams<PlaylistItemTvSeries>) => {
@@ -109,7 +109,7 @@ export const PlaylistSortTvSeries = () => {
 				</View>
 			</ScaleDecorator>
 		);
-	}, [colors]);
+	}, [colors, handleQuickMove]);
 
 	// useEffects
 	useEffect(() => {

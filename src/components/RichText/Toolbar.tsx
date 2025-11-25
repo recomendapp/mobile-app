@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
-import { DEFAULT_TOOLBAR_ITEMS, EditorBridge, ToolbarItem } from '@10play/tentap-editor';
-import { Toolbar as RNToolbar } from "@10play/tentap-editor";
+import { DEFAULT_TOOLBAR_ITEMS, EditorBridge, ToolbarItem, Toolbar as RNToolbar } from '@10play/tentap-editor';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { KeyboardToolbarProps } from 'react-native-keyboard-controller';
 

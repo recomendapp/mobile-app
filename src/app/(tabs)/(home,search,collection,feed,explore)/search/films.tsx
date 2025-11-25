@@ -1,73 +1,26 @@
 import { CardMovie } from "@/components/cards/CardMovie";
-import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import TrueSheet from "@/components/ui/TrueSheet";
 import { TrueSheet as RNTrueSheet } from "@lodev09/react-native-true-sheet";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
-import { useSearchMoviesInfiniteQuery } from "@/features/search/searchQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import useSearchStore from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList, LegendListRef } from "@legendapp/list";
 import { useScrollToTop } from "@react-navigation/native";
-import { MediaMovie } from "@recomendapp/types";
-import { useNavigation } from "expo-router";
+// import { useNavigation } from "expo-router";
 import { upperFirst } from "lodash";
-import { useRef, useState, useCallback, useMemo, memo, forwardRef } from "react";
+import { useRef, forwardRef } from "react";
 import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
+import { MediaMovie } from "@recomendapp/types";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useSearchMoviesOptions } from "@/api/options";
 
-const FiltersButton = memo(({ onPress }: { onPress: () => void }) => {
-	return (
-		<View
-		style={[
-			tw`flex-row items-center`, 
-			{ gap: GAP }
-		]}
-		>
-			<Button
-				variant="ghost"
-				icon={Icons.Filters}
-				size="icon"
-				onPress={onPress}
-			/>
-		</View>
-	);
-});
-FiltersButton.displayName = 'FiltersButton';
-
-const MovieItem = memo(({ item }: { item: MediaMovie }) => (
-	<CardMovie variant="list" movie={item} />
-));
-MovieItem.displayName = 'MovieItem';
-
-const EmptyComponent = memo(({ 
-	isLoading, 
-	search,
-	noResultsText 
-}: { 
-	isLoading: boolean; 
-	search: string | null;
-	noResultsText: string;
-}) => {
-	if (isLoading) return <Icons.Loader />;
-	
-	if (search) {
-		return (
-			<View style={tw`flex-1 items-center justify-center`}>
-				<Text textColor='muted'>{noResultsText}</Text>
-			</View>
-		);
-	}
-	
-	return null;
-});
-EmptyComponent.displayName = 'EmptyComponent';
-
-const FiltersSheet = memo(forwardRef<RNTrueSheet>((_, ref) => {
+const FiltersSheet = forwardRef<RNTrueSheet>((_, ref) => {
 	const insets = useSafeAreaInsets();
 	const t = useTranslations();
 	const filtersScrollViewRef = useRef<ScrollView>(null);
@@ -76,7 +29,7 @@ const FiltersSheet = memo(forwardRef<RNTrueSheet>((_, ref) => {
 		<TrueSheet
 			ref={ref}
 			sizes={['auto']}
-			scrollRef={filtersScrollViewRef as React.RefObject<React.Component<unknown, {}, any>>}
+			scrollRef={filtersScrollViewRef as React.RefObject<React.Component>}
 		>
 			<ScrollView
 				ref={filtersScrollViewRef}
@@ -98,21 +51,21 @@ const FiltersSheet = memo(forwardRef<RNTrueSheet>((_, ref) => {
 			</ScrollView>
 		</TrueSheet>
 	);
-}));
+});
 FiltersSheet.displayName = 'FiltersSheet';
 
-const SearchFilmsScreen = memo(() => {
+const SearchFilmsScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { tabBarHeight, bottomOffset } = useTheme();
-	const navigation = useNavigation();
+	// const navigation = useNavigation();
 	const t = useTranslations();
 	const search = useSearchStore(state => state.search);
 	
 	// States
-	const [runtimeFilter, setRuntimeFilter] = useState<{ min?: number; max?: number }>({ 
-		min: undefined, 
-		max: undefined 
-	});
+	// const [runtimeFilter, setRuntimeFilter] = useState<{ min?: number; max?: number }>({ 
+	// 	min: undefined, 
+	// 	max: undefined 
+	// });
 	
 	// Queries
 	const {
@@ -120,39 +73,17 @@ const SearchFilmsScreen = memo(() => {
 		isLoading,
 		hasNextPage,
 		fetchNextPage,
-	} = useSearchMoviesInfiniteQuery({
+	} = useInfiniteQuery(useSearchMoviesOptions({
 		query: search,
-	});
+	}));
 	
 	// REFs
 	const scrollRef = useRef<LegendListRef>(null);
 	// const filtersRef = useRef<TrueSheet>(null);
-	
-	// Memoized values
-	const moviesData = useMemo(() => 
-		data?.pages.flatMap(page => page.data as MediaMovie[]) || [], 
-		[data]
-	);
 
-	// Callbacks
-	const renderItem = useCallback(({ item }: { item: MediaMovie }) => (
-		<MovieItem item={item} />
-	), []);
-
-	const keyExtractor = useCallback((item: MediaMovie) => 
-		item.id.toString(), 
-		[]
-	);
-
-	const onEndReached = useCallback(() => {
-		if (hasNextPage) {
-			fetchNextPage();
-		}
-	}, [hasNextPage, fetchNextPage]);
-
-	// const handleFiltersPress = useCallback(() => {
+	// const handleFiltersPress = () => {
 	// 	filtersRef.current?.present();
-	// }, []);
+	// };
 	
 	useScrollToTop(scrollRef);
 	
@@ -173,8 +104,8 @@ const SearchFilmsScreen = memo(() => {
 			<LegendList
 				key={search}
 				ref={scrollRef}
-				data={moviesData}
-				renderItem={renderItem}
+				data={data?.pages.flatMap(page => page.data) as MediaMovie[] || []}
+				renderItem={({ item }) => <CardMovie variant="list" movie={item} /> }
 				contentContainerStyle={{
 					paddingLeft: insets.left + PADDING_HORIZONTAL,
 					paddingRight: insets.right + PADDING_HORIZONTAL,
@@ -184,20 +115,21 @@ const SearchFilmsScreen = memo(() => {
 				scrollIndicatorInsets={{
 					bottom: tabBarHeight,
 				}}
-				keyExtractor={keyExtractor}
+				keyExtractor={(item) => item.id.toString()}
 				ListEmptyComponent={
-					<EmptyComponent
-					isLoading={isLoading}
-					search={search}
-					noResultsText={upperFirst(t('common.messages.no_results'))}
-					/>
+					isLoading ? <Icons.Loader />
+					: search ? (
+						<View style={tw`flex-1 items-center justify-center`}>
+							<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
+						</View>
+					) : null
 				}
-				onEndReached={onEndReached}
+				onEndReached={() => hasNextPage && fetchNextPage()}
 			/>
 			{/* <FiltersSheet ref={filtersRef} /> */}
 		</>
 	);
-});
+};
 SearchFilmsScreen.displayName = 'SearchFilmsScreen';
 
 export default SearchFilmsScreen;

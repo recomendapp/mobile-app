@@ -1,4 +1,3 @@
-import * as React from "react"
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/providers/AuthProvider';
 import upperFirst from 'lodash/upperFirst';
@@ -9,10 +8,7 @@ import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
 import { useToast } from "../Toast";
 import { useTheme } from "@/providers/ThemeProvider";
-
-interface ButtonPersonFollowBaseProps
-  extends React.ComponentProps<typeof Button> {
-  }
+import { forwardRef } from 'react';
 
 type ButtonPersonFollowSkeletonProps = {
   skeleton: true;
@@ -24,10 +20,10 @@ type ButtonPersonFollowDataProps = {
   personId: number;
 }
 
-export type ButtonPersonFollowProps = ButtonPersonFollowBaseProps &
+export type ButtonPersonFollowProps = React.ComponentProps<typeof Button> &
   (ButtonPersonFollowSkeletonProps | ButtonPersonFollowDataProps);
 
-const ButtonPersonFollow = React.forwardRef<
+const ButtonPersonFollow = forwardRef<
   React.ComponentRef<typeof Button>,
   ButtonPersonFollowProps
 >(({ personId, onPress, skeleton, style, ...props }, ref) => {
@@ -45,12 +41,12 @@ const ButtonPersonFollow = React.forwardRef<
   });
   const loading = skeleton || !personId || isLoading || isFollow === undefined;
 
-  const insertFollow = useUserFollowPersonInsertMutation();
-  const deleteFollowerMutation = useUserFollowPersonDeleteMutation();
+  const { mutateAsync: insertFollow } = useUserFollowPersonInsertMutation();
+  const { mutateAsync: deleteFollowerMutation } = useUserFollowPersonDeleteMutation();
 
   const followPerson = async () => {
     if (!session || !personId) return;
-    await insertFollow.mutateAsync({
+    await insertFollow({
       userId: session.user.id,
       personId: personId,
     }, {
@@ -73,7 +69,7 @@ const ButtonPersonFollow = React.forwardRef<
         {
           text: upperFirst(t('common.messages.unfollow')),
           onPress: async () => {
-            await deleteFollowerMutation.mutateAsync({
+            await deleteFollowerMutation({
               userId: session.user.id,
               personId: personId,
             }, {
@@ -101,8 +97,12 @@ const ButtonPersonFollow = React.forwardRef<
   return (
     <Button
     ref={ref}
-    onPress={(e) => {
-      isFollow ? unfollowPerson() : followPerson();
+    onPress={async (e) => {
+      if (isFollow) {
+        await unfollowPerson()
+      } else {
+        await followPerson()
+      }
       onPress?.(e);
     }}
     variant={isFollow ? "muted" : "accent-yellow"}

@@ -17,7 +17,7 @@ const NotFoundScreen = () => {
       { paddingBottom: tabBarHeight },
     ]}
     >
-      <Text style={tw.style("text-3xl font-bold")}>This screen doesn't exist.</Text>
+      <Text style={tw.style("text-3xl font-bold")}>This screen doesn&apos;t exist.</Text>
 
       <Button onPress={() => router.back()}>Go back!</Button>
     </View>

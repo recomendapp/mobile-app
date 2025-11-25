@@ -4,6 +4,7 @@ import { BrandIconProps } from "./type";
 
 const WhatsApp = forwardRef<Svg, BrandIconProps>((props, ref) => {
 	const { variant = 'colored', size = 24, ...otherProps } = props;
+	(void variant);
 	return (
 		<Svg
 		ref={ref}

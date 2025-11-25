@@ -1,5 +1,5 @@
 import * as React from "react"
-import { MediaPerson } from "@recomendapp/types";
+import { MediaPerson, FixedOmit } from "@recomendapp/types";
 import Animated from "react-native-reanimated";
 import { ImageWithFallback } from "../utils/ImageWithFallback";
 import { Href, useRouter } from "expo-router";
@@ -7,7 +7,6 @@ import tw from "@/lib/tw";
 import { Pressable, View } from "react-native";
 import { useTheme } from "@/providers/ThemeProvider";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { FixedOmit } from "@recomendapp/types";
 import { Skeleton } from "../ui/Skeleton";
 import { Text } from "../ui/text";
 import BottomSheetPerson from "../bottom-sheets/sheets/BottomSheetPerson";
@@ -219,13 +218,13 @@ const CardPerson = React.forwardRef<
 	const content = (
 		variant === "default" ? (
 			<CardPersonDefault ref={ref} {...props} />
-		) : variant == "poster" ? (
+		) : variant === "poster" ? (
 			<CardPersonPoster ref={ref} {...props} />
-		) : variant == "list" ? (
+		) : variant === "list" ? (
 			<CardPersonList ref={ref} {...props} />
-		) : variant == "vertical" ? (
+		) : variant === "vertical" ? (
 			<CardPersonVertical ref={ref} {...props} />
-		) : variant == "inline" ? (
+		) : variant === "inline" ? (
 			<CardPersonInline ref={ref} {...props} />
 		) : null
 	)

@@ -18,7 +18,7 @@ import { upperFirst } from 'lodash';
 import { useTranslations } from 'use-intl';
 import SliderRange, { SliderRangeRef } from '@/components/ui/SliderRange';
 import { useQuery } from '@tanstack/react-query';
-import { ExploreTileOptions } from '@/api/options';
+import { useExploreTileOptions } from '@/api/options';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { MediaMovie } from '@recomendapp/types';
 import { useAuth } from '@/providers/AuthProvider';
@@ -45,7 +45,7 @@ export const FiltersBottomSheet = forwardRef<
   const runtimeRangeRef = useRef<SliderRangeRef>(null);
   const releaseDateRangeRef = useRef<SliderRangeRef>(null);
 
-  const { data: tile } = useQuery(ExploreTileOptions({ exploreId: 1 }));
+  const { data: tile } = useQuery(useExploreTileOptions({ exploreId: 1 }));
 
   // States
   const [isOpen, setIsOpen] = useState(false);

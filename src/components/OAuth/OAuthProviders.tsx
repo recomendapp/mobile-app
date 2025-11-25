@@ -56,7 +56,7 @@ export const OAuthProviders = ({
 			label: "GitHub",
 			icon: { component: Icons.brands.github, variant: mode }
 		},
-	]), [mode]);
+	]), [mode, data]);
 
 	const handleProviderPress = useCallback(async (provider: AuthProvider) => {
 		try {

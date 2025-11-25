@@ -3,7 +3,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useUserDeleteRequestDeleteMutation, useUserDeleteRequestInsertMutation, useUserUpdateMutation } from "@/features/user/userMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {  useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from 'zod';
 import { Button } from "@/components/ui/Button";
@@ -38,7 +38,7 @@ const SettingsAccountScreen = () => {
 	const t = useTranslations();
 	const toast = useToast();
 	const { colors, bottomOffset, tabBarHeight } = useTheme();
-	const updateProfileMutation = useUserUpdateMutation({
+	const { mutateAsync: updateProfileMutation} = useUserUpdateMutation({
 		userId: user?.id,
 	});
 	const { showActionSheetWithOptions } = useActionSheet();
@@ -46,15 +46,11 @@ const SettingsAccountScreen = () => {
 	const [ isLoading, setIsLoading ] = useState(false);
 
 	const now = useNow();
-	const dateLastUsernameUpdate = useMemo(() => {
-		return user?.username_updated_at
-			? new Date(user.username_updated_at)
-			: new Date('01/01/1970');
-	}, [user?.username_updated_at]);
-	const usernameDisabled = useMemo(() => (now.getTime() - dateLastUsernameUpdate.getTime()) / (1000 * 60 * 60 * 24) < 30 ? true : false, [now, dateLastUsernameUpdate]);
+	const dateLastUsernameUpdate = user?.username_updated_at ? new Date(user.username_updated_at) : new Date('01/01/1970');
+	const usernameDisabled = (now.getTime() - dateLastUsernameUpdate.getTime()) / (1000 * 60 * 60 * 24) < 30 ? true : false;
 
 	// Form
-	const accountFormSchema = useMemo(() => z.object({
+	const accountFormSchema = z.object({
 		username: z
 			.string()
 			.min(USERNAME_MIN_LENGTH, {
@@ -77,14 +73,14 @@ const SettingsAccountScreen = () => {
 			}),
 		private: z.boolean(),
 		email: z.email({ error: t('common.form.email.error.invalid') })
-	}), [t]);
+	});
 	type AccountFormValues = z.infer<typeof accountFormSchema>;
-	const defaultValues = useMemo((): Partial<AccountFormValues> => ({
+	const defaultValues: Partial<AccountFormValues> = {
 		username: user?.username,
 		private: user?.private,
 		email: session?.user.email,
-	}), [user, session]);
-	const form = useForm<AccountFormValues>({
+	};
+	const { reset: fromReset, setError: formSetError, ...form} = useForm<AccountFormValues>({
 		resolver: zodResolver(accountFormSchema),
 		defaultValues,
 		mode: 'onChange',
@@ -93,6 +89,23 @@ const SettingsAccountScreen = () => {
 	const usernameToCheck = useDebounce(form.watch('username'), 500);
 
 	// Handlers
+	const handleVerifyEmail = useCallback(async (email: string, token: string) => {
+		try {
+			setIsLoading(true);
+			await verifyEmailChange(email, token);
+			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
+		} catch (error) {
+			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
+			if (error instanceof Error) {
+				errorMessage = error.message;
+			} else if (typeof error === 'string') {
+				errorMessage = error;
+			}
+			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
+		} finally {
+			setIsLoading(false);
+		}
+	}, [verifyEmailChange, toast, t]);
 	const handleOnSubmit = useCallback(async (values: AccountFormValues) => {
 		try {
 			if (!user) return;
@@ -101,7 +114,7 @@ const SettingsAccountScreen = () => {
 				values.username !== user.username
 				|| values.private !== user.private
 			) {
-				await updateProfileMutation.mutateAsync({
+				await updateProfileMutation({
 					username: values.username,
 					privateAccount: values.private,
 				});
@@ -121,7 +134,7 @@ const SettingsAccountScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [user, session, t, updateProfileMutation, updateEmail]);
+	}, [user, session, updateProfileMutation, updateEmail, toast, t]);
 	const handleCancelEmailChange = useCallback(async () => {
 		try {
 			setIsLoading(true);
@@ -138,7 +151,7 @@ const SettingsAccountScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [t, cancelPendingEmailChange]);
+	}, [cancelPendingEmailChange, toast, t]);
 	const handleVerifyEmailButtonPress = useCallback(() => {
 		const options = [
 			...(session?.user.email ? [{label: session?.user.email, value: session?.user.email}] : []),
@@ -181,24 +194,7 @@ const SettingsAccountScreen = () => {
 				);
 			}
 		})
-	}, [session?.user.email, session?.user.new_email, showActionSheetWithOptions, t]);
-	const handleVerifyEmail = useCallback(async (email: string, token: string) => {
-		try {
-			setIsLoading(true);
-			await verifyEmailChange(email, token);
-			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
-		} catch (error) {
-			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));
-			if (error instanceof Error) {
-				errorMessage = error.message;
-			} else if (typeof error === 'string') {
-				errorMessage = error;
-			}
-			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
-		} finally {
-			setIsLoading(false);
-		}
-	}, [t, verifyEmailChange]);
+	}, [session, showActionSheetWithOptions, t, handleVerifyEmail]);
 
 	// useEffects
 	useEffect(() => {
@@ -208,20 +204,20 @@ const SettingsAccountScreen = () => {
 	}, [usernameToCheck]);
 	useEffect(() => {
 		if (usernameAvailability.isAvailable === false) {
-			form.setError('username', {
+			formSetError('username', {
 				message: t('common.form.username.schema.unavailable'),
 			});
 		}
-	}, [usernameAvailability.isAvailable, t]);
+	}, [usernameAvailability.isAvailable, t, formSetError]);
 	useEffect(() => {
 		if (user || session) {
-			form.reset({
+			fromReset({
 				username: user?.username,
 				private: user?.private,
 				email: session?.user.email
 			});
 		}
-	}, [user, session]);
+	}, [user, session, fromReset]);
 
 	useEffect(() => {
 		const subscription = form.watch((value) => {
@@ -232,12 +228,12 @@ const SettingsAccountScreen = () => {
 			setHasUnsavedChanges(() => isChanged);
 		});
 		return () => subscription.unsubscribe();
-	}, [form, defaultValues]);
+	}, [form, defaultValues.email, defaultValues.private, defaultValues.username]);
 
 	return (
 		<>
 			<Stack.Screen
-			options={useMemo(() => ({
+			options={{
 				headerTitle: upperFirst(t('pages.settings.account.label')),
 				headerRight: () => (
 					<Button
@@ -250,7 +246,7 @@ const SettingsAccountScreen = () => {
 						{upperFirst(t('common.messages.save'))}
 					</Button>
 				),
-			}), [t, isLoading, hasUnsavedChanges, form, handleOnSubmit])}
+			}}
 			/>
 			<KeyboardAwareScrollView
 			contentContainerStyle={{
@@ -403,8 +399,8 @@ const DeleteAccountSection = () => {
 	});
 	const loading = data === undefined || isLoading;
 
-	const insertRequestMutation = useUserDeleteRequestInsertMutation();
-	const deleteRequestMutation = useUserDeleteRequestDeleteMutation();
+	const { mutateAsync: insertRequestMutation } = useUserDeleteRequestInsertMutation();
+	const { mutateAsync: deleteRequestMutation } = useUserDeleteRequestDeleteMutation();
 
 	// Handlers
 	const handleDeleteButtonPress = () => {
@@ -425,9 +421,9 @@ const DeleteAccountSection = () => {
 			{ cancelable: true, userInterfaceStyle: mode }
 		);
 	};
-	const handleInsertRequest = () => {
+	const handleInsertRequest = async () => {
 		if (!user) return;
-		insertRequestMutation.mutate({
+		await insertRequestMutation({
 			userId: user.id,
 		}, {
 			onSuccess: () => {
@@ -438,9 +434,9 @@ const DeleteAccountSection = () => {
 			}
 		});
 	};
-	const handleDeleteRequest = () => {
+	const handleDeleteRequest = async () => {
 		if (!user) return;
-		deleteRequestMutation.mutate({
+		await deleteRequestMutation({
 			userId: user.id,
 		}, {
 			onSuccess: () => {

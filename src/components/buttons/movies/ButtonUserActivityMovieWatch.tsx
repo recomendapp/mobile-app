@@ -1,4 +1,3 @@
-import React from "react"
 import { Alert, View } from "react-native";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityMovieQuery } from "@/features/user/userQueries";
@@ -13,13 +12,14 @@ import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { ICON_ACTION_SIZE } from "@/theme/globals";
 import { useToast } from "@/components/Toast";
+import { forwardRef } from "react";
 
 interface ButtonUserActivityMovieWatchProps
 	extends React.ComponentProps<typeof Button> {
 		movie: MediaMovie;
 	}
 
-const ButtonUserActivityMovieWatch = React.forwardRef<
+const ButtonUserActivityMovieWatch = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserActivityMovieWatchProps
 >(({ movie, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, style, ...props }, ref) => {
@@ -31,25 +31,23 @@ const ButtonUserActivityMovieWatch = React.forwardRef<
 	const t = useTranslations();
 	const {
 		data: activity,
-		isLoading,
-		isError,
 	} = useUserActivityMovieQuery({
 		userId: session?.user.id,
 		movieId: movie.id!,
 	});
-	const insertActivity = useUserActivityMovieInsertMutation();
-	const deleteActivity = useUserActivityMovieDeleteMutation();
+	const { mutateAsync: insertActivity } = useUserActivityMovieInsertMutation();
+	const { mutateAsync: deleteActivity } = useUserActivityMovieDeleteMutation();
 
 	const handleWatch = async () => {
 		if (activity || !session) return;
-		await insertActivity.mutateAsync({
+		await insertActivity({
 			userId: session.user.id,
 			movieId: movie.id,
-		}), {
+		}, {
 			onError: () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
-		};
+		});
 	};
 
 	const handleUnwatch = async () => {
@@ -65,7 +63,7 @@ const ButtonUserActivityMovieWatch = React.forwardRef<
 				{
 					text: upperFirst(t('common.messages.confirm')),
 					onPress: async () => {
-						await deleteActivity.mutateAsync({
+						await deleteActivity({
 							activityId: activity.id,
 						}, {
 							onError: () => {
@@ -85,9 +83,13 @@ const ButtonUserActivityMovieWatch = React.forwardRef<
 		<Button
 		variant={variant}
 		size={size}
-		onPress={(e) => {
+		onPress={async (e) => {
 			if (session) {
-				activity ? handleUnwatch() : handleWatch();
+				if (activity) {
+					await handleUnwatch()
+				} else {
+					await handleWatch()
+				}
 			} else {
 				router.push({
 					pathname: '/auth',

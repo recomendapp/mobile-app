@@ -3,7 +3,7 @@ import { queryOptions } from '@tanstack/react-query'
 import { Keys } from '../keys';
 import Purchases, { CustomerInfo } from 'react-native-purchases';
 
-export const AuthUserOptions = ({
+export const useAuthUserOptions = ({
 	userId,
 } : {
 	userId?: string;
@@ -25,7 +25,7 @@ export const AuthUserOptions = ({
 	});
 };
 
-export const AuthCustomerInfoOptions = ({
+export const useAuthCustomerInfoOptions = ({
 	initialData,
 	enabled = true,
 } : {

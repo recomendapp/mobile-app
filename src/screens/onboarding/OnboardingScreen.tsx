@@ -1,4 +1,4 @@
-import {StyleSheet, View, FlatList, ViewToken} from 'react-native';
+import {StyleSheet, View, FlatList, ViewToken, Platform} from 'react-native';
 import React from 'react';
 import Animated, {
   useSharedValue,
@@ -9,12 +9,18 @@ import Pagination from './components/Pagination';
 import CustomButton from './components/CustomButton';
 import RenderItem from './components/RenderItem';
 import useOnboardingData, { OnboardingData } from './data';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { PADDING_VERTICAL } from '@/theme/globals';
+import { useRouter } from 'expo-router';
 
 const OnboardingScreen = () => {
   const flatListRef = useAnimatedRef<FlatList<OnboardingData>>();
   const x = useSharedValue(0);
   const flatListIndex = useSharedValue(0);
   const data = useOnboardingData();
+  const router = useRouter();
+  const shouldInsetsAware = !(Platform.OS === 'ios' && router.canDismiss());
+  const insets = useSafeAreaInsets();
 
   const onViewableItemsChanged = ({
     viewableItems,
@@ -52,7 +58,7 @@ const OnboardingScreen = () => {
           minimumViewTime: 300,
           viewAreaCoveragePercentThreshold: 10,
         }}
-        style={{ paddingTop: 20, paddingBottom: 100 }}
+        style={{ paddingTop: shouldInsetsAware ? insets.top + PADDING_VERTICAL : PADDING_VERTICAL, paddingBottom: insets.bottom + PADDING_VERTICAL + 50 }}
       />
       <View style={styles.bottomContainer}>
         <Pagination data={data} x={x} />

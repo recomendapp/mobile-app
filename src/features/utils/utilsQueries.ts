@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { utilsKey } from "./utilsKey";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { Notification, useNotifications, useNovu } from "@novu/react-native";
+import { Notification, useNovu } from "@novu/react-native";
 import { Database, NotificationPayload } from "@recomendapp/types";
 
 export const useNovuSubscriberHash = (subscriberId?: string) => {

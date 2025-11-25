@@ -75,7 +75,6 @@ export const Button = forwardRef<View, ButtonProps>(
     const primaryColor = colors.primary;
     const primaryForegroundColor = colors.primaryForeground;
     const mutedColor = colors.muted;
-    const mutedForegroundColor = colors.mutedForeground;
     const destructiveColor = colors.destructive;
     const destructiveForegroundColor = colors.destructiveForeground;
     const successColor = colors.success;

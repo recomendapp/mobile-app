@@ -7,7 +7,7 @@ import { logger } from "@/logger";
 const UI_DIRECTORY = new Directory(Paths.cache, 'ui');
 const UI_BACKGROUND_DIRECTORY = new Directory(UI_DIRECTORY, 'backgrounds');
 
-export const UIBackgroundsOptions = () => {
+export const useUIBackgroundsOptions = () => {
 	const supabase = useSupabaseClient();
 	return queryOptions({
 		queryKey: Keys.ui.backgrounds(),

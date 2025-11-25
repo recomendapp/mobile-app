@@ -14,7 +14,6 @@ const ProfileFollowersScreen = () => {
 	const { tabBarHeight, bottomOffset } = useTheme();
 	const {
 		data,
-		isLoading,
 		hasNextPage,
 		fetchNextPage,
 		refetch,

@@ -16,37 +16,36 @@ import { Text } from '@/components/ui/text';
 import app from '@/constants/app';
 import { UserNav } from '@/components/user/UserNav';
 import { Skeleton } from '@/components/ui/Skeleton';
-import Animated, { AnimatedStyle, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import AnimatedStackScreen from '@/components/ui/AnimatedStackScreen';
 import { View } from '@/components/ui/view';
 import { AnimatedScrollView } from 'react-native-reanimated/lib/typescript/component/ScrollView';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
-import { LayoutChangeEvent, RefreshControl, StyleProp, ViewStyle } from 'react-native';
+import { RefreshControl } from 'react-native';
 import { WidgetMostPopular } from '@/components/widgets/WidgetMostPopular';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useQueryClient } from '@tanstack/react-query';
-import { widgetKeys } from '@/features/widget/widgetKeys';
 import { userKeys } from '@/features/user/userKeys';
+import { Keys } from '@/api/keys';
 
 const HeaderLeft = () => {
   const { session, user } = useAuth();
   const t = useTranslations();
   const now = useNow();
 
-  const getTimeOfDay = useMemo((): string => {
-    const hour = now.getHours();
-    if (hour < 5) return 'night';
-    if (hour < 12) return 'morning';
-    if (hour < 18) return 'afternoon';
-    return 'evening';
-  }, [now]);
+  const hour = now.getHours();
+  const timeOfDay =
+    hour < 5 ? 'night' :
+    hour < 12 ? 'morning' :
+    hour < 18 ? 'afternoon' :
+    'evening';
 
   if (session) {
     return user ? (
       <Text style={tw`text-lg font-semibold`}>
         {upperFirst(t('common.messages.greeting_with_name', { 
-          timeOfDay: getTimeOfDay, 
+          timeOfDay: timeOfDay, 
           name: user.full_name 
         }))}
       </Text>
@@ -61,20 +60,19 @@ const HeaderLeft = () => {
     </Text>
   );
 };
-HeaderLeft.displayName = 'HeaderLeft';
 
 const HeaderRight = () => {
   const { session } = useAuth();
   const router = useRouter();
   const navigation = useNavigation();
 
-  const handleNotificationsPress = useCallback(() => {
+  const handleNotificationsPress = () => {
     router.push('/notifications');
-  }, [router]);
+  };
 
-  const handleMenuPress = useCallback(() => {
+  const handleMenuPress = () => {
     navigation.dispatch(DrawerActions.openDrawer());
-  }, [navigation]);
+  };
 
   return (
     <View style={tw`flex-row items-center gap-2`}>
@@ -99,26 +97,19 @@ const HeaderRight = () => {
     </View>
   );
 };
-HeaderRight.displayName = 'HeaderRight';
 
-const AuthenticatedWidgets = memo(() => {
-  const widgetStyles = useMemo(() => ({
-    labelStyle: { paddingHorizontal: PADDING_HORIZONTAL },
-    containerStyle: { paddingHorizontal: PADDING_HORIZONTAL }
-  }), []);
-
+const AuthenticatedWidgets = () => {
   return (
     <>
-      <WidgetUserRecos {...widgetStyles} />
-      <WidgetUserWatchlist {...widgetStyles} />
-      <WidgetUserFriendsPlaylists {...widgetStyles} />
-      <WidgetUserDiscovery {...widgetStyles} />
+      <WidgetUserRecos labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
+      <WidgetUserWatchlist labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
+      <WidgetUserFriendsPlaylists labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
+      <WidgetUserDiscovery labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
     </>
   );
-});
-AuthenticatedWidgets.displayName = 'AuthenticatedWidgets';
+};
 
-const UnauthenticatedContent = memo(() => {
+const UnauthenticatedContent = () => {
   const t = useTranslations();
 
   return (
@@ -128,8 +119,7 @@ const UnauthenticatedContent = memo(() => {
       </Button>
     </Link>
   );
-});
-UnauthenticatedContent.displayName = 'UnauthenticatedContent';
+};
 
 const HomeScreen = () => {
   const t = useTranslations();
@@ -144,10 +134,6 @@ const HomeScreen = () => {
   // useSharedValues
   const scrollY = useSharedValue(0);
   const triggerHeight = useSharedValue(0);
-  
-  const mainContent = useMemo(() => (
-    session ? <AuthenticatedWidgets /> : <UnauthenticatedContent />
-  ), [session]);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: event => {
@@ -156,28 +142,11 @@ const HomeScreen = () => {
     },
   });
 
-  const screenOptions = useMemo(() => ({
-    title: upperFirst(t('common.messages.home')),
-    headerLeft: () => <HeaderLeft />,
-    headerRight: () => <HeaderRight />
-  }), [t]);
-
-  const onLayoutWidgetMostRecommended = useCallback((e: LayoutChangeEvent) => {
-    const { height } = e.nativeEvent.layout;
-    triggerHeight.value = (height - navigationHeaderHeight) * 0.7;
-  }, [triggerHeight]);
-  
-  // Styles
-  const contentContainerStyle = useMemo((): StyleProp<AnimatedStyle<StyleProp<ViewStyle>>> => ({
-    gap: GAP,
-    paddingBottom: bottomOffset + PADDING_VERTICAL,
-  }), [bottomOffset]);
-
-  const refetch = useCallback(async () => {
+  const refetch = async () => {
     setIsRefetching(true);
     try {
-      queryClient.invalidateQueries({ queryKey: widgetKeys.widget({ name: 'most-recommended' })}); // WidgetMostRecommended
-      queryClient.invalidateQueries({ queryKey: widgetKeys.widget({ name: 'most-popular' })}); // WidgetMostPopular
+      queryClient.invalidateQueries({ queryKey: Keys.widget.mostRecommended() }); // WidgetMostRecommended
+      queryClient.invalidateQueries({ queryKey: Keys.widget.mostPopular() }); // WidgetMostPopular
       if (session?.user.id) {
         queryClient.invalidateQueries({ queryKey: userKeys.recos({ userId: session.user.id, type: 'all' })}); // WidgetUserRecos
         queryClient.invalidateQueries({ queryKey: userKeys.watchlist({ userId: session.user.id, type: 'all' })}); // WidgetUserWatchlist
@@ -187,7 +156,7 @@ const HomeScreen = () => {
     } finally {
       setIsRefetching(false);
     }
-  }, [queryClient, session]);
+  };
 
   useScrollToTop(scrollRef);
 
@@ -196,21 +165,38 @@ const HomeScreen = () => {
       <AnimatedStackScreen
         scrollY={scrollY}
         triggerHeight={triggerHeight}
-        options={screenOptions}
+        options={{
+          title: upperFirst(t('common.messages.home')),
+          headerLeft: () => <HeaderLeft />,
+          headerRight: () => <HeaderRight />
+        }}
       />
       <Animated.ScrollView
       ref={scrollRef}
       onScroll={scrollHandler}
-      contentContainerStyle={contentContainerStyle}
+      contentContainerStyle={{
+        gap: GAP,
+        paddingBottom: bottomOffset + PADDING_VERTICAL,
+      }}
       scrollIndicatorInsets={{
         bottom: tabBarHeight
       }}
       refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
       nestedScrollEnabled
       >
-        <WidgetMostRecommended scrollY={scrollY} onLayout={onLayoutWidgetMostRecommended} />
+        <WidgetMostRecommended
+        scrollY={scrollY}
+        onLayout={(e) => {
+          const { height } = e.nativeEvent.layout;
+          triggerHeight.value = (height - navigationHeaderHeight) * 0.7;
+        }}
+        />
         <WidgetMostPopular labelStyle={{paddingHorizontal: PADDING_HORIZONTAL }} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
-        {mainContent}
+        {session ? (
+          <AuthenticatedWidgets />
+        ) : (
+          <UnauthenticatedContent />
+        )}
       </Animated.ScrollView>
     </>
   );
