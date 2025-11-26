@@ -247,11 +247,12 @@ const ModalPlaylistEdit = () => {
 			const isFormChanged =
 				value.title !== defaultValues.title ||
 				(value.description?.trim() || null) !== defaultValues.description ||
-				(value.private !== defaultValues.private);
+				(value.private !== defaultValues.private) ||
+				newPoster !== undefined;
 			setHasFormChanged(isFormChanged);
 		});
 		return () => subscription.unsubscribe();
-	}, [formWatch, defaultValues]);
+	}, [formWatch, defaultValues, newPoster]);
 
 	return (
 	<>
