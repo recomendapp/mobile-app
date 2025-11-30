@@ -1,5 +1,6 @@
 import { useSearchUsersOptions } from "@/api/options";
 import { CardUser } from "@/components/cards/CardUser";
+import ErrorMessage from "@/components/ErrorMessage";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
@@ -25,8 +26,11 @@ const SearchUsersScreen = () => {
 	const {
 		data,
 		isLoading,
+		isError,
 		hasNextPage,
 		fetchNextPage,
+		refetch,
+		isRefetching,
 	} = useInfiniteQuery(useSearchUsersOptions({
 		query: search,
 	}));
@@ -38,29 +42,34 @@ const SearchUsersScreen = () => {
 
 	return (
 		<LegendList
-			key={search}
-			ref={scrollRef}
-			data={data?.pages.flatMap(page => page.data) || []}
-			renderItem={({ item }) => <CardUser variant="list" user={item} /> }
-			contentContainerStyle={{
-				paddingLeft: insets.left + PADDING_HORIZONTAL,
-				paddingRight: insets.right + PADDING_HORIZONTAL,
-				paddingBottom: bottomOffset + PADDING_VERTICAL,
-				gap: GAP,
-			}}
-			scrollIndicatorInsets={{
-				bottom: tabBarHeight,
-			}}
-			keyExtractor={(item) => item.id.toString()}
-			ListEmptyComponent={
-				isLoading ? <Icons.Loader />
-				: search ? (
-					<View style={tw`flex-1 items-center justify-center`}>
-						<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
-					</View>
-				) : null
-			}
-			onEndReached={() => hasNextPage && fetchNextPage()}
+		key={search}
+		ref={scrollRef}
+		data={data?.pages.flatMap(page => page.data) || []}
+		renderItem={({ item }) => <CardUser variant="list" user={item} /> }
+		contentContainerStyle={{
+			paddingLeft: insets.left + PADDING_HORIZONTAL,
+			paddingRight: insets.right + PADDING_HORIZONTAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
+			gap: GAP,
+		}}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight,
+		}}
+		keyExtractor={(item) => item.id.toString()}
+		ListEmptyComponent={
+			isError ? <ErrorMessage />
+			: isLoading ? <Icons.Loader />
+			: (
+				<View style={tw`flex-1 items-center justify-center`}>
+					<Text textColor='muted'>
+						{search.length ? upperFirst(t('common.messages.no_results')) : upperFirst(t('common.messages.start_typing_to_search_users'))}
+					</Text>
+				</View>
+			)
+		}
+		onRefresh={refetch}
+		refreshing={isRefetching}
+		onEndReached={() => hasNextPage && fetchNextPage()}
 		/>
 	);
 };

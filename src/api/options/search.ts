@@ -1,9 +1,7 @@
-import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { useLocale } from "use-intl";
 import { Keys } from "../keys";
-import { searchClient } from "@/lib/search";
-import { MovieSearchQuery, PersonSearchQuery, PlaylistSearchQuery, TvSeriesSearchQuery, UserSearchQuery } from "@recomendapp/types";
+import { useApiClient } from "@/providers/ApiProvider";
 
 export const useSearchMultiOptions = ({
 	query,
@@ -19,18 +17,18 @@ export const useSearchMultiOptions = ({
 		...filters
 	}
 	const locale = useLocale();
-	const supabase = useSupabaseClient();
+	const api = useApiClient();
 	return queryOptions({
 		queryKey: Keys.search.multi({ locale: locale, query: query, filters: filters }),
 		queryFn: async () => {
-			const token = (await supabase.auth.getSession()).data.session?.access_token;
-			return await searchClient.searchBestResults({
-				query: query,
-				results_per_type: mergedFilters.perPage,
-			}, {
-				accessToken: token,
-				locale: locale,
+			const { data, error } = await api.search.bestResult({
+				query: {
+					q: query,
+					per_page: mergedFilters.perPage,
+				}
 			});
+			if (error || !data) throw error;
+			return data;
 		},
 		enabled: !!query && !!query.length,
 	})
@@ -38,33 +36,26 @@ export const useSearchMultiOptions = ({
 
 export const useSearchMoviesOptions = ({
 	query,
-	filters = {
-		per_page: 10,
-		sort_by: 'popularity',
-	},
 } : {
 	query?: string;
-	filters?: Omit<MovieSearchQuery, 'query' | 'page'>;
 }) => {
 	const locale = useLocale();
-	const supabase = useSupabaseClient();
+	const api = useApiClient();
 	return infiniteQueryOptions({
 		queryKey: Keys.search.movies({
 			locale: locale,
 			query: query!,
-			filters: filters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!query) throw new Error("Query is required");
-			const token = (await supabase.auth.getSession()).data.session?.access_token;
-			return await searchClient.searchMovies({
-				query: query,
-				page: pageParam,
-				...filters,
-			}, {
-				accessToken: token,
-				locale: locale,
+			const { data, error } = await api.search.movies({
+				query: {
+					q: query,
+					page: pageParam,
+				}
 			});
+			if (error || !data) throw error;
+			return data;
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage) => {
@@ -78,33 +69,26 @@ export const useSearchMoviesOptions = ({
 
 export const useSearchTvSeriesOptions = ({
 	query,
-	filters = {
-		per_page: 10,
-		sort_by: 'popularity',
-	},
 } : {
 	query?: string;
-	filters?: Omit<TvSeriesSearchQuery, 'query' | 'page'>
 }) => {
 	const locale = useLocale();
-	const supabase = useSupabaseClient();
+	const api = useApiClient();
 	return infiniteQueryOptions({
 		queryKey: Keys.search.tvSeries({
 			locale: locale,
 			query: query!,
-			filters: filters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!query) throw new Error("Query is required");
-			const token = (await supabase.auth.getSession()).data.session?.access_token;
-			return await searchClient.searchTvSeries({
-				query: query,
-				page: pageParam,
-				...filters,
-			}, {
-				accessToken: token,
-				locale: locale,
+			const { data, error } = await api.search.tvSeries({
+				query: {
+					q: query,
+					page: pageParam,
+				}
 			});
+			if (error || !data) throw error;
+			return data;
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage) => {
@@ -118,33 +102,26 @@ export const useSearchTvSeriesOptions = ({
 
 export const useSearchPersonsOptions = ({
 	query,
-	filters = {
-		per_page: 10,
-		sort_by: 'popularity',
-	},
 } : {
 	query?: string;
-	filters?: Omit<PersonSearchQuery, 'query' | 'page'>
 }) => {
 	const locale = useLocale();
-	const supabase = useSupabaseClient();
+	const api = useApiClient();
 	return infiniteQueryOptions({
 		queryKey: Keys.search.persons({
 			locale: locale,
 			query: query!,
-			filters: filters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!query) throw new Error("Query is required");
-			const token = (await supabase.auth.getSession()).data.session?.access_token;
-			return await searchClient.searchPersons({
-				query: query,
-				page: pageParam,
-				...filters,
-			}, {
-				accessToken: token,
-				locale: locale,
+			const { data, error } = await api.search.persons({
+				query: {
+					q: query,
+					page: pageParam,
+				}
 			});
+			if (error || !data) throw error;
+			return data;
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage) => {
@@ -158,32 +135,26 @@ export const useSearchPersonsOptions = ({
 
 export const useSearchUsersOptions = ({
 	query,
-	filters = {
-		per_page: 10,
-	},
 } : {
 	query?: string;
-	filters?: Omit<UserSearchQuery, 'query' | 'page'>
 }) => {
 	const locale = useLocale();
-	const supabase = useSupabaseClient();
+	const api = useApiClient();
 	return infiniteQueryOptions({
 		queryKey: Keys.search.users({
 			locale: locale,
 			query: query!,
-			filters: filters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!query) throw new Error("Query is required");
-			const token = (await supabase.auth.getSession()).data.session?.access_token;
-			return await searchClient.searchUsers({
-				query: query,
-				page: pageParam,
-				...filters,
-			}, {
-				accessToken: token,
-				locale: locale,
+			const { data, error } = await api.search.users({
+				query: {
+					q: query,
+					page: pageParam,
+				}
 			});
+			if (error || !data) throw error;
+			return data;
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage) => {
@@ -197,33 +168,26 @@ export const useSearchUsersOptions = ({
 
 export const useSearchPlaylistsOptions = ({
 	query,
-	filters = {
-		per_page: 10,
-		sort_by: 'likes_count',
-	},
 } : {
 	query?: string;
-	filters?: Omit<PlaylistSearchQuery, 'query' | 'page'>
 }) => {
 	const locale = useLocale();
-	const supabase = useSupabaseClient();
+	const api = useApiClient();
 	return infiniteQueryOptions({
 		queryKey: Keys.search.playlists({
 			locale: locale,
 			query: query!,
-			filters: filters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!query) throw new Error("Query is required");
-			const token = (await supabase.auth.getSession()).data.session?.access_token;
-			return await searchClient.searchPlaylists({
-				query: query,
-				page: pageParam,
-				...filters,
-			}, {
-				accessToken: token,
-				locale: locale,
+			const { data, error } = await api.search.playlists({
+				query: {
+					q: query,
+					page: pageParam,
+				}
 			});
+			if (error || !data) throw error;
+			return data;
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage) => {

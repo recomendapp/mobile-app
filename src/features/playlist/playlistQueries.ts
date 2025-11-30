@@ -2,8 +2,7 @@ import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { playlistKeys } from "./playlistKeys";
 import { Playlist, PlaylistItemMovie, PlaylistItemTvSeries, PlaylistSource } from "@recomendapp/types";
-import { searchClient } from "@/lib/search";
-import { useLocale } from "use-intl";
+import { useApiClient } from "@/providers/ApiProvider";
 
 export const usePlaylistQuery = ({
 	playlistId,
@@ -160,8 +159,7 @@ export const usePlaylistGuestsSearchInfiniteQuery = ({
 		perPage: 20,
 		...filters,
 	};
-	const locale = useLocale();
-	const supabase = useSupabaseClient();
+	const api = useApiClient();
 	return useInfiniteQuery({
 		queryKey: playlistKeys.guestsAdd({
 			playlistId: playlistId as number,
@@ -173,16 +171,16 @@ export const usePlaylistGuestsSearchInfiniteQuery = ({
 		queryFn: async ({ pageParam = 1 }) => {
 			if (!playlistId) throw Error('Missing playlist id');
 			if (!query) throw Error('Missing search query');
-			const token = (await supabase.auth.getSession()).data.session?.access_token;
-			return await searchClient.searchUsers({
-				query: query,
-				page: pageParam,
-				per_page: mergedFilters.perPage,
-				exclude_ids: mergedFilters.exclude?.join(','),
-			}, {
-				accessToken: token,
-				locale: locale,
+			const { data, error } = await api.search.users({
+				query: {
+					q: query,
+					page: pageParam,
+					per_page: mergedFilters.perPage,
+					exclude_ids: mergedFilters.exclude?.join(','),
+				}
 			});
+			if (error || !data) throw error;
+			return data;
 		},
 		initialPageParam: 1,
 		getNextPageParam: (lastPage) => {

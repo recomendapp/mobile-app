@@ -28,18 +28,4 @@ export const Assets = {
 			default: 'onboarding_social_sharing_ios.png',
 		}),
 	},
-	screens: {
-		auth: {
-			login: {
-				background: [
-					require('@/assets/images/screens/auth/login/background/1.gif'),
-				]
-			},
-			signup: {
-				background: [
-					require('@/assets/images/screens/auth/signup/background/1.gif'),
-				]
-			}
-		}
-	}
 }

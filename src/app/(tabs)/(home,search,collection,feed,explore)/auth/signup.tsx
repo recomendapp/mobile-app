@@ -14,8 +14,6 @@ import tw from '@/lib/tw';
 import { useTheme } from '@/providers/ThemeProvider';
 import { GroupedInput, GroupedInputItem } from '@/components/ui/Input';
 import { upperFirst } from 'lodash';
-import { ImageBackground } from 'expo-image';
-import { useRandomImage } from '@/hooks/useRandomImage';
 import { InputOTP } from '@/components/ui/input-otp';
 import { Text } from '@/components/ui/text';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
@@ -26,7 +24,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
 import { useToast } from '@/components/Toast';
-import { Assets } from '@/constants/Assets';
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { logger } from '@/logger';
 
@@ -45,7 +42,6 @@ const SignupScreen = () => {
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locale = useLocale();
 	const t = useTranslations();
-	const bgImage = useRandomImage(Assets.screens.auth.signup.background);
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
 	const signupSchema = z.object({
@@ -228,191 +224,189 @@ const SignupScreen = () => {
 
 	return (
 	<>
-		<ImageBackground source={bgImage} style={{ flex: 1 }}>
-			<LinearGradient
-			colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
-			start={{
-				x: 0,
-				y: 0,
-			}}
-			end={{
-				x: 0,
-				y: 0.4,
-			}}
-			style={tw`flex-1`}
+		<LinearGradient
+		colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
+		start={{
+			x: 0,
+			y: 0,
+		}}
+		end={{
+			x: 0,
+			y: 0.4,
+		}}
+		style={tw`flex-1`}
+		>
+			<KeyboardAwareScrollView
+			contentContainerStyle={[
+				tw`flex-1 flex-grow justify-end items-center`,
+				{
+					gap: GAP,
+					paddingLeft: insets.left + PADDING_HORIZONTAL,
+					paddingRight: insets.right + PADDING_HORIZONTAL,
+					paddingBottom: insets.bottom + PADDING_VERTICAL,
+				}
+			]}
+			keyboardShouldPersistTaps='handled'
+			extraKeyboardSpace={-139 - keyboardOffset}
 			>
-				<KeyboardAwareScrollView
-				contentContainerStyle={[
-					tw`flex-1 flex-grow justify-end items-center`,
-					{
-						gap: GAP,
-						paddingLeft: insets.left + PADDING_HORIZONTAL,
-						paddingRight: insets.right + PADDING_HORIZONTAL,
-						paddingBottom: insets.bottom + PADDING_VERTICAL,
-					}
-				]}
-				keyboardShouldPersistTaps='handled'
-				extraKeyboardSpace={-139 - keyboardOffset}
-				>
-					{!showOtp ? (
-						<>
-						<View style={[tw`w-full`, { gap: GAP }]}>
-							<GroupedInput title={upperFirst(t('common.messages.signup'))} titleStyle={tw`text-center text-xl font-bold`}>
-								<Controller
-								name="email"
-								control={form.control}
-								render={({field: { onChange, onBlur, value }}) => (
-									<GroupedInputItem
-									icon={Icons.Mail}
-									placeholder={upperFirst(t('common.form.email.label'))}
-									nativeID='email'
-									inputMode='email'
-									autoComplete='email'
-									autoCapitalize='none'
-									value={value}
-									onChangeText={value => onChange(value)}
-									disabled={isLoading}
-									keyboardType='email-address'
-									onBlur={onBlur}
-									error={form.formState.errors.email?.message}
-									/>
-								)}
+				{!showOtp ? (
+					<>
+					<View style={[tw`w-full`, { gap: GAP }]}>
+						<GroupedInput title={upperFirst(t('common.messages.signup'))} titleStyle={tw`text-center text-xl font-bold`}>
+							<Controller
+							name="email"
+							control={form.control}
+							render={({field: { onChange, onBlur, value }}) => (
+								<GroupedInputItem
+								icon={Icons.Mail}
+								placeholder={upperFirst(t('common.form.email.label'))}
+								nativeID='email'
+								inputMode='email'
+								autoComplete='email'
+								autoCapitalize='none'
+								value={value}
+								onChangeText={value => onChange(value)}
+								disabled={isLoading}
+								keyboardType='email-address'
+								onBlur={onBlur}
+								error={form.formState.errors.email?.message}
 								/>
-								<Controller
-								name='username'
-								control={form.control}
-								render={({ field: { onChange, onBlur, value } }) => (
-									<GroupedInputItem
-									icon={Icons.User}
-									placeholder={t('pages.settings.account.username.label')}
-									disabled={isLoading}
-									autoComplete='username-new'
-									autoCapitalize='none'
-									value={value}
-									autoCorrect={false}
-									onBlur={onBlur}
-									onChangeText={onChange}
-									rightComponent={((form.formState.errors.username?.message !== t('common.form.username.schema.unavailable'))  && usernameAvailability.isAvailable !== undefined) ? (
-										usernameAvailability.isLoading ? <Icons.Loader size={16}/>
-										: (
-											<View style={[{ backgroundColor: usernameAvailability.isAvailable ? colors.success : colors.destructive }, tw`rounded-full h-4 w-4 items-center justify-center`]}>
-												{usernameAvailability.isAvailable ? (
-													<Icons.Check size={12} color={colors.successForeground} />
-												) : <Icons.Cancel size={12} color={colors.destructiveForeground} />}
-											</View>
-										)
-									) : undefined}
-									error={form.formState.errors.username?.message}
-									/>
-								)}
+							)}
+							/>
+							<Controller
+							name='username'
+							control={form.control}
+							render={({ field: { onChange, onBlur, value } }) => (
+								<GroupedInputItem
+								icon={Icons.User}
+								placeholder={t('pages.settings.account.username.label')}
+								disabled={isLoading}
+								autoComplete='username-new'
+								autoCapitalize='none'
+								value={value}
+								autoCorrect={false}
+								onBlur={onBlur}
+								onChangeText={onChange}
+								rightComponent={((form.formState.errors.username?.message !== t('common.form.username.schema.unavailable'))  && usernameAvailability.isAvailable !== undefined) ? (
+									usernameAvailability.isLoading ? <Icons.Loader size={16}/>
+									: (
+										<View style={[{ backgroundColor: usernameAvailability.isAvailable ? colors.success : colors.destructive }, tw`rounded-full h-4 w-4 items-center justify-center`]}>
+											{usernameAvailability.isAvailable ? (
+												<Icons.Check size={12} color={colors.successForeground} />
+											) : <Icons.Cancel size={12} color={colors.destructiveForeground} />}
+										</View>
+									)
+								) : undefined}
+								error={form.formState.errors.username?.message}
 								/>
-								<Controller
-								name="full_name"
-								control={form.control}
-								render={({field: { onChange, onBlur, value }}) => (
-									<GroupedInputItem
-									placeholder={upperFirst(t('common.form.full_name.label'))}
-									icon={Icons.Add}
-									nativeID='full_name'
-									value={value}
-									autoComplete="given-name"
-									autoCapitalize='words'
-									onBlur={onBlur}
-									onChangeText={onChange}
-									disabled={isLoading}
-									error={form.formState.errors.full_name?.message}
-									/>
-								)}
+							)}
+							/>
+							<Controller
+							name="full_name"
+							control={form.control}
+							render={({field: { onChange, onBlur, value }}) => (
+								<GroupedInputItem
+								placeholder={upperFirst(t('common.form.full_name.label'))}
+								icon={Icons.Add}
+								nativeID='full_name'
+								value={value}
+								autoComplete="given-name"
+								autoCapitalize='words'
+								onBlur={onBlur}
+								onChangeText={onChange}
+								disabled={isLoading}
+								error={form.formState.errors.full_name?.message}
 								/>
-								<Controller
-								name="password"
-								control={form.control}
-								render={({field: { onChange, onBlur, value }}) => (
-									<GroupedInputItem
-									label={null}
-									placeholder={t('common.form.password.placeholder')}
-									nativeID='password'
-									value={value}
-									onChangeText={onChange}
-									autoComplete='new-password'
-									autoCapitalize='none'
-									onBlur={onBlur}
-									disabled={isLoading}
-									error={form.formState.errors.password?.message}
-									type='password'
-									/>
-								)}
+							)}
+							/>
+							<Controller
+							name="password"
+							control={form.control}
+							render={({field: { onChange, onBlur, value }}) => (
+								<GroupedInputItem
+								label={null}
+								placeholder={t('common.form.password.placeholder')}
+								nativeID='password'
+								value={value}
+								onChangeText={onChange}
+								autoComplete='new-password'
+								autoCapitalize='none'
+								onBlur={onBlur}
+								disabled={isLoading}
+								error={form.formState.errors.password?.message}
+								type='password'
 								/>
-								<Controller
-								name="confirm_password"
-								control={form.control}
-								render={({field: { onChange, onBlur, value }}) => (
-									<GroupedInputItem
-									label={null}
-									placeholder={t('common.form.password.confirm.label')}
-									nativeID='confirm_password'
-									value={value}
-									onChangeText={onChange}
-									autoCapitalize='none'
-									onBlur={onBlur}
-									disabled={isLoading}
-									error={form.formState.errors.confirm_password?.message}
-									type='password'
-									/>
-								)}
+							)}
+							/>
+							<Controller
+							name="confirm_password"
+							control={form.control}
+							render={({field: { onChange, onBlur, value }}) => (
+								<GroupedInputItem
+								label={null}
+								placeholder={t('common.form.password.confirm.label')}
+								nativeID='confirm_password'
+								value={value}
+								onChangeText={onChange}
+								autoCapitalize='none'
+								onBlur={onBlur}
+								disabled={isLoading}
+								error={form.formState.errors.confirm_password?.message}
+								type='password'
 								/>
-							</GroupedInput>
-							{/* SUBMIT BUTTON */}
-							<Button
-							onPress={form.handleSubmit(handleSubmit)}
-							loading={isLoading}
-							style={tw.style('w-full rounded-xl')}
-							>
-								{upperFirst(t('common.messages.signup'))}
-							</Button>
-						</View>
-						<View style={[tw`w-full`, { gap: GAP }]}>
-							<Text style={tw`text-center`} textColor='muted'>{upperFirst(t('common.messages.or_continue_with'))}</Text>
-							<OAuthProviders />
-						</View>
-						{/* SIGNUP */}
-						<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>{t('pages.auth.signup.return_to_login')} <Link href={'/auth/login'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.login'))}</Link></Text>
-						</>
-					) : (
-						<>
-						<View style={tw`gap-2 items-center`}>
-							<Text variant='title'>
-								{t('pages.auth.signup.confirm_form.label')}
-							</Text>
-							<Text textColor='muted'>
-								{t('pages.auth.signup.confirm_form.description', { email: formGetValues('email') })}
-							</Text>
-						</View>
-						<InputOTP
-						length={numberOfDigits}
-						value={otp}
-						onChangeText={setOtp}
-						onComplete={handleVerifyOtp}
-						/>
-						<View style={tw`items-center`}>
-							<Text textColor='muted'>
-								{t('common.form.error.not_received_code')}{' '}
-							</Text>
-							<Button
-							variant="ghost"
-							className='p-0'
-							disabled={isLoading}
-							onPress={handleResendOtp}
-							>
-								{t('common.form.resend_code')}
-							</Button>
-						</View>
-						</>
-					)}
-				</KeyboardAwareScrollView>
-				<KeyboardToolbar />
-			</LinearGradient>
-		</ImageBackground>
+							)}
+							/>
+						</GroupedInput>
+						{/* SUBMIT BUTTON */}
+						<Button
+						onPress={form.handleSubmit(handleSubmit)}
+						loading={isLoading}
+						style={tw.style('w-full rounded-xl')}
+						>
+							{upperFirst(t('common.messages.signup'))}
+						</Button>
+					</View>
+					<View style={[tw`w-full`, { gap: GAP }]}>
+						<Text style={tw`text-center`} textColor='muted'>{upperFirst(t('common.messages.or_continue_with'))}</Text>
+						<OAuthProviders />
+					</View>
+					{/* SIGNUP */}
+					<Text style={[{ color: colors.mutedForeground }, tw.style('text-right')]}>{t('pages.auth.signup.return_to_login')} <Link href={'/auth/login'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.login'))}</Link></Text>
+					</>
+				) : (
+					<>
+					<View style={tw`gap-2 items-center`}>
+						<Text variant='title'>
+							{t('pages.auth.signup.confirm_form.label')}
+						</Text>
+						<Text textColor='muted'>
+							{t('pages.auth.signup.confirm_form.description', { email: formGetValues('email') })}
+						</Text>
+					</View>
+					<InputOTP
+					length={numberOfDigits}
+					value={otp}
+					onChangeText={setOtp}
+					onComplete={handleVerifyOtp}
+					/>
+					<View style={tw`items-center`}>
+						<Text textColor='muted'>
+							{t('common.form.error.not_received_code')}{' '}
+						</Text>
+						<Button
+						variant="ghost"
+						className='p-0'
+						disabled={isLoading}
+						onPress={handleResendOtp}
+						>
+							{t('common.form.resend_code')}
+						</Button>
+					</View>
+					</>
+				)}
+			</KeyboardAwareScrollView>
+			<KeyboardToolbar />
+		</LinearGradient>
 	</>
 	)
 };

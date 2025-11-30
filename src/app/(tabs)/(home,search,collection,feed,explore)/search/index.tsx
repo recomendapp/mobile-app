@@ -14,15 +14,17 @@ import { useTheme } from "@/providers/ThemeProvider";
 import useSearchStore from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useScrollToTop } from "@react-navigation/native";
-import { BestResultsSearchResponse, MediaMovie, MediaPerson, MediaTvSeries, Playlist, Profile } from "@recomendapp/types";
+import { MediaMovie, MediaPerson, MediaTvSeries, Playlist, Profile } from "@recomendapp/types";
 import { Link } from "expo-router";
 import { clamp, upperFirst } from "lodash";
 import { useRef } from "react";
-import { useWindowDimensions, ScrollView } from "react-native";
+import { useWindowDimensions, ScrollView, RefreshControl } from "react-native";
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useTranslations } from "use-intl";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchMultiOptions } from "@/api/options";
+import { BestResultItem } from "@recomendapp/api-js";
+import ErrorMessage from "@/components/ErrorMessage";
 
 const SearchScreen = () => {
 	const search = useSearchStore(state => state.search);
@@ -45,6 +47,9 @@ export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
 	const {
 		data,
 		isLoading,
+		isError,
+		refetch,
+		isRefetching,
 	} = useQuery(useSearchMultiOptions({
 		query: search,
 	}));
@@ -53,8 +58,6 @@ export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
 	const scrollRef = useRef<ScrollView>(null);
 	
 	useScrollToTop(scrollRef);
-	
-	if (loading) return null;
 	
 	return (
 	<KeyboardAwareScrollView
@@ -67,35 +70,49 @@ export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
 	scrollIndicatorInsets={{
 		bottom: tabBarHeight,
 	}}
+	refreshControl={
+		<RefreshControl
+		refreshing={isRefetching}
+		onRefresh={refetch}
+		/>
+	}
 	{...props}
 	>
-		{data.bestResult && (
-			<SearchBestResult best={data.bestResult} />
-		)}
-		{data.movies.data.length > 0 && (
-			<SearchResultsMovies movies={data.movies.data as MediaMovie[]} search={search} />
-		)}
-		{data.tv_series.data.length > 0 && (
-			<SearchResultsTvSeries tvSeries={data.tv_series.data as MediaTvSeries[]} search={search} />
-		)}
-		{data.persons.data.length > 0 && (
-			<SearchResultsPersons persons={data.persons.data as MediaPerson[]} search={search} />
-		)}
-		{data.playlists.data.length > 0 && (
-			<SearchResultsPlaylists playlists={data.playlists.data as Playlist[]} search={search} />
-		)}
-		{data.users.data.length > 0 && (
-			<SearchResultsUsers users={data.users.data} search={search} />
-		)}
-		{(data.movies.data.length === 0 && data.tv_series.data.length === 0 &&
-		  data.persons.data.length === 0 && data.playlists.data.length === 0 &&
-		  data.users.data.length === 0) && (
-			isLoading ? <Icons.Loader />
-			: search ? (
-				<View style={tw`flex-1 items-center justify-center`}>
-					<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
-				</View>
-			) : null
+		{isError ? (
+			<ErrorMessage />
+		) : loading ? (
+			<Icons.Loader />
+		) : (
+			<>
+			{data.bestResult && (
+				<SearchBestResult best={data.bestResult} />
+			)}
+			{data.movies.data.length > 0 && (
+				<SearchResultsMovies movies={data.movies.data as MediaMovie[]} search={search} />
+			)}
+			{data.tv_series.data.length > 0 && (
+				<SearchResultsTvSeries tvSeries={data.tv_series.data as MediaTvSeries[]} search={search} />
+			)}
+			{data.persons.data.length > 0 && (
+				<SearchResultsPersons persons={data.persons.data as MediaPerson[]} search={search} />
+			)}
+			{data.playlists.data.length > 0 && (
+				<SearchResultsPlaylists playlists={data.playlists.data as Playlist[]} search={search} />
+			)}
+			{data.users.data.length > 0 && (
+				<SearchResultsUsers users={data.users.data} search={search} />
+			)}
+			{(data.movies.data.length === 0 && data.tv_series.data.length === 0 &&
+			data.persons.data.length === 0 && data.playlists.data.length === 0 &&
+			data.users.data.length === 0) && (
+				isLoading ? <Icons.Loader />
+				: search ? (
+					<View style={tw`flex-1 items-center justify-center`}>
+						<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
+					</View>
+				) : null
+			)}
+			</>
 		)}
 	</KeyboardAwareScrollView>
 	);
@@ -105,7 +122,7 @@ export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
 const SearchBestResult = ({
 	best,
 } : {
-	best: BestResultsSearchResponse['bestResult']
+	best: BestResultItem;
 }) => {
 	const t = useTranslations();
 	return (
