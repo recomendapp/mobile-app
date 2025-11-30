@@ -1,5 +1,6 @@
 import { useSearchTvSeriesOptions } from "@/api/options";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
+import ErrorMessage from "@/components/ErrorMessage";
 import { Text } from "@/components/ui/text";
 import TrueSheet from "@/components/ui/TrueSheet";
 import { View } from "@/components/ui/view";
@@ -83,8 +84,11 @@ const SearchTvSeriesScreen = () => {
 	const {
 		data,
 		isLoading,
+		isError,
 		hasNextPage,
 		fetchNextPage,
+		refetch,
+		isRefetching,
 	} = useInfiniteQuery(useSearchTvSeriesOptions({
 		query: search,
 	}));
@@ -129,13 +133,18 @@ const SearchTvSeriesScreen = () => {
 				}}
 				keyExtractor={(item) => item.id.toString()}
 				ListEmptyComponent={
-					isLoading ? <Icons.Loader />
-					: search ? (
+					isError ? <ErrorMessage />
+					: isLoading ? <Icons.Loader />
+					: (
 						<View style={tw`flex-1 items-center justify-center`}>
-							<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
+							<Text textColor='muted'>
+								{search.length ? upperFirst(t('common.messages.no_results')) : upperFirst(t('common.messages.start_typing_to_search_tv_series'))}
+							</Text>
 						</View>
-					) : null
+					)
 				}
+				onRefresh={refetch}
+				refreshing={isRefetching}
 				onEndReached={() => hasNextPage && fetchNextPage()}
 			/>
 			{/* <FiltersSheet ref={filtersRef} /> */}

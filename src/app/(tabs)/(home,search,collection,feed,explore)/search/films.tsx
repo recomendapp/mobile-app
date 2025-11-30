@@ -19,6 +19,7 @@ import { useTranslations } from "use-intl";
 import { MediaMovie } from "@recomendapp/types";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSearchMoviesOptions } from "@/api/options";
+import ErrorMessage from "@/components/ErrorMessage";
 
 const FiltersSheet = forwardRef<RNTrueSheet>((_, ref) => {
 	const insets = useSafeAreaInsets();
@@ -71,8 +72,11 @@ const SearchFilmsScreen = () => {
 	const {
 		data,
 		isLoading,
+		isError,
 		hasNextPage,
 		fetchNextPage,
+		refetch,
+		isRefetching,
 	} = useInfiniteQuery(useSearchMoviesOptions({
 		query: search,
 	}));
@@ -102,29 +106,34 @@ const SearchFilmsScreen = () => {
 	return (
 		<>
 			<LegendList
-				key={search}
-				ref={scrollRef}
-				data={data?.pages.flatMap(page => page.data) as MediaMovie[] || []}
-				renderItem={({ item }) => <CardMovie variant="list" movie={item} /> }
-				contentContainerStyle={{
-					paddingLeft: insets.left + PADDING_HORIZONTAL,
-					paddingRight: insets.right + PADDING_HORIZONTAL,
-					paddingBottom: bottomOffset + PADDING_VERTICAL,
-					gap: GAP,
-				}}
-				scrollIndicatorInsets={{
-					bottom: tabBarHeight,
-				}}
-				keyExtractor={(item) => item.id.toString()}
-				ListEmptyComponent={
-					isLoading ? <Icons.Loader />
-					: search ? (
-						<View style={tw`flex-1 items-center justify-center`}>
-							<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
-						</View>
-					) : null
-				}
-				onEndReached={() => hasNextPage && fetchNextPage()}
+			key={search}
+			ref={scrollRef}
+			data={data?.pages.flatMap(page => page.data) as MediaMovie[] || []}
+			renderItem={({ item }) => <CardMovie variant="list" movie={item} /> }
+			contentContainerStyle={{
+				paddingLeft: insets.left + PADDING_HORIZONTAL,
+				paddingRight: insets.right + PADDING_HORIZONTAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
+				gap: GAP,
+			}}
+			scrollIndicatorInsets={{
+				bottom: tabBarHeight,
+			}}
+			keyExtractor={(item) => item.id.toString()}
+			ListEmptyComponent={
+				isError ? <ErrorMessage />
+				: isLoading ? <Icons.Loader />
+				: (
+					<View style={tw`flex-1 items-center justify-center`}>
+						<Text textColor='muted'>
+							{search.length ? upperFirst(t('common.messages.no_results')) : upperFirst(t('common.messages.start_typing_to_search_films'))}
+						</Text>
+					</View>
+				)
+			}
+			onRefresh={refetch}
+			refreshing={isRefetching}
+			onEndReached={() => hasNextPage && fetchNextPage()}
 			/>
 			{/* <FiltersSheet ref={filtersRef} /> */}
 		</>

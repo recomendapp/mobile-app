@@ -16,6 +16,7 @@ import { ToastProvider } from "@/components/Toast";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useQuery } from "@tanstack/react-query";
 import { useUIBackgroundsOptions } from "@/api/options";
+import { ApiProvider } from "./ApiProvider";
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -34,14 +35,16 @@ const Providers = ({ children } : ProvidersProps) => {
 									<SupabaseProvider>
 										<ReactQueryProvider>
 											<AuthProvider>
-												<BottomSheetModalProvider>
-													<NotificationsProvider>
-														<ProvidersInner>
-															{children}
-														</ProvidersInner>
-														<BottomSheetManager />
-													</NotificationsProvider>
-												</BottomSheetModalProvider>
+												<ApiProvider>
+													<BottomSheetModalProvider>
+														<NotificationsProvider>
+															<ProvidersInner>
+																{children}
+															</ProvidersInner>
+															<BottomSheetManager />
+														</NotificationsProvider>
+													</BottomSheetModalProvider>
+												</ApiProvider>
 											</AuthProvider>
 										</ReactQueryProvider>
 									</SupabaseProvider>

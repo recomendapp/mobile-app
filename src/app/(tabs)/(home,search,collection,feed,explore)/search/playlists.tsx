@@ -1,5 +1,6 @@
 import { useSearchPlaylistsOptions } from "@/api/options";
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
+import ErrorMessage from "@/components/ErrorMessage";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
@@ -26,8 +27,11 @@ const SearchPlaylistsScreen = () => {
 	const {
 		data,
 		isLoading,
+		isError,
 		hasNextPage,
 		fetchNextPage,
+		refetch,
+		isRefetching,
 	} = useInfiniteQuery(useSearchPlaylistsOptions({
 		query: search,
 	}));
@@ -54,13 +58,18 @@ const SearchPlaylistsScreen = () => {
 			}}
 			keyExtractor={(item) => item.id.toString()}
 			ListEmptyComponent={
-				isLoading ? <Icons.Loader />
-				: search ? (
+				isError ? <ErrorMessage />
+				: isLoading ? <Icons.Loader />
+				: (
 					<View style={tw`flex-1 items-center justify-center`}>
-						<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
+						<Text textColor='muted'>
+							{search.length ? upperFirst(t('common.messages.no_results')) : upperFirst(t('common.messages.start_typing_to_search_playlists'))}
+						</Text>
 					</View>
-				) : null
+				)
 			}
+			onRefresh={refetch}
+			refreshing={isRefetching}
 			onEndReached={() => hasNextPage && fetchNextPage()}
 		/>
 	);

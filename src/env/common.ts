@@ -102,11 +102,6 @@ export const REVENUECAT_IOS_API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_API
 export const REVENUECAT_ANDROID_API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY!
 
 /**
- * Search
- */
-export const SEARCH_BASE_URL = process.env.EXPO_PUBLIC_SEARCH_BASE_URL!
-
-/**
  * Google
  */
 export const GOOGLE_IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID!

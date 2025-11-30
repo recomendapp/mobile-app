@@ -2,10 +2,8 @@ import { Button } from "@/components/ui/Button";
 import { SearchBar } from "@/components/ui/searchbar";
 import { View } from "@/components/ui/view"
 import tw from "@/lib/tw";
-import { useTheme } from "@/providers/ThemeProvider";
 import useSearchStore, { SearchType } from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { Href, Stack, usePathname, useRouter } from "expo-router"
 import { upperFirst } from "lodash"
 import { useEffect, useMemo, useCallback, useState } from "react";
@@ -50,7 +48,7 @@ const SearchLayout = () => {
 		{ value: 'persons', label: upperFirst(t('common.messages.person', { count: 2 })), href: '/search/persons' },
 		{ value: 'playlists', label: upperFirst(t('common.messages.playlist', { count: 2 })), href: '/search/playlists' },
 		{ value: 'users', label: upperFirst(t('common.messages.user', { count: 2 })), href: '/search/users' },
-	], [t, type]);
+	], [t]);
 
 	const handleTypePress = useCallback((item: TypeItem) => {
 		if (item.value === type) {
@@ -107,7 +105,13 @@ const SearchLayout = () => {
 						<SearchBar
 						defaultValue={search}
 						onSearch={setSearch}
-						placeholder={type === 'movies' ? upperFirst(t('common.messages.search_film', { count: 2 })) : t('pages.search.placeholder')}
+						placeholder={
+							type === 'movies' ? upperFirst(t('common.messages.search_film', { count: 2 }))
+							: type === 'tv_series' ? upperFirst(t('common.messages.search_tv_series', { count: 2 }))
+							: type === 'persons' ? upperFirst(t('common.messages.search_person', { count: 2 }))
+							: type === 'playlists' ? upperFirst(t('common.messages.search_playlist', { count: 2 }))
+							: type === 'users' ? upperFirst(t('common.messages.search_user', { count: 2 }))
+							: t('pages.search.placeholder')}
 						/>
 					</Animated.View>
 					{props.options.headerRight && (
@@ -123,7 +127,7 @@ const SearchLayout = () => {
 					)}
 				</Animated.View>
 				{(search?.length || type) && (
-					<AnimatedLegendList
+					<Animated.FlatList
 					data={types}
 					entering={FadeInUp}
 					exiting={FadeOutUp}

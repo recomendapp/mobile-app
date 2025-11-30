@@ -1,5 +1,6 @@
 import { useSearchPersonsOptions } from "@/api/options";
 import { CardPerson } from "@/components/cards/CardPerson";
+import ErrorMessage from "@/components/ErrorMessage";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
@@ -26,8 +27,11 @@ const SearchPersonsScreen = () => {
 	const {
 		data,
 		isLoading,
+		isError,
 		hasNextPage,
 		fetchNextPage,
+		refetch,
+		isRefetching,
 	} = useInfiniteQuery(useSearchPersonsOptions({
 		query: search,
 	}));
@@ -54,13 +58,18 @@ const SearchPersonsScreen = () => {
 			}}
 			keyExtractor={(item) => item.id.toString()}
 			ListEmptyComponent={
-				isLoading ? <Icons.Loader />
-				: search ? (
+				isError ? <ErrorMessage />
+				: isLoading ? <Icons.Loader />
+				: (
 					<View style={tw`flex-1 items-center justify-center`}>
-						<Text textColor='muted'>{upperFirst(t('common.messages.no_results'))}</Text>
+						<Text textColor='muted'>
+							{search.length ? upperFirst(t('common.messages.no_results')) : upperFirst(t('common.messages.start_typing_to_search_persons'))}
+						</Text>
 					</View>
-				) : null
+				)
 			}
+			onRefresh={refetch}
+			refreshing={isRefetching}
 			onEndReached={() => hasNextPage && fetchNextPage()}
 		/>
 	);
