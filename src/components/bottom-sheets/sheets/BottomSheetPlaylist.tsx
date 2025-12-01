@@ -25,8 +25,8 @@ import { GAP } from '@/theme/globals';
 import { View } from '@/components/ui/view';
 import ButtonActionPlaylistLike from '@/components/buttons/ButtonActionPlaylistLike';
 import ButtonActionPlaylistSaved from '@/components/buttons/ButtonActionPlaylistSaved';
-import { forwardRef, useRef } from 'react';
-import { FlashList, FlashListRef } from '@shopify/flash-list';
+import { forwardRef } from 'react';
+import { FlashList } from '@shopify/flash-list';
 
 interface BottomSheetPlaylistProps extends BottomSheetProps {
 	playlist: Playlist,
@@ -54,8 +54,6 @@ const BottomSheetPlaylist = forwardRef<
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations();
-	// REFs
-	const scrollRef = useRef<FlashListRef<Item | string>>(null);
 	const {
 		data: saved,
 		isLoading: isLoadingSaved,
@@ -177,12 +175,11 @@ const BottomSheetPlaylist = forwardRef<
 	return (
 	<TrueSheet
 	ref={ref}
-	scrollRef={scrollRef as unknown as React.RefObject<React.Component>}
-	contentContainerStyle={tw`p-0`}
+	scrollable
+	style={tw`p-0`}
 	{...props}
 	>
 		<FlashList
-		ref={scrollRef}
 		bounces={false}
 		contentContainerStyle={{ paddingBottom: insets.bottom }}
 		data={[

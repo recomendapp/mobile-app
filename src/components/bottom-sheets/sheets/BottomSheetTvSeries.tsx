@@ -1,7 +1,7 @@
 import React from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
-import { MediaPerson, MediaTvSeries, UserActivityTvSeries } from '@recomendapp/types';
+import { MediaTvSeries, UserActivityTvSeries } from '@recomendapp/types';
 import { LinkProps, usePathname, useRouter } from 'expo-router';
 import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
@@ -20,7 +20,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomSheetShareTvSeries from './share/BottomSheetShareTvSeries';
-import { FlashList, FlashListRef } from '@shopify/flash-list';
+import { FlashList } from '@shopify/flash-list';
 
 interface BottomSheetTvSeriesProps extends BottomSheetProps {
   tvSeries?: MediaTvSeries,
@@ -51,9 +51,7 @@ const BottomSheetTvSeries = React.forwardRef<
   const t = useTranslations();
   const pathname = usePathname();
   // REFs
-  const scrollRef = React.useRef<FlashListRef<Item | string>>(null);
   const BottomSheetMainCreditsRef = React.useRef<RNTrueSheet>(null);
-  const creditsScrollRef = React.useRef<FlashListRef<MediaPerson>>(null);
   // States
   const items: Item[] = React.useMemo(() => ([
     ...additionalItemsTop,
@@ -119,12 +117,11 @@ const BottomSheetTvSeries = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
-    scrollRef={scrollRef as unknown as React.RefObject<React.Component>}
-    contentContainerStyle={tw`p-0`}
+    scrollable
+    style={tw`p-0`}
     {...props}
     >
       <FlashList
-      ref={scrollRef}
       bounces={false}
       contentContainerStyle={{ paddingBottom: insets.bottom }}
       data={[
@@ -185,10 +182,9 @@ const BottomSheetTvSeries = React.forwardRef<
         <BottomSheetDefaultView
         ref={BottomSheetMainCreditsRef}
         id={`${id}-credits`}
-        scrollRef={creditsScrollRef as unknown as React.RefObject<React.Component>}
+        scrollable
         >
           <FlashList
-          ref={creditsScrollRef}
           data={tvSeries?.created_by || []}
           bounces={false}
           renderItem={({ item }) => (

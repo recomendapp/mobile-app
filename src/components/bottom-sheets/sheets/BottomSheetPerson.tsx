@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomSheetSharePerson from './share/BottomSheetSharePerson';
-import { FlashList, FlashListRef } from '@shopify/flash-list';
+import { FlashList } from '@shopify/flash-list';
 
 interface BottomSheetPersonProps extends BottomSheetProps {
   person?: MediaPerson,
@@ -44,8 +44,6 @@ const BottomSheetPerson = React.forwardRef<
   const router = useRouter();
   const t = useTranslations();
   const pathname = usePathname();
-  // REFs
-  const scrollRef = React.useRef<FlashListRef<Item | string>>(null);
   // States
   const items: Item[] = React.useMemo(() => ([
     ...additionalItemsTop,
@@ -68,12 +66,11 @@ const BottomSheetPerson = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
-    scrollRef={scrollRef as unknown as React.RefObject<React.Component>}
-    contentContainerStyle={tw`p-0`}
+    scrollable
+    style={tw`p-0`}
     {...props}
     >
       <FlashList
-      ref={scrollRef}
       bounces={false}
       contentContainerStyle={{ paddingBottom: insets.bottom }}
       data={[

@@ -6,7 +6,7 @@ import { Text } from '@/components/ui/text';
 import { upperFirst } from 'lodash';
 import { View } from 'react-native';
 import { CardUser } from '@/components/cards/CardUser';
-import { FlashList, FlashListRef } from '@shopify/flash-list';
+import { FlashList } from '@shopify/flash-list';
 import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
@@ -19,21 +19,17 @@ interface BottomSheetMyRecosSendersProps extends BottomSheetProps {
 const BottomSheetMyRecosSenders = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetMyRecosSendersProps
->(({ id, comments, sizes, ...props }, ref) => {
+>(({ id, comments, detents, ...props }, ref) => {
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
 	const t = useTranslations();
-	const flashlistRef = React.useRef<FlashListRef<UserRecosAggregated['senders'][number]>>(null);
 	return (
     <TrueSheet
     ref={ref}
-	sizes={['large']}
-	// scrollRef={flashlistRef as React.RefObject<React.Component<unknown, {}, any>>}
-	scrollRef={flashlistRef as any}
+	detents={[1]}
     {...props}
     >
 		<FlashList
-		ref={flashlistRef}
 		data={comments}
 		renderItem={({ item }) => (
 			<View key={item.user.id} style={[{ backgroundColor: colors.muted }, tw`rounded-xl p-2 gap-2`]}>

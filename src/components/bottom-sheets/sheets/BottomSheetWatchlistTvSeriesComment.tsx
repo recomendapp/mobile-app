@@ -79,7 +79,7 @@ export const BottomSheetWatchlistTvSeriesComment = forwardRef<
 	return (
     <TrueSheet
 	ref={ref}
-	contentContainerStyle={{
+	style={{
 		gap: GAP,
 		paddingHorizontal: PADDING_HORIZONTAL,
 	}}

@@ -22,7 +22,7 @@ interface BottomSheetUserActivityMovieFollowersRatingProps extends BottomSheetPr
 const BottomSheetUserActivityMovieFollowersRating = React.forwardRef<
 	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetUserActivityMovieFollowersRatingProps
->(({ id, movieId, sizes = ['medium', 'large'], ...props }, ref) => {
+>(({ id, movieId, detents = [0.5, 1], ...props }, ref) => {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const t = useTranslations();
@@ -34,7 +34,6 @@ const BottomSheetUserActivityMovieFollowersRating = React.forwardRef<
 		movieId: movieId,
 	});
   const loading = followersRating === undefined || isLoading;
-  const refFlatList = React.useRef<FlatList<NonNullable<typeof followersRating>[number]>>(null);
   const chartsData = useMemo(() => {
     if (!followersRating) return null;
     const startColor = '#ff6f6fff';
@@ -52,12 +51,11 @@ const BottomSheetUserActivityMovieFollowersRating = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
-    sizes={sizes}
-    scrollRef={refFlatList as React.RefObject<React.Component>}
+    detents={detents}
+    scrollable
     {...props}
     >
       <FlatList
-      ref={refFlatList}
       data={followersRating}
       renderItem={({ item }) => (
         <CardUser

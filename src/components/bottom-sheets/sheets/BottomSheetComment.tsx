@@ -82,7 +82,7 @@ export const BottomSheetComment = React.forwardRef<
 	return (
     <TrueSheet
 	ref={ref}
-	contentContainerStyle={{
+	style={{
 		gap: GAP,
 		paddingHorizontal: PADDING_HORIZONTAL,
 		paddingBottom: insets.bottom,

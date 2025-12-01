@@ -79,7 +79,7 @@ export const BottomSheetWatchlistMovieComment = forwardRef<
 	return (
     <TrueSheet
 	ref={ref}
-	contentContainerStyle={{
+	style={{
 		gap: GAP,
 		paddingHorizontal: PADDING_HORIZONTAL,
 	}}

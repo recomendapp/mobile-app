@@ -42,16 +42,14 @@ import { useTranslations } from "use-intl";
 const FiltersSheet = forwardRef<RNTrueSheet>((_, ref) => {
 	const insets = useSafeAreaInsets();
 	const t = useTranslations();
-	const filtersScrollViewRef = useRef<ScrollView>(null);
 
 	return (
 		<TrueSheet
 		ref={ref}
-		sizes={['auto']}
-		scrollRef={filtersScrollViewRef as React.RefObject<React.Component>}
+		detents={['auto']}
+		scrollable
 		>
 			<ScrollView
-				ref={filtersScrollViewRef}
 				bounces={false}
 				contentContainerStyle={{
 					paddingTop: PADDING_VERTICAL,

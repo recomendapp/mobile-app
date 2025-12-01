@@ -58,7 +58,6 @@ const BottomSheetShareLayout = forwardRef<
     const url = `https://${Constants.expoConfig?.extra?.webDomain}${path}`;
     
     // REFs
-    const scrollRef = useRef<ScrollView>(null);
     const [loadingPlatform, setLoadingPlatform] = useState<number | null>(null);
 
     const sharePlatform = useMemo((): SharePlatform[] => ([
@@ -253,12 +252,11 @@ const BottomSheetShareLayout = forwardRef<
     return (
         <TrueSheet
         ref={ref}
-        scrollRef={scrollRef as React.RefObject<React.Component>}
-        contentContainerStyle={tw`p-0`}
+        scrollable
+        style={tw`p-0`}
         {...props}
         >
             <ScrollView
-            ref={scrollRef}
             bounces={false}
             contentContainerStyle={{ paddingTop: PADDING_VERTICAL * 2, paddingBottom: insets.bottom, gap: GAP }}
             nestedScrollEnabled

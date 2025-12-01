@@ -1,7 +1,6 @@
 import { useTheme } from '@/providers/ThemeProvider';
 import { TrueSheet as RNTrueSheet, TrueSheetProps as RNTrueSheetProps } from '@lodev09/react-native-true-sheet';
 import { forwardRef } from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface TrueSheetProps extends RNTrueSheetProps {
   lightColor?: string;
@@ -11,23 +10,15 @@ interface TrueSheetProps extends RNTrueSheetProps {
 const TrueSheet = forwardRef<
   React.ComponentRef<typeof RNTrueSheet>,
   TrueSheetProps
->(({ backgroundColor, contentContainerStyle, cornerRadius = 24, sizes = ["auto"], edgeToEdge = true, children, ...props }, ref) => {
-  const insets = useSafeAreaInsets();
+>(({ backgroundColor, style, cornerRadius = 24, detents = ["auto"], edgeToEdgeFullScreen = true, children, ...props }, ref) => {
   const { colors } = useTheme();
   return (
   <RNTrueSheet
   ref={ref}
-  sizes={sizes}
+  detents={detents}
   cornerRadius={cornerRadius}
   backgroundColor={backgroundColor ?? colors.muted}
-  contentContainerStyle={[
-    {
-      paddingTop: 16,
-      paddingBottom: insets.bottom,
-    },
-    contentContainerStyle,
-  ]}
-  edgeToEdge={edgeToEdge}
+  edgeToEdgeFullScreen={edgeToEdgeFullScreen}
   {...props}
   >
     {/* <GestureHandlerRootView // break content style and isn't working with Pressable from 'react-native' either

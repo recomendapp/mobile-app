@@ -1,7 +1,7 @@
-import { MMKV } from 'react-native-mmkv';
+import { createMMKV } from 'react-native-mmkv';
 import { StateStorage } from 'zustand/middleware';
 
-export const storage = new MMKV({
+export const storage = createMMKV({
   id: 'custom-storage',
 });
 
@@ -14,6 +14,6 @@ export const zustandStorage: StateStorage = {
     return value ?? null;
   },
   removeItem: (name) => {
-    storage.delete(name);
+    storage.remove(name);
   },
 };

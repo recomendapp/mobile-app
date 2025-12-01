@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
-import { MMKV } from 'react-native-mmkv';
+import { createMMKV } from 'react-native-mmkv';
 import { focusManager, QueryClient } from '@tanstack/react-query';
 import {
   PersistQueryClientProvider,
@@ -9,7 +9,7 @@ import {
 import { persistKey } from '@/features';
 // import { useReactQueryDevTools } from "@dev-plugins/react-query";
 
-const queryStorage = new MMKV({
+const queryStorage = createMMKV({
   id: 'react-query-cache',
 });
 
@@ -32,7 +32,7 @@ const createMMKVPersister = (key: string) => ({
   },
   removeClient: async () => {
     try {
-      queryStorage.delete(key);
+      queryStorage.remove(key);
     } catch (error) {
       console.error('Failed to remove query client:', error);
     }

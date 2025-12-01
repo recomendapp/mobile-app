@@ -17,7 +17,7 @@ import { Alert } from 'react-native';
 import { useUserReviewMovieDeleteMutation } from '@/features/user/userMutations';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useToast } from '@/components/Toast';
-import { FlashList, FlashListRef } from '@shopify/flash-list';
+import { FlashList } from '@shopify/flash-list';
 
 interface BottomSheetReviewMovieProps extends BottomSheetProps {
   review: UserReviewMovie,
@@ -46,8 +46,6 @@ export const BottomSheetReviewMovie = React.forwardRef<
   const router = useRouter();
   const t = useTranslations();
   const pathname = usePathname();
-  // REFs
-  const scrollRef = React.useRef<FlashListRef<Item>>(null);
   // Mutations
   const { mutateAsync: reviewDeleteMutation } = useUserReviewMovieDeleteMutation();
   // States
@@ -116,12 +114,11 @@ export const BottomSheetReviewMovie = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
-    scrollRef={scrollRef as unknown as React.RefObject<React.Component>}
-    contentContainerStyle={tw`p-0`}
+    scrollable
+    style={tw`p-0`}
     {...props}
     >
       <FlashList
-      ref={scrollRef}
       bounces={false}
       contentContainerStyle={{ paddingTop: PADDING_VERTICAL, paddingBottom: insets.bottom }}
       data={items}

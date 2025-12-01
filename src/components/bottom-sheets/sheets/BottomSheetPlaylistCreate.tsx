@@ -85,7 +85,7 @@ const BottomSheetPlaylistCreate = forwardRef<
 	return (
 		<TrueSheet
 		ref={ref}
-		contentContainerStyle={[
+		style={[
 			{ paddingHorizontal: PADDING_HORIZONTAL },
 			tw`gap-4 items-center justify-center`,
 		]}

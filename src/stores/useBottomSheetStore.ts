@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import React from 'react';
 import * as Haptics from 'expo-haptics';
-import { SheetSize, TrueSheet } from '@lodev09/react-native-true-sheet';
+import { SheetDetent, TrueSheet } from '@lodev09/react-native-true-sheet';
 
 type BottomSheetContentComponent<T> =
   | React.ComponentType<T>
@@ -12,7 +12,7 @@ export type SheetState<T = any> = {
   ref: React.RefObject<TrueSheet> | null;
   content: BottomSheetContentComponent<T>;
   props?: Omit<T, 'id' | 'open' | 'onOpenChange'>;
-  sizes?: SheetSize[];
+  detents?: SheetDetent[];
   persistent: boolean;
   parentId?: string;
 };
@@ -35,7 +35,7 @@ type BottomSheetStore = {
     content: BottomSheetContentComponent<T>,
     props: Omit<T, 'id' | 'open' | 'onOpenChange'>,
     options?: {
-      sizes?: SheetSize[] | null | undefined,
+      detents?: SheetDetent[] | null | undefined,
       persistent?: boolean,
       parentId?: string,
     },
@@ -51,12 +51,12 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
     content: BottomSheetContentComponent<T>,
     props: Omit<T, 'id' | 'open' | 'onOpenChange'>,
     options: {
-      sizes?: SheetSize[] | null;
+      detents?: SheetDetent[] | null;
       persistent?: boolean;
       parentId?: string;
       haptics?: boolean;
     } = {
-      sizes: undefined,
+      detents: undefined,
       persistent: false,
       parentId: undefined,
       haptics: true,
@@ -78,7 +78,7 @@ const useBottomSheetStore = create<BottomSheetStore>((set, get) => ({
           ref: sheetRef,
           content,
           props,
-          sizes: options.sizes === null ? [] : options.sizes,
+          detents: options.detents === null ? [] : options.detents,
           persistent: options.persistent ?? false,
           parentId: options.parentId,
         },

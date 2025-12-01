@@ -25,16 +25,16 @@ export const BottomSheetManager = () => {
     return unsubscribe;
   }, [sheets, closeSheet, navigation]);
 
-  return sheets.map(({ id, content: Content, props, sizes, ref }) => (
+  return sheets.map(({ id, content: Content, props, detents, ref }) => (
     <Content
       key={id}
       ref={ref}
       id={id}
-      sizes={sizes}
-      initialIndex={0}
+      detents={detents}
+      initialDetentIndex={0}
       closeSheet={closeSheet}
       removeSheet={removeSheet}
-      onDismiss={() => {
+      onDidDismiss={() => {
         removeSheet(id);
       }}
       {...props}

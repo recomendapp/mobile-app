@@ -97,7 +97,7 @@ interface BottomSheetRatingProps extends BottomSheetProps {
 const BottomSheetRating = React.forwardRef<
 	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetRatingProps
->(({ id, media, rating, onRatingChange, sizes = ['auto'], ...props }, ref) => {
+>(({ id, media, rating, onRatingChange, detents = ['auto'], ...props }, ref) => {
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
 	const t = useTranslations();
@@ -163,8 +163,8 @@ const BottomSheetRating = React.forwardRef<
 	return (
 		<TrueSheet
 		ref={ref}
-		sizes={sizes}
-		FooterComponent={() => (
+		detents={detents}
+		footer={() => (
 			<View style={{ paddingBottom: insets.bottom, paddingHorizontal: PADDING_HORIZONTAL }}>
 				{rating ? (
 					<View style={tw`flex-row gap-2 justify-between`}>

@@ -44,8 +44,6 @@ const BottomSheetUser = React.forwardRef<
   const router = useRouter();
   const t = useTranslations();
   const pathname = usePathname();
-  // REFs
-  const scrollRef = React.useRef<FlashListRef<Item | string>>(null);
   // States
   const items: Item[] = React.useMemo(() => ([
     ...additionalItemsTop,
@@ -68,12 +66,11 @@ const BottomSheetUser = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
-    scrollRef={scrollRef as unknown as React.RefObject<React.Component>}
-    contentContainerStyle={tw`p-0`}
+    scrollable
+    style={tw`p-0`}
     {...props}
     >
       <FlashList
-      ref={scrollRef}
       data={[
         'header',
         ...items,
