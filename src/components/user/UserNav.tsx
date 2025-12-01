@@ -1,22 +1,27 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { GestureResponderEvent, TouchableOpacity } from "react-native";
-import { useNavigation } from "expo-router";
-import { DrawerActions } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import UserAvatar from "./UserAvatar";
-import { forwardRef } from "react";
+import { forwardRef, useCallback } from "react";
 
 export const UserNav = forwardRef<
 	React.ComponentRef<typeof TouchableOpacity>,
 	React.ComponentPropsWithoutRef<typeof TouchableOpacity>
->(({ onPress, ...props}, ref) => {
-	const navigation = useNavigation();
+>(({ onPress, onLongPress, ...props}, ref) => {
+	const router = useRouter();
 	const { session, user } = useAuth();
 	
-	const handlePress = (event: GestureResponderEvent) => {
-		navigation.dispatch(DrawerActions.openDrawer());
+	const handlePress = useCallback((event: GestureResponderEvent) => {
+		if (!user?.username) return;
+		router.push({ pathname: '/user/[username]', params: { username: user.username }});
 		onPress?.(event);
-	};
+	}, [onPress, router, user?.username]);
+
+	const handleLongPress = useCallback((event: GestureResponderEvent) => {
+		router.push({ pathname: '/settings' });
+		onLongPress?.(event);
+	}, [onLongPress, router]);
 
 	if (!session) return null;
 	
@@ -25,7 +30,7 @@ export const UserNav = forwardRef<
 	}
 	
 	return (
-		<TouchableOpacity ref={ref} onPress={handlePress} {...props} >
+		<TouchableOpacity ref={ref} onPress={handlePress} onLongPress={handleLongPress} {...props} >
 			<UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} />
 		</TouchableOpacity>
 	);

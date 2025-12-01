@@ -1,5 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
-import { Link, useNavigation, useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 import tw from '@/lib/tw';
 import { Button } from '@/components/ui/Button';
@@ -11,7 +11,7 @@ import { WidgetUserDiscovery } from '@/components/widgets/WidgetUserDiscovery';
 import { useNow, useTranslations } from 'use-intl';
 import { useTheme } from '@/providers/ThemeProvider';
 import { Icons } from '@/constants/Icons';
-import { DrawerActions, useScrollToTop } from '@react-navigation/native';
+import { useScrollToTop } from '@react-navigation/native';
 import { Text } from '@/components/ui/text';
 import app from '@/constants/app';
 import { UserNav } from '@/components/user/UserNav';
@@ -64,14 +64,13 @@ const HeaderLeft = () => {
 const HeaderRight = () => {
   const { session } = useAuth();
   const router = useRouter();
-  const navigation = useNavigation();
 
   const handleNotificationsPress = () => {
     router.push('/notifications');
   };
 
   const handleMenuPress = () => {
-    navigation.dispatch(DrawerActions.openDrawer());
+    router.push({ pathname: '/settings' });
   };
 
   return (
