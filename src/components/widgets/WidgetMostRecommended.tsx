@@ -2,7 +2,7 @@ import { View, ViewProps, useWindowDimensions, ViewStyle, StyleProp, StyleSheet,
 import { Skeleton } from "../ui/Skeleton";
 import { useRef } from "react";
 import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
-import Animated, { SharedValue, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import Animated, { SharedValue, useAnimatedStyle, useSharedValue, interpolate } from "react-native-reanimated";
 import tw from "@/lib/tw";
 import { Image } from "expo-image";
 import { Database, MediaMovie, MediaTvSeries } from "@recomendapp/types";
@@ -53,9 +53,6 @@ const WidgetMostRecommended = ({
 	};
 	const height = clamp(screenHeight / 2, 200, 400);
 
-	// Render
-
-
 	if (data === undefined || isLoading) {
 		return <Skeleton style={[{ height: height }, tw`w-full`, style]} />
 	}
@@ -75,7 +72,7 @@ const WidgetMostRecommended = ({
 			data={data}
 			onProgressChange={progress}
 			renderItem={({ item, index }) => (
-				<WidgetMostRecommendedItem item={item} position={index + 1} style={[style]} scrollY={scrollY} baseHeight={height} />
+				<WidgetMostRecommendedItem item={item} position={index + 1} style={[style]} scrollY={scrollY} baseHeight={height} carouselProgress={progress} />
 			)}
 			autoPlay={true}
 			autoPlayInterval={6000}
@@ -99,12 +96,14 @@ const WidgetMostRecommendedItem = ({
 	style,
 	scrollY,
 	baseHeight,
+	carouselProgress,
 } : {
 	item: Database['public']['Views']['widget_most_recommended']['Row'];
 	position: number;
 	style?: StyleProp<ViewStyle>;
 	scrollY?: SharedValue<number>;
 	baseHeight: number;
+	carouselProgress: SharedValue<number>;
 }) => {
 	const openSheet = useBottomSheetStore(state => state.openSheet);
 	const router = useRouter();
@@ -137,11 +136,28 @@ const WidgetMostRecommendedItem = ({
 		const base = baseHeight;
 		const scale = 1 + stretch / base;
 		const clampedScale = Math.min(scale, 3);
+		const translateY = -stretch / 2;
+		const itemIndex = position - 1;
+
+		const itemScale = interpolate(
+			carouselProgress.value,
+			[itemIndex - 1, itemIndex, itemIndex + 1],
+			[1, clampedScale, 1],
+			'clamp'
+		);
+
+		const itemTranslateY = interpolate(
+			carouselProgress.value,
+			[itemIndex - 1, itemIndex, itemIndex + 1],
+			[0, translateY, 0],
+			'clamp'
+		);
 
 		return {
 			transform: [
-				{ translateY: -stretch / 2 },
-				{ scaleY: clampedScale },
+				{ translateY: itemTranslateY },
+				{ scaleY: itemScale },
+				{ scaleX: itemScale },
 			],
 		};
 	});
