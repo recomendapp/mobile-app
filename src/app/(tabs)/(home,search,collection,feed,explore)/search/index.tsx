@@ -25,7 +25,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchMultiOptions } from "@/api/options";
 import { BestResultItem } from "@recomendapp/api-js";
 import ErrorMessage from "@/components/ErrorMessage";
-import { KeyboardAwareScrollViewRef } from "react-native-keyboard-controller";
 
 const SearchScreen = () => {
 	const search = useSearchStore(state => state.search);
@@ -56,7 +55,7 @@ export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
 	}));
 	
 	const loading = data === undefined || isLoading;
-	const scrollRef = useRef<KeyboardAwareScrollViewRef>(null);
+	const scrollRef = useRef<ScrollView>(null);
 	
 	useScrollToTop(scrollRef);
 	

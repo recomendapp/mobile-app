@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useMemo, useRef, useState } from "react";
+import { forwardRef, useCallback, useMemo, useState } from "react";
 import { BottomSheetProps } from "../../BottomSheetManager";
 import TrueSheet from "@/components/ui/TrueSheet";
 import tw from "@/lib/tw";

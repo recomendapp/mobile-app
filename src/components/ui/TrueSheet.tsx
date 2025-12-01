@@ -1,6 +1,7 @@
 import { useTheme } from '@/providers/ThemeProvider';
 import { TrueSheet as RNTrueSheet, TrueSheetProps as RNTrueSheetProps } from '@lodev09/react-native-true-sheet';
 import { forwardRef } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface TrueSheetProps extends RNTrueSheetProps {
   lightColor?: string;
@@ -11,6 +12,7 @@ const TrueSheet = forwardRef<
   React.ComponentRef<typeof RNTrueSheet>,
   TrueSheetProps
 >(({ backgroundColor, style, cornerRadius = 24, detents = ["auto"], edgeToEdgeFullScreen = true, children, ...props }, ref) => {
+  const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   return (
   <RNTrueSheet
@@ -18,6 +20,13 @@ const TrueSheet = forwardRef<
   detents={detents}
   cornerRadius={cornerRadius}
   backgroundColor={backgroundColor ?? colors.muted}
+  style={[
+    {
+      paddingTop: 16,
+      paddingBottom: insets.bottom,
+    },
+    style
+  ]}
   edgeToEdgeFullScreen={edgeToEdgeFullScreen}
   {...props}
   >

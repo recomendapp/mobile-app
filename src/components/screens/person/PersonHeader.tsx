@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import Animated, {
 	Extrapolation,
+	FadeInDown,
 	interpolate,
 	SharedValue,
 	useAnimatedStyle,
@@ -127,22 +128,24 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 			{ paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }
 		]}
 		>
-			{!loading ? (
-				<AnimatedImageWithFallback
-				onLayout={(e) => {
-					'worklet';
-					posterHeight.value = e.nativeEvent.layout.height;
-				}}
-				alt={person?.name ?? ''}
-				source={{ uri: person?.profile_url ?? '' }}
-				style={[
-					{ aspectRatio: 1 / 1, borderRadius: BORDER_RADIUS },
-					tw`w-48 h-auto`,
-					posterAnim
-				]}
-				type={'person'}
-				/>
-			) : <Skeleton style={[{ aspectRatio: 1 / 1 }, tw`w-48` ]}/>}
+			<Animated.View entering={FadeInDown.delay(200).duration(500)}>
+				{!loading ? (
+					<AnimatedImageWithFallback
+					onLayout={(e) => {
+						'worklet';
+						posterHeight.value = e.nativeEvent.layout.height;
+					}}
+					alt={person?.name ?? ''}
+					source={{ uri: person?.profile_url ?? '' }}
+					style={[
+						{ aspectRatio: 1 / 1, borderRadius: BORDER_RADIUS },
+						tw`w-48 h-auto`,
+						posterAnim
+					]}
+					type={'person'}
+					/>
+				) : <Skeleton style={[{ aspectRatio: 1 / 1 }, tw`w-48` ]}/>}
+			</Animated.View>
 			<Animated.View
 			style={[
 				tw`gap-2 w-full`,

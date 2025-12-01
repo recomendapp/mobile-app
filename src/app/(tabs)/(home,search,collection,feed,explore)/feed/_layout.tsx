@@ -1,109 +1,72 @@
-import { useAuth } from "@/providers/AuthProvider";
-import { Href, Redirect, Stack, useRouter } from "expo-router";
+import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
+import { ParamListBase, TabNavigationState } from "@react-navigation/native";
+import { Stack, withLayoutContext } from "expo-router";
 import { upperFirst } from "lodash";
+import { View } from "react-native";
 import { useTranslations } from "use-intl";
+import { HeaderTitle } from "@react-navigation/elements";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { useUIStore } from "@/stores/useUIStore";
-import { GAP, PADDING_HORIZONTAL } from "@/theme/globals";
-import { View } from "@/components/ui/view";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
-type SegmentedOption = {
-  label: string;
-  value: 'community' | 'cast_and_crew';
-  href: Href;
-  route: string;
-};
+const Tab = createMaterialTopTabNavigator();
 
-const FeedHeader = ({
-  segmentedOptions,
-  feedView,
-  onValueChange,
-}: {
-  segmentedOptions: SegmentedOption[];
-  feedView: 'community' | 'cast_and_crew';
-  onValueChange: (value: string) => void;
-}) => {
-  const insets = useSafeAreaInsets();
-  return (
-    <View
-    style={{
-      paddingTop: insets.top,
-      paddingLeft: insets.left + PADDING_HORIZONTAL,
-      paddingRight: insets.right + PADDING_HORIZONTAL,
-      paddingBottom: GAP,
-    }}
-    >
-      <SegmentedControl
-        values={segmentedOptions.map(option => option.label)}
-        selectedIndex={segmentedOptions.findIndex(option => option.value === feedView)}
-        onValueChange={onValueChange}
-      />
-    </View>
-  );
+const MaterialTopTabs = withLayoutContext<
+	MaterialTopTabNavigationOptions,
+	typeof Tab.Navigator,
+	TabNavigationState<ParamListBase>,
+	MaterialTopTabNavigationEventMap
+>(Tab.Navigator);
+
+const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => {
+	const onPressTab = (item: typeof state.routes[number], index: number, isFocused: boolean) => {
+		const event = navigation.emit({
+			type: 'tabPress',
+			target: item.key,
+			canPreventDefault: true,
+		});
+
+		if (!isFocused && !event.defaultPrevented) {
+			navigation.navigate(item.name);
+		}
+	};
+	return (
+	<View style={{ paddingHorizontal: PADDING_HORIZONTAL, paddingBottom: PADDING_VERTICAL }}>
+		<SegmentedControl
+		values={state.routes.map(option => {
+			const { options } = descriptors[option.key];
+			const label = (options.tabBarLabel !== undefined && typeof options.tabBarLabel === 'string')
+					? options.tabBarLabel
+					: options.title !== undefined
+					? options.title
+					: option.name;
+			return upperFirst(label);
+		})}
+		selectedIndex={state.index}
+		onChange={(event) => onPressTab(state.routes[event.nativeEvent.selectedSegmentIndex], event.nativeEvent.selectedSegmentIndex, false)}
+		/>
+	</View>
+	)
 };
 
 const FeedLayout = () => {
-  const t = useTranslations();
-  const router = useRouter();
-  const { session } = useAuth();
-  const { feedView, setFeedView } = useUIStore((state) => state);
-
-  const segmentedOptions: SegmentedOption[] = [
-    {
-      label: upperFirst(t('common.messages.community')),
-      value: 'community',
-      href: '/feed',
-      route: 'index'
-    },
-    {
-      label: upperFirst(t('common.messages.cast_and_crew')),
-      value: 'cast_and_crew',
-      href: '/feed/cast-crew',
-      route: 'cast-crew'
-    },
-  ];
-
-  const handleValueChange = (value: string) => {
-    const selectedOption = segmentedOptions.find(option => option.label === value);
-    if (selectedOption) {
-      setFeedView(selectedOption.value);
-      router.replace(selectedOption.href);
-    }
-  };
-
-  if (session === null) {
-    return <Redirect href="/auth/login" />;
-  }
-
-  return (
-    <>
-      <Stack.Screen
-      options={{
-        header: () => (
-          <FeedHeader
-            segmentedOptions={segmentedOptions}
-            feedView={feedView}
-            onValueChange={handleValueChange}
-          />
-        )
-      }}
-      />
-      <Stack
-      screenOptions={{ headerShown: false }}
-      initialRouteName={segmentedOptions.find(option => option.value === feedView)?.route}
-      >
-        <Stack.Screen
-          name="index"
-          options={{ animation: 'slide_from_left' }}
-        />
-        <Stack.Screen
-          name="cast-crew"
-          options={{ animation: 'slide_from_right' }}
-        />
-      </Stack>
-    </>
-  );
+	const t = useTranslations();
+	return (
+	<>
+		<Stack.Screen
+		options={{
+			title: upperFirst(t('common.messages.feed')),
+			headerTitle: (props) => <HeaderTitle {...props}>{upperFirst(t('common.messages.feed', { count: 1 }))}</HeaderTitle>
+		}}
+		/>
+		<MaterialTopTabs
+		initialRouteName="index"
+		tabBar={(props) => <TabBar {...props} />}
+		>
+			<MaterialTopTabs.Screen name="index" options={{ title: upperFirst(t('common.messages.community')) }} />
+			<MaterialTopTabs.Screen name="cast-crew" options={{ title: upperFirst(t('common.messages.cast_and_crew')) }} />
+		</MaterialTopTabs>
+	</>
+	)
 };
 
 export default FeedLayout;

@@ -6,6 +6,8 @@ import {
 } from 'react-native';
 import Animated, {
 	Extrapolation,
+	FadeIn,
+	FadeInDown,
 	interpolate,
 	SharedValue,
 	useAnimatedStyle,
@@ -20,7 +22,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
-import { Image } from 'expo-image';
 import { IconMediaRating } from '@/components/medias/IconMediaRating';
 import { useMediaMovieFollowersAverageRatingQuery } from '@/features/media/mediaQueries';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
@@ -37,6 +38,8 @@ import ButtonUserRecoMovieSend from '@/components/buttons/movies/ButtonUserRecoM
 import { useHeaderHeight } from '@react-navigation/elements';
 import { MovieHeaderInfo } from './MovieHeaderInfo';
 import ButtonUserActivityMovieWatchDate from '@/components/buttons/movies/ButtonUserActivityMovieWatchDate';
+import { useImagePalette } from '@/hooks/useImagePalette';
+import AnimatedImage from '@/components/ui/AnimatedImage';
 
 interface MovieHeaderProps {
 	movie?: MediaMovie | null;
@@ -61,6 +64,7 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 	} = useMediaMovieFollowersAverageRatingQuery({
 		movieId: movie?.id,
 	});
+	const { palette } = useImagePalette(movie?.poster_url || undefined);
 	// SharedValue
 	const posterHeight = useSharedValue(0);
 	const headerHeight = useSharedValue(0);
@@ -130,7 +134,13 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 			bgAnim,
 		]}
 		>
-			{(movie && movie.backdrop_url) && <Image style={tw`absolute inset-0`} source={movie.backdrop_url} />}
+			{movie && (
+				movie.backdrop_url ? (
+					<AnimatedImage entering={FadeIn} style={tw`absolute inset-0`} source={movie.backdrop_url} />
+				) : (palette && palette.length > 1 ) && (
+					<Animated.View entering={FadeIn} style={[tw`absolute inset-0`, { backgroundColor: palette.at(0) }]} />
+				)
+			)}
 			<LinearGradient
 			style={tw`absolute inset-0`}
 			colors={[
@@ -150,39 +160,41 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 			{ paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }
 		]}
 		>
-			{!loading ? (
-				<AnimatedImageWithFallback
-				onLayout={(e) => {
-					'worklet';
-					posterHeight.value = e.nativeEvent.layout.height;
-				}}
-				alt={movie?.title ?? ''}
-				source={{ uri: movie?.poster_url ?? '' }}
-				style={[
-					{ aspectRatio: 2 / 3 },
-					tw`rounded-md w-48 h-auto`,
-					posterAnim
-				]}
-				type={'movie'}
-				>
-					<View style={tw`absolute gap-2 top-2 right-2`}>
-						{movie?.vote_average ? (
-							<IconMediaRating
-							rating={movie.vote_average}
-							variant="general"
-							/>
-						) : null}
-						{followersAvgRating && (
-							<Pressable onPress={() => openSheet(BottomSheetUserActivityMovieFollowersRating, { movieId: movie?.id! })}>
+			<Animated.View entering={FadeInDown.delay(200).duration(500)}>
+				{!loading ? (
+					<AnimatedImageWithFallback
+					onLayout={(e) => {
+						'worklet';
+						posterHeight.value = e.nativeEvent.layout.height;
+					}}
+					alt={movie?.title ?? ''}
+					source={{ uri: movie?.poster_url ?? '' }}
+					style={[
+						{ aspectRatio: 2 / 3 },
+						tw`rounded-md w-48 h-auto`,
+						posterAnim
+					]}
+					type={'movie'}
+					>
+						<View style={tw`absolute gap-2 top-2 right-2`}>
+							{movie?.vote_average ? (
 								<IconMediaRating
-								rating={followersAvgRating.follower_avg_rating}
-								variant="follower"
+								rating={movie.vote_average}
+								variant="general"
 								/>
-							</Pressable>
-						)}
-					</View>
-				</AnimatedImageWithFallback>
-			) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw`w-48`, posterAnim]}/>}
+							) : null}
+							{followersAvgRating && (
+								<Pressable onPress={() => openSheet(BottomSheetUserActivityMovieFollowersRating, { movieId: movie?.id! })}>
+									<IconMediaRating
+									rating={followersAvgRating.follower_avg_rating}
+									variant="follower"
+									/>
+								</Pressable>
+							)}
+						</View>
+					</AnimatedImageWithFallback>
+				) : <Skeleton style={[{ aspectRatio: 2 / 3 }, tw`w-48`, posterAnim]}/>}
+			</Animated.View>
 			<Animated.View
 			style={[
 				tw`gap-2 w-full`,
