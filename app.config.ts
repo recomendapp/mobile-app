@@ -24,11 +24,11 @@ const getWebDomain = () => {
 };
 
 const getGoogleServicesFilePath = () => {
-	return './google-services.json';
+	return process.env.GOOGLE_SERVICES_JSON || './google-services.json';
 };
 
 const getGoogleServiceInfoFile = () => {
-	return './GoogleService-Info.plist';
+	return process.env.GOOGLE_SERVICE_INFO_PLIST || './GoogleService-Info.plist';
 };
 
 const getProjectId = () => {
