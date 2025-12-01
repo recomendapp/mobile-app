@@ -5,6 +5,7 @@ node_modules/
 
 # Expo
 .expo/
+.eas/
 dist/
 web-build/
 
@@ -53,5 +54,6 @@ android/
 credentials/
 credentials.json
 google-services*.json
+GoogleService-Info*.plist
 
 .vscode/
