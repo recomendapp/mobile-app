@@ -21,9 +21,9 @@ import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reani
 import { useTranslations } from "use-intl";
 import { PostgrestError } from "@supabase/supabase-js";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
+import { useModalInsets } from "@/hooks/useModalInsets";
 
 const ModalPlaylistEditGuestsAdd = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
@@ -31,9 +31,9 @@ const ModalPlaylistEditGuestsAdd = () => {
 	const t = useTranslations();
 	const toast = useToast();
 	const { session } = useAuth();
-	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const { mode } = useTheme();
+	const { bottom: bottomInset } = useModalInsets();
 	// SharedValues
 	const footerHeight = useSharedValue(0);
 
@@ -125,7 +125,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
-		const paddingBottom =  PADDING_VERTICAL + (selectedUsers.length > 0 ? footerHeight.value : insets.bottom);
+		const paddingBottom =  PADDING_VERTICAL + (selectedUsers.length > 0 ? footerHeight.value : bottomInset);
 		return {
 			paddingBottom: withTiming(paddingBottom, { duration: 200 }),
 		};

@@ -16,15 +16,15 @@ import { useCallback, useEffect, useState } from "react";
 import DraggableFlatList, { DragEndParams, RenderItemParams, ScaleDecorator } from "react-native-draggable-flatlist";
 import { useTranslations } from "use-intl";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { useModalInsets } from "@/hooks/useModalInsets";
 
 export const PlaylistSortTvSeries = () => {
 	const { session } = useAuth();
 	const toast = useToast();
-	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
+	const { bottom: bottomInset } = useModalInsets();
 	const t = useTranslations();
 	const { playlist_id } = useLocalSearchParams();
 	const playlistId = Number(playlist_id);
@@ -149,7 +149,7 @@ export const PlaylistSortTvSeries = () => {
 			{ paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL },
 		]}
 		style={{
-			marginBottom: insets.bottom,
+			marginBottom: bottomInset,
 		}}
 		/>
 	);

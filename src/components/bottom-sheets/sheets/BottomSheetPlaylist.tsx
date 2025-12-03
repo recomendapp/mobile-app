@@ -6,7 +6,7 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Alert, Platform } from 'react-native';
+import { Alert } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAuth } from '@/providers/AuthProvider';
 import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
@@ -44,7 +44,7 @@ interface Item {
 const BottomSheetPlaylist = forwardRef<
 	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetPlaylistProps
->(({ id, playlist, additionalItemsTop = [], detents, ...props }, ref) => {
+>(({ id, playlist, additionalItemsTop = [], ...props }, ref) => {
 	const { session } = useAuth();
 	const toast = useToast();
 	const { closeSheet, openSheet } = useBottomSheetStore((state) => state);
@@ -173,7 +173,6 @@ const BottomSheetPlaylist = forwardRef<
 	return (
 	<TrueSheet
 	ref={ref}
-	detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.5, 1])}
 	scrollable
 	{...props}
 	>

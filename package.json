@@ -33,7 +33,7 @@
     "@gorhom/bottom-sheet": "^5.2.7",
     "@hookform/resolvers": "^5.2.1",
     "@legendapp/list": "^2.0.16",
-    "@lodev09/react-native-true-sheet": "^3.0.0",
+    "@lodev09/react-native-true-sheet": "^3.1.0-beta.4",
     "@maplibre/maplibre-react-native": "^10.4.1",
     "@normy/react-query": "^0.21.0",
     "@novu/react-native": "^3.11.0",

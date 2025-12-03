@@ -13,7 +13,7 @@ import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/providers/AuthProvider';
 import { PADDING_VERTICAL } from '@/theme/globals';
-import { Alert, Platform } from 'react-native';
+import { Alert } from 'react-native';
 import { useUserReviewTvSeriesDeleteMutation } from '@/features/user/userMutations';
 import { useToast } from '@/components/Toast';
 import { FlashList } from '@shopify/flash-list';
@@ -36,7 +36,7 @@ interface Item {
 export const BottomSheetReviewTvSeries = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetReviewTvSeriesProps
->(({ id, review, additionalItemsTop = [], additionalItemsBottom = [], detents, ...props }, ref) => {
+>(({ id, review, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const toast = useToast();
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors, mode, tabBarHeight } = useTheme();
@@ -111,7 +111,6 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
-    detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.20, 1])}
     scrollable
     {...props}
     >

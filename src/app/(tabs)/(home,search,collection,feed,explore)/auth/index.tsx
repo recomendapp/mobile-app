@@ -11,7 +11,6 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import { LinearGradient } from 'expo-linear-gradient';
 import Color from "color";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuery } from "@tanstack/react-query";
 import { useUIBackgroundsOptions } from "@/api/options";
 import { Text } from "@/components/ui/text";
@@ -21,6 +20,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useMemo, useState } from "react";
 import { LoopCarousel } from "@/components/ui/LoopCarousel";
 import { Image } from "expo-image";
+import { useModalInsets } from "@/hooks/useModalInsets";
 
 const AuthHeader = ({
   onBackgroundChange,
@@ -70,7 +70,7 @@ const AuthScreen = () => {
   const t = useTranslations();
   const { colors } = useTheme();
   const router = useRouter();
-  const insets = useSafeAreaInsets();
+  const { bottom: bottomInset } = useModalInsets();
 
   const [activeBackground, setActiveBackground] = useState<Database['public']['Functions']['get_ui_backgrounds']['Returns'][number] | null>(null);
   const activeDetails = useMemo(() => {
@@ -102,7 +102,7 @@ const AuthScreen = () => {
     />
     <ScrollView
     style={tw`flex-1`}
-    contentContainerStyle={[{ gap: GAP_XL, paddingBottom: insets.bottom + PADDING_VERTICAL }]}
+    contentContainerStyle={[{ gap: GAP_XL, paddingBottom: bottomInset + PADDING_VERTICAL }]}
     stickyHeaderIndices={[0]}
     bounces={false}
     showsVerticalScrollIndicator={false}

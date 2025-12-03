@@ -19,7 +19,6 @@ import { InputOTP } from '@/components/ui/input-otp';
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { View } from '@/components/ui/view';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useToast } from '@/components/Toast';
 import { logger } from '@/logger';
@@ -27,12 +26,13 @@ import { LoopCarousel } from '@/components/ui/LoopCarousel';
 import { Image } from 'expo-image';
 import { useUIBackgroundsOptions } from '@/api/options';
 import { useQuery } from '@tanstack/react-query';
+import { useModalInsets } from '@/hooks/useModalInsets';
 
 const LoginOtpScreen = () => {
 	const supabase = useSupabaseClient();
 	const { loginWithOtp } = useAuth();
-	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
+	const insets = useModalInsets();
 	const toast = useToast();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);

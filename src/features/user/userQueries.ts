@@ -707,7 +707,6 @@ export const useUserRecosMovieSendQuery = ({
 						}[];
 					};
 				})[]>();
-			console.log(error);
 			if (error) throw error;
 			const output = data?.map((userFriend) => ({
 				friend: userFriend.friend,

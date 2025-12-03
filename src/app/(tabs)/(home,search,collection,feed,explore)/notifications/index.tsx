@@ -23,14 +23,14 @@ import { CardNotificationFollowerCreated } from "@/components/cards/notification
 import { CardNotificationFriendCreated } from "@/components/cards/notifications/CardNotificationFriendCreated";
 import { CardNotificationFollowerRequest } from "@/components/cards/notifications/CardNotificationFollowerRequest";
 import { useToast } from "@/components/Toast";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useModalInsets } from "@/hooks/useModalInsets";
 
 const NotificationsScreen = () => {
 	const router = useRouter();
 	const t = useTranslations();
 	const toast = useToast();
 	const { colors } = useTheme();
-	const insets = useSafeAreaInsets();
+	const { bottom: bottomInset } = useModalInsets();
 	const { notificationsView, setNotificationsView } = useUIStore((state) => state);
 	const viewOptions = ['all', 'unread', 'archived'] as const;
 	const {
@@ -213,10 +213,10 @@ const NotificationsScreen = () => {
 		contentContainerStyle={[
 			{
 				gap: GAP,
-				paddingBottom: insets.bottom,
+				paddingBottom: bottomInset,
 			}
 		]}
-		scrollIndicatorInsets={{ bottom: insets.bottom }}
+		scrollIndicatorInsets={{ bottom: bottomInset }}
 		ListEmptyComponent={
 			loading ? <Icons.Loader />
 			: <Text textColor="muted" style={tw`text-center p-4`}>{upperFirst(t('common.messages.no_notifications'))}</Text>

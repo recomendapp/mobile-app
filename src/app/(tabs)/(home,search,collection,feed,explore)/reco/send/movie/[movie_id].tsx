@@ -27,17 +27,17 @@ import { Input } from "@/components/ui/Input";
 import { useUserRecosMovieInsertMutation } from "@/features/user/userMutations";
 import { CardUser } from "@/components/cards/CardUser";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
+import { useModalInsets } from "@/hooks/useModalInsets";
 
 const COMMENT_MAX_LENGTH = 180;
 
 const RecoSendMovie = () => {
 	const t = useTranslations();
 	const router = useRouter();
-	const insets = useSafeAreaInsets();
 	const toast = useToast();
 	const { colors, mode } = useTheme();
+	const { bottom: bottomInset } = useModalInsets();
 	const { session } = useAuth();
 	const { movie_id } = useLocalSearchParams();
 	const movieId = Number(movie_id);
@@ -149,7 +149,7 @@ const RecoSendMovie = () => {
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
-		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : insets.bottom);
+		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : bottomInset);
 		return {
 			paddingBottom: withTiming(paddingBottom, { duration: 200 }),
 		};

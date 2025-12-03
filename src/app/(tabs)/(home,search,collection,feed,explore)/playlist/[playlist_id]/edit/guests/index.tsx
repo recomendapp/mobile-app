@@ -22,9 +22,9 @@ import app from "@/constants/app";
 import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
+import { useModalInsets } from "@/hooks/useModalInsets";
 
 const RightActions = ({
 	drag,
@@ -76,12 +76,12 @@ const RightActions = ({
 const ModalPlaylistEditGuests = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
     const playlistId = Number(playlist_id);
-	const insets = useSafeAreaInsets();
 	const router = useRouter();
 	const toast = useToast();
 	const { customerInfo } = useAuth();
 	const t = useTranslations();
 	const { mode } = useTheme();
+	const { bottom: bottomInset } = useModalInsets();
 	const {
 		data: playlist,
 	} = usePlaylistQuery({
@@ -318,7 +318,7 @@ const ModalPlaylistEditGuests = () => {
 		onRefresh={refetchGuests}
 		contentContainerStyle={[
 			tw`gap-2`,
-			{ paddingBottom: insets.bottom + PADDING_VERTICAL }
+			{ paddingBottom: bottomInset + PADDING_VERTICAL }
 		]}
 		/>
 	</>

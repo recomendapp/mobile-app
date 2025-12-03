@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
 import { MediaMovie, UserActivityMovie } from '@recomendapp/types';
@@ -7,7 +7,7 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { TrueSheet as RNTrueSheet } from '@lodev09/react-native-true-sheet';
 import TrueSheet from '@/components/ui/TrueSheet';
@@ -29,19 +29,19 @@ interface BottomSheetMovieProps extends BottomSheetProps {
   additionalItemsBottom?: Item[];
 };
 
-interface Item {
+type Item = {
 	icon: LucideIcon;
 	label: string;
 	onPress: () => void;
 	submenu?: Item[];
   closeOnPress?: boolean;
   disabled?: boolean;
-}
+} | string;
 
 const BottomSheetMovie = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetMovieProps
->(({ id, movie, activity, additionalItemsTop = [], additionalItemsBottom = [], detents, ...props }, ref) => {
+>(({ id, movie, activity, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors, mode, tabBarHeight } = useTheme();
@@ -53,6 +53,7 @@ const BottomSheetMovie = React.forwardRef<
   const BottomSheetMainCreditsRef = React.useRef<RNTrueSheet>(null);
   // States
   const items: Item[] = React.useMemo(() => ([
+    'header',
     ...additionalItemsTop,
     {
       icon: Icons.Share,
@@ -113,77 +114,83 @@ const BottomSheetMovie = React.forwardRef<
     ...additionalItemsBottom,
   ]), [movie, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, activity, session]);
 
+  const renderItem = useCallback(({ item }: { item: Item }) => {
+    if (typeof item === 'string') {
+      return (
+        <View
+        style={[
+          { backgroundColor: colors.muted, borderColor: colors.mutedForeground },
+          tw`border-b p-4`,
+        ]}
+        >
+          <View style={tw`flex-row items-center gap-2 `}>
+            <ImageWithFallback
+            alt={movie?.title ?? ''}
+            source={{ uri: getTmdbImage({ path: movie?.poster_path, size: 'w342' }) ?? '' }}
+            style={[
+              { aspectRatio: 2 / 3, height: 'fit-content' },
+              tw.style('rounded-md w-12'),
+            ]}
+            type={'movie'}
+            />
+            <View style={tw`shrink`}>
+              <Text numberOfLines={2} style={tw`shrink`}>{movie?.title}</Text>
+              {movie?.directors && movie?.directors.length > 0 && (
+                <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
+                {movie.directors?.map((director) => director.name).join(', ')}
+                </Text>
+              )}
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    return (
+      <Button
+      variant='ghost'
+      icon={item.icon}
+      iconProps={{
+        color: colors.mutedForeground,
+      }}
+      disabled={item.disabled}
+      style={tw`justify-start h-auto py-4`}
+      onPress={() => {
+        (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
+        item.onPress();
+      }}
+      >
+        {item.label}
+      </Button>
+    );
+  }, [colors.mutedForeground, colors.muted, closeSheet, id, movie]);
+
+  const keyExtractor = useCallback((item: Item, index: number) => {
+    // if (typeof item === 'string') return `header-${item}`;
+    // return `${item.label}-${index}`;
+    return index.toString();
+  }, []);
+
   return (
     <TrueSheet
     ref={ref}
-    detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.5, 1])}
     scrollable
     {...props}
     >
       <FlashList
-      data={[
-        'header',
-        ...items,
-      ]}
-      contentContainerStyle={{ paddingTop: PADDING_VERTICAL }}
+      data={items}
       bounces={false}
-      keyExtractor={(_, i) => i.toString()}
+      keyExtractor={keyExtractor}
       stickyHeaderIndices={[0]}
-      renderItem={({ item }) => (
-        typeof item === 'string' ? (
-          <View
-          style={[
-            { backgroundColor: colors.muted, borderColor: colors.mutedForeground },
-            tw`border-b p-4`,
-          ]}
-          >
-            <View style={tw`flex-row items-center gap-2 `}>
-              <ImageWithFallback
-              alt={movie?.title ?? ''}
-              source={{ uri: getTmdbImage({ path: movie?.poster_path, size: 'w342' }) ?? '' }}
-              style={[
-                { aspectRatio: 2 / 3, height: 'fit-content' },
-                tw.style('rounded-md w-12'),
-              ]}
-              type={'movie'}
-              />
-              <View style={tw`shrink`}>
-                <Text numberOfLines={2} style={tw`shrink`}>{movie?.title}</Text>
-                {movie?.directors && movie?.directors.length > 0 && (
-                  <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
-                  {movie.directors?.map((director) => director.name).join(', ')}
-                  </Text>
-                )}
-              </View>
-            </View>
-          </View>
-        ) : (
-          <Button
-          variant='ghost'
-          icon={item.icon}
-          iconProps={{
-            color: colors.mutedForeground,
-          }}
-          disabled={item.disabled}
-          style={tw`justify-start h-auto py-4`}
-          onPress={() => {
-            (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
-            item.onPress();
-          }}
-          >
-            {item.label}
-          </Button>
-        )
-      )}
+      renderItem={renderItem}
       indicatorStyle={mode === 'dark' ? 'white' : 'black'}
-		  scrollIndicatorInsets={{ bottom: tabBarHeight }}
+      scrollIndicatorInsets={{ bottom: tabBarHeight }}
       nestedScrollEnabled
       />
       {movie?.directors && (
         <BottomSheetDefaultView
         ref={BottomSheetMainCreditsRef}
         id={`${id}-credits`}
-        detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.3, 1])}
         scrollable
         >
           <FlashList

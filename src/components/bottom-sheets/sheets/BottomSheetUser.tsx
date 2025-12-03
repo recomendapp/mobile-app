@@ -7,7 +7,7 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
@@ -36,7 +36,7 @@ interface Item {
 const BottomSheetUser = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetUserProps
->(({ id, user, additionalItemsTop = [], additionalItemsBottom = [], detents, ...props }, ref) => {
+>(({ id, user, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors, mode, tabBarHeight } = useTheme();
@@ -65,7 +65,6 @@ const BottomSheetUser = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
-    detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.5, 1])}
     scrollable
     {...props}
     >

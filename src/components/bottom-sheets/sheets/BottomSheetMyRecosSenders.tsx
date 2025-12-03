@@ -4,7 +4,7 @@ import { UserRecosAggregated } from '@recomendapp/types';
 import { useTheme } from '@/providers/ThemeProvider';
 import { Text } from '@/components/ui/text';
 import { upperFirst } from 'lodash';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { CardUser } from '@/components/cards/CardUser';
 import { FlashList } from '@shopify/flash-list';
 import TrueSheet from '@/components/ui/TrueSheet';
@@ -20,7 +20,7 @@ interface BottomSheetMyRecosSendersProps extends BottomSheetProps {
 const BottomSheetMyRecosSenders = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetMyRecosSendersProps
->(({ id, comments, detents, ...props }, ref) => {
+>(({ id, comments, ...props }, ref) => {
 	const insets = useSafeAreaInsets();
 	const { colors, mode, tabBarHeight } = useTheme();
 	const t = useTranslations();
@@ -55,7 +55,6 @@ const BottomSheetMyRecosSenders = React.forwardRef<
 			{upperFirst(t('common.messages.reco', { count: comments.length }))}
 		</Text>
 	}
-	detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.5, 1])}
 	scrollable
     {...props}
     >

@@ -7,7 +7,7 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { TrueSheet as RNTrueSheet } from '@lodev09/react-native-true-sheet';
 import TrueSheet from '@/components/ui/TrueSheet';
@@ -41,7 +41,7 @@ interface Item {
 const BottomSheetTvSeries = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetTvSeriesProps
->(({ id, tvSeries, activity, additionalItemsTop = [], additionalItemsBottom = [], detents, ...props }, ref) => {
+>(({ id, tvSeries, activity, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const { colors, mode, tabBarHeight } = useTheme();
@@ -116,7 +116,6 @@ const BottomSheetTvSeries = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
-    detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.5, 1])}
     scrollable
     {...props}
     >
@@ -183,7 +182,6 @@ const BottomSheetTvSeries = React.forwardRef<
         <BottomSheetDefaultView
         ref={BottomSheetMainCreditsRef}
         id={`${id}-credits`}
-        detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.3, 1])}
         scrollable
         >
           <FlashList

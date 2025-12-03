@@ -20,7 +20,6 @@ import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { useLocale, useTranslations } from 'use-intl';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { View } from '@/components/ui/view';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
 import { useToast } from '@/components/Toast';
@@ -30,6 +29,7 @@ import { useUIBackgroundsOptions } from '@/api/options';
 import { useQuery } from '@tanstack/react-query';
 import { LoopCarousel } from '@/components/ui/LoopCarousel';
 import { Image } from 'expo-image';
+import { useModalInsets } from '@/hooks/useModalInsets';
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -39,8 +39,8 @@ const PASSWORD_MIN_LENGTH = 8;
 
 const SignupScreen = () => {
 	const supabase = useSupabaseClient();
-	const insets = useSafeAreaInsets();
 	const { colors, keyboardOffset } = useTheme();
+	const insets = useModalInsets();
 	const toast = useToast();
 	const { signup, loginWithOtp } = useAuth();
 	const [ isLoading, setIsLoading ] = useState(false);

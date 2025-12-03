@@ -11,15 +11,15 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
 import { useCallback } from "react";
+import { useModalInsets } from "@/hooks/useModalInsets";
 
 const FollowRequestsScreen = () => {
 	const t = useTranslations();
-	const insets = useSafeAreaInsets();
 	const toast = useToast();
 	const { session } = useAuth();
+	const { bottom: bottomInset } = useModalInsets();
 	const {
 		data: requests,
 		isLoading,
@@ -98,7 +98,7 @@ const FollowRequestsScreen = () => {
 				gap: GAP,
 				paddingHorizontal: PADDING_HORIZONTAL,
 				paddingTop: PADDING_VERTICAL,
-				paddingBottom: insets.bottom + PADDING_VERTICAL,
+				paddingBottom: bottomInset + PADDING_VERTICAL,
 			}
 		]}
 		/>

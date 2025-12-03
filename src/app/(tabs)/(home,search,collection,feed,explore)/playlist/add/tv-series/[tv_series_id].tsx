@@ -32,8 +32,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { usePlaylistTvSeriesAddToQuery } from "@/features/playlist/playlistQueries";
 import { playlistKeys } from "@/features/playlist/playlistKeys";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
+import { useModalInsets } from "@/hooks/useModalInsets";
 
 const COMMENT_MAX_LENGTH = 180;
 
@@ -42,8 +42,8 @@ const PlaylistTvSeriesAdd = () => {
 	const router = useRouter();
 	const toast = useToast();
 	const queryClient = useQueryClient();
-	const insets = useSafeAreaInsets();
 	const { colors, mode } = useTheme();
+	const { bottom: bottomInset } = useModalInsets();
 	const { session } = useAuth();
 	const { tv_series_id, tv_series_name } = useLocalSearchParams();
 	const tvSeriesId = Number(tv_series_id);
@@ -187,7 +187,7 @@ const PlaylistTvSeriesAdd = () => {
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
-		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : insets.bottom);
+		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : bottomInset);
 		return {
 			paddingBottom: withTiming(paddingBottom, { duration: 200 }),
 		};

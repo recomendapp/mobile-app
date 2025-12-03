@@ -13,7 +13,6 @@ import { useTranslations } from 'use-intl';
 import { Text } from '@/components/ui/text';
 import { View } from '@/components/ui/view';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
 import { useToast } from '@/components/Toast';
@@ -24,10 +23,11 @@ import { useUIBackgroundsOptions } from '@/api/options';
 import { useQuery } from '@tanstack/react-query';
 import { LoopCarousel } from '@/components/ui/LoopCarousel';
 import { Image } from 'expo-image';
+import { useModalInsets } from '@/hooks/useModalInsets';
 
 const LoginScreen = () => {
 	const { login } = useAuth();
-	const insets = useSafeAreaInsets();
+	const insets = useModalInsets();
 	const { colors, keyboardOffset } = useTheme();
 	const router = useRouter();
 	const toast = useToast();
