@@ -53,5 +53,5 @@ android/
 .eas/
 
 # Google
-google-services.json
-GoogleService-Info.plist
+# google-services.json
+# GoogleService-Info.plist
