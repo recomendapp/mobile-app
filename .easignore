@@ -48,3 +48,10 @@ android/
 
 # vscode
 .vscode/
+
+# EAS
+.eas/
+
+# Google
+google-services.json
+GoogleService-Info.plist
