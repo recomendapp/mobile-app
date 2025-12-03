@@ -3,6 +3,7 @@ import { useAuthCustomerInfoOptions } from "@/api/options";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import tw from "@/lib/tw";
+import { isIOS } from "@/platform/detection";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import {  useQueryClient } from "@tanstack/react-query";
@@ -38,7 +39,7 @@ const UpgradeScreen = () => {
 			...defaultScreenOptions,
 			headerTitle: upperFirst(t('common.messages.upgrade')),
 			headerTransparent: true,
-			headerRight: () => <Button icon={Icons.X} size="icon" variant='muted' style={tw`rounded-full`} onPress={() => router.canGoBack() && router.back()} />,
+			headerRight: isIOS ? () => <Button icon={Icons.X} size="icon" variant='muted' style={tw`rounded-full`} onPress={() => router.canGoBack() && router.back()} /> : undefined,
 			headerStyle: { backgroundColor: 'transparent' },
 		}}
 		/>

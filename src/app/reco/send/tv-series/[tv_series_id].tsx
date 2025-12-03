@@ -17,51 +17,51 @@ import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reani
 import { SearchBar } from "@/components/ui/searchbar";
 import { PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
-import { useUserRecosMovieSendQuery } from "@/features/user/userQueries";
+import { useUserRecosTvSeriesSendQuery } from "@/features/user/userQueries";
 import { useTheme } from "@/providers/ThemeProvider";
 import AnimatedContentContainer from "@/components/ui/AnimatedContentContainer";
 import Fuse from "fuse.js";
 import { Icons } from "@/constants/Icons";
 import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
-import { useUserRecosMovieInsertMutation } from "@/features/user/userMutations";
+import { useUserRecosTvSeriesInsertMutation } from "@/features/user/userMutations";
 import { CardUser } from "@/components/cards/CardUser";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/Toast";
-import { useModalInsets } from "@/hooks/useModalInsets";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const COMMENT_MAX_LENGTH = 180;
 
-const RecoSendMovie = () => {
+const RecoSendTvSeries = () => {
 	const t = useTranslations();
 	const router = useRouter();
 	const toast = useToast();
+	const insets = useSafeAreaInsets();
 	const { colors, mode } = useTheme();
-	const { bottom: bottomInset } = useModalInsets();
 	const { session } = useAuth();
-	const { movie_id } = useLocalSearchParams();
-	const movieId = Number(movie_id);
+	const { tv_series_id } = useLocalSearchParams();
+	const tvSeriesId = Number(tv_series_id);
 
 	// Form
-	const sendRecoMovieFormSchema = z.object({
+	const sendRecoTvSeriesFormSchema = z.object({
 		comment: z.string()
 			.max(COMMENT_MAX_LENGTH, { message: upperFirst(t('common.form.length.char_max', { count: COMMENT_MAX_LENGTH }))})
 			.regex(/^(?!\s+$)(?!.*\n\s*\n)[\s\S]*$/)
 			.optional()
 			.nullable(),
 	});
-	type SendRecoMovieFormValues = z.infer<typeof sendRecoMovieFormSchema>;
-	const defaultValues: Partial<SendRecoMovieFormValues> = {
+	type SendRecoTvSeriesFormValues = z.infer<typeof sendRecoTvSeriesFormSchema>;
+	const defaultValues: Partial<SendRecoTvSeriesFormValues> = {
 		comment: '',
 	};
-	const form = useForm<SendRecoMovieFormValues>({
-		resolver: zodResolver(sendRecoMovieFormSchema),
+	const form = useForm<SendRecoTvSeriesFormValues>({
+		resolver: zodResolver(sendRecoTvSeriesFormSchema),
 		defaultValues,
 		mode: 'onChange',
 	});
 
 	// Mutations
-	const { mutateAsync: sendReco, isPending: isSendingReco } = useUserRecosMovieInsertMutation();
+	const { mutateAsync: sendReco, isPending: isSendingReco } = useUserRecosTvSeriesInsertMutation();
 
 	// SharedValues
 	const footerHeight = useSharedValue(0);
@@ -70,7 +70,7 @@ const RecoSendMovie = () => {
 	const [search, setSearch] = useState('');
 	const [results, setResults] = useState<typeof friends>([]);
 	const [selected, setSelected] = useState<Profile[]>([]);
-	const resultsRender = results?.map((item) => ({ item: item, isSelected: selected.some((selectedItem) => selectedItem.id === item.friend.id) }))
+	const resultsRender = results?.map((item) => ({ item: item, isSelected: selected.some((selectedItem) => selectedItem.id === item.friend.id) }));
 	const canSave = selected.length > 0 && form.formState.isValid;
 
 	// Queries
@@ -78,9 +78,9 @@ const RecoSendMovie = () => {
 		data: friends,
 		isRefetching,
 		refetch,
-	} = useUserRecosMovieSendQuery({
+	} = useUserRecosTvSeriesSendQuery({
 		userId: session?.user?.id,
-		movieId: movieId,
+		tvSeriesId: tvSeriesId,
 	});
 
 	// Search
@@ -108,12 +108,12 @@ const RecoSendMovie = () => {
 			return [...prev, user];
 		});
 	}, []);
-	const handleSubmit = useCallback(async (values: SendRecoMovieFormValues) => {
+	const handleSubmit = useCallback(async (values: SendRecoTvSeriesFormValues) => {
 		if (!session?.user.id) return;
 		if (selected.length === 0) return;
 		await sendReco({
 			senderId: session.user.id,
-			movieId: movieId,
+			tvSeriesId: tvSeriesId,
 			receivers: selected,
 			comment: values.comment?.trim() || undefined,
 		}, {
@@ -125,7 +125,7 @@ const RecoSendMovie = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [session, selected, movieId, sendReco, toast, router, t]);
+	}, [session, selected, tvSeriesId, sendReco, toast, router, t]);
 	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
@@ -149,7 +149,7 @@ const RecoSendMovie = () => {
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
-		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : bottomInset);
+		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : insets.bottom);
 		return {
 			paddingBottom: withTiming(paddingBottom, { duration: 200 }),
 		};
@@ -266,4 +266,4 @@ const RecoSendMovie = () => {
 	)
 };
 
-export default RecoSendMovie;
+export default RecoSendTvSeries;

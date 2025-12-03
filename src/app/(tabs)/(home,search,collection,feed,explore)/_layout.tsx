@@ -38,10 +38,6 @@ const AppLayout = ({ segment } : { segment: string }) => {
         <Stack.Screen name="feed" options={{ headerTitle: upperFirst(t('common.messages.feed')) }} />
       </Stack.Protected>
       <Stack.Screen name="explore" options={{ title: 'Paradise Pictures' }} />
-      {/* NOTIFICATIONS */}
-      <Stack.Protected guard={!!isMounted}>
-        <Stack.Screen name="notifications" options={{ headerShown: false, presentation: "modal", headerTitle: upperFirst(t('common.messages.notification', { count: 2 })) }} />
-      </Stack.Protected>
       {/* COLLECTION */}
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="collection/(tabs)" />
@@ -63,14 +59,6 @@ const AppLayout = ({ segment } : { segment: string }) => {
         <Stack.Screen name="tv-series/[tv_series_id]/review/create" options={{ headerTitle: upperFirst(t('common.messages.new_review')) }} />
         <Stack.Screen name="tv-series/[tv_series_id]/review/[review_id]/edit" options={{ headerTitle: upperFirst(t('common.messages.edit_review')) }} />
       </Stack.Protected>
-      {/* RECOS */}
-      <Stack.Protected guard={!!session}>
-        <Stack.Screen name="reco/send/movie/[movie_id]" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="reco/send/tv-series/[tv_series_id]" options={{ presentation: 'modal' }} />
-      </Stack.Protected>
-      {/* USERS */}
-      {/* <Stack.Screen name="user/[username]/(follow)" options={{ presentation: 'modal', headerShown: false }} /> */}
-      {/* SETTINGS */}
       <Stack.Screen name="settings/index" options={{ headerTitle: upperFirst(t('pages.settings.label')) }} />
       <Stack.Screen name="settings/appearance" options={{ headerTitle: upperFirst(t('pages.settings.appearance.label')) }} />
       <Stack.Protected guard={!!session}>
@@ -80,40 +68,9 @@ const AppLayout = ({ segment } : { segment: string }) => {
         <Stack.Screen name="settings/security" options={{ headerTitle: upperFirst(t('pages.settings.security.label')) }} />
         <Stack.Screen name="settings/notifications" options={{ headerTitle: upperFirst(t('pages.settings.notifications.label')) }} />
       </Stack.Protected>
-      {/* PLAYLIST */}
-      <Stack.Protected guard={!!session}>
-        <Stack.Screen name="playlist/[playlist_id]/sort" options={{ presentation: 'modal' }} />
-        {/* ADD */}
-        <Stack.Screen name="playlist/add/movie/[movie_id]" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="playlist/add/tv-series/[tv_series_id]" options={{ presentation: 'modal' }} />
-        <Stack.Screen
-        name='playlist/[playlist_id]/edit'
-        options={{
-          headerShown: false,
-          presentation: 'modal',
-        }}
-        />
-      </Stack.Protected>
-
-      {/* AUTH */}
-      <Stack.Protected guard={!session}>
-        <Stack.Screen
-        name='auth'
-        options={{
-          headerShown: false,
-          presentation: Platform.select({
-            ios: 'modal',
-            android: 'formSheet',
-            default: 'modal',
-          })
-        }} />
-      </Stack.Protected>
-      <Stack.Screen name="upgrade" options={{ presentation: 'fullScreenModal' }} />
+      
       {/* ABOUT */}
       <Stack.Screen name="about/index" options={{ headerTitle: upperFirst(t('common.messages.about')) }} />
-
-      {/* ONBOARDING */}
-      <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'slide_from_bottom', animationDuration: 250 }} />
     </Stack>
   </>
   );

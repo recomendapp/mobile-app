@@ -13,13 +13,13 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
 import { useCallback } from "react";
-import { useModalInsets } from "@/hooks/useModalInsets";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const FollowRequestsScreen = () => {
 	const t = useTranslations();
 	const toast = useToast();
 	const { session } = useAuth();
-	const { bottom: bottomInset } = useModalInsets();
+	const insets = useSafeAreaInsets();
 	const {
 		data: requests,
 		isLoading,
@@ -98,7 +98,7 @@ const FollowRequestsScreen = () => {
 				gap: GAP,
 				paddingHorizontal: PADDING_HORIZONTAL,
 				paddingTop: PADDING_VERTICAL,
-				paddingBottom: bottomInset + PADDING_VERTICAL,
+				paddingBottom: insets.bottom + PADDING_VERTICAL,
 			}
 		]}
 		/>

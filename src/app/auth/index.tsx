@@ -20,7 +20,8 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useMemo, useState } from "react";
 import { LoopCarousel } from "@/components/ui/LoopCarousel";
 import { Image } from "expo-image";
-import { useModalInsets } from "@/hooks/useModalInsets";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { isIOS } from "@/platform/detection";
 
 const AuthHeader = ({
   onBackgroundChange,
@@ -70,8 +71,7 @@ const AuthScreen = () => {
   const t = useTranslations();
   const { colors } = useTheme();
   const router = useRouter();
-  const { bottom: bottomInset } = useModalInsets();
-
+  const insets = useSafeAreaInsets();
   const [activeBackground, setActiveBackground] = useState<Database['public']['Functions']['get_ui_backgrounds']['Returns'][number] | null>(null);
   const activeDetails = useMemo(() => {
     switch (activeBackground?.media_type) {
@@ -95,14 +95,14 @@ const AuthScreen = () => {
     <Stack.Screen
     options={{
       headerTitle: () => <></>,
-      headerRight: () => (
+      headerRight: isIOS ? () => (
         <Button variant="muted" icon={Icons.X} size="icon" style={tw`rounded-full`} onPress={() => router.canGoBack() ? router.back() : router.replace('/')} />
-      )
+      ) : undefined
     }}
     />
     <ScrollView
     style={tw`flex-1`}
-    contentContainerStyle={[{ gap: GAP_XL, paddingBottom: bottomInset + PADDING_VERTICAL }]}
+    contentContainerStyle={[{ gap: GAP_XL, paddingBottom: insets.bottom + PADDING_VERTICAL }]}
     stickyHeaderIndices={[0]}
     bounces={false}
     showsVerticalScrollIndicator={false}

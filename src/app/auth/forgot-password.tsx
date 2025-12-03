@@ -26,13 +26,13 @@ import { LoopCarousel } from '@/components/ui/LoopCarousel';
 import { Image } from 'expo-image';
 import { useUIBackgroundsOptions } from '@/api/options';
 import { useQuery } from '@tanstack/react-query';
-import { useModalInsets } from '@/hooks/useModalInsets';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ForgotPasswordScreen = () => {
 	const supabase = useSupabaseClient();
 	const { resetPasswordForEmail } = useAuth();
 	const { colors } = useTheme();
-	const insets = useModalInsets();
+	const insets = useSafeAreaInsets();
 	const toast = useToast();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);

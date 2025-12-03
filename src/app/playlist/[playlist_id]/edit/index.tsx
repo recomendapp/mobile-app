@@ -31,8 +31,8 @@ import { Icons } from "@/constants/Icons";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 import { useToast } from "@/components/Toast";
-import { useModalInsets } from "@/hooks/useModalInsets";
 import { PADDING_VERTICAL } from "@/theme/globals";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const TITLE_MIN_LENGTH = 1;
 const TITLE_MAX_LENGTH = 100;
@@ -43,8 +43,8 @@ const ModalPlaylistEdit = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
     const playlistId = Number(playlist_id);
 	const toast = useToast();
+	const insets = useSafeAreaInsets();
 	const { colors, mode } = useTheme();
-	const { bottom: bottomInset } = useModalInsets();
 	const router = useRouter();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const t = useTranslations();
@@ -287,7 +287,7 @@ const ModalPlaylistEdit = () => {
 		bounces={false}
 		contentContainerStyle={[
 			tw`gap-2 p-4`,
-			{ paddingBottom: bottomInset + PADDING_VERTICAL }
+			{ paddingBottom: insets.bottom + PADDING_VERTICAL }
 		]}
 		nestedScrollEnabled
 		bottomOffset={headerHeight}

@@ -23,7 +23,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useModalInsets } from "@/hooks/useModalInsets";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ModalPlaylistEditGuestsAdd = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
@@ -33,7 +33,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 	const { session } = useAuth();
 	const router = useRouter();
 	const { mode } = useTheme();
-	const { bottom: bottomInset } = useModalInsets();
+	const insets = useSafeAreaInsets();
 	// SharedValues
 	const footerHeight = useSharedValue(0);
 
@@ -125,7 +125,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
-		const paddingBottom =  PADDING_VERTICAL + (selectedUsers.length > 0 ? footerHeight.value : bottomInset);
+		const paddingBottom =  PADDING_VERTICAL + (selectedUsers.length > 0 ? footerHeight.value : insets.bottom);
 		return {
 			paddingBottom: withTiming(paddingBottom, { duration: 200 }),
 		};

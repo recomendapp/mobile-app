@@ -23,11 +23,11 @@ import { useUIBackgroundsOptions } from '@/api/options';
 import { useQuery } from '@tanstack/react-query';
 import { LoopCarousel } from '@/components/ui/LoopCarousel';
 import { Image } from 'expo-image';
-import { useModalInsets } from '@/hooks/useModalInsets';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const LoginScreen = () => {
 	const { login } = useAuth();
-	const insets = useModalInsets();
+	const insets = useSafeAreaInsets();
 	const { colors, keyboardOffset } = useTheme();
 	const router = useRouter();
 	const toast = useToast();

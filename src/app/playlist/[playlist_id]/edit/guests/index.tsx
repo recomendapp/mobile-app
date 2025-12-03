@@ -24,7 +24,7 @@ import Animated, { interpolate, SharedValue, useAnimatedStyle } from "react-nati
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useModalInsets } from "@/hooks/useModalInsets";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const RightActions = ({
 	drag,
@@ -81,7 +81,7 @@ const ModalPlaylistEditGuests = () => {
 	const { customerInfo } = useAuth();
 	const t = useTranslations();
 	const { mode } = useTheme();
-	const { bottom: bottomInset } = useModalInsets();
+	const insets = useSafeAreaInsets();
 	const {
 		data: playlist,
 	} = usePlaylistQuery({
@@ -318,7 +318,7 @@ const ModalPlaylistEditGuests = () => {
 		onRefresh={refetchGuests}
 		contentContainerStyle={[
 			tw`gap-2`,
-			{ paddingBottom: bottomInset + PADDING_VERTICAL }
+			{ paddingBottom: insets.bottom + PADDING_VERTICAL }
 		]}
 		/>
 	</>

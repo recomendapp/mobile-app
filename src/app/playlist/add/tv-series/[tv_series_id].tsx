@@ -2,7 +2,7 @@ import BottomSheetPlaylistCreate from "@/components/bottom-sheets/sheets/BottomS
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { usePlaylistMovieInsertMutation } from "@/features/playlist/playlistMutations";
+import { usePlaylistTvSeriesInsertMutation } from "@/features/playlist/playlistMutations";
 import { useAuth } from "@/providers/AuthProvider";
 import { Playlist, PlaylistSource } from "@recomendapp/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,47 +29,47 @@ import { Badge } from "@/components/ui/Badge";
 import { useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/Input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { usePlaylistMovieAddToQuery } from "@/features/playlist/playlistQueries";
+import { usePlaylistTvSeriesAddToQuery } from "@/features/playlist/playlistQueries";
 import { playlistKeys } from "@/features/playlist/playlistKeys";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/Toast";
-import { useModalInsets } from "@/hooks/useModalInsets";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const COMMENT_MAX_LENGTH = 180;
 
-const PlaylistMovieAdd = () => {
+const PlaylistTvSeriesAdd = () => {
 	const t = useTranslations();
 	const router = useRouter();
-	const queryClient = useQueryClient();
 	const toast = useToast();
+	const queryClient = useQueryClient();
+	const insets = useSafeAreaInsets();
 	const { colors, mode } = useTheme();
-	const { bottom: bottomInset } = useModalInsets();
 	const { session } = useAuth();
-	const { movie_id, movie_title } = useLocalSearchParams();
-	const movieId = Number(movie_id);
-	const movieTitle = movie_title;
+	const { tv_series_id, tv_series_name } = useLocalSearchParams();
+	const tvSeriesId = Number(tv_series_id);
+	const tvSeriesName = tv_series_name;
 
 	// Form
-	const addMovieToPlaylistFormSchema = z.object({
+	const addTvSeriesToPlaylistFormSchema = z.object({
 		comment: z.string()
 			.max(COMMENT_MAX_LENGTH, { message: upperFirst(t('common.form.length.char_max', { count: COMMENT_MAX_LENGTH }))})
 			.regex(/^(?!\s+$)(?!.*\n\s*\n)[\s\S]*$/)
 			.optional()
 			.nullable(),
 	});
-	type AddMovieToPlaylistFormValues = z.infer<typeof addMovieToPlaylistFormSchema>;
-	const defaultValues: Partial<AddMovieToPlaylistFormValues> = {
+	type AddTvSeriesToPlaylistFormValues = z.infer<typeof addTvSeriesToPlaylistFormSchema>;
+	const defaultValues: Partial<AddTvSeriesToPlaylistFormValues> = {
 		comment: '',
 	};
-	const form = useForm<AddMovieToPlaylistFormValues>({
-		resolver: zodResolver(addMovieToPlaylistFormSchema),
+	const form = useForm<AddTvSeriesToPlaylistFormValues>({
+		resolver: zodResolver(addTvSeriesToPlaylistFormSchema),
 		defaultValues,
 		mode: 'onChange',
 	});
 
 	// Mutations
-	const { mutateAsync: addToPlaylistMutation, isPending: isAddingToPlaylist } = usePlaylistMovieInsertMutation({
-		movieId: movieId,
+	const { mutateAsync: addToPlaylistMutation, isPending: isAddingToPlaylist } = usePlaylistTvSeriesInsertMutation({
+		tvSeriesId: tvSeriesId,
 	});
 
 	// REFs
@@ -100,9 +100,9 @@ const PlaylistMovieAdd = () => {
 		data: playlists,
 		isRefetching,
 		refetch,
-	} = usePlaylistMovieAddToQuery({
+	} = usePlaylistTvSeriesAddToQuery({
 		userId: session?.user?.id,
-		movieId: movieId,
+		tvSeriesId: tvSeriesId,
 		source: source,
 	});
 
@@ -131,12 +131,12 @@ const PlaylistMovieAdd = () => {
 			return [...prev, playlist];
 		});
 	}, []);
-	const handleSubmit = useCallback(async (values: AddMovieToPlaylistFormValues) => {
+	const handleSubmit = useCallback(async (values: AddTvSeriesToPlaylistFormValues) => {
 		if (!session) return;
 		if (selected.length === 0) return;
 		await addToPlaylistMutation({
 			userId: session?.user.id,
-			movieId: movieId,
+			tvSeriesId: tvSeriesId,
 			playlists: selected,
 			comment: values.comment || undefined,
 		}, {
@@ -148,7 +148,7 @@ const PlaylistMovieAdd = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [session, selected, movieId, addToPlaylistMutation, toast, router, t]);
+	}, [session, selected, tvSeriesId, addToPlaylistMutation, toast, router, t]);
 	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
@@ -172,22 +172,22 @@ const PlaylistMovieAdd = () => {
 	const onCreatePlaylist = useCallback((playlist: Playlist) => {
 		BottomSheetPlaylistCreateRef.current?.dismiss();
 		queryClient.setQueryData(playlistKeys.addToSource({
-			id: movieId,
-			type: 'movie',
+			id: tvSeriesId,
+			type: 'tv_series',
 			source: 'personal',
 		}), (prev: { playlist: Playlist; already_added: boolean }[] | undefined) => {
-			if (!prev) return [{ playlist: playlist, already_added: false }];
+			if (!prev) return [{ playlist, already_added: false }];
 			return [
-				{ playlist: playlist, already_added: false },
+				{ playlist, already_added: false },
 				...prev,
 			];
 		});
 		setSelected((prev) => [...prev, playlist]);
-	}, [queryClient, movieId]);
+	}, [queryClient, tvSeriesId]);
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
-		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : bottomInset);
+		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : insets.bottom);
 		return {
 			paddingBottom: withTiming(paddingBottom, { duration: 200 }),
 		};
@@ -346,13 +346,13 @@ const PlaylistMovieAdd = () => {
 
 		<BottomSheetPlaylistCreate
 		ref={BottomSheetPlaylistCreateRef}
-		id={`${movieId}-create-playlist`}
+		id={`${tvSeriesId}-create-playlist`}
 		onCreate={onCreatePlaylist}
-		placeholder={String(movieTitle)}
-		playlistType='movie'
+		placeholder={String(tvSeriesName)}
+		playlistType='tv_series'
 		/>
 	</>
 	)
 };
 
-export default PlaylistMovieAdd;
+export default PlaylistTvSeriesAdd;

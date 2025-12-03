@@ -7,7 +7,6 @@ import tw from '@/lib/tw';
 import { PADDING, PADDING_VERTICAL } from '@/theme/globals';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useModalInsets } from '@/hooks/useModalInsets';
 
 type InheritedFlatListProps<T> = Omit<
   FlatListProps<T>,
@@ -46,7 +45,6 @@ export const SelectionFooter = <T extends any>({
   const isVisible = data.length > 0;
   const internalHeight = useSharedValue(0);
   const height = externalHeight || internalHeight;
-  const { bottom: bottomInset } = useModalInsets();
 
   const [internalData, setInternalData] = useState(data);
 
@@ -56,7 +54,7 @@ export const SelectionFooter = <T extends any>({
     const isKeyboardVisible = keyboardHeight.value !== 0;
     const targetPaddingBottom = isKeyboardVisible 
         ? PADDING_VERTICAL 
-        : bottomInset + PADDING_VERTICAL + bottomOffset;
+        : insets.bottom + PADDING_VERTICAL + bottomOffset;
     return {
       opacity: withTiming(isVisible ? 1 : 0, { duration: animationDuration }),
       transform: [
@@ -102,7 +100,7 @@ export const SelectionFooter = <T extends any>({
         style={[
           tw`border-t gap-2`,
           { backgroundColor: colors.background, borderColor: colors.border },
-          { paddingBottom: bottomInset + PADDING_VERTICAL + bottomOffset, paddingLeft: insets.left + PADDING, paddingRight: insets.right + PADDING, paddingTop: PADDING_VERTICAL },
+          { paddingBottom: insets.bottom + PADDING_VERTICAL + bottomOffset, paddingLeft: insets.left + PADDING, paddingRight: insets.right + PADDING, paddingTop: PADDING_VERTICAL },
           containerStyle,
           animatedVisibilityStyle
         ]}

@@ -29,7 +29,7 @@ import { useUIBackgroundsOptions } from '@/api/options';
 import { useQuery } from '@tanstack/react-query';
 import { LoopCarousel } from '@/components/ui/LoopCarousel';
 import { Image } from 'expo-image';
-import { useModalInsets } from '@/hooks/useModalInsets';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -40,7 +40,7 @@ const PASSWORD_MIN_LENGTH = 8;
 const SignupScreen = () => {
 	const supabase = useSupabaseClient();
 	const { colors, keyboardOffset } = useTheme();
-	const insets = useModalInsets();
+	const insets = useSafeAreaInsets();
 	const toast = useToast();
 	const { signup, loginWithOtp } = useAuth();
 	const [ isLoading, setIsLoading ] = useState(false);
