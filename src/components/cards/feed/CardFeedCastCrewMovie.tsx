@@ -15,6 +15,7 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { BadgeMedia } from "@/components/badges/BadgeMedia";
 import { GAP } from "@/theme/globals";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface CardFeedCastCrewMovieBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -59,7 +60,7 @@ const CardFeedCastCrewMovieDefault = React.forwardRef<
 		>
 			{!skeleton ? (
 				<ImageWithFallback
-				source={{ uri: movie.poster_url ?? '' }}
+				source={{ uri: getTmdbImage({ path: movie?.poster_path, size: 'w342' }) ?? '' }}
 				alt={movie.title ?? ''}
 				type={'movie'}
 				style={[tw`w-20 h-full`, { backgroundColor: colors.background }]}

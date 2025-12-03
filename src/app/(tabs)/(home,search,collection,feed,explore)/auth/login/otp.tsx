@@ -23,6 +23,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useToast } from '@/components/Toast';
 import { logger } from '@/logger';
+import { LoopCarousel } from '@/components/ui/LoopCarousel';
+import { Image } from 'expo-image';
+import { useUIBackgroundsOptions } from '@/api/options';
+import { useQuery } from '@tanstack/react-query';
 
 const LoginOtpScreen = () => {
 	const supabase = useSupabaseClient();
@@ -39,6 +43,10 @@ const LoginOtpScreen = () => {
 	const numberOfDigits = 6;
 	const [showOtp, setShowOtp] = useState<boolean>(false);
 	const [otp, setOtp] = useState('');
+
+	const {
+		data: backgrounds,
+	} = useQuery(useUIBackgroundsOptions());
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
 	const forgotPasswordSchema = z.object({
@@ -119,94 +127,105 @@ const LoginOtpScreen = () => {
 		}
 	}, [supabase, formGetValues, t, toast]);
 	return (
-	<LinearGradient
-	colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
-	start={{
-		x: 0,
-		y: 0,
-	}}
-	end={{
-		x: 0,
-		y: 0.7,
-	}}
-	style={tw`flex-1`}
-	>
-		<KeyboardAwareScrollView
-		contentContainerStyle={[
-			tw`flex-1 justify-end items-center`,
-			{
-				gap: GAP,
-				paddingLeft: insets.left + PADDING_HORIZONTAL,
-				paddingRight: insets.right + PADDING_HORIZONTAL,
-				paddingBottom: insets.bottom + PADDING_VERTICAL,
-			}
-		]}
-		keyboardShouldPersistTaps='handled'
-		>
-			{!showOtp ? (
-				<>
-					<View style={[tw`w-full`, { gap: GAP }]}>
-						<GroupedInput title={t('common.messages.otp')} titleStyle={tw`text-center text-xl font-bold`}>
-							<Controller
-								name="email"
-								control={form.control}
-								render={({field: { onChange, onBlur, value }}) => (
-									<GroupedInputItem
-									icon={Icons.Mail}
-									nativeID="email"
-									placeholder={upperFirst(t('common.form.email.label'))}
-									autoComplete='email'
-									autoCapitalize='none'
-									value={value}
-									onChangeText={onChange}
-									onBlur={onBlur}
-									disabled={isLoading}
-									keyboardType='email-address'
-									error={form.formState.errors.email?.message}
-									/>
-								)}
-							/>
-						</GroupedInput>
-						{/* SUBMIT BUTTON */}
-						<Button loading={isLoading} onPress={form.handleSubmit(handleSubmit)} style={tw`w-full rounded-xl`}>{t('pages.auth.login.otp.form.submit')}</Button>
-					</View>
-					<Text textColor='muted' style={tw`text-center`}>{t('pages.auth.login.otp.password_login')} <Link href={prevRoute?.name === 'login/index' ? '../' : '/auth/login'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.login'))}</Link></Text>
-				</>
-			) : (
-				<>
-				<View style={tw`gap-2 items-center`}>
-					<Text variant='title'>
-						{t('pages.auth.login.otp.confirm_form.label')}
-					</Text>
-					<Text textColor='muted'>
-						{t('pages.auth.login.otp.confirm_form.description', { email: formGetValues('email') })}
-					</Text>
-				</View>
-				<InputOTP
-				length={numberOfDigits}
-				value={otp}
-				onChangeText={setOtp}
-				onComplete={handleVerifyOtp}
-				/>
-				<View style={tw`items-center`}>
-					<Text textColor='muted'>
-						{t('common.form.error.not_received_code')}{' '}
-					</Text>
-					<Button
-					variant="ghost"
-					className='p-0'
-					disabled={isLoading}
-					onPress={form.handleSubmit(handleSubmit)}
-					>
-						{t('common.form.resend_code')}
-					</Button>
-				</View>
-				</>
+	<>
+		{backgrounds && (
+			<LoopCarousel
+			items={backgrounds}
+			containerStyle={tw`absolute inset-0`}
+			renderItem={(item) => (
+				<Image source={item.localUri} contentFit="cover" style={tw`w-full h-full`} />
 			)}
-			{/* RETURNS TO LOGIN */}
-		</KeyboardAwareScrollView>
-		<KeyboardToolbar />
-	</LinearGradient>
+			/>
+		)}
+		<LinearGradient
+		colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
+		start={{
+			x: 0,
+			y: 0,
+		}}
+		end={{
+			x: 0,
+			y: 0.7,
+		}}
+		style={tw`flex-1`}
+		>
+			<KeyboardAwareScrollView
+			contentContainerStyle={[
+				tw`flex-1 justify-end items-center`,
+				{
+					gap: GAP,
+					paddingLeft: insets.left + PADDING_HORIZONTAL,
+					paddingRight: insets.right + PADDING_HORIZONTAL,
+					paddingBottom: insets.bottom + PADDING_VERTICAL,
+				}
+			]}
+			keyboardShouldPersistTaps='handled'
+			>
+				{!showOtp ? (
+					<>
+						<View style={[tw`w-full`, { gap: GAP }]}>
+							<GroupedInput title={t('common.messages.otp')} titleStyle={tw`text-center text-xl font-bold`}>
+								<Controller
+									name="email"
+									control={form.control}
+									render={({field: { onChange, onBlur, value }}) => (
+										<GroupedInputItem
+										icon={Icons.Mail}
+										nativeID="email"
+										placeholder={upperFirst(t('common.form.email.label'))}
+										autoComplete='email'
+										autoCapitalize='none'
+										value={value}
+										onChangeText={onChange}
+										onBlur={onBlur}
+										disabled={isLoading}
+										keyboardType='email-address'
+										error={form.formState.errors.email?.message}
+										/>
+									)}
+								/>
+							</GroupedInput>
+							{/* SUBMIT BUTTON */}
+							<Button loading={isLoading} onPress={form.handleSubmit(handleSubmit)} style={tw`w-full rounded-xl`}>{t('pages.auth.login.otp.form.submit')}</Button>
+						</View>
+						<Text textColor='muted' style={tw`text-center`}>{t('pages.auth.login.otp.password_login')} <Link href={prevRoute?.name === 'login/index' ? '../' : '/auth/login'} replace style={{ color: colors.accentYellow }}>{upperFirst(t('common.messages.login'))}</Link></Text>
+					</>
+				) : (
+					<>
+					<View style={tw`gap-2 items-center`}>
+						<Text variant='title'>
+							{t('pages.auth.login.otp.confirm_form.label')}
+						</Text>
+						<Text textColor='muted'>
+							{t('pages.auth.login.otp.confirm_form.description', { email: formGetValues('email') })}
+						</Text>
+					</View>
+					<InputOTP
+					length={numberOfDigits}
+					value={otp}
+					onChangeText={setOtp}
+					onComplete={handleVerifyOtp}
+					/>
+					<View style={tw`items-center`}>
+						<Text textColor='muted'>
+							{t('common.form.error.not_received_code')}{' '}
+						</Text>
+						<Button
+						variant="ghost"
+						className='p-0'
+						disabled={isLoading}
+						onPress={form.handleSubmit(handleSubmit)}
+						>
+							{t('common.form.resend_code')}
+						</Button>
+					</View>
+					</>
+				)}
+				{/* RETURNS TO LOGIN */}
+			</KeyboardAwareScrollView>
+			<KeyboardToolbar />
+		</LinearGradient>
+	</>
 	);
 };
 

@@ -106,7 +106,7 @@ export const LocationDetailsBottomSheet = forwardRef<
   >
 	  <BottomSheetScrollView contentContainerStyle={{ paddingHorizontal: PADDING_HORIZONTAL, gap: GAP, paddingBottom: insets.bottom }} bounces={false}>
       <View style={[tw`flex-row justify-between items-center`, { gap: GAP }]}>
-        {!loading ? <MovieHeaderInfo movie={movie} numberOfLines={1} /> : <Skeleton color={colors.background} style={tw`w-32 h-8`}/>}
+        {!loading ? <MovieHeaderInfo movie={movie} /> : <Skeleton color={colors.background} style={tw`w-32 h-8`}/>}
         <View style={[tw`flex-row items-center`, { gap: GAP }]}>
           <Button onPress={handleCloseLocationDetails} variant='muted' icon={Icons.X} size='icon' style={{ borderRadius: BORDER_RADIUS_FULL, backgroundColor: colors.background }}/>
         </View>

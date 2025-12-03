@@ -3,7 +3,7 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { DEPARTMENT_ORDER, JOB_ORDER } from "@/constants/creditsOrder";
 import { Icons } from "@/constants/Icons";
-import { useMediaTvSeriesCreditsQuery } from "@/features/media/mediaQueries";
+import { useMediaMovieCreditsQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
@@ -14,18 +14,17 @@ import { upperFirst } from "lodash";
 import { useCallback, useMemo } from "react";
 import { useTranslations } from "use-intl";
 
-const TvSeriesCreditsScreen = () => {
-	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
-	const { id: seriesId } = getIdFromSlug(tv_series_id);
+const FilmDetailsScreen = () => {
+	const { film_id } = useLocalSearchParams<{ film_id: string }>();
+	const { id: movieId } = getIdFromSlug(film_id);
 	const t = useTranslations();
 	const { colors, bottomOffset, tabBarHeight } = useTheme();
-
 
 	const {
 		data,
 		isLoading,
-	} = useMediaTvSeriesCreditsQuery({
-		tvSeriesId: seriesId,
+	} = useMediaMovieCreditsQuery({
+		movieId: movieId,
 	});
 	const loading = data === undefined || isLoading;
 	const credits = useMemo(() => {
@@ -122,6 +121,7 @@ const TvSeriesCreditsScreen = () => {
 		return "person";
 	}, []);
 
+
 	return (
 	<>
 		<FlashList
@@ -155,4 +155,4 @@ const TvSeriesCreditsScreen = () => {
 	)
 };
 
-export default TvSeriesCreditsScreen;
+export default FilmDetailsScreen;

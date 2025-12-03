@@ -16,6 +16,7 @@ import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTv
 import { CardUser } from "../CardUser";
 import { CardReviewTvSeries } from "../reviews/CardReviewTvSeries";
 import { GAP } from "@/theme/globals";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface CardFeedActivityTvSeriesBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -61,7 +62,7 @@ const CardFeedActivityTvSeriesDefault = React.forwardRef<
 		>
 			{!skeleton ? (
 				<ImageWithFallback
-				source={{ uri: tvSeries.poster_url ?? '' }}
+				source={{ uri: getTmdbImage({ path: tvSeries?.poster_path, size: 'w342' }) ?? '' }}
 				alt={tvSeries.name ?? ''}
 				type={'tv_series'}
 				style={tw`w-20 h-full`}

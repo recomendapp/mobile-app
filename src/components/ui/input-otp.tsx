@@ -9,10 +9,9 @@ import React, {
   useState,
 } from 'react';
 import {
-  NativeSyntheticEvent,
   Pressable,
   TextInput,
-  TextInputKeyPressEventData,
+  TextInputKeyPressEvent,
   TextInputProps,
   TextStyle,
   View,
@@ -87,7 +86,6 @@ export const InputOTP = forwardRef<InputOTPRef, InputOTPProps>(
     const borderColor = colors.border;
     const primary = colors.accentYellow;
     const danger = colors.destructive;
-    const background = colors.background;
 
     // Normalize value to ensure it doesn't exceed length
     const normalizedValue = value.slice(0, length);
@@ -124,7 +122,7 @@ export const InputOTP = forwardRef<InputOTPRef, InputOTPProps>(
     );
 
     const handleKeyPress = useCallback(
-      (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+      (e: TextInputKeyPressEvent) => {
         const { key } = e.nativeEvent;
 
         if (key === 'Backspace' && normalizedValue.length > 0) {

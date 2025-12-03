@@ -23,6 +23,7 @@ import { clamp } from "lodash";
 import { useImagePalette } from "@/hooks/useImagePalette";
 import Color from "color";
 import { ShapeVerticalRoundedBackground, ShapeVerticalRoundedForeground } from "@/lib/icons";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface ShareTvSeriesProps extends React.ComponentProps<typeof ViewShot> {
 	tvSeries: MediaTvSeries;
@@ -156,7 +157,7 @@ const PosterSelector = ({
 	}, [posters]);
 	const renderItem = useCallback((item: MediaTvSeriesPoster, isActive: boolean) => (
 		<ImageWithFallback
-		source={{ uri: item.poster_url ?? '' }}
+		source={{ uri: getTmdbImage({ path: item.file_path, size: 'w342' }) ?? '' }}
 		alt={tvSeries.name ?? ''}
 		type={"tv_series"}
 		style={[{ aspectRatio: 2 / 3, width: ITEM_WIDTH }]}
@@ -256,7 +257,7 @@ const BackdropImageSelector = ({
 	
 	const renderBackdropItem = useCallback((item: MediaTvSeriesBackdrop, isActive: boolean) => (
 		<ImageWithFallback
-			source={{ uri: item.backdrop_url ?? '' }}
+			source={{ uri: getTmdbImage({ path: item.file_path, size: 'w154' }) ?? '' }}
 			alt={tvSeriesTitle}
 			type="tv_series"
 			style={{ aspectRatio: 2 / 3, width: ITEM_WIDTH }}

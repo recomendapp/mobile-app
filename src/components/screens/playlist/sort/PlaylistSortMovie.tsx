@@ -18,6 +18,7 @@ import { useTranslations } from "use-intl";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 export const PlaylistSortMovie = () => {
 	const { session } = useAuth();
@@ -85,7 +86,7 @@ export const PlaylistSortMovie = () => {
 					<View style={tw`flex-row items-center gap-2 shrink`}>
 						<ImageWithFallback
 						alt={item.movie?.title ?? ''}
-						source={{ uri: item.movie?.poster_url || '' }}
+						source={{ uri: getTmdbImage({ path: item.movie?.poster_path, size: 'w342' }) || '' }}
 						style={[{ aspectRatio: 2 / 3, height: 'fit-content' }, tw`rounded-md w-16`]}
 						/>
 						<View style={tw`shrink`}>

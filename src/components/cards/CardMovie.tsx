@@ -13,6 +13,7 @@ import BottomSheetMovie from "../bottom-sheets/sheets/BottomSheetMovie";
 import { Text } from "../ui/text";
 import ButtonUserActivityMovieRating from "../buttons/movies/ButtonUserActivityMovieRating";
 import { GAP } from "@/theme/globals";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface CardMovieBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -75,7 +76,7 @@ const CardMovieDefault = React.forwardRef<
 		>
 			<View style={tw`flex-1 flex-row items-center gap-2`}>
 				{!skeleton ? <ImageWithFallback
-					source={{uri: movie.poster_url ?? ''}}
+					source={{uri: getTmdbImage({ path: movie.poster_path, size: 'w342' })}}
 					alt={movie.title ?? ''}
 					type={'movie'}
 					style={{
@@ -116,7 +117,7 @@ React.ComponentRef<typeof Animated.View>,
 			{...props}
 		>
 			{!skeleton ? <ImageWithFallback
-				source={{uri: movie.poster_url ?? ''}}
+				source={{uri: getTmdbImage({ path: movie.poster_path, size: 'w342' })}}
 				alt={movie.title ?? ''}
 				type={'movie'}
 			/> : <Skeleton style={tw.style('w-full h-full')} />}
@@ -160,7 +161,7 @@ const CardMovieList = React.forwardRef<
 		>
 			<View style={tw`flex-1 flex-row items-center gap-2`}>
 				{!skeleton ? <ImageWithFallback
-					source={{uri: movie.poster_url ?? ''}}
+					source={{uri: getTmdbImage({ path: movie.poster_path, size: 'w342' })}}
 					alt={movie.title ?? ''}
 					type={'movie'}
 					style={[

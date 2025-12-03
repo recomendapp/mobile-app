@@ -12,8 +12,7 @@ import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
-import { PADDING_HORIZONTAL } from '@/theme/globals';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { Text } from '@/components/ui/text';
 
 const { width } = Dimensions.get('screen');
@@ -97,8 +96,7 @@ interface BottomSheetRatingProps extends BottomSheetProps {
 const BottomSheetRating = React.forwardRef<
 	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetRatingProps
->(({ id, media, rating, onRatingChange, detents = ['auto'], ...props }, ref) => {
-	const insets = useSafeAreaInsets();
+>(({ id, media, rating, onRatingChange, ...props }, ref) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
 	const closeSheet = useBottomSheetStore((state) => state.closeSheet);
@@ -163,25 +161,7 @@ const BottomSheetRating = React.forwardRef<
 	return (
 		<TrueSheet
 		ref={ref}
-		detents={detents}
-		footer={() => (
-			<View style={{ paddingBottom: insets.bottom, paddingHorizontal: PADDING_HORIZONTAL }}>
-				{rating ? (
-					<View style={tw`flex-row gap-2 justify-between`}>
-						<Button variant="destructive" onPress={handleDeleteRating} style={{ flex: 1 }}>
-							{upperFirst(t('common.messages.delete'))}
-						</Button>
-						<Button variant="accent-yellow" onPress={handleSaveRating} style={{ flex: 1 }}>
-							{upperFirst(t('common.messages.save'))}
-						</Button>
-					</View>
-				) : (
-					<Button variant="accent-yellow" onPress={handleSaveRating}>
-						{upperFirst(t('common.messages.add_rating'))}
-					</Button>
-				)}
-			</View>
-		)}
+		style={{ paddingTop: PADDING_VERTICAL * 2 }} 
 		blurTint='dark'
 		{...props}
 		>
@@ -269,6 +249,22 @@ const BottomSheetRating = React.forwardRef<
 			scrollEventThrottle={1000 / 60} // ~16ms
 			snapToInterval={ITEM_TOTAL_SIZE}
 			/>
+			<View style={{ paddingHorizontal: PADDING_HORIZONTAL }}>
+				{rating ? (
+					<View style={tw`flex-row gap-2 justify-between`}>
+						<Button variant="destructive" onPress={handleDeleteRating} style={{ flex: 1 }}>
+							{upperFirst(t('common.messages.delete'))}
+						</Button>
+						<Button variant="accent-yellow" onPress={handleSaveRating} style={{ flex: 1 }}>
+							{upperFirst(t('common.messages.save'))}
+						</Button>
+					</View>
+				) : (
+					<Button variant="accent-yellow" onPress={handleSaveRating}>
+						{upperFirst(t('common.messages.add_rating'))}
+					</Button>
+				)}
+			</View>
 		</TrueSheet>
 	);
 });

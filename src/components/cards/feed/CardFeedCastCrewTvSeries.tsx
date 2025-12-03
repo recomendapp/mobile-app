@@ -15,6 +15,7 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 import { BadgeMedia } from "@/components/badges/BadgeMedia";
 import { GAP } from "@/theme/globals";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface CardFeedCastCrewTvSeriesBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -59,7 +60,7 @@ const CardFeedCastCrewTvSeriesDefault = React.forwardRef<
 		>
 			{!skeleton ? (
 				<ImageWithFallback
-				source={{ uri: tvSeries.poster_url ?? '' }}
+				source={{ uri: getTmdbImage({ path: tvSeries?.poster_path, size: 'w342' }) ?? '' }}
 				alt={tvSeries.name ?? ''}
 				type={'tv_series'}
 				style={[tw`w-20 h-full`, { backgroundColor: colors.background }]}

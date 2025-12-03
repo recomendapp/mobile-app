@@ -10,7 +10,7 @@ import {OnboardingData} from '../data';
 import tw from '@/lib/tw';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BORDER_RADIUS_LG, GAP_LG, PADDING_HORIZONTAL } from '@/theme/globals';
-import AnimatedImage from '@/components/ui/AnimatedImage';
+import { Image } from 'expo-image';
 
 type Props = {
   index: number;
@@ -70,11 +70,9 @@ const RenderItem = ({index, x, item}: Props) => {
         />
       </View>
       <Animated.View style={[ tw`items-center justify-center w-full`, { gap: GAP_LG }]}>
-        <Animated.Text style={[tw`text-center text-xl font-bold`, { color: item.textColor, marginHorizontal: PADDING_HORIZONTAL }, textAnimationStyle]}>
-          {item.text}
-        </Animated.Text>
-        <AnimatedImage
-        source={{ uri: item.image}}
+        <Image
+        transition={500}
+        source={item.image}
         style={[
           tw`w-full h-full max-w-lg`,
           {
@@ -84,6 +82,9 @@ const RenderItem = ({index, x, item}: Props) => {
         ]}
         contentFit={'contain'}
         />
+        <Animated.Text style={[tw`text-center text-xl font-bold`, { color: item.textColor, marginHorizontal: PADDING_HORIZONTAL }, textAnimationStyle]}>
+          {item.text}
+        </Animated.Text>
       </Animated.View>
     </View>
   );

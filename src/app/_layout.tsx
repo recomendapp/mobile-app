@@ -9,10 +9,14 @@ import StatusBar from '@/components/StatusBar';
 import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import { Stack } from 'expo-router';
+import { enableFreeze, enableScreens } from 'react-native-screens';
 
 export {
   ErrorBoundary,
 } from 'expo-router';
+
+enableScreens(true);
+enableFreeze(true);
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,

@@ -10,20 +10,19 @@ import { Button } from "@/components/ui/Button";
 import { Separator } from "@/components/ui/separator";
 import { Icons } from "@/constants/Icons";
 import * as Clipboard from 'expo-clipboard';
-import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { ShareViewRef } from "@/components/share/type";
 import { LucideIcon, LucideProps } from "lucide-react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
 import { View } from "@/components/ui/view";
 import { BrandIcon, BrandIconProps } from "@/lib/icons";
 import { useTheme } from "@/providers/ThemeProvider";
-import { ScrollView } from "react-native";
+import { Platform, ScrollView } from "react-native";
 import * as env from '@/env';
 import * as MediaLibrary from 'expo-media-library';
 import { File, Directory, Paths } from 'expo-file-system';
+import { FlashList } from "@shopify/flash-list";
 
 const SHARE_DIRECTORY = new Directory(Paths.cache, 'share_temp');
 
@@ -54,7 +53,6 @@ const BottomSheetShareLayout = forwardRef<
     const toast = useToast();
     const t = useTranslations();
     const { colors, mode } = useTheme();
-    const insets = useSafeAreaInsets();
     const url = `https://${Constants.expoConfig?.extra?.webDomain}${path}`;
     
     // REFs
@@ -252,29 +250,29 @@ const BottomSheetShareLayout = forwardRef<
     return (
         <TrueSheet
         ref={ref}
-        scrollable
-        style={tw`p-0`}
+        scrollable={Platform.OS === 'ios' ? true : false}
         {...props}
         >
             <ScrollView
             bounces={false}
-            contentContainerStyle={{ paddingTop: PADDING_VERTICAL * 2, paddingBottom: insets.bottom, gap: GAP }}
+            contentContainerStyle={{ gap: GAP, paddingTop: PADDING_VERTICAL * 2 }}
             nestedScrollEnabled
             >
                 <Text variant="title" style={tw`text-center`}>{upperFirst(t('common.messages.share'))}</Text>
                 {children}
                 {children && <Separator />}
-                <LegendList
-				data={sharePlatform}
-				renderItem={renderItem}
+
+                <FlashList
+                data={sharePlatform}
+                renderItem={renderItem}
                 extraData={loadingPlatform}
-				contentContainerStyle={{
-					paddingHorizontal: PADDING_HORIZONTAL,
-					gap: GAP_XL,
-				}}
+                contentContainerStyle={{
+                    paddingHorizontal: PADDING_HORIZONTAL * 2,
+                }}
+                ItemSeparatorComponent={() => <View style={{ width: GAP_XL }}/>}
                 keyExtractor={useCallback((item: SharePlatform, index: number) => index.toString(), [])}
-				horizontal
-				showsHorizontalScrollIndicator={false}
+                horizontal
+                showsHorizontalScrollIndicator={false}
                 />
             </ScrollView>
         </TrueSheet>

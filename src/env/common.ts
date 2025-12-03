@@ -117,3 +117,10 @@ export const NOVU_APPLICATION_IDENTIFIER = process.env.EXPO_PUBLIC_NOVU_APPLICAT
  */
 export const FIREBASE_DEBUG_TOKEN_ANDROID = process.env.EXPO_PUBLIC_FIREBASE_DEBUG_TOKEN_ANDROID!
 export const FIREBASE_DEBUG_TOKEN_IOS = process.env.EXPO_PUBLIC_FIREBASE_DEBUG_TOKEN_IOS!
+
+/**
+ * TMDB
+ */
+export const TMDB_IMAGE_BASE_URL = (
+  process.env.EXPO_PUBLIC_TMDB_IMAGE_BASE_URL || "https://image.tmdb.org/t/p"
+).replace(/\/+$/, "");

@@ -20,6 +20,10 @@ import { useToast } from '@/components/Toast';
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { AuthError } from '@supabase/supabase-js';
 import { logger } from '@/logger';
+import { useUIBackgroundsOptions } from '@/api/options';
+import { useQuery } from '@tanstack/react-query';
+import { LoopCarousel } from '@/components/ui/LoopCarousel';
+import { Image } from 'expo-image';
 
 const LoginScreen = () => {
 	const { login } = useAuth();
@@ -31,6 +35,10 @@ const LoginScreen = () => {
 	const [ email, setEmail ] = useState('');
 	const [ password, setPassword ] = useState('');
 	const [ isLoading, setIsLoading ] = useState(false);
+
+	const {
+		data: backgrounds,
+	} = useQuery(useUIBackgroundsOptions());
 
 	const handleSubmit = useCallback(async () => {
 		try {
@@ -59,6 +67,15 @@ const LoginScreen = () => {
 
 	return (
 	<>
+		{backgrounds && (
+          <LoopCarousel
+          items={backgrounds}
+          containerStyle={tw`absolute inset-0`}
+          renderItem={(item) => (
+            <Image source={item.localUri} contentFit="cover" style={tw`w-full h-full`} />
+          )}
+          />
+        )}
 		<LinearGradient
 		colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
 		start={{

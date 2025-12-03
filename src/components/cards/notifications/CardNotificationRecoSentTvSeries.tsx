@@ -13,6 +13,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { scheduleOnRN } from "react-native-worklets";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface CardNotificationRecoSentTvSeriesBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -85,7 +86,7 @@ const CardNotificationRecoSentTvSeriesDefault = React.forwardRef<
 			</View>
 			{!skeleton ? (
 				<ImageWithFallback
-				source={{ uri: tvSeries.poster_url ?? '' }}
+				source={{ uri: getTmdbImage({ path: tvSeries?.poster_path, size: 'w342' }) ?? '' }}
 				alt={tvSeries.name ?? ''}
 				type={'tv_series'}
 				style={[

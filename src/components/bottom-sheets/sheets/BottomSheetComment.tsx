@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
-import { BORDER_RADIUS, GAP, PADDING_HORIZONTAL } from '@/theme/globals';
+import { BORDER_RADIUS, GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { Input } from '@/components/ui/Input';
 import { Text } from '@/components/ui/text';
 import { z } from 'zod';
@@ -82,6 +82,7 @@ export const BottomSheetComment = React.forwardRef<
 	ref={ref}
 	style={{
 		gap: GAP,
+		paddingTop: PADDING_VERTICAL * 2,
 		paddingHorizontal: PADDING_HORIZONTAL,
 	}}
 	{...props}

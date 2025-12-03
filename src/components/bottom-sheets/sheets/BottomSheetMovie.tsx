@@ -7,7 +7,7 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { TrueSheet as RNTrueSheet } from '@lodev09/react-native-true-sheet';
 import TrueSheet from '@/components/ui/TrueSheet';
@@ -19,8 +19,8 @@ import { Text } from '@/components/ui/text';
 import { useAuth } from '@/providers/AuthProvider';
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import BottomSheetShareMovie from './share/BottomSheetShareMovie';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FlashList } from '@shopify/flash-list';
+import { getTmdbImage } from '@/lib/tmdb/getTmdbImage';
 
 interface BottomSheetMovieProps extends BottomSheetProps {
   movie?: MediaMovie,
@@ -41,11 +41,10 @@ interface Item {
 const BottomSheetMovie = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetMovieProps
->(({ id, movie, activity, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
+>(({ id, movie, activity, additionalItemsTop = [], additionalItemsBottom = [], detents, ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const insets = useSafeAreaInsets();
-  const { colors } = useTheme();
+  const { colors, mode, tabBarHeight } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -117,8 +116,8 @@ const BottomSheetMovie = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+    detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.5, 1])}
     scrollable
-    style={tw`p-0`}
     {...props}
     >
       <FlashList
@@ -126,8 +125,8 @@ const BottomSheetMovie = React.forwardRef<
         'header',
         ...items,
       ]}
+      contentContainerStyle={{ paddingTop: PADDING_VERTICAL }}
       bounces={false}
-      contentContainerStyle={{ paddingBottom: insets.bottom }}
       keyExtractor={(_, i) => i.toString()}
       stickyHeaderIndices={[0]}
       renderItem={({ item }) => (
@@ -141,7 +140,7 @@ const BottomSheetMovie = React.forwardRef<
             <View style={tw`flex-row items-center gap-2 `}>
               <ImageWithFallback
               alt={movie?.title ?? ''}
-              source={{ uri: movie?.poster_url ?? '' }}
+              source={{ uri: getTmdbImage({ path: movie?.poster_path, size: 'w342' }) ?? '' }}
               style={[
                 { aspectRatio: 2 / 3, height: 'fit-content' },
                 tw.style('rounded-md w-12'),
@@ -176,12 +175,15 @@ const BottomSheetMovie = React.forwardRef<
           </Button>
         )
       )}
+      indicatorStyle={mode === 'dark' ? 'white' : 'black'}
+		  scrollIndicatorInsets={{ bottom: tabBarHeight }}
       nestedScrollEnabled
       />
       {movie?.directors && (
         <BottomSheetDefaultView
         ref={BottomSheetMainCreditsRef}
         id={`${id}-credits`}
+        detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.3, 1])}
         scrollable
         >
           <FlashList
@@ -206,6 +208,8 @@ const BottomSheetMovie = React.forwardRef<
                 </View>
               </Button>
           )}
+          indicatorStyle={mode === 'dark' ? 'white' : 'black'}
+		      scrollIndicatorInsets={{ bottom: tabBarHeight }}
           nestedScrollEnabled
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{

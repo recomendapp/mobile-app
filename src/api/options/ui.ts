@@ -54,7 +54,7 @@ export const useUIBackgroundsOptions = () => {
 
 			return cached;
 		},
-		staleTime: 24 * 60 * 60 * 1000, // 24 hours
-		gcTime: 48 * 60 * 60 * 1000, // 48 hours
+		// staleTime: 24 * 60 * 60 * 1000, // 24 hours
+		// gcTime: 48 * 60 * 60 * 1000, // 48 hours
 	});
 };

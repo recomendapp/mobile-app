@@ -1,19 +1,21 @@
-import { Text, TextProps } from "@/components/ui/text";
+import { Text } from "@/components/ui/text";
+import { View } from "@/components/ui/view";
+import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaMovie } from "@recomendapp/types";
 import { upperFirst } from "lodash";
 import { forwardRef, Fragment, ReactNode, useMemo } from "react";
-import { useFormatter, useTranslations } from "use-intl";
+import { ViewProps } from "react-native";
+import { useTranslations } from "use-intl";
 
-interface MovieHeaderInfoProps extends Omit<TextProps, 'children'> {
+interface MovieHeaderInfoProps extends Omit<ViewProps, 'children'> {
   movie: MediaMovie;
 };
 
 export const MovieHeaderInfo = forwardRef<
-  React.ComponentRef<typeof Text>,
+  React.ComponentRef<typeof View>,
   MovieHeaderInfoProps
->(({ movie, ...props }, ref) => {
-  const formatter = useFormatter();
+>(({ movie, style, ...props }, ref) => {
   const t = useTranslations();
   const { colors } = useTheme();
 
@@ -32,24 +34,26 @@ export const MovieHeaderInfo = forwardRef<
     }
     // Genres
     if (movie.genres?.length) {
-      result.push(formatter.list(movie.genres.map((g) => g.name), { style: 'narrow', type: 'conjunction' }));
+      result.push(movie.genres.at(0)!.name);
     }
     return result;
-  }, [movie, formatter]);
+  }, [movie]);
 
   return (
-    <Text ref={ref} {...props}>
-      <Text style={{ color: colors.accentYellow }}>
+    <View ref={ref} style={[tw`flex-row flex-wrap items-center justify-center`, style]} {...props}>
+      <Text style={[tw`mr-1`, { color: colors.accentYellow }]}>
         {upperFirst(t("common.messages.film", { count: 1 }))}
       </Text>
-      {items.length > 0 && " | "}
+      {items.length > 0 && <Text style={{ color: colors.mutedForeground }}> • </Text>}
       {items.map((item, i) => (
         <Fragment key={i}>
-          {i > 0 && " • "}
-          {item}
+          {i > 0 && <Text style={{ color: colors.mutedForeground }}> • </Text>}
+          <Text style={{ color: colors.mutedForeground }}>
+            {item}
+          </Text>
         </Fragment>
       ))}
-    </Text>
+    </View>
   );
 });
 MovieHeaderInfo.displayName = "MovieHeaderInfo";

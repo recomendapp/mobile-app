@@ -23,6 +23,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardToolbar } from '@/components/ui/KeyboardToolbar';
 import { useToast } from '@/components/Toast';
 import { logger } from '@/logger';
+import { LoopCarousel } from '@/components/ui/LoopCarousel';
+import { Image } from 'expo-image';
+import { useUIBackgroundsOptions } from '@/api/options';
+import { useQuery } from '@tanstack/react-query';
 
 const ForgotPasswordScreen = () => {
 	const supabase = useSupabaseClient();
@@ -39,6 +43,10 @@ const ForgotPasswordScreen = () => {
 	const numberOfDigits = 6;
 	const [showOtp, setShowOtp] = useState<boolean>(false);
 	const [otp, setOtp] = useState('');
+
+	const {
+		data: backgrounds,
+	} = useQuery(useUIBackgroundsOptions());
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
 	const forgotPasswordSchema = z.object({
@@ -107,6 +115,16 @@ const ForgotPasswordScreen = () => {
 		}
 	}, [supabase, form, t, toast]);
 	return (
+	<>
+		{backgrounds && (
+			<LoopCarousel
+			items={backgrounds}
+			containerStyle={tw`absolute inset-0`}
+			renderItem={(item) => (
+				<Image source={item.localUri} contentFit="cover" style={tw`w-full h-full`} />
+			)}
+			/>
+		)}
 		<LinearGradient
 		colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
 		start={{
@@ -195,6 +213,7 @@ const ForgotPasswordScreen = () => {
 			</KeyboardAwareScrollView>
 			<KeyboardToolbar />
 		</LinearGradient>
+	</>
 	)
 };
 

@@ -1,18 +1,18 @@
 import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
-import { Href, Link, useLocalSearchParams, useRouter } from "expo-router"
-import { clamp, upperFirst } from "lodash";
-import { Pressable, useWindowDimensions } from "react-native";
-import { MediaMoviePerson } from "@recomendapp/types";
+import { Href, Link, useLocalSearchParams } from "expo-router"
+import { clamp, lowerCase, upperFirst } from "lodash";
+import { Pressable, useWindowDimensions, ViewProps } from "react-native";
+import { MediaMovie, MediaMovieCasting } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
-import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+import { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useState, useCallback, useMemo } from "react";
 import { useLocale, useTranslations } from "use-intl";
-import { Text } from "@/components/ui/text";
+import { Text, TextProps } from "@/components/ui/text";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
-import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, GAP_XS, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import MovieHeader from "@/components/screens/film/MovieHeader";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import MovieWidgetReviews from "@/components/screens/film/MovieWidgetReviews";
@@ -21,11 +21,22 @@ import { CardPerson } from "@/components/cards/CardPerson";
 import { View } from "@/components/ui/view";
 import { MultiRowHorizontalList } from "@/components/ui/MultiRowHorizontalList";
 import { Button } from "@/components/ui/Button";
+import { FloatingBar } from "@/components/ui/FloatingBar";
+import { useAuth } from "@/providers/AuthProvider";
+import ButtonUserActivityMovieRating from "@/components/buttons/movies/ButtonUserActivityMovieRating";
+import ButtonUserActivityMovieLike from "@/components/buttons/movies/ButtonUserActivityMovieLike";
+import ButtonUserActivityMovieWatch from "@/components/buttons/movies/ButtonUserActivityMovieWatch";
+import { ButtonUserWatchlistMovie } from "@/components/buttons/movies/ButtonUserWatchlistMovie";
+import ButtonUserActivityMovieWatchDate from "@/components/buttons/movies/ButtonUserActivityMovieWatchDate";
+import { ButtonPlaylistMovieAdd } from "@/components/buttons/ButtonPlaylistMovieAdd";
+import ButtonUserRecoMovieSend from "@/components/buttons/movies/ButtonUserRecoMovieSend";
+import AnimatedContentContainer from "@/components/ui/AnimatedContentContainer";
 
 const FilmScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
-	const { tabBarHeight, bottomOffset} = useTheme();
+	const { session } = useAuth();
+	const { tabBarHeight, bottomOffset } = useTheme();
 	const locale = useLocale();
 	const t = useTranslations();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -41,11 +52,11 @@ const FilmScreen = () => {
 	const loading = movie === undefined || isLoading;
 
 	// States
-	const [showFullSynopsis, setShowFullSynopsis] = useState(false);
 
 	// SharedValue
 	const headerHeight = useSharedValue<number>(0);
 	const scrollY = useSharedValue<number>(0);
+	const floatingBarHeight = useSharedValue<number>(0);
 
 	const scrollHandler = useAnimatedScrollHandler({
 		onScroll: event => {
@@ -53,9 +64,14 @@ const FilmScreen = () => {
 		},
 	});
 
-	const toggleSynopsis = useCallback(() => {
-		setShowFullSynopsis((prev) => !prev);
-	}, []);
+	const animatedContentContainerStyle = useAnimatedStyle(() => {
+		return {
+			paddingBottom: withTiming(
+				bottomOffset + (PADDING_VERTICAL * 2) + floatingBarHeight.value,
+				{ duration: 300 }
+			),
+		};
+	});
 
 	const handleMenuPress = useCallback(() => {
 		if (movie) {
@@ -76,12 +92,10 @@ const FilmScreen = () => {
 		triggerHeight={headerHeight}
 		onMenuPress={movie ? handleMenuPress : undefined}
 		/>
-		<Animated.ScrollView
+		<AnimatedContentContainer
 		onScroll={scrollHandler}
 		scrollToOverflowEnabled
-		contentContainerStyle={{
-			paddingBottom: bottomOffset + PADDING_VERTICAL,
-		}}
+		contentContainerStyle={animatedContentContainerStyle}
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,
 		}}
@@ -92,80 +106,123 @@ const FilmScreen = () => {
 			scrollY={scrollY}
 			triggerHeight={headerHeight}
 			/>
-			{movie && <View style={tw`flex-col gap-4`}>
-				{/* SYNOPSIS */}
-				<Pressable
-				style={[tw`gap-1`, { paddingHorizontal: PADDING_HORIZONTAL }]}
-				onPress={toggleSynopsis}
-				>
-					<Text style={tw`text-lg font-medium`}>{upperFirst(t('common.messages.overview'))}</Text>
-					<Text textColor='muted' numberOfLines={showFullSynopsis ? undefined : 5} style={tw`text-justify`}>
-						{movie?.overview || upperFirst(t('common.messages.no_overview'))}
-					</Text>
-				</Pressable>
-				{/* CASTING */}
-				<View style={tw`gap-1`}> 
-					<View style={[{ gap: GAP, paddingHorizontal: PADDING_HORIZONTAL }, tw`flex-row items-center justify-between`]}>
-						<Text style={tw`text-lg font-medium`}>{upperFirst(t('common.messages.cast'))}</Text>
-						<Link href={{ pathname: '/film/[film_id]/credits', params: { film_id } }} asChild>
-							<Button variant='ghost' size="fit">
-								{upperFirst(t('common.messages.show_credit', { count: 2 }))}
+			{movie && (
+				<View style={tw`flex-col gap-4`}>
+					{/* DETAILS */}
+					<View style={{ gap: GAP  }}>
+						<View style={{ gap: GAP_XS }}>
+							<FilmSynopsis movie={movie} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
+							<FilmOriginalTitle movie={movie} style={{ marginHorizontal: PADDING_HORIZONTAL }} />
+						</View>
+						<FilmCast movie={movie} />
+						
+						<Link href={{ pathname: '/film/[film_id]/details', params: { film_id: movie.id }}} asChild>
+							<Button variant="outline" style={{ marginHorizontal: PADDING_HORIZONTAL }}>
+								{upperFirst(t('common.messages.see_more_details'))}
 							</Button>
 						</Link>
 					</View>
-					{movie.cast?.length ? <FilmCast cast={movie.cast} /> : <Text textColor='muted' style={{ paddingHorizontal: PADDING_HORIZONTAL }}>{upperFirst(t('common.messages.no_cast'))}</Text>}
+					<MovieWidgetPlaylists movieId={movie.id!} url={movie.url as Href} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}/>
+					<MovieWidgetReviews movie={movie} url={movie.url as Href} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}/>
 				</View>
-				<MovieWidgetPlaylists movieId={movie.id!} url={movie.url as Href} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}/>
-				<MovieWidgetReviews movie={movie} url={movie.url as Href} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}/>
-			</View>}
-		</Animated.ScrollView>
+			)}
+		</AnimatedContentContainer>
+		{movie && session && (
+			<FloatingBar bottomOffset={bottomOffset + PADDING_VERTICAL} height={floatingBarHeight} containerStyle={{ paddingHorizontal: 0 }} style={[tw`flex-row items-center justify-between`, { paddingVertical: PADDING_HORIZONTAL }]}>
+				<View style={tw`flex-row items-center gap-4`}>
+					<ButtonUserActivityMovieRating movie={movie} />
+					<ButtonUserActivityMovieLike movie={movie} />
+					<ButtonUserActivityMovieWatch movie={movie} />
+					<ButtonUserWatchlistMovie movie={movie} />
+					<ButtonUserActivityMovieWatchDate movie={movie} />
+				</View>
+				<View style={tw`flex-row items-center gap-4`}>
+					<ButtonPlaylistMovieAdd movie={movie} />
+					<ButtonUserRecoMovieSend movie={movie} />
+				</View>
+			</FloatingBar>
+		)}
 	</>
 	)
 };
 
-const FilmCast = ({
-	cast,
-} : {
-	cast: MediaMoviePerson[]
-}) => {
+const FilmSynopsis = ({ movie, style, containerStyle, numberOfLines = 5, ...props } : Omit<TextProps, 'children'> & { movie: MediaMovie, containerStyle: ViewProps['style'] }) => {
+	const t = useTranslations();
 	const { colors } = useTheme();
-	const router = useRouter();
-	const { width: screenWidth } = useWindowDimensions();
-	const width = useMemo(() => clamp(screenWidth - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
-	const handlePress = useCallback((id: string | number) => {
-		router.push({
-			pathname: '/person/[person_id]',
-			params: { person_id: id.toString() }
-		})
-	}, [router]);
-	const renderItem = useCallback((item: MediaMoviePerson) => (
-		<CardPerson variant='list' hideKnownForDepartment person={item.person!}>
-			{item.role?.character ? (
-				<Text
-				numberOfLines={2}
-				style={[{ color: colors.accentYellow }, tw`italic text-sm`]}
-				>
-					{item.role?.character}
-				</Text>
-			) : null}
-		</CardPerson>
-	), [handlePress, colors.accentYellow]);
+	const [showFullSynopsis, setShowFullSynopsis] = useState<boolean>(false);
+
+	const toggleSynopsis = useCallback(() => {
+		setShowFullSynopsis((prev) => !prev);
+	}, []);
+
+	if (!movie.overview || movie.overview.length === 0) return null;
 	return (
-		<MultiRowHorizontalList<MediaMoviePerson>
-		data={cast}
-		renderItem={renderItem}
-		keyExtractor={useCallback((item) => item.id.toString(), [])}
-		contentContainerStyle={{
-			paddingHorizontal: PADDING_HORIZONTAL,
-			gap: GAP,
-		}}
-		columnStyle={{
-			width: width,
-			gap: GAP,
-		}}
-		snapToInterval={width + GAP}
-		decelerationRate={"fast"}
-		/>
+		<Pressable
+		style={[containerStyle]}
+		onPress={toggleSynopsis}
+		>
+			<Text style={[tw`text-sm`, { color: colors.mutedForeground }, style]} numberOfLines={showFullSynopsis ? undefined : numberOfLines} ellipsizeMode="tail" {...props}>
+				<Text style={tw`text-sm font-medium`}>
+					{`${upperFirst(t('common.messages.overview'))} : `}
+				</Text>
+				{movie.overview}
+			</Text>
+		</Pressable>
+	)
+};
+
+const FilmOriginalTitle = ({ movie, style, numberOfLines = 1, ...props } : Omit<TextProps, 'children'> & { movie: MediaMovie }) => {
+	const t = useTranslations();
+	const { colors } = useTheme();
+
+	if (!movie.original_title || lowerCase(movie.original_title) === lowerCase(movie.title!)) return null;
+
+	return (
+		<Text style={[tw`text-sm`, { color: colors.mutedForeground }, style]} numberOfLines={numberOfLines} {...props}>
+			<Text style={tw`text-sm font-medium`}>
+				{`${upperFirst(t('common.messages.original_title'))} : `}
+			</Text>
+			{movie.original_title}
+		</Text>
+	)
+};
+
+const FilmCast = ({
+	movie,
+} : {
+	movie: MediaMovie
+}) => {
+	const t = useTranslations();
+	const { width: screenWidth } = useWindowDimensions();
+	const width = useMemo(() => clamp((screenWidth * 0.8) - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
+	const renderItem = useCallback((item: MediaMovieCasting) => (
+		<CardPerson variant='list' hideKnownForDepartment person={item.person!} style={tw`h-12`} />
+	), []);
+
+	const keyExtractor = useCallback((item: MediaMovieCasting) => item.person_id!.toString(), []);
+	if (!movie.cast?.length) return null;
+
+	return (
+		<View> 
+			<Text style={[tw`text-sm font-medium`, { marginHorizontal: PADDING_HORIZONTAL }]}>
+				{`${upperFirst(t('common.messages.starring'))} :`}
+			</Text>
+			<MultiRowHorizontalList<MediaMovieCasting>
+			data={movie.cast}
+			renderItem={renderItem}
+			keyExtractor={keyExtractor}
+			contentContainerStyle={{
+				paddingHorizontal: PADDING_HORIZONTAL,
+				gap: GAP,
+			}}
+			columnStyle={{
+				width: width,
+				gap: GAP,
+			}}
+			snapToInterval={width + GAP}
+			decelerationRate={"fast"}
+			/>
+		</View>
 	)
 };
 

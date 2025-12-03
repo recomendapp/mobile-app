@@ -160,7 +160,7 @@ const RecoSendTvSeries = () => {
 		<Stack.Screen
 			options={{
 				headerTitle: upperFirst(t('common.messages.send_to_friend')),
-				headerLeft: router.canDismiss() ? () => (
+				headerLeft: () => (
 					<Button
 					variant="ghost"
 					size="fit"
@@ -169,7 +169,7 @@ const RecoSendTvSeries = () => {
 					>
 						{upperFirst(t('common.messages.cancel'))}
 					</Button>
-				) : undefined,
+				),
 				headerStyle: {
 					backgroundColor: colors.muted,
 				},

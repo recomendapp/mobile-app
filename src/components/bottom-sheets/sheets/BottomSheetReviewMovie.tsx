@@ -13,9 +13,8 @@ import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/providers/AuthProvider';
 import { PADDING_VERTICAL } from '@/theme/globals';
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { useUserReviewMovieDeleteMutation } from '@/features/user/userMutations';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useToast } from '@/components/Toast';
 import { FlashList } from '@shopify/flash-list';
 
@@ -37,11 +36,10 @@ interface Item {
 export const BottomSheetReviewMovie = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetReviewMovieProps
->(({ id, review, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
+>(({ id, review, additionalItemsTop = [], additionalItemsBottom = [], detents, ...props }, ref) => {
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const insets = useSafeAreaInsets();
   const toast = useToast();
-  const { colors, mode } = useTheme();
+  const { colors, mode, tabBarHeight } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -114,14 +112,14 @@ export const BottomSheetReviewMovie = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+    detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.20, 1])}
     scrollable
-    style={tw`p-0`}
     {...props}
     >
       <FlashList
-      bounces={false}
-      contentContainerStyle={{ paddingTop: PADDING_VERTICAL, paddingBottom: insets.bottom }}
       data={items}
+      contentContainerStyle={{ paddingTop: PADDING_VERTICAL }}
+      bounces={false}
       keyExtractor={(_, i) => i.toString()}
       stickyHeaderIndices={[0]}
       renderItem={({ item }) => (
@@ -141,6 +139,8 @@ export const BottomSheetReviewMovie = React.forwardRef<
           {item.label}
         </Button>
       )}
+      indicatorStyle={mode === 'dark' ? 'white' : 'black'}
+		  scrollIndicatorInsets={{ bottom: tabBarHeight }}
       nestedScrollEnabled
       />
     </TrueSheet>

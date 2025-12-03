@@ -24,6 +24,7 @@ import { useUIStore } from "@/stores/useUIStore";
 import { BottomSheetComment } from "@/components/bottom-sheets/sheets/BottomSheetComment";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface PlaylistTvSeriesProps {
 	playlist: Playlist;
@@ -256,9 +257,9 @@ export const PlaylistTvSeries = ({
 		getItemId={(item) => item.id!}
 		getItemTitle={(item) => item.tv_series.name || ''}
 		getItemSubtitle={(item) => item.tv_series.created_by?.map((creator) => creator.name).join(', ') || ''}
-		getItemImageUrl={(item) => item.tv_series.poster_url || ''}
+		getItemImageUrl={(item) => getTmdbImage({ path: item.tv_series?.poster_path, size: 'w342' }) || ''}
 		getItemUrl={(item) => item.tv_series.url || ''}
-		getItemBackdropUrl={(item) => item.tv_series.backdrop_url || ''}
+		getItemBackdropUrl={(item) => getTmdbImage({ path: item.tv_series?.backdrop_path, size: 'w780' }) || ''}
 		getCreatedAt={(item) => item.created_at!}
 		// Actions
 		bottomSheetActions={bottomSheetActions}

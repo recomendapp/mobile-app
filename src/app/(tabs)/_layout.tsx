@@ -73,10 +73,10 @@ const TabsLayout = () => {
 			tabBarBackground: TabBarBackground,
 			tabBarStyle: {
 				...Platform.select({
-					ios: { position: 'absolute' },
 					android: { backgroundColor: colors.background },
 					default: {},
 				}),
+				position: 'absolute',
 				display: segment.some((seg) => hideTabBarRoutes.includes(seg)) ? 'none' : 'flex',
 			},
 			tabBarItemStyle: {

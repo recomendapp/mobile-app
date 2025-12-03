@@ -14,6 +14,7 @@ import { CardReviewMovie } from "../reviews/CardReviewMovie";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { CardUser } from "../CardUser";
 import { GAP } from "@/theme/globals";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface CardFeedReviewMovieLikeBaseProps
 	extends React.ComponentProps<typeof Animated.View> {
@@ -59,7 +60,7 @@ const CardFeedReviewMovieLikeDefault = React.forwardRef<
 		>
 			{!skeleton ? (
 				<ImageWithFallback
-				source={{ uri: movie.poster_url ?? '' }}
+				source={{ uri: getTmdbImage({ path: movie?.poster_path, size: 'w342' }) ?? '' }}
 				alt={movie.title ?? ''}
 				type={'movie'}
 				style={tw`w-20 h-full`}

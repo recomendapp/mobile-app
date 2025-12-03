@@ -23,6 +23,7 @@ import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useCallback } from "react";
 import { Text } from "@/components/ui/text";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface MediaHeaderProps {
 	season?: MediaTvSeriesSeason | null;
@@ -43,7 +44,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 	const { colors } = useTheme();
 	const title = upperFirst(t('common.messages.tv_season_value', { number: season?.season_number! }));
 	const bgColor = hslToRgb(colors.background);
-	const randomBg = useRandomImage(season?.episodes?.filter(episode => episode.still_url).map(episode => episode.still_url!) ?? []);
+	const randomBg = useRandomImage(season?.episodes?.filter(episode => episode.still_path).map(episode => episode.still_path!) ?? []);
 	// SharedValue
 	const posterHeight = useSharedValue(0);
 	const headerHeight = useSharedValue(0);
@@ -102,7 +103,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 			bgAnim,
 		]}
 		>
-			{(season && randomBg) && <Image source={randomBg} style={tw`absolute inset-0`} />}
+			{(season && randomBg) && <Image source={{ uri: getTmdbImage({ path: randomBg, size: 'w1280' }) }} style={tw`absolute inset-0`} />}
 			<LinearGradient
 			style={tw`absolute inset-0`}
 			colors={[
@@ -129,7 +130,7 @@ const TvSeriesSeasonHeader: React.FC<MediaHeaderProps> = ({
 					posterHeight.value = e.nativeEvent.layout.height;
 				}}
 				alt={title ?? ''}
-				source={{ uri: season?.poster_url ?? '' }}
+				source={{ uri: getTmdbImage({ path: season?.poster_path, size: 'w342' }) ?? '' }}
 				style={[
 					{ aspectRatio: 2 / 3 },
 					tw`rounded-md w-24 h-auto`,
@@ -230,10 +231,10 @@ const TvSeriesSeasonScreen = () => {
 			>
 				<View style={tw`flex-1 flex-row items-center gap-2`}>
 					<ImageWithFallback
-						source={{uri: item.still_url ?? ''}}
-						alt={item.name ?? ''}
-						type={'tv_episode'}
-						style={tw`aspect-video w-auto rounded-none`}
+					source={{uri: getTmdbImage({ path: item.still_path, size: 'w500' })}}
+					alt={item.name ?? ''}
+					type={'tv_episode'}
+					style={tw`aspect-video w-auto rounded-none`}
 					>
 						<IconMediaRating
 						rating={item.vote_average}

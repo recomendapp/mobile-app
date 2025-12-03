@@ -13,6 +13,7 @@ import BottomSheetTvSeries from "../bottom-sheets/sheets/BottomSheetTvSeries";
 import { Text } from "../ui/text";
 import ButtonUserActivityTvSeriesRating from "../buttons/tv-series/ButtonUserActivityTvSeriesRating";
 import { GAP } from "@/theme/globals";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface CardTvSeriesBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -75,7 +76,7 @@ const CardTvSeriesDefault = React.forwardRef<
 		>
 			<View style={tw`flex-1 flex-row items-center gap-2`}>
 				{!skeleton ? <ImageWithFallback
-					source={{uri: tvSeries.poster_url ?? ''}}
+					source={{uri: getTmdbImage({ path: tvSeries?.poster_path, size: 'w342' }) ?? ''}}
 					alt={tvSeries.name ?? ''}
 					type={'tv_series'}
 					style={{
@@ -116,7 +117,7 @@ React.ComponentRef<typeof Animated.View>,
 			{...props}
 		>
 			{!skeleton ? <ImageWithFallback
-				source={{uri: tvSeries.poster_url ?? ''}}
+				source={{uri: getTmdbImage({ path: tvSeries?.poster_path, size: 'w342' }) ?? ''}}
 				alt={tvSeries.name ?? ''}
 				type={'tv_series'}
 			/> : <Skeleton style={tw.style('w-full h-full')} />}
@@ -159,7 +160,7 @@ const CardTvSeriesList = React.forwardRef<
 		>
 			<View style={tw`flex-1 flex-row items-center gap-2`}>
 				{!skeleton ? <ImageWithFallback
-					source={{uri: tvSeries.poster_url ?? ''}}
+					source={{uri: getTmdbImage({ path: tvSeries?.poster_path, size: 'w342' }) ?? ''}}
 					alt={tvSeries.name ?? ''}
 					type={'tv_series'}
 					style={[

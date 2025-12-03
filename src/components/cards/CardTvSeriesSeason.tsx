@@ -10,6 +10,7 @@ import { upperFirst } from "lodash";
 import { IconMediaRating } from "../medias/IconMediaRating";
 import { useTranslations } from "use-intl";
 import { Text } from "../ui/text";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface CardTvSeriesSeasonProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -43,7 +44,7 @@ const CardTvSeriesSeasonDefault = React.forwardRef<
 		{...props}
 		>
 			<ImageWithFallback
-				source={{uri: season.poster_url ?? ''}}
+				source={{uri: getTmdbImage({ path: season?.poster_path, size: 'w342' }) ?? ''}}
 				alt={season.name ?? ''}
 				type={'tv_season'}
 				style={[

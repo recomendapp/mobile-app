@@ -26,6 +26,10 @@ import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
 import { useToast } from '@/components/Toast';
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { logger } from '@/logger';
+import { useUIBackgroundsOptions } from '@/api/options';
+import { useQuery } from '@tanstack/react-query';
+import { LoopCarousel } from '@/components/ui/LoopCarousel';
+import { Image } from 'expo-image';
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -42,6 +46,10 @@ const SignupScreen = () => {
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locale = useLocale();
 	const t = useTranslations();
+
+	const {
+		data: backgrounds,
+	} = useQuery(useUIBackgroundsOptions());
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
 	const signupSchema = z.object({
@@ -224,6 +232,15 @@ const SignupScreen = () => {
 
 	return (
 	<>
+		{backgrounds && (
+          <LoopCarousel
+          items={backgrounds}
+          containerStyle={tw`absolute inset-0`}
+          renderItem={(item) => (
+            <Image source={item.localUri} contentFit="cover" style={tw`w-full h-full`} />
+          )}
+          />
+        )}
 		<LinearGradient
 		colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
 		start={{

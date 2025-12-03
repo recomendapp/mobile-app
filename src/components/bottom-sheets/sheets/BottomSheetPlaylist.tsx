@@ -6,7 +6,7 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAuth } from '@/providers/AuthProvider';
 import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
@@ -18,10 +18,9 @@ import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import richTextToPlainString from '@/utils/richTextToPlainString';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useToast } from '@/components/Toast';
 import BottomSheetSharePlaylist from './share/BottomSheetSharePlaylist';
-import { GAP } from '@/theme/globals';
+import { GAP, PADDING_VERTICAL } from '@/theme/globals';
 import { View } from '@/components/ui/view';
 import ButtonActionPlaylistLike from '@/components/buttons/ButtonActionPlaylistLike';
 import ButtonActionPlaylistSaved from '@/components/buttons/ButtonActionPlaylistSaved';
@@ -45,12 +44,11 @@ interface Item {
 const BottomSheetPlaylist = forwardRef<
 	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetPlaylistProps
->(({ id, playlist, additionalItemsTop = [], ...props }, ref) => {
+>(({ id, playlist, additionalItemsTop = [], detents, ...props }, ref) => {
 	const { session } = useAuth();
 	const toast = useToast();
 	const { closeSheet, openSheet } = useBottomSheetStore((state) => state);
-	const insets = useSafeAreaInsets();
-	const { colors, mode } = useTheme();
+	const { colors, mode, tabBarHeight } = useTheme();
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations();
@@ -175,17 +173,17 @@ const BottomSheetPlaylist = forwardRef<
 	return (
 	<TrueSheet
 	ref={ref}
+	detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.5, 1])}
 	scrollable
-	style={tw`p-0`}
 	{...props}
 	>
 		<FlashList
-		bounces={false}
-		contentContainerStyle={{ paddingBottom: insets.bottom }}
 		data={[
 			'header',
 			...items,
 		]}
+		contentContainerStyle={{ paddingTop: PADDING_VERTICAL }}
+		bounces={false}
 		keyExtractor={(_, i) => i.toString()}
 		stickyHeaderIndices={[0]}
 		renderItem={({ item }) => (
@@ -236,6 +234,8 @@ const BottomSheetPlaylist = forwardRef<
 				</Button>
 			)
 		)}
+		indicatorStyle={mode === 'dark' ? 'white' : 'black'}
+		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		nestedScrollEnabled
 		/>
 	</TrueSheet>

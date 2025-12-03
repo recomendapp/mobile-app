@@ -129,7 +129,7 @@ const CollectionHeader = forwardRef<
 				bgAnim,
 			]}
 			>
-				{bgBackdrop && <Image style={tw`absolute inset-0`} source={bgBackdrop} />}
+				{bgBackdrop && <Image transition={500} style={tw`absolute inset-0`} source={bgBackdrop} />}
 				<LinearGradient
 				style={tw`absolute inset-0`}
 				colors={[
@@ -158,6 +158,7 @@ const CollectionHeader = forwardRef<
 							onLayout={(e) => {
 								posterHeight.value = e.nativeEvent.layout.height;
 							}}
+							transition={250}
 							alt={title}
 							source={{ uri : poster }}
 							style={[

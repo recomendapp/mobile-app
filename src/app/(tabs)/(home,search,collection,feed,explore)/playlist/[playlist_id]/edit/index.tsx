@@ -259,7 +259,7 @@ const ModalPlaylistEdit = () => {
 		<Stack.Screen
 			options={{
 				headerTitle: upperFirst(t('common.messages.edit_playlist')),
-				headerLeft: router.canDismiss() ? () => (
+				headerLeft: () => (
 					<Button
 					variant="ghost"
 					size="fit"
@@ -268,7 +268,7 @@ const ModalPlaylistEdit = () => {
 					>
 						{upperFirst(t('common.messages.cancel'))}
 					</Button>
-				) : undefined,
+				),
 				headerRight: () => (
 					<Button
 					variant="ghost"

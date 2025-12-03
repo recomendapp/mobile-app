@@ -16,6 +16,7 @@ import { useUIStore } from "@/stores/useUIStore";
 import { BottomSheetWatchlistMovieComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistMovieComment";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 export const CollectionWatchlistMovie = () => {
 	const toast = useToast();
@@ -175,9 +176,9 @@ export const CollectionWatchlistMovie = () => {
 		getItemId={(item) => item.id}
 		getItemTitle={(item) => item.movie?.title || ''}
 		getItemSubtitle={(item) => item.movie?.directors?.map((director) => director.name).join(', ') || ''}
-		getItemImageUrl={(item) => item.movie?.poster_url || ''}
+		getItemImageUrl={(item) => getTmdbImage({ path: item.movie?.poster_path, size: 'w342' }) || ''}
 		getItemUrl={(item) => item.movie?.url || ''}
-		getItemBackdropUrl={(item) => item.movie?.backdrop_url || ''}
+		getItemBackdropUrl={(item) => getTmdbImage({ path: item.movie?.backdrop_path, size: 'w780' }) || ''}
 		getCreatedAt={(item) => item.created_at}
 		// Actions
 		bottomSheetActions={bottomSheetActions}

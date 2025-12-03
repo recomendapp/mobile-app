@@ -15,6 +15,7 @@ import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie
 import { useUIStore } from "@/stores/useUIStore";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 export const CollectionHeartPicksMovie = () => {
 	const t = useTranslations();
@@ -157,9 +158,9 @@ export const CollectionHeartPicksMovie = () => {
 		getItemId={(item) => item.id}
 		getItemTitle={(item) => item.movie?.title || ''}
 		getItemSubtitle={(item) => item.movie?.directors?.map((director) => director.name).join(', ') || ''}
-		getItemImageUrl={(item) => item.movie?.poster_url || ''}
+		getItemImageUrl={(item) => getTmdbImage({ path: item.movie?.poster_path, size: 'w342' }) || ''}
 		getItemUrl={(item) => item.movie?.url || ''}
-		getItemBackdropUrl={(item) => item.movie?.backdrop_url || ''}
+		getItemBackdropUrl={(item) => getTmdbImage({ path: item.movie?.backdrop_path, size: 'w780' }) || ''}
 		getCreatedAt={(item) => item.created_at}
 		// Actions
 		bottomSheetActions={bottomSheetActions}

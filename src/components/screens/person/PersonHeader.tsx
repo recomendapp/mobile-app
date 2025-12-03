@@ -135,6 +135,7 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({
 						'worklet';
 						posterHeight.value = e.nativeEvent.layout.height;
 					}}
+					transition={250}
 					alt={person?.name ?? ''}
 					source={{ uri: person?.profile_url ?? '' }}
 					style={[

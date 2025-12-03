@@ -1,20 +1,19 @@
 import { useMediaTvSeriesDetailsQuery } from "@/features/media/mediaQueries";
-import { Href, Link, useLocalSearchParams, useRouter } from "expo-router"
-import { clamp, upperFirst } from "lodash";
-import { Pressable, useWindowDimensions, View } from "react-native";
-import { MediaTvSeriesPerson } from "@recomendapp/types";
+import { Href, Link, useLocalSearchParams } from "expo-router"
+import { clamp, lowerCase, upperFirst } from "lodash";
+import { Pressable, useWindowDimensions, View, ViewProps } from "react-native";
+import { MediaTvSeries, MediaTvSeriesCasting } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
-import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
-import { LegendList } from "@legendapp/list";
+import { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { memo, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import TvSeriesWidgetSeasons from "@/components/screens/tv-series/TvSeriesWidgetSeasons";
 import { useLocale, useTranslations } from "use-intl";
-import { Text } from "@/components/ui/text";
+import { Text, TextProps } from "@/components/ui/text";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
-import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { GAP, GAP_XS, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 import { CardPerson } from "@/components/cards/CardPerson";
 import TvSeriesHeader from "@/components/screens/tv-series/TvSeriesHeader";
@@ -22,11 +21,21 @@ import TvSeriesWidgetPlaylists from "@/components/screens/tv-series/TvSeriesWidg
 import TvSeriesWidgetReviews from "@/components/screens/tv-series/TvSeriesWidgetReviews";
 import { MultiRowHorizontalList } from "@/components/ui/MultiRowHorizontalList";
 import { Button } from "@/components/ui/Button";
+import { useAuth } from "@/providers/AuthProvider";
+import { FloatingBar } from "@/components/ui/FloatingBar";
+import ButtonUserActivityTvSeriesRating from "@/components/buttons/tv-series/ButtonUserActivityTvSeriesRating";
+import ButtonUserActivityTvSeriesLike from "@/components/buttons/tv-series/ButtonUserActivityTvSeriesLike";
+import ButtonUserActivityTvSeriesWatch from "@/components/buttons/tv-series/ButtonUserActivityTvSeriesWatch";
+import { ButtonUserWatchlistTvSeries } from "@/components/buttons/tv-series/ButtonUserWatchlistTvSeries";
+import { ButtonPlaylistTvSeriesAdd } from "@/components/buttons/ButtonPlaylistTvSeriesAdd";
+import ButtonUserRecoTvSeriesSend from "@/components/buttons/tv-series/ButtonUserRecoTvSeriesSend";
+import AnimatedContentContainer from "@/components/ui/AnimatedContentContainer";
 
 const TvSeriesScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
 	const { tabBarHeight, bottomOffset } = useTheme();
+	const { session } = useAuth();
 	const t = useTranslations();
 	const locale = useLocale();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -40,17 +49,25 @@ const TvSeriesScreen = () => {
 		locale: locale,
 	});
 	const loading = series === undefined || isLoading;
-	// States
-	const [showFullSynopsis, setShowFullSynopsis] = useState(false);
 	// SharedValue
 	const headerHeight = useSharedValue<number>(0);
 	const scrollY = useSharedValue<number>(0);
+	const floatingBarHeight = useSharedValue<number>(0);
 
 	const scrollHandler = useAnimatedScrollHandler({
 		onScroll: event => {
 			'worklet';
 			scrollY.value = event.contentOffset.y;
 		},
+	});
+
+	const animatedContentContainerStyle = useAnimatedStyle(() => {
+		return {
+			paddingBottom: withTiming(
+				bottomOffset + (PADDING_VERTICAL * 2) + floatingBarHeight.value,
+				{ duration: 300 }
+			),
+		};
 	});
 
 	const handleMenuPress = useCallback(() => {
@@ -72,12 +89,10 @@ const TvSeriesScreen = () => {
 		triggerHeight={headerHeight}
 		onMenuPress={series ? handleMenuPress : undefined}
 		/>
-		<Animated.ScrollView
+		<AnimatedContentContainer
 		onScroll={scrollHandler}
 		scrollToOverflowEnabled
-		contentContainerStyle={{
-			paddingBottom: bottomOffset + PADDING_VERTICAL,
-		}}
+		contentContainerStyle={animatedContentContainerStyle}
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,
 		}}
@@ -88,82 +103,124 @@ const TvSeriesScreen = () => {
 			scrollY={scrollY}
 			triggerHeight={headerHeight}
 			/>
-			{series && <View style={tw`flex-col gap-4`}>
-				{/* SYNOPSIS */}
-				<Pressable
-				style={{ gap: GAP, paddingHorizontal: PADDING_HORIZONTAL }}
-				onPress={() => setShowFullSynopsis((prev) => !prev)}
-				>
-					<Text style={tw.style('text-lg font-medium')}>{upperFirst(t('common.messages.overview'))}</Text>
-					<Text textColor='muted' numberOfLines={showFullSynopsis ? undefined : 5} style={tw.style('text-justify')}>
-						{series.overview || upperFirst(t('common.messages.no_overview'))}
-					</Text>
-				</Pressable>
-				<TvSeriesWidgetSeasons seasons={series.seasons || []} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
-				{/* CASTING */}
-				<View style={tw.style('gap-1')}> 
-					<View style={[{ gap: GAP, paddingHorizontal: PADDING_HORIZONTAL }, tw`flex-row items-center justify-between`]}>
-						<Text style={tw`text-lg font-medium`}>{upperFirst(t('common.messages.cast'))}</Text>
-						<Link href={{ pathname: '/tv-series/[tv_series_id]/credits', params: { tv_series_id: series.id } }} asChild>
-							<Button variant='ghost' size="fit">
-								{upperFirst(t('common.messages.show_credit', { count: 2 }))}
+			{series && (
+				<View style={tw`flex-col gap-4`}>
+					{/* DETAILS */}
+					<View style={{ gap: GAP  }}>
+						<View style={{ gap: GAP_XS }}>
+							<TvSeriesSynopsis tvSeries={series} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
+							<TvSeriesOriginalTitle tvSeries={series} style={{ marginHorizontal: PADDING_HORIZONTAL }} />
+						</View>
+						<TvSeriesCast tvSeries={series} />
+						<TvSeriesWidgetSeasons tvSeries={series} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
+						<Link href={{ pathname: '/tv-series/[tv_series_id]/details', params: { tv_series_id: series.id }}} asChild>
+							<Button variant="outline" style={{ marginHorizontal: PADDING_HORIZONTAL }}>
+								{upperFirst(t('common.messages.see_more_details'))}
 							</Button>
 						</Link>
 					</View>
-					{series.cast?.length ? <TvSeriesCast cast={series.cast} /> : <Text textColor='muted' style={tw`px-4`}>{upperFirst(t('common.messages.no_cast'))}</Text>}
+					<TvSeriesWidgetPlaylists tvSeriesId={series.id} url={series.url as Href} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
+					<TvSeriesWidgetReviews tvSeries={series} url={series.url as Href} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
 				</View>
-				<TvSeriesWidgetPlaylists tvSeriesId={series.id} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
-				<TvSeriesWidgetReviews tvSeries={series} url={series.url as Href} containerStyle={tw`px-4`} labelStyle={tw`px-4`} />
-			</View>}
-		</Animated.ScrollView>
+			)}
+		</AnimatedContentContainer>
+		{series && session && (
+			<FloatingBar bottomOffset={bottomOffset + PADDING_VERTICAL} height={floatingBarHeight} containerStyle={{ paddingHorizontal: 0 }} style={[tw`flex-row items-center justify-between`, { paddingVertical: PADDING_HORIZONTAL }]}>
+				<View style={tw`flex-row items-center gap-4`}>
+					<ButtonUserActivityTvSeriesRating tvSeries={series} />
+					<ButtonUserActivityTvSeriesLike tvSeries={series} />
+					<ButtonUserActivityTvSeriesWatch tvSeries={series} />
+					<ButtonUserWatchlistTvSeries tvSeries={series} />
+				</View>
+				<View style={tw`flex-row items-center gap-4`}>
+					<ButtonPlaylistTvSeriesAdd tvSeries={series} />
+					<ButtonUserRecoTvSeriesSend tvSeries={series} />
+				</View>
+			</FloatingBar>
+		)}
 	</>
 	)
 };
 
-const TvSeriesCast = ({
-	cast,
-} : {
-	cast: MediaTvSeriesPerson[]
-}) => {
+
+const TvSeriesSynopsis = ({ tvSeries, style, containerStyle, numberOfLines = 5, ...props } : Omit<TextProps, 'children'> & { tvSeries: MediaTvSeries, containerStyle: ViewProps['style'] }) => {
+	const t = useTranslations();
 	const { colors } = useTheme();
-	const router = useRouter();
-	const { width: screenWidth } = useWindowDimensions();
-	const width = useMemo(() => clamp(screenWidth - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
-	const handlePress = useCallback((id: string | number) => {
-		router.push({
-			pathname: '/person/[person_id]',
-			params: { person_id: id.toString() }
-		})
-	}, [router]);
-	const renderItem = useCallback((item: MediaTvSeriesPerson) => (
-		<CardPerson variant='list' hideKnownForDepartment person={item.person!}>
-			{item.character ? (
-				<Text
-				numberOfLines={2}
-				style={[{ color: colors.accentYellow }, tw`italic text-sm`]}
-				>
-					{item.character}
-				</Text>
-			) : null}
-		</CardPerson>
-	), [handlePress, colors.accentYellow]);
+	const [showFullSynopsis, setShowFullSynopsis] = useState<boolean>(false);
+
+	const toggleSynopsis = useCallback(() => {
+		setShowFullSynopsis((prev) => !prev);
+	}, []);
+
+	if (!tvSeries.overview || tvSeries.overview.length === 0) return null;
 	return (
-		<MultiRowHorizontalList<MediaTvSeriesPerson>
-		data={cast}
-		renderItem={renderItem}
-		keyExtractor={useCallback((item) => item.id.toString(), [])}
-		contentContainerStyle={{
-			paddingHorizontal: PADDING_HORIZONTAL,
-			gap: GAP,
-		}}
-		columnStyle={{
-			width: width,
-			gap: GAP,
-		}}
-		snapToInterval={width + GAP}
-		decelerationRate={"fast"}
-		/>
-	);
+		<Pressable
+		style={[containerStyle]}
+		onPress={toggleSynopsis}
+		>
+			<Text style={[tw`text-sm`, { color: colors.mutedForeground }, style]} numberOfLines={showFullSynopsis ? undefined : numberOfLines} ellipsizeMode="tail" {...props}>
+				<Text style={tw`text-sm font-medium`}>
+					{`${upperFirst(t('common.messages.overview'))} : `}
+				</Text>
+				{tvSeries.overview}
+			</Text>
+		</Pressable>
+	)
+};
+
+const TvSeriesOriginalTitle = ({ tvSeries, style, numberOfLines = 1, ...props } : Omit<TextProps, 'children'> & { tvSeries: MediaTvSeries }) => {
+	const t = useTranslations();
+	const { colors } = useTheme();
+
+	if (!tvSeries.original_name || lowerCase(tvSeries.original_name) === lowerCase(tvSeries.name!)) return null;
+	return (
+		<Text style={[tw`text-sm`, { color: colors.mutedForeground }, style]} numberOfLines={numberOfLines} {...props}>
+			<Text style={tw`text-sm font-medium`}>
+				{`${upperFirst(t('common.messages.original_title'))} : `}
+			</Text>
+			{tvSeries.original_name}
+		</Text>
+	)
+};
+
+
+const TvSeriesCast = ({
+	tvSeries,
+} : {
+	tvSeries: MediaTvSeries
+}) => {
+	const t = useTranslations();
+	const { width: screenWidth } = useWindowDimensions();
+	const width = useMemo(() => clamp((screenWidth * 0.8) - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
+	const renderItem = useCallback((item: MediaTvSeriesCasting) => (
+		<CardPerson variant='list' hideKnownForDepartment person={item.person!} style={tw`h-12`} />
+	), []);
+
+	const keyExtractor = useCallback((item: MediaTvSeriesCasting) => item.person_id!.toString(), []);
+	if (!tvSeries.cast?.length) return null;
+
+	return (
+		<View> 
+			<Text style={[tw`text-sm font-medium`, { marginHorizontal: PADDING_HORIZONTAL }]}>
+				{`${upperFirst(t('common.messages.starring'))} :`}
+			</Text>
+			<MultiRowHorizontalList<MediaTvSeriesCasting>
+			data={tvSeries.cast}
+			renderItem={renderItem}
+			keyExtractor={keyExtractor}
+			contentContainerStyle={{
+				paddingHorizontal: PADDING_HORIZONTAL,
+				gap: GAP,
+			}}
+			columnStyle={{
+				width: width,
+				gap: GAP,
+			}}
+			snapToInterval={width + GAP}
+			decelerationRate={"fast"}
+			/>
+		</View>
+	)
 };
 
 export default TvSeriesScreen;

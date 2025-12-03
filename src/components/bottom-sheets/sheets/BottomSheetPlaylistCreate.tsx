@@ -14,11 +14,11 @@ import TrueSheet from '@/components/ui/TrueSheet';
 import { useTranslations } from 'use-intl';
 import { useToast } from '@/components/Toast';
 import { Input } from "@/components/ui/Input";
-import { GAP, PADDING_HORIZONTAL } from '@/theme/globals';
-import { LegendList } from '@legendapp/list';
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { Label } from '@/components/ui/Label';
 import { forwardRef } from 'react';
 import { Text } from '@/components/ui/text';
+import { FlashList } from '@shopify/flash-list';
 
 interface BottomSheetPlaylistCreateProps extends BottomSheetProps {
 	onCreate?: (playlist: Playlist) => void;
@@ -85,13 +85,14 @@ const BottomSheetPlaylistCreate = forwardRef<
 	return (
 		<TrueSheet
 		ref={ref}
-		style={[
-			{ paddingHorizontal: PADDING_HORIZONTAL },
-			tw`gap-4 items-center justify-center`,
-		]}
+		style={{
+			gap: GAP,
+			paddingTop: PADDING_VERTICAL * 2,
+			paddingHorizontal: PADDING_HORIZONTAL,
+		}}
 		{...props}
 		>
-			<Text style={tw`text-lg font-bold`}>{upperFirst(t('common.messages.new_playlist'))}</Text>
+			<Text style={tw`text-center text-lg font-bold`}>{upperFirst(t('common.messages.new_playlist'))}</Text>
 			<Controller
 			name='title'
 			control={form.control}
@@ -117,12 +118,12 @@ const BottomSheetPlaylistCreate = forwardRef<
 			render={({ field: { onChange, value } }) => (
 			<View style={[tw`w-full`, { gap: GAP }]}>
 				<Label>{upperFirst(t('common.messages.select_a_type'))}</Label>
-				<LegendList
+				<FlashList
 				data={typeOptions}
 				extraData={value}
 				horizontal
 				style={tw`w-full`}
-				contentContainerStyle={{ gap: GAP }}
+				ItemSeparatorComponent={() => <View style={{ width: GAP }} />}
 				renderItem={({ item } : { item: { key: string; label: string } }) => (
 					<Button
 					variant={value === item.key ? 'accent-yellow' : 'outline'}

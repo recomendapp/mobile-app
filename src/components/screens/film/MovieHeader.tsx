@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
 	LayoutChangeEvent,
 	Pressable,
@@ -14,32 +14,27 @@ import Animated, {
 	useSharedValue,
 } from 'react-native-reanimated';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
-import { lowerCase, upperFirst } from 'lodash';
+import { upperFirst } from 'lodash';
 import { MediaMovie, MediaPerson } from '@recomendapp/types';
 import useColorConverter from '@/hooks/useColorConverter';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import { IconMediaRating } from '@/components/medias/IconMediaRating';
 import { useMediaMovieFollowersAverageRatingQuery } from '@/features/media/mediaQueries';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useLocale, useTranslations } from 'use-intl';
-import { Text } from '@/components/ui/text';
-import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
+import { Text, TextProps } from '@/components/ui/text';
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import BottomSheetUserActivityMovieFollowersRating from '@/components/bottom-sheets/sheets/BottomSheetUserActivityMovieFollowersRating';
-import { ButtonPlaylistMovieAdd } from '@/components/buttons/ButtonPlaylistMovieAdd';
-import ButtonUserActivityMovieLike from '@/components/buttons/movies/ButtonUserActivityMovieLike';
-import { ButtonUserWatchlistMovie } from '@/components/buttons/movies/ButtonUserWatchlistMovie';
-import ButtonUserActivityMovieWatch from '@/components/buttons/movies/ButtonUserActivityMovieWatch';
-import ButtonUserActivityMovieRating from '@/components/buttons/movies/ButtonUserActivityMovieRating';
-import ButtonUserRecoMovieSend from '@/components/buttons/movies/ButtonUserRecoMovieSend';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { MovieHeaderInfo } from './MovieHeaderInfo';
-import ButtonUserActivityMovieWatchDate from '@/components/buttons/movies/ButtonUserActivityMovieWatchDate';
 import { useImagePalette } from '@/hooks/useImagePalette';
 import AnimatedImage from '@/components/ui/AnimatedImage';
+import BottomSheetPerson from '@/components/bottom-sheets/sheets/BottomSheetPerson';
+import { getTmdbImage } from '@/lib/tmdb/getTmdbImage';
 
 interface MovieHeaderProps {
 	movie?: MediaMovie | null;
@@ -64,7 +59,7 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 	} = useMediaMovieFollowersAverageRatingQuery({
 		movieId: movie?.id,
 	});
-	const { palette } = useImagePalette(movie?.poster_url || undefined);
+	const { palette } = useImagePalette(getTmdbImage({ path: movie?.poster_path, size: 'w92' }) || undefined);
 	// SharedValue
 	const posterHeight = useSharedValue(0);
 	const headerHeight = useSharedValue(0);
@@ -135,8 +130,8 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 		]}
 		>
 			{movie && (
-				movie.backdrop_url ? (
-					<AnimatedImage entering={FadeIn} style={tw`absolute inset-0`} source={movie.backdrop_url} />
+				movie.backdrop_path ? (
+					<AnimatedImage transition={500} style={tw`absolute inset-0`} source={{ uri: getTmdbImage({ path: movie.backdrop_path, size: 'w780' }) ?? '' }} />
 				) : (palette && palette.length > 1 ) && (
 					<Animated.View entering={FadeIn} style={[tw`absolute inset-0`, { backgroundColor: palette.at(0) }]} />
 				)
@@ -167,8 +162,9 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 						'worklet';
 						posterHeight.value = e.nativeEvent.layout.height;
 					}}
+					transition={250}
 					alt={movie?.title ?? ''}
-					source={{ uri: movie?.poster_url ?? '' }}
+					source={{ uri: getTmdbImage({ path: movie?.poster_path, size: 'w780' }) ?? '' }}
 					style={[
 						{ aspectRatio: 2 / 3 },
 						tw`rounded-md w-48 h-auto`,
@@ -197,39 +193,33 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 			</Animated.View>
 			<Animated.View
 			style={[
-				tw`gap-2 w-full`,
+				tw`w-full items-center`,
+				{ gap: GAP },
 				textAnim
 			]}
 			>
-				{/* GENRES */}
-				{movie ? <MovieHeaderInfo movie={movie} /> : loading ? <Skeleton style={tw`w-32 h-8`} /> : null}
-				{/* TITLE */}
-				{!loading ? (
-					<Text
-					variant="title"
-					numberOfLines={2}
-					style={[
-						(!movie && !loading) && { textAlign: 'center', color: colors.mutedForeground }
-					]}
-					>
-						{movie?.title || upperFirst(t('common.messages.film_not_found'))}
-					</Text>
-				) : <Skeleton style={tw`w-64 h-12`} />}
-				{(movie?.original_title && lowerCase(movie.original_title) !== lowerCase(movie.title!)) ? (
-					<Text numberOfLines={1} style={[ { color: colors.mutedForeground }, tw`text-lg font-semibold`]}>
-						{movie.original_title}
-					</Text>
-				) : null}
-				{/* DIRECTORS & DURATION */}
-				{movie?.directors || movie?.runtime ? (
-					<Text>
-						{movie.directors && <Directors directors={movie.directors} />}
-					</Text>
-				) : null}
+				<View>
+					{!loading ? (
+						<Text
+						variant="title"
+						numberOfLines={2}
+						style={[
+							tw`text-center`,
+							(!movie && !loading) && { color: colors.mutedForeground }
+						]}
+						>
+							{movie?.title || upperFirst(t('common.messages.film_not_found'))}
+						</Text>
+					) : <Skeleton style={tw`w-64 h-12`} />}
+					{movie?.directors?.length ? (
+						<Directors style={tw`text-center`} directors={movie.directors} />
+					) : null}
+				</View>
 
+				{movie ? <MovieHeaderInfo movie={movie} /> : loading ? <Skeleton style={tw`w-32 h-8`} /> : null}
 			</Animated.View>
 		</Animated.View>
-		{movie && (
+		{/* {movie && (
 		<View style={[tw`flex-row items-center justify-between gap-4`, { paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }]}>
 			<View style={tw`flex-row items-center gap-4`}>
 				<ButtonUserActivityMovieRating movie={movie} />
@@ -243,33 +233,44 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 				<ButtonUserRecoMovieSend movie={movie} />
 			</View>
 		</View>
-		)}
+		)} */}
 	</Animated.View>
 	);
 };
 
-const Directors = ({ directors }: { directors: MediaPerson[] }) => {
+const Directors = ({ directors, ...props }: Omit<TextProps, 'children'> & { directors: MediaPerson[] }) => {
+	const router = useRouter();
 	const locale = useLocale();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const listFormatter = new Intl.ListFormat(locale, {
 		style: 'long',
 		type: 'conjunction',
 	});
 	const names = directors.map(d => d.name!);
 	const formatted = listFormatter.formatToParts(names);
+
+	const onPress = useCallback((person: MediaPerson) => {
+		router.push({ pathname: '/person/[person_id]', params: { person_id: person.slug || person.id }})
+	}, [router]);
+	const onLongPress = useCallback((person: MediaPerson) => {
+		openSheet(BottomSheetPerson, {
+			person: person,
+		});
+	}, [openSheet]);
 	return (
-		<>
+		<Text {...props}>
 		{formatted.map((part, i) => {
 			const director = directors.find(d => d.name === part.value);
 			if (part.type === 'element') {
 				return (
-					<Link key={i} href={`/person/${director?.slug || director?.id}`}>
+					<Text key={i} onPress={() => onPress(director!)} onLongPress={() => onLongPress(director!)}>
 					{director?.name}
-					</Link>
+					</Text>
 				);
 			}
 			return part.value;
 		})}
-		</>
+		</Text>
 	);
 };
 export default MovieHeader;

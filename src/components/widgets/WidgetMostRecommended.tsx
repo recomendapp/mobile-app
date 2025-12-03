@@ -22,6 +22,7 @@ import BottomSheetMovie from "../bottom-sheets/sheets/BottomSheetMovie";
 import BottomSheetTvSeries from "../bottom-sheets/sheets/BottomSheetTvSeries";
 import { useQuery } from "@tanstack/react-query";
 import { useWidgetMostRecommendedOptions } from "@/api/options";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface WidgetMostRecommendedProps extends ViewProps {
 	scrollY?: SharedValue<number>;
@@ -177,7 +178,7 @@ const WidgetMostRecommendedItem = ({
 					bgAnim,
 				]}
 				>
-					{(item.media.backdrop_url) && <Image style={StyleSheet.absoluteFill} source={item.media.backdrop_url} />}
+					{(item.media.backdrop_path) && <Image style={StyleSheet.absoluteFill} source={{ uri: getTmdbImage({ path: item.media.backdrop_path, size: 'w1280' }) ?? '' }} />}
 					<LinearGradient
 					colors={[
 						'transparent',

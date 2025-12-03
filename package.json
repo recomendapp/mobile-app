@@ -46,7 +46,7 @@
     "@react-navigation/native": "^7.1.6",
     "@react-navigation/stack": "^7.6.8",
     "@recomendapp/api-js": "^1.0.1",
-    "@recomendapp/types": "^1.0.27",
+    "@recomendapp/types": "^1.0.28",
     "@sentry/react-native": "^7.7.0",
     "@shopify/flash-list": "^2.2.0",
     "@supabase/supabase-js": "^2.86.0",

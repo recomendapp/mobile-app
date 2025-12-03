@@ -1,7 +1,9 @@
 import { useMemo } from "react";
 import { ImageSourcePropType } from "react-native";
 
-export function useRandomImage(images: ImageSourcePropType[] | string[]) {
+export function useRandomImage<T extends string | ImageSourcePropType>(
+  images: T[],
+): T | undefined {
   const image = useMemo(() => {
     if (!images.length) return undefined;
 

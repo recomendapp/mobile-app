@@ -3,27 +3,28 @@ import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useTheme } from "@/providers/ThemeProvider";
-import { MediaTvSeriesSeason } from "@recomendapp/types";
+import { MediaTvSeries } from "@recomendapp/types";
 import { CardTvSeriesSeason } from "@/components/cards/CardTvSeriesSeason";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 
 interface TvSeriesWidgetSeasonsProps extends React.ComponentPropsWithoutRef<typeof View> {
-	seasons: MediaTvSeriesSeason[];
+	tvSeries: MediaTvSeries;
 	labelStyle?: StyleProp<TextStyle>;
 	containerStyle?: StyleProp<ViewStyle>;
 }
 
 const TvSeriesWidgetSeasons = ({
-	seasons,
+	tvSeries,
 	style,
 	labelStyle,
 	containerStyle,
 } : TvSeriesWidgetSeasonsProps) => {
 	const { colors } = useTheme();
 	const t = useTranslations();
+	const { seasons } = tvSeries;
 
-	if (!seasons.length) return null;
+	if (!seasons?.length) return null;
 
 	return (
 	<View style={[tw`gap-1`, style]}>

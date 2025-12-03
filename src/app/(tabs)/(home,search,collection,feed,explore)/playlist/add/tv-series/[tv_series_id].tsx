@@ -95,7 +95,6 @@ const PlaylistTvSeriesAdd = () => {
 		},
 	];
 
-
 	// Queries
 	const {
 		data: playlists,
@@ -206,7 +205,7 @@ const PlaylistTvSeriesAdd = () => {
 		<Stack.Screen
 			options={{
 				headerTitle: upperFirst(t('common.messages.add_to_playlist')),
-				headerLeft: router.canDismiss() ? () => (
+				headerLeft: () => (
 					<Button
 					variant="ghost"
 					size="fit"
@@ -215,7 +214,7 @@ const PlaylistTvSeriesAdd = () => {
 					>
 						{upperFirst(t('common.messages.cancel'))}
 					</Button>
-				) : undefined,
+				),
 				headerStyle: {
 					backgroundColor: colors.muted,
 				},

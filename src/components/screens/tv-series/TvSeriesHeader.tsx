@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
 	LayoutChangeEvent,
 	Pressable,
@@ -14,31 +14,27 @@ import Animated, {
 	useSharedValue,
 } from 'react-native-reanimated';
 import { AnimatedImageWithFallback } from '@/components/ui/AnimatedImageWithFallback';
-import { lowerCase, upperFirst } from 'lodash';
+import { upperFirst } from 'lodash';
 import { MediaPerson, MediaTvSeries } from '@recomendapp/types';
 import useColorConverter from '@/hooks/useColorConverter';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import { IconMediaRating } from '@/components/medias/IconMediaRating';
 import { useMediaTvSeriesFollowersAverageRatingQuery } from '@/features/media/mediaQueries';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useLocale, useTranslations } from 'use-intl';
-import { Text } from '@/components/ui/text';
-import { PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
+import { Text, TextProps } from '@/components/ui/text';
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import BottomSheetUserActivityTvSeriesFollowersRating from '@/components/bottom-sheets/sheets/BottomSheetUserActivityTvSeriesFollowersRating';
-import { ButtonPlaylistTvSeriesAdd } from '@/components/buttons/ButtonPlaylistTvSeriesAdd';
-import ButtonUserActivityTvSeriesLike from '@/components/buttons/tv-series/ButtonUserActivityTvSeriesLike';
-import { ButtonUserWatchlistTvSeries } from '@/components/buttons/tv-series/ButtonUserWatchlistTvSeries';
-import ButtonUserActivityTvSeriesWatch from '@/components/buttons/tv-series/ButtonUserActivityTvSeriesWatch';
-import ButtonUserActivityTvSeriesRating from '@/components/buttons/tv-series/ButtonUserActivityTvSeriesRating';
-import ButtonUserRecoTvSeriesSend from '@/components/buttons/tv-series/ButtonUserRecoTvSeriesSend';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { TvSeriesHeaderInfo } from './TvSeriesHeaderInfo';
 import { useImagePalette } from '@/hooks/useImagePalette';
 import AnimatedImage from '@/components/ui/AnimatedImage';
+import BottomSheetPerson from '@/components/bottom-sheets/sheets/BottomSheetPerson';
+import { getTmdbImage } from '@/lib/tmdb/getTmdbImage';
 
 interface TvSeriesHeaderProps {
 	tvSeries?: MediaTvSeries | null;
@@ -63,7 +59,7 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 	} = useMediaTvSeriesFollowersAverageRatingQuery({
 		tvSeriesId: tvSeries?.id,
 	});
-	const { palette } = useImagePalette(tvSeries?.poster_url || undefined);
+	const { palette } = useImagePalette(getTmdbImage({ path: tvSeries?.poster_path, size: 'w92' }) || undefined);
 	// SharedValue
 	const posterHeight = useSharedValue(0);
 	const headerHeight = useSharedValue(0);
@@ -134,8 +130,8 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 		]}
 		>
 			{tvSeries && (
-				tvSeries.backdrop_url ? (
-					<AnimatedImage entering={FadeIn} style={tw`absolute inset-0`} source={tvSeries.backdrop_url} />
+				tvSeries.backdrop_path ? (
+					<AnimatedImage transition={500} style={tw`absolute inset-0`} source={{ uri: getTmdbImage({ path: tvSeries.backdrop_path, size: 'w780' }) ?? '' }} />
 				) : (palette && palette.length > 1 ) && (
 					<Animated.View entering={FadeIn} style={[tw`absolute inset-0`, { backgroundColor: palette.at(0) }]} />
 				)
@@ -166,8 +162,9 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 						'worklet';
 						posterHeight.value = e.nativeEvent.layout.height;
 					}}
+					transition={250}
 					alt={tvSeries?.name ?? ''}
-					source={{ uri: tvSeries?.poster_url ?? '' }}
+					source={{ uri: getTmdbImage({ path: tvSeries?.poster_path, size: 'w780' }) ?? '' }}
 					style={[
 						{ aspectRatio: 2 / 3 },
 						tw.style('rounded-md w-48 h-auto'),
@@ -196,78 +193,68 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 			</Animated.View>
 			<Animated.View
 			style={[
-				tw.style('gap-2 w-full'),
+				tw.style('w-full items-center'),
+				{ gap: GAP },
 				textAnim
 			]}
 			>
-				{/* GENRES */}
+				<View>
+					{!loading ? (
+						<Text
+						variant="title"
+						numberOfLines={2}
+						style={[
+							tw`text-center`,
+							(!tvSeries && !loading) && { color: colors.mutedForeground }
+						]}
+						>
+							{tvSeries?.name || upperFirst(t('common.messages.tv_series_not_found'))}
+						</Text>
+					) : <Skeleton style={tw.style('w-64 h-12')} />}
+					{tvSeries?.created_by ? (
+						<Directors style={tw`text-center`} directors={tvSeries.created_by} />
+					) : null}
+				</View>
 				{tvSeries ? <TvSeriesHeaderInfo tvSeries={tvSeries} /> : loading ? <Skeleton style={tw.style('w-32 h-8')} /> : null}
-				{/* TITLE */}
-				{!loading ? (
-					<Text
-					variant="title"
-					numberOfLines={2}
-					style={[
-						(!tvSeries && !loading) && { textAlign: 'center', color: colors.mutedForeground }
-					]}
-					>
-						{tvSeries?.name || upperFirst(t('common.messages.tv_series_not_found'))}
-					</Text>
-				) : <Skeleton style={tw.style('w-64 h-12')} />}
-				{(tvSeries?.original_name && lowerCase(tvSeries.original_name) !== lowerCase(tvSeries.name!)) ? (
-					<Text numberOfLines={1} style={[ { color: colors.mutedForeground }, tw.style('text-lg font-semibold')]}>
-						{tvSeries.original_name}
-					</Text>
-				) : null}
-				{/* DIRECTORS & DURATION */}
-				{tvSeries?.created_by ? (
-					<Text>
-						{tvSeries.created_by && <Directors directors={tvSeries.created_by} />}
-					</Text>
-				) : null}
-
 			</Animated.View>
 		</Animated.View>
-		{tvSeries && (
-		<View style={[tw`flex-row items-center justify-between gap-4`, { paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }]}>
-			<View style={tw`flex-row items-center gap-4`}>
-				<ButtonUserActivityTvSeriesRating tvSeries={tvSeries} />
-				<ButtonUserActivityTvSeriesLike tvSeries={tvSeries} />
-				<ButtonUserActivityTvSeriesWatch tvSeries={tvSeries} />
-				<ButtonUserWatchlistTvSeries tvSeries={tvSeries} />
-			</View>
-			<View style={tw`flex-row items-center gap-4`}>
-				<ButtonPlaylistTvSeriesAdd tvSeries={tvSeries} />
-				<ButtonUserRecoTvSeriesSend tvSeries={tvSeries} />
-			</View>
-		</View>
-		)}
 	</Animated.View>
 	);
 };
 
-const Directors = ({ directors }: { directors: MediaPerson[] }) => {
+const Directors = ({ directors, ...props }: Omit<TextProps, 'children'> & { directors: MediaPerson[] }) => {
+	const router = useRouter();
 	const locale = useLocale();
+	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const listFormatter = new Intl.ListFormat(locale, {
 		style: 'long',
 		type: 'conjunction',
 	});
 	const names = directors.map(d => d.name!);
 	const formatted = listFormatter.formatToParts(names);
+
+	const onPress = useCallback((person: MediaPerson) => {
+		router.push({ pathname: '/person/[person_id]', params: { person_id: person.slug || person.id }})
+	}, [router]);
+	const onLongPress = useCallback((person: MediaPerson) => {
+		openSheet(BottomSheetPerson, {
+			person: person,
+		});
+	}, [openSheet]);
 	return (
-		<>
+		<Text {...props}>
 		{formatted.map((part, i) => {
 			const director = directors.find(d => d.name === part.value);
 			if (part.type === 'element') {
 				return (
-					<Link key={i} href={`/person/${director?.slug || director?.id}`}>
+					<Text key={i} onPress={() => onPress(director!)} onLongPress={() => onLongPress(director!)}>
 					{director?.name}
-					</Link>
+					</Text>
 				);
 			}
 			return part.value;
 		})}
-		</>
+		</Text>
 	);
 };
 export default TvSeriesHeader;

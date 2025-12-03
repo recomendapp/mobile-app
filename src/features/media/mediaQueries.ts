@@ -90,22 +90,20 @@ export const useMediaMovieDetailsQuery = ({
 				.from('media_movie')
 				.select(`
 					*,
-					cast:tmdb_movie_credits(
-						id,
-						person:media_person(*),
-						role:tmdb_movie_roles(*)
+					cast:media_movie_casting(
+						*,
+						person:media_person(*)
 					),
 					videos:tmdb_movie_videos(*)	
 				`)
 				.match({
 					'id': id,
-					'cast.job': 'Actor',
 					'videos.iso_639_1': locale.split('-')[0],
 					'videos.type': 'Trailer',
 				})
 				.order('published_at', { referencedTable: 'videos', ascending: true, nullsFirst: false })
 				.maybeSingle()
-				.overrideTypes<MediaMovie>();
+				.overrideTypes<MediaMovie, { merge: true }>();
 			if (error) throw error;
 			return data;
 		},
@@ -129,7 +127,7 @@ export const useMediaTvSeriesDetailsQuery = ({
 				.from('media_tv_series')
 				.select(`
 					*,
-					cast:tmdb_tv_series_credits(
+					cast:media_tv_series_casting(
 						*,
 						person:media_person(*)
 					),
@@ -138,13 +136,12 @@ export const useMediaTvSeriesDetailsQuery = ({
 				`)
 				.match({
 					'id': id,
-					'cast.job': 'Actor',
 					'videos.iso_639_1': locale.split('-')[0],
 					'videos.type': 'Trailer',
 				})
 				.order('published_at', { referencedTable: 'videos', ascending: true, nullsFirst: false })
 				.maybeSingle()
-				.overrideTypes<MediaTvSeries>();
+				.overrideTypes<MediaTvSeries, { merge: true }>();
 			if (error) throw error;
 			if (!data) return data;
 			const specials = data?.seasons?.filter(season => season.season_number === 0) || [];

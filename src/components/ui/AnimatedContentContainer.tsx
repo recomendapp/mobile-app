@@ -1,15 +1,14 @@
 import { forwardRef } from 'react';
-import { ScrollView, ScrollViewProps } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, { AnimatedScrollViewProps } from 'react-native-reanimated';
 
-const AnimatedContentContainer = forwardRef<ScrollView, ScrollViewProps>(
+const AnimatedContentContainer = forwardRef<Animated.ScrollView, AnimatedScrollViewProps>(
     ({ children, contentContainerStyle, ...rest }, ref) => {
         return (
-            <ScrollView {...rest} ref={ref}>
+            <Animated.ScrollView {...rest} ref={ref}>
                 <Animated.View style={contentContainerStyle}>
                     {children}
                 </Animated.View>
-            </ScrollView>
+            </Animated.ScrollView>
         );
     }
 );

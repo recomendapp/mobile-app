@@ -1,4 +1,3 @@
-import { useBottomTabOverflow } from "@/components/TabBar/TabBarBackground";
 import Colors, { TColors } from "@/constants/Colors";
 import { useKeyboardToolbarOffset } from "@/hooks/useKeyboardToolbarOffset";
 import { getModeFromColor } from "@/utils/getModeFromColor";
@@ -6,6 +5,7 @@ import { DefaultTheme } from "@react-navigation/native";
 import { createContext, use, useCallback, useEffect, useMemo, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+import { useBottomTabOverflow } from "@/hooks/useBottomTabOverflow";
 
 type ThemeMode = "light" | "dark";
 

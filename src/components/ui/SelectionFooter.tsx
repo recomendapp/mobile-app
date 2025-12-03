@@ -25,9 +25,9 @@ interface SelectionFooterProps<T> extends InheritedFlatListProps<T> {
     keyboardAware?: boolean;
 };
 
-export const SelectionFooter = <T extends {}>({
+export const SelectionFooter = <T extends any>({
   data,
-  height = useSharedValue(0),
+  height: externalHeight,
   renderItem,
   keyExtractor,
 	containerStyle,
@@ -41,6 +41,8 @@ export const SelectionFooter = <T extends {}>({
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const isVisible = data.length > 0;
+  const internalHeight = useSharedValue(0);
+  const height = externalHeight || internalHeight;
 
   const [internalData, setInternalData] = useState(data);
 

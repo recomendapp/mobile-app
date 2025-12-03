@@ -24,7 +24,7 @@ const PlaylistSortScreen = () => {
 		<Stack.Screen
 		options={{
 			headerTitle: upperFirst(t('common.messages.edit_order')),
-			headerLeft: router.canDismiss() ? () => (
+			headerLeft: () => (
 				<Button
 				variant="ghost"
 				size="fit"
@@ -32,7 +32,7 @@ const PlaylistSortScreen = () => {
 				>
 					{upperFirst(t('common.messages.close'))}
 				</Button>
-			) : undefined,
+			),
 		}}
 		/>
 		{playlist ? (

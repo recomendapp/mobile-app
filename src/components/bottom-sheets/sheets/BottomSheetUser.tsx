@@ -7,16 +7,16 @@ import { LucideIcon } from 'lucide-react-native';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
 import { Button } from '@/components/ui/Button';
 import { Text } from '@/components/ui/text';
 import UserAvatar from '@/components/user/UserAvatar';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BottomSheetShareUser from './share/BottomSheetShareUser';
-import { FlashList, FlashListRef } from '@shopify/flash-list';
+import { FlashList } from '@shopify/flash-list';
+import { PADDING_VERTICAL } from '@/theme/globals';
 
 interface BottomSheetUserProps extends BottomSheetProps {
   user: User | Profile,
@@ -36,11 +36,10 @@ interface Item {
 const BottomSheetUser = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetUserProps
->(({ id, user, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
+>(({ id, user, additionalItemsTop = [], additionalItemsBottom = [], detents, ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const insets = useSafeAreaInsets();
-  const { colors } = useTheme();
+  const { colors, mode, tabBarHeight } = useTheme();
   const router = useRouter();
   const t = useTranslations();
   const pathname = usePathname();
@@ -66,8 +65,8 @@ const BottomSheetUser = React.forwardRef<
   return (
     <TrueSheet
     ref={ref}
+    detents={detents || (Platform.OS === 'ios' ? ['auto'] : [0.5, 1])}
     scrollable
-    style={tw`p-0`}
     {...props}
     >
       <FlashList
@@ -75,8 +74,8 @@ const BottomSheetUser = React.forwardRef<
         'header',
         ...items,
       ]}
+      contentContainerStyle={{ paddingTop: PADDING_VERTICAL }}
       bounces={false}
-      contentContainerStyle={{ paddingBottom: insets.bottom }}
       keyExtractor={(_, i) => i.toString()}
       stickyHeaderIndices={[0]}
       renderItem={({ item }) => (
@@ -119,6 +118,8 @@ const BottomSheetUser = React.forwardRef<
           </Button>
         )
       )}
+      indicatorStyle={mode === 'dark' ? 'white' : 'black'}
+		  scrollIndicatorInsets={{ bottom: tabBarHeight }}
       nestedScrollEnabled
       />
     </TrueSheet>

@@ -14,6 +14,7 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
 import { forwardRef } from "react";
+import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 
 interface ButtonUserActivityMovieRatingProps
 	extends React.ComponentProps<typeof Button> {
@@ -94,7 +95,7 @@ const ButtonUserActivityMovieRating = forwardRef<
 				openSheet(BottomSheetRating, {
 					media: {
 						title: movie.title || '',
-						imageUrl: movie.poster_url || '',
+						imageUrl: getTmdbImage({ path: movie?.poster_path, size: 'w342' }) || '',
 						type: 'movie',
 					},
 					onRatingChange: async (rating) => {
