@@ -212,8 +212,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			"@sentry/react-native/expo",
 			{
 				"url": "https://sentry.io/",
-				"project": process.env.EXPO_PUBLIC_SENTRY_PROJECT,
-				"organization": process.env.EXPO_PUBLIC_SENTRY_ORG,
+				"project": process.env.SENTRY_PROJECT,
+				"organization": process.env.SENTRY_ORG,
 			}
 		],
 		"@maplibre/maplibre-react-native",

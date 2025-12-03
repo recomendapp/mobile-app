@@ -87,8 +87,6 @@ export const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!
  * Sentry DSN for telemetry
  */
 export const SENTRY_DSN = process.env.EXPO_PUBLIC_SENTRY_DSN
-export const SENTRY_PROJECT = process.env.EXPO_PUBLIC_SENTRY_PROJECT
-export const SENTRY_ORG = process.env.EXPO_PUBLIC_SENTRY_ORG
 
 /**
  * Facebook
