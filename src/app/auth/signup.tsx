@@ -39,7 +39,7 @@ const PASSWORD_MIN_LENGTH = 8;
 
 const SignupScreen = () => {
 	const supabase = useSupabaseClient();
-	const { colors, keyboardOffset } = useTheme();
+	const { colors } = useTheme();
 	const insets = useSafeAreaInsets();
 	const toast = useToast();
 	const { signup, loginWithOtp } = useAuth();
@@ -169,7 +169,6 @@ const SignupScreen = () => {
 			toast.success(upperFirst(t('common.form.code_sent')));
 		} catch (error) {
 			if (error instanceof AuthError) {
-				console.log('error', error.code)
 				if (error.code === 'over_email_send_rate_limit') {
 					logger.metric('account:signupFailed', {
 						logContext: 'SignupOtpScreen',
@@ -264,7 +263,7 @@ const SignupScreen = () => {
 				}
 			]}
 			keyboardShouldPersistTaps='handled'
-			extraKeyboardSpace={-139 - keyboardOffset}
+			extraKeyboardSpace={-139}
 			>
 				{!showOtp ? (
 					<>

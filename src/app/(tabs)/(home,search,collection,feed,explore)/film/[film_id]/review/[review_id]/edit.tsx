@@ -31,7 +31,7 @@ const ReviewMovieEditScreen = () => {
 		movieId: review?.activity?.movie_id,
 	})
 	// Handlers
-	const handleSave = useCallback(async (data: { title: string; body: object }) => {
+	const handleSave = useCallback(async (data: { title: string; body: string }) => {
 		if (!review) return;
 		await updateReview({
 			activityId: review?.id,

@@ -42,6 +42,7 @@ type AuthContextProps = {
 	loginWithOAuth: (provider: Provider, redirectTo?: string | null) => Promise<void>;
 	loginWithOtp: (email: string, redirectTo?: string | null) => Promise<void>;
 	logout: () => Promise<void>;
+	forceLogout: () => Promise<void>;
 	signup: (credentials: {
 		email: string;
 		name: string;
@@ -208,12 +209,25 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			await supabase.from("user_notification_tokens").delete().match({ token: pushToken, provider: provider });
 		}
 		const { error } = await supabase.auth.signOut();
+		if (error) console.error("Error during logout:", error);
 		if (error) throw error;
 		setSession(null);
 		queryClient.removeQueries({
 			queryKey: Keys.auth.user(),
 		})
 	}, [supabase, pushToken, queryClient]);
+
+	const forceLogout = useCallback(async () => {
+		await supabase.auth.signOut();
+		await supabase.auth.setSession({
+			access_token: '',
+			refresh_token: '',
+		});
+		setSession(null);
+		queryClient.removeQueries({
+			queryKey: Keys.auth.user(),
+		});
+	}, [queryClient]);
 
 	const signup = useCallback(async (
 		credentials: {
@@ -322,6 +336,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			loginWithOAuth,
 			loginWithOtp,
 			logout,
+			forceLogout,
 			signup,
 			resetPasswordForEmail,
 			updateEmail,

@@ -1,5 +1,5 @@
 
-import { JSONContent, Profile, User, UserActivityMovie, UserActivityTvSeries, UserFollower, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserReviewMovie, UserReviewTvSeries, UserWatchlist, UserWatchlistMovie, UserWatchlistTvSeries } from '@recomendapp/types';
+import { Profile, User, UserActivityMovie, UserActivityTvSeries, UserFollower, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserReviewMovie, UserReviewTvSeries, UserWatchlist, UserWatchlistMovie, UserWatchlistTvSeries } from '@recomendapp/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { userKeys } from './userKeys';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
@@ -663,7 +663,7 @@ export const useUserReviewMovieUpsertMutation = ({
 		} : {
 			activityId?: number;
 			title?: string | null;
-			body: JSONContent;
+			body: string;
 		}) => {
 			const { data, error } = await supabase
 				.from('user_reviews_movie')
@@ -821,7 +821,7 @@ export const useUserReviewTvSeriesUpsertMutation = ({
 		} : {
 			activityId?: number;
 			title?: string | null;
-			body: JSONContent;
+			body: string;
 		}) => {
 			const { data, error } = await supabase
 				.from('user_reviews_tv_series')

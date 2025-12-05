@@ -3,7 +3,6 @@ import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useUserReviewTvSeriesQuery } from "@/features/user/userQueries";
-import Viewer from "@/lib/10tap/viewer";
 import tw from "@/lib/tw";
 import { Redirect, Stack, useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
@@ -15,10 +14,12 @@ import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import ButtonUserReviewTvSeriesLike from "@/components/buttons/ButtonUserReviewTvSeriesLike";
 import { BottomSheetReviewTvSeries } from "@/components/bottom-sheets/sheets/BottomSheetReviewTvSeries";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
+import { EnrichedTextInput } from "@/components/RichText/EnrichedTextInput";
+import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
 const ReviewTvSeriesScreen = () => {
 	const { session } = useAuth();
-	const { bottomOffset, colors } = useTheme();
+	const { bottomOffset, tabBarHeight, colors } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
 	const { review_id } = useLocalSearchParams();
@@ -64,16 +65,20 @@ const ReviewTvSeriesScreen = () => {
 		}}
 		/>
 		<ScrollView
-		contentContainerStyle={[
-			{ paddingBottom: bottomOffset + 8 },
-			tw`gap-2 px-4`
-		]}
+		contentContainerStyle={{
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
+			paddingHorizontal: PADDING_HORIZONTAL,
+			gap: GAP,
+		}}
 		refreshControl={
 			<RefreshControl
 			refreshing={isRefetching}
 			onRefresh={refetch}
 			/>
 		}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight,
+		}}
 		>
 			<View style={tw`justify-center items-center`}>
 				<Text variant="heading" style={[{ color: colors.accentYellow }, tw`text-center my-2`]}>
@@ -86,9 +91,7 @@ const ReviewTvSeriesScreen = () => {
 			activity={review.activity!}
 			showRating
 			/>
-			<Viewer
-			content={review.body}
-			/>
+			<EnrichedTextInput defaultValue={review.body} editable={false} />
 		</ScrollView>
 	</>
 	)

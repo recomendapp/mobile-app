@@ -1,5 +1,4 @@
 import Colors, { TColors } from "@/constants/Colors";
-import { useKeyboardToolbarOffset } from "@/hooks/useKeyboardToolbarOffset";
 import { getModeFromColor } from "@/utils/getModeFromColor";
 import { DefaultTheme } from "@react-navigation/native";
 import { createContext, use, useCallback, useEffect, useMemo, useState } from "react";
@@ -17,8 +16,6 @@ type ThemeContextType = {
 	bottomOffset: number;
 	defaultScreenOptions: NativeStackNavigationOptions;
 	mode: ThemeMode;
-	keyboardOffset: number;
-	setKeyboardToolbarOffset: (offset: number) => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -31,7 +28,6 @@ export const ThemeProvider = ({children}: ThemeProviderProps) => {
 	const [colors, setColors] = useState(Colors.dark);
 	const insets = useSafeAreaInsets();
 	const [tabBarHeight, setTabBarHeight] = useState(0);
-	const [keyboardOffset, setKeyboardToolbarOffset] = useState(0);
 
 	const bottomOffset = useMemo(() => tabBarHeight + insets.bottom, [tabBarHeight, insets.bottom]);
 
@@ -66,8 +62,6 @@ export const ThemeProvider = ({children}: ThemeProviderProps) => {
 			bottomOffset,
 			defaultScreenOptions,
 			mode,
-			keyboardOffset,
-			setKeyboardToolbarOffset,
 		}}
 		>
 			{children}
@@ -88,7 +82,6 @@ export const ThemeUpdater = () => {
 	return (
 	<>
 		<TabBarHeightUpdater />
-		<KeyboardToolbarOffsetUpdater />
 	</>
 	);
 };
@@ -102,17 +95,5 @@ const TabBarHeightUpdater = () => {
 			setTabBarHeight(0);
 		}
 	}, [tabBarHeight, setTabBarHeight]);
-	return null;
-};
-
-const KeyboardToolbarOffsetUpdater = () => {
-	const keyboardOffset = useKeyboardToolbarOffset();
-	const { setKeyboardToolbarOffset } = useTheme();
-	useEffect(() => {
-		setKeyboardToolbarOffset(keyboardOffset);
-		return () => {
-			setKeyboardToolbarOffset(0);
-		}
-	}, [keyboardOffset, setKeyboardToolbarOffset]);
 	return null;
 };

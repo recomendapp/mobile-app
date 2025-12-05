@@ -3,16 +3,11 @@ import { useMemo } from "react";
 import { DefaultKeyboardToolbarTheme, KeyboardToolbar as RNKeyboardToolbar } from "react-native-keyboard-controller";
 import { KeyboardToolbarTheme } from "react-native-keyboard-controller/lib/typescript/components/KeyboardToolbar/types";
 
-export const KeyboardToolbar = ({
+const KeyboardToolbarBase = ({
 	theme,
-	offset: offsetProps,
 	...props
 }: React.ComponentPropsWithoutRef<typeof RNKeyboardToolbar>) => {
-	const { colors, keyboardOffset } = useTheme();
-	const offset = {
-		opened: keyboardOffset,
-		...offsetProps,
-	};
+	const { colors } = useTheme();
 	const themeDefault: KeyboardToolbarTheme = useMemo(() => ({
 		...DefaultKeyboardToolbarTheme,
 		dark: {
@@ -27,5 +22,12 @@ export const KeyboardToolbar = ({
 		},
 		...theme,
 	}), [colors, theme]);
-	return <RNKeyboardToolbar offset={offset} theme={themeDefault} {...props} />;
+	return <RNKeyboardToolbar theme={themeDefault} {...props} />;
 };
+
+export const KeyboardToolbar = Object.assign(KeyboardToolbarBase, {
+	Content: RNKeyboardToolbar.Content,
+	Next: RNKeyboardToolbar.Next,
+	Prev: RNKeyboardToolbar.Prev,
+	Done: RNKeyboardToolbar.Done,
+});

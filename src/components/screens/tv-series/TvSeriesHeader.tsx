@@ -131,7 +131,7 @@ const TvSeriesHeader: React.FC<TvSeriesHeaderProps> = ({
 		>
 			{tvSeries && (
 				tvSeries.backdrop_path ? (
-					<AnimatedImage transition={500} style={tw`absolute inset-0`} source={{ uri: getTmdbImage({ path: tvSeries.backdrop_path, size: 'w780' }) ?? '' }} />
+					<AnimatedImage transition={500} style={tw`absolute inset-0`} source={{ uri: getTmdbImage({ path: tvSeries.backdrop_path, size: 'w1280' }) ?? '' }} />
 				) : (palette && palette.length > 1 ) && (
 					<Animated.View entering={FadeIn} style={[tw`absolute inset-0`, { backgroundColor: palette.at(0) }]} />
 				)

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { JSONContent, Profile, UserActivityMovie, UserReviewMovie, FixedOmit } from "@recomendapp/types";
+import { Profile, UserActivityMovie, UserReviewMovie, FixedOmit } from "@recomendapp/types";
 import Animated from "react-native-reanimated";
 import { Pressable, View } from "react-native";
 import { Href, useRouter } from "expo-router";
@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import ButtonUserReviewMovieLike from "@/components/buttons/ButtonUserReviewMovieLike";
 import { BottomSheetReviewMovie } from "@/components/bottom-sheets/sheets/BottomSheetReviewMovie";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
+import { convert } from "html-to-text";
 
 interface CardReviewMovieBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -68,7 +69,13 @@ const CardReviewMovieDefault = React.forwardRef<
 					) : <Skeleton style={tw.style("h-4 w-1/3")} />
 				)}
 				{!skeleton ? (
-					<Overview data={review?.body} />
+					<Text numberOfLines={3} style={tw.style("text-justify")}>
+						{convert(review.body, {
+							selectors: [
+								{ selector: 'a', options: { ignoreHref: true } },
+							]
+						})}
+					</Text>
 				) : <Skeleton style={tw.style("h-12 w-full")} />}
 				{!skeleton && (
 					<View style={tw.style("flex-row items-center justify-end m-1")}>
@@ -116,22 +123,7 @@ const CardReviewMovie = React.forwardRef<
 });
 CardReviewMovie.displayName = "CardReviewMovie";
 
-const Overview = ({ data }: { data: JSONContent }) => {
-	const text = data?.content
-		?.filter((paragraph) => paragraph?.content)
-		?.flatMap(
-			(paragraph) => paragraph?.content?.map((item) => item.text).join('')
-		)
-		.join('\n');
-	return (
-	<Text numberOfLines={3} style={tw.style("text-justify")}>
-		{text}
-	</Text>
-	);
-};
-
 export {
 	CardReviewMovie,
 	CardReviewMovieDefault,
-	Overview,
 }

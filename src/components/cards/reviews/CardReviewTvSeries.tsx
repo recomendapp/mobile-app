@@ -1,5 +1,5 @@
 import * as React from "react"
-import { JSONContent, Profile, UserActivityTvSeries, UserReviewTvSeries, FixedOmit } from "@recomendapp/types";
+import { Profile, UserActivityTvSeries, UserReviewTvSeries, FixedOmit } from "@recomendapp/types";
 import Animated from "react-native-reanimated";
 import { Pressable, View } from "react-native";
 import { useRouter, Href } from "expo-router";
@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import ButtonUserReviewTvSeriesLike from "@/components/buttons/ButtonUserReviewTvSeriesLike";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { BottomSheetReviewTvSeries } from "@/components/bottom-sheets/sheets/BottomSheetReviewTvSeries";
+import { convert } from "html-to-text";
 
 interface CardReviewTvSeriesBaseProps
 	extends React.ComponentPropsWithRef<typeof Animated.View> {
@@ -68,7 +69,13 @@ const CardReviewTvSeriesDefault = React.forwardRef<
 					) : <Skeleton style={tw.style("h-4 w-1/3")} />
 				)}
 				{!skeleton ? (
-					<Overview data={review?.body} />
+					<Text numberOfLines={3} style={tw.style("text-justify")}>
+						{convert(review.body, {
+							selectors: [
+								{ selector: 'a', options: { ignoreHref: true } },
+							]
+						})}
+					</Text>
 				) : <Skeleton style={tw.style("h-12 w-full")} />}
 				{!skeleton && (
 					<View style={tw.style("flex-row items-center justify-end m-1")}>
@@ -116,22 +123,7 @@ const CardReviewTvSeries = React.forwardRef<
 });
 CardReviewTvSeries.displayName = "CardReviewTvSeries";
 
-const Overview = ({ data }: { data: JSONContent }) => {
-	const text = data?.content
-		?.filter((paragraph) => paragraph?.content)
-		?.flatMap(
-			(paragraph) => paragraph?.content?.map((item) => item.text).join('')
-		)
-		.join('\n');
-	return (
-	<Text numberOfLines={3} style={tw.style("text-justify")}>
-		{text}
-	</Text>
-	);
-};
-
 export {
 	CardReviewTvSeries,
 	CardReviewTvSeriesDefault,
-	Overview,
 }

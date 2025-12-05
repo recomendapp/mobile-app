@@ -13,16 +13,18 @@ import { Href, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { LucideIcon } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert } from "react-native";
+import { Alert, Pressable } from "react-native";
 import { useTranslations } from "use-intl";
 import * as Application from 'expo-application';
 import app from "@/constants/app";
+import { Badge } from "@/components/ui/Badge";
 
 type BaseRoute = {
 	label: string;
 	icon: LucideIcon;
 	authOnly?: boolean;
 	color?: string;
+	rightComponent?: React.ReactNode;
 };
 
 type Route = BaseRoute & (
@@ -36,21 +38,13 @@ type Route = BaseRoute & (
 );
 
 const SettingsScreen = () => {
-	const { session, logout } = useAuth();
+	const { session, customerInfo, logout, forceLogout } = useAuth();
 	const { colors, tabBarHeight, bottomOffset, mode } = useTheme();
 	const toast = useToast();
 	const router = useRouter();
 	const t = useTranslations();
 
 	const [appVersion, setAppVersion] = useState<string | null>(null);
-
-	useEffect(() => {
-		async function getAppVersion() {
-			const version = Application.nativeApplicationVersion;
-			setAppVersion(version);
-		}
-		getAppVersion();
-	}, []);
 
 	const handleLogout = useCallback(async () => {
 		try {
@@ -61,8 +55,9 @@ const SettingsScreen = () => {
 				errorMessage = upperFirst(t('common.messages.error'));
 			}
 			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
+			await forceLogout();
 		}
-	}, [logout, t, toast]);
+	}, [logout, forceLogout, t, toast]);
 	const handleLogoutButtonPress = useCallback(() => {
 		Alert.alert(
 			upperFirst(t('common.messages.are_u_sure')),
@@ -86,7 +81,7 @@ const SettingsScreen = () => {
 		const routes: Route[] = [
 			{ label: upperFirst(t('pages.settings.profile.label')), route: '/settings/profile', icon: Icons.User, authOnly: true },
 			{ label: upperFirst(t('pages.settings.account.label')), route: '/settings/account', icon: Icons.Lock, authOnly: true },
-			{ label: upperFirst(t('pages.settings.subscription.label')), route: '/settings/subscription', icon: Icons.CreditCard, authOnly: true },
+			{ label: upperFirst(t('pages.settings.subscription.label')), route: '/settings/subscription', icon: Icons.CreditCard, authOnly: true, rightComponent: customerInfo?.activeSubscriptions.length === 0 ? <Pressable onPress={() => router.push({ pathname: '/upgrade' })}><Badge variant="accent-yellow">{upperFirst(t('common.messages.upgrade_to_plan', { plan: 'Premium' }))}</Badge></Pressable> : undefined },
 			{ label: upperFirst(t('pages.settings.security.label')), route: '/settings/security', icon: Icons.Shield, authOnly: true },
 			{ label: upperFirst(t('pages.settings.notifications.label')), route: '/settings/notifications', icon: Icons.Bell, authOnly: true },
 			{ label: upperFirst(t('pages.settings.appearance.label')), route: '/settings/appearance', icon: Icons.Eye },
@@ -94,7 +89,7 @@ const SettingsScreen = () => {
 			{ label: upperFirst(t('common.messages.logout')), onPress: handleLogoutButtonPress, icon: Icons.logout, authOnly: true, color: colors.destructive },
 		];
 		return routes.filter(route => !route.authOnly || (route.authOnly && session));
-	}, [t, session, handleLogoutButtonPress, colors.destructive]);
+	}, [t, session, handleLogoutButtonPress, colors.destructive, customerInfo, router]);
 
 	const renderItem = useCallback(({ item, index }: { item: Route; index: number }) => (
 		<Button
@@ -118,7 +113,10 @@ const SettingsScreen = () => {
 		>
 			<View style={tw`flex-1 flex-row items-center gap-2 justify-between`}>
 				<Text style={{ color: item.color || colors.foreground }}>{item.label}</Text>
-				<Icons.ChevronRight color={item.color || colors.mutedForeground} size={16} />
+				<View style={tw`flex-row items-center gap-2`}>
+					{item.rightComponent}
+					<Icons.ChevronRight color={item.color || colors.mutedForeground} size={16} />
+				</View>
 			</View>
 		</Button>
 	), [colors.muted, colors.mutedForeground, colors.foreground, router, routes.length]);
@@ -128,6 +126,14 @@ const SettingsScreen = () => {
 			<Text textColor="muted">{app.name} • {upperFirst(t('common.messages.version_value', { value: appVersion || 'N/A' }))}</Text>
 		</View>
 	), [appVersion, t]);
+
+	useEffect(() => {
+		async function getAppVersion() {
+			const version = Application.nativeApplicationVersion;
+			setAppVersion(version);
+		}
+		getAppVersion();
+	}, []);
 
 	return (
 	<>

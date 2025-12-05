@@ -28,7 +28,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const LoginScreen = () => {
 	const { login } = useAuth();
 	const insets = useSafeAreaInsets();
-	const { colors, keyboardOffset } = useTheme();
+	const { colors } = useTheme();
 	const router = useRouter();
 	const toast = useToast();
 	const t = useTranslations();
@@ -99,7 +99,7 @@ const LoginScreen = () => {
 				}
 			]}
 			keyboardShouldPersistTaps='handled'
-			extraKeyboardSpace={-180 - keyboardOffset}
+			extraKeyboardSpace={-180}
 			>
 				<View style={[tw`w-full`, { gap: GAP }]}>
 					<GroupedInput title={t('pages.auth.login.label', { app: app.name })} titleStyle={tw`text-center text-xl font-bold`}>

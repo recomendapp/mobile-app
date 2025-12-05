@@ -42,7 +42,7 @@ const ReviewTvSeriesCreateScreen = () => {
 	});
 
 	// Handlers
-	const handleSave = useCallback(async (data: { title: string; body: object }) => {
+	const handleSave = useCallback(async (data: { title: string; body: string }) => {
 		await insertReview({
 			activityId: activity?.id,
 			title: data.title || null,
