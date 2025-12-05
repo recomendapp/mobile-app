@@ -13,7 +13,6 @@ import { Text, useWindowDimensions, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardMovie } from "@/components/cards/CardMovie";
-import { FadeInDown } from "react-native-reanimated";
 
 interface sortBy {
 	label: string;
@@ -76,7 +75,6 @@ const UserCollectionMovieScreen = () => {
 			movie={item.movie!}
 			profileActivity={item}
 			style={tw`w-full`}
-			entering={FadeInDown}
 			/>
 		)}
 		ListHeaderComponent={

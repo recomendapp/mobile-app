@@ -13,7 +13,6 @@ import { Text, useWindowDimensions, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
-import { FadeInDown } from "react-native-reanimated";
 
 interface sortBy {
 	label: string;
@@ -77,7 +76,6 @@ const UserCollectionTvSeries = () => {
 			tvSeries={item.tv_series!}
 			profileActivity={item}
 			style={tw`w-full`}
-			entering={FadeInDown}
 			/>
 		)}
 		ListHeaderComponent={

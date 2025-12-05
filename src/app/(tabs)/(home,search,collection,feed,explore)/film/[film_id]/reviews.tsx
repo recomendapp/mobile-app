@@ -15,7 +15,6 @@ import { CardReviewMovie } from "@/components/cards/reviews/CardReviewMovie";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import ButtonMyReviewMovie from "@/components/buttons/ButtonMyReviewMovie";
-import { FadeInDown } from "react-native-reanimated";
 import { UserReviewMovie } from "@recomendapp/types";
 
 interface sortBy {
@@ -95,7 +94,6 @@ const FilmReviews = () => {
 			activity={item.activity!}
 			author={item.activity!.user!}
 			url={`/film/${movie?.slug || movie?.id}/review/${item.id}`}
-			entering={FadeInDown}
 			/>
 		), [])}
 		ListHeaderComponent={

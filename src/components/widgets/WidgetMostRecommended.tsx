@@ -205,7 +205,7 @@ const WidgetMostRecommendedItem = ({
 						</View>
 					</View>
 					<View style={[{ gap: GAP }]}>
-						<Text onPress={handleOnPress} style={tw`text-xl font-bold`}>{details?.title}</Text>
+						<Text onPress={handleOnPress} onLongPress={handleOnLongPress} style={tw`text-xl font-bold`}>{details?.title}</Text>
 						{details?.description && <Text style={tw`text-base`} numberOfLines={2}>{details.description}</Text>}
 					</View>
 				</View>

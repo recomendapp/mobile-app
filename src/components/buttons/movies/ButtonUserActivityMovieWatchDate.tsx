@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { ICON_ACTION_SIZE } from "@/theme/globals";
 import { useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
 import { upperFirst } from "lodash";
-import { useFormatter, useTranslations } from "use-intl";
+import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -27,7 +27,6 @@ const ButtonUserActivityMovieWatchDate = forwardRef<
 	const insets = useSafeAreaInsets();
 	const { colors, mode } = useTheme();
 	const toast = useToast();
-	const format = useFormatter();
 	const t = useTranslations();
 	// States
 	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -84,13 +83,7 @@ const ButtonUserActivityMovieWatchDate = forwardRef<
 			onPressProps?.(e);
 		}}
 		{...props}
-		>
-			{format.dateTime(new Date(activity.watched_date), {
-				year: 'numeric',
-				month: 'short',
-				day: 'numeric',
-			})}
-		</Button>
+		/>
 		<DateTimePickerModal
 		isVisible={isDatePickerVisible}
 		mode="date"

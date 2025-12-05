@@ -1,17 +1,14 @@
 import { useAuth } from '@/providers/AuthProvider';
-import { useNotifications } from '@/providers/NotificationsProvider';
 import { ThemeUpdater, useTheme } from '@/providers/ThemeProvider';
 import { Stack } from 'expo-router';
 import { upperFirst } from 'lodash';
 import { useMemo } from 'react';
-import { Platform } from 'react-native';
 import { useTranslations } from 'use-intl';
 
 const AppLayout = ({ segment } : { segment: string }) => {
   const { defaultScreenOptions } = useTheme();
   const t = useTranslations();
   const { session } = useAuth();
-  const { isMounted } = useNotifications();
   const initialRouteName = useMemo(() => {
     switch (segment) {
       case '(search)':

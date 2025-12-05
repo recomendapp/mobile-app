@@ -113,7 +113,7 @@ const CustomButton = ({data, flatListRef, flatListIndex, x}: Props) => {
 				}
 
 				if (!session && (!prevRoute || !prevRoute.name.includes('auth'))) {
-					router.push({ pathname: '/(tabs)/(home)/auth' });
+					router.push({ pathname: '/auth' });
 				}
 			}
 		}}>

@@ -13,7 +13,6 @@ import { Text, useWindowDimensions, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { PADDING_VERTICAL } from "@/theme/globals";
-import { FadeInDown } from "react-native-reanimated";
 
 interface sortBy {
 	label: string;
@@ -83,7 +82,6 @@ const UserPlaylistsScreen = () => {
 			playlist={item}
 			showItemsCount
 			showPlaylistAuthor={false}
-			entering={FadeInDown}
 			/>
 		)}
 		ListHeaderComponent={
