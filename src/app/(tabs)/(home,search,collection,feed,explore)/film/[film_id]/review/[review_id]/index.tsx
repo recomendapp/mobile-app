@@ -90,7 +90,7 @@ const ReviewMovieScreen = () => {
 			activity={review.activity!}
 			showRating
 			/>
-			<EnrichedTextInput defaultValue={review.body} editable={false} />
+			<EnrichedTextInput defaultValue={review.body} editable={false} style={tw`flex-1`} scrollEnabled={false} />
 		</ScrollView>
 	</>
 	)

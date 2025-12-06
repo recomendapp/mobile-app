@@ -1,11 +1,11 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { MediaMovie, MediaTvSeries, UserActivityMovie, UserActivityTvSeries, UserReviewMovie, UserReviewTvSeries } from "@recomendapp/types";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { upperFirst } from "lodash";
 import Animated, { Extrapolation, interpolate, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
-import { Stack } from "expo-router";
+import { Stack, useNavigation } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { CardMovie } from "@/components/cards/CardMovie";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
@@ -18,7 +18,8 @@ import { useToast } from "@/components/Toast";
 import { EnrichedTextInputInstance, OnChangeSelectionEvent, OnChangeStateEvent, OnLinkDetected } from "react-native-enriched";
 import { EnrichedTextInput } from "@/components/RichText/EnrichedTextInput";
 import { useReanimatedKeyboardAnimation } from "react-native-keyboard-controller";
-import { ScrollView } from "react-native";
+import { usePreventRemove } from "@react-navigation/native";
+import { Alert } from "react-native";
 
 const MAX_TITLE_LENGTH = 50;
 
@@ -54,14 +55,20 @@ const ReviewForm = ({
 	onSave,
 } : ReviewFormProps) => {
 	const toast = useToast();
-	const insets = useSafeAreaInsets();	
-	const { colors, bottomOffset, tabBarHeight } = useTheme();
+	const insets = useSafeAreaInsets();
+	const navigation = useNavigation();
+	const { colors, bottomOffset } = useTheme();
 	const t = useTranslations();
 	const [title, setTitle] = useState(review?.title ?? '');
+	const [defaultBody, setDefaultBody] = useState<string | undefined>(undefined);
 	const [body, setBody] = useState<string | null>(null);
 	const headerHeight = useSharedValue(0);
 	const toolbarHeight = useSharedValue(0);
 	const { height: keyboardHeight, progress } = useReanimatedKeyboardAnimation();
+	const hasChanges = useMemo(() => {
+		const bodyChanged = review ? (body !== null && body !== review.body) : (body !== null && body !== undefined && body.length > 0);
+		return title !== (review?.title || '') || bodyChanged;
+	}, [title, body, review]);
 	// EDITOR
 	const ref = useRef<EnrichedTextInputInstance>(null);
 	const [stylesState, setStylesState] = useState<OnChangeStateEvent | null>();
@@ -98,10 +105,34 @@ const ReviewForm = ({
 		};
 	});
 
+	usePreventRemove(hasChanges, ({ data }) => {
+		Alert.alert(
+			upperFirst(t('common.messages.are_u_sure')),
+			upperFirst(t('common.messages.do_you_really_want_to_cancel_change', { count: 2 })),
+			[
+				{
+					text: upperFirst(t('common.messages.continue_editing')),
+				},
+				{
+					text: upperFirst(t('common.messages.ignore')),
+					onPress: () => navigation.dispatch(data.action),
+					style: 'destructive',
+				},
+			]
+		);
+	});
+
+	/**
+	 * Issue workaround:
+	 * EnrichedTextInput has a bug where the scroll is not properly set when a long default value is set.
+	 * See: https://github.com/software-mansion/react-native-enriched/issues/305
+	 */
 	useEffect(() => {
-		if (review) {
-			setBody(review.body);
-		}
+		if (!review) return;
+		const timeout = setTimeout(() => {
+			setDefaultBody(review.body);
+		}, 500);
+		return () => clearTimeout(timeout);
 	}, [review]);
 
 	return (
@@ -131,60 +162,57 @@ const ReviewForm = ({
 			)
 		}}
 		/>
-		<ScrollView scrollIndicatorInsets={{ bottom: tabBarHeight }}>
-			<Animated.View
-			style={[
-				{
-					flex: 1,
-					gap: GAP,
-					paddingTop: PADDING_VERTICAL,
-					paddingLeft: insets.left + PADDING_HORIZONTAL,
-					paddingRight: insets.right + PADDING_HORIZONTAL,
-				},
-				scrollViewStyle
-			]}
+		<Animated.View
+		style={[
+			{
+				flex: 1,
+				gap: GAP,
+				paddingTop: PADDING_VERTICAL,
+				paddingLeft: insets.left + PADDING_HORIZONTAL,
+				paddingRight: insets.right + PADDING_HORIZONTAL,
+			},
+			scrollViewStyle
+		]}
+		>
+			<View
+			style={{ gap: GAP }}
+			onLayout={(e) => {
+				headerHeight.value = e.nativeEvent.layout.height + 8;
+			}}
 			>
-				<View
-				style={{ gap: GAP }}
-				onLayout={(e) => {
-					headerHeight.value = e.nativeEvent.layout.height + 8;
-				}}
-				>
-					<Input
-					value={title}
-					onChangeText={(text) => setTitle(text.replace(/\s+/g, ' ').trimStart())}
-					placeholder={upperFirst(t('common.messages.title'))}
-					maxLength={MAX_TITLE_LENGTH}
-					inputContainerStyle={tw`bg-transparent border-0 rounded-none`}
-					style={[
-						tw`h-auto font-bold`,
-						{
-							fontSize: 24,
-							color: colors.accentYellow,
-						}
-					]}
-					textAlign="center"
-					multiline
-					/>
-					{/* MEDIA */}
-					{type === 'movie' ? (
-						<CardMovie movie={movie} linked={false} showActionRating />
-					) : type === 'tv_series' && (
-						<CardTvSeries tvSeries={tvSeries} linked={false} showActionRating />
-					)}
-				</View>
-				<EnrichedTextInput
-				ref={ref}
-				defaultValue={review?.body}
-				onChangeState={(e) => setStylesState(e.nativeEvent)}
-				onChangeHtml={(html) => setBody(html.nativeEvent.value)}
-				onChangeSelection={(e) => setSelectionState(e.nativeEvent)}
-				onLinkDetected={(e) => setLinkState(e)}
-				// style={{ flex: 1 }}
-				placeholder={upperFirst(t('common.messages.write_your_review_here'))}
+				<Input
+				value={title}
+				onChangeText={(text) => setTitle(text.replace(/\s+/g, ' ').trimStart())}
+				placeholder={upperFirst(t('common.messages.title'))}
+				maxLength={MAX_TITLE_LENGTH}
+				inputContainerStyle={tw`bg-transparent border-0 rounded-none`}
+				style={[
+					tw`h-auto font-bold`,
+					{
+						fontSize: 24,
+						color: colors.accentYellow,
+					}
+				]}
+				textAlign="center"
+				multiline
 				/>
-			</Animated.View>
-		</ScrollView>
+				{type === 'movie' ? (
+					<CardMovie movie={movie} linked={false} showActionRating />
+				) : type === 'tv_series' && (
+					<CardTvSeries tvSeries={tvSeries} linked={false} showActionRating />
+				)}
+			</View>
+			<EnrichedTextInput
+			ref={ref}
+			defaultValue={defaultBody}
+			onChangeState={(e) => setStylesState(e.nativeEvent)}
+			onChangeHtml={(html) => setBody(html.nativeEvent.value)}
+			onChangeSelection={(e) => setSelectionState(e.nativeEvent)}
+			onLinkDetected={(e) => setLinkState(e)}
+			style={{ flex: 1, fontSize: 16 }}
+			placeholder={upperFirst(t('common.messages.write_your_review_here'))}
+			/>
+		</Animated.View>
 		<Toolbar
 		editorRef={ref}
 		onLayout={(e) => {
