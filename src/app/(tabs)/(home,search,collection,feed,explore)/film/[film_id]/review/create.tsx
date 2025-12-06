@@ -37,14 +37,12 @@ const ReviewMovieCreateScreen = () => {
 	const loading = movieLoading || movie === undefined || activityLoading || activity === undefined;
 	// Mutations
 	const { mutateAsync: insertReview } = useUserReviewMovieUpsertMutation({
-		userId: user?.id,
 		movieId: movie?.id,
 	});
 
 	// Handlers
 	const handleSave = useCallback(async (data: { title: string; body: string }) => {
 		await insertReview({
-			activityId: activity?.id,
 			title: data.title || null,
 			body: data.body,
 		}, {
@@ -55,7 +53,7 @@ const ReviewMovieCreateScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [activity?.id, insertReview, router, movie?.slug, movie?.id, toast, t]);
+	}, [insertReview, router, movie?.slug, movie?.id, toast, t]);
 
 	if (movie === null) {
 		return (

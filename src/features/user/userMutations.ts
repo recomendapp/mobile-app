@@ -6,6 +6,7 @@ import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { useAuth } from '@/providers/AuthProvider';
 import { mediaKeys } from '../media/mediaKeys';
 import { Keys } from '@/api/keys';
+import { useApiClient } from '@/providers/ApiProvider';
 
 export const useUserUpdateMutation = ({
 	userId,
@@ -647,34 +648,30 @@ export const useUserActivityTvSeriesUpdateMutation = () => {
 /* --------------------------------- REVIEW --------------------------------- */
 // Movies
 export const useUserReviewMovieUpsertMutation = ({
-	userId,
 	movieId
 }: {
-	userId?: string;
 	movieId?: number;
 }) => {
-	const supabase = useSupabaseClient();
+	const api = useApiClient();
+	const { session } = useAuth();
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({
-			activityId,
 			title,
 			body,
 		} : {
-			activityId?: number;
 			title?: string | null;
 			body: string;
 		}) => {
-			const { data, error } = await supabase
-				.from('user_reviews_movie')
-				.upsert({
-					id: activityId,
+			if (!movieId) throw Error('Missing movie id');
+			const { data, error } = await api.movies.review.upsert(
+				movieId,
+				{
 					title: title,
 					body: body,
-				}, { onConflict: 'id'})
-				.select('*')
-				.single()
-			if (error) throw error;
+				}
+			);
+			if (error || !data) throw error;
 			return data;
 		},
 		onSuccess: (data) => {
@@ -698,7 +695,7 @@ export const useUserReviewMovieUpsertMutation = ({
 			});
 
 			// Invalidate the review activity
-			movieId && userId && queryClient.setQueryData(userKeys.activity({ id: movieId, type: 'movie', userId: userId }), (oldData: UserActivityMovie | null): UserActivityMovie | null => {
+			movieId && session && queryClient.setQueryData(userKeys.activity({ id: movieId, type: 'movie', userId: session.user.id }), (oldData: UserActivityMovie | null): UserActivityMovie | null => {
 				if (!oldData) return oldData;
 				return {
 					...oldData,
@@ -805,34 +802,30 @@ export const useUserReviewMovieLikeDeleteMutation = () => {
 
 // Tv Series
 export const useUserReviewTvSeriesUpsertMutation = ({
-	userId,
 	tvSeriesId
 }: {
-	userId?: string;
 	tvSeriesId?: number;
 }) => {
-	const supabase = useSupabaseClient();
+	const api = useApiClient();
+	const { session } = useAuth();
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({
-			activityId,
 			title,
 			body,
 		} : {
-			activityId?: number;
 			title?: string | null;
 			body: string;
 		}) => {
-			const { data, error } = await supabase
-				.from('user_reviews_tv_series')
-				.upsert({
-					id: activityId,
+			if (!tvSeriesId) throw Error('Missing tv series id');
+			const { data, error } = await api.tvSeries.review.upsert(
+				tvSeriesId,
+				{
 					title: title,
 					body: body,
-				}, { onConflict: 'id'})
-				.select('*')
-				.single()
-			if (error) throw error;
+				}
+			);
+			if (error || !data) throw error;
 			return data;
 		},
 		onSuccess: (data) => {
@@ -856,7 +849,7 @@ export const useUserReviewTvSeriesUpsertMutation = ({
 			});
 
 			// Invalidate the review activity
-			tvSeriesId && userId && queryClient.setQueryData(userKeys.activity({ id: tvSeriesId, type: 'tv_series', userId: userId }), (oldData: UserActivityTvSeries | null): UserActivityTvSeries | null => {
+			tvSeriesId && session && queryClient.setQueryData(userKeys.activity({ id: tvSeriesId, type: 'tv_series', userId: session.user.id }), (oldData: UserActivityTvSeries | null): UserActivityTvSeries | null => {
 				if (!oldData) return oldData;
 				return {
 					...oldData,

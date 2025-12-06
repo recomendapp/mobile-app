@@ -27,14 +27,11 @@ const ReviewMovieEditScreen = () => {
 	const loading = reviewLoading || review === undefined;
 	// Mutations
 	const { mutateAsync: updateReview} = useUserReviewMovieUpsertMutation({
-		userId: session?.user.id,
 		movieId: review?.activity?.movie_id,
 	})
 	// Handlers
 	const handleSave = useCallback(async (data: { title: string; body: string }) => {
-		if (!review) return;
 		await updateReview({
-			activityId: review?.id,
 			title: data.title || null,
 			body: data.body,
 		}, {
@@ -45,7 +42,7 @@ const ReviewMovieEditScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		})
-	}, [review, updateReview, router, toast, t]);
+	}, [updateReview, router, toast, t]);
 
 	if (loading) {
 		return (

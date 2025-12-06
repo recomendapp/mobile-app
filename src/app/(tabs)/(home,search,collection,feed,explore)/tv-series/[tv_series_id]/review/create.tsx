@@ -37,14 +37,12 @@ const ReviewTvSeriesCreateScreen = () => {
 	const loading = tvSeriesLoading || tvSeries === undefined || activityLoading || activity === undefined;
 	// Mutations
 	const { mutateAsync: insertReview } = useUserReviewTvSeriesUpsertMutation({
-		userId: user?.id,
 		tvSeriesId: tvSeries?.id,
 	});
 
 	// Handlers
 	const handleSave = useCallback(async (data: { title: string; body: string }) => {
 		await insertReview({
-			activityId: activity?.id,
 			title: data.title || null,
 			body: data.body,
 		}, {
@@ -55,7 +53,7 @@ const ReviewTvSeriesCreateScreen = () => {
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	}, [activity?.id, insertReview, router, tvSeries?.slug, tvSeries?.id, toast, t]);
+	}, [insertReview, router, tvSeries?.slug, tvSeries?.id, toast, t]);
 
 	if (tvSeries === null) {
 		return (
