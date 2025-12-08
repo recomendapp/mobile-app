@@ -13,12 +13,17 @@ import { useScrollToTop } from "@react-navigation/native";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { upperFirst } from "lodash";
 import { useRef } from "react";
+import { useKeyboardState } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
 const SearchUsersScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { tabBarHeight, bottomOffset } = useTheme();
+	const {
+		isVisible: keyboardVisible,
+		height: keyboardHeight,
+	} = useKeyboardState((state) => state);
 	const t = useTranslations();
 	const search = useSearchStore(state => state.search);
 	
@@ -49,11 +54,11 @@ const SearchUsersScreen = () => {
 		contentContainerStyle={{
 			paddingLeft: insets.left + PADDING_HORIZONTAL,
 			paddingRight: insets.right + PADDING_HORIZONTAL,
-			paddingBottom: bottomOffset + PADDING_VERTICAL,
+			paddingBottom: keyboardVisible ? keyboardHeight + PADDING_VERTICAL : bottomOffset + PADDING_VERTICAL,
 			gap: GAP,
 		}}
 		scrollIndicatorInsets={{
-			bottom: tabBarHeight,
+			bottom: keyboardVisible ? (keyboardHeight - insets.bottom) : tabBarHeight,
 		}}
 		keyExtractor={(item) => item.id.toString()}
 		ListEmptyComponent={
@@ -67,6 +72,7 @@ const SearchUsersScreen = () => {
 				</View>
 			)
 		}
+		keyboardShouldPersistTaps="handled"
 		onRefresh={refetch}
 		refreshing={isRefetching}
 		onEndReached={() => hasNextPage && fetchNextPage()}

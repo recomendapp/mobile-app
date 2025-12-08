@@ -18,6 +18,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { upperFirst } from "lodash";
 import { useRef, forwardRef } from "react";
 import { ScrollView } from "react-native";
+import { useKeyboardState } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
@@ -74,6 +75,10 @@ FiltersSheet.displayName = 'FiltersSheet';
 const SearchTvSeriesScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { tabBarHeight, bottomOffset } = useTheme();
+	const {
+		isVisible: keyboardVisible,
+		height: keyboardHeight,
+	} = useKeyboardState((state) => state);
 	// const navigation = useNavigation();
 	const t = useTranslations();
 	const search = useSearchStore(state => state.search);
@@ -123,11 +128,11 @@ const SearchTvSeriesScreen = () => {
 				contentContainerStyle={{
 					paddingLeft: insets.left + PADDING_HORIZONTAL,
 					paddingRight: insets.right + PADDING_HORIZONTAL,
-					paddingBottom: bottomOffset + PADDING_VERTICAL,
+					paddingBottom: keyboardVisible ? keyboardHeight + PADDING_VERTICAL : bottomOffset + PADDING_VERTICAL,
 					gap: GAP,
 				}}
 				scrollIndicatorInsets={{
-					bottom: tabBarHeight,
+					bottom: keyboardVisible ? (keyboardHeight - insets.bottom) : tabBarHeight,
 				}}
 				keyExtractor={(item) => item.id.toString()}
 				ListEmptyComponent={
@@ -141,6 +146,7 @@ const SearchTvSeriesScreen = () => {
 						</View>
 					)
 				}
+				keyboardShouldPersistTaps="handled"
 				onRefresh={refetch}
 				refreshing={isRefetching}
 				onEndReached={() => hasNextPage && fetchNextPage()}

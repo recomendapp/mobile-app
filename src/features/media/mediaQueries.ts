@@ -87,21 +87,15 @@ export const useMediaMovieDetailsQuery = ({
 		queryFn: async () => {
 			if (!id) throw Error('No id or type provided');
 			const { data, error } = await supabase
-				.from('media_movie')
+				.from('media_movie_full')
 				.select(`
 					*,
 					cast:media_movie_casting(
 						*,
 						person:media_person(*)
-					),
-					videos:tmdb_movie_videos(*)	
+					)
 				`)
-				.match({
-					'id': id,
-					'videos.iso_639_1': locale.split('-')[0],
-					'videos.type': 'Trailer',
-				})
-				.order('published_at', { referencedTable: 'videos', ascending: true, nullsFirst: false })
+				.eq('id', id)
 				.maybeSingle()
 				.overrideTypes<MediaMovie, { merge: true }>();
 			if (error) throw error;
@@ -124,22 +118,16 @@ export const useMediaTvSeriesDetailsQuery = ({
 		queryFn: async () => {
 			if (!id) throw Error('No id or type provided');
 			const { data, error } = await supabase
-				.from('media_tv_series')
+				.from('media_tv_series_full')
 				.select(`
 					*,
 					cast:media_tv_series_casting(
 						*,
 						person:media_person(*)
 					),
-					videos:tmdb_tv_series_videos(*),
 					seasons:media_tv_series_seasons(*)
 				`)
-				.match({
-					'id': id,
-					'videos.iso_639_1': locale.split('-')[0],
-					'videos.type': 'Trailer',
-				})
-				.order('published_at', { referencedTable: 'videos', ascending: true, nullsFirst: false })
+				.eq('id', id)
 				.maybeSingle()
 				.overrideTypes<MediaTvSeries, { merge: true }>();
 			if (error) throw error;

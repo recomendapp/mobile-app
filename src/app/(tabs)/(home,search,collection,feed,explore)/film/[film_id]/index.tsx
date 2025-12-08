@@ -2,7 +2,7 @@ import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, useLocalSearchParams } from "expo-router"
 import { clamp, lowerCase, upperFirst } from "lodash";
 import { Pressable, useWindowDimensions, ViewProps } from "react-native";
-import { MediaMovie, MediaMovieCasting } from "@recomendapp/types";
+import { Database, MediaMovie, MediaMovieCasting } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
@@ -12,7 +12,7 @@ import { useState, useCallback, useMemo } from "react";
 import { useLocale, useTranslations } from "use-intl";
 import { Text, TextProps } from "@/components/ui/text";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
-import { GAP, GAP_XS, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { BORDER_RADIUS_FULL, GAP, GAP_XS, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import MovieHeader from "@/components/screens/film/MovieHeader";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import MovieWidgetReviews from "@/components/screens/film/MovieWidgetReviews";
@@ -31,6 +31,10 @@ import ButtonUserActivityMovieWatchDate from "@/components/buttons/movies/Button
 import { ButtonPlaylistMovieAdd } from "@/components/buttons/ButtonPlaylistMovieAdd";
 import ButtonUserRecoMovieSend from "@/components/buttons/movies/ButtonUserRecoMovieSend";
 import AnimatedContentContainer from "@/components/ui/AnimatedContentContainer";
+import { Icons } from "@/constants/Icons";
+import YoutubePlayer from "react-native-youtube-iframe";
+import { Vimeo } from 'react-native-vimeo-iframe'
+import { LegendList } from "@legendapp/list";
 
 const FilmScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
@@ -50,8 +54,6 @@ const FilmScreen = () => {
 	});
 
 	const loading = movie === undefined || isLoading;
-
-	// States
 
 	// SharedValue
 	const headerHeight = useSharedValue<number>(0);
@@ -122,6 +124,7 @@ const FilmScreen = () => {
 							</Button>
 						</Link>
 					</View>
+					<FilmTrailers movie={movie} />
 					<MovieWidgetPlaylists movieId={movie.id!} url={movie.url as Href} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}/>
 					<MovieWidgetReviews movie={movie} url={movie.url as Href} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }}/>
 				</View>
@@ -221,6 +224,72 @@ const FilmCast = ({
 			}}
 			snapToInterval={width + GAP}
 			decelerationRate={"fast"}
+			/>
+		</View>
+	)
+};
+
+const FilmTrailers = ({
+	movie,
+} : {
+	movie: MediaMovie
+}) => {
+	const { colors } = useTheme();
+	const t = useTranslations();
+	// UI
+	const { width } = useWindowDimensions();
+	const playerWidth = width - PADDING_HORIZONTAL * 2;
+	const playerHeight = playerWidth * 9 / 16;
+	// States
+	const [selectedTrailer, setSelectedTrailer] = useState<Database['public']['Tables']['tmdb_movie_videos']['Row'] | null>(movie.trailers?.at(0) || null);
+	const normalizedSite = useMemo(() => selectedTrailer?.site.toLowerCase(), [selectedTrailer]);
+	// Render
+	const renderItem = useCallback(({ item }: { item: Database['public']['Tables']['tmdb_movie_videos']['Row'] }) => {
+		const label = item.iso_639_1 === movie.original_language ? 'VO' : (item.iso_639_1?.toUpperCase() || 'N/A');
+		return (
+			<Button variant={item.id === selectedTrailer?.id ? 'accent-yellow' : 'outline'} onPress={() => setSelectedTrailer(item)} style={{ borderRadius: BORDER_RADIUS_FULL }}>
+				{label}
+			</Button>
+		)
+	}, [selectedTrailer, movie.original_language]);
+	if (!movie.trailers?.length || !selectedTrailer) return null;
+	return (
+		<View style={{ gap: GAP }}> 
+			<View style={[tw`flex-row items-center`, { gap: GAP, marginHorizontal: PADDING_HORIZONTAL }]}>
+				<Icons.PlayCircle color={colors.foreground} />
+				<Text style={tw`text-lg font-medium`}>
+					{upperFirst(t('common.messages.trailer', { count: 2 }))}
+				</Text>
+			</View>
+			<View style={{ marginHorizontal: PADDING_HORIZONTAL }}>
+				{
+					normalizedSite === 'youtube' ? (
+						<YoutubePlayer
+						height={playerHeight}
+						videoId={selectedTrailer.key}
+						/>
+					) : normalizedSite === 'vimeo' ? (
+						<Vimeo
+						videoId={selectedTrailer.key}
+						params={'api=1&controls=1'}
+						style={{ width: '100%', aspectRatio: 16 / 9 }}
+						/>
+					) : (
+						<View style={[tw`items-center justify-center`, { width: '100%', aspectRatio: 16 / 9, backgroundColor: colors.muted }]}>
+							<Text style={{ color: colors.mutedForeground }}>
+								{upperFirst(t('common.messages.trailer', { count: 1 }))} not supported.
+							</Text>
+						</View>
+					)
+				}
+			</View>
+			<LegendList
+			data={movie.trailers || []}
+			extraData={selectedTrailer}
+			renderItem={renderItem}
+			horizontal
+			showsHorizontalScrollIndicator={false}
+			contentContainerStyle={{ paddingHorizontal: PADDING_HORIZONTAL, gap: GAP }}
 			/>
 		</View>
 	)

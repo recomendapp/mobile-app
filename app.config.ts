@@ -194,13 +194,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		],
 		["expo-apple-authentication"],
 		[
-			"expo-video",
-			{
-				"supportsBackgroundPlayback": false,
-				"supportsPictureInPicture": false
-			}
-		],
-		[
 			"expo-asset",
 			{
 				"assets": [

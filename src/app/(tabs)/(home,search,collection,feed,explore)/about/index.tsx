@@ -291,7 +291,7 @@ const AboutScreen = () => {
   ], [t, resources, colors.accentPink, colors.foreground, colors.muted, colors.mutedForeground, colors.accentYellow]);
 
   return (
-    <ScrollView contentContainerStyle={{ paddingBottom: bottomOffset + PADDING_VERTICAL, paddingTop: PADDING_VERTICAL, gap: GAP_XL }}>
+    <ScrollView contentContainerStyle={{ paddingBottom: bottomOffset + PADDING_VERTICAL, paddingTop: PADDING_VERTICAL, gap: GAP_XL, justifyContent: 'center', alignItems: 'center' }}>
       {sections.map((section, index) => (
         <View key={index} style={[tw`px-4 flex flex-col max-w-xl`, { gap: GAP }]}>
           {section.title && (

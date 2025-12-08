@@ -69,7 +69,7 @@ const CardReviewTvSeriesDefault = React.forwardRef<
 					) : <Skeleton style={tw.style("h-4 w-1/3")} />
 				)}
 				{!skeleton ? (
-					<Text numberOfLines={3} style={tw.style("text-justify")}>
+					<Text numberOfLines={3} style={tw.style("text-sm text-justify")}>
 						{convert(review.body, {
 							selectors: [
 								{ selector: 'a', options: { ignoreHref: true } },

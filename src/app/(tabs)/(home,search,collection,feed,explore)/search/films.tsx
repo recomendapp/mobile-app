@@ -20,6 +20,7 @@ import { MediaMovie } from "@recomendapp/types";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSearchMoviesOptions } from "@/api/options";
 import ErrorMessage from "@/components/ErrorMessage";
+import { useKeyboardState } from "react-native-keyboard-controller";
 
 const FiltersSheet = forwardRef<RNTrueSheet>((_, ref) => {
 	const insets = useSafeAreaInsets();
@@ -56,6 +57,10 @@ FiltersSheet.displayName = 'FiltersSheet';
 const SearchFilmsScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { tabBarHeight, bottomOffset } = useTheme();
+	const {
+		isVisible: keyboardVisible,
+		height: keyboardHeight,
+	} = useKeyboardState((state) => state);
 	// const navigation = useNavigation();
 	const t = useTranslations();
 	const search = useSearchStore(state => state.search);
@@ -111,11 +116,11 @@ const SearchFilmsScreen = () => {
 			contentContainerStyle={{
 				paddingLeft: insets.left + PADDING_HORIZONTAL,
 				paddingRight: insets.right + PADDING_HORIZONTAL,
-				paddingBottom: bottomOffset + PADDING_VERTICAL,
+				paddingBottom: keyboardVisible ? keyboardHeight + PADDING_VERTICAL : bottomOffset + PADDING_VERTICAL,
 				gap: GAP,
 			}}
 			scrollIndicatorInsets={{
-				bottom: tabBarHeight,
+				bottom: keyboardVisible ? (keyboardHeight - insets.bottom) : tabBarHeight,
 			}}
 			keyExtractor={(item) => item.id.toString()}
 			ListEmptyComponent={
@@ -129,6 +134,7 @@ const SearchFilmsScreen = () => {
 					</View>
 				)
 			}
+			keyboardShouldPersistTaps="handled"
 			onRefresh={refetch}
 			refreshing={isRefetching}
 			onEndReached={() => hasNextPage && fetchNextPage()}

@@ -2,7 +2,7 @@ import { useMediaTvSeriesDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, useLocalSearchParams } from "expo-router"
 import { clamp, lowerCase, upperFirst } from "lodash";
 import { Pressable, useWindowDimensions, View, ViewProps } from "react-native";
-import { MediaTvSeries, MediaTvSeriesCasting } from "@recomendapp/types";
+import { Database, MediaTvSeries, MediaTvSeriesCasting } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
@@ -13,7 +13,7 @@ import TvSeriesWidgetSeasons from "@/components/screens/tv-series/TvSeriesWidget
 import { useLocale, useTranslations } from "use-intl";
 import { Text, TextProps } from "@/components/ui/text";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
-import { GAP, GAP_XS, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { BORDER_RADIUS_FULL, GAP, GAP_XS, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 import { CardPerson } from "@/components/cards/CardPerson";
 import TvSeriesHeader from "@/components/screens/tv-series/TvSeriesHeader";
@@ -30,6 +30,10 @@ import { ButtonUserWatchlistTvSeries } from "@/components/buttons/tv-series/Butt
 import { ButtonPlaylistTvSeriesAdd } from "@/components/buttons/ButtonPlaylistTvSeriesAdd";
 import ButtonUserRecoTvSeriesSend from "@/components/buttons/tv-series/ButtonUserRecoTvSeriesSend";
 import AnimatedContentContainer from "@/components/ui/AnimatedContentContainer";
+import { Icons } from "@/constants/Icons";
+import YoutubePlayer from "react-native-youtube-iframe";
+import { LegendList } from "@legendapp/list";
+import { Vimeo } from "react-native-vimeo-iframe";
 
 const TvSeriesScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
@@ -119,6 +123,7 @@ const TvSeriesScreen = () => {
 							</Button>
 						</Link>
 					</View>
+					<TvSeriesTrailers tvSeries={series} />
 					<TvSeriesWidgetPlaylists tvSeriesId={series.id} url={series.url as Href} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
 					<TvSeriesWidgetReviews tvSeries={series} url={series.url as Href} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
 				</View>
@@ -218,6 +223,73 @@ const TvSeriesCast = ({
 			}}
 			snapToInterval={width + GAP}
 			decelerationRate={"fast"}
+			/>
+		</View>
+	)
+};
+
+const TvSeriesTrailers = ({
+	tvSeries,
+} : {
+	tvSeries: MediaTvSeries
+}) => {
+	const { colors } = useTheme();
+	const t = useTranslations();
+	// UI
+	const { width } = useWindowDimensions();
+	const playerWidth = width - PADDING_HORIZONTAL * 2;
+	const playerHeight = playerWidth * 9 / 16;
+	// States
+	const [selectedTrailer, setSelectedTrailer] = useState<Database['public']['Tables']['tmdb_tv_series_videos']['Row'] | null>(tvSeries.trailers?.at(0) || null);
+	const normalizedSite = useMemo(() => selectedTrailer?.site.toLowerCase(), [selectedTrailer]);
+	// Render
+	const renderItem = useCallback(({ item }: { item: Database['public']['Tables']['tmdb_tv_series_videos']['Row'] }) => {
+		const label = item.iso_639_1 === tvSeries.original_language ? 'VO' : (item.iso_639_1?.toUpperCase() || 'N/A');
+		return (
+			<Button variant={item.id === selectedTrailer?.id ? 'accent-yellow' : 'outline'} onPress={() => setSelectedTrailer(item)} style={{ borderRadius: BORDER_RADIUS_FULL }}>
+				{label}
+			</Button>
+		)
+	}, [selectedTrailer, tvSeries.original_language]);
+	if (!tvSeries.trailers?.length || !selectedTrailer) return null;
+	return (
+		<View style={{ gap: GAP }}> 
+			<View style={[tw`flex-row items-center`, { gap: GAP, marginHorizontal: PADDING_HORIZONTAL }]}>
+				<Icons.PlayCircle color={colors.foreground} />
+				<Text style={tw`text-lg font-medium`}>
+					{upperFirst(t('common.messages.trailer', { count: 2 }))}
+				</Text>
+			</View>
+			<View style={{ marginHorizontal: PADDING_HORIZONTAL }}>
+
+				{
+					normalizedSite === 'youtube' ? (
+						<YoutubePlayer
+						height={playerHeight}
+						videoId={selectedTrailer.key}
+						/>
+					) : normalizedSite === 'vimeo' ? (
+						<Vimeo
+						videoId={selectedTrailer.key}
+						params={'api=1&controls=1'}
+						style={{ width: '100%', aspectRatio: 16 / 9 }}
+						/>
+					) : (
+						<View style={[tw`items-center justify-center`, { width: '100%', aspectRatio: 16 / 9, backgroundColor: colors.muted }]}>
+							<Text style={{ color: colors.mutedForeground }}>
+								{upperFirst(t('common.messages.trailer', { count: 1 }))} not supported.
+							</Text>
+						</View>
+					)
+				}
+			</View>
+			<LegendList
+			data={tvSeries.trailers || []}
+			extraData={selectedTrailer}
+			renderItem={renderItem}
+			horizontal
+			showsHorizontalScrollIndicator={false}
+			contentContainerStyle={{ paddingHorizontal: PADDING_HORIZONTAL, gap: GAP }}
 			/>
 		</View>
 	)

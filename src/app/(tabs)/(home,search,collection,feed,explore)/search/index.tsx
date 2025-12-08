@@ -25,7 +25,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchMultiOptions } from "@/api/options";
 import { BestResultItem } from "@recomendapp/api-js";
 import ErrorMessage from "@/components/ErrorMessage";
-import { KeyboardAwareScrollViewRef } from "react-native-keyboard-controller";
+import { KeyboardAwareScrollViewRef, useKeyboardState } from "react-native-keyboard-controller";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SearchScreen = () => {
 	const search = useSearchStore(state => state.search);
@@ -42,8 +43,14 @@ interface SearchResultsProps extends React.ComponentPropsWithoutRef<typeof Scrol
 };
 
 export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
+	const insets = useSafeAreaInsets();
 	const { bottomOffset, tabBarHeight } = useTheme();
 	const t = useTranslations();
+	const {
+		isVisible: keyboardVisible,
+		height: keyboardHeight,
+	} = useKeyboardState((state) => state);
+
 
 	const {
 		data,
@@ -65,11 +72,11 @@ export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
 	ref={scrollRef}
 	contentContainerStyle={{
 		gap: GAP,
-		paddingBottom: bottomOffset + PADDING_VERTICAL,
+		paddingBottom: keyboardVisible ? PADDING_VERTICAL : bottomOffset + PADDING_VERTICAL,
 	}}
-	keyboardShouldPersistTaps='always'
+	keyboardShouldPersistTaps='handled'
 	scrollIndicatorInsets={{
-		bottom: tabBarHeight,
+		bottom: keyboardVisible ? (keyboardHeight - insets.bottom) : tabBarHeight,
 	}}
 	refreshControl={
 		<RefreshControl
