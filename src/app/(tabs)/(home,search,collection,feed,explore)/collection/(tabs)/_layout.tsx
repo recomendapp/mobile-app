@@ -110,7 +110,7 @@ const CollectionLayout = () => {
 			),
 			headerRight: () => (
 			<View style={tw`flex-row items-center gap-1`}>
-				<ButtonCreatePlaylist variant="ghost" size="icon" redirectAfterCreate={false} />
+				<ButtonCreatePlaylist redirectAfterCreate={false} />
 				<UserNav />
 			</View>
 			)

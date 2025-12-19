@@ -11,9 +11,9 @@ import { useSharedValue } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
-import { ICON_ACTION_SIZE } from "@/theme/globals";
 import { useToast } from "@/components/Toast";
-import { forwardRef } from "react";
+import { forwardRef, useCallback } from "react";
+import tw from "@/lib/tw";
 
 interface ButtonUserActivityTvSeriesLikeProps
 	extends React.ComponentProps<typeof Button> {
@@ -23,7 +23,7 @@ interface ButtonUserActivityTvSeriesLikeProps
 const ButtonUserActivityTvSeriesLike = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserActivityTvSeriesLikeProps
->(({ tvSeries, icon = Icons.like, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
+>(({ tvSeries, icon = Icons.like, variant = "outline", size = "icon", style, onPress: onPressProps, iconProps, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session } = useAuth();
 	const toast = useToast();
@@ -41,7 +41,7 @@ const ButtonUserActivityTvSeriesLike = forwardRef<
 	const { mutateAsync: updateActivity } = useUserActivityTvSeriesUpdateMutation();
 	const isLiked = useSharedValue(activity?.is_liked ? 1 : 0);
 
-	const handleLike = async () => {
+	const handleLike = useCallback(async () => {
 		if (!session) return;
 		isLiked.value = 1;
 		if (activity) {
@@ -76,8 +76,8 @@ const ButtonUserActivityTvSeriesLike = forwardRef<
 				}
 			});
 		}
-	};
-	const handleUnlike = async () => {
+	}, [activity, insertActivity, tvSeries.id, queryClient, session, toast, t, updateActivity, isLiked]);
+	const handleUnlike = useCallback(async () => {
 		if (!session) return;
 		if (!activity) return;
 		isLiked.value = 0;
@@ -95,7 +95,7 @@ const ButtonUserActivityTvSeriesLike = forwardRef<
 				isLiked.value = 1;
 			}
 		});
-	};
+	}, [activity, queryClient, session, toast, t, updateActivity, isLiked]);
 
 	return (
 		<Button
@@ -121,10 +121,13 @@ const ButtonUserActivityTvSeriesLike = forwardRef<
 			onPressProps?.(e);
 		}}
 		iconProps={{
-			color: activity?.is_liked ? colors.accentPink : colors.foreground,
-			fill: activity?.is_liked ? colors.accentPink : 'transparent',
-			size: ICON_ACTION_SIZE,
+			fill: activity?.is_liked ? colors.foreground : 'transparent',
 			...iconProps,
+		}}
+		style={{
+			...({ backgroundColor: activity?.is_liked ? colors.accentPink : 'transparent' }),
+			...tw`rounded-full`,
+			...style,
 		}}
 		{...props}
 		/>

@@ -705,7 +705,8 @@ export const useUserReviewMovieUpsertMutation = ({
 					},
 				};
 			});
-		}
+		},
+		throwOnError: true,
 	});
 };
 export const useUserReviewMovieDeleteMutation = () => {
@@ -859,7 +860,8 @@ export const useUserReviewTvSeriesUpsertMutation = ({
 					},
 				};
 			});
-		}
+		},
+		throwOnError: true,
 	});
 };
 export const useUserReviewTvSeriesDeleteMutation = () => {

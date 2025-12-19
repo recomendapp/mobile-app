@@ -5,7 +5,7 @@ import { MediaMovie } from "@recomendapp/types";
 import { useAuth } from "@/providers/AuthProvider";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
-import { ICON_ACTION_SIZE } from "@/theme/globals";
+import tw from "@/lib/tw";
 
 interface ButtonUserRecoMovieSendProps
 	extends React.ComponentProps<typeof Button> {
@@ -15,7 +15,7 @@ interface ButtonUserRecoMovieSendProps
 const ButtonUserRecoMovieSend = React.forwardRef<
 	React.ComponentRef<typeof Pressable>,
 	ButtonUserRecoMovieSendProps
->(({ movie, icon = Icons.Reco, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
+>(({ movie, icon = Icons.Reco, variant = "outline", size = "icon", style, onPress: onPressProps, ...props }, ref) => {
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -44,9 +44,9 @@ const ButtonUserRecoMovieSend = React.forwardRef<
 			}
 			onPressProps?.(e);
 		}}
-		iconProps={{
-			size: ICON_ACTION_SIZE,
-			...iconProps,
+		style={{
+			...tw`rounded-full`,
+			...style,
 		}}
 		{...props}
 		/>

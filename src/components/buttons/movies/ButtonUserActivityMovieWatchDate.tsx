@@ -3,7 +3,6 @@ import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import { MediaMovie } from "@recomendapp/types";
 import { Button } from "@/components/ui/Button";
-import { ICON_ACTION_SIZE } from "@/theme/globals";
 import { useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
@@ -22,7 +21,7 @@ interface ButtonUserActivityMovieWatchDateProps
 const ButtonUserActivityMovieWatchDate = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserActivityMovieWatchDateProps
->(({ movie, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
+>(({ movie, variant = "outline", size = "icon", style, onPress: onPressProps, ...props }, ref) => {
 	const { session } = useAuth();
 	const insets = useSafeAreaInsets();
 	const { colors, mode } = useTheme();
@@ -72,15 +71,15 @@ const ButtonUserActivityMovieWatchDate = forwardRef<
 		<Button
 		ref={ref}
 		variant={variant}
-		iconProps={{
-			size: ICON_ACTION_SIZE,
-			...iconProps
-		}}
 		size={size}
 		icon={Icons.Calendar}
 		onPress={(e) => {
 			showDatePicker();
 			onPressProps?.(e);
+		}}
+		style={{
+			...tw`rounded-full`,
+			...style,
 		}}
 		{...props}
 		/>

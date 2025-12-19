@@ -4,8 +4,8 @@ import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
-import { ICON_ACTION_SIZE } from "@/theme/globals";
 import { MediaMovie } from "@recomendapp/types";
+import tw from "@/lib/tw";
 
 interface ButtonPlaylistMovieAddProps
 	extends React.ComponentProps<typeof Button> {
@@ -15,7 +15,7 @@ interface ButtonPlaylistMovieAddProps
 export const ButtonPlaylistMovieAdd = React.forwardRef<
 	React.ComponentRef<typeof Pressable>,
 	ButtonPlaylistMovieAddProps
->(({ movie, icon = Icons.AddPlaylist, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
+>(({ movie, icon = Icons.AddPlaylist, variant = "outline", size = "icon", style, onPress: onPressProps, ...props }, ref) => {
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -44,9 +44,9 @@ export const ButtonPlaylistMovieAdd = React.forwardRef<
 			}
 			onPressProps?.(e);
 		}}
-		iconProps={{
-			size: ICON_ACTION_SIZE,
-			...iconProps,
+		style={{
+			...tw`rounded-full`,
+			...style,
 		}}
 		{...props}
 		/>

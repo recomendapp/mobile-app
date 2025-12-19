@@ -51,7 +51,7 @@ const ReviewTvSeriesScreen = () => {
 		options={{
 			headerRight: () => (
 			<>
-				{session && <ButtonUserReviewTvSeriesLike reviewId={review?.id} />}
+				{session && <ButtonUserReviewTvSeriesLike variant="ghost" reviewId={review?.id} />}
 				<Button
 				variant="ghost"
 				size="icon"

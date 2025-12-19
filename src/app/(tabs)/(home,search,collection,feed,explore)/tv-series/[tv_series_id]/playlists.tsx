@@ -86,9 +86,9 @@ const TvSeriesPlaylists = () => {
 			title: tvSeries?.name || '',
 			headerTitle: (props) => <HeaderTitle {...props}>{upperFirst(t('common.messages.playlist', { count: 2 }))}</HeaderTitle>,
 			headerRight: (session && tvSeries) ? () => (
-				<ButtonPlaylistTvSeriesAdd tvSeries={tvSeries} />
+				<ButtonPlaylistTvSeriesAdd variant="ghost" tvSeries={tvSeries} />
 			) : undefined,
-		}), [tvSeries?.name, session, t])}
+		}), [tvSeries, session, t])}
 		/>
 		<LegendList
 		data={playlists}

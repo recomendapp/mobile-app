@@ -130,14 +130,14 @@ const TvSeriesScreen = () => {
 			)}
 		</AnimatedContentContainer>
 		{series && session && (
-			<FloatingBar bottomOffset={bottomOffset + PADDING_VERTICAL} height={floatingBarHeight} containerStyle={{ paddingHorizontal: 0 }} style={[tw`flex-row items-center justify-between`, { paddingVertical: PADDING_HORIZONTAL }]}>
-				<View style={tw`flex-row items-center gap-4`}>
+			<FloatingBar bottomOffset={bottomOffset + PADDING_VERTICAL} height={floatingBarHeight} containerStyle={{ paddingHorizontal: 0 }} style={tw`flex-row items-center justify-between`}>
+				<View style={tw`flex-row items-center gap-2`}>
 					<ButtonUserActivityTvSeriesRating tvSeries={series} />
 					<ButtonUserActivityTvSeriesLike tvSeries={series} />
 					<ButtonUserActivityTvSeriesWatch tvSeries={series} />
 					<ButtonUserWatchlistTvSeries tvSeries={series} />
 				</View>
-				<View style={tw`flex-row items-center gap-4`}>
+				<View style={tw`flex-row items-center gap-2`}>
 					<ButtonPlaylistTvSeriesAdd tvSeries={series} />
 					<ButtonUserRecoTvSeriesSend tvSeries={series} />
 				</View>

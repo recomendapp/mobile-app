@@ -8,11 +8,11 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
-import { ICON_ACTION_SIZE } from "@/theme/globals";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { BottomSheetWatchlistTvSeriesComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistTvSeriesComment";
 import { useToast } from "@/components/Toast";
-import { forwardRef } from "react";
+import { forwardRef, useCallback } from "react";
+import tw from "@/lib/tw";
 
 interface ButtonUserWatchlistTvSeriesProps
 	extends React.ComponentProps<typeof Button> {
@@ -22,7 +22,7 @@ interface ButtonUserWatchlistTvSeriesProps
 export const ButtonUserWatchlistTvSeries = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserWatchlistTvSeriesProps
->(({ tvSeries, icon = Icons.Watchlist, variant = "ghost", size = "fit", onPress: onPressProps, onLongPress: onLongPressProps, iconProps, ...props }, ref) => {
+>(({ tvSeries, icon = Icons.Watchlist, variant = "outline", size = "icon", style, onPress: onPressProps, onLongPress: onLongPressProps, iconProps, ...props }, ref) => {
 	const { colors } = useTheme();
 	const toast = useToast();
 	const { session } = useAuth();
@@ -40,7 +40,7 @@ export const ButtonUserWatchlistTvSeries = forwardRef<
 	const { mutateAsync: insertWatchlist } = useUserWatchlistTvSeriesInsertMutation();
 	const { mutateAsync: deleteWatchlist } = useUserWatchlistTvSeriesDeleteMutation();
 
-	const handleWatchlist = async () => {
+	const handleWatchlist = useCallback(async () => {
 		if (watchlist) return;
 		if (!session || !tvSeries.id) {
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
@@ -54,8 +54,8 @@ export const ButtonUserWatchlistTvSeries = forwardRef<
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 		  }
 		});
-	};
-	const handleUnwatchlist = async () => {
+	}, [insertWatchlist, tvSeries.id, session, toast, t, watchlist]);
+	const handleUnwatchlist = useCallback(async () => {
 		if (!watchlist) return;
 		if (!watchlist.id) {
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
@@ -68,7 +68,7 @@ export const ButtonUserWatchlistTvSeries = forwardRef<
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 		  }
 		});
-	};
+	}, [deleteWatchlist, watchlist, toast, t]);
 
 	return (
 		<Button
@@ -101,8 +101,11 @@ export const ButtonUserWatchlistTvSeries = forwardRef<
 		}}
 		iconProps={{
 			fill: watchlist ? colors.foreground : 'transparent',
-			size: ICON_ACTION_SIZE,
 			...iconProps
+		}}
+		style={{
+			...tw`rounded-full`,
+			...style,
 		}}
 		{...props}
 		/>

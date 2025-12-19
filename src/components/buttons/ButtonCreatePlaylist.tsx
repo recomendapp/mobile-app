@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useCallback } from "react";
 import { Icons } from "@/constants/Icons";
 import { useRouter } from "expo-router";
 import BottomSheetPlaylistCreate from "../bottom-sheets/sheets/BottomSheetPlaylistCreate";
@@ -17,14 +17,14 @@ const ButtonCreatePlaylist = forwardRef<
 >(({ variant = "muted", icon = Icons.Add, size = "icon", onPress, redirectAfterCreate = true, ...props }, ref) => {
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const router = useRouter();
-	const handlePress = (e: GestureResponderEvent) => {
+	const handlePress = useCallback((e: GestureResponderEvent) => {
 		openSheet(BottomSheetPlaylistCreate, {
 			onCreate: (playlist) => {
 				redirectAfterCreate && router.push(`/playlist/${playlist.id}`);
 			}
 		});
 		onPress?.(e);
-	};
+	}, [openSheet, router, redirectAfterCreate, onPress]);
 	return (
 		<Button
 		ref={ref}

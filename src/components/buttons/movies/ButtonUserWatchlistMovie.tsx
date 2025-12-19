@@ -8,11 +8,12 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
-import { ICON_ACTION_SIZE } from "@/theme/globals";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { BottomSheetWatchlistMovieComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistMovieComment";
 import { useToast } from "@/components/Toast";
-import { forwardRef } from "react";
+import { forwardRef, useCallback } from "react";
+import tw from "@/lib/tw";
+
 interface ButtonUserWatchlistMovieProps
 	extends React.ComponentProps<typeof Button> {
 		movie: MediaMovie;
@@ -21,7 +22,7 @@ interface ButtonUserWatchlistMovieProps
 export const ButtonUserWatchlistMovie = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserWatchlistMovieProps
->(({ movie, icon = Icons.Watchlist, variant = "ghost", size = "fit", onPress: onPressProps, onLongPress: onLongPressProps, iconProps, ...props }, ref) => {
+>(({ movie, icon = Icons.Watchlist, variant = "outline", size = "icon", style, onPress: onPressProps, onLongPress: onLongPressProps, iconProps, ...props }, ref) => {
 	const { colors } = useTheme();
 	const toast = useToast();
 	const { session } = useAuth();
@@ -39,7 +40,7 @@ export const ButtonUserWatchlistMovie = forwardRef<
 	const { mutateAsync: insertWatchlist } = useUserWatchlistMovieInsertMutation();
 	const { mutateAsync: deleteWatchlist } = useUserWatchlistMovieDeleteMutation();
 
-	const handleWatchlist = async () => {
+	const handleWatchlist = useCallback(async () => {
 		if (watchlist) return;
 		if (!session || !movie.id) {
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
@@ -53,8 +54,8 @@ export const ButtonUserWatchlistMovie = forwardRef<
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 		  }
 		});
-	};
-	const handleUnwatchlist = async () => {
+	}, [insertWatchlist, movie.id, session, toast, t, watchlist]);
+	const handleUnwatchlist = useCallback(async () => {
 		if (!watchlist) return;
 		if (!watchlist.id) {
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
@@ -67,7 +68,7 @@ export const ButtonUserWatchlistMovie = forwardRef<
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 		  }
 		});
-	};
+	}, [deleteWatchlist, toast, t, watchlist]);
 
 	return (
 	<Button
@@ -100,8 +101,11 @@ export const ButtonUserWatchlistMovie = forwardRef<
 	}}
 	iconProps={{
 		fill: watchlist ? colors.foreground : 'transparent',
-		size: ICON_ACTION_SIZE,
 		...iconProps
+	}}
+	style={{
+		...tw`rounded-full`,
+		...style,
 	}}
 	{...props}
 	/>

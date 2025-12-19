@@ -219,21 +219,6 @@ const MovieHeader: React.FC<MovieHeaderProps> = ({
 				{movie ? <MovieHeaderInfo movie={movie} /> : loading ? <Skeleton style={tw`w-32 h-8`} /> : null}
 			</Animated.View>
 		</Animated.View>
-		{/* {movie && (
-		<View style={[tw`flex-row items-center justify-between gap-4`, { paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }]}>
-			<View style={tw`flex-row items-center gap-4`}>
-				<ButtonUserActivityMovieRating movie={movie} />
-				<ButtonUserActivityMovieLike movie={movie} />
-				<ButtonUserActivityMovieWatch movie={movie} />
-				<ButtonUserWatchlistMovie movie={movie} />
-				<ButtonUserActivityMovieWatchDate movie={movie} />
-			</View>
-			<View style={tw`flex-row items-center gap-4`}>
-				<ButtonPlaylistMovieAdd movie={movie} />
-				<ButtonUserRecoMovieSend movie={movie} />
-			</View>
-		</View>
-		)} */}
 	</Animated.View>
 	);
 };

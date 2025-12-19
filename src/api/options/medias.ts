@@ -13,8 +13,6 @@ export const useMediaMovieDetailsOptions = ({
 		queryKey: Keys.medias.details({ mediaId: mediaId!, mediaType: 'movie' }),
 		queryFn: async () => {
 			if (!mediaId) throw new Error('mediaId is required');
-			// fake delay to simulate loading
-			await new Promise((resolve) => setTimeout(resolve, 1000));
 			const { data, error } = await supabase
 				.from('media_movie')
 				.select('*')

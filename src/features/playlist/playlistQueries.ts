@@ -188,7 +188,6 @@ export const usePlaylistGuestsSearchInfiniteQuery = ({
 				? lastPage.pagination.current_page + 1
 				: undefined;
 		},
-		throwOnError: true,
 		enabled: !!playlistId && !!query && !!query.length,
 	});
 };
@@ -243,7 +242,6 @@ export const usePlaylistFeaturedInfiniteQuery = ({
 		getNextPageParam: (lastPage, pages) => {
 			return lastPage?.length === mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
 		},
-		throwOnError: true,
 	});
 };
 /* -------------------------------------------------------------------------- */

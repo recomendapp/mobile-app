@@ -4,8 +4,8 @@ import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
-import { ICON_ACTION_SIZE } from "@/theme/globals";
 import { MediaTvSeries } from "@recomendapp/types";
+import tw from "@/lib/tw";
 
 interface ButtonPlaylistTvSeriesAddProps
 	extends React.ComponentProps<typeof Button> {
@@ -15,7 +15,7 @@ interface ButtonPlaylistTvSeriesAddProps
 export const ButtonPlaylistTvSeriesAdd = React.forwardRef<
 	React.ComponentRef<typeof Pressable>,
 	ButtonPlaylistTvSeriesAddProps
->(({ tvSeries, icon = Icons.AddPlaylist, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
+>(({ tvSeries, icon = Icons.AddPlaylist, variant = "outline", size = "icon", style, onPress: onPressProps, ...props }, ref) => {
 	const { session } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -44,9 +44,9 @@ export const ButtonPlaylistTvSeriesAdd = React.forwardRef<
 			}
 			onPressProps?.(e);
 		}}
-		iconProps={{
-			size: ICON_ACTION_SIZE,
-			...iconProps,
+		style={{
+			...tw`rounded-full`,
+			...style,
 		}}
 		{...props}
 		/>

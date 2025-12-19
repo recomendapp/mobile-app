@@ -24,7 +24,7 @@ import { Alert } from "react-native";
 const MAX_TITLE_LENGTH = 50;
 
 interface ReviewFormBaseProps {
-	onSave?: (review: { title: string; body: string }) => void;
+	onSave?: (review: { title: string; body: string }) => void | Promise<void>;
 };
 
 type ReviewFormMovieProps = {
@@ -65,6 +65,7 @@ const ReviewForm = ({
 	const headerHeight = useSharedValue(0);
 	const toolbarHeight = useSharedValue(0);
 	const { height: keyboardHeight, progress } = useReanimatedKeyboardAnimation();
+	const [isSaving, setIsSaving] = useState(false);
 	const hasChanges = useMemo(() => {
 		const bodyChanged = review ? (body !== null && body !== review.body) : (body !== null && body !== undefined && body.length > 0);
 		return title !== (review?.title || '') || bodyChanged;
@@ -76,16 +77,23 @@ const ReviewForm = ({
 	const [linkState, setLinkState] = useState<OnLinkDetected | null>(null);
 	// HANDLER
 	const handleSave = useCallback(async () => {
-		if (!activity?.rating) {
-			return toast.error(upperFirst(t('common.messages.a_rating_is_required_to_add_a_review')));
+		setIsSaving(true);
+		try {
+			if (!activity?.rating) {
+				setIsSaving(false);
+				return toast.error(upperFirst(t('common.messages.a_rating_is_required_to_add_a_review')));
+			}
+			if (!body) {
+				setIsSaving(false);
+				return toast.error(upperFirst(t('common.messages.review_cannot_be_empty')));
+			}
+			await onSave?.({
+				title: title,
+				body: body,
+			});
+		} catch {
+			setIsSaving(false);
 		}
-		if (!body) {
-			return toast.error(upperFirst(t('common.messages.review_cannot_be_empty')));
-		}
-		onSave?.({
-			title: title,
-			body: body,
-		})
 	}, [activity?.rating, onSave, title, t, toast, body]);
 
 	const scrollViewStyle = useAnimatedStyle(() => {
@@ -105,7 +113,7 @@ const ReviewForm = ({
 		};
 	});
 
-	usePreventRemove(hasChanges, ({ data }) => {
+	usePreventRemove((hasChanges && !isSaving), ({ data }) => {
 		Alert.alert(
 			upperFirst(t('common.messages.are_u_sure')),
 			upperFirst(t('common.messages.do_you_really_want_to_cancel_change', { count: 2 })),

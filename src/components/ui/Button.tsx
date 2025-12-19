@@ -124,7 +124,7 @@ export const Button = forwardRef<View, ButtonProps>(
         case 'outline':
           return {
             ...baseStyle,
-            backgroundColor: 'transparent',
+            backgroundColor: mutedColor,
             borderWidth: 1,
             borderColor,
           };

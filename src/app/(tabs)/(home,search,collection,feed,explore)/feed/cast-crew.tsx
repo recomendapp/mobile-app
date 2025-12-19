@@ -1,6 +1,8 @@
+import { useUIBackgroundsOptions } from "@/api/options";
 import { CardFeedCastCrewMovie } from "@/components/cards/feed/CardFeedCastCrewMovie";
 import { CardFeedCastCrewTvSeries } from "@/components/cards/feed/CardFeedCastCrewTvSeries";
 import { Button } from "@/components/ui/Button";
+import { LoopCarousel } from "@/components/ui/LoopCarousel";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import app from "@/constants/app";
@@ -12,6 +14,10 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { BORDER_RADIUS, GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { Database } from "@recomendapp/types";
+import { useQuery } from "@tanstack/react-query";
+import Color from "color";
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo } from "react";
@@ -22,6 +28,9 @@ const CastCrewFeedScreen = () => {
 	const router = useRouter();
 	const { tabBarHeight, bottomOffset, colors } = useTheme();
 	const { session, customerInfo } = useAuth();
+	const {
+		data: backgrounds,
+	} = useQuery(useUIBackgroundsOptions());
 	const {
 		data,
 		isLoading,
@@ -34,7 +43,7 @@ const CastCrewFeedScreen = () => {
 	const loading = isLoading || data === undefined;
 	const feed = useMemo(() => data?.pages.flat() || [], [data]);
 	// Render
-	const renderItem = ({ item } : { item: Database['public']['Functions']['get_feed_cast_crew']['Returns'][number], index: number }) => {
+	const renderItem = useCallback(({ item } : { item: Database['public']['Functions']['get_feed_cast_crew']['Returns'][number], index: number }) => {
 		switch (item.media_type) {
 			case 'movie':
 				return <CardFeedCastCrewMovie movie={item.media} person={item.person} jobs={item.jobs} />;
@@ -43,7 +52,7 @@ const CastCrewFeedScreen = () => {
 			default:
 				return <View style={[{ backgroundColor: colors.muted}, { borderRadius: BORDER_RADIUS, paddingVertical: PADDING_VERTICAL, paddingHorizontal: PADDING_HORIZONTAL }]}><Text textColor="muted" style={tw`text-center`}>Unsupported media type</Text></View>;
 		};
-	};
+	}, [colors.muted]);
 	const renderEmpty = useCallback(() => (
 		loading ? <Icons.Loader />
 		: (
@@ -70,8 +79,31 @@ const CastCrewFeedScreen = () => {
 	}
 	if (!customerInfo?.entitlements.active['premium']) {
 		return (
-			<View style={[tw`flex-1 items-center justify-center gap-2`, { paddingTop: PADDING_VERTICAL, paddingBottom: bottomOffset + PADDING_VERTICAL }]}>
+			<View style={[tw`flex-1 items-center justify-center`, { paddingTop: PADDING_VERTICAL, paddingBottom: bottomOffset + PADDING_VERTICAL }]}>
+				{backgrounds && (
+					<View style={tw`relative absolute inset-0`}>
+						<LoopCarousel
+						items={backgrounds}
+						containerStyle={tw`flex-1`}
+						renderItem={(item) => (
+							<Image source={item.localUri} contentFit="cover" style={tw`absolute inset-0`} />
+						)}
+						/>
+						<LinearGradient
+						colors={[Color(colors.background).hex(), 'transparent']}
+						style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '50%' }}
+						/>
+						<LinearGradient
+						colors={['transparent', Color(colors.background).hex()]}
+						style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '25%' }}
+						/>
+					</View>
+				)}
 				<Button
+				icon={Icons.premium}
+				iconProps={{
+					color: colors.accentBlue
+				}}
 				onPress={() => router.push({
 					pathname: '/upgrade',
 					params: {

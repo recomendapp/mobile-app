@@ -8,7 +8,8 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 import { useToast } from "../Toast";
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useCallback, useEffect, useState } from "react";
+import tw from "@/lib/tw";
 
 interface ButtonUserReviewMovieLikeProps
 	extends React.ComponentProps<typeof Button> {
@@ -19,7 +20,7 @@ interface ButtonUserReviewMovieLikeProps
 const ButtonUserReviewMovieLike = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserReviewMovieLikeProps
->(({ reviewId, reviewLikesCount, variant = "ghost", size, icon = Icons.like, onPress, ...props }, ref) => {
+>(({ reviewId, reviewLikesCount, variant = "outline", size, icon = Icons.like, style, onPress, ...props }, ref) => {
 	const { colors } = useTheme();
 	const { session } = useAuth();
 	const t = useTranslations();
@@ -34,7 +35,7 @@ const ButtonUserReviewMovieLike = forwardRef<
 	const { mutateAsync: insertLike } = useUserReviewMovieLikeInsertMutation();
 	const { mutateAsync: deleteLike } = useUserReviewMovieLikeDeleteMutation();
 
-	const handleLike = async () => {
+	const handleLike = useCallback(async () => {
 		if (!session?.user.id || !reviewId) return;
 		await insertLike({
 			userId: session.user.id,
@@ -47,8 +48,8 @@ const ButtonUserReviewMovieLike = forwardRef<
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
-	const handleUnlike = async () => {
+	}, [insertLike, reviewId, session, toast, t]);
+	const handleUnlike = useCallback(async () => {
 		if (!like) return;
 		await deleteLike({
 			likeId: like.id
@@ -60,7 +61,7 @@ const ButtonUserReviewMovieLike = forwardRef<
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
+	}, [deleteLike, like, toast, t]);
 
 	useEffect(() => {
 		setLikeCount(reviewLikesCount);
@@ -85,6 +86,10 @@ const ButtonUserReviewMovieLike = forwardRef<
 				await handleLike()
 			}
 			onPress?.(e);
+		}}
+		style={{
+			...tw`rounded-full`,
+			...style,
 		}}
 		{...props}
 		>

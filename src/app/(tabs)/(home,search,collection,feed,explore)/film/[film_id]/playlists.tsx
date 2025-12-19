@@ -85,7 +85,7 @@ const FilmPlaylists = () => {
 			title: movie?.title || '',
 			headerTitle: (props) => <HeaderTitle {...props}>{upperFirst(t('common.messages.playlist', { count: 2 }))}</HeaderTitle>,
 			headerRight: (session && movie) ? () => (
-				<ButtonPlaylistMovieAdd movie={movie} />
+				<ButtonPlaylistMovieAdd variant="ghost" movie={movie} />
 			) : undefined,
 		}), [movie, session, t])}
 		/>

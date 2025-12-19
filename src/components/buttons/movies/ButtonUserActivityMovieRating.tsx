@@ -6,26 +6,27 @@ import { MediaMovie } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
-import { ICON_ACTION_SIZE } from "@/theme/globals";
-import { IconMediaRating } from "@/components/medias/IconMediaRating";
 import BottomSheetRating from "@/components/bottom-sheets/sheets/BottomSheetRating";
 import { useUserActivityMovieInsertMutation, useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
-import { forwardRef } from "react";
+import { forwardRef, useCallback } from "react";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { useTheme } from "@/providers/ThemeProvider";
+import { Text } from "@/components/ui/text";
 
 interface ButtonUserActivityMovieRatingProps
-	extends React.ComponentProps<typeof Button> {
+	extends Omit<React.ComponentProps<typeof Button>, 'size'> {
 		movie: MediaMovie;
 	}
 
 const ButtonUserActivityMovieRating = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserActivityMovieRatingProps
->(({ movie, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, ...props }, ref) => {
+>(({ movie, variant = "outline", style, onPress: onPressProps, iconProps, ...props }, ref) => {
 	const { session } = useAuth();
+	const { colors } = useTheme();
 	const toast = useToast();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -42,7 +43,7 @@ const ButtonUserActivityMovieRating = forwardRef<
 	const { mutateAsync: insertActivity } = useUserActivityMovieInsertMutation();
 	const { mutateAsync: updateActivity } = useUserActivityMovieUpdateMutation();
 	// Handlers
-	const handleRate = async (rating: number) => {
+	const handleRate = useCallback(async (rating: number) => {
 		if (!session) return;
 		if (activity) {
 			await updateActivity({
@@ -64,8 +65,8 @@ const ButtonUserActivityMovieRating = forwardRef<
 				}
 			});
 		}
-	};
-	const handleUnrate = async () => {
+	}, [activity, insertActivity, movie.id, session, toast, t, updateActivity]);
+	const handleUnrate = useCallback(async () => {
 		if (activity?.review) {
 			toast.error(upperFirst(t('common.messages.an_error_occurred')), { description: 'You cannot unrate a media with a review.' });
 			return;
@@ -78,17 +79,14 @@ const ButtonUserActivityMovieRating = forwardRef<
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
+	}, [activity, toast, t, updateActivity]);
 
 	return (
 		<Button
 		ref={ref}
 		variant={variant}
-		iconProps={{
-			size: ICON_ACTION_SIZE,
-			...iconProps
-		}}
-		size={size}
+		iconProps={iconProps}
+		size={activity?.rating ? 'default' : 'icon'}
 		icon={!activity?.rating ? Icons.Star : undefined}
 		onPress={(e) => {
 			if (session) {
@@ -117,10 +115,15 @@ const ButtonUserActivityMovieRating = forwardRef<
 			}
 			onPressProps?.(e);
 		}}
+		style={{
+			...(!activity?.rating ? tw`rounded-full` : { backgroundColor: colors.background, borderColor: colors.accentYellow }),
+			...style,
+		}}
 		{...props}
 		>
-			{activity?.rating ? <IconMediaRating rating={activity.rating} style={tw`w-12`} /> : null}
-
+			{activity?.rating ? (
+				<Text style={tw`font-bold`}>{activity.rating}</Text>
+			) : null}
 		</Button>
 	);
 });

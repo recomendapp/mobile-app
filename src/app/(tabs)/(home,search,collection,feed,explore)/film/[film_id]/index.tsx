@@ -131,15 +131,15 @@ const FilmScreen = () => {
 			)}
 		</AnimatedContentContainer>
 		{movie && session && (
-			<FloatingBar bottomOffset={bottomOffset + PADDING_VERTICAL} height={floatingBarHeight} containerStyle={{ paddingHorizontal: 0 }} style={[tw`flex-row items-center justify-between`, { paddingVertical: PADDING_HORIZONTAL }]}>
-				<View style={tw`flex-row items-center gap-4`}>
+			<FloatingBar bottomOffset={bottomOffset + PADDING_VERTICAL} height={floatingBarHeight} containerStyle={{ paddingHorizontal: 0 }} style={tw`flex-row items-center justify-between`}>
+				<View style={tw`flex-row items-center gap-2`}>
 					<ButtonUserActivityMovieRating movie={movie} />
 					<ButtonUserActivityMovieLike movie={movie} />
 					<ButtonUserActivityMovieWatch movie={movie} />
 					<ButtonUserWatchlistMovie movie={movie} />
 					<ButtonUserActivityMovieWatchDate movie={movie} />
 				</View>
-				<View style={tw`flex-row items-center gap-4`}>
+				<View style={tw`flex-row items-center gap-2`}>
 					<ButtonPlaylistMovieAdd movie={movie} />
 					<ButtonUserRecoMovieSend movie={movie} />
 				</View>

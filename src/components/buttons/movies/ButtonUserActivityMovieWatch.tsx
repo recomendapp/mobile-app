@@ -1,4 +1,4 @@
-import { Alert, View } from "react-native";
+import { Alert } from "react-native";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
@@ -10,9 +10,8 @@ import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
-import { ICON_ACTION_SIZE } from "@/theme/globals";
 import { useToast } from "@/components/Toast";
-import { forwardRef } from "react";
+import { forwardRef, useCallback } from "react";
 
 interface ButtonUserActivityMovieWatchProps
 	extends React.ComponentProps<typeof Button> {
@@ -22,7 +21,7 @@ interface ButtonUserActivityMovieWatchProps
 const ButtonUserActivityMovieWatch = forwardRef<
 	React.ComponentRef<typeof Button>,
 	ButtonUserActivityMovieWatchProps
->(({ movie, variant = "ghost", size = "fit", onPress: onPressProps, iconProps, style, ...props }, ref) => {
+>(({ movie, icon = Icons.Check, variant = "outline", size = "icon", style, onPress: onPressProps, ...props }, ref) => {
 	const { colors, mode } = useTheme();
 	const toast = useToast();
 	const { session } = useAuth();
@@ -38,7 +37,7 @@ const ButtonUserActivityMovieWatch = forwardRef<
 	const { mutateAsync: insertActivity } = useUserActivityMovieInsertMutation();
 	const { mutateAsync: deleteActivity } = useUserActivityMovieDeleteMutation();
 
-	const handleWatch = async () => {
+	const handleWatch = useCallback(async () => {
 		if (activity || !session) return;
 		await insertActivity({
 			userId: session.user.id,
@@ -48,9 +47,9 @@ const ButtonUserActivityMovieWatch = forwardRef<
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
+	}, [activity, insertActivity, movie.id, session, toast, t]);
 
-	const handleUnwatch = async () => {
+	const handleUnwatch = useCallback(async () => {
 		if (!activity) return;
 		Alert.alert(
 			upperFirst(t('common.messages.are_u_sure')),
@@ -77,12 +76,14 @@ const ButtonUserActivityMovieWatch = forwardRef<
 				userInterfaceStyle: mode,
 			}
 		);
-	};
+	}, [activity, deleteActivity, mode, toast, t]);
 
 	return (
 		<Button
+		ref={ref}
 		variant={variant}
 		size={size}
+		icon={icon}
 		onPress={async (e) => {
 			if (session) {
 				if (activity) {
@@ -100,11 +101,13 @@ const ButtonUserActivityMovieWatch = forwardRef<
 			}
 			onPressProps?.(e);
 		}}
-		>
-			<View style={[{ backgroundColor: activity ? colors.accentBlue : undefined, borderColor: activity ? colors.accentBlue : colors.foreground, width: ICON_ACTION_SIZE, height: ICON_ACTION_SIZE }, tw`rounded-full border-2 items-center justify-center`]}>
-				<Icons.Check color={colors.foreground} size={ICON_ACTION_SIZE * 0.7}/>
-			</View>
-		</Button>
+		style={{
+			...({ backgroundColor: activity ? colors.accentBlue : undefined }),
+			...tw`rounded-full`,
+			...style,
+		}}
+		{...props}
+		/>
 	);
 });
 ButtonUserActivityMovieWatch.displayName = 'ButtonUserActivityMovieWatch';
