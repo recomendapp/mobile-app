@@ -90,6 +90,8 @@ export function SearchBar({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: cardColor,
+    borderColor: colors.border,
+    borderWidth: 1,
     height: HEIGHT,
     paddingHorizontal: 16,
     ...tw`rounded-lg`

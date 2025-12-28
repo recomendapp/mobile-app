@@ -14,7 +14,7 @@ interface ButtonCreatePlaylistProps extends React.ComponentPropsWithoutRef<typeo
 const ButtonCreatePlaylist = forwardRef<
   React.ComponentRef<typeof Button>,
   ButtonCreatePlaylistProps
->(({ variant = "muted", icon = Icons.Add, size = "icon", onPress, redirectAfterCreate = true, ...props }, ref) => {
+>(({ variant = "outline", icon = Icons.Add, size = "icon", onPress, redirectAfterCreate = true, ...props }, ref) => {
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const router = useRouter();
 	const handlePress = useCallback((e: GestureResponderEvent) => {

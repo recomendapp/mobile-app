@@ -138,6 +138,7 @@ const BottomSheetPlaylistCreate = forwardRef<
 			)}
 			/>
 			<Button
+			variant='outline'
 			onPress={() => {
 				if (form.getValues('title').length === 0 && placeholder && placeholder.length > 0) {
 					onSubmit({ title: placeholder, type: form.getValues('type') });

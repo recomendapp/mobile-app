@@ -2,14 +2,11 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import React, { useCallback, useMemo } from "react";
 import { UserActivityType } from "@recomendapp/types";
-import { Icons } from "@/constants/Icons";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { View } from "@/components/ui/view";
-import { Stack } from "expo-router";
 import tw from "@/lib/tw";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useUIStore } from "@/stores/useUIStore";
-import { Button } from "@/components/ui/Button";
 import { CollectionHeartPicksMovie } from "@/components/screens/collection/heart-picks/CollectionHeartPicksMovie";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CollectionHeartPicksTvSeries } from "@/components/screens/collection/heart-picks/CollectionHeartPicksTvSeries";
@@ -18,7 +15,7 @@ import { NativeSyntheticEvent } from "react-native";
 
 const HeartPicksScreen = () => {
 	const t = useTranslations();
-	const { heartPicks: { tab, view }, setHeartPicksTab, setHeartPicksView } = useUIStore((state) => state);
+	const { heartPicks: { tab }, setHeartPicksTab } = useUIStore((state) => state);
 
 	// States
 	const segmentedOptions = useMemo((): { label: string, value: UserActivityType }[] => [
@@ -32,42 +29,13 @@ const HeartPicksScreen = () => {
 		},
 	], [t]);
 
-	const SelectedComponent = useMemo(() => {
-		switch (tab) {
-			case 'movie':
-				return CollectionHeartPicksMovie;
-			case 'tv_series':
-				return CollectionHeartPicksTvSeries;
-			default:
-				return CollectionHeartPicksMovie;
-		}
-	}, [tab]);
-
-	const handleChangeView = useCallback(() => {
-		setHeartPicksView(view === 'grid' ? 'list' : 'grid');
-	}, [setHeartPicksView, view]);
-
 	const handleChangeTab = useCallback((event: NativeSyntheticEvent<NativeSegmentedControlIOSChangeEvent>) => {
 		const value = segmentedOptions[event.nativeEvent.selectedSegmentIndex].value;
 		setHeartPicksTab(value);
-	}, [setHeartPicksTab]);
+	}, [setHeartPicksTab, segmentedOptions]);
 
 	return (
 	<>
-		<Stack.Screen
-		options={{
-			headerRight: () => (
-				<View style={tw`flex-row items-center gap-2`}>
-					<Button
-					variant="ghost"
-					icon={view === 'grid' ? Icons.Grid : Icons.List}
-					size="icon"
-					onPress={handleChangeView}
-					/>
-				</View>
-			)
-		}}
-		/>
 		<View
 		style={{ paddingHorizontal: PADDING_HORIZONTAL, paddingBottom: PADDING_VERTICAL }}
 		>
@@ -83,7 +51,7 @@ const HeartPicksScreen = () => {
 			exiting={FadeOut}
 			style={tw`flex-1`}
 		>
-			<SelectedComponent />
+			{tab === 'tv_series' ? <CollectionHeartPicksTvSeries /> : <CollectionHeartPicksMovie />}
 		</Animated.View>
 	</>
 	)

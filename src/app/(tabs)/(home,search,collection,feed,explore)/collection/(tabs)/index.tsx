@@ -1,5 +1,5 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
-import useCollectionStaticRoutes from "@/components/screens/collection/useCollectionStaticRoutes";
+import useCollectionStaticRoutes from "@/components/collection/useCollectionStaticRoutes";
 import { useAuth } from "@/providers/AuthProvider";
 import { useUserPlaylistsInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
@@ -9,6 +9,7 @@ import { LegendList } from "@legendapp/list";
 import { useTheme } from "@/providers/ThemeProvider";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Text } from "@/components/ui/text";
+import { useCallback, useMemo } from "react";
 
 const CollectionScreen = () => {
 	const { user } = useAuth();
@@ -24,31 +25,35 @@ const CollectionScreen = () => {
 		userId: user?.id,
 	});
 
-	const combinedItems = [
+	const combinedItems = useMemo(() => [
 		...staticRoutes,
-		...(playlists?.pages.flatMap((page) => page) ?? []),
-	];
+		...(playlists?.pages.flat() || []),
+	], [staticRoutes, playlists]);
 
-	return (
-		<LegendList
-		data={combinedItems}
-		renderItem={({ item }) => (
-			item.type === 'static' ? (
+	const renderItem = useCallback(({ item } : { item: typeof combinedItems[number] }) => {
+		if (item.type === 'static') {
+			return (
 				<Link href={item.href} style={tw`p-1`}>
 					{item.icon}
 					<View style={tw`w-full items-center`}>
 						<Text>{item.label}</Text>
 					</View>
 				</Link>
-			) : (
-				item.type === 'tv_series'
-				|| item.type === 'movie'
-			) ? (
+			);
+		} else if (item.type === 'tv_series' || item.type === 'movie') {
+			return (
 				<View style={tw`p-1`}>
 					<CardPlaylist playlist={item} style={tw`w-full`} showPlaylistAuthor={false} showItemsCount />
 				</View>
-			) : null
-		)}
+			);
+		}
+		return null;
+	}, []);
+
+	return (
+		<LegendList
+		data={combinedItems}
+		renderItem={renderItem}
 		onRefresh={refetch}
 		numColumns={
 			SCREEN_WIDTH < 360 ? 2 :

@@ -10,15 +10,13 @@ import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { useSharedValue } from "react-native-reanimated";
 import ButtonActionPlaylistLike from "@/components/buttons/ButtonActionPlaylistLike";
 import ButtonActionPlaylistSaved from "@/components/buttons/ButtonActionPlaylistSaved";
-import CollectionHeader from "@/components/screens/collection/CollectionHeader";
+import CollectionHeader from "@/components/collection/CollectionHeader";
 import { PlaylistMovie } from "@/components/screens/playlist/PlaylistMovie";
 import { PlaylistTvSeries } from "@/components/screens/playlist/PlaylistTvSeries";
-import { useUIStore } from "@/stores/useUIStore";
 
 const PlaylistScreen = () => {
 	const { playlist_id } = useLocalSearchParams();
 	const playlistId = Number(playlist_id) || undefined;
-	const { playlistView, setPlaylistView } = useUIStore((state) => state);
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const { data: playlist } = usePlaylistQuery({
 		playlistId: playlistId,
@@ -37,12 +35,6 @@ const PlaylistScreen = () => {
 				<View style={tw`flex-row items-center`}>
 					<ButtonActionPlaylistLike playlist={playlist} />
 					<ButtonActionPlaylistSaved playlist={playlist} />
-					<Button
-					variant="ghost"
-					size="icon"
-					icon={playlistView === 'grid' ? Icons.Grid : Icons.List}
-					onPress={() => setPlaylistView(playlistView === 'grid' ? 'list' : 'grid')}
-					/>
 					<Button
 					variant="ghost"
 					size="icon"

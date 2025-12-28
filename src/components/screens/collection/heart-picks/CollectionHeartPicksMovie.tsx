@@ -3,19 +3,18 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import React from "react";
 import { UserActivityMovie } from "@recomendapp/types";
-import CollectionScreen, { CollectionAction, SortByOption } from "@/components/screens/collection/CollectionScreen";
+import CollectionScreen, { CollectionAction, SortByOption } from "@/components/collection/CollectionScreen";
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import { useSharedValue } from "react-native-reanimated";
 import { useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
 import { useUserHeartPicksMovieQuery } from "@/features/user/userQueries";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
-import { useUIStore } from "@/stores/useUIStore";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { useUIStore } from "@/stores/useUIStore";
 
 export const CollectionHeartPicksMovie = () => {
 	const t = useTranslations();
@@ -24,15 +23,13 @@ export const CollectionHeartPicksMovie = () => {
 	const { mode } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.heartPicks.view);
+	const setHeartPicksView = useUIStore((state) => state.setHeartPicksView);
     const queryData = useUserHeartPicksMovieQuery({
 		userId: user?.id,
     });
 	const screenTitle = upperFirst(t('common.messages.heart_pick', { count: 2 }));
 	// Mutations
 	const { mutateAsync: updateActivity } = useUserActivityMovieUpdateMutation();
-	// SharedValues
-	const scrollY = useSharedValue(0);
-	const headerHeight = useSharedValue(0);
 
 	// Handlers
 	const handleUnlike = React.useCallback((data: UserActivityMovie) => {
@@ -166,11 +163,9 @@ export const CollectionHeartPicksMovie = () => {
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
 		onItemAction={onItemAction}
-		// Shared Values
-		scrollY={scrollY}
-		headerHeight={headerHeight}
 		// View
-		view={view}
+		defaultView={view}
+		onViewChange={setHeartPicksView}
         />
 	</>
     );

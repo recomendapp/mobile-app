@@ -24,7 +24,7 @@ import { GAP, PADDING_VERTICAL } from '@/theme/globals';
 import { View } from '@/components/ui/view';
 import ButtonActionPlaylistLike from '@/components/buttons/ButtonActionPlaylistLike';
 import ButtonActionPlaylistSaved from '@/components/buttons/ButtonActionPlaylistSaved';
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { FlashList } from '@shopify/flash-list';
 
 interface BottomSheetPlaylistProps extends BottomSheetProps {
@@ -63,7 +63,7 @@ const BottomSheetPlaylist = forwardRef<
 	const { mutateAsync: deletePlaylistSaved } = useUserPlaylistSavedDeleteMutation();
 	const { mutateAsync: playlistDeleteMutation} = usePlaylistDeleteMutation();
 
-	const items: Item[] = [
+	const items = useMemo<Item[]>(() => [
 		...additionalItemsTop,
 		{
 			icon: Icons.Share,
@@ -168,7 +168,24 @@ const BottomSheetPlaylist = forwardRef<
 				closeSheet: false,
 			}
 		] : []),
-	];
+	], [
+		additionalItemsTop,
+		closeSheet,
+		deletePlaylistSaved,
+		id,
+		insertPlaylistSaved,
+		isLoadingSaved,
+		mode,
+		openSheet,
+		playlist,
+		router,
+		pathname,
+		session?.user.id,
+		t,
+		toast,
+		playlistDeleteMutation,
+		saved,
+	]);
 
 	return (
 	<TrueSheet

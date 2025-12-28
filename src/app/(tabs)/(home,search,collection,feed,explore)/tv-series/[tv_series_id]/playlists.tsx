@@ -98,7 +98,7 @@ const TvSeriesPlaylists = () => {
 		ListHeaderComponent={
 			<View style={tw.style('flex flex-row justify-end items-center gap-2 py-2')}>
 				<Button
-				icon={sortOrder === 'desc' ? Icons.ArrowDownNarrowWide : Icons.ArrowUpNarrowWide}
+				icon={sortOrder === 'desc' ? Icons.ArrowDown : Icons.ArrowUp}
 				variant="muted"
 				size='icon'
 				onPress={handleSortOrderToggle}

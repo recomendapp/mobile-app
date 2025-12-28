@@ -3,11 +3,10 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import React from "react";
 import { UserWatchlistMovie } from "@recomendapp/types";
-import CollectionScreen, { CollectionAction, SortByOption } from "@/components/screens/collection/CollectionScreen";
+import CollectionScreen, { CollectionAction, SortByOption } from "@/components/collection/CollectionScreen";
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import { useSharedValue } from "react-native-reanimated";
 import { useUserWatchlistMovieDeleteMutation } from "@/features/user/userMutations";
 import { useUserWatchlistMoviesQuery } from "@/features/user/userQueries";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
@@ -25,15 +24,13 @@ export const CollectionWatchlistMovie = () => {
 	const { mode } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.watchlist.view);
+	const setWatchlistView = useUIStore((state) => state.setWatchlistView);
     const queryData = useUserWatchlistMoviesQuery({
 		userId: user?.id,
     });
 	const screenTitle = upperFirst(t('common.messages.watchlist'));
 	// Mutations
 	const { mutateAsync: deleteWatchlistMutation } = useUserWatchlistMovieDeleteMutation();
-	// SharedValues
-	const scrollY = useSharedValue(0);
-	const headerHeight = useSharedValue(0);
 
 	// Handlers
 	const handleDeleteWatchlist = React.useCallback((data: UserWatchlistMovie) => {
@@ -184,11 +181,9 @@ export const CollectionWatchlistMovie = () => {
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
 		onItemAction={onItemAction}
-		// Shared Values
-		scrollY={scrollY}
-		headerHeight={headerHeight}
 		// View
-		view={view}
+		defaultView={view}
+		onViewChange={setWatchlistView}
         />
 	</>
     );

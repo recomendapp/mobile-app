@@ -1,7 +1,7 @@
 import { useTheme } from "@/providers/ThemeProvider";
 import useColorConverter from "@/hooks/useColorConverter";
 import tw from "@/lib/tw";
-import React, { forwardRef } from "react";
+import React, { forwardRef, memo, useMemo } from "react";
 import { Dimensions, Text } from "react-native";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import useRandomBackdrop from "@/hooks/useRandomBackdrop";
@@ -98,7 +98,7 @@ const CollectionHeader = forwardRef<
 		};
 	});
 
-	const renderItemsCount = () => {
+	const itemsCount = useMemo(() => {
 		if (numberOfItems === undefined) return null;
 		switch (type) {
 			case 'movie':
@@ -108,8 +108,8 @@ const CollectionHeader = forwardRef<
 			default:
 				return t('common.messages.item_count', { count: numberOfItems });
 		}
-	}
-
+	}, [numberOfItems, t, type]);
+	
 	return (
 		<Animated.View
 		ref={ref}
@@ -183,7 +183,7 @@ const CollectionHeader = forwardRef<
 					)}
 					{!hideNumberOfItems && (
 						!loading ? <Text numberOfLines={1} style={[{ color: colors.mutedForeground }]}>
-							{renderItemsCount()}
+							{itemsCount}
 						</Text> : <Skeleton style={tw`h-4 w-10`} />
 					)}
 				</View>
@@ -202,4 +202,4 @@ const CollectionHeader = forwardRef<
 });
 CollectionHeader.displayName = "CollectionHeader";
 
-export default CollectionHeader;
+export default memo(CollectionHeader);

@@ -1,4 +1,4 @@
-import React from 'react';
+import { forwardRef, useMemo } from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
 import { UserReviewTvSeries } from '@recomendapp/types';
@@ -33,7 +33,7 @@ interface Item {
   disabled?: boolean;
 }
 
-export const BottomSheetReviewTvSeries = React.forwardRef<
+export const BottomSheetReviewTvSeries = forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetReviewTvSeriesProps
 >(({ id, review, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
@@ -47,7 +47,7 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
   // Mutations
   const { mutateAsync: reviewDeleteMutation } = useUserReviewTvSeriesDeleteMutation();
   // States
-  const items: Item[] = [
+  const items = useMemo<Item[]>(() => [
     ...additionalItemsTop,
     {
       icon: Icons.Movie,
@@ -107,7 +107,24 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
       }
     ] : []),
     ...additionalItemsBottom,
-  ];
+  ], [
+    additionalItemsTop,
+    additionalItemsBottom,
+    closeSheet,
+    id,
+    mode,
+    router,
+    pathname,
+    review.activity?.tv_series?.slug,
+    review.activity?.tv_series_id,
+    review.activity?.tv_series?.url,
+    review.id,
+    review.activity?.user_id,
+    session?.user.id,
+    t,
+    toast,
+    reviewDeleteMutation,
+  ]);
   return (
     <TrueSheet
     ref={ref}

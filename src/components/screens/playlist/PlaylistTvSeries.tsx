@@ -2,7 +2,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { Playlist, PlaylistItemTvSeries } from "@recomendapp/types";
-import CollectionScreen, { CollectionAction, SortByOption } from "@/components/screens/collection/CollectionScreen";
+import CollectionScreen, { CollectionAction, SortByOption } from "@/components/collection/CollectionScreen";
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
@@ -44,6 +44,7 @@ export const PlaylistTvSeries = ({
 	const { session } = useAuth();
 	const { mode } = useTheme();
 	const view = useUIStore((state) => state.playlistView);
+	const setPlaylistView = useUIStore((state) => state.setPlaylistView);
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const [shouldRefresh, setShouldRefresh] = useState(false);
   	const debouncedRefresh = useDebounce(shouldRefresh, 200);
@@ -277,7 +278,8 @@ export const PlaylistTvSeries = ({
 		scrollY={scrollY}
 		headerHeight={headerHeight}
 		// View
-		view={view}
+		defaultView={view}
+		onViewChange={setPlaylistView}
 		/>
 	</>
 	);
