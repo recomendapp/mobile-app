@@ -8,6 +8,7 @@ import { Icons } from "@/constants/Icons";
 import { Button } from "@/components/ui/Button";
 import { PlaylistSortMovie } from "@/components/screens/playlist/sort/PlaylistSortMovie";
 import { PlaylistSortTvSeries } from "@/components/screens/playlist/sort/PlaylistSortTvSeries";
+import { Pressable } from "react-native";
 
 const PlaylistSortScreen = () => {
 	const t = useTranslations();
@@ -25,13 +26,14 @@ const PlaylistSortScreen = () => {
 		options={{
 			headerTitle: upperFirst(t('common.messages.edit_order')),
 			headerLeft: () => (
-				<Button
-				variant="ghost"
-				size="fit"
+				<Pressable
+				// icon={Icons.X}
+				// variant="ghost"
+				// size="fit"
 				onPress={() => router.dismiss()}
 				>
-					{upperFirst(t('common.messages.close'))}
-				</Button>
+					<Icons.X />
+				</Pressable>
 			),
 		}}
 		/>

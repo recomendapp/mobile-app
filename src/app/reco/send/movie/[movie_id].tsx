@@ -29,6 +29,7 @@ import { CardUser } from "@/components/cards/CardUser";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/Toast";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ButtonHeader } from "@/components/buttons/ButtonHeader";
 
 const COMMENT_MAX_LENGTH = 180;
 
@@ -160,16 +161,30 @@ const RecoSendMovie = () => {
 		<Stack.Screen
 			options={{
 				headerTitle: upperFirst(t('common.messages.send_to_friend')),
-				headerLeft: () => (
-					<Button
-					variant="ghost"
-					size="fit"
-					disabled={isSendingReco}
-					onPress={handleCancel}
-					>
-						{upperFirst(t('common.messages.cancel'))}
-					</Button>
-				),
+				unstable_headerLeftItems: () => [
+					{
+					type: "button",
+					label: "Notifications",
+					onPress: () => router.push("/home/notifications"),
+					render: () => (
+						<ButtonHeader
+						imageProps={{
+							systemName: "bell",
+						}}
+						/>
+					),  
+					},
+				],
+				// headerLeft: () => (
+				// 	<Button
+				// 	variant="ghost"
+				// 	size="fit"
+				// 	disabled={isSendingReco}
+				// 	onPress={handleCancel}
+				// 	>
+				// 		{upperFirst(t('common.messages.cancel'))}
+				// 	</Button>
+				// ),
 				headerStyle: {
 					backgroundColor: colors.muted,
 				},

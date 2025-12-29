@@ -69,7 +69,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		},
 		infoPlist: {
 			ITSAppUsesNonExemptEncryption: false,
-			UIDesignRequiresCompatibility: true, // Disable iOS 26 Liquid Glass effect
+			// UIDesignRequiresCompatibility: true, // Disable iOS 26 Liquid Glass effect
 			NSLocationWhenInUseUsageDescription: 'Your location is used to show relevant content based on where you are.',
 		},
 		usesAppleSignIn: true,

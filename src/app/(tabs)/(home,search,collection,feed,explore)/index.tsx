@@ -1,5 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
-import { Link, useRouter } from 'expo-router';
+import { Link, Stack, useRouter } from 'expo-router';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 import tw from '@/lib/tw';
 import { Button } from '@/components/ui/Button';
@@ -22,12 +22,15 @@ import { View } from '@/components/ui/view';
 import { AnimatedScrollView } from 'react-native-reanimated/lib/typescript/component/ScrollView';
 import { useRef, useState } from 'react';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
-import { RefreshControl } from 'react-native';
+import { Platform, RefreshControl } from 'react-native';
 import { WidgetMostPopular } from '@/components/widgets/WidgetMostPopular';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useQueryClient } from '@tanstack/react-query';
 import { userKeys } from '@/features/user/userKeys';
 import { Keys } from '@/api/keys';
+import { ButtonHeader } from '@/components/buttons/ButtonHeader';
+import { osName } from 'expo-device';
+import { isLiquidGlassAvailable } from "expo-glass-effect";
 
 const HeaderLeft = () => {
   const { session, user } = useAuth();
@@ -123,8 +126,8 @@ const UnauthenticatedContent = () => {
 const HomeScreen = () => {
   const t = useTranslations();
   const queryClient = useQueryClient();
-  const { bottomOffset, tabBarHeight } = useTheme();
-  const { session } = useAuth();
+  const { colors, bottomOffset, tabBarHeight } = useTheme();
+  const { session, user } = useAuth();
   const navigationHeaderHeight = useHeaderHeight();
   // States
   const [isRefetching, setIsRefetching] = useState(false);
@@ -161,7 +164,7 @@ const HomeScreen = () => {
 
   return (
     <>
-      <AnimatedStackScreen
+      {/* <AnimatedStackScreen
         scrollY={scrollY}
         triggerHeight={triggerHeight}
         options={{
@@ -169,6 +172,25 @@ const HomeScreen = () => {
           headerLeft: () => <HeaderLeft />,
           headerRight: () => <HeaderRight />
         }}
+      /> */}
+      <Stack.Screen
+      options={{
+        title: upperFirst(t('common.messages.home')),
+        headerTitle: () => <></>,
+        headerTransparent: true,
+        headerStyle: {
+          backgroundColor: 'transparent',
+        },
+        headerLeft: () => <HeaderLeft />,
+        headerRight: () => (
+          <>
+            <ButtonHeader
+            buttonProps={{ onPress: () => console.log('okoko')}}
+            style={{ padding: osName === "iPadOS" ? 40 : 0 }}
+            />
+          </>
+        ),
+      }}
       />
       <Animated.ScrollView
       ref={scrollRef}
