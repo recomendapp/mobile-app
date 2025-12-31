@@ -22,21 +22,20 @@ const IconMediaRating = React.forwardRef<
 				return {
 					text: colors.accentBlue,
 					border: colors.accentBlue,
-				}
-			case "user":
-				return {
-					text: colors.accentYellow,
-					border: colors.accentYellow,
+					background: colors.accentBlueForeground,
 				}
 			case "profile":
 				return {
 					text: colors.white,
 					border: colors.muted,
+					background: colors.background,
 				}
+			case "user":
 			default:
 				return {
 					text: colors.accentYellow,
 					border: colors.accentYellow,
+					background: colors.accentYellowForeground,
 				}
 		}
 	}, [variant, colors]);
@@ -56,7 +55,7 @@ const IconMediaRating = React.forwardRef<
 	<Animated.View
 	ref={ref}
 	style={[
-		{ aspectRatio: 3 / 2, backgroundColor:  colors.background, borderColor: variantStyles.border },
+		{ aspectRatio: 3 / 2, backgroundColor:  variantStyles.background, borderColor: variantStyles.border },
 		tw.style('relative flex shadow-sm w-8 rounded-sm border-2 justify-center items-center shrink-0'),
 		style,
 	]}

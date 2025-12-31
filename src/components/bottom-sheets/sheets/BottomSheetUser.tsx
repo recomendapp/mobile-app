@@ -16,7 +16,6 @@ import { Text } from '@/components/ui/text';
 import UserAvatar from '@/components/user/UserAvatar';
 import BottomSheetShareUser from './share/BottomSheetShareUser';
 import { FlashList } from '@shopify/flash-list';
-import { PADDING_VERTICAL } from '@/theme/globals';
 
 interface BottomSheetUserProps extends BottomSheetProps {
   user: User | Profile,
@@ -39,7 +38,7 @@ const BottomSheetUser = React.forwardRef<
 >(({ id, user, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const { colors, mode, tabBarHeight } = useTheme();
+  const { colors, mode, tabBarHeight, isLiquidGlassAvailable } = useTheme();
   const router = useRouter();
   const t = useTranslations();
   const pathname = usePathname();
@@ -73,7 +72,6 @@ const BottomSheetUser = React.forwardRef<
         'header',
         ...items,
       ]}
-      contentContainerStyle={{ paddingTop: PADDING_VERTICAL }}
       bounces={false}
       keyExtractor={(_, i) => i.toString()}
       stickyHeaderIndices={[0]}
@@ -81,7 +79,7 @@ const BottomSheetUser = React.forwardRef<
         typeof item === 'string' ? (
           <View
           style={[
-            { backgroundColor: colors.muted, borderColor: colors.mutedForeground },
+            { backgroundColor: isLiquidGlassAvailable ? 'transparent' : colors.muted, borderColor: colors.mutedForeground },
             tw`border-b p-4`,
           ]}
           >

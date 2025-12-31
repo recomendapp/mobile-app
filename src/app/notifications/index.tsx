@@ -2,14 +2,13 @@ import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
-import { useNotificationsInfiniteQuery } from "@/features/utils/utilsQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { GAP } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
-import { useNotificationArchiveMutation, useNotificationReadMutation, useNotificationUnarchiveMutation, useNotificationUnreadMutation } from "@/features/utils/utilsMutations";
+import { useNotificationArchiveMutation, useNotificationReadMutation, useNotificationUnarchiveMutation, useNotificationUnreadMutation } from "@/api/notifications/notificationsMutations";
 import ReusableAppleStyleSwipeableRow from "@/components/ui/swippeable/ReusableAppleStyleSwipeableRow";
 import { useUIStore } from "@/stores/useUIStore";
 import { useTranslations } from "use-intl";
@@ -24,6 +23,7 @@ import { CardNotificationFriendCreated } from "@/components/cards/notifications/
 import { CardNotificationFollowerRequest } from "@/components/cards/notifications/CardNotificationFollowerRequest";
 import { useToast } from "@/components/Toast";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useNotificationsQuery } from "@/api/notifications/notificationsQueries";
 
 const NotificationsScreen = () => {
 	const router = useRouter();
@@ -38,7 +38,7 @@ const NotificationsScreen = () => {
 		isLoading,
 		hasNextPage,
 		fetchNextPage,
-	} = useNotificationsInfiniteQuery({
+	} = useNotificationsQuery({
 		view: notificationsView,
 	});
 	const loading = isLoading || data === undefined;

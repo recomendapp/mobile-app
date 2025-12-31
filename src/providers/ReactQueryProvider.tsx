@@ -6,7 +6,7 @@ import {
   PersistQueryClientProvider,
   PersistQueryClientProviderProps,
 } from '@tanstack/react-query-persist-client';
-import { persistKey } from '@/features';
+import { persistKey } from '@/api';
 // import { useReactQueryDevTools } from "@dev-plugins/react-query";
 
 const queryStorage = createMMKV({

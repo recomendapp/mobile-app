@@ -1,10 +1,8 @@
 import { useNovu } from "@novu/react-native";
 import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
-import { utilsKey } from "./utilsKey";
-import { NotificationWithContent } from "./utilsQueries";
+import { NotificationWithContent } from "./notificationsOptions";
+import { notificationsKeys } from "./notificationsKeys";
 
-
-/* ------------------------------ NOTIFICATIONS ----------------------------- */
 export const useNotificationArchiveMutation = () => {
 	const queryClient = useQueryClient();
 	const novu = useNovu();
@@ -17,9 +15,9 @@ export const useNotificationArchiveMutation = () => {
 			return data;
 		},
 		onMutate: async (notification: NotificationWithContent['notifications'][number]) => {
-			await queryClient.cancelQueries({ queryKey: utilsKey.notifications() });
+			await queryClient.cancelQueries({ queryKey: notificationsKeys.list() });
 			const previousData = queryClient.getQueriesData<InfiniteData<NotificationWithContent>>({
-				queryKey: utilsKey.notifications(),
+				queryKey: notificationsKeys.list(),
 			});
 
 			previousData.forEach(([key, oldData]) => {
@@ -67,9 +65,9 @@ export const useNotificationUnarchiveMutation = () => {
 			return data;
 		},
 		onMutate: async (notification: NotificationWithContent['notifications'][number]) => {
-			await queryClient.cancelQueries({ queryKey: utilsKey.notifications() });
+			await queryClient.cancelQueries({ queryKey: notificationsKeys.list() });
 			const previousData = queryClient.getQueriesData<InfiniteData<NotificationWithContent>>({
-				queryKey: utilsKey.notifications(),
+				queryKey: notificationsKeys.list(),
 			});
 
 			previousData.forEach(([key, oldData]) => {
@@ -117,9 +115,9 @@ export const useNotificationReadMutation = () => {
 			return data;
 		},
 		onMutate: async (notification: NotificationWithContent['notifications'][number]) => {
-			await queryClient.cancelQueries({ queryKey: utilsKey.notifications() });
+			await queryClient.cancelQueries({ queryKey: notificationsKeys.list() });
 			const previousData = queryClient.getQueriesData<InfiniteData<NotificationWithContent>>({
-				queryKey: utilsKey.notifications(),
+				queryKey: notificationsKeys.list(),
 			});
 
 			previousData.forEach(([key, oldData]) => {
@@ -168,9 +166,9 @@ export const useNotificationUnreadMutation = () => {
 			return data;
 		},
 		onMutate: async (notification: NotificationWithContent['notifications'][number]) => {
-			await queryClient.cancelQueries({ queryKey: utilsKey.notifications() });
+			await queryClient.cancelQueries({ queryKey: notificationsKeys.list() });
 			const previousData = queryClient.getQueriesData<InfiniteData<NotificationWithContent>>({
-				queryKey: utilsKey.notifications(),
+				queryKey: notificationsKeys.list(),
 			});
 
 			previousData.forEach(([key, oldData]) => {
@@ -210,4 +208,3 @@ export const useNotificationUnreadMutation = () => {
 		},
 	});
 };
-/* -------------------------------------------------------------------------- */

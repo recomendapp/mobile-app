@@ -1,14 +1,13 @@
-import { usePlaylistQuery } from "@/features/playlist/playlistQueries";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import tw from "@/lib/tw";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
-import { Button } from "@/components/ui/Button";
 import { PlaylistSortMovie } from "@/components/screens/playlist/sort/PlaylistSortMovie";
 import { PlaylistSortTvSeries } from "@/components/screens/playlist/sort/PlaylistSortTvSeries";
-import { Pressable } from "react-native";
+import { useCallback } from "react";
+import { usePlaylistDetailsQuery } from "@/api/playlists/playlistsQueries";
 
 const PlaylistSortScreen = () => {
 	const t = useTranslations();
@@ -17,24 +16,29 @@ const PlaylistSortScreen = () => {
 	const playlistId = Number(playlist_id);
 	const {
 		data: playlist,
-	} = usePlaylistQuery({
+	} = usePlaylistDetailsQuery({
 		playlistId: playlistId,
 	});
+
+	const handleClose = useCallback(() => {
+		router.back();
+	}, [router]);
 	return (
 	<>
 		<Stack.Screen
 		options={{
 			headerTitle: upperFirst(t('common.messages.edit_order')),
-			headerLeft: () => (
-				<Pressable
-				// icon={Icons.X}
-				// variant="ghost"
-				// size="fit"
-				onPress={() => router.dismiss()}
-				>
-					<Icons.X />
-				</Pressable>
-			),
+			unstable_headerLeftItems: (props) => [
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.close')),
+					onPress: handleClose,
+					icon: {
+						name: "xmark",
+						type: "sfSymbol",
+					},
+				},
+			],
 		}}
 		/>
 		{playlist ? (

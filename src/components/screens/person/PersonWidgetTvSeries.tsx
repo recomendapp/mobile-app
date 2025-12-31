@@ -3,15 +3,15 @@ import { useWindowDimensions, View } from "react-native";
 import { clamp, upperFirst } from "lodash";
 import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useMediaPersonTvSeriesInfiniteQuery } from "@/features/media/mediaQueries";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
-import { MediaTvSeries } from "@recomendapp/types";
+import { Database } from "@recomendapp/types";
 import { MultiRowHorizontalList } from "@/components/ui/MultiRowHorizontalList";
 import { GAP, PADDING_HORIZONTAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { useMemo } from "react";
+import { useMediaPersonTvSeriesQuery } from "@/api/medias/mediaQueries";
 
 interface PersonWidgetTvSeriesProps extends React.ComponentPropsWithoutRef<typeof View> {
 	personId: number;
@@ -32,8 +32,12 @@ const PersonWidgetTvSeries = ({
 		isLoading,
 		fetchNextPage,
 		hasNextPage,
-	} = useMediaPersonTvSeriesInfiniteQuery({
+	} = useMediaPersonTvSeriesQuery({
 		personId,
+		filters: {
+			sortBy: 'last_appearance_date',
+			sortOrder: 'desc',
+		}
 	});
 	const loading = tvSeries === undefined || isLoading;
 	return (
@@ -46,12 +50,12 @@ const PersonWidgetTvSeries = ({
 				<Icons.ChevronRight color={colors.mutedForeground} />
 			</View>
 		</Link>
-		<MultiRowHorizontalList<{ tv_series: MediaTvSeries }>
+		<MultiRowHorizontalList<{ media_tv_series: Database['public']['Views']['media_tv_series']['Row'] }>
 		key={loading ? 'loading' : 'tv_series'}
 		data={loading ? new Array(3).fill(null) : tvSeries?.pages.flat()}
 		renderItem={(item) => (
 			!loading ? (
-				<CardTvSeries variant="list" tvSeries={item.tv_series} />
+				<CardTvSeries variant="list" tvSeries={item.media_tv_series} />
 			) : (
 				<CardTvSeries variant="list" skeleton />
 			)
@@ -61,7 +65,7 @@ const PersonWidgetTvSeries = ({
 				{upperFirst(t('common.messages.no_tv_series'))}
 			</Text>
 		}
-		keyExtractor={(item, index) => loading ? index.toString() : item.tv_series.id.toString()}
+		keyExtractor={(item, index) => loading ? index.toString() : item.media_tv_series.id.toString()}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
 			gap: GAP,

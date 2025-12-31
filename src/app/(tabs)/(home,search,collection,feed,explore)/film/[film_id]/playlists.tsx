@@ -1,11 +1,9 @@
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslations } from "use-intl";
-import { HeaderTitle } from "@react-navigation/elements";
 import { upperFirst } from "lodash";
 import { useAuth } from "@/providers/AuthProvider";
 import { Text, useWindowDimensions, View } from "react-native";
-import { useMediaMovieQuery, useMediaPlaylistsMovieInfiniteQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
@@ -15,8 +13,8 @@ import { useCallback, useState, useMemo } from "react";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
-import { ButtonPlaylistMovieAdd } from "@/components/buttons/ButtonPlaylistMovieAdd";
 import { Playlist } from "@recomendapp/types";
+import { useMediaMovieDetailsQuery, useMediaMoviePlaylistsQuery } from "@/api/medias/mediaQueries";
 
 interface sortBy {
 	label: string;
@@ -25,6 +23,7 @@ interface sortBy {
 
 const FilmPlaylists = () => {
 	const t = useTranslations();
+	const router = useRouter();
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { session } = useAuth();
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
@@ -40,7 +39,7 @@ const FilmPlaylists = () => {
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	// Requests
-	const { data: movie } = useMediaMovieQuery({ movieId: movieId });
+	const { data: movie } = useMediaMovieDetailsQuery({ movieId: movieId });
 	const {
 		data,
 		isLoading,
@@ -48,7 +47,7 @@ const FilmPlaylists = () => {
 		hasNextPage,
 		isRefetching,
 		refetch,
-	} = useMediaPlaylistsMovieInfiniteQuery({
+	} = useMediaMoviePlaylistsQuery({
 		movieId: movieId,
 		filters: {
 			sortBy: sortBy.value,
@@ -81,13 +80,44 @@ const FilmPlaylists = () => {
 	return (
 	<>
 		<Stack.Screen
-		options={useMemo(() => ({
-			title: movie?.title || '',
-			headerTitle: (props) => <HeaderTitle {...props}>{upperFirst(t('common.messages.playlist', { count: 2 }))}</HeaderTitle>,
-			headerRight: (session && movie) ? () => (
-				<ButtonPlaylistMovieAdd variant="ghost" movie={movie} />
+		options={{
+			headerRight: session ? () => (
+				<Button
+				variant="outline"
+				size="icon"
+				icon={Icons.AddPlaylist}
+				style={tw`rounded-full`}
+				onPress={() => {
+					router.push({
+						pathname: '/playlist/add/movie/[movie_id]',
+						params: {
+							movie_id: movieId,
+							movie_title: movie?.title,
+						},
+					})
+				}}
+				/>
 			) : undefined,
-		}), [movie, session, t])}
+			unstable_headerRightItems: session ? (props) => [
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.add_to_playlist')),
+					onPress: () => {
+						router.push({
+							pathname: '/playlist/add/movie/[movie_id]',
+							params: {
+								movie_id: movieId,
+								movie_title: movie?.title,
+							},
+						})
+					},
+					icon: {
+						name: "text.badge.plus",
+						type: "sfSymbol",
+					},
+				}
+			] : undefined,
+		}}
 		/>
 		<LegendList
 		data={playlists}

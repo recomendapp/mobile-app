@@ -59,7 +59,6 @@ export const Input = forwardRef<TextInput, InputProps>(
       onFocus,
       onBlur,
       placeholder,
-      keyboardAppearance: keyboardAppearanceProp,
       ...props
     },
     ref
@@ -69,7 +68,7 @@ export const Input = forwardRef<TextInput, InputProps>(
     const t = useTranslations();
 
     // Theme colors
-    const { colors, mode } = useTheme();
+    const { colors } = useTheme();
     const cardColor = colors.card;
     const textColor = colors.foreground;
     const muted = colors.mutedForeground;
@@ -240,7 +239,6 @@ export const Input = forwardRef<TextInput, InputProps>(
                 editable={!disabled}
                 selectionColor={primary}
                 secureTextEntry={secureTextEntry}
-                keyboardAppearance={keyboardAppearanceProp || mode}
                 {...props}
               />
             </>
@@ -298,7 +296,6 @@ export const Input = forwardRef<TextInput, InputProps>(
                   placeholder={placeholder}
                   selectionColor={primary}
                   secureTextEntry={secureTextEntry}
-                  keyboardAppearance={keyboardAppearanceProp || mode}
                   {...props}
                 />
               </View>
@@ -454,7 +451,6 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
       onFocus,
       onBlur,
       placeholder,
-      keyboardAppearance: keyboardAppearanceProp,
       ...props
     },
     ref
@@ -463,7 +459,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
     const [showPassword, setShowPassword] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
 
-    const { colors, mode } = useTheme();
+    const { colors } = useTheme();
     const text = colors.foreground;
     const muted = colors.mutedForeground;
     const primary = colors.accentYellow;
@@ -594,7 +590,6 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 secureTextEntry={secureTextEntry}
-                keyboardAppearance={keyboardAppearanceProp || mode}
                 {...props}
               />
             </>
@@ -658,7 +653,6 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                   secureTextEntry={secureTextEntry}
-                  keyboardAppearance={keyboardAppearanceProp || mode}
                   {...props}
                 />
               </View>

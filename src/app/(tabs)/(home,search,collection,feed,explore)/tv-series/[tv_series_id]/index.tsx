@@ -1,8 +1,7 @@
-import { useMediaTvSeriesDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, useLocalSearchParams } from "expo-router"
-import { clamp, lowerCase, upperFirst } from "lodash";
+import { lowerCase, upperFirst } from "lodash";
 import { Pressable, useWindowDimensions, View, ViewProps } from "react-native";
-import { Database, MediaTvSeries, MediaTvSeriesCasting } from "@recomendapp/types";
+import { Database } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
@@ -10,16 +9,14 @@ import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useCallback, useMemo, useState } from "react";
 import TvSeriesWidgetSeasons from "@/components/screens/tv-series/TvSeriesWidgetSeasons";
-import { useLocale, useTranslations } from "use-intl";
+import { useTranslations } from "use-intl";
 import { Text, TextProps } from "@/components/ui/text";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { BORDER_RADIUS_FULL, GAP, GAP_XS, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
-import { CardPerson } from "@/components/cards/CardPerson";
 import TvSeriesHeader from "@/components/screens/tv-series/TvSeriesHeader";
 import TvSeriesWidgetPlaylists from "@/components/screens/tv-series/TvSeriesWidgetPlaylists";
 import TvSeriesWidgetReviews from "@/components/screens/tv-series/TvSeriesWidgetReviews";
-import { MultiRowHorizontalList } from "@/components/ui/MultiRowHorizontalList";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/providers/AuthProvider";
 import { FloatingBar } from "@/components/ui/FloatingBar";
@@ -34,6 +31,7 @@ import { Icons } from "@/constants/Icons";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { LegendList } from "@legendapp/list";
 import { Vimeo } from "react-native-vimeo-iframe";
+import { useMediaTvSeriesDetailsQuery } from "@/api/medias/mediaQueries";
 
 const TvSeriesScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
@@ -41,16 +39,12 @@ const TvSeriesScreen = () => {
 	const { tabBarHeight, bottomOffset } = useTheme();
 	const { session } = useAuth();
 	const t = useTranslations();
-	const locale = useLocale();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const {
 		data: series,
 		isLoading,
-		isRefetching,
-		refetch,
 	} = useMediaTvSeriesDetailsQuery({
-		id: seriesId,
-		locale: locale,
+		tvSeriesId: seriesId,
 	});
 	const loading = series === undefined || isLoading;
 	// SharedValue
@@ -88,6 +82,18 @@ const TvSeriesScreen = () => {
 		options={{
 			headerTitle: series?.name || '',
 			headerTransparent: true,
+			unstable_headerRightItems: (props) => [
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.menu')),
+					onPress: handleMenuPress,
+					tintColor: props.tintColor,
+					icon: {
+						name: "ellipsis",
+						type: "sfSymbol",
+					},
+				},
+			],
 		}}
 		scrollY={scrollY}
 		triggerHeight={headerHeight}
@@ -115,7 +121,7 @@ const TvSeriesScreen = () => {
 							<TvSeriesSynopsis tvSeries={series} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
 							<TvSeriesOriginalTitle tvSeries={series} style={{ marginHorizontal: PADDING_HORIZONTAL }} />
 						</View>
-						<TvSeriesCast tvSeries={series} />
+						{/* <TvSeriesCast tvSeries={series} /> */}
 						<TvSeriesWidgetSeasons tvSeries={series} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
 						<Link href={{ pathname: '/tv-series/[tv_series_id]/details', params: { tv_series_id: series.id }}} asChild>
 							<Button variant="outline" style={{ marginHorizontal: PADDING_HORIZONTAL }}>
@@ -148,7 +154,7 @@ const TvSeriesScreen = () => {
 };
 
 
-const TvSeriesSynopsis = ({ tvSeries, style, containerStyle, numberOfLines = 5, ...props } : Omit<TextProps, 'children'> & { tvSeries: MediaTvSeries, containerStyle: ViewProps['style'] }) => {
+const TvSeriesSynopsis = ({ tvSeries, style, containerStyle, numberOfLines = 5, ...props } : Omit<TextProps, 'children'> & { tvSeries: Database['public']['Views']['media_tv_series_full']['Row'], containerStyle: ViewProps['style'] }) => {
 	const t = useTranslations();
 	const { colors } = useTheme();
 	const [showFullSynopsis, setShowFullSynopsis] = useState<boolean>(false);
@@ -173,7 +179,7 @@ const TvSeriesSynopsis = ({ tvSeries, style, containerStyle, numberOfLines = 5, 
 	)
 };
 
-const TvSeriesOriginalTitle = ({ tvSeries, style, numberOfLines = 1, ...props } : Omit<TextProps, 'children'> & { tvSeries: MediaTvSeries }) => {
+const TvSeriesOriginalTitle = ({ tvSeries, style, numberOfLines = 1, ...props } : Omit<TextProps, 'children'> & { tvSeries: Database['public']['Views']['media_tv_series_full']['Row'] }) => {
 	const t = useTranslations();
 	const { colors } = useTheme();
 
@@ -189,49 +195,49 @@ const TvSeriesOriginalTitle = ({ tvSeries, style, numberOfLines = 1, ...props } 
 };
 
 
-const TvSeriesCast = ({
-	tvSeries,
-} : {
-	tvSeries: MediaTvSeries
-}) => {
-	const t = useTranslations();
-	const { width: screenWidth } = useWindowDimensions();
-	const width = useMemo(() => clamp((screenWidth * 0.8) - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
-	const renderItem = useCallback((item: MediaTvSeriesCasting) => (
-		<CardPerson variant='list' hideKnownForDepartment person={item.person!} style={tw`h-12`} />
-	), []);
+// const TvSeriesCast = ({
+// 	tvSeries,
+// } : {
+// 	tvSeries: Database['public']['Views']['media_tv_series_full']['Row']
+// }) => {
+// 	const t = useTranslations();
+// 	const { width: screenWidth } = useWindowDimensions();
+// 	const width = useMemo(() => clamp((screenWidth * 0.8) - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
+// 	const renderItem = useCallback((item: MediaTvSeriesCasting) => (
+// 		<CardPerson variant='list' hideKnownForDepartment person={item.person!} style={tw`h-12`} />
+// 	), []);
 
-	const keyExtractor = useCallback((item: MediaTvSeriesCasting) => item.person_id!.toString(), []);
-	if (!tvSeries.cast?.length) return null;
+// 	const keyExtractor = useCallback((item: MediaTvSeriesCasting) => item.person_id!.toString(), []);
+// 	if (!tvSeries.cast?.length) return null;
 
-	return (
-		<View> 
-			<Text style={[tw`text-sm font-medium`, { marginHorizontal: PADDING_HORIZONTAL }]}>
-				{`${upperFirst(t('common.messages.starring'))} :`}
-			</Text>
-			<MultiRowHorizontalList<MediaTvSeriesCasting>
-			data={tvSeries.cast}
-			renderItem={renderItem}
-			keyExtractor={keyExtractor}
-			contentContainerStyle={{
-				paddingHorizontal: PADDING_HORIZONTAL,
-				gap: GAP,
-			}}
-			columnStyle={{
-				width: width,
-				gap: GAP,
-			}}
-			snapToInterval={width + GAP}
-			decelerationRate={"fast"}
-			/>
-		</View>
-	)
-};
+// 	return (
+// 		<View> 
+// 			<Text style={[tw`text-sm font-medium`, { marginHorizontal: PADDING_HORIZONTAL }]}>
+// 				{`${upperFirst(t('common.messages.starring'))} :`}
+// 			</Text>
+// 			<MultiRowHorizontalList<MediaTvSeriesCasting>
+// 			data={tvSeries.cast}
+// 			renderItem={renderItem}
+// 			keyExtractor={keyExtractor}
+// 			contentContainerStyle={{
+// 				paddingHorizontal: PADDING_HORIZONTAL,
+// 				gap: GAP,
+// 			}}
+// 			columnStyle={{
+// 				width: width,
+// 				gap: GAP,
+// 			}}
+// 			snapToInterval={width + GAP}
+// 			decelerationRate={"fast"}
+// 			/>
+// 		</View>
+// 	)
+// };
 
 const TvSeriesTrailers = ({
 	tvSeries,
 } : {
-	tvSeries: MediaTvSeries
+	tvSeries: Database['public']['Views']['media_tv_series_full']['Row']
 }) => {
 	const { colors } = useTheme();
 	const t = useTranslations();

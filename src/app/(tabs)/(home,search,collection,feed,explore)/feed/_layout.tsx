@@ -1,10 +1,9 @@
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions, type MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
 import { ParamListBase, TabNavigationState } from "@react-navigation/native";
-import { Stack, withLayoutContext } from "expo-router";
+import { withLayoutContext } from "expo-router";
 import { upperFirst } from "lodash";
 import { View } from "react-native";
 import { useTranslations } from "use-intl";
-import { HeaderTitle } from "@react-navigation/elements";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 
@@ -51,21 +50,13 @@ const TabBar = ({ state, descriptors, navigation } : MaterialTopTabBarProps) => 
 const FeedLayout = () => {
 	const t = useTranslations();
 	return (
-	<>
-		<Stack.Screen
-		options={{
-			title: upperFirst(t('common.messages.feed')),
-			headerTitle: (props) => <HeaderTitle {...props}>{upperFirst(t('common.messages.feed', { count: 1 }))}</HeaderTitle>
-		}}
-		/>
-		<MaterialTopTabs
-		initialRouteName="index"
-		tabBar={(props) => <TabBar {...props} />}
-		>
-			<MaterialTopTabs.Screen name="index" options={{ title: upperFirst(t('common.messages.community')) }} />
-			<MaterialTopTabs.Screen name="cast-crew" options={{ title: upperFirst(t('common.messages.cast_and_crew')) }} />
-		</MaterialTopTabs>
-	</>
+	<MaterialTopTabs
+	initialRouteName="index"
+	tabBar={(props) => <TabBar {...props} />}
+	>
+		<MaterialTopTabs.Screen name="index" options={{ title: upperFirst(t('common.messages.community')) }} />
+		<MaterialTopTabs.Screen name="cast-crew" options={{ title: upperFirst(t('common.messages.cast_and_crew')) }} />
+	</MaterialTopTabs>
 	)
 };
 

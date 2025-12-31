@@ -19,7 +19,6 @@ import { PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
 import { useUserRecosTvSeriesSendQuery } from "@/features/user/userQueries";
 import { useTheme } from "@/providers/ThemeProvider";
-import AnimatedContentContainer from "@/components/ui/AnimatedContentContainer";
 import Fuse from "fuse.js";
 import { Icons } from "@/constants/Icons";
 import { Badge } from "@/components/ui/Badge";
@@ -28,7 +27,6 @@ import { useUserRecosTvSeriesInsertMutation } from "@/features/user/userMutation
 import { CardUser } from "@/components/cards/CardUser";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/Toast";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const COMMENT_MAX_LENGTH = 180;
 
@@ -36,8 +34,7 @@ const RecoSendTvSeries = () => {
 	const t = useTranslations();
 	const router = useRouter();
 	const toast = useToast();
-	const insets = useSafeAreaInsets();
-	const { colors, mode } = useTheme();
+	const { mode } = useTheme();
 	const { session } = useAuth();
 	const { tv_series_id } = useLocalSearchParams();
 	const tvSeriesId = Number(tv_series_id);
@@ -71,7 +68,9 @@ const RecoSendTvSeries = () => {
 	const [results, setResults] = useState<typeof friends>([]);
 	const [selected, setSelected] = useState<Profile[]>([]);
 	const resultsRender = results?.map((item) => ({ item: item, isSelected: selected.some((selectedItem) => selectedItem.id === item.friend.id) }));
-	const canSave = selected.length > 0 && form.formState.isValid;
+	const canSave = useMemo(() => {
+		return selected.length > 0;
+	}, [selected]);
 
 	// Queries
 	const {
@@ -143,15 +142,14 @@ const RecoSendTvSeries = () => {
 				], { userInterfaceStyle: mode }
 			);
 		} else {
-			router.dismiss();
+			router.back();
 		}
 	}, [canSave, router, t, mode]);
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
-		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : insets.bottom);
 		return {
-			paddingBottom: withTiming(paddingBottom, { duration: 200 }),
+			marginBottom: withTiming(footerHeight.value, { duration: 200 }),
 		};
 	});
 
@@ -160,19 +158,39 @@ const RecoSendTvSeries = () => {
 		<Stack.Screen
 			options={{
 				headerTitle: upperFirst(t('common.messages.send_to_friend')),
-				headerLeft: () => (
+				headerRight: () => (
 					<Button
-					variant="ghost"
-					size="fit"
-					disabled={isSendingReco}
-					onPress={handleCancel}
-					>
-						{upperFirst(t('common.messages.cancel'))}
-					</Button>
+					variant="outline"
+					icon={Icons.Reco}
+					size="icon"
+					onPress={form.handleSubmit(handleSubmit)}
+					disabled={isSendingReco || !canSave}
+					style={tw`rounded-full`}
+					/>
 				),
-				headerStyle: {
-					backgroundColor: colors.muted,
-				},
+				unstable_headerLeftItems: (props) => [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.close')),
+						onPress: handleCancel,
+						icon: {
+							name: "xmark",
+							type: "sfSymbol",
+						},
+					},
+				],
+				unstable_headerRightItems: (props) => [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.send')),
+						onPress: form.handleSubmit(handleSubmit),
+						disabled: isSendingReco || !canSave,
+						icon: {
+							name: "paperplane.fill",
+							type: "sfSymbol",
+						},
+					},
+				],
 			}}
 		/>
 		<View style={[{ paddingHorizontal: PADDING, paddingVertical: PADDING_VERTICAL }]}>
@@ -223,14 +241,14 @@ const RecoSendTvSeries = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[
 			tw`gap-2`,
-			animatedFooterStyle
+			{ paddingBottom: PADDING_VERTICAL },
 		]}
-		renderScrollComponent={(props) => <AnimatedContentContainer {...props} />}
+		style={animatedFooterStyle}
 		keyboardShouldPersistTaps='handled'
 		/>
 		<SelectionFooter
 		data={selected}
-		height={footerHeight}
+		visibleHeight={footerHeight}
 		renderItem={({ item }) => (
 			<CardUser user={item} variant="icon" linked={false} onPress={() => handleToggleUser(item)} width={50} height={50} />
 		)}
@@ -240,9 +258,7 @@ const RecoSendTvSeries = () => {
 			name="comment"
 			control={form.control}
 			render={({ field: { onChange, onBlur, value } }) => (
-			<>
 				<Input
-				icon={Icons.Comment}
 				placeholder={upperFirst(t('common.messages.add_comment', { count: 1 }))}
 				autoCapitalize="sentences"
 				value={value || ''}
@@ -251,14 +267,6 @@ const RecoSendTvSeries = () => {
 				disabled={isSendingReco}
 				error={form.formState.errors.comment?.message}
 				/>
-				<Button
-				variant="accent-yellow"
-				onPress={form.handleSubmit(handleSubmit)}
-				disabled={isSendingReco}
-				>
-					{upperFirst(t('common.messages.add'))}
-				</Button>
-			</>
 			)}
 			/>
 		</SelectionFooter>

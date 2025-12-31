@@ -1,9 +1,9 @@
+import { useMediaMovieCreditsQuery } from "@/api/medias/mediaQueries";
 import { CardPerson } from "@/components/cards/CardPerson";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { DEPARTMENT_ORDER, JOB_ORDER } from "@/constants/creditsOrder";
 import { Icons } from "@/constants/Icons";
-import { useMediaMovieCreditsQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";

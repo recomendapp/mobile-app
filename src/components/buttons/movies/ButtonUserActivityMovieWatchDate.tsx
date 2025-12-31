@@ -99,7 +99,7 @@ const ButtonUserActivityMovieWatchDate = forwardRef<
 		pickerContainerStyleIOS={{
 			backgroundColor: colors.muted,
 		}}
-		themeVariant={mode}
+		// themeVariant={mode}
 		confirmTextIOS={upperFirst(t('common.messages.save'))}
 		cancelTextIOS={upperFirst(t('common.messages.cancel'))}
 		customCancelButtonIOS={({ onPress, label, ...props }) => (

@@ -162,7 +162,6 @@ const BottomSheetRating = React.forwardRef<
 		<TrueSheet
 		ref={ref}
 		style={{ paddingTop: PADDING_VERTICAL * 2 }} 
-		blurTint='dark'
 		{...props}
 		>
 			<View style={[tw`flex-row items-center justify-center`, { paddingHorizontal: PADDING_HORIZONTAL }]}>

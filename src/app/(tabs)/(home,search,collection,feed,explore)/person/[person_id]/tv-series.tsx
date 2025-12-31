@@ -1,4 +1,3 @@
-import { useMediaPersonQuery, useMediaPersonTvSeriesInfiniteQuery } from "@/features/media/mediaQueries";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
@@ -15,10 +14,11 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { Text } from "@/components/ui/text";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
+import { useMediaPersonDetailsQuery, useMediaPersonTvSeriesQuery } from "@/api/medias/mediaQueries";
 
 interface sortBy {
 	label: string;
-	value: 'last_appearance_date' | 'release_date' | 'vote_average';
+	value: 'last_appearance_date' | 'first_air_date' | 'vote_average';
 }
 
 const PersonTvSeriesScreen = () => {
@@ -31,13 +31,13 @@ const PersonTvSeriesScreen = () => {
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
 		{ label: upperFirst(t('common.messages.last_appearance_date')), value: 'last_appearance_date' },
-		{ label: upperFirst(t('common.messages.release_date')), value: 'release_date' },
+		{ label: upperFirst(t('common.messages.release_date')), value: 'first_air_date' },
 		{ label: upperFirst(t('common.messages.vote_average')), value: 'vote_average' },
 	], [t]);
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	// Queries
-	const { data: person } = useMediaPersonQuery({ personId });
+	const { data: person } = useMediaPersonDetailsQuery({ personId });
 	const {
 		data,
 		isLoading,
@@ -45,7 +45,7 @@ const PersonTvSeriesScreen = () => {
 		hasNextPage,
 		isRefetching,
 		refetch,
-	} = useMediaPersonTvSeriesInfiniteQuery({
+	} = useMediaPersonTvSeriesQuery({
 		personId: personId,
 		filters: {
 			sortBy: sortBy.value,
@@ -83,7 +83,7 @@ const PersonTvSeriesScreen = () => {
 		renderItem={useCallback(({ item } : { item: typeof tvSeries[number] }) => (
 			<CardTvSeries
 			variant="poster"
-			tvSeries={item.tv_series}
+			tvSeries={item.media_tv_series}
 			style={tw`w-full`}
 			/>
 		), [])}
@@ -124,7 +124,7 @@ const PersonTvSeriesScreen = () => {
 			paddingHorizontal: PADDING_HORIZONTAL,
 		}}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}
-		keyExtractor={useCallback((item: typeof tvSeries[number]) => item.tv_series.id.toString(), [])}
+		keyExtractor={useCallback((item: typeof tvSeries[number]) => item.media_tv_series.id.toString(), [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		/>

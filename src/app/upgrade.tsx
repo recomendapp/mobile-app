@@ -19,7 +19,7 @@ const UpgradeScreen = () => {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const t = useTranslations();
-	const { defaultScreenOptions } = useTheme();
+	const { defaultScreenOptions, isLiquidGlassAvailable } = useTheme();
 	const authCustomerInfoOptions = useAuthCustomerInfoOptions();
 
 	const onSuccess = useCallback(async ({ customerInfo } : { customerInfo: CustomerInfo }) => {
@@ -30,6 +30,10 @@ const UpgradeScreen = () => {
 		router.canGoBack() && router.back();
 	}, [queryClient, authCustomerInfoOptions.queryKey, router, session?.user.id]);
 
+	const handleClose = useCallback(() => {
+		router.canGoBack() && router.back();
+	}, [router]);
+
 	if (!session) return <Redirect href={'/auth/login'} />
 	
 	return (
@@ -39,8 +43,21 @@ const UpgradeScreen = () => {
 			...defaultScreenOptions,
 			headerTitle: upperFirst(t('common.messages.upgrade')),
 			headerTransparent: true,
-			headerRight: isIOS ? () => <Button icon={Icons.X} size="icon" variant='muted' style={tw`rounded-full`} onPress={() => router.canGoBack() && router.back()} /> : undefined,
 			headerStyle: { backgroundColor: 'transparent' },
+			headerLeft: () => (
+				<Button variant="muted" icon={Icons.X} size="icon" style={tw`rounded-full`} onPress={handleClose} />
+			),
+			unstable_headerLeftItems: isLiquidGlassAvailable ? (props) => [
+			{
+				type: "button",
+				label: upperFirst(t('common.messages.close')),
+				onPress: handleClose,
+				icon: {
+					name: "xmark",
+					type: "sfSymbol",
+				},
+			},
+			] : undefined,
 		}}
 		/>
 		<RevenueCatUI.Paywall onPurchaseCompleted={onSuccess} onRestoreCompleted={onSuccess} />

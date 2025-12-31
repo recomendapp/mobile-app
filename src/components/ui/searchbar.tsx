@@ -43,7 +43,6 @@ export function SearchBar({
   selectionColor,
   value,
   onChangeText,
-  keyboardAppearance: keyboardAppearanceProp,
   ...props
 }: SearchBarProps) {
   const [internalValue, setInternalValue] = useState(value || '');
@@ -51,7 +50,7 @@ export function SearchBar({
   const inputRef = useRef<TextInput>(null);
 
   // Theme colors
-  const { colors, mode } = useTheme();
+  const { colors } = useTheme();
   const cardColor = colors.card;
   const textColor = colors.foreground;
   const muted = colors.mutedForeground;
@@ -123,7 +122,6 @@ export function SearchBar({
         returnKeyType={returnKeyType}
         autoCorrect={autoCorrect}
         selectionColor={selectionColor || colors.accentYellow}
-        keyboardAppearance={keyboardAppearanceProp || mode}
         {...props}
       />
 

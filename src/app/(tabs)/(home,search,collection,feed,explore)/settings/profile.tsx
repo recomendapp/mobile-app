@@ -240,6 +240,20 @@ const SettingsProfileScreen = () => {
 						{upperFirst(t('common.messages.save'))}
 					</Button>
 				),
+				unstable_headerRightItems: (props) => [
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.save')),
+					onPress: form.handleSubmit(handleSubmit),
+					tintColor: props.tintColor,
+					disabled: !canSave || isLoading,
+					icon: {
+						name: "checkmark",
+						type: "sfSymbol",
+					},
+				},
+			],
+				
 			}}
 		/>
 		<KeyboardAwareScrollView

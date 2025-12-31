@@ -173,7 +173,7 @@ const ProfileScreen = () => {
 	return (
 	<>
 		<Stack.Screen
-			options={useMemo(() => ({
+			options={{
 				title: profile ? `@${profile.username}` : '',
 				headerTitle: (props) => (
 					<View style={tw`flex-row items-center gap-1`}>
@@ -203,8 +203,33 @@ const ProfileScreen = () => {
 					})}
 					/>
 				</>
-				)
-			}), [profile, colors.accentBlue, session?.user.id, router, openSheet])}
+				),
+				unstable_headerRightItems: (props) => [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.setting', { count: 2 })),
+						onPress: () => router.push('/settings'),
+						tintColor: props.tintColor,
+						icon: {
+							name: "gearshape",
+							type: "sfSymbol",
+						},
+						visible: profile?.id === session?.user.id,
+					},
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.menu')),
+						onPress: () => openSheet(BottomSheetUser, {
+							user: profile!
+						}),
+						tintColor: props.tintColor,
+						icon: {
+							name: "ellipsis",
+							type: "sfSymbol",
+						},
+					},
+				],
+			}}
 		/>
 		<ScrollView
 		refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refresh} />}

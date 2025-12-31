@@ -8,12 +8,11 @@ import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useRouter } from "expo-router";
-import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsTvSeriesQuery } from "@/features/playlist/playlistQueries";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import useDebounce from "@/hooks/useDebounce";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { usePlaylistItemsTvSeriesRealtimeMutation, usePlaylistTvSeriesDeleteMutation, usePlaylistTvSeriesUpdateMutation } from "@/features/playlist/playlistMutations";
+import { usePlaylistItemsTvSeriesRealtimeMutation, usePlaylistTvSeriesDeleteMutation, usePlaylistTvSeriesUpdateMutation } from "@/api/playlists/playlistMutations";
 import { CardUser } from "@/components/cards/CardUser";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
@@ -25,6 +24,7 @@ import { BottomSheetComment } from "@/components/bottom-sheets/sheets/BottomShee
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsTvSeriesQuery } from "@/api/playlists/playlistsQueries";
 
 interface PlaylistTvSeriesProps {
 	playlist: Playlist;
@@ -51,8 +51,8 @@ export const PlaylistTvSeries = ({
 	const { data: isAllowedToEdit } = usePlaylistIsAllowedToEditQuery({
 		playlistId: playlist.id,
 		userId: session?.user.id,
-	})
-	const playlistItems = usePlaylistItemsTvSeriesQuery({
+	});
+	const playlistItems= usePlaylistItemsTvSeriesQuery({
 		playlistId: playlist.id,
 	});
 	const { mutateAsync: deletePlaylistItemMutation } = usePlaylistTvSeriesDeleteMutation();

@@ -1,47 +1,49 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { playlistKeys } from "./playlistKeys";
-import { Playlist, PlaylistItemMovie, PlaylistItemTvSeries, PlaylistSource } from "@recomendapp/types";
+import { infiniteQueryOptions, queryOptions, useQuery } from "@tanstack/react-query";
+import { playlistsKeys } from "./playlistsKeys";
 import { useApiClient } from "@/providers/ApiProvider";
+import { useAuth } from "@/providers/AuthProvider";
+import { SupabaseClient } from "@/lib/supabase/client";
+import { ApiClient } from "@recomendapp/api-js";
 
-export const usePlaylistQuery = ({
+/* --------------------------------- DETAILS -------------------------------- */
+export const playlistDetailsOptions = ({
+	supabase,
 	playlistId,
-	initialData
 } : {
-	playlistId?: number;
-	initialData?: Playlist;
+	supabase: SupabaseClient,
+	playlistId?: number
 }) => {
-	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: playlistKeys.detail(playlistId!),
+	return queryOptions({
+		queryKey: playlistsKeys.details({ playlistId: playlistId! }),
 		queryFn: async () => {
 			if (!playlistId) throw Error('Missing playlist id');
 			const { data, error } = await supabase
-				.from('playlists')
-				.select(`
-					*,
-					user:profile(*)
-				`)
-				.eq('id', playlistId)
-				.maybeSingle()
-				.overrideTypes<Playlist, { merge: false }>();
+			.from('playlists')
+			.select(`*, user:profile(*)`)
+			.eq('id', playlistId)
+			.maybeSingle();
+
 			if (error || !data) throw error;
 			return data;
 		},
-		initialData: initialData,
-		structuralSharing: false,
 		enabled: !!playlistId,
 	});
 };
-// Items
-export const usePlaylistItemsMovieQuery = ({
+/* -------------------------------------------------------------------------- */
+
+/* ---------------------------------- ITEMS --------------------------------- */
+export const playlistItemsMovieOptions = ({
+	supabase,
 	playlistId,
 } : {
+	supabase: SupabaseClient;
 	playlistId?: number;
 }) => {
-	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: playlistKeys.items(playlistId as number),
+	return queryOptions({
+		queryKey: playlistsKeys.items({
+			playlistId: playlistId!,
+		}),
 		queryFn: async () => {
 			if (!playlistId) throw Error('Missing playlist id');
 			const { data, error } = await supabase
@@ -49,30 +51,6 @@ export const usePlaylistItemsMovieQuery = ({
 				.select(`*, movie:media_movie(*)`)
 				.eq('playlist_id', playlistId)
 				.order('rank', { ascending: true })
-				.overrideTypes<PlaylistItemMovie[]>();
-			if (error) throw error;
-			return data;
-		},
-		enabled: !!playlistId,
-		structuralSharing: false,
-	});
-};
-export const usePlaylistItemsTvSeriesQuery = ({
-	playlistId,
-} : {
-	playlistId?: number;
-}) => {
-	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: playlistKeys.items(playlistId as number),
-		queryFn: async () => {
-			if (!playlistId) throw Error('Missing playlist id');
-			const { data, error } = await supabase
-				.from('playlist_items_tv_series')
-				.select(`*, tv_series:media_tv_series(*)`)
-				.eq('playlist_id', playlistId)
-				.order('rank', { ascending: true })
-				.overrideTypes<PlaylistItemTvSeries[]>();
 			if (error) throw error;
 			return data;
 		},
@@ -81,15 +59,45 @@ export const usePlaylistItemsTvSeriesQuery = ({
 	});
 };
 
+export const playlistItemsTvSeriesOptions = ({
+	supabase,
+	playlistId,
+} : {
+	supabase: SupabaseClient;
+	playlistId?: number;
+}) => {
+	return queryOptions({
+		queryKey: playlistsKeys.items({
+			playlistId: playlistId!,
+		}),
+		queryFn: async () => {
+			if (!playlistId) throw Error('Missing playlist id');
+			const { data, error } = await supabase
+				.from('playlist_items_tv_series')
+				.select(`*, tv_series:media_tv_series(*)`)
+				.eq('playlist_id', playlistId)
+				.order('rank', { ascending: true })
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!playlistId,
+		structuralSharing: false,
+	});
+};
+/* -------------------------------------------------------------------------- */
+
 /* --------------------------------- GUESTS --------------------------------- */
-export const usePlaylistGuestsQuery = ({
+export const playlistGuestsOptions = ({
+	supabase,
 	playlistId
 }: {
+	supabase: SupabaseClient;
 	playlistId?: number
 }) => {
-	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: playlistKeys.guests(playlistId as number),
+	return queryOptions({
+		queryKey: playlistsKeys.guests({
+			playlistId: playlistId!,
+		}),
 		queryFn: async () => {
 			if (!playlistId) throw Error('Missing playlist id');
 			const { data, error } = await supabase
@@ -107,16 +115,67 @@ export const usePlaylistGuestsQuery = ({
 	});
 };
 
-export const usePlaylistIsAllowedToEditQuery = ({
+export const playlistGuestsAddOptions = ({
+	api,
+	userId,
+	playlistId,
+	query,
+	guests,
+} : {
+	api: ApiClient;
+	userId?: string;
+	playlistId?: number;
+	query?: string;
+	guests?: { user_id: string; edit: boolean }[];
+}) => {
+	const PER_PAGE = 20;
+	return infiniteQueryOptions({
+		queryKey: playlistsKeys.guestsAdd({
+			playlistId: playlistId!,
+			filters: {
+				search: query!,
+			},
+		}),
+		queryFn: async ({ pageParam = 1 }) => {
+			if (!playlistId) throw Error('Missing playlist id');
+			if (!query) throw Error('Missing search query');
+			if (!query.length) throw Error('Empty search query');
+			if (!userId) throw Error('Missing user id');
+			const { data, error } = await api.search.users({
+				query: {
+					q: query,
+					page: pageParam,
+					per_page: PER_PAGE,
+					exclude_ids: [
+						userId,
+						...(guests?.map((guest) => guest.user_id) || [])
+					].join(','),
+				}
+			});
+			if (error || !data) throw error;
+			return data;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) => {
+			return lastPage.pagination.current_page < lastPage.pagination.total_pages
+				? lastPage.pagination.current_page + 1
+				: undefined;
+		},
+		enabled: !!playlistId && !!query && !!query.length && !!userId,
+	});
+};
+
+export const playlistIsAllowedToEditOptions = ({
+	supabase,
 	playlistId,
 	userId,
 } : {
+	supabase: SupabaseClient;
 	playlistId?: number;
 	userId?: string;
 }) => {
-	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: playlistKeys.allowedToEdit({
+	return queryOptions({
+		queryKey: playlistsKeys.allowedToEdit({
 			playlistId: playlistId!,
 			userId: userId!,
 		}),
@@ -142,123 +201,22 @@ export const usePlaylistIsAllowedToEditQuery = ({
 		enabled: !!playlistId && !!userId,
 	});
 };
-
-export const usePlaylistGuestsSearchInfiniteQuery = ({
-	playlistId,
-	query,
-	filters,
-} : {
-	playlistId?: number;
-	query?: string;
-	filters?: {
-		perPage?: number;
-		exclude?: string[];
-	};
-}) => {
-	const mergedFilters = {
-		perPage: 20,
-		...filters,
-	};
-	const api = useApiClient();
-	return useInfiniteQuery({
-		queryKey: playlistKeys.guestsAdd({
-			playlistId: playlistId as number,
-			filters: {
-				...mergedFilters,
-				query: query,
-			}
-		}),
-		queryFn: async ({ pageParam = 1 }) => {
-			if (!playlistId) throw Error('Missing playlist id');
-			if (!query) throw Error('Missing search query');
-			const { data, error } = await api.search.users({
-				query: {
-					q: query,
-					page: pageParam,
-					per_page: mergedFilters.perPage,
-					exclude_ids: mergedFilters.exclude?.join(','),
-				}
-			});
-			if (error || !data) throw error;
-			return data;
-		},
-		initialPageParam: 1,
-		getNextPageParam: (lastPage) => {
-			return lastPage.pagination.current_page < lastPage.pagination.total_pages
-				? lastPage.pagination.current_page + 1
-				: undefined;
-		},
-		enabled: !!playlistId && !!query && !!query.length,
-	});
-};
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------- FEATURED -------------------------------- */
-export const usePlaylistFeaturedInfiniteQuery = ({
-	filters
-} : {
-	filters?: {
-		sortBy?: 'created_at' | 'updated_at';
-		sortOrder?: 'asc' | 'desc';
-		resultsPerPage?: number;
-	};
-} = {}) => {
-	const mergedFilters = {
-		resultsPerPage: 20,
-		sortBy: 'updated_at',
-		sortOrder: 'desc',
-		...filters,
-	};
-	const supabase = useSupabaseClient();
-	return useInfiniteQuery({
-		queryKey: playlistKeys.featured({ filters: mergedFilters }),
-		queryFn: async ({ pageParam = 1 }) => {
-			let from = (pageParam - 1) * mergedFilters.resultsPerPage;
-			let to = from - 1 + mergedFilters.resultsPerPage;
-			let query = supabase
-				.from('playlists_featured')
-				.select('*, playlist:playlists(*, user:profile(*))')
-				.range(from, to)
-			
-			if (mergedFilters) {
-				if (mergedFilters.sortBy) {
-					switch (mergedFilters.sortBy) {
-						case 'created_at':
-							query = query.order('playlist(created_at)', { ascending: mergedFilters.sortOrder === 'asc' });
-							break;
-						case 'updated_at':
-							query = query.order('playlist(updated_at)', { ascending: mergedFilters.sortOrder === 'asc' });
-							break;
-						default:
-							break;
-					}
-				}
-			}
-			const { data, error } = await query;
-			if (error) throw error;
-			return data;
-		},
-		initialPageParam: 1,
-		getNextPageParam: (lastPage, pages) => {
-			return lastPage?.length === mergedFilters.resultsPerPage ? pages.length + 1 : undefined;
-		},
-	});
-};
 /* -------------------------------------------------------------------------- */
 
 /* --------------------------------- ADD TO --------------------------------- */
-export const usePlaylistMovieAddToQuery = ({
+export const playlistMovieAddToOptions = ({
+	supabase,
 	movieId,
 	userId,
-	source = 'personal',
+	source,
 } : {
+	supabase: SupabaseClient;
 	movieId: number;
 	userId?: string;
-	source: PlaylistSource;
+	source: 'saved' | 'personal';
 }) => {
-	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: playlistKeys.addToSource({ id: movieId, type: 'movie', source }),
+	return queryOptions({
+		queryKey: playlistsKeys.addToSource({ id: movieId, type: 'movie', source }),
 		queryFn: async () => {
 			if (!userId) throw Error('Missing user id');
 			if (!source) throw Error('Missing source');
@@ -313,18 +271,20 @@ export const usePlaylistMovieAddToQuery = ({
 		enabled: !!userId && !!movieId,
 	});
 };
-export const usePlaylistTvSeriesAddToQuery = ({
+
+export const playlistTvSeriesAddToOptions = ({
+	supabase,
 	tvSeriesId,
 	userId,
-	source = 'personal',
+	source,
 } : {
+	supabase: SupabaseClient;
 	tvSeriesId: number;
 	userId?: string;
-	source: PlaylistSource;
+	source: 'saved' | 'personal';
 }) => {
-	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: playlistKeys.addToSource({ id: tvSeriesId, type: 'tv_series', source }),
+	return queryOptions({
+		queryKey: playlistsKeys.addToSource({ id: tvSeriesId, type: 'tv_series', source }),
 		queryFn: async () => {
 			if (!userId) throw Error('Missing user id');
 			if (!source) throw Error('Missing source');
@@ -381,3 +341,48 @@ export const usePlaylistTvSeriesAddToQuery = ({
 };
 /* -------------------------------------------------------------------------- */
 
+/* --------------------------------- FEATURED -------------------------------- */
+export const playlistsFeaturedOptions = ({
+	supabase,
+	filters
+} : {
+	supabase: SupabaseClient;
+	filters: {
+		sortBy: 'created_at' | 'updated_at';
+		sortOrder: 'asc' | 'desc';
+	};
+}) => {
+	const PER_PAGE = 20;
+	return infiniteQueryOptions({
+		queryKey: playlistsKeys.featured({ filters }),
+		queryFn: async ({ pageParam = 1 }) => {
+			const from = (pageParam - 1) * PER_PAGE;
+			const to = from + PER_PAGE - 1;
+			let query = supabase
+				.from('playlists_featured')
+				.select('*, playlist:playlists(*, user:profile(*))')
+				.range(from, to)
+			
+			if (filters.sortBy && filters.sortOrder) {
+				switch (filters.sortBy) {
+					case 'created_at':
+						query = query.order('playlist(created_at)', { ascending: filters.sortOrder === 'asc' });
+						break;
+					case 'updated_at':
+					default:
+						query = query.order('playlist(updated_at)', { ascending: filters.sortOrder === 'asc' });
+						break;
+				}
+			}
+
+			const { data, error } = await query;
+			if (error) throw error;
+			return data;
+		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, pages) => {
+			return lastPage?.length === PER_PAGE ? pages.length + 1 : undefined;
+		},
+	});
+};
+/* -------------------------------------------------------------------------- */

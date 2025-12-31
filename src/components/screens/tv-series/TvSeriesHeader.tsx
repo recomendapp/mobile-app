@@ -23,7 +23,6 @@ import { useRouter } from 'expo-router';
 import { useTheme } from '@/providers/ThemeProvider';
 import tw from '@/lib/tw';
 import { IconMediaRating } from '@/components/medias/IconMediaRating';
-import { useMediaTvSeriesFollowersAverageRatingQuery } from '@/features/media/mediaQueries';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { useLocale, useTranslations } from 'use-intl';
 import { Text, TextProps } from '@/components/ui/text';
@@ -35,6 +34,7 @@ import { useImagePalette } from '@/hooks/useImagePalette';
 import AnimatedImage from '@/components/ui/AnimatedImage';
 import BottomSheetPerson from '@/components/bottom-sheets/sheets/BottomSheetPerson';
 import { getTmdbImage } from '@/lib/tmdb/getTmdbImage';
+import { useMediaTvSeriesFollowersAverageRatingQuery } from '@/api/medias/mediaQueries';
 
 interface TvSeriesHeaderProps {
 	tvSeries?: MediaTvSeries | null;

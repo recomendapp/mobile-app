@@ -8,12 +8,11 @@ import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useRouter } from "expo-router";
-import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsMovieQuery } from "@/features/playlist/playlistQueries";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import useDebounce from "@/hooks/useDebounce";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { usePlaylistItemsMovieRealtimeMutation, usePlaylistMovieDeleteMutation, usePlaylistMovieUpdateMutation } from "@/features/playlist/playlistMutations";
+import { usePlaylistItemsMovieRealtimeMutation, usePlaylistMovieDeleteMutation, usePlaylistMovieUpdateMutation } from "@/api/playlists/playlistMutations";
 import { CardUser } from "@/components/cards/CardUser";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
@@ -25,6 +24,8 @@ import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { useUIStore } from "@/stores/useUIStore";
+import { useQuery } from "@tanstack/react-query";
+import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsMovieQuery } from "@/api/playlists/playlistsQueries";
 
 interface PlaylistMovieProps {
 	playlist: Playlist;
@@ -51,7 +52,7 @@ export const PlaylistMovie = ({
 	const { data: isAllowedToEdit } = usePlaylistIsAllowedToEditQuery({
 		playlistId: playlist.id,
 		userId: session?.user.id,
-	})
+	});
 	const playlistItems = usePlaylistItemsMovieQuery({
 		playlistId: playlist.id,
 	});

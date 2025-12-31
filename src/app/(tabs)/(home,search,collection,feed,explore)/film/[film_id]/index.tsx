@@ -1,15 +1,14 @@
-import { useMediaMovieDetailsQuery } from "@/features/media/mediaQueries";
 import { Href, Link, useLocalSearchParams } from "expo-router"
-import { clamp, lowerCase, upperFirst } from "lodash";
+import { lowerCase, upperFirst } from "lodash";
 import { Pressable, useWindowDimensions, ViewProps } from "react-native";
-import { Database, MediaMovie, MediaMovieCasting } from "@recomendapp/types";
+import { Database } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useState, useCallback, useMemo } from "react";
-import { useLocale, useTranslations } from "use-intl";
+import { useTranslations } from "use-intl";
 import { Text, TextProps } from "@/components/ui/text";
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { BORDER_RADIUS_FULL, GAP, GAP_XS, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
@@ -17,9 +16,7 @@ import MovieHeader from "@/components/screens/film/MovieHeader";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import MovieWidgetReviews from "@/components/screens/film/MovieWidgetReviews";
 import MovieWidgetPlaylists from "@/components/screens/film/MovieWidgetPlaylists";
-import { CardPerson } from "@/components/cards/CardPerson";
 import { View } from "@/components/ui/view";
-import { MultiRowHorizontalList } from "@/components/ui/MultiRowHorizontalList";
 import { Button } from "@/components/ui/Button";
 import { FloatingBar } from "@/components/ui/FloatingBar";
 import { useAuth } from "@/providers/AuthProvider";
@@ -35,13 +32,13 @@ import { Icons } from "@/constants/Icons";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { Vimeo } from 'react-native-vimeo-iframe'
 import { LegendList } from "@legendapp/list";
+import { useMediaMovieDetailsQuery } from "@/api/medias/mediaQueries";
 
 const FilmScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
 	const { session } = useAuth();
 	const { tabBarHeight, bottomOffset } = useTheme();
-	const locale = useLocale();
 	const t = useTranslations();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 
@@ -49,8 +46,7 @@ const FilmScreen = () => {
 		data: movie,
 		isLoading,
 	} = useMediaMovieDetailsQuery({
-		id: movieId,
-		locale: locale,
+		movieId: movieId,
 	});
 
 	const loading = movie === undefined || isLoading;
@@ -89,6 +85,18 @@ const FilmScreen = () => {
 		options={{
 			headerTitle: movie?.title || '',
 			headerTransparent: true,
+			unstable_headerRightItems: (props) => [
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.menu')),
+					onPress: handleMenuPress,
+					tintColor: props.tintColor,
+					icon: {
+						name: "ellipsis",
+						type: "sfSymbol",
+					},
+				},
+			],
 		}}
 		scrollY={scrollY}
 		triggerHeight={headerHeight}
@@ -116,7 +124,7 @@ const FilmScreen = () => {
 							<FilmSynopsis movie={movie} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
 							<FilmOriginalTitle movie={movie} style={{ marginHorizontal: PADDING_HORIZONTAL }} />
 						</View>
-						<FilmCast movie={movie} />
+						{/* <FilmCast movie={movie} /> */}
 						
 						<Link href={{ pathname: '/film/[film_id]/details', params: { film_id: movie.id }}} asChild>
 							<Button variant="outline" style={{ marginHorizontal: PADDING_HORIZONTAL }}>
@@ -149,7 +157,7 @@ const FilmScreen = () => {
 	)
 };
 
-const FilmSynopsis = ({ movie, style, containerStyle, numberOfLines = 5, ...props } : Omit<TextProps, 'children'> & { movie: MediaMovie, containerStyle: ViewProps['style'] }) => {
+const FilmSynopsis = ({ movie, style, containerStyle, numberOfLines = 5, ...props } : Omit<TextProps, 'children'> & { movie: Database['public']['Views']['media_movie_full']['Row'], containerStyle: ViewProps['style'] }) => {
 	const t = useTranslations();
 	const { colors } = useTheme();
 	const [showFullSynopsis, setShowFullSynopsis] = useState<boolean>(false);
@@ -174,7 +182,7 @@ const FilmSynopsis = ({ movie, style, containerStyle, numberOfLines = 5, ...prop
 	)
 };
 
-const FilmOriginalTitle = ({ movie, style, numberOfLines = 1, ...props } : Omit<TextProps, 'children'> & { movie: MediaMovie }) => {
+const FilmOriginalTitle = ({ movie, style, numberOfLines = 1, ...props } : Omit<TextProps, 'children'> & { movie: Database['public']['Views']['media_movie_full']['Row'] }) => {
 	const t = useTranslations();
 	const { colors } = useTheme();
 
@@ -190,49 +198,49 @@ const FilmOriginalTitle = ({ movie, style, numberOfLines = 1, ...props } : Omit<
 	)
 };
 
-const FilmCast = ({
-	movie,
-} : {
-	movie: MediaMovie
-}) => {
-	const t = useTranslations();
-	const { width: screenWidth } = useWindowDimensions();
-	const width = useMemo(() => clamp((screenWidth * 0.8) - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
-	const renderItem = useCallback((item: MediaMovieCasting) => (
-		<CardPerson variant='list' hideKnownForDepartment person={item.person!} style={tw`h-12`} />
-	), []);
+// const FilmCast = ({
+// 	movie,
+// } : {
+// 	movie: Database['public']['Views']['media_movie_full']['Row'];
+// }) => {
+// 	const t = useTranslations();
+// 	const { width: screenWidth } = useWindowDimensions();
+// 	const width = useMemo(() => clamp((screenWidth * 0.8) - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
+// 	const renderItem = useCallback((item: MediaMovieCasting) => (
+// 		<CardPerson variant='list' hideKnownForDepartment person={item.person!} style={tw`h-12`} />
+// 	), []);
 
-	const keyExtractor = useCallback((item: MediaMovieCasting) => item.person_id!.toString(), []);
-	if (!movie.cast?.length) return null;
+// 	const keyExtractor = useCallback((item: MediaMovieCasting) => item.person_id!.toString(), []);
+// 	if (!movie.cast?.length) return null;
 
-	return (
-		<View> 
-			<Text style={[tw`text-sm font-medium`, { marginHorizontal: PADDING_HORIZONTAL }]}>
-				{`${upperFirst(t('common.messages.starring'))} :`}
-			</Text>
-			<MultiRowHorizontalList<MediaMovieCasting>
-			data={movie.cast}
-			renderItem={renderItem}
-			keyExtractor={keyExtractor}
-			contentContainerStyle={{
-				paddingHorizontal: PADDING_HORIZONTAL,
-				gap: GAP,
-			}}
-			columnStyle={{
-				width: width,
-				gap: GAP,
-			}}
-			snapToInterval={width + GAP}
-			decelerationRate={"fast"}
-			/>
-		</View>
-	)
-};
+// 	return (
+// 		<View> 
+// 			<Text style={[tw`text-sm font-medium`, { marginHorizontal: PADDING_HORIZONTAL }]}>
+// 				{`${upperFirst(t('common.messages.starring'))} :`}
+// 			</Text>
+// 			<MultiRowHorizontalList<MediaMovieCasting>
+// 			data={movie.cast}
+// 			renderItem={renderItem}
+// 			keyExtractor={keyExtractor}
+// 			contentContainerStyle={{
+// 				paddingHorizontal: PADDING_HORIZONTAL,
+// 				gap: GAP,
+// 			}}
+// 			columnStyle={{
+// 				width: width,
+// 				gap: GAP,
+// 			}}
+// 			snapToInterval={width + GAP}
+// 			decelerationRate={"fast"}
+// 			/>
+// 		</View>
+// 	)
+// };
 
 const FilmTrailers = ({
 	movie,
 } : {
-	movie: MediaMovie
+	movie: Database['public']['Views']['media_movie_full']['Row'];
 }) => {
 	const { colors } = useTheme();
 	const t = useTranslations();

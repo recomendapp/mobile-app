@@ -5,11 +5,12 @@ import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { upperFirst } from "lodash";
 import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useMediaPlaylistsTvSeriesInfiniteQuery } from "@/features/media/mediaQueries";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 import { Playlist } from "@recomendapp/types";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useMediaTvSeriesPlaylistsQuery } from "@/api/medias/mediaQueries";
 
 interface TvSeriesWidgetPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	tvSeriesId: number;
@@ -33,8 +34,12 @@ const TvSeriesWidgetPlaylists = ({
 		isLoading,
 		fetchNextPage,
 		hasNextPage,
-	} = useMediaPlaylistsTvSeriesInfiniteQuery({
+	} = useMediaTvSeriesPlaylistsQuery({
 		tvSeriesId,
+		filters: {
+			sortBy: 'updated_at',
+			sortOrder: 'desc',
+		}
 	});
 	const loading = playlists === undefined || isLoading;
 

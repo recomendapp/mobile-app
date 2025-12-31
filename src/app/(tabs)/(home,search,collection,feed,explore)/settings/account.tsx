@@ -246,6 +246,19 @@ const SettingsAccountScreen = () => {
 						{upperFirst(t('common.messages.save'))}
 					</Button>
 				),
+				unstable_headerRightItems: (props) => [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.save')),
+						onPress: form.handleSubmit(handleOnSubmit),
+						tintColor: props.tintColor,
+						disabled: !hasUnsavedChanges || !form.formState.isValid || isLoading,
+						icon: {
+							name: "checkmark",
+							type: "sfSymbol",
+						},
+					},
+				],
 			}}
 			/>
 			<KeyboardAwareScrollView

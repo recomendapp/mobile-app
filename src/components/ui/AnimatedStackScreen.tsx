@@ -54,7 +54,9 @@ const AnimatedStackScreen = forwardRef<
 
 	const titleAnimatedStyle = useAnimatedStyle(() => {
 		'worklet';
-		const show = scrollY.value >= triggerHeight.get();
+		const show = triggerHeight.value === 0
+			? false
+			: scrollY.value >= triggerHeight.value;
 		return {
 			opacity: withTiming(show ? 1 : 0, { duration: 200 }),
 			transform: [
@@ -65,7 +67,9 @@ const AnimatedStackScreen = forwardRef<
 	});
 	const backgroundAnimatedStyle = useAnimatedStyle(() => {
 		'worklet';
-		const show = scrollY.value >= triggerHeight.get();
+		const show = triggerHeight.value === 0
+			? false
+			: scrollY.value >= triggerHeight.value;
 		return {
 			opacity: withTiming(show ? 1 : 0, { duration: 200 }),
 			transform: [{ translateY: withTiming(show ? 0 : -10, { duration: 200 }) }],

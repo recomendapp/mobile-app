@@ -8,10 +8,9 @@ import { Icons } from "@/constants/Icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { usePlaylistGuestsQuery, usePlaylistQuery } from "@/features/playlist/playlistQueries";
 import Switch from "@/components/ui/Switch";
 import { Alert } from "react-native";
-import { usePlaylistGuestsDeleteMutation, usePlaylistGuestsUpsertMutation } from "@/features/playlist/playlistMutations";
+import { usePlaylistGuestsDeleteMutation, usePlaylistGuestsUpsertMutation } from "@/api/playlists/playlistMutations";
 import { Profile } from "@recomendapp/types";
 import Fuse from "fuse.js";
 import { SearchBar } from "@/components/ui/searchbar";
@@ -25,6 +24,7 @@ import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { usePlaylistDetailsQuery, usePlaylistGuestsQuery } from "@/api/playlists/playlistsQueries";
 
 const RightActions = ({
 	drag,
@@ -84,7 +84,7 @@ const ModalPlaylistEditGuests = () => {
 	const insets = useSafeAreaInsets();
 	const {
 		data: playlist,
-	} = usePlaylistQuery({
+	} = usePlaylistDetailsQuery({
 		playlistId: playlistId,
 	});
 	const {
@@ -98,8 +98,12 @@ const ModalPlaylistEditGuests = () => {
 	const loading = guestsRequest === undefined || guestsRequestLoading;
 	
 	// Mutations
-	const { mutateAsync: upsertGuestsMutation } = usePlaylistGuestsUpsertMutation();
-	const { mutateAsync: deleteGuestsMutation } = usePlaylistGuestsDeleteMutation();
+	const { mutateAsync: upsertGuestsMutation } = usePlaylistGuestsUpsertMutation({
+		playlistId: playlistId,
+	});
+	const { mutateAsync: deleteGuestsMutation } = usePlaylistGuestsDeleteMutation({
+		playlistId: playlistId,
+	});
 
 	// States
 	const [ guests, setGuests ] = useState<{ user: Profile, edit: boolean }[] | undefined>(undefined);
@@ -169,7 +173,6 @@ const ModalPlaylistEditGuests = () => {
 			const guestsToDelete = guestsRequest?.filter((guest) => !guests?.some((g) => g.user.id === guest.user?.id));
 			if (guestsToUpsert?.length) {
 				await upsertGuestsMutation({
-					playlistId: playlist.id,
 					guests: guestsToUpsert.map((guest) => ({
 						user_id: guest.user.id!,
 						edit: guest.edit
@@ -178,8 +181,7 @@ const ModalPlaylistEditGuests = () => {
 			}
 			if (guestsToDelete?.length) {
 				await deleteGuestsMutation({
-					playlistId: playlist.id,
-					ids: guestsToDelete.map((guest) => guest.id),
+					userIds: guestsToDelete.map((guest) => guest.user_id),
 				}, { onError: (error) => { throw error } })
 			}
 			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));

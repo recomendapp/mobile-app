@@ -44,7 +44,7 @@ const BottomSheetMovie = React.forwardRef<
 >(({ id, movie, activity, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const { colors, mode, tabBarHeight } = useTheme();
+  const { colors, mode, tabBarHeight, isLiquidGlassAvailable } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -119,7 +119,7 @@ const BottomSheetMovie = React.forwardRef<
       return (
         <View
         style={[
-          { backgroundColor: colors.muted, borderColor: colors.mutedForeground },
+          { backgroundColor: isLiquidGlassAvailable ? 'transparent' : colors.muted, borderColor: colors.mutedForeground },
           tw`border-b p-4`,
         ]}
         >
@@ -163,13 +163,7 @@ const BottomSheetMovie = React.forwardRef<
         {item.label}
       </Button>
     );
-  }, [colors.mutedForeground, colors.muted, closeSheet, id, movie]);
-
-  const keyExtractor = useCallback((item: Item, index: number) => {
-    // if (typeof item === 'string') return `header-${item}`;
-    // return `${item.label}-${index}`;
-    return index.toString();
-  }, []);
+  }, [colors.mutedForeground, colors.muted, closeSheet, id, movie, isLiquidGlassAvailable]);
 
   return (
     <TrueSheet
@@ -180,7 +174,7 @@ const BottomSheetMovie = React.forwardRef<
       <FlashList
       data={items}
       bounces={false}
-      keyExtractor={keyExtractor}
+      keyExtractor={(_, i) => i.toString()}
       stickyHeaderIndices={[0]}
       renderItem={renderItem}
       indicatorStyle={mode === 'dark' ? 'white' : 'black'}

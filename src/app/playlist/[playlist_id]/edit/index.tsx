@@ -14,32 +14,27 @@ import { View } from "@/components/ui/view";
 import { Label } from "@/components/ui/Label";
 import { ImagePickerAsset, launchCameraAsync, launchImageLibraryAsync, requestCameraPermissionsAsync } from "expo-image-picker";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { decode } from "base64-arraybuffer";
 import { Separator } from "@/components/ui/separator";
-import { randomUUID } from 'expo-crypto';
-import { usePlaylistQuery } from "@/features/playlist/playlistQueries";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Skeleton } from "@/components/ui/Skeleton";
 import Switch from "@/components/ui/Switch";
 import { Alert, Pressable } from "react-native";
-import { usePlaylistUpdateMutation } from "@/features/playlist/playlistMutations";
+import { usePlaylistUpdateMutation } from "@/api/playlists/playlistMutations";
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LucideIcon } from "lucide-react-native";
 import { Icons } from "@/constants/Icons";
-import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 import { useToast } from "@/components/Toast";
 import { PADDING_VERTICAL } from "@/theme/globals";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { usePlaylistDetailsQuery } from "@/api/playlists/playlistsQueries";
 
 const TITLE_MIN_LENGTH = 1;
 const TITLE_MAX_LENGTH = 100;
 const DESCRIPTION_MAX_LENGTH = 300;
 
 const ModalPlaylistEdit = () => {
-	const supabase = useSupabaseClient();
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
     const playlistId = Number(playlist_id);
 	const toast = useToast();
@@ -51,7 +46,7 @@ const ModalPlaylistEdit = () => {
 	const headerHeight = useHeaderHeight();
 	const {
 		data: playlist,
-	} = usePlaylistQuery({
+	} = usePlaylistDetailsQuery({
 		playlistId: playlistId,
 	});
 	const { mutateAsync: updatePlaylistMutation} = usePlaylistUpdateMutation();
@@ -87,7 +82,9 @@ const ModalPlaylistEdit = () => {
 	});
 
 	const [ hasFormChanged, setHasFormChanged ] = useState(false);
-	const canSave = (hasFormChanged || newPoster !== undefined) && form.formState.isValid;
+	const canSave = useMemo(() => {
+		return hasFormChanged || newPoster !== undefined;
+	}, [hasFormChanged, newPoster]);
 
 	// Routes
 	const routes: { label: string, icon: LucideIcon, route: Href }[] = [
@@ -105,16 +102,6 @@ const ModalPlaylistEdit = () => {
 		{ label: upperFirst(t('common.messages.delete_current_image')), value: "delete", disable: !playlist?.poster_url && !newPoster },
 	]), [playlist?.poster_url, newPoster, t]);
 	// Handlers
-	const handleProcessImage = useCallback(async (image: ImagePickerAsset) => {
-		const processedImage = await ImageManipulator.manipulate(image.uri)
-			.resize({ width: 1024, height: 1024 })
-			.renderAsync()
-		return await processedImage.saveAsync({
-			compress: 0.8,
-			format: SaveFormat.JPEG,
-			base64: true,
-		})
-	}, []);
 	const handlePosterOptions = useCallback(() => {
 		const options = [
 			...posterOptions,
@@ -139,7 +126,7 @@ const ModalPlaylistEdit = () => {
 						base64: true,
 					})
 					if (!results.canceled && results.assets?.length) {
-						setNewPoster(await handleProcessImage(results.assets[0]));
+						setNewPoster(results.assets[0]);
 					}
 					break;
 				case 'camera':
@@ -156,7 +143,7 @@ const ModalPlaylistEdit = () => {
 						base64: true,
 					});
 					if (!cameraResults.canceled && cameraResults.assets?.length) {
-						setNewPoster(await handleProcessImage(cameraResults.assets[0]));
+						setNewPoster(cameraResults.assets[0]);
 					}
 					break;
 				case 'delete':
@@ -166,35 +153,18 @@ const ModalPlaylistEdit = () => {
 					break;
 			};
 		});
-	}, [playlist, showActionSheetWithOptions, toast, t, posterOptions, handleProcessImage]);
+	}, [playlist, showActionSheetWithOptions, toast, t, posterOptions]);
+
 	const handleSubmit = useCallback(async (values: PlaylistFormValues) => {
 		try {
 			if (!playlist) return;
 			setIsLoading(true);
-			let poster_url: string | null | undefined;
-			if (newPoster) {
-				const fileExt = newPoster.uri.split('.').pop();
-				const fileName = `${playlist.id}.${randomUUID()}.${fileExt}`;
-				const { data, error } = await supabase.storage
-					.from('playlist_posters')
-					.upload(fileName, decode(newPoster.base64!), {
-						contentType: newPoster.mimeType || `image/${SaveFormat.JPEG}`,
-						upsert: true,
-					});
-				if (error) throw error;
-				const { data: { publicUrl } } = supabase.storage
-					.from('playlist_posters')
-					.getPublicUrl(data.path)
-				poster_url = publicUrl;
-			} else if (newPoster === null) {
-				poster_url = null;
-			}
 			await updatePlaylistMutation({
-				playlistId: playlist.id,
+				id: playlist.id,
 				title: values.title.trim(),
 				description: values.description?.trim() || null,
 				private: values.private,
-				poster_url: poster_url,
+				poster: newPoster,
 			});
 			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 			router.dismiss();
@@ -209,7 +179,8 @@ const ModalPlaylistEdit = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [playlist, newPoster, supabase, updatePlaylistMutation, toast, router, t]);
+	}, [playlist, newPoster, updatePlaylistMutation, toast, router, t]);
+
 	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(

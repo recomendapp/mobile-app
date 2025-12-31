@@ -1,10 +1,8 @@
-import { Text, View } from "react-native";
-import { useMediaMovieQuery, useMediaReviewsMovieInfiniteQuery } from "@/features/media/mediaQueries";
+import { ActivityIndicator, Text, View } from "react-native";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
-import { HeaderTitle } from "@react-navigation/elements";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
@@ -14,8 +12,10 @@ import { useCallback, useMemo, useState } from "react";
 import { CardReviewMovie } from "@/components/cards/reviews/CardReviewMovie";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
-import ButtonMyReviewMovie from "@/components/buttons/ButtonMyReviewMovie";
 import { UserReviewMovie } from "@recomendapp/types";
+import { useUserActivityMovieQuery } from "@/features/user/userQueries";
+import { useAuth } from "@/providers/AuthProvider";
+import { useMediaMovieDetailsQuery, useMediaMovieReviewsQuery } from "@/api/medias/mediaQueries";
 
 interface sortBy {
 	label: string;
@@ -24,6 +24,8 @@ interface sortBy {
 
 const FilmReviews = () => {
 	const t = useTranslations();
+	const router = useRouter();
+	const { session } = useAuth();
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
 	const { colors, tabBarHeight, bottomOffset } = useTheme();
@@ -37,7 +39,13 @@ const FilmReviews = () => {
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	// Requests
-	const { data: movie } = useMediaMovieQuery({ movieId: movieId });
+	const { data: movie } = useMediaMovieDetailsQuery({ movieId: movieId });
+	const {
+		data: activity,
+	} = useUserActivityMovieQuery({
+		userId: session?.user.id,
+		movieId: movieId,
+	});
 	const {
 		data,
 		isLoading,
@@ -45,7 +53,7 @@ const FilmReviews = () => {
 		hasNextPage,
 		isRefetching,
 		refetch,
-	} = useMediaReviewsMovieInfiniteQuery({
+	} = useMediaMovieReviewsQuery({
 		movieId: movieId,
 		filters: {
 			sortBy: sortBy.value,
@@ -76,15 +84,41 @@ const FilmReviews = () => {
 	return (
 	<>
 		<Stack.Screen
-		options={useMemo(() => ({
-			title: movie?.title || '',
-			headerTitle: (props) => <HeaderTitle {...props}>{upperFirst(t('common.messages.review', { count: 2 }))}</HeaderTitle>,
-			headerRight: movie ? () => (
-				<>
-					<ButtonMyReviewMovie movie={movie} size="icon" />
-				</>
+		options={{
+			headerRight: activity !== undefined ? () => (
+				<Button
+				variant={"outline"}
+				size="icon"
+				style={tw`rounded-full`}
+				icon={activity?.review ? Icons.Eye : Icons.Edit}
+				onPress={() => {
+					router.push(`/film/${movie?.slug || movieId}/review/${activity?.review ? activity.review.id : `create`}`);
+				}}
+				/>
 			) : undefined,
-		}), [movie?.title, t])}
+			unstable_headerRightItems: session ? (props) => [
+				...(activity !== undefined ? [
+					{
+						type: "button",
+						label: activity?.review ? upperFirst(t('common.messages.my_review', { count: 1 })) : upperFirst(t('common.messages.add_review')),
+						onPress: () => {
+							router.push(`/film/${movie?.slug || movieId}/review/${activity?.review ? activity.review.id : `create`}`);
+						},
+						icon: {
+							name: activity?.review ? "eye" : "pencil",
+							type: "sfSymbol",
+						},
+					}
+				] as const : [
+					{
+						type: "custom",
+						element: (
+							<ActivityIndicator size={36} />
+						)
+					}
+				] as const),
+			] : undefined,
+		}}
 		/>
 		<LegendList
 		data={reviews}

@@ -4,12 +4,13 @@ import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useMediaReviewsMovieInfiniteQuery } from "@/features/media/mediaQueries";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 import { MediaMovie, UserReviewMovie } from "@recomendapp/types";
 import { CardReviewMovie } from "@/components/cards/reviews/CardReviewMovie";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useMediaMovieReviewsQuery } from "@/api/medias/mediaQueries";
 
 interface MovieWidgetReviewsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	movie: MediaMovie;
@@ -33,8 +34,12 @@ const MovieWidgetReviews = ({
 		isLoading,
 		fetchNextPage,
 		hasNextPage,
-	} = useMediaReviewsMovieInfiniteQuery({
+	} = useMediaMovieReviewsQuery({
 		movieId: movie.id,
+		filters: {
+			sortBy: 'updated_at',
+			sortOrder: 'desc',
+		}
 	});
 	const loading = reviews === undefined || isLoading;
 

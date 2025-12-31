@@ -2,8 +2,7 @@ import tw from '@/lib/tw';
 import { upperFirst } from 'lodash';
 import { Button } from '@/components/ui/Button';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { usePlaylistInsertMutation } from '@/features/playlist/playlistMutations';
-import { useAuth } from '@/providers/AuthProvider';
+import { usePlaylistInsertMutation } from '@/api/playlists/playlistMutations';
 import { Playlist, PlaylistType } from '@recomendapp/types';
 import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
@@ -16,7 +15,7 @@ import { useToast } from '@/components/Toast';
 import { Input } from "@/components/ui/Input";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
 import { Label } from '@/components/ui/Label';
-import { forwardRef } from 'react';
+import { forwardRef, useCallback } from 'react';
 import { Text } from '@/components/ui/text';
 import { FlashList } from '@shopify/flash-list';
 
@@ -33,7 +32,6 @@ const BottomSheetPlaylistCreate = forwardRef<
 	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetPlaylistCreateProps
 >(({ id, onCreate,  placeholder, playlistType, ...props }, ref) => {
-	const { session } = useAuth();
 	const toast = useToast();
 	const closeSheet = useBottomSheetStore((state) => state.closeSheet);
 	const t = useTranslations();
@@ -63,12 +61,10 @@ const BottomSheetPlaylistCreate = forwardRef<
 	});
 	/* -------------------------------------------------------------------------- */
 
-	const onSubmit = async (values: PlaylistFormValues) => {
-		if (!session) return;
+	const onSubmit = useCallback(async (values: PlaylistFormValues) => {
 		await createPlaylistMutation({
 			title: values.title,
 			type: values.type,
-			userId: session.user.id
 		}, {
 			onSuccess: (playlist) => {
 				toast.success(upperFirst(t('common.messages.added', { gender: 'female', count: 1 })));
@@ -80,7 +76,7 @@ const BottomSheetPlaylistCreate = forwardRef<
 				toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
 			}
 		});
-	};
+	}, [createPlaylistMutation, toast, t, onCreate, closeSheet, id, form]);
 
 	return (
 		<TrueSheet

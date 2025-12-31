@@ -88,4 +88,6 @@ export const createClient = (locale?: string) => {
   );
 };
 
+export type SupabaseClient = ReturnType<typeof createClient>;
+
 export const supabase = createClient();

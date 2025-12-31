@@ -1,4 +1,4 @@
-import { withPersistKey } from "@/features"
+import { withPersistKey } from "@/api"
 
 export const widgetKeys = {
 	base: ['widget'] as const,

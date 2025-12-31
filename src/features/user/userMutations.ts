@@ -4,9 +4,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { userKeys } from './userKeys';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { useAuth } from '@/providers/AuthProvider';
-import { mediaKeys } from '../media/mediaKeys';
 import { Keys } from '@/api/keys';
 import { useApiClient } from '@/providers/ApiProvider';
+import { mediasKeys } from '@/api/medias/mediasKeys';
 
 export const useUserUpdateMutation = ({
 	userId,
@@ -691,7 +691,7 @@ export const useUserReviewMovieUpsertMutation = ({
 
 			// Invalidate reviews queries
 			movieId && queryClient.invalidateQueries({
-				queryKey: mediaKeys.reviews({ id: movieId, type: 'movie' }),
+				queryKey: mediasKeys.reviews({ id: movieId, type: 'movie' }),
 			});
 
 			// Invalidate the review activity
@@ -735,7 +735,7 @@ export const useUserReviewMovieDeleteMutation = () => {
 			queryClient.setQueryData(userKeys.review({ id: data.id, type: 'movie' }), null);
 
 			data.movieId && queryClient.invalidateQueries({
-				queryKey: mediaKeys.reviews({ id: data.movieId, type: 'movie' }),
+				queryKey: mediasKeys.reviews({ id: data.movieId, type: 'movie' }),
 			});
 
 			// Invalidate the review activity
@@ -747,57 +747,6 @@ export const useUserReviewMovieDeleteMutation = () => {
 				};
 			});
 		}
-	});
-};
-
-export const useUserReviewMovieLikeInsertMutation = () => {
-	const supabase = useSupabaseClient();
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: async ({
-			userId,
-			reviewId,
-		} : {
-			userId: string;
-			reviewId: number;
-		}) => {
-			const { data, error } = await supabase
-				.from('user_review_movie_likes')
-				.insert({
-					user_id: userId,
-					review_id: reviewId,
-				})
-				.select('*')
-				.single()
-			if (error) throw error;
-			return data;
-		},
-		onSuccess: (data) => {
-			queryClient.setQueryData(userKeys.reviewLike({ reviewId: data.review_id, type: 'movie', userId: data.user_id }), data);
-		},
-	});
-};
-export const useUserReviewMovieLikeDeleteMutation = () => {
-	const supabase = useSupabaseClient();
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: async ({
-			likeId,
-		} : {
-			likeId: number;
-		}) => {
-			const { data, error } = await supabase
-				.from('user_review_movie_likes')
-				.delete()
-				.eq('id', likeId)
-				.select()
-				.single();
-			if (error) throw error;
-			return data;
-		},
-		onSuccess: (data) => {
-			queryClient.setQueryData(userKeys.reviewLike({ reviewId: data.review_id, type: 'movie', userId: data.user_id }), null);
-		},
 	});
 };
 
@@ -846,7 +795,7 @@ export const useUserReviewTvSeriesUpsertMutation = ({
 
 			// Invalidate reviews queries
 			tvSeriesId && queryClient.invalidateQueries({
-				queryKey: mediaKeys.reviews({ id: tvSeriesId, type: 'tv_series' }),
+				queryKey: mediasKeys.reviews({ id: tvSeriesId, type: 'tv_series' }),
 			});
 
 			// Invalidate the review activity
@@ -890,7 +839,7 @@ export const useUserReviewTvSeriesDeleteMutation = () => {
 			queryClient.setQueryData(userKeys.review({ id: data.id, type: 'tv_series' }), null);
 
 			data.tvSeriesId && queryClient.invalidateQueries({
-				queryKey: mediaKeys.reviews({ id: data.tvSeriesId, type: 'tv_series' }),
+				queryKey: mediasKeys.reviews({ id: data.tvSeriesId, type: 'tv_series' }),
 			});
 
 			// Invalidate the review activity
@@ -905,56 +854,6 @@ export const useUserReviewTvSeriesDeleteMutation = () => {
 	});
 };
 
-export const useUserReviewTvSeriesLikeInsertMutation = () => {
-	const supabase = useSupabaseClient();
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: async ({
-			userId,
-			reviewId,
-		} : {
-			userId: string;
-			reviewId: number;
-		}) => {
-			const { data, error } = await supabase
-				.from('user_review_tv_series_likes')
-				.insert({
-					user_id: userId,
-					review_id: reviewId,
-				})
-				.select('*')
-				.single()
-			if (error) throw error;
-			return data;
-		},
-		onSuccess: (data) => {
-			queryClient.setQueryData(userKeys.reviewLike({ reviewId: data.review_id, type: 'tv_series', userId: data.user_id }), data);
-		},
-	});
-};
-export const useUserReviewTvSeriesLikeDeleteMutation = () => {
-	const supabase = useSupabaseClient();
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: async ({
-			likeId,
-		} : {
-			likeId: number;
-		}) => {
-			const { data, error } = await supabase
-				.from('user_review_tv_series_likes')
-				.delete()
-				.eq('id', likeId)
-				.select()
-				.single();
-			if (error) throw error;
-			return data;
-		},
-		onSuccess: (data) => {
-			queryClient.setQueryData(userKeys.reviewLike({ reviewId: data.review_id, type: 'tv_series', userId: data.user_id }), null);
-		},
-	});
-};
 /* -------------------------------------------------------------------------- */
 
 /* ---------------------------------- RECOS --------------------------------- */

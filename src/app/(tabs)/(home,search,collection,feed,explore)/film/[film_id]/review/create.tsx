@@ -1,7 +1,6 @@
 import ReviewForm from "@/components/screens/review/ReviewForm";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
-import { useMediaMovieQuery } from "@/features/media/mediaQueries";
 import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import tw from "@/lib/tw";
@@ -12,6 +11,7 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
 import { useCallback } from "react";
+import { useMediaMovieDetailsQuery } from "@/api/medias/mediaQueries";
 
 const ReviewMovieCreateScreen = () => {
 	const { user } = useAuth();
@@ -24,7 +24,7 @@ const ReviewMovieCreateScreen = () => {
 	const {
 		data: movie,
 		isLoading: movieLoading,
-	} = useMediaMovieQuery({
+	} = useMediaMovieDetailsQuery({
 		movieId: filmId,
 	});
 	const {

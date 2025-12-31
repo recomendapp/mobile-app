@@ -146,7 +146,7 @@ const AboutScreen = () => {
             title={false}
             className="!p-0"
           /> */}
-          <Text style={tw`text-xs italic text-muted-foreground`}>
+          <Text style={[tw`text-xs italic`, { color: colors.mutedForeground }]}>
             {t('pricing.subdescription')}
           </Text>
         </View>

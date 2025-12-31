@@ -1,7 +1,6 @@
 import ReviewForm from "@/components/screens/review/ReviewForm";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
-import { useMediaTvSeriesQuery } from "@/features/media/mediaQueries";
 import { useUserActivityTvSeriesQuery } from "@/features/user/userQueries";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import tw from "@/lib/tw";
@@ -12,6 +11,7 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
 import { useCallback } from "react";
+import { useMediaTvSeriesDetailsQuery } from "@/api/medias/mediaQueries";
 
 const ReviewTvSeriesCreateScreen = () => {
 	const { user } = useAuth();
@@ -24,9 +24,10 @@ const ReviewTvSeriesCreateScreen = () => {
 	const {
 		data: tvSeries,
 		isLoading: tvSeriesLoading,
-	} = useMediaTvSeriesQuery({
-		tvSeriesId: tvSeriesId,
+	} = useMediaTvSeriesDetailsQuery({
+		tvSeriesId: tvSeriesId
 	});
+
 	const {
 		data: activity,
 		isLoading: activityLoading,

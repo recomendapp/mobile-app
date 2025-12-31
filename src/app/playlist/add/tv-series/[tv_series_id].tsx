@@ -2,7 +2,7 @@ import BottomSheetPlaylistCreate from "@/components/bottom-sheets/sheets/BottomS
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { usePlaylistTvSeriesInsertMutation } from "@/features/playlist/playlistMutations";
+import { usePlaylistTvSeriesInsertMutation } from "@/api/playlists/playlistMutations";
 import { useAuth } from "@/providers/AuthProvider";
 import { Playlist, PlaylistSource } from "@recomendapp/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,19 +21,17 @@ import Animated, { FadeInRight, FadeOutRight, useAnimatedStyle, useSharedValue, 
 import { SearchBar } from "@/components/ui/searchbar";
 import { PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
-import { useTheme } from "@/providers/ThemeProvider";
-import AnimatedContentContainer from "@/components/ui/AnimatedContentContainer";
 import Fuse from "fuse.js";
 import { Icons } from "@/constants/Icons";
 import { Badge } from "@/components/ui/Badge";
 import { useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/Input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { usePlaylistTvSeriesAddToQuery } from "@/features/playlist/playlistQueries";
-import { playlistKeys } from "@/features/playlist/playlistKeys";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/Toast";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSupabaseClient } from "@/providers/SupabaseProvider";
+import { usePlaylistTvSeriesAddToQuery } from "@/api/playlists/playlistsQueries";
+import { playlistTvSeriesAddToOptions } from "@/api/playlists/playlistsOptions";
 
 const COMMENT_MAX_LENGTH = 180;
 
@@ -41,9 +39,8 @@ const PlaylistTvSeriesAdd = () => {
 	const t = useTranslations();
 	const router = useRouter();
 	const toast = useToast();
+	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const insets = useSafeAreaInsets();
-	const { colors, mode } = useTheme();
 	const { session } = useAuth();
 	const { tv_series_id, tv_series_name } = useLocalSearchParams();
 	const tvSeriesId = Number(tv_series_id);
@@ -83,7 +80,7 @@ const PlaylistTvSeriesAdd = () => {
 	const [search, setSearch] = useState('');
 	const [results, setResults] = useState<typeof playlists>([]);
 	const [selected, setSelected] = useState<Playlist[]>([]);
-	const canSave = selected.length > 0 && form.formState.isValid;
+	const canSave = useMemo(() => selected.length > 0, [selected]);
 	const segmentedOptions: { label: string, value: PlaylistSource }[] = [
 		{
 			label: upperFirst(t('common.messages.my_playlist', { count: 2 })),
@@ -163,33 +160,33 @@ const PlaylistTvSeriesAdd = () => {
 						onPress: () => router.dismiss(),
 						style: 'destructive',
 					},
-				], { userInterfaceStyle: mode }
+				]
 			);
 		} else {
-			router.dismiss();
+			router.back();
 		}
-	}, [canSave, router, t, mode]);
+	}, [canSave, router, t]);
 	const onCreatePlaylist = useCallback((playlist: Playlist) => {
 		BottomSheetPlaylistCreateRef.current?.dismiss();
-		queryClient.setQueryData(playlistKeys.addToSource({
-			id: tvSeriesId,
-			type: 'tv_series',
+		queryClient.setQueryData(playlistTvSeriesAddToOptions({
+			supabase: supabase,
+			tvSeriesId: tvSeriesId,
+			userId: session?.user?.id,
 			source: 'personal',
-		}), (prev: { playlist: Playlist; already_added: boolean }[] | undefined) => {
-			if (!prev) return [{ playlist, already_added: false }];
+		}).queryKey, (oldData) => {
+			if (!oldData) return [{ playlist: playlist, already_added: false }];
 			return [
-				{ playlist, already_added: false },
-				...prev,
+				{ playlist: playlist, already_added: false },
+				...oldData,
 			];
 		});
 		setSelected((prev) => [...prev, playlist]);
-	}, [queryClient, tvSeriesId]);
+	}, [queryClient, tvSeriesId, session?.user?.id, supabase]);
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
-		const paddingBottom =  PADDING_VERTICAL + (selected.length > 0 ? footerHeight.value : insets.bottom);
 		return {
-			paddingBottom: withTiming(paddingBottom, { duration: 200 }),
+			marginBottom: withTiming(footerHeight.value, { duration: 200 }),
 		};
 	});
 
@@ -205,19 +202,39 @@ const PlaylistTvSeriesAdd = () => {
 		<Stack.Screen
 			options={{
 				headerTitle: upperFirst(t('common.messages.add_to_playlist')),
-				headerLeft: () => (
+				headerRight: () => (
 					<Button
-					variant="ghost"
-					size="fit"
-					disabled={isAddingToPlaylist}
-					onPress={handleCancel}
-					>
-						{upperFirst(t('common.messages.cancel'))}
-					</Button>
+					variant="outline"
+					icon={Icons.Check}
+					size="icon"
+					onPress={form.handleSubmit(handleSubmit)}
+					disabled={isAddingToPlaylist || !canSave}
+					style={tw`rounded-full`}
+					/>
 				),
-				headerStyle: {
-					backgroundColor: colors.muted,
-				},
+				unstable_headerLeftItems: (props) => [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.close')),
+						onPress: handleCancel,
+						icon: {
+							name: "xmark",
+							type: "sfSymbol",
+						},
+					},
+				],
+				unstable_headerRightItems: (props) => [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.add')),
+						onPress: form.handleSubmit(handleSubmit),
+						disabled: isAddingToPlaylist || !canSave,
+						icon: {
+							name: "checkmark",
+							type: "sfSymbol",
+						},
+					},
+				],
 			}}
 		/>
 		<View style={[tw`gap-2`, { paddingHorizontal: PADDING, paddingVertical: PADDING_VERTICAL }]}>
@@ -292,14 +309,14 @@ const PlaylistTvSeriesAdd = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[
 			tw`gap-2`,
-			animatedFooterStyle
+			{ paddingBottom: PADDING_VERTICAL },
 		]}
+		style={animatedFooterStyle}
 		keyboardShouldPersistTaps='handled'
-		renderScrollComponent={(props) => <AnimatedContentContainer {...props} />}
 		/>
 		<SelectionFooter
 		data={selected}
-		height={footerHeight}
+		visibleHeight={footerHeight}
 		renderItem={({ item }) => (
 			<Pressable
 			key={item.id}

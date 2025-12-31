@@ -16,6 +16,7 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { BottomSheetReviewMovie } from "@/components/bottom-sheets/sheets/BottomSheetReviewMovie";
 import { EnrichedTextInput } from "@/components/RichText/EnrichedTextInput";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { useUserReviewMovieLike } from "@/api/users/hooks/useUserReviewMovieLike";
 
 const ReviewMovieScreen = () => {
 	const { session } = useAuth();
@@ -23,75 +24,109 @@ const ReviewMovieScreen = () => {
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
 	const { review_id } = useLocalSearchParams();
+	const reviewId = Number(review_id);
 	const {
 		data: review,
-		isLoading: reviewLoading,
 		isRefetching,
 		refetch
 	} = useUserReviewMovieQuery({
-		reviewId: Number(review_id),
+		reviewId,
 	});
-	const loading = reviewLoading || review === undefined;
-	if (loading) {
-		return (
-			<View style={tw`flex-1 items-center justify-center`}>
-				<Icons.Loader />
-			</View>
-		);
-	};
-	if (!review) {
+	const { isLiked, toggle } = useUserReviewMovieLike({
+		reviewId,
+	});
+
+	if (review === null) {
 		return (
 			<Redirect href={{ pathname: '/+not-found', params: { }}} />
 		)
 	}
+
 	return (
 	<>
 		<Stack.Screen
 		options={{
 			headerRight: () => (
 			<>
-				{session && <ButtonUserReviewMovieLike variant="ghost" reviewId={review?.id} />}
+				{review && session && <ButtonUserReviewMovieLike variant="ghost" reviewId={review?.id} />}
 				<Button
 				variant="ghost"
 				size="icon"
 				icon={Icons.EllipsisVertical}
-				onPress={() => openSheet(BottomSheetReviewMovie, {
-					review: review,
-				})}
+				onPress={() => {
+					if (review) {
+						openSheet(BottomSheetReviewMovie, {
+							review: review,
+						})
+					}
+				}}
 				/>
 			</>
 			),
+			unstable_headerRightItems: (props) => [
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.like')),
+					onPress: toggle,
+					icon: {
+						name: isLiked ? "heart.fill" : "heart",
+						type: "sfSymbol",
+					},
+					tintColor: isLiked ? colors.accentPink : undefined,
+				},
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.menu')),
+					onPress: () => {
+						if (review) {
+							openSheet(BottomSheetReviewMovie, {
+								review: review,
+							})
+						}
+					},
+					icon: {
+						name: "ellipsis",
+						type: "sfSymbol",
+					},
+				}
+			]
 		}}
 		/>
-		<ScrollView
-		contentContainerStyle={{
-			paddingBottom: bottomOffset + PADDING_VERTICAL,
-			paddingHorizontal: PADDING_HORIZONTAL,
-			gap: GAP,
-		}}
-		refreshControl={
-			<RefreshControl
-			refreshing={isRefetching}
-			onRefresh={refetch}
-			/>
-		}
-		scrollIndicatorInsets={{
-			bottom: tabBarHeight,
-		}}
-		>
-			<View style={tw`justify-center items-center`}>
-				<Text variant="heading" style={[{ color: colors.accentYellow }, tw`text-center my-2`]}>
-					{review.title || upperFirst(t('common.messages.review_by', { name: review.activity?.user?.username! })) }
-				</Text>
-				<CardUser variant="inline" user={review.activity?.user!} />
+		{review ? (
+			<ScrollView
+			contentContainerStyle={{
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
+				paddingHorizontal: PADDING_HORIZONTAL,
+				gap: GAP,
+			}}
+			refreshControl={
+				<RefreshControl
+				refreshing={isRefetching}
+				onRefresh={refetch}
+				/>
+			}
+			scrollIndicatorInsets={{
+				bottom: tabBarHeight,
+			}}
+			>
+				<View style={tw`justify-center items-center`}>
+					<Text variant="heading" style={[{ color: colors.accentYellow }, tw`text-center my-2`]}>
+						{review.title || upperFirst(t('common.messages.review_by', { name: review.activity?.user?.username! })) }
+					</Text>
+					<CardUser variant="inline" user={review.activity?.user!} />
+				</View>
+				<CardMovie
+				movie={review.activity?.movie!}
+				activity={review.activity!}
+				showRating
+				/>
+				<EnrichedTextInput defaultValue={review.body} editable={false} style={tw`flex-1`} scrollEnabled={false} />
+			</ScrollView>
+		) : (
+			<View style={tw`flex-1 items-center justify-center`}>
+				<Icons.Loader />
 			</View>
-			<CardMovie
-			movie={review.activity?.movie!}
-			activity={review.activity!}
-			showRating
-			/>
-			<EnrichedTextInput defaultValue={review.body} editable={false} style={tw`flex-1`} scrollEnabled={false} />
-		</ScrollView>
+		)}
 	</>
 	)
 };

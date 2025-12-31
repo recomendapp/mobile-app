@@ -2,7 +2,7 @@ import { User } from "@recomendapp/types";
 import { Provider, Session } from "@supabase/supabase-js";
 import { createContext, use, useCallback, useEffect, useState } from "react";
 import { useSupabaseClient } from "./SupabaseProvider";
-import { AppState, Platform } from "react-native";
+import { Alert, AppState, Platform } from "react-native";
 import { supabase } from "@/lib/supabase/client";
 import { useSplashScreen } from "./SplashScreenProvider";
 import { useLocaleContext } from "./LocaleProvider";
@@ -20,6 +20,8 @@ import * as env from '@/env';
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Keys } from "@/api/keys";
 import { useAuthCustomerInfoOptions, useAuthUserOptions } from "@/api/options";
+import { upperFirst } from "lodash";
+import { useTranslations } from "use-intl";
 
 // Tells Supabase Auth to continuously refresh the session automatically
 // if the app is in the foreground. When this is added, you will continue
@@ -43,6 +45,7 @@ type AuthContextProps = {
 	loginWithOtp: (email: string, redirectTo?: string | null) => Promise<void>;
 	logout: () => Promise<void>;
 	forceLogout: () => Promise<void>;
+	safeLogout: (withConfirm?: boolean) => Promise<void>;
 	signup: (credentials: {
 		email: string;
 		name: string;
@@ -68,6 +71,7 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
 	const { auth } = useSplashScreen();
+	const t = useTranslations();
 	const queryClient = useQueryClient();
 	const { setLocale } = useLocaleContext();
 	const supabase = useSupabaseClient();
@@ -209,7 +213,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			await supabase.from("user_notification_tokens").delete().match({ token: pushToken, provider: provider });
 		}
 		const { error } = await supabase.auth.signOut();
-		if (error) console.error("Error during logout:", error);
 		if (error) throw error;
 		setSession(null);
 		queryClient.removeQueries({
@@ -228,6 +231,38 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			queryKey: Keys.auth.user(),
 		});
 	}, [queryClient]);
+
+	const safeLogout = useCallback(async (withConfirm = true) => {
+		if (withConfirm) {
+			Alert.alert(
+				upperFirst(t('common.messages.are_u_sure')),
+				undefined,
+				[
+					{
+						text: upperFirst(t('common.messages.cancel')),
+						style: 'cancel',
+					},
+					{
+						text: upperFirst(t('common.messages.logout')),
+						style: 'destructive',
+						onPress: async () => {
+							try {
+								await logout();
+							} catch {
+								await forceLogout();
+							}
+						},
+					},
+				]
+			);
+		} else {
+			try {
+				await logout();
+			} catch {
+				await forceLogout();
+			}
+		}
+	}, [logout, forceLogout, t]);
 
 	const signup = useCallback(async (
 		credentials: {
@@ -337,6 +372,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			loginWithOtp,
 			logout,
 			forceLogout,
+			safeLogout,
 			signup,
 			resetPasswordForEmail,
 			updateEmail,

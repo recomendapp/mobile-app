@@ -20,7 +20,6 @@ import { MovieHeaderInfo } from '@/components/screens/film/MovieHeaderInfo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocale, useTranslations } from 'use-intl';
 import { Link } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useTheme } from '@/providers/ThemeProvider';
 import { upperFirst } from 'lodash';
@@ -31,7 +30,7 @@ import { ButtonUserWatchlistMovie } from '@/components/buttons/movies/ButtonUser
 import { ButtonPlaylistMovieAdd } from '@/components/buttons/ButtonPlaylistMovieAdd';
 import ButtonUserRecoMovieSend from '@/components/buttons/movies/ButtonUserRecoMovieSend';
 import { useAuth } from '@/providers/AuthProvider';
-import { useMediaMovieDetailsOptions } from '@/api/options';
+import { useMediaMovieDetailsQuery } from '@/api/medias/mediaQueries';
 
 interface LocationDetailsBottomSheetProps {
   index: SharedValue<number>;
@@ -60,9 +59,7 @@ export const LocationDetailsBottomSheet = forwardRef<
   // Queries
   const {
     data: movie,
-    isLoading,
-  } = useQuery(useMediaMovieDetailsOptions({ mediaId: selectedLocation?.movie.id }))
-  const loading = isLoading || movie === undefined;
+  } = useMediaMovieDetailsQuery({ movieId: selectedLocation?.movie.id })
 
   //#region hooks
   const headerHeight = useHeaderHeight();
@@ -106,13 +103,13 @@ export const LocationDetailsBottomSheet = forwardRef<
   >
 	  <BottomSheetScrollView contentContainerStyle={{ paddingHorizontal: PADDING_HORIZONTAL, gap: GAP, paddingBottom: insets.bottom }} bounces={false}>
       <View style={[tw`flex-row justify-between items-center`, { gap: GAP }]}>
-        {!loading ? <MovieHeaderInfo movie={movie} /> : <Skeleton color={colors.background} style={tw`w-32 h-8`}/>}
+        {movie ? <MovieHeaderInfo movie={movie} /> : <Skeleton color={colors.background} style={tw`w-32 h-8`}/>}
         <View style={[tw`flex-row items-center`, { gap: GAP }]}>
           <Button onPress={handleCloseLocationDetails} variant='muted' icon={Icons.X} size='icon' style={{ borderRadius: BORDER_RADIUS_FULL, backgroundColor: colors.background }}/>
         </View>
       </View>
       <View style={[tw`flex-row items-center`, { gap: GAP }]}>
-        {!loading ?  (
+        {movie ?  (
           <ImageWithFallback
           alt={movie.title || 'Movie Poster'}
           source={{ uri: movie.poster_url || '' }}
@@ -124,7 +121,7 @@ export const LocationDetailsBottomSheet = forwardRef<
           />
         ) : <Skeleton color={colors.background} style={[{ aspectRatio: 2 / 3 }, tw`w-20 h-auto rounded-md`]}/>}
         <View>
-          {!loading ? <Link href={{ pathname: '/film/[film_id]', params: { film_id: movie.slug || movie.id }}}><Text variant='title'>{movie.title}</Text></Link> : <Skeleton color={colors.background} style={tw`w-32 h-8`}/>}
+          {movie ? <Link href={{ pathname: '/film/[film_id]', params: { film_id: movie.slug || movie.id }}}><Text variant='title'>{movie.title}</Text></Link> : <Skeleton color={colors.background} style={tw`w-32 h-8`}/>}
           {movie?.directors && movie.directors.length > 0 && (
             <Text>
               <Directors directors={movie.directors} />
@@ -146,7 +143,7 @@ export const LocationDetailsBottomSheet = forwardRef<
           </View>
         </View>
       )}
-      {!loading ? (
+      {movie ? (
         <View style={[{ backgroundColor: colors.background, paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL, gap: GAP }, tw`rounded-md`]}>
           <Text variant='caption'>{upperFirst(t('common.messages.overview'))}</Text>
           <Text>{movie.overview || upperFirst(t('common.messages.no_description'))}</Text>

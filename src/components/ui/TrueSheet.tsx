@@ -13,16 +13,19 @@ interface TrueSheetProps extends RNTrueSheetProps {
 const TrueSheet = forwardRef<
   React.ComponentRef<typeof RNTrueSheet>,
   TrueSheetProps
->(({ backgroundColor, style, cornerRadius = 24, detents, edgeToEdgeFullScreen = true, children, ...props }, ref) => {
-  const { colors } = useTheme();
+>(({ backgroundColor, style, detents, children, ...props }, ref) => {
+  const { colors, isLiquidGlassAvailable } = useTheme();
   const insets = useSafeAreaInsets();
   return (
   <RNTrueSheet
   ref={ref}
   detents={detents || (props.scrollable && isAndroid) ? [0.33, 1] : ['auto']}
-  cornerRadius={cornerRadius}
-  backgroundColor={backgroundColor ?? colors.muted}
-  edgeToEdgeFullScreen={edgeToEdgeFullScreen}
+  backgroundColor={
+    backgroundColor
+    ?? isLiquidGlassAvailable
+        ? "transparent"
+        : colors.muted
+  }
   style={[
     { paddingBottom: Platform.OS === 'android' ? insets.bottom : 0 },
     style,

@@ -16,6 +16,7 @@ import { useNotifications } from '@/providers/NotificationsProvider';
 import { upperFirst } from 'lodash';
 import { useTranslations } from 'use-intl';
 import { Platform } from 'react-native';
+import { osName } from 'expo-device';
 
 export {
   ErrorBoundary,
@@ -32,22 +33,106 @@ configureReanimatedLogger({
 const RootLayoutNav = () => {
   const t = useTranslations();
   const { session } = useAuth();
-  const { defaultScreenOptions } = useTheme();
+  const { defaultScreenOptions, isLiquidGlassAvailable } = useTheme();
   const { isMounted } = useNotifications();
   return (
-  <Stack initialRouteName='(tabs)' screenOptions={defaultScreenOptions}>
+  <Stack
+  initialRouteName='(tabs)'
+  screenOptions={defaultScreenOptions}
+  >
     <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
     {/* PLAYLISTS */}
     <Stack.Protected guard={!!session}>
-      <Stack.Screen name="playlist/[playlist_id]/sort" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="playlist/add/movie/[movie_id]" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="playlist/add/tv-series/[tv_series_id]" options={{ presentation: 'modal' }} />
+      <Stack.Screen
+      name="playlist/[playlist_id]/sort"
+      options={{
+        presentation: Platform.OS === "ios"
+          ? isLiquidGlassAvailable && osName !== "iPadOS"
+            ? "formSheet"
+            : "modal"
+          : "modal",
+        sheetGrabberVisible: true,
+        sheetAllowedDetents: [0.8],
+        sheetInitialDetentIndex: 0,
+        headerTransparent: true,
+        ...(isLiquidGlassAvailable ? {
+          contentStyle: { backgroundColor: 'transparent' },
+          headerStyle: { backgroundColor: 'transparent' },
+        } : {}),
+      }}
+      />
+      <Stack.Screen
+      name="playlist/add/movie/[movie_id]"
+      options={{
+        presentation: Platform.OS === "ios"
+          ? isLiquidGlassAvailable && osName !== "iPadOS"
+            ? "formSheet"
+            : "modal"
+          : "modal",
+        sheetGrabberVisible: true,
+        sheetAllowedDetents: [0.8],
+        sheetInitialDetentIndex: 0,
+        ...(isLiquidGlassAvailable ? {
+          contentStyle: { backgroundColor: 'transparent' },
+          headerStyle: { backgroundColor: 'transparent' },
+        } : {}),
+      }}
+      />
+      <Stack.Screen
+      name="playlist/add/tv-series/[tv_series_id]"
+      options={{
+        presentation: Platform.OS === "ios"
+          ? isLiquidGlassAvailable && osName !== "iPadOS"
+            ? "formSheet"
+            : "modal"
+          : "modal",
+        sheetGrabberVisible: true,
+        sheetAllowedDetents: [0.8],
+        sheetInitialDetentIndex: 0,
+        ...(isLiquidGlassAvailable ? {
+          contentStyle: { backgroundColor: 'transparent' },
+          headerStyle: { backgroundColor: 'transparent' },
+        } : {}),
+      }}
+      />
       <Stack.Screen name='playlist/[playlist_id]/edit' options={{ headerShown: false, presentation: 'modal' }} />
     </Stack.Protected>
     {/* RECOS */}
     <Stack.Protected guard={!!session}>
-      <Stack.Screen name="reco/send/movie/[movie_id]" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="reco/send/tv-series/[tv_series_id]" options={{ presentation: 'modal' }} />
+      <Stack.Screen
+      name="reco/send/movie/[movie_id]"
+      options={{
+        presentation: Platform.OS === "ios"
+          ? isLiquidGlassAvailable && osName !== "iPadOS"
+            ? "formSheet"
+            : "modal"
+          : "modal",
+        sheetGrabberVisible: true,
+        sheetAllowedDetents: [0.8],
+        sheetInitialDetentIndex: 0,
+        ...(isLiquidGlassAvailable ? {
+          contentStyle: { backgroundColor: 'transparent' },
+          headerStyle: { backgroundColor: 'transparent' },
+        } : {}),
+      }}
+      />
+      <Stack.Screen
+      name="reco/send/tv-series/[tv_series_id]"
+      options={{
+        presentation: Platform.OS === "ios"
+          ? isLiquidGlassAvailable && osName !== "iPadOS"
+            ? "formSheet"
+            : "modal"
+          : "modal",
+        sheetGrabberVisible: true,
+        sheetAllowedDetents: [0.8],
+        sheetInitialDetentIndex: 0,
+        ...(isLiquidGlassAvailable ? {
+          contentStyle: { backgroundColor: 'transparent' },
+          headerStyle: { backgroundColor: 'transparent' },
+        } : {}),
+      }}
+      />
     </Stack.Protected>
     {/* NOTIFICATIONS */}
     <Stack.Protected guard={!!isMounted}>

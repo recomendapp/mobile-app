@@ -9,7 +9,7 @@ import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { Alert } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAuth } from '@/providers/AuthProvider';
-import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
+import { usePlaylistDeleteMutation } from '@/api/playlists/playlistMutations';
 import { useUserPlaylistSavedQuery } from '@/features/user/userQueries';
 import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation } from '@/features/user/userMutations';
 import TrueSheet from '@/components/ui/TrueSheet';
@@ -20,7 +20,7 @@ import { Text } from '@/components/ui/text';
 import richTextToPlainString from '@/utils/richTextToPlainString';
 import { useToast } from '@/components/Toast';
 import BottomSheetSharePlaylist from './share/BottomSheetSharePlaylist';
-import { GAP, PADDING_VERTICAL } from '@/theme/globals';
+import { GAP } from '@/theme/globals';
 import { View } from '@/components/ui/view';
 import ButtonActionPlaylistLike from '@/components/buttons/ButtonActionPlaylistLike';
 import ButtonActionPlaylistSaved from '@/components/buttons/ButtonActionPlaylistSaved';
@@ -48,7 +48,7 @@ const BottomSheetPlaylist = forwardRef<
 	const { session } = useAuth();
 	const toast = useToast();
 	const { closeSheet, openSheet } = useBottomSheetStore((state) => state);
-	const { colors, mode, tabBarHeight } = useTheme();
+	const { colors, mode, tabBarHeight, isLiquidGlassAvailable } = useTheme();
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations();
@@ -142,7 +142,7 @@ const BottomSheetPlaylist = forwardRef<
 								text: upperFirst(t('common.messages.delete')),
 								onPress: async () => {
 									await playlistDeleteMutation(
-										{ playlistId: playlist.id, userId: session.user.id },
+										{ playlistId: playlist.id },
 										{
 											onSuccess: () => {
 												toast.success(upperFirst(t('common.messages.deleted')));
@@ -198,7 +198,6 @@ const BottomSheetPlaylist = forwardRef<
 			'header',
 			...items,
 		]}
-		contentContainerStyle={{ paddingTop: PADDING_VERTICAL }}
 		bounces={false}
 		keyExtractor={(_, i) => i.toString()}
 		stickyHeaderIndices={[0]}
@@ -206,7 +205,7 @@ const BottomSheetPlaylist = forwardRef<
 			typeof item === 'string' ? (
 				<View
 				style={[
-					{ backgroundColor: colors.muted, borderColor: colors.mutedForeground, gap: GAP },
+					{ backgroundColor: isLiquidGlassAvailable ? 'transparent' : colors.muted, borderColor: colors.mutedForeground, gap: GAP },
 					tw`flex-row items-center justify-between border-b p-4`,
 				]}
 				>

@@ -16,6 +16,7 @@ import { BottomSheetReviewTvSeries } from "@/components/bottom-sheets/sheets/Bot
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { EnrichedTextInput } from "@/components/RichText/EnrichedTextInput";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { useUserReviewTvSeriesLike } from "@/api/users/hooks/useUserReviewTvSeriesLike";
 
 const ReviewTvSeriesScreen = () => {
 	const { session } = useAuth();
@@ -23,24 +24,19 @@ const ReviewTvSeriesScreen = () => {
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
 	const { review_id } = useLocalSearchParams();
+	const reviewId = Number(review_id);
 	const {
 		data: review,
-		isLoading: reviewLoading,
 		isRefetching,
 		refetch
 	} = useUserReviewTvSeriesQuery({
-		reviewId: Number(review_id),
+		reviewId,
 	});
-	const loading = reviewLoading || review === undefined;
+	const { isLiked, toggle } = useUserReviewTvSeriesLike({
+		reviewId,
+	});
 
-	if (loading) {
-		return (
-			<View style={tw`flex-1 items-center justify-center`}>
-				<Icons.Loader />
-			</View>
-		);
-	}
-	if (!review) {
+	if (review === null) {
 		return (
 			<Redirect href={{ pathname: '/+not-found', params: { }}} />
 		)
@@ -51,48 +47,85 @@ const ReviewTvSeriesScreen = () => {
 		options={{
 			headerRight: () => (
 			<>
-				{session && <ButtonUserReviewTvSeriesLike variant="ghost" reviewId={review?.id} />}
+				{review && session && <ButtonUserReviewTvSeriesLike variant="ghost" reviewId={review?.id} />}
 				<Button
 				variant="ghost"
 				size="icon"
 				icon={Icons.EllipsisVertical}
-				onPress={() => openSheet(BottomSheetReviewTvSeries, {
-					review: review,
-				})}
+				onPress={() => {
+					if (review) {
+						openSheet(BottomSheetReviewTvSeries, {
+							review: review,
+						})
+					}
+				}}
 				/>
 			</>
 			),
+			unstable_headerRightItems: (props) => [
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.like')),
+					onPress: toggle,
+					icon: {
+						name: isLiked ? "heart.fill" : "heart",
+						type: "sfSymbol",
+					},
+					tintColor: isLiked ? colors.accentPink : undefined,
+				},
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.menu')),
+					onPress: () => {
+						if (review) {
+							openSheet(BottomSheetReviewTvSeries, {
+								review: review,
+							})
+						}
+					},
+					icon: {
+						name: "ellipsis",
+						type: "sfSymbol",
+					},
+				}
+			]
 		}}
 		/>
-		<ScrollView
-		contentContainerStyle={{
-			paddingBottom: bottomOffset + PADDING_VERTICAL,
-			paddingHorizontal: PADDING_HORIZONTAL,
-			gap: GAP,
-		}}
-		refreshControl={
-			<RefreshControl
-			refreshing={isRefetching}
-			onRefresh={refetch}
-			/>
-		}
-		scrollIndicatorInsets={{
-			bottom: tabBarHeight,
-		}}
-		>
-			<View style={tw`justify-center items-center`}>
-				<Text variant="heading" style={[{ color: colors.accentYellow }, tw`text-center my-2`]}>
-					{review.title || upperFirst(t('common.messages.review_by', { name: review.activity?.user?.username! })) }
-				</Text>
-				<CardUser variant="inline" user={review.activity?.user!} />
+		{review ? (
+			<ScrollView
+			contentContainerStyle={{
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
+				paddingHorizontal: PADDING_HORIZONTAL,
+				gap: GAP,
+			}}
+			refreshControl={
+				<RefreshControl
+				refreshing={isRefetching}
+				onRefresh={refetch}
+				/>
+			}
+			scrollIndicatorInsets={{
+				bottom: tabBarHeight,
+			}}
+			>
+				<View style={tw`justify-center items-center`}>
+					<Text variant="heading" style={[{ color: colors.accentYellow }, tw`text-center my-2`]}>
+						{review.title || upperFirst(t('common.messages.review_by', { name: review.activity?.user?.username! })) }
+					</Text>
+					<CardUser variant="inline" user={review.activity?.user!} />
+				</View>
+				<CardTvSeries
+				tvSeries={review.activity?.tv_series!}
+				activity={review.activity!}
+				showRating
+				/>
+				<EnrichedTextInput defaultValue={review.body} editable={false} style={tw`flex-1`} scrollEnabled={false} />
+			</ScrollView>
+		) : (
+			<View style={tw`flex-1 items-center justify-center`}>
+				<Icons.Loader />
 			</View>
-			<CardTvSeries
-			tvSeries={review.activity?.tv_series!}
-			activity={review.activity!}
-			showRating
-			/>
-			<EnrichedTextInput defaultValue={review.body} editable={false} style={tw`flex-1`} scrollEnabled={false} />
-		</ScrollView>
+		)}
 	</>
 	)
 };

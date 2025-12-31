@@ -116,13 +116,13 @@ const ButtonUserActivityMovieRating = forwardRef<
 			onPressProps?.(e);
 		}}
 		style={{
-			...(!activity?.rating ? tw`rounded-full` : { backgroundColor: colors.background, borderColor: colors.accentYellow }),
+			...(!activity?.rating ? tw`rounded-full` : { backgroundColor: colors.accentYellowForeground, borderColor: colors.accentYellow }),
 			...style,
 		}}
 		{...props}
 		>
 			{activity?.rating ? (
-				<Text style={tw`font-bold`}>{activity.rating}</Text>
+				<Text style={[tw`font-bold`, { color: colors.accentYellow }]}>{activity.rating}</Text>
 			) : null}
 		</Button>
 	);

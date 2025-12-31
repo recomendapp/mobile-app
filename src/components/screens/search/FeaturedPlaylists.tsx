@@ -1,6 +1,5 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { useTheme } from "@/providers/ThemeProvider";
-import { usePlaylistFeaturedInfiniteQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { StyleProp, useWindowDimensions, View, ViewStyle } from "react-native";
 import { LegendList, LegendListRef } from "@legendapp/list";
@@ -12,6 +11,7 @@ import { Icons } from "@/constants/Icons";
 import { Text } from "@/components/ui/text";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
+import { usePlaylistsFeaturedQuery } from "@/api/playlists/playlistsQueries";
 
 interface FeaturedPlaylistsProps {
 	contentContainerStyle?: StyleProp<ViewStyle>;
@@ -29,7 +29,12 @@ const FeaturedPlaylists = ({
 		fetchNextPage,
 		hasNextPage,
 		refetch,
-	} = usePlaylistFeaturedInfiniteQuery();
+	} = usePlaylistsFeaturedQuery({
+		filters: {
+			sortBy: 'updated_at',
+			sortOrder: 'desc',
+		}
+	});
 	const playlists = useMemo(() => data?.pages.flat() || [], [data]);
 	// REFs
 	const scrollRef = useRef<LegendListRef>(null);

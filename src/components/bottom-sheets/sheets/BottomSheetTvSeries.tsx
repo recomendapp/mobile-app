@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
 import { MediaTvSeries, UserActivityTvSeries } from '@recomendapp/types';
@@ -29,14 +29,14 @@ interface BottomSheetTvSeriesProps extends BottomSheetProps {
   additionalItemsBottom?: Item[];
 };
 
-interface Item {
+type Item = {
 	icon: LucideIcon;
 	label: string;
 	onPress: () => void;
 	submenu?: Item[];
   closeOnPress?: boolean;
   disabled?: boolean;
-}
+} | string;
 
 const BottomSheetTvSeries = React.forwardRef<
   React.ComponentRef<typeof TrueSheet>,
@@ -44,7 +44,7 @@ const BottomSheetTvSeries = React.forwardRef<
 >(({ id, tvSeries, activity, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const { colors, mode, tabBarHeight } = useTheme();
+  const { colors, mode, tabBarHeight, isLiquidGlassAvailable } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -53,6 +53,7 @@ const BottomSheetTvSeries = React.forwardRef<
   const BottomSheetMainCreditsRef = React.useRef<RNTrueSheet>(null);
   // States
   const items: Item[] = React.useMemo(() => ([
+    'header',
     ...additionalItemsTop,
     {
       icon: Icons.Share,
@@ -113,6 +114,58 @@ const BottomSheetTvSeries = React.forwardRef<
     ...additionalItemsBottom,
   ]), [tvSeries, additionalItemsTop, additionalItemsBottom, openSheet, router, t, pathname, activity, session]);
 
+  const renderItem = useCallback(({ item }: { item: Item }) => {
+    if (typeof item === 'string') {
+      return (
+        <View
+        style={[
+          { backgroundColor: isLiquidGlassAvailable ? 'transparent' : colors.muted, borderColor: colors.mutedForeground },
+          tw`border-b p-4`,
+        ]}
+        >
+          <View style={tw`flex-row items-center gap-2 `}>
+            <ImageWithFallback
+            alt={tvSeries?.name ?? ''}
+            source={{ uri: getTmdbImage({ path: tvSeries?.poster_path, size: 'w342' }) ?? '' }}
+            style={[
+              { aspectRatio: 2 / 3, height: 'fit-content' },
+              tw.style('rounded-md w-12'),
+            ]}
+            type={'tv_series'}
+            />
+            <View style={tw`shrink`}>
+              <Text numberOfLines={2} style={tw`shrink`}>{tvSeries?.name}</Text>
+              {tvSeries?.created_by && tvSeries?.created_by.length > 0 && (
+                <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
+                {tvSeries.created_by?.map((creator) => creator.name).join(', ')}
+                </Text>
+              )}
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    return (
+      <Button
+      variant='ghost'
+      icon={item.icon}
+      iconProps={{
+        color: colors.mutedForeground,
+      }}
+      disabled={item.disabled}
+      style={tw`justify-start h-auto py-4`}
+      onPress={() => {
+        (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
+        item.onPress();
+      }}
+      >
+        {item.label}
+      </Button>
+    );
+  }, [colors.mutedForeground, colors.muted, closeSheet, id, tvSeries, isLiquidGlassAvailable]);
+
+
   return (
     <TrueSheet
     ref={ref}
@@ -120,60 +173,11 @@ const BottomSheetTvSeries = React.forwardRef<
     {...props}
     >
       <FlashList
-      data={[
-        'header',
-        ...items
-      ]}
-      contentContainerStyle={{ paddingTop: PADDING_VERTICAL }}
+      data={items}
       bounces={false}
-      keyExtractor={(_, i) => i.toString()}
       stickyHeaderIndices={[0]}
-      renderItem={({ item }) => (
-        typeof item === 'string' ? (
-          <View
-          style={[
-            { backgroundColor: colors.muted, borderColor: colors.mutedForeground },
-            tw`border-b p-4`,
-          ]}
-          >
-            <View style={tw`flex-row items-center gap-2 `}>
-              <ImageWithFallback
-              alt={tvSeries?.name ?? ''}
-              source={{ uri: getTmdbImage({ path: tvSeries?.poster_path, size: 'w342' }) ?? '' }}
-              style={[
-                { aspectRatio: 2 / 3, height: 'fit-content' },
-                tw.style('rounded-md w-12'),
-              ]}
-              type={'tv_series'}
-              />
-              <View style={tw`shrink`}>
-                <Text numberOfLines={2} style={tw`shrink`}>{tvSeries?.name}</Text>
-                {tvSeries?.created_by && tvSeries?.created_by.length > 0 && (
-                  <Text numberOfLines={1} style={[{ color: colors.mutedForeground }, tw`shrink`]}>
-                  {tvSeries.created_by?.map((creator) => creator.name).join(', ')}
-                  </Text>
-                )}
-              </View>
-            </View>
-          </View>
-        ) : (
-          <Button
-          variant='ghost'
-          icon={item.icon}
-          iconProps={{
-            color: colors.mutedForeground,
-          }}
-          disabled={item.disabled}
-          style={tw`justify-start h-auto py-4`}
-          onPress={() => {
-            (item.closeOnPress || item.closeOnPress === undefined) && closeSheet(id);
-            item.onPress();
-          }}
-          >
-            {item.label}
-          </Button>
-        )
-      )}
+      keyExtractor={(_, i) => i.toString()}
+      renderItem={renderItem}
       indicatorStyle={mode === 'dark' ? 'white' : 'black'}
 		  scrollIndicatorInsets={{ bottom: tabBarHeight }}
       nestedScrollEnabled

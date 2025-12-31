@@ -1,14 +1,15 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { GestureResponderEvent, TouchableOpacity } from "react-native";
+import { GestureResponderEvent, Pressable, PressableProps } from "react-native";
 import { useRouter } from "expo-router";
 import UserAvatar from "./UserAvatar";
 import { forwardRef, useCallback } from "react";
+import tw from "@/lib/tw";
 
 export const UserNav = forwardRef<
-	React.ComponentRef<typeof TouchableOpacity>,
-	React.ComponentPropsWithoutRef<typeof TouchableOpacity>
->(({ onPress, onLongPress, ...props}, ref) => {
+	React.ComponentRef<typeof Pressable>,
+	PressableProps
+>(({ onPress, onLongPress, style, ...props}, ref) => {
 	const router = useRouter();
 	const { session, user } = useAuth();
 	
@@ -26,13 +27,20 @@ export const UserNav = forwardRef<
 	if (!session) return null;
 	
 	if (!user) {
-		return <Skeleton className='h-12 w-12 rounded-full' />
+		return (
+		<Skeleton
+		style={[
+			tw`w-12 h-12 rounded-full`,
+			style as object,
+		]}
+		/>
+		);
 	}
 	
 	return (
-		<TouchableOpacity ref={ref} onPress={handlePress} onLongPress={handleLongPress} {...props} >
+		<Pressable ref={ref} onPress={handlePress} onLongPress={handleLongPress} style={style} {...props} >
 			<UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} />
-		</TouchableOpacity>
+		</Pressable>
 	);
 });
 UserNav.displayName = 'UserNav';

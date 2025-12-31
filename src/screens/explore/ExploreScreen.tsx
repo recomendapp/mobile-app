@@ -8,7 +8,7 @@ import { Stack, useRouter } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useQuery } from "@tanstack/react-query";
-import { useExploreTileMetaOptions, useExploreTileOptions, useMediaGenresOptions } from "@/api/options";
+import { useExploreTileMetaOptions, useExploreTileOptions } from "@/api/options";
 import { ExploreTile } from "@recomendapp/types";
 import Color from "color";
 import { Button } from "@/components/ui/Button";
@@ -22,6 +22,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { FiltersBottomSheet } from "./sheets/FiltersBottomSheet";
 import { useExploreStore } from "@/stores/useExploreStore";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useMediaGenresQuery } from "@/api/medias/mediaQueries";
 
 const MOVE_DELAY = 500;
 
@@ -62,7 +63,7 @@ const ExploreScreen = () => {
 
 	const {
 		data: genres,
-	} = useQuery(useMediaGenresOptions());
+	} = useMediaGenresQuery();
 
 	const {
 		data: tile,

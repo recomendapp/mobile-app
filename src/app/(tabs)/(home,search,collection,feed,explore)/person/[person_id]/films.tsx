@@ -1,4 +1,3 @@
-import { useMediaPersonFilmsInfiniteQuery, useMediaPersonQuery } from "@/features/media/mediaQueries";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
@@ -15,6 +14,7 @@ import { useActionSheet } from "@expo/react-native-action-sheet";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Text } from "@/components/ui/text";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { useMediaPersonDetailsQuery, useMediaPersonFilmsQuery } from "@/api/medias/mediaQueries";
 
 interface sortBy {
 	label: string;
@@ -36,7 +36,7 @@ const PersonFilmsScreen = () => {
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	// Queries
-	const { data: person } = useMediaPersonQuery({ personId });
+	const { data: person } = useMediaPersonDetailsQuery({ personId });
 	const {
 		data,
 		isLoading,
@@ -44,7 +44,7 @@ const PersonFilmsScreen = () => {
 		hasNextPage,
 		isRefetching,
 		refetch,
-	} = useMediaPersonFilmsInfiniteQuery({
+	} = useMediaPersonFilmsQuery({
 		personId: personId,
 		filters: {
 			sortBy: sortBy.value,
@@ -82,7 +82,7 @@ const PersonFilmsScreen = () => {
 		renderItem={useCallback(({ item } : { item: typeof movies[number] }) => (
 			<CardMovie
 			variant="poster"
-			movie={item.movie}
+			movie={item.media_movie}
 			style={tw`w-full`}
 			/>
 		), [])}
@@ -123,7 +123,7 @@ const PersonFilmsScreen = () => {
 			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}
-		keyExtractor={useCallback((item: typeof movies[number]) => item.movie.id.toString(), [])}
+		keyExtractor={useCallback((item: typeof movies[number]) => item.media_movie.id.toString(), [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}
 		/>

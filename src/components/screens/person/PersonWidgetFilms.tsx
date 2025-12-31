@@ -3,15 +3,15 @@ import { useWindowDimensions, View } from "react-native";
 import { clamp, upperFirst } from "lodash";
 import { Href, Link } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useMediaPersonFilmsInfiniteQuery } from "@/features/media/mediaQueries";
 import { Icons } from "@/constants/Icons";
 import { useTranslations } from "use-intl";
 import { Text } from "@/components/ui/text";
 import { CardMovie } from "@/components/cards/CardMovie";
-import { MediaMovie } from "@recomendapp/types";
+import { Database } from "@recomendapp/types";
 import { MultiRowHorizontalList } from "@/components/ui/MultiRowHorizontalList";
 import { GAP, PADDING_HORIZONTAL } from "@/theme/globals";
 import { useMemo } from "react";
+import { useMediaPersonFilmsQuery } from "@/api/medias/mediaQueries";
 
 interface PersonWidgetFilmsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	personId: number;
@@ -32,8 +32,12 @@ const PersonWidgetFilms = ({
 		isLoading,
 		fetchNextPage,
 		hasNextPage,
-	} = useMediaPersonFilmsInfiniteQuery({
+	} = useMediaPersonFilmsQuery({
 		personId,
+		filters: {
+			sortBy: 'release_date',
+			sortOrder: 'desc',
+		}
 	});
 	const loading = movies === undefined || isLoading;
 	return (
@@ -46,12 +50,12 @@ const PersonWidgetFilms = ({
 				<Icons.ChevronRight color={colors.mutedForeground} />
 			</View>
 		</Link>
-		<MultiRowHorizontalList<{ movie: MediaMovie }>
+		<MultiRowHorizontalList<{ media_movie: Database['public']['Views']['media_movie']['Row'] }>
 		key={loading ? 'loading' : 'movie'}
 		data={loading ? new Array(3).fill(null) : movies?.pages.flat()}
 		renderItem={(item) => (
 			!loading ? (
-				<CardMovie variant="list" movie={item.movie} />
+				<CardMovie variant="list" movie={item.media_movie} />
 			) : (
 				<CardMovie variant="list" skeleton />
 			)
@@ -61,7 +65,7 @@ const PersonWidgetFilms = ({
 				{upperFirst(t('common.messages.no_films'))}
 			</Text>
 		}
-		keyExtractor={(item, index) => loading ? index.toString() : item.movie.id.toString()}
+		keyExtractor={(item, index) => loading ? index.toString() : item.media_movie.id.toString()}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
 			gap: GAP,

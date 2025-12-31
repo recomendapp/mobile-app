@@ -22,15 +22,14 @@ import { View } from '@/components/ui/view';
 import { AnimatedScrollView } from 'react-native-reanimated/lib/typescript/component/ScrollView';
 import { useRef, useState } from 'react';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from '@/theme/globals';
-import { Platform, RefreshControl } from 'react-native';
+import { Pressable, RefreshControl } from 'react-native';
 import { WidgetMostPopular } from '@/components/widgets/WidgetMostPopular';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useQueryClient } from '@tanstack/react-query';
 import { userKeys } from '@/features/user/userKeys';
 import { Keys } from '@/api/keys';
-import { ButtonHeader } from '@/components/buttons/ButtonHeader';
-import { osName } from 'expo-device';
-import { isLiquidGlassAvailable } from "expo-glass-effect";
+import { NativeStackHeaderItem } from '@react-navigation/native-stack';
+import UserAvatar from '@/components/user/UserAvatar';
 
 const HeaderLeft = () => {
   const { session, user } = useAuth();
@@ -126,7 +125,8 @@ const UnauthenticatedContent = () => {
 const HomeScreen = () => {
   const t = useTranslations();
   const queryClient = useQueryClient();
-  const { colors, bottomOffset, tabBarHeight } = useTheme();
+  const router = useRouter();
+  const { bottomOffset, tabBarHeight } = useTheme();
   const { session, user } = useAuth();
   const navigationHeaderHeight = useHeaderHeight();
   // States
@@ -164,33 +164,68 @@ const HomeScreen = () => {
 
   return (
     <>
-      {/* <AnimatedStackScreen
+      <AnimatedStackScreen
         scrollY={scrollY}
         triggerHeight={triggerHeight}
         options={{
           title: upperFirst(t('common.messages.home')),
+          headerTitle: () => <></>,
           headerLeft: () => <HeaderLeft />,
-          headerRight: () => <HeaderRight />
+          headerRight: () => <HeaderRight />,
+          unstable_headerRightItems: (props) => [
+            ...(session ? [
+              {
+                type: "button",
+                label: upperFirst(t('common.messages.notification', { count: 2 })),
+                onPress: () => router.push('/notifications'),
+                icon: {
+                  name: "bell",
+                  type: "sfSymbol",
+                },
+              },
+              {
+                type: "custom",
+                element: (
+                  <Pressable onPress={() => router.push(`/user/${user?.username}`)} disabled={!user}>
+                    {user ? <UserAvatar full_name={user.full_name} avatar_url={user.avatar_url} style={{ width: 36, height: 36 }} /> : <UserAvatar skeleton style={{ width: 36, height: 36 }} />}
+                  </Pressable>
+                ),
+              },
+            ] satisfies NativeStackHeaderItem[] : [
+              {
+                type: "menu",
+                variant: "plain",
+                icon: {
+                  name: "ellipsis",
+                  type: "sfSymbol",
+                },
+                label: "Options",
+                menu: {
+                  items: [
+                    {
+                      type: "action",
+                      label: upperFirst(t('common.messages.login')),
+                      onPress: () => router.push('/auth/login'),
+                      icon: {
+                        name: "person.crop.circle",
+                        type: "sfSymbol",
+                      },
+                    },
+                    {
+                      type: "action",
+                      label: upperFirst(t('common.messages.setting', { count: 2})),
+                      onPress: () => router.push('/settings'),
+                      icon: {
+                        name: "gear",
+                        type: "sfSymbol",
+                      },
+                    },
+                  ],
+                },
+              },
+            ] satisfies NativeStackHeaderItem[]),
+          ],
         }}
-      /> */}
-      <Stack.Screen
-      options={{
-        title: upperFirst(t('common.messages.home')),
-        headerTitle: () => <></>,
-        headerTransparent: true,
-        headerStyle: {
-          backgroundColor: 'transparent',
-        },
-        headerLeft: () => <HeaderLeft />,
-        headerRight: () => (
-          <>
-            <ButtonHeader
-            buttonProps={{ onPress: () => console.log('okoko')}}
-            style={{ padding: osName === "iPadOS" ? 40 : 0 }}
-            />
-          </>
-        ),
-      }}
       />
       <Animated.ScrollView
       ref={scrollRef}

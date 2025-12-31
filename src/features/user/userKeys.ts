@@ -1,5 +1,5 @@
 import { UserActivityType, UserRecosType, UserReviewType, UserWatchlistType } from "@recomendapp/types"
-import { withPersistKey } from "..";
+import { withPersistKey } from "../../api";
 
 export const userKeys = {
 	all: ['user'] as const,

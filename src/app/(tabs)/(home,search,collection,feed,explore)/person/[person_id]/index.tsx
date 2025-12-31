@@ -1,3 +1,4 @@
+import { useMediaPersonDetailsQuery } from "@/api/medias/mediaQueries";
 import BottomSheetPerson from "@/components/bottom-sheets/sheets/BottomSheetPerson";
 import ButtonPersonFollow from "@/components/buttons/ButtonPersonFollow";
 import { PersonHeader } from "@/components/screens/person/PersonHeader";
@@ -6,7 +7,6 @@ import PersonWidgetTvSeries from "@/components/screens/person/PersonWidgetTvSeri
 import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
-import { useMediaPersonQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -14,11 +14,13 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { GAP, PADDING_VERTICAL } from "@/theme/globals";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import { useLocalSearchParams } from "expo-router";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { View } from "react-native"
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+import { useTranslations } from "use-intl";
 
 const PersonScreen = () => {
+	const t = useTranslations();
 	const { person_id } = useLocalSearchParams<{ person_id: string }>();
 	const { id: personId } = getIdFromSlug(person_id);
 	const { bottomOffset, tabBarHeight } = useTheme();
@@ -28,7 +30,7 @@ const PersonScreen = () => {
 	const {
 		data: person,
 		isLoading,
-	} = useMediaPersonQuery({
+	} = useMediaPersonDetailsQuery({
 		personId: personId,
 	});
 	const loading = useMemo(() => person === undefined || isLoading, [person, isLoading]);
@@ -42,6 +44,14 @@ const PersonScreen = () => {
 			scrollY.value = event.contentOffset.y;
 		},
 	});
+
+	const handleMenuPress = useCallback(() => {
+		if (person) {
+			openSheet(BottomSheetPerson, {
+				person: person,
+			})
+		}
+	}, [openSheet, person]);
 
 	// Render
 	const renderContent = useMemo(() => {

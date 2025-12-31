@@ -1,8 +1,7 @@
-import { useMediaTvSeriesSeasonDetailsQuery } from "@/features/media/mediaQueries";
 import { useLocalSearchParams } from "expo-router"
 import { upperFirst } from "lodash";
 import { LayoutChangeEvent, View } from "react-native";
-import { MediaTvSeriesEpisode, MediaTvSeriesSeason } from "@recomendapp/types";
+import { Database, MediaTvSeriesEpisode } from "@recomendapp/types";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
@@ -24,9 +23,14 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useCallback } from "react";
 import { Text } from "@/components/ui/text";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { useMediaTvSeriesSeasonDetailsQuery } from "@/api/medias/mediaQueries";
 
 interface MediaHeaderProps {
-	season?: MediaTvSeriesSeason | null;
+	season?: Database['public']['Views']['media_tv_series_seasons']['Row']
+		& {
+			serie: Pick<Database['public']['Views']['media_tv_series']['Row'], 'id' | 'name'>;
+			episodes: Database['public']['Views']['media_tv_series_episodes']['Row'][];
+		} | null;
 	loading: boolean;
 	scrollY: SharedValue<number>;
 	triggerHeight: SharedValue<number>;
@@ -196,7 +200,7 @@ const TvSeriesSeasonScreen = () => {
 		isRefetching,
 		refetch,
 	} = useMediaTvSeriesSeasonDetailsQuery({
-		id: seriesId,
+		tvSeriesId: seriesId,
 		seasonNumber: Number(season_number),
 	});
 	const loading = season === undefined || isLoading;

@@ -1,11 +1,9 @@
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslations } from "use-intl";
-import { HeaderTitle } from "@react-navigation/elements";
 import { upperFirst } from "lodash";
 import { useAuth } from "@/providers/AuthProvider";
 import { Text, useWindowDimensions, View } from "react-native";
-import { useMediaPlaylistsTvSeriesInfiniteQuery, useMediaTvSeriesQuery } from "@/features/media/mediaQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
@@ -15,8 +13,8 @@ import { useCallback, useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
-import { ButtonPlaylistTvSeriesAdd } from "@/components/buttons/ButtonPlaylistTvSeriesAdd";
 import { Playlist } from "@recomendapp/types";
+import { useMediaTvSeriesDetailsQuery, useMediaTvSeriesPlaylistsQuery } from "@/api/medias/mediaQueries";
 
 interface sortBy {
 	label: string;
@@ -25,6 +23,7 @@ interface sortBy {
 
 const TvSeriesPlaylists = () => {
 	const t = useTranslations();
+	const router = useRouter();
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { session } = useAuth();
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
@@ -40,7 +39,7 @@ const TvSeriesPlaylists = () => {
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	// Requests
-	const { data: tvSeries } = useMediaTvSeriesQuery({ tvSeriesId: seriesId });
+	const { data: tvSeries } = useMediaTvSeriesDetailsQuery({ tvSeriesId: seriesId });
 	const {
 		data,
 		isLoading,
@@ -48,7 +47,7 @@ const TvSeriesPlaylists = () => {
 		hasNextPage,
 		isRefetching,
 		refetch,
-	} = useMediaPlaylistsTvSeriesInfiniteQuery({
+	} = useMediaTvSeriesPlaylistsQuery({
 		tvSeriesId: seriesId,
 		filters: {
 			sortBy: sortBy.value,
@@ -82,13 +81,44 @@ const TvSeriesPlaylists = () => {
 	return (
 	<>
 		<Stack.Screen
-		options={useMemo(() => ({
-			title: tvSeries?.name || '',
-			headerTitle: (props) => <HeaderTitle {...props}>{upperFirst(t('common.messages.playlist', { count: 2 }))}</HeaderTitle>,
-			headerRight: (session && tvSeries) ? () => (
-				<ButtonPlaylistTvSeriesAdd variant="ghost" tvSeries={tvSeries} />
+		options={{
+			headerRight: session ? () => (
+				<Button
+				variant="outline"
+				size="icon"
+				icon={Icons.AddPlaylist}
+				style={tw`rounded-full`}
+				onPress={() => {
+					router.push({
+						pathname: '/playlist/add/tv-series/[tv_series_id]',
+						params: {
+							tv_series_id: seriesId,
+							tv_series_name: tvSeries?.name,
+						},
+					})
+				}}
+				/>
 			) : undefined,
-		}), [tvSeries, session, t])}
+			unstable_headerRightItems: session ? (props) => [
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.add_to_playlist')),
+					onPress: () => {
+						router.push({
+							pathname: '/playlist/add/tv-series/[tv_series_id]',
+							params: {
+								tv_series_id: seriesId,
+								tv_series_name: tvSeries?.name,
+							},
+						})
+					},
+					icon: {
+						name: "text.badge.plus",
+						type: "sfSymbol",
+					},
+				}
+			] : undefined,
+		}}
 		/>
 		<LegendList
 		data={playlists}

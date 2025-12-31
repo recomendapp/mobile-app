@@ -405,36 +405,6 @@ export const useUserReviewMovieQuery = ({
 		enabled: !!reviewId,
 	});
 };
-export const useUserReviewMovieLikeQuery = ({
-	userId,
-	reviewId,
-} : {
-	userId?: string;
-	reviewId: number;
-}) => {
-	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: userKeys.reviewLike({
-			reviewId: reviewId,
-			type: 'movie',
-			userId: userId!,
-		}),
-		queryFn: async () => {
-			if (!userId) throw Error('Missing user id');
-			const { data, error } = await supabase
-				.from('user_review_movie_likes')
-				.select('*')
-				.match({
-					'user_id': userId,
-					'review_id': reviewId,
-				})
-				.maybeSingle();
-			if (error) throw error;
-			return data;
-		},
-		enabled: !!userId && !!reviewId,
-	});
-};
 
 // TV Series
 export const useUserReviewTvSeriesQuery = ({
@@ -463,36 +433,6 @@ export const useUserReviewTvSeriesQuery = ({
 		},
 		initialData: initialData,
 		enabled: !!reviewId,
-	});
-};
-export const useUserReviewTvSeriesLikeQuery = ({
-	userId,
-	reviewId,
-} : {
-	userId?: string;
-	reviewId: number;
-}) => {
-	const supabase = useSupabaseClient();
-	return useQuery({
-		queryKey: userKeys.reviewLike({
-			reviewId: reviewId,
-			type: 'tv_series',
-			userId: userId!,
-		}),
-		queryFn: async () => {
-			if (!userId) throw Error('Missing user id');
-			const { data, error } = await supabase
-				.from('user_review_tv_series_likes')
-				.select('*')
-				.match({
-					'user_id': userId,
-					'review_id': reviewId,
-				})
-				.maybeSingle();
-			if (error) throw error;
-			return data;
-		},
-		enabled: !!userId && !!reviewId,
 	});
 };
 /* -------------------------------------------------------------------------- */

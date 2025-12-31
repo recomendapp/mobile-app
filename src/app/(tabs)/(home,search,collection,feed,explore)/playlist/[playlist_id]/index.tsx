@@ -1,7 +1,6 @@
 import { Icons } from "@/constants/Icons";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useLocalSearchParams } from "expo-router";
-import { usePlaylistQuery } from "@/features/playlist/playlistQueries";
 import BottomSheetPlaylist from "@/components/bottom-sheets/sheets/BottomSheetPlaylist";
 import { View } from "@/components/ui/view";
 import tw from "@/lib/tw";
@@ -13,12 +12,16 @@ import ButtonActionPlaylistSaved from "@/components/buttons/ButtonActionPlaylist
 import CollectionHeader from "@/components/collection/CollectionHeader";
 import { PlaylistMovie } from "@/components/screens/playlist/PlaylistMovie";
 import { PlaylistTvSeries } from "@/components/screens/playlist/PlaylistTvSeries";
+import { upperFirst } from "lodash";
+import { useTranslations } from "use-intl";
+import { usePlaylistDetailsQuery } from "@/api/playlists/playlistsQueries";
 
 const PlaylistScreen = () => {
+	const t = useTranslations();
 	const { playlist_id } = useLocalSearchParams();
 	const playlistId = Number(playlist_id) || undefined;
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
-	const { data: playlist } = usePlaylistQuery({
+	const { data: playlist } = usePlaylistDetailsQuery({
 		playlistId: playlistId,
 	});
 
@@ -44,7 +47,24 @@ const PlaylistScreen = () => {
 					})}
 					/>
 				</View>
-			) : undefined
+			) : undefined,
+			unstable_headerRightItems: (props) => [
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.menu')),
+					onPress: () => {
+						if (playlist) {
+							openSheet(BottomSheetPlaylist, {
+								playlist: playlist
+							})
+						}
+					},
+					icon: {
+						name: "ellipsis",
+						type: "sfSymbol",
+					},
+				},
+			]
 		}}
 		scrollY={scrollY}
 		triggerHeight={headerHeight}

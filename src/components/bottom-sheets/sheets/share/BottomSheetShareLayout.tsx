@@ -250,7 +250,7 @@ const BottomSheetShareLayout = forwardRef<
     return (
         <TrueSheet
         ref={ref}
-        scrollable={Platform.OS === 'ios' ? true : false}
+        // scrollable={Platform.OS === 'ios' ? true : false}
         {...props}
         >
             <ScrollView

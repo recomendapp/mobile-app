@@ -1,10 +1,8 @@
-import { Text, View } from "react-native";
-import { useMediaReviewsTvSeriesInfiniteQuery, useMediaTvSeriesQuery } from "@/features/media/mediaQueries";
+import { ActivityIndicator, Text, View } from "react-native";
 import { getIdFromSlug } from "@/utils/getIdFromSlug";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
-import { HeaderTitle } from "@react-navigation/elements";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
@@ -13,9 +11,11 @@ import { LegendList } from "@legendapp/list";
 import { useCallback, useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
-import ButtonMyReviewTvSeries from "@/components/buttons/ButtonMyReviewTvSeries";
 import { CardReviewTvSeries } from "@/components/cards/reviews/CardReviewTvSeries";
 import { UserReviewTvSeries } from "@recomendapp/types";
+import { useUserActivityTvSeriesQuery } from "@/features/user/userQueries";
+import { useAuth } from "@/providers/AuthProvider";
+import { useMediaTvSeriesDetailsQuery, useMediaTvSeriesReviewsQuery } from "@/api/medias/mediaQueries";
 
 interface sortBy {
 	label: string;
@@ -24,6 +24,8 @@ interface sortBy {
 
 const TvSeriesReviews = () => {
 	const t = useTranslations();
+	const router = useRouter();
+	const { session } = useAuth();
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: tvSeriesId } = getIdFromSlug(tv_series_id);
 	const { colors, bottomOffset, tabBarHeight } = useTheme();
@@ -37,7 +39,13 @@ const TvSeriesReviews = () => {
 	const [sortBy, setSortBy] = useState<sortBy>(sortByOptions[0]);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	// Requests
-	const { data: tvSeries } = useMediaTvSeriesQuery({ tvSeriesId: tvSeriesId });
+	const { data: tvSeries } = useMediaTvSeriesDetailsQuery({ tvSeriesId: tvSeriesId });
+	const {
+		data: activity,
+	} = useUserActivityTvSeriesQuery({
+		userId: session?.user.id,
+		tvSeriesId: tvSeriesId,
+	});
 	const {
 		data,
 		isLoading,
@@ -45,7 +53,7 @@ const TvSeriesReviews = () => {
 		hasNextPage,
 		isRefetching,
 		refetch,
-	} = useMediaReviewsTvSeriesInfiniteQuery({
+	} = useMediaTvSeriesReviewsQuery({
 		tvSeriesId: tvSeriesId,
 		filters: {
 			sortBy: sortBy.value,
@@ -77,15 +85,41 @@ const TvSeriesReviews = () => {
 	return (
 	<>
 		<Stack.Screen
-		options={useMemo(() => ({
-			title: tvSeries?.name || '',
-			headerTitle: (props) => <HeaderTitle {...props}>{upperFirst(t('common.messages.review', { count: 2 }))}</HeaderTitle>,
-			headerRight: tvSeries ? () => (
-				<>
-					<ButtonMyReviewTvSeries tvSeries={tvSeries} size="icon" />
-				</>
+		options={{
+			headerRight: activity !== undefined ? () => (
+				<Button
+				variant={"outline"}
+				size="icon"
+				style={tw`rounded-full`}
+				icon={activity?.review ? Icons.Eye : Icons.Edit}
+				onPress={() => {
+					router.push(`/tv-series/${tvSeries?.slug || tvSeriesId}/review/${activity?.review ? activity.review.id : `create`}`);
+				}}
+				/>
 			) : undefined,
-		}), [tvSeries?.name, t])}
+			unstable_headerRightItems: session ? (props) => [
+				...(activity !== undefined ? [
+					{
+						type: "button",
+						label: activity?.review ? upperFirst(t('common.messages.my_review', { count: 1 })) : upperFirst(t('common.messages.add_review')),
+						onPress: () => {
+							router.push(`/tv-series/${tvSeries?.slug || tvSeriesId}/review/${activity?.review ? activity.review.id : `create`}`);
+						},
+						icon: {
+							name: activity?.review ? "eye" : "pencil",
+							type: "sfSymbol",
+						},
+					}
+				] as const : [
+					{
+						type: "custom",
+						element: (
+							<ActivityIndicator size={36} />
+						)
+					}
+				] as const),
+			] : undefined,
+		}}
 		/>
 		<LegendList
 		data={reviews}
