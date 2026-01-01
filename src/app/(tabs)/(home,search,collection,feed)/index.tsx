@@ -117,15 +117,7 @@ const AuthenticatedWidgets = () => {
 };
 
 const UnauthenticatedContent = () => {
-  const t = useTranslations();
-
-  return (
-    <Link href="/auth" asChild>
-      <Button style={{ marginHorizontal: PADDING_HORIZONTAL }}>
-        {upperFirst(t('common.messages.get_started_its_free'))}
-      </Button>
-    </Link>
-  );
+  return null;
 };
 
 const HomeScreen = () => {
