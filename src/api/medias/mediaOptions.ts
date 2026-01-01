@@ -1,4 +1,3 @@
-import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { mediasKeys } from "./mediasKeys";
 import { SupabaseClient } from "@/lib/supabase/client";
@@ -387,6 +386,36 @@ export const mediaTvSeriesPlaylistsOptions = ({
 		enabled: !!tvSeriesId,
 	});
 };
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------- TV SERIES ------------------------------- */
+export const mediaTvSeriesSeasonsOptions = ({
+	supabase,
+	tvSeriesId,
+} : {
+	supabase: SupabaseClient;
+	tvSeriesId?: number;
+}) => {
+	return queryOptions({
+		queryKey: mediasKeys.tvSeriesSeasons({ serieId: tvSeriesId! }),
+		queryFn: async () => {
+			if (!tvSeriesId) throw new Error('tvSeriesId is required');
+			const { data, error } = await supabase
+				.from('media_tv_series_seasons')
+				.select('*')
+				.eq('serie_id', tvSeriesId)
+				.order('season_number', { ascending: true });
+			if (error) throw error;
+			data.sort((a, b) => {
+				if (a.season_number === 0) return 1;
+				if (b.season_number === 0) return -1;
+				return a.season_number - b.season_number;
+			});
+			return data;
+		},
+		enabled: !!tvSeriesId,
+	})
+}
 /* -------------------------------------------------------------------------- */
 
 /* --------------------------------- PERSONS -------------------------------- */

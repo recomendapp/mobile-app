@@ -61,11 +61,12 @@ const Providers = ({ children } : ProvidersProps) => {
 
 const ProvidersInner = ({ children } : PropsWithChildren) => {
 	useQuery(useUIBackgroundsOptions()); // Preload UI backgrounds
-	return (
-		<Splash>
-			{children}
-		</Splash>
-	);
+	return children;
+	// return (
+	// 	<Splash>
+	// 		{children}
+	// 	</Splash>
+	// );
 };
 
 export { Providers };

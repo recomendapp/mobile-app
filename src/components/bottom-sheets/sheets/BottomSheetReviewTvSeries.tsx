@@ -39,7 +39,7 @@ export const BottomSheetReviewTvSeries = forwardRef<
 >(({ id, review, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const toast = useToast();
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const { colors, mode, tabBarHeight } = useTheme();
+  const { colors, mode } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -155,7 +155,6 @@ export const BottomSheetReviewTvSeries = forwardRef<
         </Button>
       )}
       indicatorStyle={mode === 'dark' ? 'white' : 'black'}
-		  scrollIndicatorInsets={{ bottom: tabBarHeight }}
       nestedScrollEnabled
       />
     </TrueSheet>

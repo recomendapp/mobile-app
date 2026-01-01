@@ -1,7 +1,7 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { mediasKeys } from "./mediasKeys";
-import { mediaMovieCreditsOptions, mediaMovieDetailsOptions, mediaMoviePlaylistsOptions, mediaMovieReviewsOptions, mediaPersonDetailsOptions, mediaPersonFilmsOptions, mediaTvSeriesCreditsOptions, mediaTvSeriesDetailsOptions, mediaTvSeriesPlaylistsOptions, mediaTvSeriesReviewsOptions, mediaTvSeriesSeasonDetailsOptions, mediaPersonTvSeriesOptions, mediaMovieFollowersAverageRatingOptions, mediaTvSeriesFollowersAverageRatingOptions, mediaMoviePostersOptions, mediaTvSeriesPostersOptions, mediaMovieBackdropsOptions, mediaTvSeriesBackdropsOptions, mediaGenresOptions } from "./mediaOptions";
+import { mediaMovieCreditsOptions, mediaMovieDetailsOptions, mediaMoviePlaylistsOptions, mediaMovieReviewsOptions, mediaPersonDetailsOptions, mediaPersonFilmsOptions, mediaTvSeriesCreditsOptions, mediaTvSeriesDetailsOptions, mediaTvSeriesPlaylistsOptions, mediaTvSeriesReviewsOptions, mediaTvSeriesSeasonDetailsOptions, mediaPersonTvSeriesOptions, mediaMovieFollowersAverageRatingOptions, mediaTvSeriesFollowersAverageRatingOptions, mediaMoviePostersOptions, mediaTvSeriesPostersOptions, mediaMovieBackdropsOptions, mediaTvSeriesBackdropsOptions, mediaGenresOptions, mediaTvSeriesSeasonsOptions } from "./mediaOptions";
 
 /* --------------------------------- DETAILS -------------------------------- */
 export const useMediaMovieDetailsQuery = ({
@@ -156,6 +156,20 @@ export const useMediaTvSeriesPlaylistsQuery = ({
 		filters,
 	}));
 };
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------- TV SERIES ------------------------------- */
+export const useMediaTvSeriesSeasonsQuery = ({
+	tvSeriesId,
+} : {
+	tvSeriesId?: number;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery(mediaTvSeriesSeasonsOptions({
+		supabase,
+		tvSeriesId,
+	}));
+}
 /* -------------------------------------------------------------------------- */
 
 /* --------------------------------- PERSONS -------------------------------- */

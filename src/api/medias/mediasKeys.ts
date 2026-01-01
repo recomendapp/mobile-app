@@ -11,6 +11,12 @@ export const mediasKeys = {
 		id: number;
 	}) => [...mediasKeys.base, type, id] as const,
 
+	tvSeriesSeasons: ({
+		serieId,
+	} : {
+		serieId: number;
+	}) => [...mediasKeys.details({ type: 'tv_series', id: serieId }), 'seasons'] as const,
+
 	tvSeason: ({
 		serieId,
 		seasonNumber,

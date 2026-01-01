@@ -48,7 +48,7 @@ const BottomSheetPlaylist = forwardRef<
 	const { session } = useAuth();
 	const toast = useToast();
 	const { closeSheet, openSheet } = useBottomSheetStore((state) => state);
-	const { colors, mode, tabBarHeight, isLiquidGlassAvailable } = useTheme();
+	const { colors, mode, isLiquidGlassAvailable } = useTheme();
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations();
@@ -250,7 +250,6 @@ const BottomSheetPlaylist = forwardRef<
 			)
 		)}
 		indicatorStyle={mode === 'dark' ? 'white' : 'black'}
-		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		nestedScrollEnabled
 		/>
 	</TrueSheet>

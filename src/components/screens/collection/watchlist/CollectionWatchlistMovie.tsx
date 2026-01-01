@@ -16,8 +16,17 @@ import { BottomSheetWatchlistMovieComment } from "@/components/bottom-sheets/she
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { SharedValue } from "react-native-reanimated";
 
-export const CollectionWatchlistMovie = () => {
+interface CollectionWatchlistMovieProps {
+	scrollY?: SharedValue<number>;
+	headerHeight?: SharedValue<number>;
+}
+
+export const CollectionWatchlistMovie = ({
+	scrollY,
+	headerHeight,
+} : CollectionWatchlistMovieProps) => {
 	const toast = useToast();
 	const t = useTranslations();
     const { user } = useAuth();
@@ -181,6 +190,9 @@ export const CollectionWatchlistMovie = () => {
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
 		onItemAction={onItemAction}
+		// SharedValues
+		scrollY={scrollY}
+		headerHeight={headerHeight}
 		// View
 		defaultView={view}
 		onViewChange={setWatchlistView}

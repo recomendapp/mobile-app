@@ -22,7 +22,7 @@ const BottomSheetMyRecosSenders = React.forwardRef<
   BottomSheetMyRecosSendersProps
 >(({ id, comments, ...props }, ref) => {
 	const insets = useSafeAreaInsets();
-	const { colors, mode, tabBarHeight } = useTheme();
+	const { colors, mode } = useTheme();
 	const t = useTranslations();
 	const renderItem = useCallback(({ item }: { item: UserRecosAggregated['senders'][number] }) => {
 		return (
@@ -67,7 +67,6 @@ const BottomSheetMyRecosSenders = React.forwardRef<
 			paddingBottom: insets.bottom + PADDING_VERTICAL,
 		}}
 		indicatorStyle={mode === 'dark' ? 'white' : 'black'}
-		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		ItemSeparatorComponent={() => <View style={tw`h-2`} />}
 		/>
     </TrueSheet>

@@ -44,7 +44,7 @@ const BottomSheetMovie = React.forwardRef<
 >(({ id, movie, activity, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const { colors, mode, tabBarHeight, isLiquidGlassAvailable } = useTheme();
+  const { colors, mode, isLiquidGlassAvailable } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -178,7 +178,6 @@ const BottomSheetMovie = React.forwardRef<
       stickyHeaderIndices={[0]}
       renderItem={renderItem}
       indicatorStyle={mode === 'dark' ? 'white' : 'black'}
-      scrollIndicatorInsets={{ bottom: tabBarHeight }}
       nestedScrollEnabled
       />
       {movie?.directors && (
@@ -210,7 +209,6 @@ const BottomSheetMovie = React.forwardRef<
               </Button>
           )}
           indicatorStyle={mode === 'dark' ? 'white' : 'black'}
-		      scrollIndicatorInsets={{ bottom: tabBarHeight }}
           nestedScrollEnabled
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{

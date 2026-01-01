@@ -152,6 +152,7 @@ const RootLayoutNav = () => {
       }} />
     </Stack.Protected>
 
+    <Stack.Screen name="explore" options={{ title: upperFirst(t('common.messages.explore')), headerTitle: () => <></>, headerTransparent: true, headerStyle: { backgroundColor: 'transparent' } }} />
     <Stack.Screen name="upgrade" options={{ presentation: 'fullScreenModal' }} />
     <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'slide_from_bottom', animationDuration: 250 }} />
   </Stack>

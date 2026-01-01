@@ -16,8 +16,17 @@ import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTv
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { SharedValue } from "react-native-reanimated";
 
-export const CollectionWatchlistTvSeries = () => {
+interface CollectionWatchlistTvSeriesProps {
+	scrollY?: SharedValue<number>;
+	headerHeight?: SharedValue<number>;
+}
+
+export const CollectionWatchlistTvSeries = ({
+	scrollY,
+	headerHeight,
+} : CollectionWatchlistTvSeriesProps) => {
 	const t = useTranslations();
 	const toast = useToast();
     const { user } = useAuth();
@@ -179,6 +188,9 @@ export const CollectionWatchlistTvSeries = () => {
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
 		onItemAction={onItemAction}
+		// SharedValues
+		scrollY={scrollY}
+		headerHeight={headerHeight}
 		// View
 		defaultView={view}
 		onViewChange={setWatchlistView}

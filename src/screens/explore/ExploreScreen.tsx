@@ -23,6 +23,8 @@ import { FiltersBottomSheet } from "./sheets/FiltersBottomSheet";
 import { useExploreStore } from "@/stores/useExploreStore";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useMediaGenresQuery } from "@/api/medias/mediaQueries";
+import { TrueSheet } from "@lodev09/react-native-true-sheet";
+import { Input } from "@/components/ui/Input";
 
 const MOVE_DELAY = 500;
 
@@ -43,7 +45,7 @@ const ExploreScreen = () => {
 	// REFs
 	const mapRef = useRef<MapViewRef>(null);
 	const cameraRef = useRef<CameraRef>(null);
-	const searchRef = useRef<BottomSheetModal>(null);
+	const searchRef = useRef<TrueSheet>(null);
 	const locationDetailsRef = useRef<LocationDetailsBottomSheetMethods>(null);
 	
 	// SharedValues
@@ -120,16 +122,14 @@ const ExploreScreen = () => {
 	}, [tile, tileMeta, refetchTile]);
 
 	useLayoutEffect(() => {
-		requestAnimationFrame(
-			() => {
-				searchRef.current?.present()
-			}
-		);
+		return () => {
+			searchRef.current?.dismiss();
+		}
 	}, []);
 
 	return (
 	<>
-		<Stack.Screen
+		{/* <Stack.Screen
 		options={{
 			headerTitle: () => <></>,
 			headerShown: true,
@@ -141,9 +141,9 @@ const ExploreScreen = () => {
 				<View>
 					<Button variant="muted" icon={Icons.ChevronLeft} size="icon" style={{ borderRadius: BORDER_RADIUS_FULL }} onPress={() => router.canGoBack() ? router.back() : router.replace({ pathname: '/(tabs)/(home)'})} />
 				</View>
-			)
+			),
 		}}
-		/>
+		/> */}
 		<MapView
 		ref={mapRef}
 		style={{ flex: 1 }}
@@ -287,7 +287,7 @@ const ExploreScreen = () => {
 					/>
 				</ShapeSource>
 			)}
-			<MarkerView
+			{/* <MarkerView
 			coordinate={[selectedMovie?.geometry.coordinates[0] || userPosition.longitude, selectedMovie?.geometry.coordinates[1] || userPosition.latitude]}
 			anchor={{ x: 0.5, y: 1 }}
 			style={{ opacity: selectedMovie ? 1 : 0 }}
@@ -299,10 +299,27 @@ const ExploreScreen = () => {
 					</View>
 					<Icons.MapPin color={'rgba(136, 0, 0, 1)'} fill={'rgba(255, 0, 0, 1)'} size={32} />
 				</View>
-			</MarkerView>
+			</MarkerView> */}
 		</MapView>
 
-		<SearchBottomSheet
+		<TrueSheet
+		ref={searchRef}
+		detents={['auto', 0.8]}
+		initialDetentIndex={0}
+		dimmed={false}
+		dismissible={false}
+		header={
+			<View>
+				<Input placeholder="Search..." />
+			</View>
+		}
+		>
+			<View>
+				<Text>Test Sheet Content</Text>
+			</View>
+		</TrueSheet>
+
+		{/* <SearchBottomSheet
 		ref={searchRef}
 		index={animatedPOIListIndex}
 		position={animatedPOIListPosition}
@@ -313,9 +330,9 @@ const ExploreScreen = () => {
         index={animatedPOIDetailsIndex}
         position={animatedPOIDetailsPosition}
 		onClose={handleOnLocationClose}
-      	/>
+      	/> */}
 
-		<Animated.View onLayout={(e) => optionsHeight.value = e.nativeEvent.layout.height} style={[{ position: 'absolute', bottom: insets.bottom + PADDING_VERTICAL, right: PADDING_HORIZONTAL, gap: GAP }, animatedOptionsStyle]}>
+		{/* <Animated.View onLayout={(e) => optionsHeight.value = e.nativeEvent.layout.height} style={[{ position: 'absolute', bottom: insets.bottom + PADDING_VERTICAL, right: PADDING_HORIZONTAL, gap: GAP }, animatedOptionsStyle]}>
 			{showRecenter && (
 				<Button
 				icon={Icons.Navigation}
@@ -332,7 +349,7 @@ const ExploreScreen = () => {
 			index={animatedFiltersIndex}
 			position={animatedFiltersPosition}
 			/>
-		</Animated.View>
+		</Animated.View> */}
 	</>
 	);
 };

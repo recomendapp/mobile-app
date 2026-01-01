@@ -15,8 +15,17 @@ import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { useUIStore } from "@/stores/useUIStore";
+import { SharedValue } from "react-native-reanimated";
 
-export const CollectionHeartPicksTvSeries = () => {
+interface CollectionHeartPicksTvSeriesProps {
+	scrollY?: SharedValue<number>;
+	headerHeight?: SharedValue<number>;
+}
+
+export const CollectionHeartPicksTvSeries = ({
+	scrollY,
+	headerHeight,
+} : CollectionHeartPicksTvSeriesProps) => {
 	const t = useTranslations();
 	const toast = useToast();
     const { user } = useAuth();
@@ -161,6 +170,9 @@ export const CollectionHeartPicksTvSeries = () => {
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
 		onItemAction={onItemAction}
+		// SharedValues
+		scrollY={scrollY}
+		headerHeight={headerHeight}
 		// View
 		defaultView={view}
 		onViewChange={setHeartPicksView}

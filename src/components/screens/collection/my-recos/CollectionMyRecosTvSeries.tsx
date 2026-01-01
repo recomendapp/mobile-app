@@ -16,8 +16,17 @@ import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTv
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { SharedValue } from "react-native-reanimated";
 
-export const CollectionMyRecosTvSeries = () => {
+interface CollectionMyRecosTvSeriesProps {
+	scrollY?: SharedValue<number>;
+	headerHeight?: SharedValue<number>;
+}
+
+export const CollectionMyRecosTvSeries = ({
+	scrollY,
+	headerHeight,
+} : CollectionMyRecosTvSeriesProps) => {
 	const t = useTranslations();
 	const toast = useToast();
     const { user } = useAuth();
@@ -216,6 +225,9 @@ export const CollectionMyRecosTvSeries = () => {
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
 		onItemAction={onItemAction}
+		// SharedValues
+		scrollY={scrollY}
+		headerHeight={headerHeight}
 		// View
 		defaultView={view}
 		onViewChange={setMyRecosView}

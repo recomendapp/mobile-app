@@ -220,7 +220,6 @@ const CollectionScreen = <T extends {}>({
 
     return (
     <>
-    
         <AnimatedLegendList
         onScroll={scrollHandler}
         ListHeaderComponent={
@@ -274,13 +273,18 @@ const CollectionScreen = <T extends {}>({
                 </View>
             )
         }
-        showsVerticalScrollIndicator={false}
         refreshing={isRefetching}
         onRefresh={refetch}
         contentContainerStyle={{
             paddingHorizontal: PADDING_HORIZONTAL,
-            paddingBottom: bottomOffset + PADDING_VERTICAL,
+            paddingBottom: PADDING_VERTICAL,
             gap: GAP,
+        }}
+        style={{
+            marginBottom: bottomOffset,
+        }}
+        scrollIndicatorInsets={{
+            bottom: bottomOffset
         }}
         maintainVisibleContentPosition={maintainVisibleContentPosition}
         numColumns={

@@ -97,7 +97,7 @@ const ReviewForm = ({
 	}, [activity?.rating, onSave, title, t, toast, body]);
 
 	const scrollViewStyle = useAnimatedStyle(() => {
-		const closedPadding = bottomOffset + PADDING_VERTICAL;
+		const closedPadding = PADDING_VERTICAL;
 
 		const openPadding = (-keyboardHeight.value) + toolbarHeight.value + (PADDING_VERTICAL * 2);
 
@@ -148,26 +148,26 @@ const ReviewForm = ({
 		<Stack.Screen
 		options={{
 			headerRight: () => (
-				review ?(
-					<Button
-					variant="ghost"
-					size="fit"
-					onPress={handleSave}
-					textStyle={{ color: colors.accentYellow }}
-					>
-						{upperFirst(t('common.messages.save'))}
-					</Button>
-				) : (
-					<Button
-					variant="ghost"
-					size="fit"
-					onPress={handleSave}
-					textStyle={{ color: colors.accentYellow }}
-					>
-						{upperFirst(t('common.messages.publish'))}
-					</Button>
-				)
-			)
+				<Button
+				variant="ghost"
+				size="fit"
+				onPress={handleSave}
+				textStyle={{ color: colors.accentYellow }}
+				>
+					{review ? upperFirst(t('common.messages.save')) : upperFirst(t('common.messages.publish'))}
+				</Button>
+			),
+			unstable_headerRightItems: (props) => [
+				{
+					type: "button",
+					label: review ? upperFirst(t('common.messages.save')) : upperFirst(t('common.messages.publish')),
+					onPress: handleSave,
+					icon: {
+						name: "checkmark",
+						type: "sfSymbol",
+					},
+				},
+			],
 		}}
 		/>
 		<Animated.View
@@ -178,6 +178,7 @@ const ReviewForm = ({
 				paddingTop: PADDING_VERTICAL,
 				paddingLeft: insets.left + PADDING_HORIZONTAL,
 				paddingRight: insets.right + PADDING_HORIZONTAL,
+				marginBottom: bottomOffset,
 			},
 			scrollViewStyle
 		]}

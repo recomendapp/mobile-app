@@ -16,8 +16,17 @@ import BottomSheetMyRecosSenders from "@/components/bottom-sheets/sheets/BottomS
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { SharedValue } from "react-native-reanimated";
 
-export const CollectionMyRecosMovie = () => {
+interface CollectionMyRecosMovieProps {
+	scrollY?: SharedValue<number>;
+	headerHeight?: SharedValue<number>;
+}
+
+export const CollectionMyRecosMovie = ({
+	scrollY,
+	headerHeight,
+} : CollectionMyRecosMovieProps) => {
 	const toast = useToast();
 	const t = useTranslations();
 	const { mode } = useTheme();
@@ -217,6 +226,9 @@ export const CollectionMyRecosMovie = () => {
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
 		onItemAction={onItemAction}
+		// SharedValues
+		scrollY={scrollY}
+		headerHeight={headerHeight}
 		// View
 		defaultView={view}
 		onViewChange={setMyRecosView}

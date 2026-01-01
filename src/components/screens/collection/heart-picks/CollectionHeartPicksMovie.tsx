@@ -15,8 +15,17 @@ import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { useUIStore } from "@/stores/useUIStore";
+import { SharedValue } from "react-native-reanimated";
 
-export const CollectionHeartPicksMovie = () => {
+interface CollectionHeartPicksMovieProps {
+	scrollY?: SharedValue<number>;
+	headerHeight?: SharedValue<number>;
+}
+
+export const CollectionHeartPicksMovie = ({
+	scrollY,
+	headerHeight,
+}: CollectionHeartPicksMovieProps) => {
 	const t = useTranslations();
 	const toast = useToast();
     const { user } = useAuth();
@@ -163,6 +172,9 @@ export const CollectionHeartPicksMovie = () => {
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
 		onItemAction={onItemAction}
+		// SharedValues
+		scrollY={scrollY}
+		headerHeight={headerHeight}
 		// View
 		defaultView={view}
 		onViewChange={setHeartPicksView}

@@ -4,7 +4,7 @@ import { StyleSheet, StyleProp, ViewStyle } from "react-native";
 import Animated, { SharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { Button } from "./Button";
 import { Icons } from "@/constants/Icons";
-import { HeaderTitle } from '@react-navigation/elements';
+import { HeaderTitle, HeaderTitleProps } from '@react-navigation/elements';
 import { useTheme } from "@/providers/ThemeProvider";
 import { LinearGradient } from "expo-linear-gradient";
 import Color from "color";
@@ -30,6 +30,7 @@ export interface AnimatedStackScreenProps extends React.ComponentProps<typeof St
 	 * @default 0.90
 	 */
 	scaleStartRatio?: number;
+	disabledTitleAnimation?: boolean;
 }
 
 const ReanimatedHeaderTitle = Animated.createAnimatedComponent(HeaderTitle);
@@ -37,20 +38,16 @@ const ReanimatedHeaderTitle = Animated.createAnimatedComponent(HeaderTitle);
 const AnimatedStackScreen = forwardRef<
 	React.ComponentRef<typeof Stack.Screen>,
 	AnimatedStackScreenProps
->(({ onMenuPress, scrollY, triggerHeight, animationStartRatio = 0.25, scaleStartRatio = 0.90, ...props }, ref) => {
-	const { colors } = useTheme();
+>(({ onMenuPress, scrollY, triggerHeight, animationStartRatio = 0.25, scaleStartRatio = 0.90, disabledTitleAnimation = false, ...props }, ref) => {
+	const { colors, isLiquidGlassAvailable } = useTheme();
 	const defaultOptions = useMemo(() => ({
 		headerTransparent: true,
 	}), []);
 
-	const { headerReplaceBackground, headerBackground, ...options } = useMemo(() => ({
+	const { headerReplaceBackground, headerBackground, headerTitle, ...options } = useMemo(() => ({
 		...defaultOptions,
 		...(typeof props.options === 'object' ? props.options : {}),
 	}), [defaultOptions, props.options]);
-
-	const headerTitle = useMemo(() => (
-		typeof options.headerTitle === 'string' ? options.headerTitle : undefined
-	), [options.headerTitle]);
 
 	const titleAnimatedStyle = useAnimatedStyle(() => {
 		'worklet';
@@ -136,13 +133,19 @@ const AnimatedStackScreen = forwardRef<
 		</>
 	), [headerReplaceBackground, headerBackgroundColor, colors.background, backgroundAnimatedStyle, headerBackground]);
 
-	const renderHeaderTitle = useCallback(() => (
-		<ReanimatedHeaderTitle
-			style={titleAnimatedStyle}
-			tintColor={colors.foreground}
-		>
-			{headerTitle}
-		</ReanimatedHeaderTitle>
+	const renderHeaderTitle = useCallback((props: HeaderTitleProps) => (
+		typeof headerTitle === 'string' ? (
+			<ReanimatedHeaderTitle
+				style={titleAnimatedStyle}
+				tintColor={colors.foreground}
+			>
+				{headerTitle}
+			</ReanimatedHeaderTitle>
+		) : (
+			<Animated.View style={titleAnimatedStyle}>
+				{headerTitle?.(props)}
+			</Animated.View>
+		)
 	), [titleAnimatedStyle, colors.foreground, headerTitle]);
 
 	const screenOptions = useMemo(() => ({
@@ -153,11 +156,11 @@ const AnimatedStackScreen = forwardRef<
 			options.headerStyle,
 			{ backgroundColor: 'transparent' }
 		],
-		headerBackground: renderHeaderBackground,
-		title: headerTitle,
+		headerBackground: !isLiquidGlassAvailable ? renderHeaderBackground : undefined,
+		title: typeof headerTitle === 'string' ? headerTitle : undefined,
 		...options,
-		headerTitle: renderHeaderTitle
-	}), [onMenuPress, headerTitle, options, renderHeaderBackground, renderHeaderTitle, renderHeaderRight]);
+		headerTitle: disabledTitleAnimation ? headerTitle : renderHeaderTitle,
+	}), [onMenuPress, headerTitle, options, renderHeaderBackground, renderHeaderTitle, renderHeaderRight, isLiquidGlassAvailable, disabledTitleAnimation]);
 
 	return (
 	<Stack.Screen

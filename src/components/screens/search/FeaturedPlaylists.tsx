@@ -72,10 +72,16 @@ const FeaturedPlaylists = ({
 		contentContainerStyle={[
 			{
 				gap: GAP,
-				paddingBottom: bottomOffset + PADDING_VERTICAL,
+				paddingBottom: PADDING_VERTICAL,
 			},
 			contentContainerStyle,
 		]}
+		style={{
+			marginBottom: bottomOffset,
+		}}
+		scrollIndicatorInsets={{
+			bottom: bottomOffset,
+		}}
 		ListEmptyComponent={
 			isLoading ? <Icons.Loader />
 			: (

@@ -39,7 +39,7 @@ const BottomSheetPerson = React.forwardRef<
 >(({ id, person, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const openSheet = useBottomSheetStore((state) => state.openSheet);
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const { colors, mode, tabBarHeight, isLiquidGlassAvailable } = useTheme();
+  const { colors, mode, isLiquidGlassAvailable } = useTheme();
   const router = useRouter();
   const t = useTranslations();
   const pathname = usePathname();
@@ -124,7 +124,6 @@ const BottomSheetPerson = React.forwardRef<
         )
       )}
       indicatorStyle={mode === 'dark' ? 'white' : 'black'}
-		  scrollIndicatorInsets={{ bottom: tabBarHeight }}
       nestedScrollEnabled
       />
     </TrueSheet>
