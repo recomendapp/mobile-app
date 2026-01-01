@@ -91,7 +91,7 @@ export function SearchBar({
     backgroundColor: cardColor,
     borderColor: colors.border,
     borderWidth: 1,
-    height: HEIGHT,
+    minHeight: HEIGHT,
     paddingHorizontal: 16,
     ...tw`rounded-lg`
   };
