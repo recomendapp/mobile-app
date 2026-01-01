@@ -26,7 +26,7 @@ const PersonFilmsScreen = () => {
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { person_id } = useLocalSearchParams<{ person_id: string }>();
 	const { id: personId } = getIdFromSlug(person_id);
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -120,12 +120,9 @@ const PersonFilmsScreen = () => {
 		contentContainerStyle={{
 			gap: GAP,
 			paddingHorizontal: PADDING_HORIZONTAL,
-			paddingBottom: PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
-		style={{
-			marginBottom: bottomOffset,
-		}}
-		scrollIndicatorInsets={{ bottom: bottomOffset }}
+		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={useCallback((item: typeof movies[number]) => item.media_movie.id.toString(), [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}

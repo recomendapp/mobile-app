@@ -31,12 +31,13 @@ import { Icons } from "@/constants/Icons";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { LegendList } from "@legendapp/list";
 import { Vimeo } from "react-native-vimeo-iframe";
-import { useMediaTvSeriesDetailsQuery } from "@/api/medias/mediaQueries";
+import { useMediaTvSeriesCastQuery, useMediaTvSeriesDetailsQuery } from "@/api/medias/mediaQueries";
+import TvSeriesWidgetCast from "@/components/screens/tv-series/TvSeriesWidgetCast";
 
 const TvSeriesScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
-	const { bottomOffset } = useTheme();
+	const { bottomOffset, tabBarHeight } = useTheme();
 	const { session } = useAuth();
 	const t = useTranslations();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
@@ -46,7 +47,11 @@ const TvSeriesScreen = () => {
 	} = useMediaTvSeriesDetailsQuery({
 		tvSeriesId: seriesId,
 	});
+	// Prefetch 
+	const { data: cast } = useMediaTvSeriesCastQuery({ tvSeriesId: seriesId });
+
 	const loading = series === undefined || isLoading;
+	
 	// SharedValue
 	const headerHeight = useSharedValue<number>(0);
 	const scrollY = useSharedValue<number>(0);
@@ -62,7 +67,7 @@ const TvSeriesScreen = () => {
 	const animatedContentContainerStyle = useAnimatedStyle(() => {
 		return {
 			paddingBottom: withTiming(
-				PADDING_VERTICAL, // + floatingBarHeight.value,
+				bottomOffset + (PADDING_VERTICAL * 2) + floatingBarHeight.value,
 				{ duration: 300 }
 			),
 		};
@@ -103,11 +108,8 @@ const TvSeriesScreen = () => {
 		onScroll={scrollHandler}
 		scrollToOverflowEnabled
 		contentContainerStyle={animatedContentContainerStyle}
-		style={{
-			marginBottom: bottomOffset
-		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset,
+			bottom: tabBarHeight,
 		}}
 		>
 			<TvSeriesHeader
@@ -124,7 +126,7 @@ const TvSeriesScreen = () => {
 							<TvSeriesSynopsis tvSeries={series} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
 							<TvSeriesOriginalTitle tvSeries={series} style={{ marginHorizontal: PADDING_HORIZONTAL }} />
 						</View>
-						{/* <TvSeriesCast tvSeries={series} /> */}
+						<TvSeriesWidgetCast tvSeriesId={series.id} />
 						<TvSeriesWidgetSeasons tvSeries={series} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} labelStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
 						<Link href={{ pathname: '/tv-series/[tv_series_id]/details', params: { tv_series_id: series.id }}} asChild>
 							<Button variant="outline" style={{ marginHorizontal: PADDING_HORIZONTAL }}>
@@ -138,7 +140,7 @@ const TvSeriesScreen = () => {
 				</View>
 			)}
 		</AnimatedContentContainer>
-		{/* {series && session && (
+		{series && session && (
 			<FloatingBar bottomOffset={bottomOffset + PADDING_VERTICAL} height={floatingBarHeight} containerStyle={{ paddingHorizontal: 0 }} style={tw`flex-row items-center justify-between`}>
 				<View style={tw`flex-row items-center gap-2`}>
 					<ButtonUserActivityTvSeriesRating tvSeries={series} />
@@ -151,7 +153,7 @@ const TvSeriesScreen = () => {
 					<ButtonUserRecoTvSeriesSend tvSeries={series} />
 				</View>
 			</FloatingBar>
-		)} */}
+		)}
 	</>
 	)
 };

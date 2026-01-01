@@ -28,7 +28,7 @@ const SettingsAppearanceScreen = () => {
 	const { session } = useAuth();
 	const toast = useToast();
 	const queryClient = useQueryClient();
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locales = useLocalizedLanguageName(locale);
@@ -118,13 +118,10 @@ const SettingsAppearanceScreen = () => {
 				gap: GAP,
 				paddingTop: PADDING_VERTICAL,
 				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingBottom: PADDING_VERTICAL,
-			}}
-			style={{
-				marginBottom: bottomOffset,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 			}}
 			scrollIndicatorInsets={{
-				bottom: bottomOffset
+				bottom: tabBarHeight,
 			}}
 			bottomOffset={bottomOffset + PADDING_VERTICAL}
 			>

@@ -1,7 +1,7 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { mediasKeys } from "./mediasKeys";
-import { mediaMovieCreditsOptions, mediaMovieDetailsOptions, mediaMoviePlaylistsOptions, mediaMovieReviewsOptions, mediaPersonDetailsOptions, mediaPersonFilmsOptions, mediaTvSeriesCreditsOptions, mediaTvSeriesDetailsOptions, mediaTvSeriesPlaylistsOptions, mediaTvSeriesReviewsOptions, mediaTvSeriesSeasonDetailsOptions, mediaPersonTvSeriesOptions, mediaMovieFollowersAverageRatingOptions, mediaTvSeriesFollowersAverageRatingOptions, mediaMoviePostersOptions, mediaTvSeriesPostersOptions, mediaMovieBackdropsOptions, mediaTvSeriesBackdropsOptions, mediaGenresOptions, mediaTvSeriesSeasonsOptions } from "./mediaOptions";
+import { mediaMovieCreditsOptions, mediaMovieDetailsOptions, mediaMoviePlaylistsOptions, mediaMovieReviewsOptions, mediaPersonDetailsOptions, mediaPersonFilmsOptions, mediaTvSeriesCreditsOptions, mediaTvSeriesDetailsOptions, mediaTvSeriesPlaylistsOptions, mediaTvSeriesReviewsOptions, mediaTvSeriesSeasonDetailsOptions, mediaPersonTvSeriesOptions, mediaMovieFollowersAverageRatingOptions, mediaTvSeriesFollowersAverageRatingOptions, mediaMoviePostersOptions, mediaTvSeriesPostersOptions, mediaMovieBackdropsOptions, mediaTvSeriesBackdropsOptions, mediaGenresOptions, mediaTvSeriesSeasonsOptions, mediaMovieCastOptions, mediaTvSeriesCastOptions } from "./mediaOptions";
 
 /* --------------------------------- DETAILS -------------------------------- */
 export const useMediaMovieDetailsQuery = ({
@@ -68,6 +68,17 @@ export const useMediaMovieCreditsQuery = ({
 		movieId,
 	}))
 };
+export const useMediaMovieCastQuery = ({
+	movieId,
+} : {
+	movieId?: number;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery(mediaMovieCastOptions({
+		supabase,
+		movieId,
+	}))
+};
 
 export const useMediaTvSeriesCreditsQuery = ({
 	tvSeriesId,
@@ -80,6 +91,17 @@ export const useMediaTvSeriesCreditsQuery = ({
 		tvSeriesId,
 	}))
 };
+export const useMediaTvSeriesCastQuery = ({
+	tvSeriesId,
+} : {
+	tvSeriesId?: number;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery(mediaTvSeriesCastOptions({
+		supabase,
+		tvSeriesId,
+	}))
+}
 /* -------------------------------------------------------------------------- */
 
 /* --------------------------------- REVIEWS -------------------------------- */

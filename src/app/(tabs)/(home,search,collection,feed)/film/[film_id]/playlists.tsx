@@ -28,7 +28,7 @@ const FilmPlaylists = () => {
 	const { session } = useAuth();
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -157,13 +157,10 @@ const FilmPlaylists = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={{
 				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingBottom: PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 				gap: GAP,
 		}}
-		style={{
-			marginBottom: bottomOffset
-		}}
-		scrollIndicatorInsets={{ bottom: bottomOffset }}
+		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={useCallback((item: Playlist) => item.id.toString(), [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}

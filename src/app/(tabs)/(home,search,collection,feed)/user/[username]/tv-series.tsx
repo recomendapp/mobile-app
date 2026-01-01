@@ -6,13 +6,14 @@ import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { LegendList } from "@legendapp/list";
-import { useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
 import { useCallback, useMemo, useState } from "react";
 import { Text, useWindowDimensions, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
+import { HeaderTitle } from "@react-navigation/elements";
 
 interface sortBy {
 	label: string;
@@ -23,8 +24,8 @@ const UserCollectionTvSeries = () => {
 	const t = useTranslations();
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { username } = useLocalSearchParams<{ username: string }>();
-	const { data, } = useUserProfileQuery({ username: username });
-	const { colors, bottomOffset } = useTheme();
+	const { data: userProfile } = useUserProfileQuery({ username: username });
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -41,7 +42,7 @@ const UserCollectionTvSeries = () => {
 		isRefetching,
 		refetch,
 	} = useUserActivitiesTvSeriesInfiniteQuery({
-		userId: data?.id || undefined,
+		userId: userProfile?.id || undefined,
 		filters: {
 			sortBy: sortBy.value,
 			sortOrder,
@@ -67,6 +68,12 @@ const UserCollectionTvSeries = () => {
 
 	return (
 	<>
+		<Stack.Screen
+		options={{
+			title: userProfile ? `@${userProfile.username}` : '',
+			headerTitle: (props) => <HeaderTitle {...props}>{upperFirst(t('common.messages.tv_series', { count: 2 }))}</HeaderTitle>
+		}}
+		/>
 		<LegendList
 		data={tvSeries?.pages.flat() || []}
 		renderItem={({ item }) => (
@@ -111,13 +118,10 @@ const UserCollectionTvSeries = () => {
 		contentContainerStyle={{
 			gap: GAP,
 			paddingHorizontal: PADDING_HORIZONTAL,
-			paddingBottom: PADDING_VERTICAL,
-		}}
-		style={{
-			marginBottom: bottomOffset,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset,
+			bottom: tabBarHeight,
 		}}
 		keyExtractor={(item) => item.id.toString()}
 		onEndReached={() => hasNextPage && fetchNextPage()}

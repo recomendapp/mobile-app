@@ -2,7 +2,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import useColorConverter from "@/hooks/useColorConverter";
 import tw from "@/lib/tw";
 import React, { forwardRef, memo, useMemo } from "react";
-import { Dimensions, Platform, Text } from "react-native";
+import { Dimensions, Text } from "react-native";
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import useRandomBackdrop from "@/hooks/useRandomBackdrop";
 import { Image } from "expo-image";
@@ -147,7 +147,7 @@ const CollectionHeader = forwardRef<
 			style={[
 				tw`items-center justify-center px-4 pb-4 min-h-40 gap-2`,
 				{
-					marginTop: Platform.OS === 'android' ? navigationHeaderHeight : 0,
+					marginTop: navigationHeaderHeight,
 				}
 			]}
 			>

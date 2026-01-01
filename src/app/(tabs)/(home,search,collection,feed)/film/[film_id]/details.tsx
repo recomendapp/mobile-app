@@ -18,7 +18,7 @@ const FilmDetailsScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
 	const t = useTranslations();
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 
 	const {
 		data,
@@ -135,13 +135,10 @@ const FilmDetailsScreen = () => {
 			return `person-${item.department}-${item.job}-${item.person.id}`;
 		}, [])}
 		contentContainerStyle={{
-			paddingBottom: PADDING_VERTICAL
-		}}
-		style={{
-			marginBottom: bottomOffset
+			paddingBottom: bottomOffset + PADDING_VERTICAL
 		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset
+			bottom: tabBarHeight,
 		}}
 		ListEmptyComponent={
 			loading ? <Icons.Loader />

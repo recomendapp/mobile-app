@@ -19,7 +19,7 @@ import { useTranslations } from "use-intl";
 
 const SearchUsersScreen = () => {
 	const insets = useSafeAreaInsets();
-	const { bottomOffset } = useTheme();
+	const { bottomOffset, tabBarHeight } = useTheme();
 	const {
 		isVisible: keyboardVisible,
 		height: keyboardHeight,
@@ -54,14 +54,11 @@ const SearchUsersScreen = () => {
 		contentContainerStyle={{
 			paddingLeft: insets.left + PADDING_HORIZONTAL,
 			paddingRight: insets.right + PADDING_HORIZONTAL,
-			paddingBottom: keyboardVisible ? keyboardHeight + PADDING_VERTICAL : PADDING_VERTICAL,
+			paddingBottom: keyboardVisible ? keyboardHeight + PADDING_VERTICAL : bottomOffset + PADDING_VERTICAL,
 			gap: GAP,
 		}}
-		style={{
-			marginBottom: bottomOffset,
-		}}
 		scrollIndicatorInsets={{
-			bottom: keyboardVisible ? (keyboardHeight - insets.bottom) : bottomOffset,
+			bottom: keyboardVisible ? (keyboardHeight - insets.bottom) : tabBarHeight,
 		}}
 		keyExtractor={(item) => item.id.toString()}
 		ListEmptyComponent={

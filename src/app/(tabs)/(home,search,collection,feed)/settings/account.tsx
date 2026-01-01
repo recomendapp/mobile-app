@@ -37,7 +37,7 @@ const SettingsAccountScreen = () => {
 	const format = useFormatter();
 	const t = useTranslations();
 	const toast = useToast();
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const { mutateAsync: updateProfileMutation} = useUserUpdateMutation({
 		userId: user?.id,
 	});
@@ -266,13 +266,10 @@ const SettingsAccountScreen = () => {
 				gap: GAP,
 				paddingTop: PADDING_VERTICAL,
 				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingBottom: PADDING_VERTICAL,
-			}}
-			style={{
-				marginBottom: bottomOffset,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 			}}
 			scrollIndicatorInsets={{
-				bottom: bottomOffset
+				bottom: tabBarHeight
 			}}
 			bottomOffset={bottomOffset + PADDING_VERTICAL}
 			>

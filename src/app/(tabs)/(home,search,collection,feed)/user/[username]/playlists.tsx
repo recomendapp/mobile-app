@@ -24,7 +24,7 @@ const UserPlaylistsScreen = () => {
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { data, } = useUserProfileQuery({ username: username });
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -119,15 +119,12 @@ const UserPlaylistsScreen = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[
 			{
-				paddingBottom: PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 			},
 			tw`px-4`,
 		]}
-		style={{
-			marginBottom: bottomOffset,
-		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset
+			bottom: tabBarHeight
 		}}
 		keyExtractor={(item) => item.id.toString()}
 		columnWrapperStyle={tw`gap-2`}

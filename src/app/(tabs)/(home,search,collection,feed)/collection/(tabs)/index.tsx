@@ -14,7 +14,7 @@ import { useCallback, useMemo } from "react";
 const CollectionScreen = () => {
 	const { user } = useAuth();
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
-	const { bottomOffset } = useTheme();
+	const { bottomOffset, tabBarHeight } = useTheme();
 	const staticRoutes = useCollectionStaticRoutes();
 	const {
 		data: playlists,
@@ -63,12 +63,9 @@ const CollectionScreen = () => {
 		}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
-			paddingBottom: PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
-		style={{
-			marginBottom: bottomOffset,
-		}}
-		scrollIndicatorInsets={{ bottom: bottomOffset }}
+		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={(item) => (
 			item.type === 'static' ? `static-${item.label}` : item.id.toString()
 		)}

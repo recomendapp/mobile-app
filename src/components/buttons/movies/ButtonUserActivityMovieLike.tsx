@@ -125,7 +125,7 @@ const ButtonUserActivityMovieLike = forwardRef<
 			...iconProps,
 		}}
 		style={{
-			...({ backgroundColor: activity?.is_liked ? colors.accentPink : 'transparent' }),
+			...(activity?.is_liked ? { backgroundColor: colors.accentPink } : undefined),
 			...tw`rounded-full`,
 			...style,
 		}}

@@ -22,7 +22,7 @@ const FeaturedPlaylists = ({
 } : FeaturedPlaylistsProps) => {
 	const t = useTranslations();
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const {
 		data,
 		isLoading,
@@ -72,15 +72,12 @@ const FeaturedPlaylists = ({
 		contentContainerStyle={[
 			{
 				gap: GAP,
-				paddingBottom: PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 			},
 			contentContainerStyle,
 		]}
-		style={{
-			marginBottom: bottomOffset,
-		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset,
+			bottom: tabBarHeight,
 		}}
 		ListEmptyComponent={
 			isLoading ? <Icons.Loader />
@@ -93,7 +90,6 @@ const FeaturedPlaylists = ({
 			)
 		}
 		keyExtractor={keyExtractor}
-		showsVerticalScrollIndicator={false}
 		ItemSeparatorComponent={itemSeparator}
 		onRefresh={refetch}
 		keyboardShouldPersistTaps='always'

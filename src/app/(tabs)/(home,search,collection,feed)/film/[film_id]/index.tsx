@@ -32,13 +32,14 @@ import { Icons } from "@/constants/Icons";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { Vimeo } from 'react-native-vimeo-iframe'
 import { LegendList } from "@legendapp/list";
-import { useMediaMovieDetailsQuery } from "@/api/medias/mediaQueries";
+import { useMediaMovieCastQuery, useMediaMovieDetailsQuery, useMediaTvSeriesSeasonsQuery } from "@/api/medias/mediaQueries";
+import MovieWidgetCast from "@/components/screens/film/MovieWidgetCast";
 
 const FilmScreen = () => {
 	const { film_id } = useLocalSearchParams<{ film_id: string }>();
 	const { id: movieId } = getIdFromSlug(film_id);
 	const { session } = useAuth();
-	const { bottomOffset } = useTheme();
+	const { bottomOffset, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 
@@ -48,6 +49,10 @@ const FilmScreen = () => {
 	} = useMediaMovieDetailsQuery({
 		movieId: movieId,
 	});
+
+	// Prefetch related data
+	useMediaMovieCastQuery({ movieId: movieId });
+	useMediaTvSeriesSeasonsQuery({ tvSeriesId: movieId });
 
 	const loading = movie === undefined || isLoading;
 
@@ -65,7 +70,7 @@ const FilmScreen = () => {
 	const animatedContentContainerStyle = useAnimatedStyle(() => {
 		return {
 			paddingBottom: withTiming(
-				PADDING_VERTICAL, // + floatingBarHeight.value,
+				bottomOffset + (PADDING_VERTICAL * 2) + floatingBarHeight.value,
 				{ duration: 300 }
 			),
 		};
@@ -106,11 +111,8 @@ const FilmScreen = () => {
 		onScroll={scrollHandler}
 		scrollToOverflowEnabled
 		contentContainerStyle={animatedContentContainerStyle}
-		style={{
-			marginBottom: bottomOffset
-		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset,
+			bottom: tabBarHeight,
 		}}
 		>
 			<MovieHeader
@@ -127,8 +129,7 @@ const FilmScreen = () => {
 							<FilmSynopsis movie={movie} containerStyle={{ paddingHorizontal: PADDING_HORIZONTAL }} />
 							<FilmOriginalTitle movie={movie} style={{ marginHorizontal: PADDING_HORIZONTAL }} />
 						</View>
-						{/* <FilmCast movie={movie} /> */}
-						
+						<MovieWidgetCast movieId={movie.id} />
 						<Link href={{ pathname: '/film/[film_id]/details', params: { film_id: movie.id }}} asChild>
 							<Button variant="outline" style={{ marginHorizontal: PADDING_HORIZONTAL }}>
 								{upperFirst(t('common.messages.see_more_details'))}
@@ -141,7 +142,7 @@ const FilmScreen = () => {
 				</View>
 			)}
 		</AnimatedContentContainer>
-		{/* {movie && session && (
+		{movie && session && (
 			<FloatingBar bottomOffset={bottomOffset + PADDING_VERTICAL} height={floatingBarHeight} containerStyle={{ paddingHorizontal: 0 }} style={tw`flex-row items-center justify-between`}>
 				<View style={tw`flex-row items-center gap-2`}>
 					<ButtonUserActivityMovieRating movie={movie} />
@@ -155,7 +156,7 @@ const FilmScreen = () => {
 					<ButtonUserRecoMovieSend movie={movie} />
 				</View>
 			</FloatingBar>
-		)} */}
+		)}
 	</>
 	)
 };
@@ -200,45 +201,6 @@ const FilmOriginalTitle = ({ movie, style, numberOfLines = 1, ...props } : Omit<
 		</Text>
 	)
 };
-
-// const FilmCast = ({
-// 	movie,
-// } : {
-// 	movie: Database['public']['Views']['media_movie_full']['Row'];
-// }) => {
-// 	const t = useTranslations();
-// 	const { width: screenWidth } = useWindowDimensions();
-// 	const width = useMemo(() => clamp((screenWidth * 0.8) - ((PADDING_HORIZONTAL * 2) + GAP * 2), 400), [screenWidth]);
-// 	const renderItem = useCallback((item: MediaMovieCasting) => (
-// 		<CardPerson variant='list' hideKnownForDepartment person={item.person!} style={tw`h-12`} />
-// 	), []);
-
-// 	const keyExtractor = useCallback((item: MediaMovieCasting) => item.person_id!.toString(), []);
-// 	if (!movie.cast?.length) return null;
-
-// 	return (
-// 		<View> 
-// 			<Text style={[tw`text-sm font-medium`, { marginHorizontal: PADDING_HORIZONTAL }]}>
-// 				{`${upperFirst(t('common.messages.starring'))} :`}
-// 			</Text>
-// 			<MultiRowHorizontalList<MediaMovieCasting>
-// 			data={movie.cast}
-// 			renderItem={renderItem}
-// 			keyExtractor={keyExtractor}
-// 			contentContainerStyle={{
-// 				paddingHorizontal: PADDING_HORIZONTAL,
-// 				gap: GAP,
-// 			}}
-// 			columnStyle={{
-// 				width: width,
-// 				gap: GAP,
-// 			}}
-// 			snapToInterval={width + GAP}
-// 			decelerationRate={"fast"}
-// 			/>
-// 		</View>
-// 	)
-// };
 
 const FilmTrailers = ({
 	movie,

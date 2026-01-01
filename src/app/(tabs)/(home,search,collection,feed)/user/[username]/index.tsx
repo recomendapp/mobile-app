@@ -19,26 +19,22 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import ProfileWidgetActivitiesMovie from "@/components/screens/user/ProfileWidgetActivitiesMovie";
 import ProfileWidgetActivitiesTvSeries from "@/components/screens/user/ProfileWidgetActivitiesTvSeries";
-import { ActivityIndicator, Platform, Pressable, RefreshControl, ScrollView } from "react-native";
+import { ActivityIndicator, Pressable, RefreshControl } from "react-native";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetUser from "@/components/bottom-sheets/sheets/BottomSheetUser";
 import { useCallback, useMemo } from "react";
 import { Keys } from "@/api/keys";
-import AnimatedStackScreen from "@/components/ui/AnimatedStackScreen";
-import Animated, { SharedValue, useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 const ProfileHeader = ({
-	triggerHeight,
 	profile,
 	skeleton,
 } : {
-	triggerHeight: SharedValue<number>;
 	profile?: Profile | null;
 	skeleton: boolean;
 }) => {
 	const router = useRouter();
 	const { user } = useAuth();
-	const navigationHeaderHeight = useHeaderHeight();
 	const { colors } = useTheme();
 	const t = useTranslations();
 	const routesFollow = useMemo(() => ([
@@ -53,10 +49,6 @@ const ProfileHeader = ({
 	]), [profile?.username, router, t]);
 	return (
 		<View
-		onLayout={(event) => {
-			const { height } = event.nativeEvent.layout;
-			triggerHeight.value = navigationHeaderHeight - height * 0.5;
-		}}
 		style={[
 			{ borderColor: colors.border },
 			tw`gap-2 p-4 border-b`,
@@ -119,15 +111,11 @@ const ProfileScreen = () => {
 	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
 	const { session } = useAuth();
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight, isLiquidGlassAvailable } = useTheme();
 	const navigationHeaderHeight = useHeaderHeight();
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
-
-	// Shared values
-	const scrollY = useSharedValue(0);
-	const triggerHeight = useSharedValue(0);
 
 	const {
 		data: profile,
@@ -153,19 +141,15 @@ const ProfileScreen = () => {
 		});
 	}, [refetch, profile?.id, session?.user.id, queryClient]);
 
-	const scrollHandler = useAnimatedScrollHandler({
-		onScroll: event => {
-			'worklet';
-			scrollY.value = event.contentOffset.y;
-		},
-	});
-
 	return (
 	<>
-		<AnimatedStackScreen
-		disabledTitleAnimation
+		<Stack.Screen
 		options={{
 			title: profile ? `@${profile.username}` : '',
+			headerTransparent: true,
+			...(isLiquidGlassAvailable ? {
+				headerStyle: { backgroundColor: 'transparent' },
+			} : {}),
 			headerTitle: (props) => (
 				<View style={tw`flex-row items-center gap-1`}>
 						<HeaderTitle {...props}>
@@ -196,17 +180,19 @@ const ProfileScreen = () => {
 			</>
 			),
 			unstable_headerRightItems: (props) => [
-				{
-					type: "button",
-					label: upperFirst(t('common.messages.setting', { count: 2 })),
-					onPress: () => router.push('/settings'),
-					tintColor: props.tintColor,
-					icon: {
-						name: "gearshape",
-						type: "sfSymbol",
-					},
-					visible: profile?.id === session?.user.id,
-				},
+				...(profile?.id === session?.user.id ? [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.setting', { count: 2 })),
+						onPress: () => router.push('/settings'),
+						tintColor: props.tintColor,
+						icon: {
+							name: "gearshape",
+							type: "sfSymbol",
+						},
+						visible: profile?.id === session?.user.id,
+					}
+				] as const : []),
 				{
 					type: "button",
 					label: upperFirst(t('common.messages.menu')),
@@ -221,25 +207,19 @@ const ProfileScreen = () => {
 				},
 			],
 		}}
-		scrollY={scrollY}
-		triggerHeight={triggerHeight}
 		/>
 		<Animated.ScrollView
-		onScroll={scrollHandler}
 		refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refresh} />}
 		contentContainerStyle={{
 			gap: GAP,
-			paddingTop: Platform.OS === 'android' ? navigationHeaderHeight : 0,
-			paddingBottom: PADDING_VERTICAL,
-		}}
-		style={{
-			marginBottom: bottomOffset,
+			paddingTop: navigationHeaderHeight,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset,
+			bottom: tabBarHeight,
 		}}
 		>
-			<ProfileHeader profile={profile} skeleton={loading} triggerHeight={triggerHeight} />
+			<ProfileHeader profile={profile} skeleton={loading} />
 			{
 				loading ? null
 				: !profile?.visible ? <ProfilePrivateAccountCard />

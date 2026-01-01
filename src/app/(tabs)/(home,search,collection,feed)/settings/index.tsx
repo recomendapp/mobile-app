@@ -39,7 +39,7 @@ type Route = BaseRoute & (
 
 const SettingsScreen = () => {
 	const { session, customerInfo, logout, forceLogout } = useAuth();
-	const { colors, bottomOffset, mode } = useTheme();
+	const { colors, bottomOffset, tabBarHeight, mode } = useTheme();
 	const toast = useToast();
 	const router = useRouter();
 	const t = useTranslations();
@@ -141,13 +141,10 @@ const SettingsScreen = () => {
 		data={routes}
 		renderItem={renderItem}
 		contentContainerStyle={{
-			paddingBottom: PADDING_VERTICAL,
-		}}
-		style={{
-			marginBottom: bottomOffset,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset
+			bottom: tabBarHeight
 		}}
 		keyExtractor={useCallback((_: Route, number: number) => number.toString(), [])}
 		ListFooterComponent={renderFooter}

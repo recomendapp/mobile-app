@@ -10,7 +10,7 @@ import { ScrollView } from 'react-native';
 import { useTranslations } from 'use-intl';
 
 const AboutScreen = () => {
-  const { colors, bottomOffset } = useTheme();
+  const { colors, bottomOffset, tabBarHeight } = useTheme();
   const t = useTranslations('pages.about');
 
 	const resources = useMemo<{ name: string; link: ExternalPathString }[]>(() => [
@@ -293,14 +293,14 @@ const AboutScreen = () => {
   return (
     <ScrollView
     contentContainerStyle={{
-      paddingBottom: PADDING_VERTICAL,
+      paddingBottom: bottomOffset + PADDING_VERTICAL,
       paddingTop: PADDING_VERTICAL,
       gap: GAP_XL,
       justifyContent: 'center',
       alignItems: 'center'
     }}
-    style={{
-      marginBottom: bottomOffset,
+    scrollIndicatorInsets={{
+      bottom: tabBarHeight
     }}
     >
       {sections.map((section, index) => (

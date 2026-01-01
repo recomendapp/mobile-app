@@ -20,7 +20,7 @@ import { useUserReviewMovieLike } from "@/api/users/hooks/useUserReviewMovieLike
 
 const ReviewMovieScreen = () => {
 	const { session } = useAuth();
-	const { bottomOffset, colors } = useTheme();
+	const { bottomOffset, tabBarHeight, colors } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
 	const { review_id } = useLocalSearchParams();
@@ -96,14 +96,11 @@ const ReviewMovieScreen = () => {
 			<ScrollView
 			contentContainerStyle={{
 				paddingBottom: PADDING_VERTICAL,
-				paddingHorizontal: PADDING_HORIZONTAL,
+				paddingHorizontal: bottomOffset + PADDING_HORIZONTAL,
 				gap: GAP,
 			}}
-			style={{
-				marginBottom: bottomOffset,
-			}}
 			scrollIndicatorInsets={{
-				bottom: bottomOffset,
+				bottom: tabBarHeight,
 			}}
 			refreshControl={
 				<RefreshControl

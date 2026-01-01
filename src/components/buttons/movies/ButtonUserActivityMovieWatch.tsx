@@ -102,7 +102,7 @@ const ButtonUserActivityMovieWatch = forwardRef<
 			onPressProps?.(e);
 		}}
 		style={{
-			...({ backgroundColor: activity ? colors.accentBlue : undefined }),
+			...(activity ? { backgroundColor: colors.accentBlue } : undefined),
 			...tw`rounded-full`,
 			...style,
 		}}

@@ -26,7 +26,7 @@ const PersonTvSeriesScreen = () => {
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
 	const { person_id } = useLocalSearchParams<{ person_id: string }>();
 	const { id: personId } = getIdFromSlug(person_id);
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const { showActionSheetWithOptions } = useActionSheet();
 	// States
 	const sortByOptions = useMemo((): sortBy[] => [
@@ -120,13 +120,10 @@ const PersonTvSeriesScreen = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={{
 			gap: GAP,
-			paddingBottom: PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 			paddingHorizontal: PADDING_HORIZONTAL,
 		}}
-		style={{
-			marginBottom: bottomOffset,
-		}}
-		scrollIndicatorInsets={{ bottom: bottomOffset }}
+		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={useCallback((item: typeof tvSeries[number]) => item.media_tv_series.id.toString(), [])}
 		refreshing={isRefetching}
 		onRefresh={refetch}

@@ -37,7 +37,7 @@ const SettingsProfileScreen = () => {
 	const supabase = useSupabaseClient();
 	const { user } = useAuth();
 	const toast = useToast();
-	const { bottomOffset } = useTheme();
+	const { bottomOffset, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const { mutateAsync: updateProfileMutation } = useUserUpdateMutation({
@@ -261,13 +261,10 @@ const SettingsProfileScreen = () => {
 			gap: GAP,
 			paddingTop: PADDING_VERTICAL,
 			paddingHorizontal: PADDING_HORIZONTAL,
-			paddingBottom: PADDING_VERTICAL,
-		}}
-		style={{
-			marginBottom: bottomOffset,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset
+			bottom: tabBarHeight
 		}}
 		bottomOffset={bottomOffset + PADDING_VERTICAL}
 		>

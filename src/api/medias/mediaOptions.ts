@@ -138,6 +138,34 @@ export const mediaMovieCreditsOptions = ({
 		enabled: !!movieId,
 	});
 };
+export const mediaMovieCastOptions = ({
+	supabase,
+	movieId,
+} : {
+	supabase: SupabaseClient;
+	movieId?: number;
+}) => {
+	return queryOptions({
+		queryKey: mediasKeys.cast({
+			id: movieId!,
+			type: 'movie',
+		}),
+		queryFn: async () => {
+			if (!movieId) throw new Error('movieId is required');
+			const { data, error } = await supabase
+				.from('media_movie_casting')
+				.select(`
+					*,
+					media_person(*)
+				`)
+				.eq('movie_id', movieId)
+				.order('order', { ascending: true });
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!movieId,
+	})
+};
 
 export const mediaTvSeriesCreditsOptions = ({
 	supabase,
@@ -158,6 +186,34 @@ export const mediaTvSeriesCreditsOptions = ({
 				`)
 				.eq('serie_id', tvSeriesId)
 				.neq('department', 'Acting')
+			if (error) throw error;
+			return data;
+		},
+		enabled: !!tvSeriesId,
+	});
+};
+export const mediaTvSeriesCastOptions = ({
+	supabase,
+	tvSeriesId,
+} : {
+	supabase: SupabaseClient;
+	tvSeriesId?: number;
+}) => {
+	return queryOptions({
+		queryKey: mediasKeys.cast({
+			id: tvSeriesId!,
+			type: 'tv_series',
+		}),
+		queryFn: async () => {
+			if (!tvSeriesId) throw new Error('tvSeriesId is required');
+			const { data, error } = await supabase
+				.from('media_tv_series_casting')
+				.select(`
+					*,
+					media_person(*)
+				`)
+				.eq('serie_id', tvSeriesId)
+				.order('order', { ascending: true });
 			if (error) throw error;
 			return data;
 		},

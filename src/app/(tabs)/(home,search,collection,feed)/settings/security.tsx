@@ -22,7 +22,7 @@ import { useToast } from "@/components/Toast";
 const SettingsSecurityScreen = () => {
 	const supabase = useSupabaseClient();
 	const toast = useToast();
-	const { bottomOffset } = useTheme();
+	const { bottomOffset, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const profileFormSchema = useMemo(() => z.object({
@@ -120,13 +120,10 @@ const SettingsSecurityScreen = () => {
 				gap: GAP,
 				paddingTop: PADDING_VERTICAL,
 				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingBottom: PADDING_VERTICAL,
-			}}
-			style={{
-				marginBottom: bottomOffset,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 			}}
 			scrollIndicatorInsets={{
-				bottom: bottomOffset
+				bottom: tabBarHeight
 			}}
 			bottomOffset={bottomOffset + PADDING_VERTICAL}
 			>

@@ -33,6 +33,14 @@ export const mediasKeys = {
 		type: 'movie' | 'tv_series';
 	}) => [...mediasKeys.details({ id, type }), 'credits'] as const,
 
+	cast: ({
+		id,
+		type,
+	} : {
+		id: number;
+		type: 'movie' | 'tv_series';
+	}) => [...mediasKeys.details({ id, type }), 'cast'] as const,
+
 	/* --------------------------------- PERSONS -------------------------------- */
 	personFilms: ({
 		personId,

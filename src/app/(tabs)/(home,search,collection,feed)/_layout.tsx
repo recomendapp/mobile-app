@@ -1,5 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
-import { useTheme } from '@/providers/ThemeProvider';
+import { ThemeUpdater, useTheme } from '@/providers/ThemeProvider';
 import { Stack } from 'expo-router';
 import { upperFirst } from 'lodash';
 import { useMemo } from 'react';
@@ -24,6 +24,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
 
   return (
   <>
+    <ThemeUpdater />
     <Stack
     initialRouteName={initialRouteName}
     screenOptions={defaultScreenOptions}

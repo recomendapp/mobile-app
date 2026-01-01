@@ -132,7 +132,7 @@ const HomeScreen = () => {
   const t = useTranslations();
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { bottomOffset } = useTheme();
+  const { bottomOffset, tabBarHeight } = useTheme();
   const { session, user } = useAuth();
   const navigationHeaderHeight = useHeaderHeight();
   // States
@@ -247,13 +247,10 @@ const HomeScreen = () => {
       onScroll={scrollHandler}
       contentContainerStyle={{
         gap: GAP,
-        paddingBottom: PADDING_VERTICAL,
-      }}
-      style={{
-        marginBottom: bottomOffset,
+        paddingBottom: bottomOffset + PADDING_VERTICAL,
       }}
       scrollIndicatorInsets={{
-        bottom: bottomOffset
+        bottom: tabBarHeight
       }}
       refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
       nestedScrollEnabled

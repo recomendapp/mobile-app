@@ -97,7 +97,7 @@ const ReviewForm = ({
 	}, [activity?.rating, onSave, title, t, toast, body]);
 
 	const scrollViewStyle = useAnimatedStyle(() => {
-		const closedPadding = PADDING_VERTICAL;
+		const closedPadding = bottomOffset + PADDING_VERTICAL;
 
 		const openPadding = (-keyboardHeight.value) + toolbarHeight.value + (PADDING_VERTICAL * 2);
 
@@ -178,7 +178,6 @@ const ReviewForm = ({
 				paddingTop: PADDING_VERTICAL,
 				paddingLeft: insets.left + PADDING_HORIZONTAL,
 				paddingRight: insets.right + PADDING_HORIZONTAL,
-				marginBottom: bottomOffset,
 			},
 			scrollViewStyle
 		]}

@@ -109,7 +109,7 @@ const CollectionScreen = <T extends {}>({
 	fuseThreshold = 0.5,
 	...props
 }: CollectionScreenConfig<T>) => {
-    const { colors, bottomOffset } = useTheme();
+    const { colors, bottomOffset, tabBarHeight} = useTheme();
     const t = useTranslations();
     const openSheet = useBottomSheetStore((state) => state.openSheet);
     const { width: SCREEN_WIDTH } = useWindowDimensions();
@@ -277,14 +277,11 @@ const CollectionScreen = <T extends {}>({
         onRefresh={refetch}
         contentContainerStyle={{
             paddingHorizontal: PADDING_HORIZONTAL,
-            paddingBottom: PADDING_VERTICAL,
+            paddingBottom: bottomOffset + PADDING_VERTICAL,
             gap: GAP,
         }}
-        style={{
-            marginBottom: bottomOffset,
-        }}
         scrollIndicatorInsets={{
-            bottom: bottomOffset
+            bottom: tabBarHeight
         }}
         maintainVisibleContentPosition={maintainVisibleContentPosition}
         numColumns={

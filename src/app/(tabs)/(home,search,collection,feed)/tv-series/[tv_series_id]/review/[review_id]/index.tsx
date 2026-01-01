@@ -20,7 +20,7 @@ import { useUserReviewTvSeriesLike } from "@/api/users/hooks/useUserReviewTvSeri
 
 const ReviewTvSeriesScreen = () => {
 	const { session } = useAuth();
-	const { bottomOffset, colors } = useTheme();
+	const { bottomOffset, colors, tabBarHeight } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const t = useTranslations();
 	const { review_id } = useLocalSearchParams();
@@ -94,15 +94,12 @@ const ReviewTvSeriesScreen = () => {
 		{review ? (
 			<ScrollView
 			contentContainerStyle={{
-				paddingBottom: PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 				paddingHorizontal: PADDING_HORIZONTAL,
 				gap: GAP,
 			}}
-			style={{
-				marginBottom: bottomOffset,
-			}}
 			scrollIndicatorInsets={{
-				bottom: bottomOffset,
+				bottom: tabBarHeight,
 			}}
 			refreshControl={
 				<RefreshControl

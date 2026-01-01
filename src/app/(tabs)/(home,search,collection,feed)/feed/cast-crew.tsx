@@ -26,7 +26,7 @@ import { useTranslations } from "use-intl";
 const CastCrewFeedScreen = () => {
 	const t = useTranslations();
 	const router = useRouter();
-	const { bottomOffset, colors } = useTheme();
+	const { bottomOffset, tabBarHeight, colors } = useTheme();
 	const { session, customerInfo } = useAuth();
 	const {
 		data: backgrounds,
@@ -124,14 +124,11 @@ const CastCrewFeedScreen = () => {
 		ListEmptyComponent={renderEmpty}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
-			paddingBottom: PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 			gap: GAP,
 		}}
-		style={{
-			marginBottom: bottomOffset,
-		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset,
+			bottom: tabBarHeight,
 		}}
 		keyExtractor={keyExtractor}
 		onEndReached={onEndReached}

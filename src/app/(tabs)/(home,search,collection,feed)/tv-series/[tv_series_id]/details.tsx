@@ -18,7 +18,7 @@ const TvSeriesDetailsScreen = () => {
 	const { tv_series_id } = useLocalSearchParams<{ tv_series_id: string }>();
 	const { id: seriesId } = getIdFromSlug(tv_series_id);
 	const t = useTranslations();
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 
 	const {
 		data,
@@ -134,13 +134,10 @@ const TvSeriesDetailsScreen = () => {
 			return `person-${item.department}-${item.job}-${item.person.id}`;
 		}, [])}
 		contentContainerStyle={{
-			paddingBottom: PADDING_VERTICAL
-		}}
-		style={{
-			marginBottom: bottomOffset
+			paddingBottom: bottomOffset + PADDING_VERTICAL
 		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset
+			bottom: tabBarHeight
 		}}
 		ListEmptyComponent={
 			loading ? <Icons.Loader />

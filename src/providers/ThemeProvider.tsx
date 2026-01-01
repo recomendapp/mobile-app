@@ -3,6 +3,7 @@ import { DarkTheme, ThemeProvider as NativeThemeProvider } from "@react-navigati
 import { createContext, use, useCallback, useEffect, useMemo, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+import { useBottomTabOverflow } from "@/hooks/useBottomTabOverflow";
 import { setBackgroundColorAsync } from "expo-system-ui";
 import { Appearance, Platform } from "react-native";
 import { isLiquidGlassAvailable as utilsIsLiquidGlassAvailable } from "expo-glass-effect";
@@ -14,6 +15,8 @@ type ThemeMode = "light" | "dark";
 type ThemeContextType = {
 	colors: TColors;
 	applyColors: (theme: keyof typeof Colors) => void;
+	tabBarHeight: number;
+	setTabBarHeight: (height: number) => void;
 	bottomOffset: number;
 	defaultScreenOptions: NativeStackNavigationOptions;
 	mode: ThemeMode;
@@ -35,14 +38,9 @@ export const ThemeProvider = ({children}: ThemeProviderProps) => {
 		setColors(Colors[theme]);
 	}, []);
 
-	const tabBarHeight = Platform.select({
-		android: 79,
-		web: 0,
-		default: 80,
-	});
-	const bottomOffset = useMemo(() => (
-		Platform.OS === 'android' ? tabBarHeight + insets.bottom : 0
-	), [insets.bottom, tabBarHeight]);
+	const [tabBarHeight, setTabBarHeight] = useState(0);
+
+	const bottomOffset = useMemo(() => tabBarHeight + insets.bottom, [tabBarHeight, insets.bottom]);
 
 	const defaultScreenOptions = useMemo<NativeStackNavigationOptions>(() => ({
 		animation: 'ios_from_right',
@@ -92,6 +90,8 @@ export const ThemeProvider = ({children}: ThemeProviderProps) => {
 		value={{
 			applyColors,
 			colors,
+			tabBarHeight,
+			setTabBarHeight,
 			bottomOffset,
 			defaultScreenOptions,
 			mode,
@@ -110,4 +110,25 @@ export const useTheme = () => {
 		throw new Error('useTheme must be used within a ThemeProvider');
 	}
 	return context;
+};
+
+/* ---------------------------------- UTILS --------------------------------- */
+export const ThemeUpdater = () => {
+	return (
+	<>
+		<TabBarHeightUpdater />
+	</>
+	);
+};
+
+const TabBarHeightUpdater = () => {
+	const tabBarHeight = useBottomTabOverflow();
+	const { setTabBarHeight } = useTheme();
+	useEffect(() => {
+		setTabBarHeight(tabBarHeight);
+		return () => {
+			setTabBarHeight(0);
+		}
+	}, [tabBarHeight, setTabBarHeight]);
+	return null;
 };

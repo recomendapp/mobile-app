@@ -16,7 +16,7 @@ const CollectionSavedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const {
 		data,
 		isLoading,
@@ -58,12 +58,9 @@ const CollectionSavedScreen = () => {
 		}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
-			paddingBottom: PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
-		style={{
-			marginBottom: bottomOffset
-		}}
-		scrollIndicatorInsets={{ bottom: bottomOffset }}
+		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={keyExtractor}
 		onEndReached={onEndReached}
 		onEndReachedThreshold={0.3}

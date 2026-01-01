@@ -14,7 +14,7 @@ import { useCallback } from "react";
 
 const SettingsNotificationsScreen = () => {
 	const t = useTranslations();
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const { permissionStatus } = useNotifications();
 	const openAppSettings = useCallback(async () => {
 		if (Platform.OS === 'android') {
@@ -53,14 +53,11 @@ const SettingsNotificationsScreen = () => {
 				gap: GAP,
 				paddingTop: PADDING_VERTICAL,
 				paddingHorizontal: PADDING_HORIZONTAL,
-				paddingBottom: PADDING_VERTICAL
+				paddingBottom: bottomOffset + PADDING_VERTICAL
 			}
 		]}
-		style={{
-			marginBottom: bottomOffset,
-		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset
+			bottom: tabBarHeight
 		}}
 		>
 			{permissionStatus !== 'granted' && (

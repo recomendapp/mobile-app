@@ -21,7 +21,7 @@ import { Icons } from "@/constants/Icons";
 const FeedScreen = () => {
 	const { user } = useAuth();
 	const t = useTranslations();
-	const { bottomOffset, colors } = useTheme();
+	const { bottomOffset, tabBarHeight, colors } = useTheme();
 	const {
 		data,
 		isLoading,
@@ -81,14 +81,11 @@ const FeedScreen = () => {
 		ListEmptyComponent={renderEmpty}
 		contentContainerStyle={{
 			paddingHorizontal: PADDING_HORIZONTAL,
-			paddingBottom: PADDING_VERTICAL,
+			paddingBottom: bottomOffset + PADDING_VERTICAL,
 			gap: GAP,
 		}}
-		style={{
-			marginBottom: bottomOffset,
-		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset,
+			bottom: tabBarHeight,
 		}}
 		keyExtractor={keyExtractor}
 		onEndReached={onEndReached}

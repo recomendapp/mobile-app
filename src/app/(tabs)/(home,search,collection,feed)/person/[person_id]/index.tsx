@@ -24,7 +24,7 @@ const PersonScreen = () => {
 	const t = useTranslations();
 	const { person_id } = useLocalSearchParams<{ person_id: string }>();
 	const { id: personId } = getIdFromSlug(person_id);
-	const { bottomOffset } = useTheme();
+	const { bottomOffset, tabBarHeight } = useTheme();
 	const { session } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	// Queries
@@ -91,15 +91,12 @@ const PersonScreen = () => {
 		scrollToOverflowEnabled
 		contentContainerStyle={[
 			{
-				paddingBottom: PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 				gap: GAP,
 			},
 		]}
-		style={{
-			marginBottom: bottomOffset,
-		}}
 		scrollIndicatorInsets={{
-			bottom: bottomOffset,
+			bottom: tabBarHeight,
 		}}
 		>
 			<PersonHeader
