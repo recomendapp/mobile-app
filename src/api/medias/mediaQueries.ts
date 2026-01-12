@@ -1,7 +1,6 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { mediasKeys } from "./mediasKeys";
-import { mediaMovieCreditsOptions, mediaMovieDetailsOptions, mediaMoviePlaylistsOptions, mediaMovieReviewsOptions, mediaPersonDetailsOptions, mediaPersonFilmsOptions, mediaTvSeriesCreditsOptions, mediaTvSeriesDetailsOptions, mediaTvSeriesPlaylistsOptions, mediaTvSeriesReviewsOptions, mediaTvSeriesSeasonDetailsOptions, mediaPersonTvSeriesOptions, mediaMovieFollowersAverageRatingOptions, mediaTvSeriesFollowersAverageRatingOptions, mediaMoviePostersOptions, mediaTvSeriesPostersOptions, mediaMovieBackdropsOptions, mediaTvSeriesBackdropsOptions, mediaGenresOptions, mediaTvSeriesSeasonsOptions, mediaMovieCastOptions, mediaTvSeriesCastOptions } from "./mediaOptions";
+import { mediaMovieCreditsOptions, mediaMovieDetailsOptions, mediaMoviePlaylistsOptions, mediaMovieReviewsOptions, mediaPersonDetailsOptions, mediaPersonFilmsOptions, mediaTvSeriesCreditsOptions, mediaTvSeriesDetailsOptions, mediaTvSeriesPlaylistsOptions, mediaTvSeriesReviewsOptions, mediaTvSeriesSeasonDetailsOptions, mediaPersonTvSeriesOptions, mediaMovieFollowersAverageRatingOptions, mediaTvSeriesFollowersAverageRatingOptions, mediaMoviePostersOptions, mediaTvSeriesPostersOptions, mediaMovieBackdropsOptions, mediaTvSeriesBackdropsOptions, mediaGenresOptions, mediaTvSeriesSeasonsOptions, mediaMovieCastOptions, mediaTvSeriesCastOptions, mediaMovieFollowersAverageRatingsOptions, mediaTvSeriesFollowersAverageRatingsOptions } from "./mediaOptions";
 
 /* --------------------------------- DETAILS -------------------------------- */
 export const useMediaMovieDetailsQuery = ({
@@ -237,6 +236,30 @@ export const useMediaPersonTvSeriesQuery = ({
 /* -------------------------------------------------------------------------- */
 		
 /* -------------------------------- FOLLOWERS ------------------------------- */
+export const useMediaMovieFollowersAverageRatingsQuery = ({
+	movieId,
+} : {
+	movieId: number;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery(mediaMovieFollowersAverageRatingsOptions({
+		supabase,
+		movieId,
+	}));
+};
+
+export const useMediaTvSeriesFollowersAverageRatingsQuery = ({
+	tvSeriesId,
+} : {
+	tvSeriesId: number;
+}) => {
+	const supabase = useSupabaseClient();
+	return useQuery(mediaTvSeriesFollowersAverageRatingsOptions({
+		supabase,
+		tvSeriesId,
+	}));
+}
+
 export const useMediaMovieFollowersAverageRatingQuery = ({
 	movieId,
 } : {

@@ -3,40 +3,35 @@ import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
-import { useUserAcceptFollowerRequestMutation, useUserDeclineFollowerRequestMutation } from "@/features/user/userMutations";
-import { useUserFollowersRequestsQuery } from "@/features/user/userQueries";
+import { useUserAcceptFollowerRequestMutation, useUserDeclineFollowerRequestMutation } from "@/api/users/usersMutations";
 import tw from "@/lib/tw";
-import { useAuth } from "@/providers/AuthProvider";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useUserFollowersRequestsQuery } from "@/api/users/usersQueries";
 
 const FollowRequestsScreen = () => {
 	const t = useTranslations();
 	const toast = useToast();
-	const { session } = useAuth();
 	const insets = useSafeAreaInsets();
 	const {
-		data: requests,
+		data,
 		isLoading,
 		isRefetching,
 		refetch,
-	} = useUserFollowersRequestsQuery({
-		userId: session?.user.id,
-	});
+		hasNextPage,
+		fetchNextPage,
+	} = useUserFollowersRequestsQuery();
+	const requests = useMemo(() => data?.pages.flat() || [], [data]);
 	const loading = requests === undefined || isLoading;
 
 	// Mutations
-	const { mutateAsync: acceptRequest} = useUserAcceptFollowerRequestMutation({
-		userId: session?.user.id,
-	});
-	const { mutateAsync: declineRequest} = useUserDeclineFollowerRequestMutation({
-		userId: session?.user.id,
-	});
+	const { mutateAsync: acceptRequest} = useUserAcceptFollowerRequestMutation();
+	const { mutateAsync: declineRequest} = useUserDeclineFollowerRequestMutation();
 
 	// Handlers
 	const handleAcceptRequest = useCallback(async (requestId: number) => {
@@ -83,6 +78,7 @@ const FollowRequestsScreen = () => {
 		keyExtractor={(item) => item.id.toString()}
 		refreshing={isRefetching}
 		onRefresh={refetch}
+		onEndReached={() => hasNextPage && fetchNextPage()}
 		ListEmptyComponent={
 			loading ? <Icons.Loader />
 			: (

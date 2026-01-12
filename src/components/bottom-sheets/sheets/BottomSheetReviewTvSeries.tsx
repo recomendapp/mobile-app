@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/providers/AuthProvider';
 import { PADDING_VERTICAL } from '@/theme/globals';
 import { Alert } from 'react-native';
-import { useUserReviewTvSeriesDeleteMutation } from '@/features/user/userMutations';
+import { useUserReviewTvSeriesDeleteMutation } from '@/api/users/usersMutations';
 import { useToast } from '@/components/Toast';
 import { FlashList } from '@shopify/flash-list';
 

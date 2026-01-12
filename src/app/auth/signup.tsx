@@ -25,11 +25,10 @@ import { OAuthProviders } from '@/components/OAuth/OAuthProviders';
 import { useToast } from '@/components/Toast';
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { logger } from '@/logger';
-import { useUIBackgroundsOptions } from '@/api/options';
-import { useQuery } from '@tanstack/react-query';
 import { LoopCarousel } from '@/components/ui/LoopCarousel';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useUIBackgroundsQuery } from '@/api/ui/uiQueries';
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -49,7 +48,7 @@ const SignupScreen = () => {
 
 	const {
 		data: backgrounds,
-	} = useQuery(useUIBackgroundsOptions());
+	} = useUIBackgroundsQuery();
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
 	const signupSchema = z.object({

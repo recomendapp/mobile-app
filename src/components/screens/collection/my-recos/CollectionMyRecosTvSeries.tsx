@@ -7,8 +7,7 @@ import CollectionScreen, { CollectionAction, SortByOption } from "@/components/c
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import { useUserRecosTvSeriesCompleteMutation, useUserRecosTvSeriesDeleteMutation } from "@/features/user/userMutations";
-import { useUserRecosTvSeriesQuery } from "@/features/user/userQueries";
+import { useUserRecosTvSeriesCompleteMutation, useUserRecosTvSeriesDeleteMutation } from "@/api/users/usersMutations";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useUIStore } from "@/stores/useUIStore";
 import BottomSheetMyRecosSenders from "@/components/bottom-sheets/sheets/BottomSheetMyRecosSenders";
@@ -17,6 +16,7 @@ import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { SharedValue } from "react-native-reanimated";
+import { useUserRecosTvSeriesQuery } from "@/api/users/usersQueries";
 
 interface CollectionMyRecosTvSeriesProps {
 	scrollY?: SharedValue<number>;

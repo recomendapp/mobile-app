@@ -2,7 +2,7 @@ import tw from '@/lib/tw';
 import { UserWatchlistMovie } from '@recomendapp/types';
 import { upperFirst } from 'lodash';
 import useBottomSheetStore from '@/stores/useBottomSheetStore';
-import { useUserWatchlistMovieUpdateMutation } from '@/features/user/userMutations';
+import { useUserWatchlistMovieUpdateMutation } from '@/api/users/usersMutations';
 import { Button } from '@/components/ui/Button';
 import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';

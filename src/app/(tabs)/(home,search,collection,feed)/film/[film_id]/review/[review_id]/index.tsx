@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useUserReviewMovieQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Redirect, Stack, useLocalSearchParams } from "expo-router";
 import { upperFirst } from "lodash";
@@ -17,6 +16,7 @@ import { BottomSheetReviewMovie } from "@/components/bottom-sheets/sheets/Bottom
 import { EnrichedTextInput } from "@/components/RichText/EnrichedTextInput";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useUserReviewMovieLike } from "@/api/users/hooks/useUserReviewMovieLike";
+import { useUserReviewMovieQuery } from "@/api/users/usersQueries";
 
 const ReviewMovieScreen = () => {
 	const { session } = useAuth();
@@ -95,8 +95,8 @@ const ReviewMovieScreen = () => {
 		{review ? (
 			<ScrollView
 			contentContainerStyle={{
-				paddingBottom: PADDING_VERTICAL,
-				paddingHorizontal: bottomOffset + PADDING_HORIZONTAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
+				paddingHorizontal: PADDING_HORIZONTAL,
 				gap: GAP,
 			}}
 			scrollIndicatorInsets={{

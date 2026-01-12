@@ -7,8 +7,6 @@ import { BORDER_RADIUS, BORDER_RADIUS_FULL, GAP, PADDING_HORIZONTAL, PADDING_VER
 import { Stack, useRouter } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useQuery } from "@tanstack/react-query";
-import { useExploreTileMetaOptions, useExploreTileOptions } from "@/api/options";
 import { ExploreTile } from "@recomendapp/types";
 import Color from "color";
 import { Button } from "@/components/ui/Button";
@@ -25,6 +23,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useMediaGenresQuery } from "@/api/medias/mediaQueries";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { Input } from "@/components/ui/Input";
+import { useExploreTileMetaQuery, useExploreTileQuery } from "@/api/explore/exploreQueries";
 
 const MOVE_DELAY = 500;
 
@@ -70,8 +69,8 @@ const ExploreScreen = () => {
 	const {
 		data: tile,
 		refetch: refetchTile
-	} = useQuery(useExploreTileOptions({ exploreId: 1 }));
-	const { data: tileMeta } = useQuery(useExploreTileMetaOptions({ exploreId: 1 }));
+	} = useExploreTileQuery({ exploreId: 1 });
+	const { data: tileMeta } = useExploreTileMetaQuery({ exploreId: 1 });
 
 	const handleOnLocationPress = useCallback((e: OnPressEvent) => {
 		const location = e.features.at(0) as ExploreTile['features'][number];

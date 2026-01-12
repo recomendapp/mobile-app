@@ -13,9 +13,9 @@ import { CardReviewMovie } from "@/components/cards/reviews/CardReviewMovie";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { UserReviewMovie } from "@recomendapp/types";
-import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { useAuth } from "@/providers/AuthProvider";
 import { useMediaMovieDetailsQuery, useMediaMovieReviewsQuery } from "@/api/medias/mediaQueries";
+import { useUserActivityMovieQuery } from "@/api/users/usersQueries";
 
 interface sortBy {
 	label: string;
@@ -158,6 +158,7 @@ const FilmReviews = () => {
 				paddingBottom: bottomOffset + PADDING_VERTICAL,
 				gap: GAP,
 		}}
+		maintainVisibleContentPosition={false}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={useCallback((item: UserReviewMovie) => item.id.toString(), [])}
 		refreshing={isRefetching}

@@ -1,5 +1,4 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { MediaMovie } from "@recomendapp/types";
@@ -7,7 +6,7 @@ import tw from "@/lib/tw";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import BottomSheetRating from "@/components/bottom-sheets/sheets/BottomSheetRating";
-import { useUserActivityMovieInsertMutation, useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
+import { useUserActivityMovieInsertMutation, useUserActivityMovieUpdateMutation } from "@/api/users/usersMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
@@ -15,6 +14,7 @@ import { forwardRef, useCallback } from "react";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Text } from "@/components/ui/text";
+import { useUserActivityMovieQuery } from "@/api/users/usersQueries";
 
 interface ButtonUserActivityMovieRatingProps
 	extends Omit<React.ComponentProps<typeof Button>, 'size'> {

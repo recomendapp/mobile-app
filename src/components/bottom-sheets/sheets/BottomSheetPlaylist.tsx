@@ -10,8 +10,6 @@ import { Alert } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAuth } from '@/providers/AuthProvider';
 import { usePlaylistDeleteMutation } from '@/api/playlists/playlistMutations';
-import { useUserPlaylistSavedQuery } from '@/features/user/userQueries';
-import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation } from '@/features/user/userMutations';
 import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
@@ -26,6 +24,7 @@ import ButtonActionPlaylistLike from '@/components/buttons/ButtonActionPlaylistL
 import ButtonActionPlaylistSaved from '@/components/buttons/ButtonActionPlaylistSaved';
 import { forwardRef, useMemo } from 'react';
 import { FlashList } from '@shopify/flash-list';
+import { useUserPlaylistSaved } from '@/api/users/hooks/useUserPlaylistSaved';
 
 interface BottomSheetPlaylistProps extends BottomSheetProps {
 	playlist: Playlist,
@@ -52,15 +51,7 @@ const BottomSheetPlaylist = forwardRef<
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations();
-	const {
-		data: saved,
-		isLoading: isLoadingSaved,
-	} = useUserPlaylistSavedQuery({
-		userId: session?.user.id,
-		playlistId: playlist.id,
-	});
-	const { mutateAsync: insertPlaylistSaved } = useUserPlaylistSavedInsertMutation();
-	const { mutateAsync: deletePlaylistSaved } = useUserPlaylistSavedDeleteMutation();
+	const { isSaved, toggle } = useUserPlaylistSaved({ playlistId: playlist.id });
 	const { mutateAsync: playlistDeleteMutation} = usePlaylistDeleteMutation();
 
 	const items = useMemo<Item[]>(() => [
@@ -74,33 +65,12 @@ const BottomSheetPlaylist = forwardRef<
 		},
 		...(session?.user.id && playlist.user?.id !== session.user.id ? [
 			{
-				icon: saved
+				icon: isSaved
 					? Icons.Check
 					: Icons.Add,
-				onPress: async () => {
-					if (saved) {
-						await deletePlaylistSaved({
-							savedId: saved.id,
-						}, {
-							onError: () => {
-								toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
-							}
-						});
-					} else {
-						await insertPlaylistSaved({
-							userId: session.user.id,
-							playlistId: playlist.id,
-						}, {
-							onError: () => {
-								toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
-							}
-						});
-
-					}
-				},
-				label: saved ? upperFirst(t('common.messages.remove_from_library')) : upperFirst(t('common.messages.save_to_library')),
+				onPress: toggle,
+				label: isSaved ? upperFirst(t('common.messages.remove_from_library')) : upperFirst(t('common.messages.save_to_library')),
 				closeSheet: false,
-				disabled: isLoadingSaved,
 			}
 		] : []),
 		{
@@ -171,10 +141,7 @@ const BottomSheetPlaylist = forwardRef<
 	], [
 		additionalItemsTop,
 		closeSheet,
-		deletePlaylistSaved,
 		id,
-		insertPlaylistSaved,
-		isLoadingSaved,
 		mode,
 		openSheet,
 		playlist,
@@ -184,7 +151,8 @@ const BottomSheetPlaylist = forwardRef<
 		t,
 		toast,
 		playlistDeleteMutation,
-		saved,
+		isSaved,
+		toggle,
 	]);
 
 	return (

@@ -626,6 +626,58 @@ export const mediaPersonTvSeriesOptions = ({
 /* -------------------------------------------------------------------------- */
 		
 /* -------------------------------- FOLLOWERS ------------------------------- */
+export const mediaMovieFollowersAverageRatingsOptions = ({
+	supabase,
+	movieId,
+} : {
+	supabase: SupabaseClient;
+	movieId: number;
+}) => {
+	return queryOptions({
+		queryKey: mediasKeys.followersAverageRatings({
+			id: movieId,
+			type: 'movie',
+		}),
+		queryFn: async () => {
+			const { data, error } = await supabase
+				.from('user_activities_movie_follower')
+				.select('*, user:profile(*)')
+				.eq('movie_id', movieId)
+				.not('rating', 'is', null)
+				.order('created_at', { ascending: false });
+			if (error) throw error;
+			return data;
+		},
+		staleTime: 1000 * 60 * 60 // 1 hour
+	});
+};
+
+export const mediaTvSeriesFollowersAverageRatingsOptions = ({
+	supabase,
+	tvSeriesId,
+} : {
+	supabase: SupabaseClient;
+	tvSeriesId: number;
+}) => {
+	return queryOptions({
+		queryKey: mediasKeys.followersAverageRatings({
+			id: tvSeriesId,
+			type: 'tv_series',
+		}),
+		queryFn: async () => {
+			const { data, error } = await supabase
+				.from('user_activities_tv_series_follower')
+				.select('*, user:profile(*)')
+				.eq('tv_series_id', tvSeriesId)
+				.not('rating', 'is', null)
+				.order('created_at', { ascending: false });
+			if (error) throw error;
+			return data;
+		},
+		staleTime: 1000 * 60 * 60 // 1 hour
+	});
+};
+
 export const mediaMovieFollowersAverageRatingOptions = ({
 	supabase,
 	movieId,
@@ -721,7 +773,7 @@ export const mediaTvSeriesPostersOptions = ({
 			const { data, error } = await supabase
 				.from('media_tv_series_posters')
 				.select('*')
-				.eq('tv_series_id', tvSeriesId)
+				.eq('serie_id', tvSeriesId)
 				.range(from, to)
 			if (error) throw error;
 			return data;
@@ -781,7 +833,7 @@ export const mediaTvSeriesBackdropsOptions = ({
 			const { data, error } = await supabase
 				.from('media_tv_series_backdrops')
 				.select('*')
-				.eq('tv_series_id', tvSeriesId)
+				.eq('serie_id', tvSeriesId)
 				.range(from, to)
 			if (error) throw error;
 			return data;

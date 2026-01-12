@@ -11,8 +11,6 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import { LinearGradient } from 'expo-linear-gradient';
 import Color from "color";
-import { useQuery } from "@tanstack/react-query";
-import { useUIBackgroundsOptions } from "@/api/options";
 import { Text } from "@/components/ui/text";
 import { getMediaDetails } from "@/components/utils/getMediaDetails";
 import { Database } from "@recomendapp/types";
@@ -21,6 +19,7 @@ import { useCallback, useMemo, useState } from "react";
 import { LoopCarousel } from "@/components/ui/LoopCarousel";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useUIBackgroundsQuery } from "@/api/ui/uiQueries";
 
 const AuthHeader = ({
   onBackgroundChange,
@@ -33,7 +32,7 @@ const AuthHeader = ({
   const bgColor = useMemo(() => Color(colors.background).rgb().object(), [colors.background]);
   const {
     data,
-  } = useQuery(useUIBackgroundsOptions());
+  } = useUIBackgroundsQuery();
   return (
     <View style={[tw`items-center justify-end`, { paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL, paddingTop: headerHeight, height: SCREEN_HEIGHT * 0.5 }]}>
       <Animated.View style={tw`absolute inset-0`}>

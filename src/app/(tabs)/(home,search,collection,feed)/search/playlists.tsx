@@ -1,4 +1,4 @@
-import { useSearchPlaylistsOptions } from "@/api/options";
+import { useSearchPlaylistsQuery } from "@/api/search/searchQueries";
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import ErrorMessage from "@/components/ErrorMessage";
 import { Text } from "@/components/ui/text";
@@ -11,7 +11,6 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList, LegendListRef } from "@legendapp/list";
 import { useScrollToTop } from "@react-navigation/native";
 import { Playlist } from "@recomendapp/types";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { upperFirst } from "lodash";
 import { useRef } from "react";
 import { useKeyboardState } from "react-native-keyboard-controller";
@@ -37,9 +36,9 @@ const SearchPlaylistsScreen = () => {
 		fetchNextPage,
 		refetch,
 		isRefetching,
-	} = useInfiniteQuery(useSearchPlaylistsOptions({
+	} = useSearchPlaylistsQuery({
 		query: search,
-	}));
+	});
 	
 	// REFs
 	const scrollRef = useRef<LegendListRef>(null);

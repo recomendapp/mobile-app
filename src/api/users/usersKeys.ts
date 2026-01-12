@@ -51,11 +51,10 @@ export const usersKeys = {
 		filters,
 	} : {
 		filters?: {
-			sortBy?: 'created_at';
-			sortOrder?: 'asc' | 'desc';
-			perPage?: number;
+			sortBy: 'created_at';
+			sortOrder: 'asc' | 'desc';
 		}
-	}) => filters ? [...usersKeys.base, 'my_feed', filters] as const : [...usersKeys.base, 'my_feed'] as const,
+	} = {}) => filters ? [...usersKeys.base, 'my_feed', filters] as const : [...usersKeys.base, 'my_feed'] as const,
 	myFeedCastCrew: () => [...usersKeys.base, 'my_feed_cast_crew'] as const,
 	feed: ({
 		userId,
@@ -63,9 +62,8 @@ export const usersKeys = {
 	} : {
 		userId: string;
 		filters?: {
-			sortBy?: 'created_at';
-			sortOrder?: 'asc' | 'desc';
-			perPage?: number;
+			sortBy: 'created_at';
+			sortOrder: 'asc' | 'desc';
 		}
 	}) => filters ? [...usersKeys.details({ userId }), 'feed', filters] as const : [...usersKeys.details({ userId }), 'feed'] as const,
 	/* -------------------------------------------------------------------------- */
@@ -74,10 +72,15 @@ export const usersKeys = {
 	activities: ({
 		userId,
 		type,
+		filters,
 	} : {
 		userId: string;
-		type: 'movie' | 'tv_series';
-	}) => [...usersKeys.details({ userId }), 'activities', type] as const,
+		type: 'all' | 'movie' | 'tv_series';
+		filters?: {
+			sortBy: 'watched_date' | 'rating';
+			sortOrder: 'asc' | 'desc';
+		}
+	}) => filters ? [...usersKeys.details({ userId }), 'activities', type, filters] as const : [...usersKeys.details({ userId }), 'activities', type] as const,
 
 	activity: ({
 		id,
@@ -95,9 +98,8 @@ export const usersKeys = {
 	} : {
 		userId: string;
 		filters?: {
-			sortBy?: 'watched_date' | 'rating';
-			sortOrder?: 'asc' | 'desc';
-			perPage?: number;
+			sortBy: 'watched_date' | 'rating';
+			sortOrder: 'asc' | 'desc';
 		}
 	}) => filters ? [...usersKeys.activities({ userId, type: 'movie' }), filters] as const : usersKeys.activities({ userId, type: 'movie' }),
 
@@ -107,9 +109,8 @@ export const usersKeys = {
 	} : {
 		userId: string;
 		filters?: {
-			sortBy?: 'watched_date' | 'rating';
-			sortOrder?: 'asc' | 'desc';
-			perPage?: number;
+			sortBy: 'watched_date' | 'rating';
+			sortOrder: 'asc' | 'desc';
 		}
 	}) => filters ? [...usersKeys.activities({ userId, type: 'tv_series' }), filters] as const : usersKeys.activities({ userId, type: 'tv_series' }),
 	/* -------------------------------------------------------------------------- */
@@ -141,11 +142,11 @@ export const usersKeys = {
 		filters,
 	} : {
 		userId: string;
-		type: 'movie' | 'tv_series' | 'all';
+		type: 'all' | 'movie' | 'tv_series';
 		filters?: {
 			sortBy: 'created_at';
 			sortOrder: 'asc' | 'desc' | 'random';
-			limit: number;
+			limit?: number;
 		}
 	}) => filters ? [...usersKeys.details({ userId }), 'recos', type, filters] as const : [...usersKeys.details({ userId }), 'recos', type] as const,
 
@@ -169,7 +170,7 @@ export const usersKeys = {
 		filters?: {
 			sortBy: 'created_at';
 			sortOrder: 'asc' | 'desc' | 'random';
-			limit: number;
+			limit?: number;
 		}
 	}) => filters ? [...usersKeys.details({ userId }), 'watchlist', type, filters] as const : [...usersKeys.details({ userId }), 'watchlist', type] as const,
 
@@ -201,7 +202,7 @@ export const usersKeys = {
 	} : {
 		userId: string;
 		filters?: {
-			sortBy: 'updated_at';
+			sortBy: 'updated_at' | 'created_at' | 'likes_count';
 			sortOrder: 'asc' | 'desc';
 		}
 	}) => filters ? [...usersKeys.details({ userId }), 'playlists', filters] as const : [...usersKeys.details({ userId }), 'playlists'] as const,
@@ -216,6 +217,14 @@ export const usersKeys = {
 			sortOrder: 'asc' | 'desc';
 		}
 	}) => filters ? [...usersKeys.details({ userId }), 'playlists-saved', filters] as const : [...usersKeys.details({ userId }), 'playlists-saved'] as const,
+
+	playlistLike: ({
+		userId,
+		playlistId,
+	} : {
+		userId: string;
+		playlistId: number;
+	}) => [...usersKeys.details({ userId }), 'playlist-like', playlistId] as const,
 
 	playlistSaved: ({
 		userId,

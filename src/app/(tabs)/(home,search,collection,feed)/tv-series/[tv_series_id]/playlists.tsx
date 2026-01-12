@@ -161,6 +161,7 @@ const TvSeriesPlaylists = () => {
 				paddingBottom: bottomOffset + PADDING_VERTICAL,
 				gap: GAP,
 		}}
+		maintainVisibleContentPosition={false}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={useCallback((item: Playlist) => item.id.toString(), [])}
 		columnWrapperStyle={tw`gap-2`}

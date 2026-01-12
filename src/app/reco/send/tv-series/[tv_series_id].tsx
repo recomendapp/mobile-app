@@ -17,16 +17,16 @@ import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reani
 import { SearchBar } from "@/components/ui/searchbar";
 import { PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
-import { useUserRecosTvSeriesSendQuery } from "@/features/user/userQueries";
 import { useTheme } from "@/providers/ThemeProvider";
 import Fuse from "fuse.js";
 import { Icons } from "@/constants/Icons";
 import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
-import { useUserRecosTvSeriesInsertMutation } from "@/features/user/userMutations";
+import { useUserRecosTvSeriesInsertMutation } from "@/api/users/usersMutations";
 import { CardUser } from "@/components/cards/CardUser";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/Toast";
+import { useUserRecosTvSeriesSendQuery } from "@/api/users/usersQueries";
 
 const COMMENT_MAX_LENGTH = 180;
 

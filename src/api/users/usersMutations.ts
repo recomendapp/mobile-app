@@ -1,4 +1,4 @@
-import { userReviewMovieLikeOptions, userReviewTvSeriesLikeOptions, useUserHeartPicksMovieOptions, useUserHeartPicksTvSeriesOptions, useUserMyFeedInfiniteOptions, useUserOptions, useUserWatchlistMoviesOptions, useUserWatchlistOptions, useUserWatchlistTvSeriesOptions } from "./usersOptions";
+import { userReviewMovieLikeOptions, userReviewTvSeriesLikeOptions, userHeartPicksMovieOptions, userHeartPicksTvSeriesOptions, userWatchlistOptions, userWatchlistMoviesOptions, userWatchlistTvSeriesOptions, userPlaylistLikeOptions, userPlaylistSavedOptions, userProfileOptions } from "./usersOptions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Database, UserRecosMovieAggregated, UserRecosTvSeriesAggregated } from "@recomendapp/types";
 import { useAuth } from "@/providers/AuthProvider";
@@ -10,14 +10,12 @@ import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import { usersKeys } from "./usersKeys";
 import { useApiClient } from "@/providers/ApiProvider";
 import { mediasKeys } from "../medias/mediasKeys";
+import { authUserOptions } from "../auth/authOptions";
 
 export const useUserUpdateMutation = () => {
 	const { session } = useAuth();
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const userOptions = useUserOptions({
-		userId: session?.user.id,
-	})
 	return useMutation({
 		mutationFn: async ({
 			username,
@@ -75,7 +73,15 @@ export const useUserUpdateMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(userOptions.queryKey, (oldData) => {
+			queryClient.setQueryData(authUserOptions({ supabase, userId: data.id }).queryKey, (oldData) => {
+				if (!oldData) return oldData;
+				return {
+					...oldData,
+					...data,
+				};
+			});
+			queryClient.setQueryData(userProfileOptions({ supabase, username: data.username }).queryKey, (oldData) => {
+				if (!oldData) return oldData;
 				return {
 					...oldData,
 					...data,
@@ -89,7 +95,6 @@ export const useUserUpdateMutation = () => {
 export const useUserFollowProfileInsertMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const userMyFeedOptions = useUserMyFeedInfiniteOptions();
 	return useMutation({
 		mutationFn: async ({
 			userId,
@@ -126,16 +131,15 @@ export const useUserFollowProfileInsertMutation = () => {
 				})
 			})
 			queryClient.invalidateQueries({
-				queryKey: userMyFeedOptions.queryKey,
+				queryKey: usersKeys.myFeed(),
 			});
 		},
 	});
 };
 
-export const useUserUnfollowProfileDeleteMutation = () => {
+export const useUserFollowProfileDeleteMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const userMyFeedOptions = useUserMyFeedInfiniteOptions();
 	return useMutation({
 		mutationFn: async ({
 			userId,
@@ -171,7 +175,7 @@ export const useUserUnfollowProfileDeleteMutation = () => {
 				})
 			});
 			queryClient.invalidateQueries({
-				queryKey: userMyFeedOptions.queryKey,
+				queryKey: usersKeys.myFeed(),
 			});
 		},
 	});
@@ -211,7 +215,7 @@ export const useUserFollowPersonInsertMutation = () => {
 	});
 };
 
-export const useUserUnfollowPersonDeleteMutation = () => {
+export const useUserFollowPersonDeleteMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
 	return useMutation({
@@ -318,7 +322,6 @@ export const useUserDeclineFollowerRequestMutation = () => {
 export const useUserActivityMovieInsertMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const userMyFeedOptions = useUserMyFeedInfiniteOptions();
 	return useMutation({
 		mutationFn: async ({
 			userId,
@@ -368,19 +371,14 @@ export const useUserActivityMovieInsertMutation = () => {
 				});
 			}
 			queryClient.invalidateQueries({
-				queryKey: userMyFeedOptions.queryKey,
+				queryKey: usersKeys.myFeed(),
 			})
 		}
 	});
 };
 export const useUserActivityMovieDeleteMutation = () => {
-	const { session } = useAuth();
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const userMyFeedOptions = useUserMyFeedInfiniteOptions();
-	const heartPicksOptions = useUserHeartPicksMovieOptions({
-		userId: session?.user.id,
-	})
 	return useMutation({
 		mutationFn: async ({
 			activityId,
@@ -404,26 +402,21 @@ export const useUserActivityMovieDeleteMutation = () => {
 			}), null);
 
 			if (data.is_liked) {
-				queryClient.setQueryData(heartPicksOptions.queryKey, (oldData) => {
+				queryClient.setQueryData(userHeartPicksMovieOptions({ supabase, userId: data.user_id }).queryKey, (oldData) => {
 					if (!oldData) return oldData;
 					return oldData.filter((pick) => pick.id !== data.id);
 				})
 			}
 
 			queryClient.invalidateQueries({
-				queryKey: userMyFeedOptions.queryKey,
+				queryKey: usersKeys.myFeed(),
 			})
 		}
 	});
 };
 export const useUserActivityMovieUpdateMutation = () => {
-	const { session } = useAuth();
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const userMyFeedOptions = useUserMyFeedInfiniteOptions();
-	const heartPicksOptions = useUserHeartPicksMovieOptions({
-		userId: session?.user.id,
-	})
 	return useMutation({
 		mutationFn: async ({
 			activityId,
@@ -467,14 +460,14 @@ export const useUserActivityMovieUpdateMutation = () => {
 						})
 					})
 				} else {
-					queryClient.setQueryData(heartPicksOptions.queryKey, (oldData) => {
+					queryClient.setQueryData(userHeartPicksMovieOptions({ supabase, userId: data.user_id }).queryKey, (oldData) => {
 						if (!oldData) return oldData;
 						return oldData.filter((pick) => pick.id !== data.id);
 					});
 				}
 			}
 			queryClient.invalidateQueries({
-				queryKey: userMyFeedOptions.queryKey,
+				queryKey: usersKeys.myFeed(),
 			})
 		}
 	});
@@ -483,7 +476,6 @@ export const useUserActivityMovieUpdateMutation = () => {
 export const useUserActivityTvSeriesInsertMutation = () => {
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const userMyFeedOptions = useUserMyFeedInfiniteOptions();
 	return useMutation({
 		mutationFn: async ({
 			userId,
@@ -534,19 +526,14 @@ export const useUserActivityTvSeriesInsertMutation = () => {
 			}
 
 			queryClient.invalidateQueries({
-				queryKey: userMyFeedOptions.queryKey,
+				queryKey: usersKeys.myFeed(),
 			})
 		}
 	});
 };
 export const useUserActivityTvSeriesDeleteMutation = () => {
-	const { session } = useAuth();
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const userMyFeedOptions = useUserMyFeedInfiniteOptions();
-	const heartPicksOptions = useUserHeartPicksTvSeriesOptions({
-		userId: session?.user.id,
-	});
 	return useMutation({
 		mutationFn: async ({
 			activityId,
@@ -570,26 +557,21 @@ export const useUserActivityTvSeriesDeleteMutation = () => {
 			}), null);
 
 			if (data.is_liked) {
-				queryClient.setQueryData(heartPicksOptions.queryKey, (oldData) => {
+				queryClient.setQueryData(userHeartPicksTvSeriesOptions({ supabase, userId: data.user_id }).queryKey, (oldData) => {
 					if (!oldData) return oldData;
 					return oldData.filter((pick) => pick.id !== data.id);
 				})
 			}
 
 			queryClient.invalidateQueries({
-				queryKey: userMyFeedOptions.queryKey,
+				queryKey: usersKeys.myFeed(),
 			})
 		}
 	});
 };
 export const useUserActivityTvSeriesUpdateMutation = () => {
-	const { session } = useAuth();
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const userMyFeedOptions = useUserMyFeedInfiniteOptions();
-	const heartPicksOptions = useUserHeartPicksTvSeriesOptions({
-		userId: session?.user.id,
-	});
 	return useMutation({
 		mutationFn: async ({
 			activityId,
@@ -634,7 +616,7 @@ export const useUserActivityTvSeriesUpdateMutation = () => {
 						})
 					});
 				} else {
-					queryClient.setQueryData(heartPicksOptions.queryKey, (oldData) => {
+					queryClient.setQueryData(userHeartPicksTvSeriesOptions({ supabase, userId: data.user_id }).queryKey, (oldData) => {
 						if (!oldData) return oldData;
 						return oldData.filter((pick) => pick.id !== data.id);
 					});
@@ -642,13 +624,12 @@ export const useUserActivityTvSeriesUpdateMutation = () => {
 			}
 
 			queryClient.invalidateQueries({
-				queryKey: userMyFeedOptions.queryKey,
+				queryKey: usersKeys.myFeed(),
 			})
 		}
 	});
 };
 /* -------------------------------------------------------------------------- */
-
 
 /* --------------------------------- REVIEW --------------------------------- */
 export const useUserReviewMovieUpsertMutation = ({
@@ -690,20 +671,17 @@ export const useUserReviewMovieUpsertMutation = ({
 		}
 	});
 };
-export const useUserReviewMovieDeleteMutation = ({
-	userId,
-	movieId
-}: {
-	userId?: string;
-	movieId: number;
-}) => {
+export const useUserReviewMovieDeleteMutation = () => {
+	const { session } = useAuth();
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({
 			id,
+			movieId,
 		} : {
 			id: number;
+			movieId: number;
 		}) => {
 			const { error } = await supabase
 				.from('user_reviews_movie')
@@ -723,8 +701,8 @@ export const useUserReviewMovieDeleteMutation = ({
 			});
 
 			// Invalidate the review activity
-			userId && queryClient.invalidateQueries({
-				queryKey: usersKeys.activity({ id: data.movieId, type: 'movie', userId: userId }),
+			session && queryClient.invalidateQueries({
+				queryKey: usersKeys.activity({ id: data.movieId, type: 'movie', userId: session.user.id }),
 			});
 		}
 	});
@@ -827,7 +805,7 @@ export const useUserReviewMovieLikeDeleteMutation = () => {
 export const useUserReviewTvSeriesUpsertMutation = ({
 	tvSeriesId
 }: {
-	tvSeriesId: number;
+	tvSeriesId?: number;
 }) => {
 	const { session } = useAuth();
 	const api = useApiClient();
@@ -852,6 +830,7 @@ export const useUserReviewTvSeriesUpsertMutation = ({
 			return data;
 		},
 		onSuccess: (data) => {
+			if (!tvSeriesId) return;
 			queryClient.invalidateQueries({
 				queryKey: mediasKeys.reviews({ id: tvSeriesId, type: 'tv_series' }),
 			});
@@ -862,20 +841,17 @@ export const useUserReviewTvSeriesUpsertMutation = ({
 		}
 	});
 };
-export const useUserReviewTvSeriesDeleteMutation = ({
-	userId,
-	tvSeriesId
-}: {
-	userId?: string;
-	tvSeriesId: number;
-}) => {
+export const useUserReviewTvSeriesDeleteMutation = () => {
+	const { session } = useAuth();
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({
 			id,
+			tvSeriesId,
 		} : {
 			id: number;
+			tvSeriesId: number;
 		}) => {
 			const { error } = await supabase
 				.from('user_reviews_tv_series')
@@ -895,8 +871,8 @@ export const useUserReviewTvSeriesDeleteMutation = ({
 			});
 
 			// Invalidate the review activity
-			userId && queryClient.invalidateQueries({
-				queryKey: usersKeys.activity({ id: data.tvSeriesId, type: 'tv_series', userId: userId }),
+			session && queryClient.invalidateQueries({
+				queryKey: usersKeys.activity({ id: data.tvSeriesId, type: 'tv_series', userId: session.user.id }),
 			});
 		}
 	});
@@ -997,7 +973,6 @@ export const useUserReviewTvSeriesLikeDeleteMutation = () => {
 };
 /* -------------------------------------------------------------------------- */
 
-
 /* -------------------------------- WATCHLIST ------------------------------- */
 export const useUserWatchlistMovieInsertMutation = () => {
 	const supabase = useSupabaseClient();
@@ -1038,20 +1013,8 @@ export const useUserWatchlistMovieInsertMutation = () => {
 	});
 };
 export const useUserWatchlistMovieDeleteMutation = () => {
-	const { session } = useAuth();
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const watchlistAllOptions = useUserWatchlistOptions({
-		userId: session?.user.id,
-		filters: {
-			sortBy: 'created_at',
-			sortOrder: 'random',
-			limit: 6,
-		}
-	});
-	const watchlistOptions = useUserWatchlistMoviesOptions({
-		userId: session?.user.id,
-	});
 	return useMutation({
 		mutationFn: async ({
 			watchlistId,
@@ -1075,13 +1038,13 @@ export const useUserWatchlistMovieDeleteMutation = () => {
 			}), null);
 
 			// Watchlist
-			queryClient.setQueryData(watchlistAllOptions.queryKey, (oldData) => {
+			queryClient.setQueryData(userWatchlistOptions({ supabase, userId: data.user_id, filters: { sortBy: 'created_at', sortOrder: 'random', limit: 6 }}).queryKey, (oldData) => {
 				if (!oldData) return oldData;
 				return oldData.filter(
 					(watchlist) => watchlist?.id !== data.id
 				);
 			});
-			queryClient.setQueryData(watchlistOptions.queryKey, (oldData) => {
+			queryClient.setQueryData(userWatchlistMoviesOptions({ supabase, userId: data.user_id }).queryKey, (oldData) => {
 				if (!oldData) return oldData;
 				return oldData.filter(
 					(watchlist) => watchlist?.id !== data.id
@@ -1091,20 +1054,8 @@ export const useUserWatchlistMovieDeleteMutation = () => {
 	});
 };
 export const useUserWatchlistMovieUpdateMutation = () => {
-	const { session } = useAuth();
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const watchlistAllOptions = useUserWatchlistOptions({
-		userId: session?.user.id,
-		filters: {
-			sortBy: 'created_at',
-			sortOrder: 'random',
-			limit: 6,
-		}
-	});
-	const watchlistOptions = useUserWatchlistMoviesOptions({
-		userId: session?.user.id,
-	});
 	return useMutation({
 		mutationFn: async ({
 			watchlistId,
@@ -1132,7 +1083,7 @@ export const useUserWatchlistMovieUpdateMutation = () => {
 			}), data);
 
 			// Watchlist
-			queryClient.setQueryData(watchlistAllOptions.queryKey, (oldData) => {
+			queryClient.setQueryData(userWatchlistOptions({ supabase, userId: data.user_id, filters: { sortBy: 'created_at', sortOrder: 'random', limit: 6 }}).queryKey, (oldData) => {
 				if (!oldData) return oldData;
 				return oldData.map((item) => {
 					if (item.id === data.id) {
@@ -1144,7 +1095,7 @@ export const useUserWatchlistMovieUpdateMutation = () => {
 					return item;
 				});
 			});
-			queryClient.setQueryData(watchlistOptions.queryKey, (oldData) => {
+			queryClient.setQueryData(userWatchlistMoviesOptions({ supabase, userId: data.user_id }).queryKey, (oldData) => {
 				if (!oldData) return oldData;
 				return oldData.map((item) => {
 					if (item.id === data.id) {
@@ -1199,20 +1150,8 @@ export const useUserWatchlistTvSeriesInsertMutation = () => {
 	});
 };
 export const useUserWatchlistTvSeriesDeleteMutation = () => {
-	const { session } = useAuth();
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const watchlistAllOptions = useUserWatchlistOptions({
-		userId: session?.user.id,
-		filters: {
-			sortBy: 'created_at',
-			sortOrder: 'random',
-			limit: 6,
-		}
-	});
-	const watchlistOptions = useUserWatchlistTvSeriesOptions({
-		userId: session?.user.id,
-	});
 	return useMutation({
 		mutationFn: async ({
 			watchlistId,
@@ -1236,13 +1175,13 @@ export const useUserWatchlistTvSeriesDeleteMutation = () => {
 			}), null);
 
 			// Watchlist
-			queryClient.setQueryData(watchlistAllOptions.queryKey, (oldData) => {
+			queryClient.setQueryData(userWatchlistOptions({ supabase, userId: data.user_id, filters: { sortBy: 'created_at', sortOrder: 'random', limit: 6 }}).queryKey, (oldData) => {
 				if (!oldData) return oldData;
 				return oldData.filter(
 					(watchlist) => watchlist?.id !== data.id
 				);
 			});
-			queryClient.setQueryData(watchlistOptions.queryKey, (oldData) => {
+			queryClient.setQueryData(userWatchlistTvSeriesOptions({ supabase, userId: data.user_id }).queryKey, (oldData) => {
 				if (!oldData) return oldData;
 				return oldData.filter(
 					(watchlist) => watchlist?.id !== data.id
@@ -1252,20 +1191,8 @@ export const useUserWatchlistTvSeriesDeleteMutation = () => {
 	});
 };
 export const useUserWatchlistTvSeriesUpdateMutation = () => {
-	const { session } = useAuth();
 	const supabase = useSupabaseClient();
 	const queryClient = useQueryClient();
-	const watchlistAllOptions = useUserWatchlistOptions({
-		userId: session?.user.id,
-		filters: {
-			sortBy: 'created_at',
-			sortOrder: 'random',
-			limit: 6,
-		}
-	});
-	const watchlistOptions = useUserWatchlistTvSeriesOptions({
-		userId: session?.user.id,
-	});
 	return useMutation({
 		mutationFn: async ({
 			watchlistId,
@@ -1293,7 +1220,7 @@ export const useUserWatchlistTvSeriesUpdateMutation = () => {
 			}), data);
 
 			// Watchlist
-			queryClient.setQueryData(watchlistAllOptions.queryKey, (oldData) => {
+			queryClient.setQueryData(userWatchlistOptions({ supabase, userId: data.user_id, filters: { sortBy: 'created_at', sortOrder: 'random', limit: 6 }}).queryKey, (oldData) => {
 				if (!oldData) return oldData;
 				return oldData.map((item) => {
 					if (item.id === data.id) {
@@ -1305,7 +1232,7 @@ export const useUserWatchlistTvSeriesUpdateMutation = () => {
 					return item;
 				});
 			});
-			queryClient.setQueryData(watchlistOptions.queryKey, (oldData) => {
+			queryClient.setQueryData(userWatchlistTvSeriesOptions({ supabase, userId: data.user_id }).queryKey, (oldData) => {
 				if (!oldData) return oldData;
 				return oldData.map((item) => {
 					if (item.id === data.id) {
@@ -1336,7 +1263,7 @@ export const useUserRecosMovieInsertMutation = () => {
 			senderId: string;
 			movieId: number;
 			receivers: Database['public']['Views']['profile']['Row'][];
-			comment: string;
+			comment?: string;
 		}) => {
 			if (receivers.length === 0) throw Error('Missing receivers');
 			const { error } = await supabase
@@ -1471,7 +1398,7 @@ export const useUserRecosTvSeriesInsertMutation = () => {
 			senderId: string;
 			tvSeriesId: number;
 			receivers: Database['public']['Views']['profile']['Row'][];
-			comment: string;
+			comment?: string;
 		}) => {
 			if (receivers.length === 0) throw Error('Missing receivers');
 			const { error } = await supabase
@@ -1618,11 +1545,27 @@ export const useUserPlaylistSavedInsertMutation = () => {
 			if (error) throw error;
 			return data;
 		},
+		onMutate: async ({ userId, playlistId }) => {
+			const options = userPlaylistSavedOptions({ supabase, userId, playlistId });
+			await queryClient.cancelQueries({ queryKey: options.queryKey });
+			const previous = queryClient.getQueryData(options.queryKey);
+			queryClient.setQueryData(options.queryKey, true);
+			return { previous };
+		},
+		onError: (_err, _variables, context) => {
+			if (context?.previous) {
+				const { userId, playlistId } = _variables;
+				const options = userPlaylistSavedOptions({ supabase, userId, playlistId });
+				queryClient.setQueryData(options.queryKey, context.previous);
+			}
+		},
+		onSettled: (_data, _error, variables) => {
+			const { userId, playlistId } = variables;
+			const options = userPlaylistSavedOptions({ supabase, userId, playlistId });
+			queryClient.invalidateQueries({ queryKey: options.queryKey });
+		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.playlistSaved({
-				userId: data.user_id,
-				playlistId: data.playlist_id,
-			}), data);
+			queryClient.setQueryData(userPlaylistSavedOptions({ supabase, userId: data.user_id, playlistId: data.playlist_id }).queryKey, true);
 
 			queryClient.invalidateQueries({
 				queryKey: usersKeys.playlistsSaved({
@@ -1638,24 +1581,45 @@ export const useUserPlaylistSavedDeleteMutation = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({
-			savedId,
+			userId,
+			playlistId,
 		} : {
-			savedId: number;
+			userId: string;
+			playlistId: number;
 		}) => {
 			const { data, error } = await supabase
 				.from('playlists_saved')
 				.delete()
-				.eq('id', savedId)
+				.match({
+					user_id: userId,
+					playlist_id: playlistId,
+				})
 				.select()
 				.single();
 			if (error) throw error;
 			return data;
 		},
+		onMutate: async ({ userId, playlistId }) => {
+			const options = userPlaylistSavedOptions({ supabase, userId, playlistId });
+			await queryClient.cancelQueries({ queryKey: options.queryKey });
+			const previous = queryClient.getQueryData(options.queryKey);
+			queryClient.setQueryData(options.queryKey, false);
+			return { previous };
+		},
+		onError: (_err, _variables, context) => {
+			if (context?.previous) {
+				const { userId, playlistId } = _variables;
+				const options = userPlaylistSavedOptions({ supabase, userId, playlistId });
+				queryClient.setQueryData(options.queryKey, context.previous);
+			}
+		},
+		onSettled: (_data, _error, variables) => {
+			const { userId, playlistId } = variables;
+			const options = userPlaylistSavedOptions({ supabase, userId, playlistId });
+			queryClient.invalidateQueries({ queryKey: options.queryKey });
+		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.playlistSaved({
-				userId: data.user_id,
-				playlistId: data.playlist_id,
-			}), null);
+			queryClient.setQueryData(userPlaylistSavedOptions({ supabase, userId: data.user_id, playlistId: data.playlist_id }).queryKey, false);
 
 			queryClient.invalidateQueries({
 				queryKey: usersKeys.playlistsSaved({
@@ -1665,8 +1629,102 @@ export const useUserPlaylistSavedDeleteMutation = () => {
 		}
 	});
 };
-/* -------------------------------------------------------------------------- */
 
+export const useUserPlaylistLikeInsertMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			userId,
+			playlistId,
+		} : {
+			userId: string;
+			playlistId: number;
+		}) => {
+			const { data, error } = await supabase
+				.from('playlists_likes')
+				.insert({
+					user_id: userId,
+					playlist_id: playlistId,
+				})
+				.select()
+				.single()
+			if (error) throw error;
+			return data;
+		},
+		onMutate: async ({ userId, playlistId }) => {
+			const options = userPlaylistLikeOptions({ supabase, userId, playlistId });
+			await queryClient.cancelQueries({ queryKey: options.queryKey });
+			const previous = queryClient.getQueryData(options.queryKey);
+			queryClient.setQueryData(options.queryKey, true);
+			return { previous };
+		},
+		onError: (_err, _variables, context) => {
+			if (context?.previous) {
+				const { userId, playlistId } = _variables;
+				const options = userPlaylistLikeOptions({ supabase, userId, playlistId });
+				queryClient.setQueryData(options.queryKey, context.previous);
+			}
+		},
+		onSettled: (_data, _error, variables) => {
+			const { userId, playlistId } = variables;
+			const options = userPlaylistLikeOptions({ supabase, userId, playlistId });
+			queryClient.invalidateQueries({ queryKey: options.queryKey });
+		},
+		onSuccess: (data) => {
+			queryClient.setQueryData(userPlaylistLikeOptions({ supabase, userId: data.user_id, playlistId: data.playlist_id }).queryKey, true);
+		}
+	});
+};
+
+export const useUserPlaylistLikeDeleteMutation = () => {
+	const supabase = useSupabaseClient();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			userId,
+			playlistId,
+		} : {
+			userId: string;
+			playlistId: number;
+		}) => {
+			const { data, error } = await supabase
+				.from('playlists_likes')
+				.delete()
+				.match({
+					user_id: userId,
+					playlist_id: playlistId,
+				})
+				.select()
+				.single();
+			if (error) throw error;
+			return data;
+		},
+		onMutate: async ({ userId, playlistId }) => {
+			const options = userPlaylistLikeOptions({ supabase, userId, playlistId });
+			await queryClient.cancelQueries({ queryKey: options.queryKey });
+			const previous = queryClient.getQueryData(options.queryKey);
+			queryClient.setQueryData(options.queryKey, false);
+			return { previous };
+		},
+		onError: (_err, _variables, context) => {
+			if (context?.previous) {
+				const { userId, playlistId } = _variables;
+				const options = userPlaylistLikeOptions({ supabase, userId, playlistId });
+				queryClient.setQueryData(options.queryKey, context.previous);
+			}
+		},
+		onSettled: (_data, _error, variables) => {
+			const { userId, playlistId } = variables;
+			const options = userPlaylistLikeOptions({ supabase, userId, playlistId });
+			queryClient.invalidateQueries({ queryKey: options.queryKey });
+		},
+		onSuccess: (data) => {
+			queryClient.setQueryData(userPlaylistLikeOptions({ supabase, userId: data.user_id, playlistId: data.playlist_id }).queryKey, false);
+		}
+	});
+};
+/* -------------------------------------------------------------------------- */
 
 /* --------------------------------- ACCOUNT -------------------------------- */
 export const useUserDeleteRequestInsertMutation = () => {

@@ -1,9 +1,8 @@
-import { Keys } from "@/api/keys";
-import { useAuthCustomerInfoOptions } from "@/api/options";
+import { authKeys } from "@/api/auth/authKeys";
+import { authCustomerInfoOptions } from "@/api/auth/authOptions";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import tw from "@/lib/tw";
-import { isIOS } from "@/platform/detection";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import {  useQueryClient } from "@tanstack/react-query";
@@ -20,15 +19,14 @@ const UpgradeScreen = () => {
 	const queryClient = useQueryClient();
 	const t = useTranslations();
 	const { defaultScreenOptions, isLiquidGlassAvailable } = useTheme();
-	const authCustomerInfoOptions = useAuthCustomerInfoOptions();
 
 	const onSuccess = useCallback(async ({ customerInfo } : { customerInfo: CustomerInfo }) => {
-		queryClient.setQueryData(authCustomerInfoOptions.queryKey, customerInfo);
+		queryClient.setQueryData(authCustomerInfoOptions().queryKey, customerInfo);
 		session?.user.id && await queryClient.invalidateQueries({
-			queryKey: Keys.auth.user(),
+			queryKey: authKeys.user(),
 		});
 		router.canGoBack() && router.back();
-	}, [queryClient, authCustomerInfoOptions.queryKey, router, session?.user.id]);
+	}, [queryClient, router, session?.user.id]);
 
 	const handleClose = useCallback(() => {
 		router.canGoBack() && router.back();

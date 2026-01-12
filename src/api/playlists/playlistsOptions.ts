@@ -1,8 +1,5 @@
-import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { infiniteQueryOptions, queryOptions, useQuery } from "@tanstack/react-query";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { playlistsKeys } from "./playlistsKeys";
-import { useApiClient } from "@/providers/ApiProvider";
-import { useAuth } from "@/providers/AuthProvider";
 import { SupabaseClient } from "@/lib/supabase/client";
 import { ApiClient } from "@recomendapp/api-js";
 

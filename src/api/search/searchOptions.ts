@@ -1,12 +1,15 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
-import { useLocale } from "use-intl";
-import { Keys } from "../keys";
-import { useApiClient } from "@/providers/ApiProvider";
+import { searchKeys } from "./searchKeys";
+import { ApiClient } from "@recomendapp/api-js";
 
-export const useSearchMultiOptions = ({
+export const searchMultiOptions = ({
+	api,
+	locale,
 	query,
 	filters,
 } : {
+	api: ApiClient;
+	locale: string;
 	query: string;
 	filters?: {
 		perPage?: number;
@@ -16,10 +19,8 @@ export const useSearchMultiOptions = ({
 		perPage: 10,
 		...filters
 	}
-	const locale = useLocale();
-	const api = useApiClient();
 	return queryOptions({
-		queryKey: Keys.search.multi({ locale: locale, query: query, filters: filters }),
+		queryKey: searchKeys.multi({ locale: locale, query: query, filters: filters }),
 		queryFn: async () => {
 			const { data, error } = await api.search.bestResult({
 				query: {
@@ -34,15 +35,17 @@ export const useSearchMultiOptions = ({
 	})
 };
 
-export const useSearchMoviesOptions = ({
+export const searchMoviesOptions = ({
+	api,
+	locale,
 	query,
 } : {
+	api: ApiClient;
+	locale: string;
 	query?: string;
 }) => {
-	const locale = useLocale();
-	const api = useApiClient();
 	return infiniteQueryOptions({
-		queryKey: Keys.search.movies({
+		queryKey: searchKeys.movies({
 			locale: locale,
 			query: query!,
 		}),
@@ -67,15 +70,17 @@ export const useSearchMoviesOptions = ({
 	})
 };
 
-export const useSearchTvSeriesOptions = ({
+export const searchTvSeriesOptions = ({
+	api,
+	locale,
 	query,
 } : {
+	api: ApiClient;
+	locale: string;
 	query?: string;
 }) => {
-	const locale = useLocale();
-	const api = useApiClient();
 	return infiniteQueryOptions({
-		queryKey: Keys.search.tvSeries({
+		queryKey: searchKeys.tvSeries({
 			locale: locale,
 			query: query!,
 		}),
@@ -100,15 +105,17 @@ export const useSearchTvSeriesOptions = ({
 	})
 };
 
-export const useSearchPersonsOptions = ({
+export const searchPersonsOptions = ({
+	api,
+	locale,
 	query,
 } : {
+	api: ApiClient;
+	locale: string;
 	query?: string;
 }) => {
-	const locale = useLocale();
-	const api = useApiClient();
 	return infiniteQueryOptions({
-		queryKey: Keys.search.persons({
+		queryKey: searchKeys.persons({
 			locale: locale,
 			query: query!,
 		}),
@@ -133,15 +140,17 @@ export const useSearchPersonsOptions = ({
 	})
 };
 
-export const useSearchUsersOptions = ({
+export const searchUsersOptions = ({
+	api,
+	locale,
 	query,
 } : {
+	api: ApiClient;
+	locale: string;
 	query?: string;
 }) => {
-	const locale = useLocale();
-	const api = useApiClient();
 	return infiniteQueryOptions({
-		queryKey: Keys.search.users({
+		queryKey: searchKeys.users({
 			locale: locale,
 			query: query!,
 		}),
@@ -166,15 +175,17 @@ export const useSearchUsersOptions = ({
 	})
 };
 
-export const useSearchPlaylistsOptions = ({
+export const searchPlaylistsOptions = ({
+	api,
+	locale,
 	query,
 } : {
+	api: ApiClient;
+	locale: string;
 	query?: string;
 }) => {
-	const locale = useLocale();
-	const api = useApiClient();
 	return infiniteQueryOptions({
-		queryKey: Keys.search.playlists({
+		queryKey: searchKeys.playlists({
 			locale: locale,
 			query: query!,
 		}),

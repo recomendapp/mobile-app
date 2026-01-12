@@ -1,11 +1,9 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
-import { useUserActivityMovieInsertMutation, useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
+import { useUserActivityMovieInsertMutation, useUserActivityMovieUpdateMutation } from "@/api/users/usersMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaMovie } from "@recomendapp/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { userKeys } from "@/features/user/userKeys";
 import { upperFirst } from "lodash";
 import { useSharedValue } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
@@ -14,6 +12,8 @@ import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/Toast";
 import { forwardRef, useCallback } from "react";
 import tw from "@/lib/tw";
+import { useUserActivityMovieQuery } from "@/api/users/usersQueries";
+import { usersKeys } from "@/api/users/usersKeys";
 
 interface ButtonUserActivityMovieLikeProps
 	extends React.ComponentProps<typeof Button> {
@@ -51,7 +51,7 @@ const ButtonUserActivityMovieLike = forwardRef<
 			}, {
 				onSuccess: () => {
 					queryClient.invalidateQueries({
-						queryKey: userKeys.heartPicks({ userId: session.user.id, type: 'movie' })
+						queryKey: usersKeys.heartPicks({ userId: session.user.id, type: 'movie' })
 					});
 				},
 				onError: () => {
@@ -67,7 +67,7 @@ const ButtonUserActivityMovieLike = forwardRef<
 			}, {
 				onSuccess: (data) => {
 					queryClient.invalidateQueries({
-						queryKey: userKeys.heartPicks({ userId: session.user.id, type: 'movie' })
+						queryKey: usersKeys.heartPicks({ userId: session.user.id, type: 'movie' })
 					});
 				},
 				onError: () => {
@@ -87,7 +87,7 @@ const ButtonUserActivityMovieLike = forwardRef<
 		}, {
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: userKeys.heartPicks({ userId: session.user.id, type: 'movie' })
+					queryKey: usersKeys.heartPicks({ userId: session.user.id, type: 'movie' })
 				});
 			},
 			onError: () => {

@@ -1,7 +1,6 @@
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { Text } from "@/components/ui/text";
 import { Icons } from "@/constants/Icons";
-import { useUserActivitiesTvSeriesInfiniteQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Profile } from "@recomendapp/types";
@@ -10,6 +9,7 @@ import { Link } from "expo-router";
 import { upperFirst } from "lodash";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { useTranslations } from "use-intl";
+import { useUserActivitiesTvSeriesQuery } from "@/api/users/usersQueries";
 
 interface ProfileWidgetActivitiesTvSeriesProps extends React.ComponentPropsWithoutRef<typeof View> {
 	profile: Profile;
@@ -30,8 +30,12 @@ const ProfileWidgetActivitiesTvSeries = ({
 	  fetchNextPage,
 	  isFetching,
 	  hasNextPage,
-	} = useUserActivitiesTvSeriesInfiniteQuery({
+	} = useUserActivitiesTvSeriesQuery({
 	  userId: profile?.id ?? undefined,
+	  filters: {
+		sortBy: 'watched_date',
+		sortOrder: 'desc',
+	  }
 	});
 
 	if (!activities?.pages.flat().length) return null;

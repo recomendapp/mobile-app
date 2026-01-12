@@ -1,6 +1,6 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useUserUpdateMutation } from "@/features/user/userMutations";
+import { useUserUpdateMutation } from "@/api/users/usersMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -17,12 +17,8 @@ import { View } from "@/components/ui/view";
 import { Label } from "@/components/ui/Label";
 import { ImagePickerAsset, launchCameraAsync, launchImageLibraryAsync, requestCameraPermissionsAsync } from "expo-image-picker";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { decode } from "base64-arraybuffer";
 import UserAvatar from "@/components/user/UserAvatar";
 import { Separator } from "@/components/ui/separator";
-import { randomUUID } from 'expo-crypto';
-import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 import { useToast } from "@/components/Toast";
@@ -34,15 +30,12 @@ const FULL_NAME_MAX_LENGTH = 30;
 const BIO_MAX_LENGTH = 150;
 
 const SettingsProfileScreen = () => {
-	const supabase = useSupabaseClient();
 	const { user } = useAuth();
 	const toast = useToast();
 	const { bottomOffset, tabBarHeight } = useTheme();
 	const t = useTranslations();
 	const { showActionSheetWithOptions } = useActionSheet();
-	const { mutateAsync: updateProfileMutation } = useUserUpdateMutation({
-		userId: user?.id,
-	});
+	const { mutateAsync: updateProfileMutation } = useUserUpdateMutation();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const [ newAvatar, setNewAvatar ] = useState<ImagePickerAsset | null | undefined>(undefined);
 	// Form
@@ -86,7 +79,7 @@ const SettingsProfileScreen = () => {
 	});
 
 	const [ hasFormChanged, setHasFormChanged ] = useState(false);
-	const canSave = (hasFormChanged || newAvatar !== undefined) && form.formState.isValid;
+	const canSave = useMemo(() => hasFormChanged || newAvatar !== undefined, [hasFormChanged, newAvatar]);
 
 	// Avatar
 	const avatarOptions = useMemo(() => [
@@ -94,17 +87,7 @@ const SettingsProfileScreen = () => {
 		{ label: upperFirst(t('common.messages.take_a_photo')), value: "camera" },
 		{ label: upperFirst(t('common.messages.delete_current_image')), value: "delete", disable: !user?.avatar_url && !newAvatar },
 	], [t, user?.avatar_url, newAvatar]);
-	// Handlers
-	const handleProcessImage = useCallback(async (image: ImagePickerAsset) => {
-		const processedImage = await ImageManipulator.manipulate(image.uri)
-			.resize({ width: 1024, height: 1024 })
-			.renderAsync()
-		return await processedImage.saveAsync({
-			compress: 0.8,
-			format: SaveFormat.JPEG,
-			base64: true,
-		})
-	}, []);
+
 	const handleAvatarOptions = useCallback(() => {
 		const options = [
 			...avatarOptions,
@@ -129,8 +112,7 @@ const SettingsProfileScreen = () => {
 						base64: true,
 					})
 					if (!results.canceled && results.assets?.length) {
-						const processImage = await handleProcessImage(results.assets[0]);
-						setNewAvatar(processImage);
+						setNewAvatar(results.assets[0]);
 					}
 					break;
 				case 'camera':
@@ -147,8 +129,7 @@ const SettingsProfileScreen = () => {
 						base64: true,
 					});
 					if (!cameraResults.canceled && cameraResults.assets?.length) {
-						const processImage = await handleProcessImage(cameraResults.assets[0]);
-						setNewAvatar(processImage);
+						setNewAvatar(cameraResults.assets[0]);
 					}
 					break;
 				case 'delete':
@@ -158,34 +139,17 @@ const SettingsProfileScreen = () => {
 					break;
 			};
 		});
-	}, [showActionSheetWithOptions, toast, t, user?.avatar_url, avatarOptions, handleProcessImage]);
+	}, [showActionSheetWithOptions, toast, t, user?.avatar_url, avatarOptions]);
+
 	const handleSubmit = useCallback(async (values: ProfileFormValues) => {
 		try {
 			if (!user) return;
 			setIsLoading(true);
-			let avatar_url: string | null | undefined;
-			if (newAvatar) {
-				const fileExt = newAvatar.uri.split('.').pop();
-				const fileName = `${user.id}.${randomUUID()}.${fileExt}`;
-				const { data, error } = await supabase.storage
-					.from('avatars')
-					.upload(fileName, decode(newAvatar.base64!), {
-						contentType: newAvatar.mimeType || `image/${SaveFormat.JPEG}`,
-						upsert: true,
-					});
-				if (error) throw error;
-				const { data: { publicUrl } } = supabase.storage
-				.from('avatars')
-				.getPublicUrl(data.path)
-				avatar_url = publicUrl;
-			} else if (newAvatar === null) {
-				avatar_url = null; // Delete avatar
-			}
 			await updateProfileMutation({
-				fullName: values.full_name,
+				full_name: values.full_name,
 				bio: values.bio?.trim() || null,
 				website: values.website?.trim() || null,
-				avatarUrl: avatar_url,
+				avatar: newAvatar,
 			});
 			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 		} catch (error) {
@@ -200,7 +164,7 @@ const SettingsProfileScreen = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [user, newAvatar, supabase, updateProfileMutation, toast, t]);
+	}, [user, newAvatar, updateProfileMutation, toast, t]);
 
 	// useEffects
 	useEffect(() => {

@@ -1,5 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
-import { Link, Stack, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import WidgetMostRecommended from '@/components/widgets/WidgetMostRecommended';
 import tw from '@/lib/tw';
 import { Button } from '@/components/ui/Button';
@@ -26,10 +26,10 @@ import { Pressable, RefreshControl } from 'react-native';
 import { WidgetMostPopular } from '@/components/widgets/WidgetMostPopular';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { useQueryClient } from '@tanstack/react-query';
-import { userKeys } from '@/features/user/userKeys';
-import { Keys } from '@/api/keys';
 import { NativeStackHeaderItem } from '@react-navigation/native-stack';
 import UserAvatar from '@/components/user/UserAvatar';
+import { widgetKeys } from '@/api/widget/widgetKeys';
+import { usersKeys } from '@/api/users/usersKeys';
 
 const HeaderLeft = () => {
   const { session, user } = useAuth();
@@ -145,13 +145,13 @@ const HomeScreen = () => {
   const refetch = async () => {
     setIsRefetching(true);
     try {
-      queryClient.invalidateQueries({ queryKey: Keys.widget.mostRecommended() }); // WidgetMostRecommended
-      queryClient.invalidateQueries({ queryKey: Keys.widget.mostPopular() }); // WidgetMostPopular
+      queryClient.invalidateQueries({ queryKey: widgetKeys.mostRecommended() }); // WidgetMostRecommended
+      queryClient.invalidateQueries({ queryKey: widgetKeys.mostPopular() }); // WidgetMostPopular
       if (session?.user.id) {
-        queryClient.invalidateQueries({ queryKey: userKeys.recos({ userId: session.user.id, type: 'all' })}); // WidgetUserRecos
-        queryClient.invalidateQueries({ queryKey: userKeys.watchlist({ userId: session.user.id, type: 'all' })}); // WidgetUserWatchlist
-        queryClient.invalidateQueries({ queryKey: userKeys.playlistsFriends({ userId: session.user.id })}); // WidgetUserFriendsPlaylists
-        queryClient.invalidateQueries({ queryKey: userKeys.discovery({}) }); // WidgetUserDiscovery
+        queryClient.invalidateQueries({ queryKey: usersKeys.recos({ userId: session.user.id, type: 'all' })}); // WidgetUserRecos
+        queryClient.invalidateQueries({ queryKey: usersKeys.watchlist({ userId: session.user.id, type: 'all' })}); // WidgetUserWatchlist
+        queryClient.invalidateQueries({ queryKey: usersKeys.playlistsFriends({ userId: session.user.id })}); // WidgetUserFriendsPlaylists
+        queryClient.invalidateQueries({ queryKey: widgetKeys.users({ filters: { sortBy: 'created_at', sortOrder: 'desc' }})}); // WidgetUserDiscovery
       }
     } finally {
       setIsRefetching(false);

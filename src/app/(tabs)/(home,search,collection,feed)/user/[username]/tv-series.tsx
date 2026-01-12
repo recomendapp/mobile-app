@@ -1,7 +1,6 @@
 
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
-import { useUserActivitiesTvSeriesInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -14,6 +13,7 @@ import { useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { HeaderTitle } from "@react-navigation/elements";
+import { useUserActivitiesTvSeriesQuery, useUserProfileQuery } from "@/api/users/usersQueries";
 
 interface sortBy {
 	label: string;
@@ -41,7 +41,7 @@ const UserCollectionTvSeries = () => {
 		hasNextPage,
 		isRefetching,
 		refetch,
-	} = useUserActivitiesTvSeriesInfiniteQuery({
+	} = useUserActivitiesTvSeriesQuery({
 		userId: userProfile?.id || undefined,
 		filters: {
 			sortBy: sortBy.value,
@@ -123,6 +123,7 @@ const UserCollectionTvSeries = () => {
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,
 		}}
+		maintainVisibleContentPosition={false}
 		keyExtractor={(item) => item.id.toString()}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		refreshing={isRefetching}

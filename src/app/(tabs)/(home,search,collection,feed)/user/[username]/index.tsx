@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import UserAvatar from "@/components/user/UserAvatar";
 import { Icons } from "@/constants/Icons";
-import { useUserActivitiesMovieInfiniteQuery, useUserActivitiesTvSeriesInfiniteQuery, useUserPlaylistsInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -23,8 +22,9 @@ import { ActivityIndicator, Pressable, RefreshControl } from "react-native";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetUser from "@/components/bottom-sheets/sheets/BottomSheetUser";
 import { useCallback, useMemo } from "react";
-import { Keys } from "@/api/keys";
 import Animated from "react-native-reanimated";
+import { authKeys } from "@/api/auth/authKeys";
+import { useUserActivitiesMovieQuery, useUserActivitiesTvSeriesQuery, useUserPlaylistsQuery, useUserProfileQuery } from "@/api/users/usersQueries";
 
 const ProfileHeader = ({
 	profile,
@@ -128,16 +128,16 @@ const ProfileScreen = () => {
 	const loading = isLoading || profile === undefined;
 
 	// Hooks
-	const { data: widgetActivitiesMovie, isLoading: widgetActivitiesMovieLoading } = useUserActivitiesMovieInfiniteQuery({ userId: profile?.id || undefined });
-	const { data: widgetActivitiesTvSeries, isLoading: widgetActivitiesTvSeriesLoading } = useUserActivitiesTvSeriesInfiniteQuery({ userId: profile?.id || undefined });
-	const { data: widgetPlaylists, isLoading: widgetPlaylistsLoading } = useUserPlaylistsInfiniteQuery({ userId: profile?.id || undefined });
+	const { data: widgetActivitiesMovie, isLoading: widgetActivitiesMovieLoading } = useUserActivitiesMovieQuery({ userId: profile?.id, filters: { sortBy: 'watched_date', sortOrder: 'desc' } });
+	const { data: widgetActivitiesTvSeries, isLoading: widgetActivitiesTvSeriesLoading } = useUserActivitiesTvSeriesQuery({ userId: profile?.id, filters: { sortBy: 'watched_date', sortOrder: 'desc' } });
+	const { data: widgetPlaylists, isLoading: widgetPlaylistsLoading } = useUserPlaylistsQuery({ userId: profile?.id, filters: { sortBy: 'updated_at', sortOrder: 'desc' } });
 	const areWidgetsLoading = widgetActivitiesMovieLoading || widgetActivitiesTvSeriesLoading || widgetPlaylistsLoading;
 	const hasActivity = !areWidgetsLoading && (widgetActivitiesMovie?.pages.flat().length || widgetActivitiesTvSeries?.pages.flat().length || widgetPlaylists?.pages.flat().length);
 
 	const refresh = useCallback(() => {
 		refetch();
 		profile?.id === session?.user.id && queryClient.invalidateQueries({
-			queryKey: Keys.auth.user()
+			queryKey: authKeys.user()
 		});
 	}, [refetch, profile?.id, session?.user.id, queryClient]);
 

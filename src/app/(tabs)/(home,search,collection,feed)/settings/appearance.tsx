@@ -14,7 +14,7 @@ import { supportedLocales } from "@/translations/locales";
 import { useLocaleContext } from "@/providers/LocaleProvider";
 import { Picker } from '@react-native-picker/picker';
 import useLocalizedLanguageName from "@/hooks/useLocalizedLanguageName";
-import { useUserUpdateMutation } from "@/features/user/userMutations";
+import { useUserUpdateMutation } from "@/api/users/usersMutations";
 import { useAuth } from "@/providers/AuthProvider";
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
@@ -32,9 +32,7 @@ const SettingsAppearanceScreen = () => {
 	const t = useTranslations();
 	const [ isLoading, setIsLoading ] = useState(false);
 	const locales = useLocalizedLanguageName(locale);
-	const { mutateAsync: updateUser } = useUserUpdateMutation({
-		userId: session?.user.id
-	})
+	const { mutateAsync: updateUser } = useUserUpdateMutation()
 
 	// Form
 	const profileFormSchema = z.object({

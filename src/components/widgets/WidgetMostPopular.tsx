@@ -7,8 +7,7 @@ import { CardMovie } from "../cards/CardMovie";
 import { CardTvSeries } from "../cards/CardTvSeries";
 import { GAP, WIDTH_CARD_XS } from "@/theme/globals";
 import { Text } from "../ui/text";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useWidgetMostPopularOptions } from "@/api/options";
+import { useWidgetMostPopularQuery } from "@/api/widget/widgetQueries";
 
 interface WidgetMostPopularProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -27,7 +26,7 @@ export const WidgetMostPopular = ({
     data,
     hasNextPage,
     fetchNextPage,
-  } = useInfiniteQuery(useWidgetMostPopularOptions());
+  } = useWidgetMostPopularQuery();
   const medias = data?.pages.flat() || [];
 
   if (!medias.length) {

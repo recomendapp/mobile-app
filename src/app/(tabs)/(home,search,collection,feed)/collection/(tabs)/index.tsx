@@ -1,7 +1,6 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import useCollectionStaticRoutes from "@/components/collection/useCollectionStaticRoutes";
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserPlaylistsInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Link } from "expo-router";
 import { useWindowDimensions, View } from "react-native";
@@ -10,6 +9,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Text } from "@/components/ui/text";
 import { useCallback, useMemo } from "react";
+import { useUserPlaylistsQuery } from "@/api/users/usersQueries";
 
 const CollectionScreen = () => {
 	const { user } = useAuth();
@@ -21,8 +21,12 @@ const CollectionScreen = () => {
 		fetchNextPage,
 		refetch,
 		hasNextPage,
-	} = useUserPlaylistsInfiniteQuery({
+	} = useUserPlaylistsQuery({
 		userId: user?.id,
+		filters: {
+			sortBy: 'updated_at',
+			sortOrder: 'desc',
+		}
 	});
 
 	const combinedItems = useMemo(() => [
@@ -69,6 +73,7 @@ const CollectionScreen = () => {
 		keyExtractor={(item) => (
 			item.type === 'static' ? `static-${item.label}` : item.id.toString()
 		)}
+		maintainVisibleContentPosition={false}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		onEndReachedThreshold={0.3}
 		nestedScrollEnabled

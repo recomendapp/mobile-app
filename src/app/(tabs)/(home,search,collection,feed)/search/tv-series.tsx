@@ -1,4 +1,4 @@
-import { useSearchTvSeriesOptions } from "@/api/options";
+import { useSearchTvSeriesQuery } from "@/api/search/searchQueries";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import ErrorMessage from "@/components/ErrorMessage";
 import { Text } from "@/components/ui/text";
@@ -13,7 +13,6 @@ import { LegendList, LegendListRef } from "@legendapp/list";
 import { TrueSheet as RNTrueSheet } from "@lodev09/react-native-true-sheet";
 import { useScrollToTop } from "@react-navigation/native";
 import { MediaTvSeries } from "@recomendapp/types";
-import { useInfiniteQuery } from "@tanstack/react-query";
 // import { useNavigation } from "expo-router";
 import { upperFirst } from "lodash";
 import { useRef, forwardRef } from "react";
@@ -92,9 +91,9 @@ const SearchTvSeriesScreen = () => {
 		fetchNextPage,
 		refetch,
 		isRefetching,
-	} = useInfiniteQuery(useSearchTvSeriesOptions({
+	} = useSearchTvSeriesQuery({
 		query: search,
-	}));
+	});
 	
 	// REFs
 	const scrollRef = useRef<LegendListRef>(null);

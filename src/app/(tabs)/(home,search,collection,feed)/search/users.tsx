@@ -1,4 +1,4 @@
-import { useSearchUsersOptions } from "@/api/options";
+import { useSearchUsersQuery } from "@/api/search/searchQueries";
 import { CardUser } from "@/components/cards/CardUser";
 import ErrorMessage from "@/components/ErrorMessage";
 import { Text } from "@/components/ui/text";
@@ -10,7 +10,6 @@ import useSearchStore from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList, LegendListRef } from "@legendapp/list";
 import { useScrollToTop } from "@react-navigation/native";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { upperFirst } from "lodash";
 import { useRef } from "react";
 import { useKeyboardState } from "react-native-keyboard-controller";
@@ -36,9 +35,9 @@ const SearchUsersScreen = () => {
 		fetchNextPage,
 		refetch,
 		isRefetching,
-	} = useInfiniteQuery(useSearchUsersOptions({
+	} = useSearchUsersQuery({
 		query: search,
-	}));
+	});
 	
 	// REFs
 	const scrollRef = useRef<LegendListRef>(null);

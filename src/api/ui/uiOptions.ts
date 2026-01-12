@@ -1,16 +1,19 @@
 import { queryOptions } from "@tanstack/react-query"
-import { Keys } from "../keys"
-import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { File, Directory, Paths } from 'expo-file-system';
 import { logger } from "@/logger";
+import { uiKeys } from "./uiKeys";
+import { SupabaseClient } from "@/lib/supabase/client";
 
 const UI_DIRECTORY = new Directory(Paths.cache, 'ui');
 const UI_BACKGROUND_DIRECTORY = new Directory(UI_DIRECTORY, 'backgrounds');
 
-export const useUIBackgroundsOptions = () => {
-	const supabase = useSupabaseClient();
+export const uiBackgroundsOptions = ({
+	supabase,
+} : {
+	supabase: SupabaseClient,
+}) => {
 	return queryOptions({
-		queryKey: Keys.ui.backgrounds(),
+		queryKey: uiKeys.backgrounds(),
 		queryFn: async () => {
 			const { data, error } = await supabase
 				.rpc('get_ui_backgrounds');

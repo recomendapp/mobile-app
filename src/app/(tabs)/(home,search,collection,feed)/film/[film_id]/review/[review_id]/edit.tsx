@@ -1,15 +1,15 @@
 import ReviewForm from "@/components/screens/review/ReviewForm";
 import { Icons } from "@/constants/Icons";
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserReviewMovieQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native"
-import { useUserReviewMovieUpsertMutation } from "@/features/user/userMutations";
+import { useUserReviewMovieUpsertMutation } from "@/api/users/usersMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
 import { useCallback } from "react";
+import { useUserReviewMovieQuery } from "@/api/users/usersQueries";
 
 const ReviewMovieEditScreen = () => {
 	const { session }	= useAuth();

@@ -1,5 +1,3 @@
-import { useAuth } from "@/providers/AuthProvider";
-import { useUserFeedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { upperFirst } from "lodash";
 import { LegendList, LegendListRef } from "@legendapp/list";
@@ -17,9 +15,9 @@ import { CardFeedReviewTvSeriesLike } from "@/components/cards/feed/CardFeedRevi
 import { useScrollToTop } from "@react-navigation/native";
 import { useCallback, useMemo, useRef } from "react";
 import { Icons } from "@/constants/Icons";
+import { useUserMyFeedQuery } from "@/api/users/usersQueries";
 
 const FeedScreen = () => {
-	const { user } = useAuth();
 	const t = useTranslations();
 	const { bottomOffset, tabBarHeight, colors } = useTheme();
 	const {
@@ -28,8 +26,11 @@ const FeedScreen = () => {
 		fetchNextPage,
 		hasNextPage,
 		refetch,
-	} = useUserFeedInfiniteQuery({
-		userId: user?.id,
+	} = useUserMyFeedQuery({
+		filters: {
+			sortBy: 'created_at',
+			sortOrder: 'desc',
+		}
 	});
 	const loading = isLoading || data === undefined;
 	const feed = useMemo(() => data?.pages.flat() || [], [data]);

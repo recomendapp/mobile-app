@@ -1,5 +1,5 @@
+import { useUserFollowersQuery, useUserProfileQuery } from "@/api/users/usersQueries";
 import { CardUser } from "@/components/cards/CardUser";
-import { useUserFollowersInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries";
 import { useTheme } from "@/providers/ThemeProvider";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
@@ -17,7 +17,7 @@ const ProfileFollowersScreen = () => {
 		hasNextPage,
 		fetchNextPage,
 		refetch,
-	} = useUserFollowersInfiniteQuery({
+	} = useUserFollowersQuery({
 		userId: profile?.id || undefined,
 	});
 	const followers = useMemo(() => data?.pages.flat() || [], [data]);

@@ -24,9 +24,8 @@ import { useToast } from '@/components/Toast';
 import { logger } from '@/logger';
 import { LoopCarousel } from '@/components/ui/LoopCarousel';
 import { Image } from 'expo-image';
-import { useUIBackgroundsOptions } from '@/api/options';
-import { useQuery } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useUIBackgroundsQuery } from '@/api/ui/uiQueries';
 
 const LoginOtpScreen = () => {
 	const supabase = useSupabaseClient();
@@ -46,7 +45,7 @@ const LoginOtpScreen = () => {
 
 	const {
 		data: backgrounds,
-	} = useQuery(useUIBackgroundsOptions());
+	} = useUIBackgroundsQuery();
 
 	/* ------------------------------- FORM SCHEMA ------------------------------ */
 	const forgotPasswordSchema = z.object({

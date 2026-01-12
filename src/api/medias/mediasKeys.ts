@@ -99,6 +99,13 @@ export const mediasKeys = {
 	/* -------------------------------------------------------------------------- */
 
 	/* -------------------------------- FOLLOWERS ------------------------------- */
+	followersAverageRatings: ({
+		id,
+		type,
+	} : {
+		id: number;
+		type: 'movie' | 'tv_series';
+	}) => [...mediasKeys.details({ id, type }), 'followersAverageRatings'] as const,
 	followersAverageRating: ({
 		id,
 		type,

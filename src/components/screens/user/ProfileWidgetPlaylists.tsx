@@ -1,7 +1,6 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { Text } from "@/components/ui/text";
 import { Icons } from "@/constants/Icons";
-import { useUserPlaylistsInfiniteQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Profile } from "@recomendapp/types";
@@ -10,6 +9,7 @@ import { Link } from "expo-router";
 import { upperFirst } from "lodash";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { useTranslations } from "use-intl";
+import { useUserPlaylistsQuery } from "@/api/users/usersQueries";
 
 interface ProfileWidgetPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
 	profile: Profile;
@@ -30,8 +30,12 @@ const ProfileWidgetPlaylists = ({
 	  fetchNextPage,
 	  isFetching,
 	  hasNextPage,
-	} = useUserPlaylistsInfiniteQuery({
+	} = useUserPlaylistsQuery({
 	  userId: profile?.id ?? undefined,
+	  filters: {
+		sortBy: 'updated_at',
+		sortOrder: 'desc',
+	  }
 	});
 
 	if (!playlists?.pages.flat().length) return null;

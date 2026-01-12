@@ -1,7 +1,6 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
-import { useUserPlaylistsInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -13,6 +12,7 @@ import { Text, useWindowDimensions, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { PADDING_VERTICAL } from "@/theme/globals";
+import { useUserPlaylistsQuery, useUserProfileQuery } from "@/api/users/usersQueries";
 
 interface sortBy {
 	label: string;
@@ -41,7 +41,7 @@ const UserPlaylistsScreen = () => {
 		hasNextPage,
 		isRefetching,
 		refetch,
-	} = useUserPlaylistsInfiniteQuery({
+	} = useUserPlaylistsQuery({
 		userId: data?.id,
 		filters: {
 			sortBy: sortBy.value,
@@ -126,6 +126,7 @@ const UserPlaylistsScreen = () => {
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight
 		}}
+		maintainVisibleContentPosition={false}
 		keyExtractor={(item) => item.id.toString()}
 		columnWrapperStyle={tw`gap-2`}
 		refreshing={isRefetching}

@@ -10,17 +10,15 @@ import useSearchStore from "@/stores/useSearchStore";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList, LegendListRef } from "@legendapp/list";
 import { useScrollToTop } from "@react-navigation/native";
-// import { useNavigation } from "expo-router";
 import { upperFirst } from "lodash";
 import { useRef, forwardRef } from "react";
 import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 import { MediaMovie } from "@recomendapp/types";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useSearchMoviesOptions } from "@/api/options";
 import ErrorMessage from "@/components/ErrorMessage";
 import { useKeyboardState } from "react-native-keyboard-controller";
+import { useSearchMoviesQuery } from "@/api/search/searchQueries";
 
 const FiltersSheet = forwardRef<RNTrueSheet>((_, ref) => {
 	const insets = useSafeAreaInsets();
@@ -80,9 +78,9 @@ const SearchFilmsScreen = () => {
 		fetchNextPage,
 		refetch,
 		isRefetching,
-	} = useInfiniteQuery(useSearchMoviesOptions({
+	} = useSearchMoviesQuery({
 		query: search,
-	}));
+	});
 	
 	// REFs
 	const scrollRef = useRef<LegendListRef>(null);

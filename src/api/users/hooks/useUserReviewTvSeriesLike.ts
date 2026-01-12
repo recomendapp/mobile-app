@@ -1,14 +1,11 @@
 import { useAuth } from "@/providers/AuthProvider"
-import { useQuery } from "@tanstack/react-query"
-import {
-	useUserReviewTvSeriesLikeOptions,
-} from "@/api/users/usersOptions"
 import {
 useUserReviewTvSeriesLikeInsertMutation,
 useUserReviewTvSeriesLikeDeleteMutation,
 } from "@/api/users/usersMutations"
 import * as Haptics from 'expo-haptics'
 import { useCallback, useMemo } from "react"
+import { useUserReviewTvSeriesLikeQuery } from "../usersQueries"
 
 export const useUserReviewTvSeriesLike = ({
 	reviewId,
@@ -17,10 +14,10 @@ export const useUserReviewTvSeriesLike = ({
 }) => {
 	const { session } = useAuth()
 
-	const { data: isLiked, isLoading } = useQuery(useUserReviewTvSeriesLikeOptions({
+	const { data: isLiked, isLoading } = useUserReviewTvSeriesLikeQuery({
 		userId: session?.user.id,
 		reviewId,
-	}))
+	});
 
 	const { mutate: insertLike, isPending: isInserting } = useUserReviewTvSeriesLikeInsertMutation()
 	const { mutate: deleteLike, isPending: isDeleting } = useUserReviewTvSeriesLikeDeleteMutation()

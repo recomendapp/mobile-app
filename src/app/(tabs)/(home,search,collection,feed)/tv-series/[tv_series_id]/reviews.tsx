@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import { CardReviewTvSeries } from "@/components/cards/reviews/CardReviewTvSeries";
 import { UserReviewTvSeries } from "@recomendapp/types";
-import { useUserActivityTvSeriesQuery } from "@/features/user/userQueries";
 import { useAuth } from "@/providers/AuthProvider";
 import { useMediaTvSeriesDetailsQuery, useMediaTvSeriesReviewsQuery } from "@/api/medias/mediaQueries";
+import { useUserActivityTvSeriesQuery } from "@/api/users/usersQueries";
 
 interface sortBy {
 	label: string;
@@ -159,6 +159,7 @@ const TvSeriesReviews = () => {
 				paddingBottom: bottomOffset + PADDING_VERTICAL,
 				gap: GAP,
 		}}
+		maintainVisibleContentPosition={false}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={useCallback((item: UserReviewTvSeries) => item.id.toString(), [])}
 		refreshing={isRefetching}

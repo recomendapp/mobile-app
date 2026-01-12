@@ -17,12 +17,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { upperFirst } from 'lodash';
 import { useTranslations } from 'use-intl';
 import SliderRange, { SliderRangeRef } from '@/components/ui/SliderRange';
-import { useQuery } from '@tanstack/react-query';
-import { useExploreTileOptions } from '@/api/options';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { MediaMovie } from '@recomendapp/types';
 import { useAuth } from '@/providers/AuthProvider';
 import Switch from '@/components/ui/Switch';
+import { useExploreTileQuery } from '@/api/explore/exploreQueries';
 
 interface FiltersBottomSheetProps {
   index: SharedValue<number>;
@@ -45,7 +44,7 @@ export const FiltersBottomSheet = forwardRef<
   const runtimeRangeRef = useRef<SliderRangeRef>(null);
   const releaseDateRangeRef = useRef<SliderRangeRef>(null);
 
-  const { data: tile } = useQuery(useExploreTileOptions({ exploreId: 1 }));
+  const { data: tile } = useExploreTileQuery({ exploreId: 1 });
 
   // States
   const [isOpen, setIsOpen] = useState(false);

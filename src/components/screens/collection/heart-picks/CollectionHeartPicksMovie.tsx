@@ -7,8 +7,7 @@ import CollectionScreen, { CollectionAction, SortByOption } from "@/components/c
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import { useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
-import { useUserHeartPicksMovieQuery } from "@/features/user/userQueries";
+import { useUserActivityMovieUpdateMutation } from "@/api/users/usersMutations";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { useToast } from "@/components/Toast";
@@ -16,6 +15,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { useUIStore } from "@/stores/useUIStore";
 import { SharedValue } from "react-native-reanimated";
+import { useUserHeartPicksMovieQuery } from "@/api/users/usersQueries";
 
 interface CollectionHeartPicksMovieProps {
 	scrollY?: SharedValue<number>;

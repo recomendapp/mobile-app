@@ -18,4 +18,13 @@ export const widgetKeys = {
 			perPage?: number,
 		}
 	} = {}) => filters ? withPersistKey([...widgetKeys.base, 'most-popular', filters]) : withPersistKey([...widgetKeys.base, 'most-popular']),
+
+	users: ({
+		filters,
+	} : {
+		filters?: {
+			sortBy?: 'created_at' | 'followers_count',
+			sortOrder?: 'asc' | 'desc',
+		}
+	} = {}) => filters ? [...widgetKeys.base, 'users', filters] as const : [...widgetKeys.base, 'users'] as const,
 };

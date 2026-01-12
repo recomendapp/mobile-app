@@ -15,15 +15,22 @@ import { PlaylistTvSeries } from "@/components/screens/playlist/PlaylistTvSeries
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { usePlaylistDetailsQuery } from "@/api/playlists/playlistsQueries";
+import { useUserPlaylistLike } from "@/api/users/hooks/useUserPlaylistLike";
+import { useTheme } from "@/providers/ThemeProvider";
+import { useUserPlaylistSaved } from "@/api/users/hooks/useUserPlaylistSaved";
 
 const PlaylistScreen = () => {
 	const t = useTranslations();
+	const { colors } = useTheme();
 	const { playlist_id } = useLocalSearchParams();
 	const playlistId = Number(playlist_id) || undefined;
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const { data: playlist } = usePlaylistDetailsQuery({
 		playlistId: playlistId,
 	});
+
+	const { isLiked, toggle: toggleLike } = useUserPlaylistLike({ playlistId });
+	const { isSaved, toggle: toggleSaved } = useUserPlaylistSaved({ playlistId });
 
 	// SharedValues
 	const scrollY = useSharedValue(0);
@@ -49,6 +56,26 @@ const PlaylistScreen = () => {
 				</View>
 			) : undefined,
 			unstable_headerRightItems: (props) => [
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.like')),
+					onPress: toggleLike,
+					icon: {
+						name: isLiked ? "heart.fill" : "heart",
+						type: "sfSymbol",
+					},
+					tintColor: isLiked ? colors.accentPink : undefined,
+				},
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.save')),
+					onPress: toggleSaved,
+					icon: {
+						name: isSaved ? "bookmark.fill" : "bookmark",
+						type: "sfSymbol",
+					},
+					tintColor: isSaved ? colors.foreground : undefined,
+				},
 				{
 					type: "button",
 					label: upperFirst(t('common.messages.menu')),

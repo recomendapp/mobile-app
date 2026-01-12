@@ -1,6 +1,6 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useUserDeleteRequestDeleteMutation, useUserDeleteRequestInsertMutation, useUserUpdateMutation } from "@/features/user/userMutations";
+import { useUserDeleteRequestDeleteMutation, useUserDeleteRequestInsertMutation, useUserUpdateMutation } from "@/api/users/usersMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useState } from "react";
@@ -22,12 +22,12 @@ import Switch from "@/components/ui/Switch";
 import { GridView } from "@/components/ui/GridView";
 import richTextToPlainString from "@/utils/richTextToPlainString";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import { useUserDeleteRequestQuery } from "@/features/user/userQueries";
 import { Separator } from "@/components/ui/separator";
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 import { useToast } from "@/components/Toast";
+import { useUserDeleteRequestQuery } from "@/api/users/usersQueries";
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -38,9 +38,7 @@ const SettingsAccountScreen = () => {
 	const t = useTranslations();
 	const toast = useToast();
 	const { colors, bottomOffset, tabBarHeight } = useTheme();
-	const { mutateAsync: updateProfileMutation} = useUserUpdateMutation({
-		userId: user?.id,
-	});
+	const { mutateAsync: updateProfileMutation} = useUserUpdateMutation();
 	const { showActionSheetWithOptions } = useActionSheet();
 	const [ hasUnsavedChanges, setHasUnsavedChanges ] = useState(false);
 	const [ isLoading, setIsLoading ] = useState(false);
@@ -116,7 +114,7 @@ const SettingsAccountScreen = () => {
 			) {
 				await updateProfileMutation({
 					username: values.username,
-					privateAccount: values.private,
+					private: values.private,
 				});
 			}
 			if (values.email && values.email !== session?.user.email) {

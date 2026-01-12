@@ -1,6 +1,5 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserPlaylistsSavedInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Text, useWindowDimensions, View } from "react-native";
 import { LegendList } from "@legendapp/list";
@@ -11,6 +10,7 @@ import { useTranslations } from "use-intl";
 import { Playlist } from "@recomendapp/types";
 import { useCallback, useMemo } from "react";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
+import { useUserPlaylistsSavedQuery } from "@/api/users/usersQueries";
 
 const CollectionSavedScreen = () => {
 	const { user } = useAuth();
@@ -23,7 +23,7 @@ const CollectionSavedScreen = () => {
 		fetchNextPage,
 		refetch,
 		hasNextPage,
-	} = useUserPlaylistsSavedInfiniteQuery({
+	} = useUserPlaylistsSavedQuery({
 		userId: user?.id,
 	});
 	const loading = isLoading || data === undefined;
@@ -60,6 +60,7 @@ const CollectionSavedScreen = () => {
 			paddingHorizontal: PADDING_HORIZONTAL,
 			paddingBottom: bottomOffset + PADDING_VERTICAL,
 		}}
+		maintainVisibleContentPosition={false}
 		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		keyExtractor={keyExtractor}
 		onEndReached={onEndReached}

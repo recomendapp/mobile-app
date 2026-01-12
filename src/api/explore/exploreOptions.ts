@@ -1,18 +1,19 @@
-import { useSupabaseClient } from '@/providers/SupabaseProvider';
 import { queryOptions } from '@tanstack/react-query'
-import { Keys } from '../keys';
-import { useLocale } from 'use-intl';
 import { ExploreTile } from '@recomendapp/types';
+import { exploreKeys } from './exploreKeys';
+import { SupabaseClient } from '@/lib/supabase/client';
 
-export const useExploreTileMetaOptions = ({
+export const exploreTileMetaOptions = ({
+	supabase,
+	locale,
 	exploreId,
 } : {
+	supabase: SupabaseClient;
+	locale: string;
 	exploreId: number;
 }) => {
-	const supabase = useSupabaseClient();
-	const locale = useLocale();
 	return queryOptions({
-		queryKey: Keys.explore.tileMeta({
+		queryKey: exploreKeys.tileMeta({
 			exploreId: exploreId,
 			locale: locale,
 		}),
@@ -28,15 +29,17 @@ export const useExploreTileMetaOptions = ({
 	})
 };
 
-export const useExploreTileOptions = ({
+export const exploreTileOptions = ({
+	supabase,
+	locale,
 	exploreId,
 } : {
+	supabase: SupabaseClient;
+	locale: string;
 	exploreId: number;
 }) => {
-	const supabase = useSupabaseClient();
-	const locale = useLocale();
 	return queryOptions({
-		queryKey: Keys.explore.tile({
+		queryKey: exploreKeys.tile({
 			exploreId: exploreId,
 			locale: locale,
 		}),

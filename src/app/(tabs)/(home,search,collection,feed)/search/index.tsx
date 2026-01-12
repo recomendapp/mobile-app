@@ -21,12 +21,11 @@ import { useRef } from "react";
 import { useWindowDimensions, ScrollView, RefreshControl } from "react-native";
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { useTranslations } from "use-intl";
-import { useQuery } from "@tanstack/react-query";
-import { useSearchMultiOptions } from "@/api/options";
 import { BestResultItem } from "@recomendapp/api-js";
 import ErrorMessage from "@/components/ErrorMessage";
 import { KeyboardAwareScrollViewRef, useKeyboardState } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSearchMultiQuery } from "@/api/search/searchQueries";
 
 const SearchScreen = () => {
 	const search = useSearchStore(state => state.search);
@@ -58,9 +57,9 @@ export const SearchResults = ({ search, ...props } : SearchResultsProps) => {
 		isError,
 		refetch,
 		isRefetching,
-	} = useQuery(useSearchMultiOptions({
+	} = useSearchMultiQuery({
 		query: search,
-	}));
+	});
 	
 	const loading = data === undefined || isLoading;
 	const scrollRef = useRef<KeyboardAwareScrollViewRef>(null);

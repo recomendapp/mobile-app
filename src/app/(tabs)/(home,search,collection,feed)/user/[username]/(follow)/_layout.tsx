@@ -1,5 +1,4 @@
 import { View } from "@/components/ui/view";
-import { useUserProfileQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationEventMap, MaterialTopTabNavigationOptions } from "@react-navigation/material-top-tabs";
@@ -9,6 +8,7 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { Icons } from "@/constants/Icons";
+import { useUserProfileQuery } from "@/api/users/usersQueries";
 
 const Tab = createMaterialTopTabNavigator();
 

@@ -1,8 +1,7 @@
 import { Alert } from "react-native";
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
-import { useUserActivityMovieDeleteMutation, useUserActivityMovieInsertMutation } from "@/features/user/userMutations";
+import { useUserActivityMovieDeleteMutation, useUserActivityMovieInsertMutation } from "@/api/users/usersMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaMovie } from "@recomendapp/types";
 import { upperFirst } from "lodash";
@@ -12,6 +11,7 @@ import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/Toast";
 import { forwardRef, useCallback } from "react";
+import { useUserActivityMovieQuery } from "@/api/users/usersQueries";
 
 interface ButtonUserActivityMovieWatchProps
 	extends React.ComponentProps<typeof Button> {

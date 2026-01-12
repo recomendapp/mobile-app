@@ -1,7 +1,6 @@
 
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
-import { useUserActivitiesTvSeriesInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -15,6 +14,7 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { FadeInDown } from "react-native-reanimated";
 import { UserActivityTvSeries } from "@recomendapp/types";
+import { useUserActivitiesTvSeriesQuery, useUserProfileQuery } from "@/api/users/usersQueries";
 
 interface sortBy {
 	label: string;
@@ -42,7 +42,7 @@ const UserCollectionTvSeries = () => {
 		hasNextPage,
 		isRefetching,
 		refetch,
-	} = useUserActivitiesTvSeriesInfiniteQuery({
+	} = useUserActivitiesTvSeriesQuery({
 		userId: profile?.id || undefined,
 		filters: {
 			sortBy: sortBy.value,

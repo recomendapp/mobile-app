@@ -1,5 +1,4 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { userKeys } from "../../features/user/userKeys";
 import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Database, Playlist, PlaylistItemMovie, PlaylistItemTvSeries } from "@recomendapp/types";
 import { useAuth } from "@/providers/AuthProvider";
@@ -11,6 +10,7 @@ import { randomUUID } from "expo-crypto";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import { ImagePickerAsset } from "expo-image-picker";
 import { decode } from "base64-arraybuffer";
+import { usersKeys } from "../users/usersKeys";
 
 /**
  * Creates a new playlist
@@ -84,7 +84,7 @@ export const usePlaylistInsertMutation = () => {
 		},
 		onSuccess: (data) => {
 			queryClient.invalidateQueries({
-				queryKey: userKeys.playlists({
+				queryKey: usersKeys.playlists({
 					userId: data.user_id
 				}),
 			});
@@ -158,7 +158,7 @@ export const usePlaylistUpdateMutation = () => {
 
 			// Update playlists users
 			if (session) {
-				const baseKey = userKeys.playlists({ userId: session?.user.id });
+				const baseKey = usersKeys.playlists({ userId: session?.user.id });
 				const playlistsQueries = queryClient.getQueriesData<InfiniteData<Playlist[] | undefined>>({
 					predicate: (query) => {
 						const key = query.queryKey
@@ -219,7 +219,7 @@ export const usePlaylistDeleteMutation = () => {
 			queryClient.setQueryData(playlistsKeys.details({ playlistId: data.id }), null);
 			// Update playlists users
 			if (session) {
-				const baseKey = userKeys.playlists({ userId: session?.user.id });
+				const baseKey = usersKeys.playlists({ userId: session?.user.id });
 				const playlistsQueries = queryClient.getQueriesData<InfiniteData<Playlist[] | undefined>>({
 					predicate: (query) => {
 						const key = query.queryKey
@@ -536,7 +536,7 @@ export const usePlaylistMovieInsertMutation = ({
 			});
 			// Update playlists users
 			if (session) {
-				const baseKey = userKeys.playlists({ userId: session?.user.id });
+				const baseKey = usersKeys.playlists({ userId: session?.user.id });
 				const playlistsQueries = queryClient.getQueriesData<InfiniteData<Playlist[] | undefined>>({
 					predicate: (query) => {
 						const key = query.queryKey
@@ -643,7 +643,7 @@ export const usePlaylistMovieDeleteMutation = () => {
 
 			// Update user playlists
 			if (session) {
-				const baseKey = userKeys.playlists({ userId: session?.user.id });
+				const baseKey = usersKeys.playlists({ userId: session?.user.id });
 				const playlistsQueries = queryClient.getQueriesData<InfiniteData<Playlist[] | undefined>>({
 					predicate: (query) => {
 						const key = query.queryKey
@@ -795,7 +795,7 @@ export const usePlaylistTvSeriesInsertMutation = ({
 
 			// Update playlists users
 			if (session) {
-				const baseKey = userKeys.playlists({ userId: session?.user.id });
+				const baseKey = usersKeys.playlists({ userId: session?.user.id });
 				const playlistsQueries = queryClient.getQueriesData<InfiniteData<Playlist[] | undefined>>({
 					predicate: (query) => {
 						const key = query.queryKey
@@ -902,7 +902,7 @@ export const usePlaylistTvSeriesDeleteMutation = () => {
 
 			// Update user playlists
 			if (session) {
-				const baseKey = userKeys.playlists({ userId: session?.user.id });
+				const baseKey = usersKeys.playlists({ userId: session?.user.id });
 				const playlistsQueries = queryClient.getQueriesData<InfiniteData<Playlist[] | undefined>>({
 					predicate: (query) => {
 						const key = query.queryKey

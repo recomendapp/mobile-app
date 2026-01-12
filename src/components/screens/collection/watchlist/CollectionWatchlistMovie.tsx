@@ -7,8 +7,7 @@ import CollectionScreen, { CollectionAction, SortByOption } from "@/components/c
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import { useUserWatchlistMovieDeleteMutation } from "@/features/user/userMutations";
-import { useUserWatchlistMoviesQuery } from "@/features/user/userQueries";
+import { useUserWatchlistMovieDeleteMutation } from "@/api/users/usersMutations";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { useUIStore } from "@/stores/useUIStore";
@@ -17,6 +16,7 @@ import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { SharedValue } from "react-native-reanimated";
+import { useUserWatchlistMovieQuery } from "@/api/users/usersQueries";
 
 interface CollectionWatchlistMovieProps {
 	scrollY?: SharedValue<number>;
@@ -34,7 +34,7 @@ export const CollectionWatchlistMovie = ({
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.watchlist.view);
 	const setWatchlistView = useUIStore((state) => state.setWatchlistView);
-    const queryData = useUserWatchlistMoviesQuery({
+    const queryData = useUserWatchlistMovieQuery({
 		userId: user?.id,
     });
 	const screenTitle = upperFirst(t('common.messages.watchlist'));

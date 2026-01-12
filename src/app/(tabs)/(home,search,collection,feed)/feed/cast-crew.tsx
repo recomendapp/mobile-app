@@ -1,4 +1,5 @@
-import { useUIBackgroundsOptions } from "@/api/options";
+import { useUIBackgroundsQuery } from "@/api/ui/uiQueries";
+import { useUserFeedCastCrewQuery } from "@/api/users/usersQueries";
 import { CardFeedCastCrewMovie } from "@/components/cards/feed/CardFeedCastCrewMovie";
 import { CardFeedCastCrewTvSeries } from "@/components/cards/feed/CardFeedCastCrewTvSeries";
 import { Button } from "@/components/ui/Button";
@@ -7,14 +8,12 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import app from "@/constants/app";
 import { Icons } from "@/constants/Icons";
-import { useUserFeedCastCrewInfiniteQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import { BORDER_RADIUS, GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { Database } from "@recomendapp/types";
-import { useQuery } from "@tanstack/react-query";
 import Color from "color";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -30,16 +29,14 @@ const CastCrewFeedScreen = () => {
 	const { session, customerInfo } = useAuth();
 	const {
 		data: backgrounds,
-	} = useQuery(useUIBackgroundsOptions());
+	} = useUIBackgroundsQuery();
 	const {
 		data,
 		isLoading,
 		fetchNextPage,
 		hasNextPage,
 		refetch,
-	} = useUserFeedCastCrewInfiniteQuery({
-		userId: !!customerInfo?.entitlements.active['premium'] ? session?.user.id : undefined,
-	});
+	} = useUserFeedCastCrewQuery();
 	const loading = isLoading || data === undefined;
 	const feed = useMemo(() => data?.pages.flat() || [], [data]);
 	// Render

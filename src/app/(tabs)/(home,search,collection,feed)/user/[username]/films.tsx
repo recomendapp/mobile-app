@@ -1,7 +1,6 @@
 
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
-import { useUserActivitiesMovieInfiniteQuery, useUserProfileQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useActionSheet } from "@expo/react-native-action-sheet";
@@ -14,6 +13,7 @@ import { useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardMovie } from "@/components/cards/CardMovie";
 import { HeaderTitle } from "@react-navigation/elements";
+import { useUserActivitiesMovieQuery, useUserProfileQuery } from "@/api/users/usersQueries";
 
 interface sortBy {
 	label: string;
@@ -41,7 +41,7 @@ const UserCollectionMovieScreen = () => {
 		hasNextPage,
 		isRefetching,
 		refetch,
-	} = useUserActivitiesMovieInfiniteQuery({
+	} = useUserActivitiesMovieQuery({
 		userId: userProfile?.id || undefined,
 		filters: {
 			sortBy: sortBy.value,
@@ -79,7 +79,7 @@ const UserCollectionMovieScreen = () => {
 		renderItem={({ item }) => (
 			<CardMovie
 			variant="poster"
-			movie={item.movie!}
+			movie={item.movie}
 			profileActivity={item}
 			style={tw`w-full`}
 			/>
@@ -122,6 +122,7 @@ const UserCollectionMovieScreen = () => {
 		scrollIndicatorInsets={{
 			bottom: tabBarHeight,
 		}}
+		maintainVisibleContentPosition={false}
 		keyExtractor={(item) => item.id.toString()}
 		onEndReached={() => hasNextPage && fetchNextPage()}
 		refreshing={isRefetching}

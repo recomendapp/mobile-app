@@ -7,8 +7,7 @@ import CollectionScreen, { CollectionAction, SortByOption } from "@/components/c
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import { useUserActivityTvSeriesUpdateMutation } from "@/features/user/userMutations";
-import { useUserHeartPicksTvSeriesQuery } from "@/features/user/userQueries";
+import { useUserActivityTvSeriesUpdateMutation } from "@/api/users/usersMutations";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useToast } from "@/components/Toast";
@@ -16,6 +15,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { useUIStore } from "@/stores/useUIStore";
 import { SharedValue } from "react-native-reanimated";
+import { useUserHeartPicksTvSeriesQuery } from "@/api/users/usersQueries";
 
 interface CollectionHeartPicksTvSeriesProps {
 	scrollY?: SharedValue<number>;
