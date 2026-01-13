@@ -15,7 +15,7 @@ import { CardReviewTvSeries } from "@/components/cards/reviews/CardReviewTvSerie
 import { UserReviewTvSeries } from "@recomendapp/types";
 import { useAuth } from "@/providers/AuthProvider";
 import { useMediaTvSeriesDetailsQuery, useMediaTvSeriesReviewsQuery } from "@/api/medias/mediaQueries";
-import { useUserActivityTvSeriesQuery } from "@/api/users/usersQueries";
+import { useUserActivityTvSeriesQuery } from "@/api/users/userQueries";
 
 interface sortBy {
 	label: string;

@@ -9,7 +9,7 @@ import { Link } from "expo-router";
 import { upperFirst } from "lodash";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { useTranslations } from "use-intl";
-import { useUserActivitiesTvSeriesQuery } from "@/api/users/usersQueries";
+import { useUserActivitiesTvSeriesQuery } from "@/api/users/userQueries";
 
 interface ProfileWidgetActivitiesTvSeriesProps extends React.ComponentPropsWithoutRef<typeof View> {
 	profile: Profile;

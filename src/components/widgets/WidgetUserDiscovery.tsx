@@ -6,7 +6,7 @@ import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { Text } from "../ui/text";
 import { GAP } from "@/theme/globals";
-import { useWidgetUsersQuery } from "@/api/widget/widgetQueries";
+import { useWidgetUsersQuery } from "@/api/widgets/widgetQueries";
 
 interface WidgetUserDiscoveryProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;

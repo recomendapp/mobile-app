@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
-import { useUserAcceptFollowerRequestMutation, useUserDeclineFollowerRequestMutation } from "@/api/users/usersMutations";
+import { useUserAcceptFollowerRequestMutation, useUserDeclineFollowerRequestMutation } from "@/api/users/userMutations";
 import tw from "@/lib/tw";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
@@ -12,7 +12,7 @@ import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
 import { useCallback, useMemo } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useUserFollowersRequestsQuery } from "@/api/users/usersQueries";
+import { useUserFollowersRequestsQuery } from "@/api/users/userQueries";
 
 const FollowRequestsScreen = () => {
 	const t = useTranslations();

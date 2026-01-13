@@ -13,7 +13,7 @@ import { useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardMovie } from "@/components/cards/CardMovie";
 import { HeaderTitle } from "@react-navigation/elements";
-import { useUserActivitiesMovieQuery, useUserProfileQuery } from "@/api/users/usersQueries";
+import { useUserActivitiesMovieQuery, useUserProfileQuery } from "@/api/users/userQueries";
 
 interface sortBy {
 	label: string;

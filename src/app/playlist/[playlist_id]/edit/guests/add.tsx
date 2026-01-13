@@ -20,7 +20,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
-import { usePlaylistGuestsAddQuery } from "@/api/playlists/playlistsQueries";
+import { usePlaylistGuestsAddQuery } from "@/api/playlists/playlistQueries";
 
 const ModalPlaylistEditGuestsAdd = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();

@@ -1,6 +1,6 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { Icons } from "@/constants/Icons";
-import { useUserWatchlistMovieDeleteMutation, useUserWatchlistMovieInsertMutation } from "@/api/users/usersMutations";
+import { useUserWatchlistMovieDeleteMutation, useUserWatchlistMovieInsertMutation } from "@/api/users/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaMovie } from "@recomendapp/types";
 import { upperFirst } from "lodash";
@@ -12,7 +12,7 @@ import { BottomSheetWatchlistMovieComment } from "@/components/bottom-sheets/she
 import { useToast } from "@/components/Toast";
 import { forwardRef, useCallback } from "react";
 import tw from "@/lib/tw";
-import { useUserWatchlistMovieItemQuery } from "@/api/users/usersQueries";
+import { useUserWatchlistMovieItemQuery } from "@/api/users/userQueries";
 
 interface ButtonUserWatchlistMovieProps
 	extends React.ComponentProps<typeof Button> {

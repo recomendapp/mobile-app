@@ -1,6 +1,6 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { Icons } from "@/constants/Icons";
-import { useUserWatchlistTvSeriesDeleteMutation, useUserWatchlistTvSeriesInsertMutation } from "@/api/users/usersMutations";
+import { useUserWatchlistTvSeriesDeleteMutation, useUserWatchlistTvSeriesInsertMutation } from "@/api/users/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaTvSeries } from "@recomendapp/types";
 import { upperFirst } from "lodash";
@@ -12,7 +12,7 @@ import { BottomSheetWatchlistTvSeriesComment } from "@/components/bottom-sheets/
 import { useToast } from "@/components/Toast";
 import { forwardRef, useCallback } from "react";
 import tw from "@/lib/tw";
-import { useUserWatchlistTvSeriesItemQuery } from "@/api/users/usersQueries";
+import { useUserWatchlistTvSeriesItemQuery } from "@/api/users/userQueries";
 
 interface ButtonUserWatchlistTvSeriesProps
 	extends React.ComponentProps<typeof Button> {

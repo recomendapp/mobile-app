@@ -2,7 +2,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Icons } from "@/constants/Icons";
 import { MediaMovie } from "@recomendapp/types";
 import { Button } from "@/components/ui/Button";
-import { useUserActivityMovieUpdateMutation } from "@/api/users/usersMutations";
+import { useUserActivityMovieUpdateMutation } from "@/api/users/userMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
@@ -11,7 +11,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { forwardRef, useState } from "react";
-import { useUserActivityMovieQuery } from "@/api/users/usersQueries";
+import { useUserActivityMovieQuery } from "@/api/users/userQueries";
 
 interface ButtonUserActivityMovieWatchDateProps
 	extends React.ComponentProps<typeof Button> {

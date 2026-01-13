@@ -8,7 +8,7 @@ import { GAP } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
-import { useNotificationArchiveMutation, useNotificationReadMutation, useNotificationUnarchiveMutation, useNotificationUnreadMutation } from "@/api/notifications/notificationsMutations";
+import { useNotificationArchiveMutation, useNotificationReadMutation, useNotificationUnarchiveMutation, useNotificationUnreadMutation } from "@/api/notifications/notificationMutations";
 import ReusableAppleStyleSwipeableRow from "@/components/ui/swippeable/ReusableAppleStyleSwipeableRow";
 import { useUIStore } from "@/stores/useUIStore";
 import { useTranslations } from "use-intl";
@@ -23,7 +23,7 @@ import { CardNotificationFriendCreated } from "@/components/cards/notifications/
 import { CardNotificationFollowerRequest } from "@/components/cards/notifications/CardNotificationFollowerRequest";
 import { useToast } from "@/components/Toast";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNotificationsQuery } from "@/api/notifications/notificationsQueries";
+import { useNotificationsQuery } from "@/api/notifications/notificationQueries";
 
 const NotificationsScreen = () => {
 	const router = useRouter();

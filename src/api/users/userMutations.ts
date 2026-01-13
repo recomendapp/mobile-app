@@ -1,4 +1,4 @@
-import { userReviewMovieLikeOptions, userReviewTvSeriesLikeOptions, userHeartPicksMovieOptions, userHeartPicksTvSeriesOptions, userWatchlistOptions, userWatchlistMoviesOptions, userWatchlistTvSeriesOptions, userPlaylistLikeOptions, userPlaylistSavedOptions, userProfileOptions } from "./usersOptions";
+import { userReviewMovieLikeOptions, userReviewTvSeriesLikeOptions, userHeartPicksMovieOptions, userHeartPicksTvSeriesOptions, userWatchlistOptions, userWatchlistMoviesOptions, userWatchlistTvSeriesOptions, userPlaylistLikeOptions, userPlaylistSavedOptions, userProfileOptions } from "./userOptions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Database, UserRecosMovieAggregated, UserRecosTvSeriesAggregated } from "@recomendapp/types";
 import { useAuth } from "@/providers/AuthProvider";
@@ -7,9 +7,9 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { randomUUID } from "expo-crypto";
 import { decode } from "base64-arraybuffer";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
-import { usersKeys } from "./usersKeys";
+import { userKeys } from "./userKeys";
 import { useApiClient } from "@/providers/ApiProvider";
-import { mediasKeys } from "../medias/mediasKeys";
+import { mediasKeys } from "../medias/mediaKeys";
 import { authUserOptions } from "../auth/authOptions";
 
 export const useUserUpdateMutation = () => {
@@ -116,22 +116,22 @@ export const useUserFollowProfileInsertMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.followProfile({
+			queryClient.setQueryData(userKeys.followProfile({
 				userId: data.user_id,
 				profileId: data.followee_id,
 			}), data);
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.followers({
+				queryKey: userKeys.followers({
 					userId: data.followee_id,
 				})
 			})
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.followees({
+				queryKey: userKeys.followees({
 					userId: data.user_id,
 				})
 			})
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.myFeed(),
+				queryKey: userKeys.myFeed(),
 			});
 		},
 	});
@@ -160,22 +160,22 @@ export const useUserFollowProfileDeleteMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.followProfile({
+			queryClient.setQueryData(userKeys.followProfile({
 				userId: data.user_id,
 				profileId: data.followee_id,
 			}), null);
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.followers({
+				queryKey: userKeys.followers({
 					userId: data.followee_id,
 				})
 			});
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.followees({
+				queryKey: userKeys.followees({
 					userId: data.user_id,
 				})
 			});
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.myFeed(),
+				queryKey: userKeys.myFeed(),
 			});
 		},
 	});
@@ -204,12 +204,12 @@ export const useUserFollowPersonInsertMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.followPerson({
+			queryClient.setQueryData(userKeys.followPerson({
 				userId: data.user_id,
 				personId: data.person_id,
 			}), data);
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.myFeedCastCrew(),
+				queryKey: userKeys.myFeedCastCrew(),
 			});
 		},
 	});
@@ -238,12 +238,12 @@ export const useUserFollowPersonDeleteMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.followPerson({
+			queryClient.setQueryData(userKeys.followPerson({
 				userId: data.user_id,
 				personId: data.person_id,
 			}), null);
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.myFeedCastCrew(),
+				queryKey: userKeys.myFeedCastCrew(),
 			});
 		},
 	});
@@ -271,17 +271,17 @@ export const useUserAcceptFollowerRequestMutation = () => {
 		},
 		onSuccess: (data) => {
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.followersRequests({
+				queryKey: userKeys.followersRequests({
 					userId: data.followee_id
 				})
 			})
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.followees({
+				queryKey: userKeys.followees({
 					userId: data.user_id,
 				})
 			})
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.followers({
+				queryKey: userKeys.followers({
 					userId: data.followee_id,
 				})
 			});
@@ -309,7 +309,7 @@ export const useUserDeclineFollowerRequestMutation = () => {
 		},
 		onSuccess: (data) => {
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.followersRequests({
+				queryKey: userKeys.followersRequests({
 					userId: data.followee_id
 				})
 			})
@@ -348,14 +348,14 @@ export const useUserActivityMovieInsertMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.activity({
+			queryClient.setQueryData(userKeys.activity({
 				id: data.movie_id,
 				type: 'movie',
 				userId: data.user_id,
 			}), data);
 
 			// Watchlist
-			queryClient.setQueryData(usersKeys.watchlistItem({
+			queryClient.setQueryData(userKeys.watchlistItem({
 				id: data.movie_id,
 				type: 'movie',
 				userId: data.user_id,
@@ -364,14 +364,14 @@ export const useUserActivityMovieInsertMutation = () => {
 			// Heart picks
 			if (data.is_liked) {
 				queryClient.invalidateQueries({
-					queryKey: usersKeys.heartPicks({
+					queryKey: userKeys.heartPicks({
 						userId: data.user_id,
 						type: 'movie',
 					})
 				});
 			}
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.myFeed(),
+				queryKey: userKeys.myFeed(),
 			})
 		}
 	});
@@ -395,7 +395,7 @@ export const useUserActivityMovieDeleteMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.activity({
+			queryClient.setQueryData(userKeys.activity({
 				id: data.movie_id,
 				type: 'movie',
 				userId: data.user_id,
@@ -409,7 +409,7 @@ export const useUserActivityMovieDeleteMutation = () => {
 			}
 
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.myFeed(),
+				queryKey: userKeys.myFeed(),
 			})
 		}
 	});
@@ -446,7 +446,7 @@ export const useUserActivityMovieUpdateMutation = () => {
 			};
 		},
 		onSuccess: ({ isLikedChange, ...data}) => {
-			queryClient.setQueryData(usersKeys.activity({
+			queryClient.setQueryData(userKeys.activity({
 				id: data.movie_id,
 				type: 'movie',
 				userId: data.user_id,
@@ -454,7 +454,7 @@ export const useUserActivityMovieUpdateMutation = () => {
 			if (isLikedChange !== undefined) {
 				if (isLikedChange) {
 					queryClient.invalidateQueries({
-						queryKey: usersKeys.heartPicks({
+						queryKey: userKeys.heartPicks({
 							userId: data.user_id,
 							type: 'movie',
 						})
@@ -467,7 +467,7 @@ export const useUserActivityMovieUpdateMutation = () => {
 				}
 			}
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.myFeed(),
+				queryKey: userKeys.myFeed(),
 			})
 		}
 	});
@@ -502,14 +502,14 @@ export const useUserActivityTvSeriesInsertMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.activity({
+			queryClient.setQueryData(userKeys.activity({
 				id: data.tv_series_id,
 				type: 'tv_series',
 				userId: data.user_id,
 			}), data);
 
 			// Watchlist
-			queryClient.setQueryData(usersKeys.watchlistItem({
+			queryClient.setQueryData(userKeys.watchlistItem({
 				id: data.tv_series_id,
 				type: 'tv_series',
 				userId: data.user_id,
@@ -518,7 +518,7 @@ export const useUserActivityTvSeriesInsertMutation = () => {
 			// Heart picks
 			if (data.is_liked) {
 				queryClient.invalidateQueries({
-					queryKey: usersKeys.heartPicks({
+					queryKey: userKeys.heartPicks({
 						userId: data.user_id,
 						type: 'tv_series',
 					})
@@ -526,7 +526,7 @@ export const useUserActivityTvSeriesInsertMutation = () => {
 			}
 
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.myFeed(),
+				queryKey: userKeys.myFeed(),
 			})
 		}
 	});
@@ -550,7 +550,7 @@ export const useUserActivityTvSeriesDeleteMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.activity({
+			queryClient.setQueryData(userKeys.activity({
 				id: data.tv_series_id,
 				type: 'tv_series',
 				userId: data.user_id,
@@ -564,7 +564,7 @@ export const useUserActivityTvSeriesDeleteMutation = () => {
 			}
 
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.myFeed(),
+				queryKey: userKeys.myFeed(),
 			})
 		}
 	});
@@ -601,7 +601,7 @@ export const useUserActivityTvSeriesUpdateMutation = () => {
 			};
 		},
 		onSuccess: ({ isLikedChange, ...data}) => {
-			queryClient.setQueryData(usersKeys.activity({
+			queryClient.setQueryData(userKeys.activity({
 				id: data.tv_series_id,
 				type: 'tv_series',
 				userId: data.user_id,
@@ -610,7 +610,7 @@ export const useUserActivityTvSeriesUpdateMutation = () => {
 			if (isLikedChange !== undefined) {
 				if (isLikedChange) {
 					queryClient.invalidateQueries({
-						queryKey: usersKeys.heartPicks({
+						queryKey: userKeys.heartPicks({
 							userId: data.user_id,
 							type: 'tv_series',
 						})
@@ -624,7 +624,7 @@ export const useUserActivityTvSeriesUpdateMutation = () => {
 			}
 
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.myFeed(),
+				queryKey: userKeys.myFeed(),
 			})
 		}
 	});
@@ -666,7 +666,7 @@ export const useUserReviewMovieUpsertMutation = ({
 			});
 
 			session && queryClient.invalidateQueries({
-				queryKey: usersKeys.activity({ id: movieId, type: 'movie', userId: session.user.id }),
+				queryKey: userKeys.activity({ id: movieId, type: 'movie', userId: session.user.id }),
 			});
 		}
 	});
@@ -694,7 +694,7 @@ export const useUserReviewMovieDeleteMutation = () => {
 			}
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.review({ id: data.id, type: 'movie' }), null);
+			queryClient.setQueryData(userKeys.review({ id: data.id, type: 'movie' }), null);
 
 			queryClient.invalidateQueries({
 				queryKey: mediasKeys.reviews({ id: data.movieId, type: 'movie' }),
@@ -702,7 +702,7 @@ export const useUserReviewMovieDeleteMutation = () => {
 
 			// Invalidate the review activity
 			session && queryClient.invalidateQueries({
-				queryKey: usersKeys.activity({ id: data.movieId, type: 'movie', userId: session.user.id }),
+				queryKey: userKeys.activity({ id: data.movieId, type: 'movie', userId: session.user.id }),
 			});
 		}
 	});
@@ -836,7 +836,7 @@ export const useUserReviewTvSeriesUpsertMutation = ({
 			});
 
 			session && queryClient.invalidateQueries({
-				queryKey: usersKeys.activity({ id: tvSeriesId, type: 'tv_series', userId: session.user.id }),
+				queryKey: userKeys.activity({ id: tvSeriesId, type: 'tv_series', userId: session.user.id }),
 			});
 		}
 	});
@@ -864,7 +864,7 @@ export const useUserReviewTvSeriesDeleteMutation = () => {
 			}
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.review({ id: data.id, type: 'tv_series' }), null);
+			queryClient.setQueryData(userKeys.review({ id: data.id, type: 'tv_series' }), null);
 
 			queryClient.invalidateQueries({
 				queryKey: mediasKeys.reviews({ id: data.tvSeriesId, type: 'tv_series' }),
@@ -872,7 +872,7 @@ export const useUserReviewTvSeriesDeleteMutation = () => {
 
 			// Invalidate the review activity
 			session && queryClient.invalidateQueries({
-				queryKey: usersKeys.activity({ id: data.tvSeriesId, type: 'tv_series', userId: session.user.id }),
+				queryKey: userKeys.activity({ id: data.tvSeriesId, type: 'tv_series', userId: session.user.id }),
 			});
 		}
 	});
@@ -997,14 +997,14 @@ export const useUserWatchlistMovieInsertMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.watchlistItem({
+			queryClient.setQueryData(userKeys.watchlistItem({
 				id: data.movie_id,
 				type: 'movie',
 				userId: data.user_id,
 			}), data);
 
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.watchlist({
+				queryKey: userKeys.watchlist({
 					userId: data.user_id,
 					type: 'movie',
 				})
@@ -1031,7 +1031,7 @@ export const useUserWatchlistMovieDeleteMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.watchlistItem({
+			queryClient.setQueryData(userKeys.watchlistItem({
 				id: data.movie_id,
 				type: 'movie',
 				userId: data.user_id,
@@ -1076,7 +1076,7 @@ export const useUserWatchlistMovieUpdateMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.watchlistItem({
+			queryClient.setQueryData(userKeys.watchlistItem({
 				id: data.movie_id,
 				type: 'movie',
 				userId: data.user_id,
@@ -1134,14 +1134,14 @@ export const useUserWatchlistTvSeriesInsertMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.watchlistItem({
+			queryClient.setQueryData(userKeys.watchlistItem({
 				id: data.tv_series_id,
 				type: 'tv_series',
 				userId: data.user_id,
 			}), data);
 
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.watchlist({
+				queryKey: userKeys.watchlist({
 					userId: data.user_id,
 					type: 'tv_series',
 				})
@@ -1168,7 +1168,7 @@ export const useUserWatchlistTvSeriesDeleteMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.watchlistItem({
+			queryClient.setQueryData(userKeys.watchlistItem({
 				id: data.tv_series_id,
 				type: 'tv_series',
 				userId: data.user_id,
@@ -1213,7 +1213,7 @@ export const useUserWatchlistTvSeriesUpdateMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.watchlistItem({
+			queryClient.setQueryData(userKeys.watchlistItem({
 				id: data.tv_series_id,
 				type: 'tv_series',
 				userId: data.user_id,
@@ -1281,7 +1281,7 @@ export const useUserRecosMovieInsertMutation = () => {
 		},
 		onSuccess: ({ movieId }) => {
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.recosSend({ id: movieId, type: 'movie' }),
+				queryKey: userKeys.recosSend({ id: movieId, type: 'movie' }),
 			});
 		}
 	});
@@ -1318,7 +1318,7 @@ export const useUserRecosMovieDeleteMutation = () => {
 			const recosQueries = queryClient.getQueriesData<UserRecosMovieAggregated[]>({
 				predicate: (query) => {
 					const key = query.queryKey
-					return Array.isArray(key) && usersKeys.recos({ userId: data.userId, type: 'movie' }).every((v, i) => v === key[i]);
+					return Array.isArray(key) && userKeys.recos({ userId: data.userId, type: 'movie' }).every((v, i) => v === key[i]);
 				}
 			});
 			recosQueries.forEach(([key, oldData]) => {
@@ -1367,7 +1367,7 @@ export const useUserRecosMovieCompleteMutation = () => {
 			const recosQueries = queryClient.getQueriesData<UserRecosMovieAggregated[]>({
 				predicate: (query) => {
 					const key = query.queryKey
-					return Array.isArray(key) && usersKeys.recos({ userId: data.userId, type: 'movie' }).every((v, i) => v === key[i]);
+					return Array.isArray(key) && userKeys.recos({ userId: data.userId, type: 'movie' }).every((v, i) => v === key[i]);
 				}
 			});
 
@@ -1416,7 +1416,7 @@ export const useUserRecosTvSeriesInsertMutation = () => {
 		},
 		onSuccess: ({ tvSeriesId }) => {
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.recosSend({ id: tvSeriesId, type: 'tv_series' }),
+				queryKey: userKeys.recosSend({ id: tvSeriesId, type: 'tv_series' }),
 			});
 		}
 	});
@@ -1453,7 +1453,7 @@ export const useUserRecosTvSeriesDeleteMutation = () => {
 			const recosQueries = queryClient.getQueriesData<UserRecosTvSeriesAggregated[]>({
 				predicate: (query) => {
 					const key = query.queryKey
-					return Array.isArray(key) && usersKeys.recos({ userId: data.userId, type: 'tv_series' }).every((v, i) => v === key[i]);
+					return Array.isArray(key) && userKeys.recos({ userId: data.userId, type: 'tv_series' }).every((v, i) => v === key[i]);
 				}
 			});
 
@@ -1503,7 +1503,7 @@ export const useUserRecosTvSeriesCompleteMutation = () => {
 			const recosQueries = queryClient.getQueriesData<UserRecosTvSeriesAggregated[]>({
 				predicate: (query) => {
 					const key = query.queryKey
-					return Array.isArray(key) && usersKeys.recos({ userId: data.userId, type: 'tv_series' }).every((v, i) => v === key[i]);
+					return Array.isArray(key) && userKeys.recos({ userId: data.userId, type: 'tv_series' }).every((v, i) => v === key[i]);
 				}
 			});
 
@@ -1568,7 +1568,7 @@ export const useUserPlaylistSavedInsertMutation = () => {
 			queryClient.setQueryData(userPlaylistSavedOptions({ supabase, userId: data.user_id, playlistId: data.playlist_id }).queryKey, true);
 
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.playlistsSaved({
+				queryKey: userKeys.playlistsSaved({
 					userId: data.user_id,
 				})
 			})
@@ -1622,7 +1622,7 @@ export const useUserPlaylistSavedDeleteMutation = () => {
 			queryClient.setQueryData(userPlaylistSavedOptions({ supabase, userId: data.user_id, playlistId: data.playlist_id }).queryKey, false);
 
 			queryClient.invalidateQueries({
-				queryKey: usersKeys.playlistsSaved({
+				queryKey: userKeys.playlistsSaved({
 					userId: data.user_id,
 				})
 			})
@@ -1747,7 +1747,7 @@ export const useUserDeleteRequestInsertMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.deleteRequest({ userId: data.user_id }), data);
+			queryClient.setQueryData(userKeys.deleteRequest({ userId: data.user_id }), data);
 		}
 	});
 };
@@ -1771,7 +1771,7 @@ export const useUserDeleteRequestDeleteMutation = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			queryClient.setQueryData(usersKeys.deleteRequest({ userId: data.user_id }), null);
+			queryClient.setQueryData(userKeys.deleteRequest({ userId: data.user_id }), null);
 		}
 	});
 };

@@ -1,11 +1,11 @@
-export const usersKeys = {
+export const userKeys = {
 	base: ['user'] as const,
 
 	details: ({
 		userId,
 	} : {
 		userId: string;
-	}) => [...usersKeys.base, userId] as const,
+	}) => [...userKeys.base, userId] as const,
 
 	profile: ({
 		username,
@@ -18,32 +18,32 @@ export const usersKeys = {
 		userId,
 	} : {
 		userId: string;
-	}) => [...usersKeys.details({ userId }), 'followers'] as const,
+	}) => [...userKeys.details({ userId }), 'followers'] as const,
 	followersRequests: ({
 		userId,
 	} : {
 		userId: string;
-	}) => [...usersKeys.details({ userId }), 'followers-requests'] as const,
+	}) => [...userKeys.details({ userId }), 'followers-requests'] as const,
 
 	followees: ({
 		userId,
 	} : {
 		userId: string;
-	}) => [...usersKeys.details({ userId }), 'followees'] as const,
+	}) => [...userKeys.details({ userId }), 'followees'] as const,
 	followProfile: ({
 		userId,
 		profileId,
 	} : {
 		userId: string;
 		profileId: string;
-	}) => [...usersKeys.details({ userId }), 'follow', profileId] as const,
+	}) => [...userKeys.details({ userId }), 'follow', profileId] as const,
 	followPerson: ({
 		userId,
 		personId,
 	} : {
 		userId: string;
 		personId: number;
-	}) => [...usersKeys.details({ userId }), 'follow-person', personId] as const,
+	}) => [...userKeys.details({ userId }), 'follow-person', personId] as const,
 	/* -------------------------------------------------------------------------- */
 
 	/* ---------------------------------- FEED ---------------------------------- */
@@ -54,8 +54,8 @@ export const usersKeys = {
 			sortBy: 'created_at';
 			sortOrder: 'asc' | 'desc';
 		}
-	} = {}) => filters ? [...usersKeys.base, 'my_feed', filters] as const : [...usersKeys.base, 'my_feed'] as const,
-	myFeedCastCrew: () => [...usersKeys.base, 'my_feed_cast_crew'] as const,
+	} = {}) => filters ? [...userKeys.base, 'my_feed', filters] as const : [...userKeys.base, 'my_feed'] as const,
+	myFeedCastCrew: () => [...userKeys.base, 'my_feed_cast_crew'] as const,
 	feed: ({
 		userId,
 		filters,
@@ -65,7 +65,7 @@ export const usersKeys = {
 			sortBy: 'created_at';
 			sortOrder: 'asc' | 'desc';
 		}
-	}) => filters ? [...usersKeys.details({ userId }), 'feed', filters] as const : [...usersKeys.details({ userId }), 'feed'] as const,
+	}) => filters ? [...userKeys.details({ userId }), 'feed', filters] as const : [...userKeys.details({ userId }), 'feed'] as const,
 	/* -------------------------------------------------------------------------- */
 
 	/* ------------------------------- Activities ------------------------------- */
@@ -80,7 +80,7 @@ export const usersKeys = {
 			sortBy: 'watched_date' | 'rating';
 			sortOrder: 'asc' | 'desc';
 		}
-	}) => filters ? [...usersKeys.details({ userId }), 'activities', type, filters] as const : [...usersKeys.details({ userId }), 'activities', type] as const,
+	}) => filters ? [...userKeys.details({ userId }), 'activities', type, filters] as const : [...userKeys.details({ userId }), 'activities', type] as const,
 
 	activity: ({
 		id,
@@ -90,7 +90,7 @@ export const usersKeys = {
 		id: number;
 		type: 'movie' | 'tv_series';
 		userId: string;
-	}) => [...usersKeys.details({ userId }), 'activity', type, id] as const,
+	}) => [...userKeys.details({ userId }), 'activity', type, id] as const,
 
 	movieActivities: ({
 		userId,
@@ -101,7 +101,7 @@ export const usersKeys = {
 			sortBy: 'watched_date' | 'rating';
 			sortOrder: 'asc' | 'desc';
 		}
-	}) => filters ? [...usersKeys.activities({ userId, type: 'movie' }), filters] as const : usersKeys.activities({ userId, type: 'movie' }),
+	}) => filters ? [...userKeys.activities({ userId, type: 'movie' }), filters] as const : userKeys.activities({ userId, type: 'movie' }),
 
 	tvSeriesActivities: ({
 		userId,
@@ -112,7 +112,7 @@ export const usersKeys = {
 			sortBy: 'watched_date' | 'rating';
 			sortOrder: 'asc' | 'desc';
 		}
-	}) => filters ? [...usersKeys.activities({ userId, type: 'tv_series' }), filters] as const : usersKeys.activities({ userId, type: 'tv_series' }),
+	}) => filters ? [...userKeys.activities({ userId, type: 'tv_series' }), filters] as const : userKeys.activities({ userId, type: 'tv_series' }),
 	/* -------------------------------------------------------------------------- */
 
 	/* --------------------------------- Reviews -------------------------------- */
@@ -122,7 +122,7 @@ export const usersKeys = {
 	} : {
 		id: number;
 		type: 'movie' | 'tv_series';
-	}) => [...usersKeys.base, 'review', type, id] as const,
+	}) => [...userKeys.base, 'review', type, id] as const,
 
 	reviewLike: ({
 		reviewId,
@@ -132,7 +132,7 @@ export const usersKeys = {
 		reviewId: number;
 		type: 'movie' | 'tv_series';
 		userId: string;
-	}) => [...usersKeys.details({ userId }), 'review-like', type, reviewId] as const,
+	}) => [...userKeys.details({ userId }), 'review-like', type, reviewId] as const,
 	/* -------------------------------------------------------------------------- */
 
 	/* ---------------------------------- Recos --------------------------------- */
@@ -148,7 +148,7 @@ export const usersKeys = {
 			sortOrder: 'asc' | 'desc' | 'random';
 			limit?: number;
 		}
-	}) => filters ? [...usersKeys.details({ userId }), 'recos', type, filters] as const : [...usersKeys.details({ userId }), 'recos', type] as const,
+	}) => filters ? [...userKeys.details({ userId }), 'recos', type, filters] as const : [...userKeys.details({ userId }), 'recos', type] as const,
 
 	recosSend: ({
 		id,
@@ -156,7 +156,7 @@ export const usersKeys = {
 	} : {
 		id: number;
 		type: 'movie' | 'tv_series';
-	}) => [...usersKeys.details({ userId: '' }), 'recos-send', type, id] as const,
+	}) => [...userKeys.details({ userId: '' }), 'recos-send', type, id] as const,
 	/* -------------------------------------------------------------------------- */
 
 	/* -------------------------------- Watchlist ------------------------------- */
@@ -172,7 +172,7 @@ export const usersKeys = {
 			sortOrder: 'asc' | 'desc' | 'random';
 			limit?: number;
 		}
-	}) => filters ? [...usersKeys.details({ userId }), 'watchlist', type, filters] as const : [...usersKeys.details({ userId }), 'watchlist', type] as const,
+	}) => filters ? [...userKeys.details({ userId }), 'watchlist', type, filters] as const : [...userKeys.details({ userId }), 'watchlist', type] as const,
 
 	watchlistItem: ({
 		userId,
@@ -182,7 +182,7 @@ export const usersKeys = {
 		userId: string;
 		type: 'movie' | 'tv_series';
 		id: number;
-	}) => [...usersKeys.details({ userId }), 'watchlist-item', type, id] as const,
+	}) => [...userKeys.details({ userId }), 'watchlist-item', type, id] as const,
 	/* -------------------------------------------------------------------------- */
 
 	/* ------------------------------- HEART PICKS ------------------------------ */
@@ -192,7 +192,7 @@ export const usersKeys = {
 	} : {
 		userId: string;
 		type: 'movie' | 'tv_series';
-	}) => [...usersKeys.details({ userId }), 'heart-picks', type] as const,
+	}) => [...userKeys.details({ userId }), 'heart-picks', type] as const,
 	/* -------------------------------------------------------------------------- */
 
 	/* -------------------------------- Playlists ------------------------------- */
@@ -205,7 +205,7 @@ export const usersKeys = {
 			sortBy: 'updated_at' | 'created_at' | 'likes_count';
 			sortOrder: 'asc' | 'desc';
 		}
-	}) => filters ? [...usersKeys.details({ userId }), 'playlists', filters] as const : [...usersKeys.details({ userId }), 'playlists'] as const,
+	}) => filters ? [...userKeys.details({ userId }), 'playlists', filters] as const : [...userKeys.details({ userId }), 'playlists'] as const,
 
 	playlistsSaved: ({
 		userId,
@@ -216,7 +216,7 @@ export const usersKeys = {
 			sortBy: 'created_at';
 			sortOrder: 'asc' | 'desc';
 		}
-	}) => filters ? [...usersKeys.details({ userId }), 'playlists-saved', filters] as const : [...usersKeys.details({ userId }), 'playlists-saved'] as const,
+	}) => filters ? [...userKeys.details({ userId }), 'playlists-saved', filters] as const : [...userKeys.details({ userId }), 'playlists-saved'] as const,
 
 	playlistLike: ({
 		userId,
@@ -224,7 +224,7 @@ export const usersKeys = {
 	} : {
 		userId: string;
 		playlistId: number;
-	}) => [...usersKeys.details({ userId }), 'playlist-like', playlistId] as const,
+	}) => [...userKeys.details({ userId }), 'playlist-like', playlistId] as const,
 
 	playlistSaved: ({
 		userId,
@@ -232,7 +232,7 @@ export const usersKeys = {
 	} : {
 		userId: string;
 		playlistId: number;
-	}) => [...usersKeys.details({ userId }), 'playlist-saved', playlistId] as const,
+	}) => [...userKeys.details({ userId }), 'playlist-saved', playlistId] as const,
 
 	playlistsFriends: ({
 		userId,
@@ -243,7 +243,7 @@ export const usersKeys = {
 			sortBy: 'updated_at' | 'created_at' | 'likes_count';
 			sortOrder: 'asc' | 'desc';
 		}
-	}) => filters ? [...usersKeys.details({ userId: userId }), 'playlists-friends', filters] as const : [...usersKeys.details({ userId: userId }), 'playlists_friends'] as const,
+	}) => filters ? [...userKeys.details({ userId: userId }), 'playlists-friends', filters] as const : [...userKeys.details({ userId: userId }), 'playlists_friends'] as const,
 	/* -------------------------------------------------------------------------- */
 
 	/* --------------------------------- ACCOUNT -------------------------------- */
@@ -251,6 +251,6 @@ export const usersKeys = {
 		userId,
 	} : {
 		userId: string;
-	}) => [...usersKeys.details({ userId }), 'delete-request'] as const,
+	}) => [...userKeys.details({ userId }), 'delete-request'] as const,
 	/* -------------------------------------------------------------------------- */
 }

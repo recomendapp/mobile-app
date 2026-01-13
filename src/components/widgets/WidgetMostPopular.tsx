@@ -7,7 +7,7 @@ import { CardMovie } from "../cards/CardMovie";
 import { CardTvSeries } from "../cards/CardTvSeries";
 import { GAP, WIDTH_CARD_XS } from "@/theme/globals";
 import { Text } from "../ui/text";
-import { useWidgetMostPopularQuery } from "@/api/widget/widgetQueries";
+import { useWidgetMostPopularQuery } from "@/api/widgets/widgetQueries";
 
 interface WidgetMostPopularProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;

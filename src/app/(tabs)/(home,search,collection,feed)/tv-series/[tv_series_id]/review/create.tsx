@@ -5,13 +5,13 @@ import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import tw from "@/lib/tw";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native"
-import { useUserReviewTvSeriesUpsertMutation } from "@/api/users/usersMutations";
+import { useUserReviewTvSeriesUpsertMutation } from "@/api/users/userMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
 import { useCallback } from "react";
 import { useMediaTvSeriesDetailsQuery } from "@/api/medias/mediaQueries";
-import { useUserActivityTvSeriesQuery } from "@/api/users/usersQueries";
+import { useUserActivityTvSeriesQuery } from "@/api/users/userQueries";
 
 const ReviewTvSeriesCreateScreen = () => {
 	const { user } = useAuth();

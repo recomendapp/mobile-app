@@ -28,7 +28,7 @@ import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 import { useToast } from "@/components/Toast";
 import { PADDING_VERTICAL } from "@/theme/globals";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { usePlaylistDetailsQuery } from "@/api/playlists/playlistsQueries";
+import { usePlaylistDetailsQuery } from "@/api/playlists/playlistQueries";
 
 const TITLE_MIN_LENGTH = 1;
 const TITLE_MAX_LENGTH = 100;

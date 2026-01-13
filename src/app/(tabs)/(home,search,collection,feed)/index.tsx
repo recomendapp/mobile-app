@@ -28,8 +28,8 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import { useQueryClient } from '@tanstack/react-query';
 import { NativeStackHeaderItem } from '@react-navigation/native-stack';
 import UserAvatar from '@/components/user/UserAvatar';
-import { widgetKeys } from '@/api/widget/widgetKeys';
-import { usersKeys } from '@/api/users/usersKeys';
+import { widgetKeys } from '@/api/widgets/widgetKeys';
+import { userKeys } from '@/api/users/userKeys';
 
 const HeaderLeft = () => {
   const { session, user } = useAuth();
@@ -148,9 +148,9 @@ const HomeScreen = () => {
       queryClient.invalidateQueries({ queryKey: widgetKeys.mostRecommended() }); // WidgetMostRecommended
       queryClient.invalidateQueries({ queryKey: widgetKeys.mostPopular() }); // WidgetMostPopular
       if (session?.user.id) {
-        queryClient.invalidateQueries({ queryKey: usersKeys.recos({ userId: session.user.id, type: 'all' })}); // WidgetUserRecos
-        queryClient.invalidateQueries({ queryKey: usersKeys.watchlist({ userId: session.user.id, type: 'all' })}); // WidgetUserWatchlist
-        queryClient.invalidateQueries({ queryKey: usersKeys.playlistsFriends({ userId: session.user.id })}); // WidgetUserFriendsPlaylists
+        queryClient.invalidateQueries({ queryKey: userKeys.recos({ userId: session.user.id, type: 'all' })}); // WidgetUserRecos
+        queryClient.invalidateQueries({ queryKey: userKeys.watchlist({ userId: session.user.id, type: 'all' })}); // WidgetUserWatchlist
+        queryClient.invalidateQueries({ queryKey: userKeys.playlistsFriends({ userId: session.user.id })}); // WidgetUserFriendsPlaylists
         queryClient.invalidateQueries({ queryKey: widgetKeys.users({ filters: { sortBy: 'created_at', sortOrder: 'desc' }})}); // WidgetUserDiscovery
       }
     } finally {

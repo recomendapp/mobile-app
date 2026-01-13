@@ -16,7 +16,7 @@ import { BottomSheetReviewMovie } from "@/components/bottom-sheets/sheets/Bottom
 import { EnrichedTextInput } from "@/components/RichText/EnrichedTextInput";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useUserReviewMovieLike } from "@/api/users/hooks/useUserReviewMovieLike";
-import { useUserReviewMovieQuery } from "@/api/users/usersQueries";
+import { useUserReviewMovieQuery } from "@/api/users/userQueries";
 
 const ReviewMovieScreen = () => {
 	const { session } = useAuth();

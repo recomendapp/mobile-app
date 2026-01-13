@@ -6,7 +6,7 @@ import tw from "@/lib/tw";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import BottomSheetRating from "@/components/bottom-sheets/sheets/BottomSheetRating";
-import { useUserActivityTvSeriesInsertMutation, useUserActivityTvSeriesUpdateMutation } from "@/api/users/usersMutations";
+import { useUserActivityTvSeriesInsertMutation, useUserActivityTvSeriesUpdateMutation } from "@/api/users/userMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
@@ -14,7 +14,7 @@ import { forwardRef, useCallback } from "react";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useUserActivityTvSeriesQuery } from "@/api/users/usersQueries";
+import { useUserActivityTvSeriesQuery } from "@/api/users/userQueries";
 
 interface ButtonUserActivityTvSeriesRatingProps
 	extends Omit<React.ComponentProps<typeof Button>, 'icon'> {

@@ -1,6 +1,6 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { UserRecosAggregated, UserRecosMovieAggregated, UserRecosTvSeriesAggregated, UserWatchlist } from "@recomendapp/types";
-import { usersKeys } from "./usersKeys";
+import { userKeys } from "./userKeys";
 import { SupabaseClient } from "@/lib/supabase/client";
 
 export const userProfileOptions = ({
@@ -11,7 +11,7 @@ export const userProfileOptions = ({
 	username?: string;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.profile({ username: username! }),
+		queryKey: userKeys.profile({ username: username! }),
 		queryFn: async () => {
 			if (!username) return null;
 			const { data, error } = await supabase
@@ -36,7 +36,7 @@ export const userFollowersOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: usersKeys.followers({
+		queryKey: userKeys.followers({
 			userId: userId!,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
@@ -69,7 +69,7 @@ export const userFolloweesOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: usersKeys.followees({
+		queryKey: userKeys.followees({
 			userId: userId!,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
@@ -101,7 +101,7 @@ export const userFollowersRequestsOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: usersKeys.followersRequests({
+		queryKey: userKeys.followersRequests({
 			userId: userId!,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
@@ -135,7 +135,7 @@ export const userFollowProfileOptions = ({
 	profileId?: string;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.followProfile({
+		queryKey: userKeys.followProfile({
 			userId: userId!,
 			profileId: profileId!,
 		}),
@@ -164,7 +164,7 @@ export const userFollowPersonOptions = ({
 	personId?: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.followPerson({
+		queryKey: userKeys.followPerson({
 			userId: userId!,
 			personId: personId!,
 		}),
@@ -200,7 +200,7 @@ export const userMyFeedOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: usersKeys.myFeed({
+		queryKey: userKeys.myFeed({
 			filters: filters,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
@@ -238,7 +238,7 @@ export const userMyFeedCastCrewOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: usersKeys.myFeedCastCrew(),
+		queryKey: userKeys.myFeedCastCrew(),
 		queryFn: async ({ pageParam = 1 }) => {
 			let from = (pageParam - 1) * PER_PAGE;
 			const { data, error } = await  supabase
@@ -270,7 +270,7 @@ export const userMyFeedCastCrewOptions = ({
 // }) => {
 // 	const PER_PAGE = 20;
 // 	return infiniteQueryOptions({
-// 		queryKey: usersKeys.feed({
+// 		queryKey: userKeys.feed({
 // 			userId: userId!,
 // 			filters: filters,
 // 		}),
@@ -320,7 +320,7 @@ export const userActivitiesOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: usersKeys.activities({
+		queryKey: userKeys.activities({
 			userId: userId!,
 			type: 'all',
 			filters: filters,
@@ -375,7 +375,7 @@ export const userActivitiesMovieOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: usersKeys.movieActivities({
+		queryKey: userKeys.movieActivities({
 			userId: userId!,
 			filters: filters,
 		}),
@@ -430,7 +430,7 @@ export const userActivitiesTvSeriesOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: usersKeys.tvSeriesActivities({
+		queryKey: userKeys.tvSeriesActivities({
 			userId: userId!,
 			filters: filters,
 		}),
@@ -482,7 +482,7 @@ export const userActivityMovieOptions = ({
 	movieId?: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.activity({
+		queryKey: userKeys.activity({
 			id: movieId!,
 			type: 'movie',
 			userId: userId!,
@@ -514,7 +514,7 @@ export const userActivityTvSeriesOptions = ({
 	tvSeriesId?: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.activity({
+		queryKey: userKeys.activity({
 			id: tvSeriesId!,
 			type: 'tv_series',
 			userId: userId!,
@@ -547,7 +547,7 @@ export const userReviewMovieOptions = ({
 	reviewId?: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.review({
+		queryKey: userKeys.review({
 			id: reviewId!,
 			type: 'movie',
 		}),
@@ -575,7 +575,7 @@ export const userReviewMovieLikeOptions = ({
 	reviewId?: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.reviewLike({
+		queryKey: userKeys.reviewLike({
 			reviewId: reviewId!,
 			type: 'movie',
 			userId: userId!,
@@ -606,7 +606,7 @@ export const userReviewTvSeriesOptions = ({
 	reviewId?: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.review({
+		queryKey: userKeys.review({
 			id: reviewId!,
 			type: 'tv_series',
 		}),
@@ -634,7 +634,7 @@ export const userReviewTvSeriesLikeOptions = ({
 	reviewId?: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.reviewLike({
+		queryKey: userKeys.reviewLike({
 			reviewId: reviewId!,
 			type: 'tv_series',
 			userId: userId!,
@@ -674,7 +674,7 @@ export const userRecosOptions = ({
 	};
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.recos({
+		queryKey: userKeys.recos({
 			userId: userId!,
 			type: 'all',
 			filters,
@@ -717,7 +717,7 @@ export const userRecosMovieOptions = ({
 	userId?: string;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.recos({
+		queryKey: userKeys.recos({
 			userId: userId!,
 			type: 'movie',
 		}),
@@ -749,7 +749,7 @@ export const userRecosTvSeriesOptions = ({
 	userId?: string;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.recos({
+		queryKey: userKeys.recos({
 			userId: userId!,
 			type: 'tv_series',
 		}),
@@ -784,7 +784,7 @@ export const userRecosMovieSendOptions = ({
 	movieId: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.recosSend({
+		queryKey: userKeys.recosSend({
 			id: movieId,
 			type: 'movie',
 		}),
@@ -828,7 +828,7 @@ export const userRecosTvSeriesSendOptions = ({
 	tvSeriesId: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.recosSend({
+		queryKey: userKeys.recosSend({
 			id: tvSeriesId,
 			type: 'tv_series',
 		}),
@@ -879,7 +879,7 @@ export const userWatchlistOptions = ({
 	}
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.watchlist({
+		queryKey: userKeys.watchlist({
 			userId: userId!,
 			type: 'all',
 			filters,
@@ -916,7 +916,7 @@ export const userWatchlistMoviesOptions = ({
 	userId?: string;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.watchlist({
+		queryKey: userKeys.watchlist({
 			userId: userId!,
 			type: 'movie',
 		}),
@@ -943,7 +943,7 @@ export const userWatchlistTvSeriesOptions = ({
 	userId?: string;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.watchlist({
+		queryKey: userKeys.watchlist({
 			userId: userId!,
 			type: 'tv_series',
 		}),
@@ -973,7 +973,7 @@ export const userWatchlistMovieItemOptions = ({
 	movieId?: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.watchlistItem({
+		queryKey: userKeys.watchlistItem({
 			id: movieId!,
 			type: 'movie',
 			userId: userId!,
@@ -1006,7 +1006,7 @@ export const userWatchlistTvSeriesItemOptions = ({
 	tvSeriesId?: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.watchlistItem({
+		queryKey: userKeys.watchlistItem({
 			id: tvSeriesId!,
 			type: 'tv_series',
 			userId: userId!,
@@ -1040,7 +1040,7 @@ export const userHeartPicksMovieOptions = ({
 	userId?: string;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.heartPicks({
+		queryKey: userKeys.heartPicks({
 			userId: userId!,
 			type: 'movie',
 		}),
@@ -1068,7 +1068,7 @@ export const userHeartPicksTvSeriesOptions = ({
 	userId?: string;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.heartPicks({
+		queryKey: userKeys.heartPicks({
 			userId: userId!,
 			type: 'tv_series',
 		}),
@@ -1103,7 +1103,7 @@ export const userPlaylistsOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: usersKeys.playlists({
+		queryKey: userKeys.playlists({
 			userId: userId!,
 			filters: filters,
 		}),
@@ -1156,7 +1156,7 @@ export const userPlaylistsSavedOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: usersKeys.playlistsSaved({
+		queryKey: userKeys.playlistsSaved({
 			userId: userId!,
 		}),
 		queryFn: async ({ pageParam = 1 }) => {
@@ -1192,7 +1192,7 @@ export const userPlaylistSavedOptions = ({
 	playlistId?: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.playlistSaved({
+		queryKey: userKeys.playlistSaved({
 			userId: userId!,
 			playlistId: playlistId!,
 		}),
@@ -1226,7 +1226,7 @@ export const userPlaylistsFriendOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: usersKeys.playlistsFriends({
+		queryKey: userKeys.playlistsFriends({
 			userId: userId!,
 			filters: filters,
 		}),
@@ -1276,7 +1276,7 @@ export const userPlaylistLikeOptions = ({
 	playlistId?: number;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.playlistLike({
+		queryKey: userKeys.playlistLike({
 			userId: userId!,
 			playlistId: playlistId!,
 		}),
@@ -1306,7 +1306,7 @@ export const userDeleteRequestOptions = ({
 	userId?: string;
 }) => {
 	return queryOptions({
-		queryKey: usersKeys.deleteRequest({ userId: userId! }),
+		queryKey: userKeys.deleteRequest({ userId: userId! }),
 		queryFn: async () => {
 			if (!userId) throw Error('Missing user id');
 			const { data, error } = await supabase

@@ -13,7 +13,7 @@ import { useTranslations } from "use-intl";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { HeaderTitle } from "@react-navigation/elements";
-import { useUserActivitiesTvSeriesQuery, useUserProfileQuery } from "@/api/users/usersQueries";
+import { useUserActivitiesTvSeriesQuery, useUserProfileQuery } from "@/api/users/userQueries";
 
 interface sortBy {
 	label: string;

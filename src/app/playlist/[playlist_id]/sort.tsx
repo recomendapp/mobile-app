@@ -7,7 +7,7 @@ import { Icons } from "@/constants/Icons";
 import { PlaylistSortMovie } from "@/components/screens/playlist/sort/PlaylistSortMovie";
 import { PlaylistSortTvSeries } from "@/components/screens/playlist/sort/PlaylistSortTvSeries";
 import { useCallback } from "react";
-import { usePlaylistDetailsQuery } from "@/api/playlists/playlistsQueries";
+import { usePlaylistDetailsQuery } from "@/api/playlists/playlistQueries";
 
 const PlaylistSortScreen = () => {
 	const t = useTranslations();

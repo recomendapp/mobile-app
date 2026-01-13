@@ -2,10 +2,10 @@ import { useAuth } from "@/providers/AuthProvider"
 import {
 useUserPlaylistSavedInsertMutation,
 useUserPlaylistSavedDeleteMutation,
-} from "@/api/users/usersMutations"
+} from "@/api/users/userMutations"
 import * as Haptics from 'expo-haptics'
 import { useCallback, useMemo } from "react"
-import { useUserPlaylistSavedQuery } from "../usersQueries"
+import { useUserPlaylistSavedQuery } from "../userQueries"
 
 export const useUserPlaylistSaved = ({ playlistId }: { playlistId?: number }) => {
 	const { session } = useAuth()

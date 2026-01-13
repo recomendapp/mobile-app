@@ -1,23 +1,23 @@
-export const playlistsKeys = {
+export const playlistKeys = {
 	base: ['playlists'] as const,
 
 	details: ({
 		playlistId,
 	} : {
 		playlistId: number;
-	}) => [...playlistsKeys.base, playlistId] as const,
+	}) => [...playlistKeys.base, playlistId] as const,
 
 	items: ({
 		playlistId,
 	} : {
 		playlistId: number;
-	}) => [...playlistsKeys.details({ playlistId }), 'items'] as const,
+	}) => [...playlistKeys.details({ playlistId }), 'items'] as const,
 
 	guests: ({
 		playlistId,
 	} : {
 		playlistId: number;
-	}) => [...playlistsKeys.details({ playlistId }), 'guests'] as const,
+	}) => [...playlistKeys.details({ playlistId }), 'guests'] as const,
 	
 	guestsAdd: ({
 		playlistId,
@@ -27,7 +27,7 @@ export const playlistsKeys = {
 		filters?: {
 			search: string;
 		};
-	}) => filters ? [...playlistsKeys.guests({ playlistId }), 'add', filters] : [...playlistsKeys.guests({ playlistId }), 'add'] as const,
+	}) => filters ? [...playlistKeys.guests({ playlistId }), 'add', filters] : [...playlistKeys.guests({ playlistId }), 'add'] as const,
 
 	allowedToEdit: ({
 		playlistId,
@@ -35,7 +35,7 @@ export const playlistsKeys = {
 	} : {
 		playlistId: number;
 		userId: string;
-	}) => [...playlistsKeys.details({ playlistId }), 'allowedToEdit', userId] as const,
+	}) => [...playlistKeys.details({ playlistId }), 'allowedToEdit', userId] as const,
 
 	featured: ({
 		filters,
@@ -44,7 +44,7 @@ export const playlistsKeys = {
 			sortBy: 'created_at' | 'updated_at';
 			sortOrder: 'asc' | 'desc';
 		};
-	}) => filters ? [...playlistsKeys.base, 'featured', filters] : [...playlistsKeys.base, 'featured'] as const,
+	}) => filters ? [...playlistKeys.base, 'featured', filters] : [...playlistKeys.base, 'featured'] as const,
 
 	addTo: ({
 		id,
@@ -52,7 +52,7 @@ export const playlistsKeys = {
 	} : {
 		id: number;
 		type: 'movie' | 'tv_series';
-	}) => [...playlistsKeys.base, 'addTo', type, id] as const,
+	}) => [...playlistKeys.base, 'addTo', type, id] as const,
 	
 	addToSource: ({
 		id,
@@ -62,5 +62,5 @@ export const playlistsKeys = {
 		id: number;
 		type: 'movie' | 'tv_series';
 		source: 'saved' | 'personal';
-	}) => [...playlistsKeys.addTo({ id, type }), source] as const,
+	}) => [...playlistKeys.addTo({ id, type }), source] as const,
 }

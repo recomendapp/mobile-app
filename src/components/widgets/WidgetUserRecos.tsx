@@ -14,7 +14,7 @@ import { CardTvSeries } from "../cards/CardTvSeries";
 import { GAP } from "@/theme/globals";
 import { GridView } from "../ui/GridView";
 import { Text } from "../ui/text";
-import { useUserRecosQuery } from "@/api/users/usersQueries";
+import { useUserRecosQuery } from "@/api/users/userQueries";
 
 interface WidgetUserRecosProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;

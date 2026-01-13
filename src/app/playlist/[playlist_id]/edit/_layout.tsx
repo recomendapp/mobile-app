@@ -1,4 +1,4 @@
-import { usePlaylistDetailsQuery } from "@/api/playlists/playlistsQueries";
+import { usePlaylistDetailsQuery } from "@/api/playlists/playlistQueries";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Redirect, Stack, useLocalSearchParams, useRouter } from "expo-router";

@@ -2,7 +2,7 @@ import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useApiClient } from "@/providers/ApiProvider";
 import { useAuth } from "@/providers/AuthProvider";
-import { playlistDetailsOptions, playlistGuestsAddOptions, playlistGuestsOptions, playlistIsAllowedToEditOptions, playlistItemsMovieOptions, playlistItemsTvSeriesOptions, playlistMovieAddToOptions, playlistsFeaturedOptions, playlistTvSeriesAddToOptions } from "./playlistsOptions";
+import { playlistDetailsOptions, playlistGuestsAddOptions, playlistGuestsOptions, playlistIsAllowedToEditOptions, playlistItemsMovieOptions, playlistItemsTvSeriesOptions, playlistMovieAddToOptions, playlistsFeaturedOptions, playlistTvSeriesAddToOptions } from "./playlistOptions";
 
 /* --------------------------------- DETAILS -------------------------------- */
 export const usePlaylistDetailsQuery = ({

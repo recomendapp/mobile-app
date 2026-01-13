@@ -10,7 +10,7 @@ import { NovuProvider } from "@novu/react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/Toast";
 import * as env from '@/env';
-import { notificationsKeys } from "@/api/notifications/notificationsKeys";
+import { notificationKeys } from "@/api/notifications/notificationKeys";
 import { useNovuSubscriberHashQuery } from "@/api/novu/novuQueries";
 
 type NotificationsContextType = {
@@ -165,7 +165,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
       handleToast(notification);
       // Invalidate notifications queries
       queryClient.invalidateQueries({
-        queryKey: notificationsKeys.list()
+        queryKey: notificationKeys.list()
       });
     });
 

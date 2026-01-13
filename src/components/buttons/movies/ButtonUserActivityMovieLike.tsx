@@ -1,6 +1,6 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { Icons } from "@/constants/Icons";
-import { useUserActivityMovieInsertMutation, useUserActivityMovieUpdateMutation } from "@/api/users/usersMutations";
+import { useUserActivityMovieInsertMutation, useUserActivityMovieUpdateMutation } from "@/api/users/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaMovie } from "@recomendapp/types";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/Toast";
 import { forwardRef, useCallback } from "react";
 import tw from "@/lib/tw";
-import { useUserActivityMovieQuery } from "@/api/users/usersQueries";
-import { usersKeys } from "@/api/users/usersKeys";
+import { useUserActivityMovieQuery } from "@/api/users/userQueries";
+import { userKeys } from "@/api/users/userKeys";
 
 interface ButtonUserActivityMovieLikeProps
 	extends React.ComponentProps<typeof Button> {
@@ -51,7 +51,7 @@ const ButtonUserActivityMovieLike = forwardRef<
 			}, {
 				onSuccess: () => {
 					queryClient.invalidateQueries({
-						queryKey: usersKeys.heartPicks({ userId: session.user.id, type: 'movie' })
+						queryKey: userKeys.heartPicks({ userId: session.user.id, type: 'movie' })
 					});
 				},
 				onError: () => {
@@ -67,7 +67,7 @@ const ButtonUserActivityMovieLike = forwardRef<
 			}, {
 				onSuccess: (data) => {
 					queryClient.invalidateQueries({
-						queryKey: usersKeys.heartPicks({ userId: session.user.id, type: 'movie' })
+						queryKey: userKeys.heartPicks({ userId: session.user.id, type: 'movie' })
 					});
 				},
 				onError: () => {
@@ -87,7 +87,7 @@ const ButtonUserActivityMovieLike = forwardRef<
 		}, {
 			onSuccess: () => {
 				queryClient.invalidateQueries({
-					queryKey: usersKeys.heartPicks({ userId: session.user.id, type: 'movie' })
+					queryKey: userKeys.heartPicks({ userId: session.user.id, type: 'movie' })
 				});
 			},
 			onError: () => {

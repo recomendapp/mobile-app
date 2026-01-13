@@ -25,7 +25,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { useUIStore } from "@/stores/useUIStore";
 import { useQuery } from "@tanstack/react-query";
-import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsMovieQuery } from "@/api/playlists/playlistsQueries";
+import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsMovieQuery } from "@/api/playlists/playlistQueries";
 
 interface PlaylistMovieProps {
 	playlist: Playlist;

@@ -12,7 +12,7 @@ import { CardTvSeries } from "../cards/CardTvSeries";
 import { GAP } from "@/theme/globals";
 import { GridView } from "../ui/GridView";
 import { Text } from "../ui/text";
-import { useUserWatchlistQuery } from "@/api/users/usersQueries";
+import { useUserWatchlistQuery } from "@/api/users/userQueries";
 
 interface WidgetUserWatchlistProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;

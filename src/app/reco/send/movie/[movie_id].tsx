@@ -22,11 +22,11 @@ import Fuse from "fuse.js";
 import { Icons } from "@/constants/Icons";
 import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
-import { useUserRecosMovieInsertMutation } from "@/api/users/usersMutations";
+import { useUserRecosMovieInsertMutation } from "@/api/users/userMutations";
 import { CardUser } from "@/components/cards/CardUser";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/Toast";
-import { useUserRecosMovieSendQuery } from "@/api/users/usersQueries";
+import { useUserRecosMovieSendQuery } from "@/api/users/userQueries";
 
 const COMMENT_MAX_LENGTH = 180;
 

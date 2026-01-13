@@ -16,7 +16,7 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { EnrichedTextInput } from "@/components/RichText/EnrichedTextInput";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useUserReviewTvSeriesLike } from "@/api/users/hooks/useUserReviewTvSeriesLike";
-import { useUserReviewTvSeriesQuery } from "@/api/users/usersQueries";
+import { useUserReviewTvSeriesQuery } from "@/api/users/userQueries";
 
 const ReviewTvSeriesScreen = () => {
 	const { session } = useAuth();

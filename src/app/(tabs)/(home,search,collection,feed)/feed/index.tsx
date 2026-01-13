@@ -15,7 +15,7 @@ import { CardFeedReviewTvSeriesLike } from "@/components/cards/feed/CardFeedRevi
 import { useScrollToTop } from "@react-navigation/native";
 import { useCallback, useMemo, useRef } from "react";
 import { Icons } from "@/constants/Icons";
-import { useUserMyFeedQuery } from "@/api/users/usersQueries";
+import { useUserMyFeedQuery } from "@/api/users/userQueries";
 
 const FeedScreen = () => {
 	const t = useTranslations();

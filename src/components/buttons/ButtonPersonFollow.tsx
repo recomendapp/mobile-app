@@ -7,8 +7,8 @@ import { useTranslations } from "use-intl";
 import { useToast } from "../Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { forwardRef } from 'react';
-import { useUserFollowPersonQuery } from '@/api/users/usersQueries';
-import { useUserFollowPersonDeleteMutation, useUserFollowPersonInsertMutation } from '@/api/users/usersMutations';
+import { useUserFollowPersonQuery } from '@/api/users/userQueries';
+import { useUserFollowPersonDeleteMutation, useUserFollowPersonInsertMutation } from '@/api/users/userMutations';
 
 type ButtonPersonFollowSkeletonProps = {
   skeleton: true;

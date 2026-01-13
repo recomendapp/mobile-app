@@ -15,7 +15,7 @@ import { Icons } from "@/constants/Icons";
 import { UserReviewMovie } from "@recomendapp/types";
 import { useAuth } from "@/providers/AuthProvider";
 import { useMediaMovieDetailsQuery, useMediaMovieReviewsQuery } from "@/api/medias/mediaQueries";
-import { useUserActivityMovieQuery } from "@/api/users/usersQueries";
+import { useUserActivityMovieQuery } from "@/api/users/userQueries";
 
 interface sortBy {
 	label: string;

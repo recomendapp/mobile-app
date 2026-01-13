@@ -9,8 +9,8 @@ import { CORNERS } from "@/theme/globals";
 import { useToast } from "../Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { forwardRef } from 'react';
-import { useUserFollowProfileQuery } from '@/api/users/usersQueries';
-import { useUserFollowProfileInsertMutation, useUserFollowProfileDeleteMutation } from '@/api/users/usersMutations';
+import { useUserFollowProfileQuery } from '@/api/users/userQueries';
+import { useUserFollowProfileInsertMutation, useUserFollowProfileDeleteMutation } from '@/api/users/userMutations';
 
 type ButtonUserFollowSkeletonProps = {
   skeleton: true;

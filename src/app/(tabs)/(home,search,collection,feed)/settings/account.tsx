@@ -1,6 +1,6 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useUserDeleteRequestDeleteMutation, useUserDeleteRequestInsertMutation, useUserUpdateMutation } from "@/api/users/usersMutations";
+import { useUserDeleteRequestDeleteMutation, useUserDeleteRequestInsertMutation, useUserUpdateMutation } from "@/api/users/userMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useState } from "react";
@@ -27,7 +27,7 @@ import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { KeyboardToolbar } from "@/components/ui/KeyboardToolbar";
 import { useToast } from "@/components/Toast";
-import { useUserDeleteRequestQuery } from "@/api/users/usersQueries";
+import { useUserDeleteRequestQuery } from "@/api/users/userQueries";
 
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
@@ -120,6 +120,7 @@ const SettingsAccountScreen = () => {
 			if (values.email && values.email !== session?.user.email) {
 				await updateEmail(values.email);
 			}
+			setHasUnsavedChanges(false);
 			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 		} catch (error) {
 			let errorMessage: string = upperFirst(t('common.messages.an_error_occurred'));

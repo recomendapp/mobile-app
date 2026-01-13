@@ -1,7 +1,7 @@
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
 import { useNovu } from "@novu/react-native";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { notificationsOptions } from "./notificationsOptions";
+import { notificationsOptions } from "./notificationOptions";
 
 export const useNotificationsQuery = ({
 	view,

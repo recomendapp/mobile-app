@@ -2,10 +2,10 @@ import { useAuth } from "@/providers/AuthProvider"
 import {
 useUserReviewTvSeriesLikeInsertMutation,
 useUserReviewTvSeriesLikeDeleteMutation,
-} from "@/api/users/usersMutations"
+} from "@/api/users/userMutations"
 import * as Haptics from 'expo-haptics'
 import { useCallback, useMemo } from "react"
-import { useUserReviewTvSeriesLikeQuery } from "../usersQueries"
+import { useUserReviewTvSeriesLikeQuery } from "../userQueries"
 
 export const useUserReviewTvSeriesLike = ({
 	reviewId,

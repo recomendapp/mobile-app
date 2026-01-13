@@ -1,5 +1,5 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
-import { mediasKeys } from "./mediasKeys";
+import { mediasKeys } from "./mediaKeys";
 import { SupabaseClient } from "@/lib/supabase/client";
 
 /* --------------------------------- DETAILS -------------------------------- */

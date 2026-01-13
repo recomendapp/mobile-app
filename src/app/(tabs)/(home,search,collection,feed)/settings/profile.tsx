@@ -1,6 +1,6 @@
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useUserUpdateMutation } from "@/api/users/usersMutations";
+import { useUserUpdateMutation } from "@/api/users/userMutations";
 import tw from "@/lib/tw";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -151,6 +151,8 @@ const SettingsProfileScreen = () => {
 				website: values.website?.trim() || null,
 				avatar: newAvatar,
 			});
+			setNewAvatar(undefined);
+			setHasFormChanged(false);
 			toast.success(upperFirst(t('common.messages.saved', { count: 1, gender: 'male' })));
 		} catch (error) {
 			console.error(error);

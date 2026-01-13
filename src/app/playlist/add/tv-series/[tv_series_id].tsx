@@ -30,8 +30,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/components/Toast";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { usePlaylistTvSeriesAddToQuery } from "@/api/playlists/playlistsQueries";
-import { playlistTvSeriesAddToOptions } from "@/api/playlists/playlistsOptions";
+import { usePlaylistTvSeriesAddToQuery } from "@/api/playlists/playlistQueries";
+import { playlistTvSeriesAddToOptions } from "@/api/playlists/playlistOptions";
 
 const COMMENT_MAX_LENGTH = 180;
 

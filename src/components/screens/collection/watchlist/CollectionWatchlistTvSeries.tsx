@@ -7,7 +7,7 @@ import CollectionScreen, { CollectionAction, SortByOption } from "@/components/c
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import { useUserWatchlistTvSeriesDeleteMutation } from "@/api/users/usersMutations";
+import { useUserWatchlistTvSeriesDeleteMutation } from "@/api/users/userMutations";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useUIStore } from "@/stores/useUIStore";
 import { BottomSheetWatchlistTvSeriesComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistTvSeriesComment";
@@ -16,7 +16,7 @@ import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { SharedValue } from "react-native-reanimated";
-import { useUserWatchlistTvSeriesQuery } from "@/api/users/usersQueries";
+import { useUserWatchlistTvSeriesQuery } from "@/api/users/userQueries";
 
 interface CollectionWatchlistTvSeriesProps {
 	scrollY?: SharedValue<number>;

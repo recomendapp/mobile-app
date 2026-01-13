@@ -5,13 +5,13 @@ import { getIdFromSlug } from "@/utils/getIdFromSlug";
 import tw from "@/lib/tw";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native"
-import { useUserReviewMovieUpsertMutation } from "@/api/users/usersMutations";
+import { useUserReviewMovieUpsertMutation } from "@/api/users/userMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
 import { useCallback } from "react";
 import { useMediaMovieDetailsQuery } from "@/api/medias/mediaQueries";
-import { useUserActivityMovieQuery } from "@/api/users/usersQueries";
+import { useUserActivityMovieQuery } from "@/api/users/userQueries";
 
 const ReviewMovieCreateScreen = () => {
 	const { user } = useAuth();

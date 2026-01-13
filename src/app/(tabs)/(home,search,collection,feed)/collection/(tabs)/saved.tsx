@@ -10,7 +10,7 @@ import { useTranslations } from "use-intl";
 import { Playlist } from "@recomendapp/types";
 import { useCallback, useMemo } from "react";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
-import { useUserPlaylistsSavedQuery } from "@/api/users/usersQueries";
+import { useUserPlaylistsSavedQuery } from "@/api/users/userQueries";
 
 const CollectionSavedScreen = () => {
 	const { user } = useAuth();

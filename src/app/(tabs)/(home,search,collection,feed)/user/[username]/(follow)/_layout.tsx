@@ -8,7 +8,7 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { Icons } from "@/constants/Icons";
-import { useUserProfileQuery } from "@/api/users/usersQueries";
+import { useUserProfileQuery } from "@/api/users/userQueries";
 
 const Tab = createMaterialTopTabNavigator();
 

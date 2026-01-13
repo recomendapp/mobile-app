@@ -14,7 +14,7 @@ import { PlaylistMovie } from "@/components/screens/playlist/PlaylistMovie";
 import { PlaylistTvSeries } from "@/components/screens/playlist/PlaylistTvSeries";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
-import { usePlaylistDetailsQuery } from "@/api/playlists/playlistsQueries";
+import { usePlaylistDetailsQuery } from "@/api/playlists/playlistQueries";
 import { useUserPlaylistLike } from "@/api/users/hooks/useUserPlaylistLike";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useUserPlaylistSaved } from "@/api/users/hooks/useUserPlaylistSaved";

@@ -24,7 +24,7 @@ import BottomSheetUser from "@/components/bottom-sheets/sheets/BottomSheetUser";
 import { useCallback, useMemo } from "react";
 import Animated from "react-native-reanimated";
 import { authKeys } from "@/api/auth/authKeys";
-import { useUserActivitiesMovieQuery, useUserActivitiesTvSeriesQuery, useUserPlaylistsQuery, useUserProfileQuery } from "@/api/users/usersQueries";
+import { useUserActivitiesMovieQuery, useUserActivitiesTvSeriesQuery, useUserPlaylistsQuery, useUserProfileQuery } from "@/api/users/userQueries";
 
 const ProfileHeader = ({
 	profile,

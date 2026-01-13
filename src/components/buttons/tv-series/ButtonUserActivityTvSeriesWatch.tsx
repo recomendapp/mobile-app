@@ -1,7 +1,7 @@
 import { Alert } from "react-native";
 import { useAuth } from "@/providers/AuthProvider";
 import { Icons } from "@/constants/Icons";
-import { useUserActivityTvSeriesDeleteMutation, useUserActivityTvSeriesInsertMutation } from "@/api/users/usersMutations";
+import { useUserActivityTvSeriesDeleteMutation, useUserActivityTvSeriesInsertMutation } from "@/api/users/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaTvSeries } from "@recomendapp/types";
 import { upperFirst } from "lodash";
@@ -11,7 +11,7 @@ import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/Toast";
 import { forwardRef, useCallback } from "react";
-import { useUserActivityTvSeriesQuery } from "@/api/users/usersQueries";
+import { useUserActivityTvSeriesQuery } from "@/api/users/userQueries";
 
 interface ButtonUserActivityTvSeriesWatchProps
 	extends React.ComponentProps<typeof Button> {

@@ -21,7 +21,7 @@ import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "../bottom-sheets/sheets/BottomSheetMovie";
 import BottomSheetTvSeries from "../bottom-sheets/sheets/BottomSheetTvSeries";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
-import { useWidgetMostRecommendedQuery } from "@/api/widget/widgetQueries";
+import { useWidgetMostRecommendedQuery } from "@/api/widgets/widgetQueries";
 
 interface WidgetMostRecommendedProps extends ViewProps {
 	scrollY?: SharedValue<number>;

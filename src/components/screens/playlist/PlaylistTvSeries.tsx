@@ -24,7 +24,7 @@ import { BottomSheetComment } from "@/components/bottom-sheets/sheets/BottomShee
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
-import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsTvSeriesQuery } from "@/api/playlists/playlistsQueries";
+import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsTvSeriesQuery } from "@/api/playlists/playlistQueries";
 
 interface PlaylistTvSeriesProps {
 	playlist: Playlist;

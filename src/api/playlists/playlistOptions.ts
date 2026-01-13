@@ -1,5 +1,5 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
-import { playlistsKeys } from "./playlistsKeys";
+import { playlistKeys } from "./playlistKeys";
 import { SupabaseClient } from "@/lib/supabase/client";
 import { ApiClient } from "@recomendapp/api-js";
 
@@ -12,7 +12,7 @@ export const playlistDetailsOptions = ({
 	playlistId?: number
 }) => {
 	return queryOptions({
-		queryKey: playlistsKeys.details({ playlistId: playlistId! }),
+		queryKey: playlistKeys.details({ playlistId: playlistId! }),
 		queryFn: async () => {
 			if (!playlistId) throw Error('Missing playlist id');
 			const { data, error } = await supabase
@@ -38,7 +38,7 @@ export const playlistItemsMovieOptions = ({
 	playlistId?: number;
 }) => {
 	return queryOptions({
-		queryKey: playlistsKeys.items({
+		queryKey: playlistKeys.items({
 			playlistId: playlistId!,
 		}),
 		queryFn: async () => {
@@ -64,7 +64,7 @@ export const playlistItemsTvSeriesOptions = ({
 	playlistId?: number;
 }) => {
 	return queryOptions({
-		queryKey: playlistsKeys.items({
+		queryKey: playlistKeys.items({
 			playlistId: playlistId!,
 		}),
 		queryFn: async () => {
@@ -92,7 +92,7 @@ export const playlistGuestsOptions = ({
 	playlistId?: number
 }) => {
 	return queryOptions({
-		queryKey: playlistsKeys.guests({
+		queryKey: playlistKeys.guests({
 			playlistId: playlistId!,
 		}),
 		queryFn: async () => {
@@ -127,7 +127,7 @@ export const playlistGuestsAddOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: playlistsKeys.guestsAdd({
+		queryKey: playlistKeys.guestsAdd({
 			playlistId: playlistId!,
 			filters: {
 				search: query!,
@@ -172,7 +172,7 @@ export const playlistIsAllowedToEditOptions = ({
 	userId?: string;
 }) => {
 	return queryOptions({
-		queryKey: playlistsKeys.allowedToEdit({
+		queryKey: playlistKeys.allowedToEdit({
 			playlistId: playlistId!,
 			userId: userId!,
 		}),
@@ -213,7 +213,7 @@ export const playlistMovieAddToOptions = ({
 	source: 'saved' | 'personal';
 }) => {
 	return queryOptions({
-		queryKey: playlistsKeys.addToSource({ id: movieId, type: 'movie', source }),
+		queryKey: playlistKeys.addToSource({ id: movieId, type: 'movie', source }),
 		queryFn: async () => {
 			if (!userId) throw Error('Missing user id');
 			if (!source) throw Error('Missing source');
@@ -281,7 +281,7 @@ export const playlistTvSeriesAddToOptions = ({
 	source: 'saved' | 'personal';
 }) => {
 	return queryOptions({
-		queryKey: playlistsKeys.addToSource({ id: tvSeriesId, type: 'tv_series', source }),
+		queryKey: playlistKeys.addToSource({ id: tvSeriesId, type: 'tv_series', source }),
 		queryFn: async () => {
 			if (!userId) throw Error('Missing user id');
 			if (!source) throw Error('Missing source');
@@ -351,7 +351,7 @@ export const playlistsFeaturedOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: playlistsKeys.featured({ filters }),
+		queryKey: playlistKeys.featured({ filters }),
 		queryFn: async ({ pageParam = 1 }) => {
 			const from = (pageParam - 1) * PER_PAGE;
 			const to = from + PER_PAGE - 1;

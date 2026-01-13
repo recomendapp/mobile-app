@@ -1,6 +1,6 @@
 import { Notification, useNovu } from "@novu/react-native";
 import { infiniteQueryOptions } from "@tanstack/react-query";
-import { notificationsKeys } from "./notificationsKeys";
+import { notificationKeys } from "./notificationKeys";
 import { Database, NotificationPayload } from "@recomendapp/types";
 import { SupabaseClient } from "@/lib/supabase/client";
 
@@ -22,7 +22,7 @@ export const notificationsOptions = ({
 }) => {
 	const PER_PAGE = 20;
 	return infiniteQueryOptions({
-		queryKey: notificationsKeys.list({
+		queryKey: notificationKeys.list({
 			view,
 		}),
 		queryFn: async ({ pageParam = 1 }): Promise<NotificationWithContent> => {

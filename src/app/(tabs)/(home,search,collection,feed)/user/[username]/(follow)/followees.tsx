@@ -1,4 +1,4 @@
-import { useUserFolloweesQuery, useUserProfileQuery } from "@/api/users/usersQueries";
+import { useUserFolloweesQuery, useUserProfileQuery } from "@/api/users/userQueries";
 import { CardUser } from "@/components/cards/CardUser";
 import { useTheme } from "@/providers/ThemeProvider";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";

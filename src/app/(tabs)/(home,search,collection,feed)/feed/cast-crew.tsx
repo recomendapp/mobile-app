@@ -1,5 +1,5 @@
 import { useUIBackgroundsQuery } from "@/api/ui/uiQueries";
-import { useUserFeedCastCrewQuery } from "@/api/users/usersQueries";
+import { useUserFeedCastCrewQuery } from "@/api/users/userQueries";
 import { CardFeedCastCrewMovie } from "@/components/cards/feed/CardFeedCastCrewMovie";
 import { CardFeedCastCrewTvSeries } from "@/components/cards/feed/CardFeedCastCrewTvSeries";
 import { Button } from "@/components/ui/Button";

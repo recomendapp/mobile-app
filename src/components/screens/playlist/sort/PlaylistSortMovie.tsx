@@ -19,7 +19,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsMovieQuery } from "@/api/playlists/playlistsQueries";
+import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsMovieQuery } from "@/api/playlists/playlistQueries";
 
 export const PlaylistSortMovie = () => {
 	const { session } = useAuth();

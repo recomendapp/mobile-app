@@ -24,7 +24,7 @@ import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { usePlaylistDetailsQuery, usePlaylistGuestsQuery } from "@/api/playlists/playlistsQueries";
+import { usePlaylistDetailsQuery, usePlaylistGuestsQuery } from "@/api/playlists/playlistQueries";
 
 const RightActions = ({
 	drag,

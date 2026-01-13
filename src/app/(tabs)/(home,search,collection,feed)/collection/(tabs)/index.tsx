@@ -9,7 +9,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Text } from "@/components/ui/text";
 import { useCallback, useMemo } from "react";
-import { useUserPlaylistsQuery } from "@/api/users/usersQueries";
+import { useUserPlaylistsQuery } from "@/api/users/userQueries";
 
 const CollectionScreen = () => {
 	const { user } = useAuth();

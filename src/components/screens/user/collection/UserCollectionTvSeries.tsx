@@ -14,7 +14,7 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardTvSeries } from "@/components/cards/CardTvSeries";
 import { FadeInDown } from "react-native-reanimated";
 import { UserActivityTvSeries } from "@recomendapp/types";
-import { useUserActivitiesTvSeriesQuery, useUserProfileQuery } from "@/api/users/usersQueries";
+import { useUserActivitiesTvSeriesQuery, useUserProfileQuery } from "@/api/users/userQueries";
 
 interface sortBy {
 	label: string;

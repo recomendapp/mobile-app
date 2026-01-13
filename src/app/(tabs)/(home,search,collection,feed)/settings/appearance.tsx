@@ -14,7 +14,7 @@ import { supportedLocales } from "@/translations/locales";
 import { useLocaleContext } from "@/providers/LocaleProvider";
 import { Picker } from '@react-native-picker/picker';
 import useLocalizedLanguageName from "@/hooks/useLocalizedLanguageName";
-import { useUserUpdateMutation } from "@/api/users/usersMutations";
+import { useUserUpdateMutation } from "@/api/users/userMutations";
 import { useAuth } from "@/providers/AuthProvider";
 import { KeyboardAwareScrollView } from '@/components/ui/KeyboardAwareScrollView';
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";

@@ -14,7 +14,7 @@ import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { CardMovie } from "@/components/cards/CardMovie";
 import { FadeInDown } from "react-native-reanimated";
 import { UserActivityMovie } from "@recomendapp/types";
-import { useUserActivitiesMovieQuery, useUserProfileQuery } from "@/api/users/usersQueries";
+import { useUserActivitiesMovieQuery, useUserProfileQuery } from "@/api/users/userQueries";
 
 interface sortBy {
 	label: string;

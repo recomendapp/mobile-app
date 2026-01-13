@@ -11,7 +11,7 @@ import { Icons } from "@/constants/Icons";
 import { Text } from "@/components/ui/text";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
-import { usePlaylistsFeaturedQuery } from "@/api/playlists/playlistsQueries";
+import { usePlaylistsFeaturedQuery } from "@/api/playlists/playlistQueries";
 
 interface FeaturedPlaylistsProps {
 	contentContainerStyle?: StyleProp<ViewStyle>;

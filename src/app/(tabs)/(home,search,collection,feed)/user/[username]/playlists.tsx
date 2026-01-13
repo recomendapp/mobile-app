@@ -12,7 +12,7 @@ import { Text, useWindowDimensions, View } from "react-native";
 import { useTranslations } from "use-intl";
 import { HeaderTitle } from "@react-navigation/elements";
 import { PADDING_VERTICAL } from "@/theme/globals";
-import { useUserPlaylistsQuery, useUserProfileQuery } from "@/api/users/usersQueries";
+import { useUserPlaylistsQuery, useUserProfileQuery } from "@/api/users/userQueries";
 
 interface sortBy {
 	label: string;

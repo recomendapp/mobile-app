@@ -6,7 +6,7 @@ import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { Text } from "../ui/text";
 import { GAP } from "@/theme/globals";
-import { useUserPlaylistsFriendQuery } from "@/api/users/usersQueries";
+import { useUserPlaylistsFriendQuery } from "@/api/users/userQueries";
 
 interface WidgetUserFriendsPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
