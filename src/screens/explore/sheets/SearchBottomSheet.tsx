@@ -13,8 +13,6 @@ import { BottomSheetSearchbar } from '@/components/ui/BottomSheetSearchbar';
 import { GAP, PADDING_HORIZONTAL } from '@/theme/globals';
 import { ExploreTile } from '@recomendapp/types';
 import tw from '@/lib/tw';
-import { useQuery } from '@tanstack/react-query';
-import { useExploreTileOptions } from '@/api/options';
 import Fuse from 'fuse.js';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { Button } from '@/components/ui/Button';
@@ -24,6 +22,7 @@ import { useExploreStore } from '@/stores/useExploreStore';
 import { Icons } from '@/constants/Icons';
 import { upperFirst } from 'lodash';
 import { useTranslations } from 'use-intl';
+import { useExploreTileQuery } from '@/api/explore/exploreQueries';
 
 interface SearchBottomSheetProps {
   index: SharedValue<number>;
@@ -52,7 +51,7 @@ export const SearchBottomSheet = forwardRef<
   // Queries
   const {
 		data: tile,
-	} = useQuery(useExploreTileOptions({ exploreId: 1 }));
+	} = useExploreTileQuery({ exploreId: 1 });
   const locations = useMemo(
     () => tile?.features || [],
     [tile]

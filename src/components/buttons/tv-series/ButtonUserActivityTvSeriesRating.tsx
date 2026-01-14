@@ -1,5 +1,4 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserActivityTvSeriesQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { MediaTvSeries } from "@recomendapp/types";
@@ -7,7 +6,7 @@ import tw from "@/lib/tw";
 import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import BottomSheetRating from "@/components/bottom-sheets/sheets/BottomSheetRating";
-import { useUserActivityTvSeriesInsertMutation, useUserActivityTvSeriesUpdateMutation } from "@/features/user/userMutations";
+import { useUserActivityTvSeriesInsertMutation, useUserActivityTvSeriesUpdateMutation } from "@/api/users/userMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
@@ -15,6 +14,7 @@ import { forwardRef, useCallback } from "react";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/providers/ThemeProvider";
+import { useUserActivityTvSeriesQuery } from "@/api/users/userQueries";
 
 interface ButtonUserActivityTvSeriesRatingProps
 	extends Omit<React.ComponentProps<typeof Button>, 'icon'> {
@@ -116,13 +116,13 @@ const ButtonUserActivityTvSeriesRating = forwardRef<
 			onPressProps?.(e);
 		}}
 		style={{
-			...(!activity?.rating ? tw`rounded-full` : { backgroundColor: colors.background, borderColor: colors.accentYellow }),
+			...(!activity?.rating ? tw`rounded-full` : { backgroundColor: colors.accentYellowForeground, borderColor: colors.accentYellow }),
 			...style,
 		}}
 		{...props}
 		>
 			{activity?.rating ? (
-				<Text style={tw`font-bold`}>{activity.rating}</Text>
+				<Text style={[tw`font-bold`, { color: colors.accentYellow }]}>{activity.rating}</Text>
 			) : null}
 		</Button>
 	);

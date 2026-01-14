@@ -16,6 +16,7 @@ const AuthLayout = () => {
       headerStyle: {
         backgroundColor: 'transparent',
       },
+      headerBackButtonDisplayMode: 'minimal',
     }}
     >
       <Stack.Screen name="index" options={{ title: upperFirst(t('common.messages.welcome')) }} />

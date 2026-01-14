@@ -1,9 +1,8 @@
-import { Keys } from "@/api/keys";
-import { useAuthCustomerInfoOptions } from "@/api/options";
+import { authKeys } from "@/api/auth/authKeys";
+import { authCustomerInfoOptions } from "@/api/auth/authOptions";
 import { Button } from "@/components/ui/Button";
 import { Icons } from "@/constants/Icons";
 import tw from "@/lib/tw";
-import { isIOS } from "@/platform/detection";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import {  useQueryClient } from "@tanstack/react-query";
@@ -19,16 +18,19 @@ const UpgradeScreen = () => {
 	const router = useRouter();
 	const queryClient = useQueryClient();
 	const t = useTranslations();
-	const { defaultScreenOptions } = useTheme();
-	const authCustomerInfoOptions = useAuthCustomerInfoOptions();
+	const { defaultScreenOptions, isLiquidGlassAvailable } = useTheme();
 
 	const onSuccess = useCallback(async ({ customerInfo } : { customerInfo: CustomerInfo }) => {
-		queryClient.setQueryData(authCustomerInfoOptions.queryKey, customerInfo);
+		queryClient.setQueryData(authCustomerInfoOptions().queryKey, customerInfo);
 		session?.user.id && await queryClient.invalidateQueries({
-			queryKey: Keys.auth.user(),
+			queryKey: authKeys.user(),
 		});
 		router.canGoBack() && router.back();
-	}, [queryClient, authCustomerInfoOptions.queryKey, router, session?.user.id]);
+	}, [queryClient, router, session?.user.id]);
+
+	const handleClose = useCallback(() => {
+		router.canGoBack() && router.back();
+	}, [router]);
 
 	if (!session) return <Redirect href={'/auth/login'} />
 	
@@ -39,8 +41,21 @@ const UpgradeScreen = () => {
 			...defaultScreenOptions,
 			headerTitle: upperFirst(t('common.messages.upgrade')),
 			headerTransparent: true,
-			headerRight: isIOS ? () => <Button icon={Icons.X} size="icon" variant='muted' style={tw`rounded-full`} onPress={() => router.canGoBack() && router.back()} /> : undefined,
 			headerStyle: { backgroundColor: 'transparent' },
+			headerLeft: () => (
+				<Button variant="muted" icon={Icons.X} size="icon" style={tw`rounded-full`} onPress={handleClose} />
+			),
+			unstable_headerLeftItems: isLiquidGlassAvailable ? (props) => [
+			{
+				type: "button",
+				label: upperFirst(t('common.messages.close')),
+				onPress: handleClose,
+				icon: {
+					name: "xmark",
+					type: "sfSymbol",
+				},
+			},
+			] : undefined,
 		}}
 		/>
 		<RevenueCatUI.Paywall onPurchaseCompleted={onSuccess} onRestoreCompleted={onSuccess} />

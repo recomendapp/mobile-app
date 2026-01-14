@@ -3,13 +3,11 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import React from "react";
 import { UserRecosTvSeriesAggregated } from "@recomendapp/types";
-import CollectionScreen, { CollectionAction, SortByOption } from "@/components/screens/collection/CollectionScreen";
+import CollectionScreen, { CollectionAction, SortByOption } from "@/components/collection/CollectionScreen";
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import { useSharedValue } from "react-native-reanimated";
-import { useUserRecosTvSeriesCompleteMutation, useUserRecosTvSeriesDeleteMutation } from "@/features/user/userMutations";
-import { useUserRecosTvSeriesQuery } from "@/features/user/userQueries";
+import { useUserRecosTvSeriesCompleteMutation, useUserRecosTvSeriesDeleteMutation } from "@/api/users/userMutations";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useUIStore } from "@/stores/useUIStore";
 import BottomSheetMyRecosSenders from "@/components/bottom-sheets/sheets/BottomSheetMyRecosSenders";
@@ -17,14 +15,25 @@ import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTv
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { SharedValue } from "react-native-reanimated";
+import { useUserRecosTvSeriesQuery } from "@/api/users/userQueries";
 
-export const CollectionMyRecosTvSeries = () => {
+interface CollectionMyRecosTvSeriesProps {
+	scrollY?: SharedValue<number>;
+	headerHeight?: SharedValue<number>;
+}
+
+export const CollectionMyRecosTvSeries = ({
+	scrollY,
+	headerHeight,
+} : CollectionMyRecosTvSeriesProps) => {
 	const t = useTranslations();
 	const toast = useToast();
     const { user } = useAuth();
 	const { mode } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.myRecos.view);
+	const setMyRecosView = useUIStore((state) => state.setMyRecosView);
     const queryData = useUserRecosTvSeriesQuery({
 		userId: user?.id,
     });
@@ -33,8 +42,6 @@ export const CollectionMyRecosTvSeries = () => {
 	const { mutateAsync: deleteReco } = useUserRecosTvSeriesDeleteMutation();
 	const { mutateAsync: completeReco } = useUserRecosTvSeriesCompleteMutation();
 	// SharedValues
-	const scrollY = useSharedValue(0);
-	const headerHeight = useSharedValue(0);
 
 	// Handlers
 	const handleDeleteReco = React.useCallback((data: UserRecosTvSeriesAggregated) => {
@@ -218,11 +225,12 @@ export const CollectionMyRecosTvSeries = () => {
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
 		onItemAction={onItemAction}
-		// Shared Values
+		// SharedValues
 		scrollY={scrollY}
 		headerHeight={headerHeight}
 		// View
-		view={view}
+		defaultView={view}
+		onViewChange={setMyRecosView}
         />
 	</>
     );

@@ -1,8 +1,7 @@
 import { Alert } from "react-native";
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserActivityTvSeriesQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
-import { useUserActivityTvSeriesDeleteMutation, useUserActivityTvSeriesInsertMutation } from "@/features/user/userMutations";
+import { useUserActivityTvSeriesDeleteMutation, useUserActivityTvSeriesInsertMutation } from "@/api/users/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaTvSeries } from "@recomendapp/types";
 import { upperFirst } from "lodash";
@@ -12,6 +11,7 @@ import { usePathname, useRouter } from "expo-router";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/Toast";
 import { forwardRef, useCallback } from "react";
+import { useUserActivityTvSeriesQuery } from "@/api/users/userQueries";
 
 interface ButtonUserActivityTvSeriesWatchProps
 	extends React.ComponentProps<typeof Button> {
@@ -102,7 +102,7 @@ const ButtonUserActivityTvSeriesWatch = forwardRef<
 			onPressProps?.(e);
 		}}
 		style={{
-			...({ backgroundColor: activity ? colors.accentBlue : undefined }),
+			...(activity ? { backgroundColor: colors.accentBlue } : undefined),
 			...tw`rounded-full`,
 			...style,
 		}}

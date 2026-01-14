@@ -1,11 +1,9 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserActivityTvSeriesQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
-import { useUserActivityTvSeriesInsertMutation, useUserActivityTvSeriesUpdateMutation } from "@/features/user/userMutations";
+import { useUserActivityTvSeriesInsertMutation, useUserActivityTvSeriesUpdateMutation } from "@/api/users/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaTvSeries } from "@recomendapp/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { userKeys } from "@/features/user/userKeys";
 import { upperFirst } from "lodash";
 import { useSharedValue } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
@@ -14,6 +12,8 @@ import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/Toast";
 import { forwardRef, useCallback } from "react";
 import tw from "@/lib/tw";
+import { useUserActivityTvSeriesQuery } from "@/api/users/userQueries";
+import { userKeys } from "@/api/users/userKeys";
 
 interface ButtonUserActivityTvSeriesLikeProps
 	extends React.ComponentProps<typeof Button> {
@@ -125,7 +125,7 @@ const ButtonUserActivityTvSeriesLike = forwardRef<
 			...iconProps,
 		}}
 		style={{
-			...({ backgroundColor: activity?.is_liked ? colors.accentPink : 'transparent' }),
+			...(activity?.is_liked ? { backgroundColor: colors.accentPink } : undefined),
 			...tw`rounded-full`,
 			...style,
 		}}

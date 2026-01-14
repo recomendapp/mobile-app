@@ -11,7 +11,6 @@ import { BORDER_RADIUS, GAP, HEIGHT, PADDING, PADDING_HORIZONTAL, PADDING_VERTIC
 import WheelSelector from "@/components/ui/WheelSelector";
 import Animated, { FadeInDown, FadeInRight, FadeOutDown, FadeOutRight } from "react-native-reanimated";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useMediaTvSeriesBackdropInfiniteQuery, useMediaTvSeriesPosterInfiniteQuery } from "@/features/media/mediaQueries";
 import { Image } from "expo-image";
 import { CaptureResult, ShareViewRef } from "@/components/share/type";
 import { CircleIcon, LucideIcon } from "lucide-react-native";
@@ -24,6 +23,7 @@ import { useImagePalette } from "@/hooks/useImagePalette";
 import Color from "color";
 import { ShapeVerticalRoundedBackground, ShapeVerticalRoundedForeground } from "@/lib/icons";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { useMediaTvSeriesBackdropsQuery, useMediaTvSeriesPostersQuery } from "@/api/medias/mediaQueries";
 
 interface ShareTvSeriesProps extends React.ComponentProps<typeof ViewShot> {
 	tvSeries: MediaTvSeries;
@@ -147,7 +147,7 @@ const PosterSelector = ({
 		data,
 		hasNextPage,
 		fetchNextPage,
-	} = useMediaTvSeriesPosterInfiniteQuery({
+	} = useMediaTvSeriesPostersQuery({
 		tvSeriesId: poster ? tvSeries.id : undefined,
 	});
 	const posters = useMemo(() => data?.pages.flat() || [], [data]);
@@ -250,7 +250,7 @@ const BackdropImageSelector = ({
 		data,
 		hasNextPage,
 		fetchNextPage,
-	} = useMediaTvSeriesBackdropInfiniteQuery({
+	} = useMediaTvSeriesBackdropsQuery({
 		tvSeriesId: tvSeriesId,
 	});
 	const backdrops = useMemo(() => data?.pages.flat() || [], [data]);

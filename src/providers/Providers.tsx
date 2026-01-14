@@ -10,13 +10,11 @@ import { LocaleProvider } from "./LocaleProvider";
 import { NotificationsProvider } from "./NotificationsProvider";
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Splash } from "@/components/Splash/Splash";
 import { PropsWithChildren } from "react";
 import { ToastProvider } from "@/components/Toast";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { useQuery } from "@tanstack/react-query";
-import { useUIBackgroundsOptions } from "@/api/options";
 import { ApiProvider } from "./ApiProvider";
+import { useUIBackgroundsQuery } from "@/api/ui/uiQueries";
 
 type ProvidersProps = {
 	children: React.ReactNode;
@@ -60,12 +58,13 @@ const Providers = ({ children } : ProvidersProps) => {
 };
 
 const ProvidersInner = ({ children } : PropsWithChildren) => {
-	useQuery(useUIBackgroundsOptions()); // Preload UI backgrounds
-	return (
-		<Splash>
-			{children}
-		</Splash>
-	);
+	useUIBackgroundsQuery(); // Preload UI backgrounds
+	return children;
+	// return (
+	// 	<Splash>
+	// 		{children}
+	// 	</Splash>
+	// );
 };
 
 export { Providers };

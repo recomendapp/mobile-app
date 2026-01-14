@@ -3,13 +3,11 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import React from "react";
 import { UserRecosMovieAggregated } from "@recomendapp/types";
-import CollectionScreen, { CollectionAction, SortByOption } from "@/components/screens/collection/CollectionScreen";
+import CollectionScreen, { CollectionAction, SortByOption } from "@/components/collection/CollectionScreen";
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import { useSharedValue } from "react-native-reanimated";
-import { useUserRecosMovieCompleteMutation, useUserRecosMovieDeleteMutation } from "@/features/user/userMutations";
-import { useUserRecosMovieQuery } from "@/features/user/userQueries";
+import { useUserRecosMovieCompleteMutation, useUserRecosMovieDeleteMutation } from "@/api/users/userMutations";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
 import { useUIStore } from "@/stores/useUIStore";
@@ -17,14 +15,25 @@ import BottomSheetMyRecosSenders from "@/components/bottom-sheets/sheets/BottomS
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { SharedValue } from "react-native-reanimated";
+import { useUserRecosMovieQuery } from "@/api/users/userQueries";
 
-export const CollectionMyRecosMovie = () => {
+interface CollectionMyRecosMovieProps {
+	scrollY?: SharedValue<number>;
+	headerHeight?: SharedValue<number>;
+}
+
+export const CollectionMyRecosMovie = ({
+	scrollY,
+	headerHeight,
+} : CollectionMyRecosMovieProps) => {
 	const toast = useToast();
 	const t = useTranslations();
 	const { mode } = useTheme();
     const { user } = useAuth();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.myRecos.view);
+	const setMyRecosView = useUIStore((state) => state.setMyRecosView);
     const queryData = useUserRecosMovieQuery({
 		userId: user?.id,
     });
@@ -32,9 +41,6 @@ export const CollectionMyRecosMovie = () => {
 	// Mutations
 	const { mutateAsync: deleteReco } = useUserRecosMovieDeleteMutation();
 	const { mutateAsync: completeReco } = useUserRecosMovieCompleteMutation();
-	// SharedValues
-	const scrollY = useSharedValue(0);
-	const headerHeight = useSharedValue(0);
 
 	// Handlers
 	const handleDeleteReco = React.useCallback((data: UserRecosMovieAggregated) => {
@@ -220,11 +226,12 @@ export const CollectionMyRecosMovie = () => {
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
 		onItemAction={onItemAction}
-		// Shared Values
+		// SharedValues
 		scrollY={scrollY}
 		headerHeight={headerHeight}
 		// View
-		view={view}
+		defaultView={view}
+		onViewChange={setMyRecosView}
         />
 	</>
     );

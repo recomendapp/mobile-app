@@ -1,6 +1,5 @@
 import { CardPlaylist } from "@/components/cards/CardPlaylist";
 import { useTheme } from "@/providers/ThemeProvider";
-import { usePlaylistFeaturedInfiniteQuery } from "@/features/playlist/playlistQueries";
 import tw from "@/lib/tw";
 import { StyleProp, useWindowDimensions, View, ViewStyle } from "react-native";
 import { LegendList, LegendListRef } from "@legendapp/list";
@@ -12,6 +11,7 @@ import { Icons } from "@/constants/Icons";
 import { Text } from "@/components/ui/text";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
+import { usePlaylistsFeaturedQuery } from "@/api/playlists/playlistQueries";
 
 interface FeaturedPlaylistsProps {
 	contentContainerStyle?: StyleProp<ViewStyle>;
@@ -22,14 +22,19 @@ const FeaturedPlaylists = ({
 } : FeaturedPlaylistsProps) => {
 	const t = useTranslations();
 	const { width: SCREEN_WIDTH } = useWindowDimensions();
-	const { colors, bottomOffset } = useTheme();
+	const { colors, bottomOffset, tabBarHeight } = useTheme();
 	const {
 		data,
 		isLoading,
 		fetchNextPage,
 		hasNextPage,
 		refetch,
-	} = usePlaylistFeaturedInfiniteQuery();
+	} = usePlaylistsFeaturedQuery({
+		filters: {
+			sortBy: 'updated_at',
+			sortOrder: 'desc',
+		}
+	});
 	const playlists = useMemo(() => data?.pages.flat() || [], [data]);
 	// REFs
 	const scrollRef = useRef<LegendListRef>(null);
@@ -71,6 +76,9 @@ const FeaturedPlaylists = ({
 			},
 			contentContainerStyle,
 		]}
+		scrollIndicatorInsets={{
+			bottom: tabBarHeight,
+		}}
 		ListEmptyComponent={
 			isLoading ? <Icons.Loader />
 			: (
@@ -82,7 +90,6 @@ const FeaturedPlaylists = ({
 			)
 		}
 		keyExtractor={keyExtractor}
-		showsVerticalScrollIndicator={false}
 		ItemSeparatorComponent={itemSeparator}
 		onRefresh={refetch}
 		keyboardShouldPersistTaps='always'

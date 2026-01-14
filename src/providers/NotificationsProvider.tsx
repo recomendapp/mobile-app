@@ -7,11 +7,11 @@ import * as Device from 'expo-device';
 import { useRouter } from "expo-router";
 import { NotificationPayload } from "@recomendapp/types";
 import { NovuProvider } from "@novu/react-native";
-import { useNovuSubscriberHash } from "@/features/utils/utilsQueries";
 import { useQueryClient } from "@tanstack/react-query";
-import { utilsKey } from "@/features/utils/utilsKey";
 import { useToast } from "@/components/Toast";
 import * as env from '@/env';
+import { notificationKeys } from "@/api/notifications/notificationKeys";
+import { useNovuSubscriberHashQuery } from "@/api/novu/novuQueries";
 
 type NotificationsContextType = {
   isMounted: boolean;
@@ -39,7 +39,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
   const [permissionStatus, setPermissionStatus] = useState<Notifications.PermissionStatus | null>(null);
   const [notifications, setNotifications] = useState<Notifications.Notification[] | null>(null);
   const [error, setError] = useState<Error | null>(null);
-  const { data: subscriberHash } = useNovuSubscriberHash(session?.user.id);
+  const { data: subscriberHash } = useNovuSubscriberHashQuery({ subscriberId: session?.user.id });
 
   const notificationsListener = useRef<Notifications.EventSubscription | null>(null);
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
@@ -165,7 +165,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
       handleToast(notification);
       // Invalidate notifications queries
       queryClient.invalidateQueries({
-        queryKey: utilsKey.notifications()
+        queryKey: notificationKeys.list()
       });
     });
 

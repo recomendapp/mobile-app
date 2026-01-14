@@ -3,8 +3,7 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { ImageWithFallback } from "@/components/utils/ImageWithFallback";
 import { Icons } from "@/constants/Icons";
-import { usePlaylistTvSeriesUpdateMutation } from "@/features/playlist/playlistMutations";
-import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsTvSeriesQuery } from "@/features/playlist/playlistQueries";
+import { usePlaylistTvSeriesUpdateMutation } from "@/api/playlists/playlistMutations";
 import tw from "@/lib/tw";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -19,6 +18,8 @@ import { PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "@/components/Toast";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsTvSeriesQuery } from "@/api/playlists/playlistQueries";
 
 export const PlaylistSortTvSeries = () => {
 	const { session } = useAuth();
@@ -26,6 +27,7 @@ export const PlaylistSortTvSeries = () => {
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
 	const t = useTranslations();
+	const headerHeight = useHeaderHeight();
 	const { playlist_id } = useLocalSearchParams();
 	const playlistId = Number(playlist_id);
 	const { data: playlistItemsRequest, isLoading: playlistItemsRequestIsLoading } = usePlaylistItemsTvSeriesQuery({
@@ -80,20 +82,19 @@ export const PlaylistSortTvSeries = () => {
 				<View
 				style={[
 					tw`flex-row items-center justify-between gap-2 rounded-md my-0.5`,
-					{ backgroundColor: isActive ? colors.muted : colors.background }
 				]}
 				>
 					<View style={tw`flex-row items-center gap-2 shrink`}>
 						<ImageWithFallback
 						alt={item.tv_series?.name ?? ''}
-						source={{ uri: getTmdbImage({ path: item.tv_series?.poster_path, size: 'w342' }) || '' }}
-						style={[{ aspectRatio: 2 / 3, height: 'fit-content' }, tw`rounded-md w-16`]}
+						source={{ uri: getTmdbImage({ path: item.tv_series?.poster_path, size: 'w185' }) || '' }}
+						style={[{ aspectRatio: 2 / 3, height: 'fit-content' }, tw`rounded-md w-12`]}
 						/>
 						<View style={tw`shrink`}>
 							<Text numberOfLines={1}>
 								{item.tv_series?.name ?? ''}
 							</Text>
-							{subtitle && <Text style={{ color: colors.mutedForeground }} numberOfLines={1}>
+							{subtitle && <Text style={[tw`text-xs`, { color: colors.mutedForeground }]} numberOfLines={1}>
 								{subtitle}
 							</Text>}
 						</View>
@@ -144,12 +145,10 @@ export const PlaylistSortTvSeries = () => {
 		onDragEnd={handleOnDragEnd}
 		renderItem={renderItem}
 		keyExtractor={(item) => item.id.toString()}
-		contentContainerStyle={[
-			{ backgroundColor: colors.background },
-			{ paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL },
-		]}
-		style={{
-			marginBottom: insets.bottom,
+		contentContainerStyle={{
+			paddingHorizontal: PADDING_HORIZONTAL,
+			paddingBottom: PADDING_VERTICAL + insets.bottom,
+			paddingTop: headerHeight
 		}}
 		/>
 	);

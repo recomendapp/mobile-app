@@ -2,15 +2,15 @@ import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAuth } from '@/providers/AuthProvider';
 import upperFirst from 'lodash/upperFirst';
-import { useUserFollowProfileQuery } from '@/features/user/userQueries';
 import { Alert, ViewStyle } from 'react-native';
-import { useUserFollowProfileInsertMutation, useUserFollowProfileDeleteMutation } from '@/features/user/userMutations';
 import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
 import { CORNERS } from "@/theme/globals";
 import { useToast } from "../Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { forwardRef } from 'react';
+import { useUserFollowProfileQuery } from '@/api/users/userQueries';
+import { useUserFollowProfileInsertMutation, useUserFollowProfileDeleteMutation } from '@/api/users/userMutations';
 
 type ButtonUserFollowSkeletonProps = {
   skeleton: true;
@@ -39,7 +39,7 @@ const ButtonUserFollow = forwardRef<
     isLoading,
   } = useUserFollowProfileQuery({
     userId: user?.id,
-    followeeId: profileId,
+    profileId: profileId,
   });
   const loading = skeleton || !profileId || isLoading || isFollow === undefined;
 

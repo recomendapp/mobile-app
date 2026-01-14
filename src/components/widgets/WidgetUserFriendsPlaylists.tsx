@@ -1,5 +1,3 @@
-import { useAuth } from "@/providers/AuthProvider";
-import { useUserPlaylistsFriendsInfinite } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { CardPlaylist } from "../cards/CardPlaylist";
@@ -8,6 +6,7 @@ import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { Text } from "../ui/text";
 import { GAP } from "@/theme/globals";
+import { useUserPlaylistsFriendQuery } from "@/api/users/userQueries";
 
 interface WidgetUserFriendsPlaylistsProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -20,11 +19,10 @@ export const WidgetUserFriendsPlaylists = ({
   containerStyle,
 }: WidgetUserFriendsPlaylistsProps) => {
   const t = useTranslations();
-  const { session } = useAuth();
-  const { data: playlists } = useUserPlaylistsFriendsInfinite({
-    userId: session?.user.id,
+  const { data: playlists, hasNextPage, fetchNextPage } = useUserPlaylistsFriendQuery({
     filters: {
-      resultsPerPage: 20,
+      sortBy: 'updated_at',
+      sortOrder: 'desc',
     },
   });
 
@@ -47,6 +45,7 @@ export const WidgetUserFriendsPlaylists = ({
         snapToInterval={152}
         decelerationRate="fast"
         keyExtractor={(item) => item.id.toString()}
+        onEndReached={() => hasNextPage && fetchNextPage()}
         horizontal
         showsHorizontalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ width: GAP }} />}

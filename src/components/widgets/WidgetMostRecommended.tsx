@@ -20,9 +20,8 @@ import { useRouter } from "expo-router";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import BottomSheetMovie from "../bottom-sheets/sheets/BottomSheetMovie";
 import BottomSheetTvSeries from "../bottom-sheets/sheets/BottomSheetTvSeries";
-import { useQuery } from "@tanstack/react-query";
-import { useWidgetMostRecommendedOptions } from "@/api/options";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { useWidgetMostRecommendedQuery } from "@/api/widgets/widgetQueries";
 
 interface WidgetMostRecommendedProps extends ViewProps {
 	scrollY?: SharedValue<number>;
@@ -42,7 +41,7 @@ const WidgetMostRecommended = ({
 		data,
 		isLoading,
 		isError
-	} = useQuery(useWidgetMostRecommendedOptions());
+	} = useWidgetMostRecommendedQuery();
 	const ref = useRef<ICarouselInstance>(null);
 	const progress = useSharedValue<number>(0);
 	

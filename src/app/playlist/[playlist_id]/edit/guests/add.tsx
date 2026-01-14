@@ -1,15 +1,12 @@
 import { CardUser } from "@/components/cards/CardUser";
-import AnimatedContentContainer from "@/components/ui/AnimatedContentContainer";
 import { Button } from "@/components/ui/Button";
 import { SearchBar } from "@/components/ui/searchbar";
 import { SelectionFooter } from "@/components/ui/SelectionFooter";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
-import { usePlaylistGuestsUpsertMutation } from "@/features/playlist/playlistMutations";
-import { usePlaylistGuestsQuery, usePlaylistGuestsSearchInfiniteQuery } from "@/features/playlist/playlistQueries";
+import { usePlaylistGuestsUpsertMutation } from "@/api/playlists/playlistMutations";
 import tw from "@/lib/tw";
-import { useAuth } from "@/providers/AuthProvider";
 import { GAP, PADDING, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { Profile } from "@recomendapp/types";
 import { AnimatedLegendList } from "@legendapp/list/reanimated";
@@ -23,17 +20,15 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { usePlaylistGuestsAddQuery } from "@/api/playlists/playlistQueries";
 
 const ModalPlaylistEditGuestsAdd = () => {
 	const { playlist_id } = useLocalSearchParams<{ playlist_id: string }>();
 	const playlistId = Number(playlist_id);
 	const t = useTranslations();
 	const toast = useToast();
-	const { session } = useAuth();
 	const router = useRouter();
 	const { mode } = useTheme();
-	const insets = useSafeAreaInsets();
 	// SharedValues
 	const footerHeight = useSharedValue(0);
 
@@ -41,7 +36,6 @@ const ModalPlaylistEditGuestsAdd = () => {
 	const [ search, setSearch ] = useState('');
 	const [ selectedUsers, setSelectedUsers ] = useState<Profile[]>([]);
 	const canSave: boolean = selectedUsers.length > 0;
-	const { data: guests } = usePlaylistGuestsQuery({ playlistId });
 	const {
 		data,
 		isLoading,
@@ -49,15 +43,9 @@ const ModalPlaylistEditGuestsAdd = () => {
 		fetchNextPage,
 		hasNextPage,
 		refetch,
-	} = usePlaylistGuestsSearchInfiniteQuery({
-		playlistId: (!!session && guests) ? playlistId : undefined,
+	} = usePlaylistGuestsAddQuery({
+		playlistId: playlistId,
 		query: search,
-		filters: {
-			exclude: [
-				session?.user.id!,
-				...(guests?.map((guest) => guest.user_id) || [])
-			]
-		}
 	});
 	const users = (
 		data?.pages.flatMap((page) => page.data.map((user) => ({
@@ -66,7 +54,9 @@ const ModalPlaylistEditGuestsAdd = () => {
 		}))) || []
 	);
 	// Mutations
-	const { mutateAsync: upsertGuestsMutation, isPending: isUpsertingGuests } = usePlaylistGuestsUpsertMutation();
+	const { mutateAsync: upsertGuestsMutation, isPending: isUpsertingGuests } = usePlaylistGuestsUpsertMutation({
+		playlistId: playlistId,
+	});
 
 	// Handlers
 	const handleToggleUser = useCallback((user: Profile) => {
@@ -82,7 +72,6 @@ const ModalPlaylistEditGuestsAdd = () => {
 		try {
 			if (selectedUsers.length === 0) return;
 			await upsertGuestsMutation({
-				playlistId: playlistId,
 				guests: selectedUsers.map((guest) => ({
 					user_id: guest.id!,
 				})),
@@ -100,7 +89,7 @@ const ModalPlaylistEditGuestsAdd = () => {
 			}
 			toast.error(upperFirst(t('common.messages.error')), { description: errorMessage });
 		}
-	}, [playlistId, selectedUsers, upsertGuestsMutation, toast, router, t]);
+	}, [selectedUsers, upsertGuestsMutation, toast, router, t]);
 	const handleCancel = useCallback(() => {
 		if (canSave) {
 			Alert.alert(
@@ -125,9 +114,8 @@ const ModalPlaylistEditGuestsAdd = () => {
 
 	// AnimatedStyles
 	const animatedFooterStyle = useAnimatedStyle(() => {
-		const paddingBottom =  PADDING_VERTICAL + (selectedUsers.length > 0 ? footerHeight.value : insets.bottom);
 		return {
-			paddingBottom: withTiming(paddingBottom, { duration: 200 }),
+			marginBottom: withTiming(footerHeight.value, { duration: 200 }),
 		};
 	});
 
@@ -157,6 +145,32 @@ const ModalPlaylistEditGuestsAdd = () => {
 						{upperFirst(t('common.messages.save'))}
 					</Button>
 				),
+				unstable_headerLeftItems: (props) => [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.cancel')),
+						onPress: handleCancel,
+						tintColor: props.tintColor,
+						disabled: isUpsertingGuests,
+						icon: {
+							name: "xmark",
+							type: "sfSymbol",
+						},
+					},
+				],
+				unstable_headerRightItems: (props) => [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.save')),
+						onPress: handleSubmit,
+						tintColor: props.tintColor,
+						disabled: !canSave || isUpsertingGuests,
+						icon: {
+							name: "checkmark",
+							type: "sfSymbol",
+						},
+					},
+				],
 			}}
 		/>
 		<View style={[tw`gap-2`, { paddingHorizontal: PADDING, paddingVertical: PADDING_VERTICAL }]}>
@@ -201,13 +215,13 @@ const ModalPlaylistEditGuestsAdd = () => {
 		onEndReachedThreshold={0.5}
 		contentContainerStyle={[
 			{ gap: GAP },
-			animatedFooterStyle
+			{ paddingBottom: PADDING_VERTICAL },
 		]}
-		renderScrollComponent={(props) => <AnimatedContentContainer {...props} />}
+		style={animatedFooterStyle}
 		/>
 		<SelectionFooter
 		data={selectedUsers}
-		height={footerHeight}
+		visibleHeight={footerHeight}
 		renderItem={({ item }) => (
 			<CardUser variant="icon" linked={false} onPress={() => handleToggleUser(item)} user={item} width={50} height={50}/>
 		)}

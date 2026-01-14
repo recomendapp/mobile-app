@@ -1,4 +1,4 @@
-import React from 'react';
+import { forwardRef, useMemo } from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
 import { UserReviewMovie } from '@recomendapp/types';
@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/providers/AuthProvider';
 import { PADDING_VERTICAL } from '@/theme/globals';
 import { Alert } from 'react-native';
-import { useUserReviewMovieDeleteMutation } from '@/features/user/userMutations';
+import { useUserReviewMovieDeleteMutation } from '@/api/users/userMutations';
 import { useToast } from '@/components/Toast';
 import { FlashList } from '@shopify/flash-list';
 
@@ -33,13 +33,13 @@ interface Item {
   disabled?: boolean;
 }
 
-export const BottomSheetReviewMovie = React.forwardRef<
+export const BottomSheetReviewMovie = forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetReviewMovieProps
 >(({ id, review, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
   const toast = useToast();
-  const { colors, mode, tabBarHeight } = useTheme();
+  const { colors, mode } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -47,7 +47,7 @@ export const BottomSheetReviewMovie = React.forwardRef<
   // Mutations
   const { mutateAsync: reviewDeleteMutation } = useUserReviewMovieDeleteMutation();
   // States
-  const items: Item[] = [
+  const items = useMemo<Item[]>(() => [
     ...additionalItemsTop,
     {
       icon: Icons.Movie,
@@ -107,7 +107,20 @@ export const BottomSheetReviewMovie = React.forwardRef<
       }
     ] : []),
     ...additionalItemsBottom,
-  ];
+  ], [
+    additionalItemsTop,
+    additionalItemsBottom,
+    closeSheet,
+    id,
+    mode,
+    pathname,
+    review,
+    router,
+    session?.user.id,
+    t,
+    toast,
+    reviewDeleteMutation,
+  ]);
 
   return (
     <TrueSheet
@@ -139,7 +152,6 @@ export const BottomSheetReviewMovie = React.forwardRef<
         </Button>
       )}
       indicatorStyle={mode === 'dark' ? 'white' : 'black'}
-		  scrollIndicatorInsets={{ bottom: tabBarHeight }}
       nestedScrollEnabled
       />
     </TrueSheet>

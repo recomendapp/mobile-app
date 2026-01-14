@@ -1,9 +1,8 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
 import { MediaMovie } from "@recomendapp/types";
 import { Button } from "@/components/ui/Button";
-import { useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
+import { useUserActivityMovieUpdateMutation } from "@/api/users/userMutations";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
@@ -12,6 +11,7 @@ import { useTheme } from "@/providers/ThemeProvider";
 import tw from "@/lib/tw";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { forwardRef, useState } from "react";
+import { useUserActivityMovieQuery } from "@/api/users/userQueries";
 
 interface ButtonUserActivityMovieWatchDateProps
 	extends React.ComponentProps<typeof Button> {
@@ -24,7 +24,7 @@ const ButtonUserActivityMovieWatchDate = forwardRef<
 >(({ movie, variant = "outline", size = "icon", style, onPress: onPressProps, ...props }, ref) => {
 	const { session } = useAuth();
 	const insets = useSafeAreaInsets();
-	const { colors, mode } = useTheme();
+	const { colors } = useTheme();
 	const toast = useToast();
 	const t = useTranslations();
 	// States
@@ -99,7 +99,7 @@ const ButtonUserActivityMovieWatchDate = forwardRef<
 		pickerContainerStyleIOS={{
 			backgroundColor: colors.muted,
 		}}
-		themeVariant={mode}
+		// themeVariant={mode}
 		confirmTextIOS={upperFirst(t('common.messages.save'))}
 		cancelTextIOS={upperFirst(t('common.messages.cancel'))}
 		customCancelButtonIOS={({ onPress, label, ...props }) => (

@@ -1,5 +1,4 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserWatchlistQuery } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { Link } from "expo-router";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
@@ -13,6 +12,7 @@ import { CardTvSeries } from "../cards/CardTvSeries";
 import { GAP } from "@/theme/globals";
 import { GridView } from "../ui/GridView";
 import { Text } from "../ui/text";
+import { useUserWatchlistQuery } from "@/api/users/userQueries";
 
 interface WidgetUserWatchlistProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -61,7 +61,8 @@ export const WidgetUserWatchlist = ({
   const { data: watchlist } = useUserWatchlistQuery({
     userId: session?.user.id,
     filters: {
-      sortBy: 'random',
+      sortBy: 'created_at',
+      sortOrder: 'random',
       limit: 6,
     }
   });

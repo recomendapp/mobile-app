@@ -1,7 +1,6 @@
 import { CardMovie } from "@/components/cards/CardMovie";
 import { Text } from "@/components/ui/text";
 import { Icons } from "@/constants/Icons";
-import { useUserActivitiesMovieInfiniteQuery } from "@/features/user/userQueries"
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Profile } from "@recomendapp/types";
@@ -10,6 +9,7 @@ import { Link } from "expo-router";
 import { upperFirst } from "lodash";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { useTranslations } from "use-intl";
+import { useUserActivitiesMovieQuery } from "@/api/users/userQueries";
 
 interface ProfileWidgetActivitiesMovieProps extends React.ComponentPropsWithoutRef<typeof View> {
 	profile: Profile;
@@ -30,8 +30,12 @@ const ProfileWidgetActivitiesMovie = ({
 	  fetchNextPage,
 	  isFetching,
 	  hasNextPage,
-	} = useUserActivitiesMovieInfiniteQuery({
+	} = useUserActivitiesMovieQuery({
 	  userId: profile?.id ?? undefined,
+	  filters: {
+		sortBy: 'watched_date',
+		sortOrder: 'desc',
+	  }
 	});
 
 	if (!activities?.pages.flat().length) return null;
@@ -39,7 +43,7 @@ const ProfileWidgetActivitiesMovie = ({
 	return (
 	  <View style={[tw`gap-2`, style]}>
 		<Link
-		href={`/user/${profile.username!}/collection`}
+		href={`/user/${profile.username!}/films`}
 		style={labelStyle}
 		>
 			<View style={tw`flex-row items-center`}>

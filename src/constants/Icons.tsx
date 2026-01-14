@@ -1,6 +1,6 @@
 import { RecomendLogo } from "@/lib/icons/RecomendLogo";
 import { RecomendIcon } from "@/lib/icons/RecomendIcon";
-import { AlertCircleIcon, ArchiveIcon, ArchiveRestoreIcon, ArrowDownNarrowWideIcon, ArrowDownToLineIcon, ArrowUpNarrowWideIcon, BellIcon, BoldIcon, BookmarkIcon, CalendarIcon, CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, CirclePlayIcon, ClapperboardIcon, CompassIcon, CreditCardIcon, EditIcon, EllipsisIcon, EllipsisVerticalIcon, EyeIcon, EyeOffIcon, HeartIcon, HomeIcon, ImageIcon, InfoIcon, ItalicIcon, LayoutGridIcon, LibraryIcon, LinkIcon, ListIcon, ListOrderedIcon, ListPlusIcon, ListVideoIcon, Loader2Icon, LockIcon, LogOutIcon, MailIcon, MapPinIcon, MenuIcon, NavigationIcon, PlusIcon, QuoteIcon, RectangleEllipsisIcon, RectangleHorizontalIcon, RectangleVerticalIcon, RotateCcwIcon, SearchIcon, SendIcon, Settings2Icon, SettingsIcon, ShieldIcon, StarIcon, StoreIcon, StrikethroughIcon, TextIcon, TrashIcon, UnderlineIcon, UserIcon, UserPlusIcon, UsersIcon, WallpaperIcon, XIcon, ZapIcon } from "lucide-react-native";
+import { AlertCircleIcon, ArchiveIcon, ArchiveRestoreIcon, ArrowDownIcon, ArrowDownToLineIcon, ArrowUpIcon, BellIcon, BoldIcon, BookmarkIcon, CalendarIcon, CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, CirclePlayIcon, ClapperboardIcon, CompassIcon, CreditCardIcon, EditIcon, EllipsisIcon, EllipsisVerticalIcon, EyeIcon, EyeOffIcon, HeartIcon, HomeIcon, ImageIcon, InfoIcon, ItalicIcon, LayoutGridIcon, LibraryIcon, LinkIcon, ListIcon, ListOrderedIcon, ListPlusIcon, ListVideoIcon, Loader2Icon, LockIcon, LogOutIcon, MailIcon, MapPinIcon, MenuIcon, NavigationIcon, PlusIcon, QuoteIcon, RectangleEllipsisIcon, RectangleHorizontalIcon, RectangleVerticalIcon, RotateCcwIcon, SearchIcon, SendIcon, Settings2Icon, SettingsIcon, ShieldIcon, StarIcon, StoreIcon, StrikethroughIcon, TextIcon, TrashIcon, TvIcon, UnderlineIcon, UserIcon, UserPlusIcon, UsersIcon, WallpaperIcon, XIcon, ZapIcon } from "lucide-react-native";
 import { Premium } from "@/lib/icons/Premium";
 import { ActivityIndicator } from "react-native";
 import { Apple, Facebook, Github, Google, Instagram, Messenger, WhatsApp, X } from "@/lib/icons";
@@ -42,8 +42,8 @@ export const Icons = {
 	settings: SettingsIcon,
 	info: InfoIcon,
 	link: LinkIcon,
-	ArrowUpNarrowWide: ArrowUpNarrowWideIcon,
-	ArrowDownNarrowWide: ArrowDownNarrowWideIcon,
+	ArrowDown: ArrowDownIcon,
+	ArrowUp: ArrowUpIcon,
 	ChevronUp: ChevronUpIcon,
 	ChevronDown: ChevronDownIcon,
 	ChevronLeft: ChevronLeftIcon,
@@ -58,6 +58,7 @@ export const Icons = {
 	Watchlist: BookmarkIcon,
 	Likes: HeartIcon,
 	Movie: ClapperboardIcon,
+	Tv: TvIcon,
 	AddPlaylist: ListPlusIcon,
 	Delete: TrashIcon,
 	Filters: Settings2Icon,

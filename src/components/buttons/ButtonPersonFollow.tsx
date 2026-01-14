@@ -1,14 +1,14 @@
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/providers/AuthProvider';
 import upperFirst from 'lodash/upperFirst';
-import { useUserFollowPersonQuery } from '@/features/user/userQueries';
 import { Alert, ViewStyle } from 'react-native';
-import { useUserFollowPersonInsertMutation, useUserFollowPersonDeleteMutation } from '@/features/user/userMutations';
 import tw from "@/lib/tw";
 import { useTranslations } from "use-intl";
 import { useToast } from "../Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { forwardRef } from 'react';
+import { useUserFollowPersonQuery } from '@/api/users/userQueries';
+import { useUserFollowPersonDeleteMutation, useUserFollowPersonInsertMutation } from '@/api/users/userMutations';
 
 type ButtonPersonFollowSkeletonProps = {
   skeleton: true;

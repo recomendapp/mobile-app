@@ -3,8 +3,6 @@ import tw from '@/lib/tw';
 import { View, FlatList } from 'react-native';
 import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
-import { useUserActivityMovieFollowersRatingQuery } from '@/features/user/userQueries';
-import { useAuth } from '@/providers/AuthProvider';
 import { CardUser } from '@/components/cards/CardUser';
 import { BarChart } from '@/components/charts/bar-chart';
 import { IconMediaRating } from '@/components/medias/IconMediaRating';
@@ -14,6 +12,7 @@ import { useTranslations } from 'use-intl';
 import { interpolateRgb } from 'd3-interpolate'; 
 import { Text } from '@/components/ui/text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useMediaMovieFollowersAverageRatingsQuery } from '@/api/medias/mediaQueries';
 
 interface BottomSheetUserActivityMovieFollowersRatingProps extends BottomSheetProps {
   movieId: number;
@@ -23,14 +22,12 @@ const BottomSheetUserActivityMovieFollowersRating = React.forwardRef<
 	React.ComponentRef<typeof TrueSheet>,
 	BottomSheetUserActivityMovieFollowersRatingProps
 >(({ id, movieId, detents = [0.5, 1], ...props }, ref) => {
-  const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const t = useTranslations();
   const {
     data: followersRating,
 		isLoading,
-	} = useUserActivityMovieFollowersRatingQuery({
-    userId: user?.id,
+	} = useMediaMovieFollowersAverageRatingsQuery({
 		movieId: movieId,
 	});
   const loading = followersRating === undefined || isLoading;

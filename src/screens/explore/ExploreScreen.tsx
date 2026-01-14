@@ -7,8 +7,6 @@ import { BORDER_RADIUS, BORDER_RADIUS_FULL, GAP, PADDING_HORIZONTAL, PADDING_VER
 import { Stack, useRouter } from "expo-router";
 import { useTheme } from "@/providers/ThemeProvider";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useQuery } from "@tanstack/react-query";
-import { useExploreTileMetaOptions, useExploreTileOptions, useMediaGenresOptions } from "@/api/options";
 import { ExploreTile } from "@recomendapp/types";
 import Color from "color";
 import { Button } from "@/components/ui/Button";
@@ -22,6 +20,11 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { FiltersBottomSheet } from "./sheets/FiltersBottomSheet";
 import { useExploreStore } from "@/stores/useExploreStore";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useMediaGenresQuery } from "@/api/medias/mediaQueries";
+import { TrueSheet } from "@lodev09/react-native-true-sheet";
+import { Input } from "@/components/ui/Input";
+import { useExploreTileMetaQuery, useExploreTileQuery } from "@/api/explore/exploreQueries";
+import { useUIStore } from "@/stores/useUIStore";
 
 const MOVE_DELAY = 500;
 
@@ -30,11 +33,6 @@ const ExploreScreen = () => {
 	const filters = useExploreStore((state) => state.filters);
 	const { colors } = useTheme();
 	const insets = useSafeAreaInsets();
-	const userPosition = useMemo(() => ({
-		latitude: 48.5,
-		longitude: 2.5,
-		zoomLevel: 8,
-	}), []);
 	
 	const headerHeight = useHeaderHeight();
 	const { height: screenHeight } = useWindowDimensions();
@@ -42,7 +40,7 @@ const ExploreScreen = () => {
 	// REFs
 	const mapRef = useRef<MapViewRef>(null);
 	const cameraRef = useRef<CameraRef>(null);
-	const searchRef = useRef<BottomSheetModal>(null);
+	const searchRef = useRef<TrueSheet>(null);
 	const locationDetailsRef = useRef<LocationDetailsBottomSheetMethods>(null);
 	
 	// SharedValues
@@ -55,6 +53,7 @@ const ExploreScreen = () => {
 	const optionsHeight = useSharedValue(0);
 	
 	// States
+	const { map, setMapCamera } = useUIStore((state) => state);
 	const [selectedMovie, setSelectedMovie] = useState<ExploreTile['features'][number] | null>(null);
 	const [showRecenter, setShowRecenter] = useState(false);
 	
@@ -62,13 +61,29 @@ const ExploreScreen = () => {
 
 	const {
 		data: genres,
-	} = useQuery(useMediaGenresOptions());
+	} = useMediaGenresQuery();
 
 	const {
 		data: tile,
 		refetch: refetchTile
-	} = useQuery(useExploreTileOptions({ exploreId: 1 }));
-	const { data: tileMeta } = useQuery(useExploreTileMetaOptions({ exploreId: 1 }));
+	} = useExploreTileQuery({ exploreId: 1 });
+	const { data: tileMeta } = useExploreTileMetaQuery({ exploreId: 1 });
+
+	// Handlers
+	const handleSaveCameraPosition = useCallback(async () => {
+		if (!mapRef.current) return;
+		try {
+			const center = await mapRef.current.getCenter();
+			const zoom = await mapRef.current.getZoom();
+
+			const lng = center[0];
+			const lat = center[1];
+
+			setMapCamera([lng, lat], zoom);
+		} catch (error) {
+			console.error('Error getting camera position:', error);
+		}
+	}, [setMapCamera]);
 
 	const handleOnLocationPress = useCallback((e: OnPressEvent) => {
 		const location = e.features.at(0) as ExploreTile['features'][number];
@@ -119,16 +134,14 @@ const ExploreScreen = () => {
 	}, [tile, tileMeta, refetchTile]);
 
 	useLayoutEffect(() => {
-		requestAnimationFrame(
-			() => {
-				searchRef.current?.present()
-			}
-		);
+		return () => {
+			searchRef.current?.dismiss();
+		}
 	}, []);
 
 	return (
 	<>
-		<Stack.Screen
+		{/* <Stack.Screen
 		options={{
 			headerTitle: () => <></>,
 			headerShown: true,
@@ -140,15 +153,17 @@ const ExploreScreen = () => {
 				<View>
 					<Button variant="muted" icon={Icons.ChevronLeft} size="icon" style={{ borderRadius: BORDER_RADIUS_FULL }} onPress={() => router.canGoBack() ? router.back() : router.replace({ pathname: '/(tabs)/(home)'})} />
 				</View>
-			)
+			),
 		}}
-		/>
+		/> */}
 		<MapView
 		ref={mapRef}
 		style={{ flex: 1 }}
 		mapStyle={styleJSON}
 		attributionEnabled={false}
 		onRegionDidChange={async () => {
+			handleSaveCameraPosition();
+
 			if (!mapRef.current || !selectedMovie) return;
 
 			try {
@@ -177,8 +192,8 @@ const ExploreScreen = () => {
 			<Camera
 			ref={cameraRef}
 			defaultSettings={{
-				centerCoordinate: [userPosition.longitude, userPosition.latitude],
-				zoomLevel: userPosition.zoomLevel,
+				centerCoordinate: map.center,
+				zoomLevel: map.zoom,
 			}}
 			maxZoomLevel={12}
 			minZoomLevel={7}
@@ -191,7 +206,7 @@ const ExploreScreen = () => {
 				<ShapeSource
 				id="explore-points"
 				shape={tile}
-				onPress={handleOnLocationPress}
+				// onPress={handleOnLocationPress}
 				>
 					<SymbolLayer
 					id="movies"
@@ -286,7 +301,7 @@ const ExploreScreen = () => {
 					/>
 				</ShapeSource>
 			)}
-			<MarkerView
+			{/* <MarkerView
 			coordinate={[selectedMovie?.geometry.coordinates[0] || userPosition.longitude, selectedMovie?.geometry.coordinates[1] || userPosition.latitude]}
 			anchor={{ x: 0.5, y: 1 }}
 			style={{ opacity: selectedMovie ? 1 : 0 }}
@@ -298,10 +313,27 @@ const ExploreScreen = () => {
 					</View>
 					<Icons.MapPin color={'rgba(136, 0, 0, 1)'} fill={'rgba(255, 0, 0, 1)'} size={32} />
 				</View>
-			</MarkerView>
+			</MarkerView> */}
 		</MapView>
 
-		<SearchBottomSheet
+		{/* <TrueSheet
+		ref={searchRef}
+		detents={['auto', 0.8]}
+		initialDetentIndex={0}
+		dimmed={false}
+		dismissible={false}
+		header={
+			<View>
+				<Input placeholder="Search..." />
+			</View>
+		}
+		>
+			<View>
+				<Text>Test Sheet Content</Text>
+			</View>
+		</TrueSheet> */}
+
+		{/* <SearchBottomSheet
 		ref={searchRef}
 		index={animatedPOIListIndex}
 		position={animatedPOIListPosition}
@@ -312,7 +344,7 @@ const ExploreScreen = () => {
         index={animatedPOIDetailsIndex}
         position={animatedPOIDetailsPosition}
 		onClose={handleOnLocationClose}
-      	/>
+      	/> */}
 
 		<Animated.View onLayout={(e) => optionsHeight.value = e.nativeEvent.layout.height} style={[{ position: 'absolute', bottom: insets.bottom + PADDING_VERTICAL, right: PADDING_HORIZONTAL, gap: GAP }, animatedOptionsStyle]}>
 			{showRecenter && (

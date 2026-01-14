@@ -2,29 +2,30 @@ import { useAuth } from "@/providers/AuthProvider";
 import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { Playlist, PlaylistItemMovie } from "@recomendapp/types";
-import CollectionScreen, { CollectionAction, SortByOption } from "@/components/screens/collection/CollectionScreen";
+import CollectionScreen, { CollectionAction, SortByOption } from "@/components/collection/CollectionScreen";
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useRouter } from "expo-router";
-import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsMovieQuery } from "@/features/playlist/playlistQueries";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import useDebounce from "@/hooks/useDebounce";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSupabaseClient } from "@/providers/SupabaseProvider";
-import { usePlaylistItemsMovieRealtimeMutation, usePlaylistMovieDeleteMutation, usePlaylistMovieUpdateMutation } from "@/features/playlist/playlistMutations";
+import { usePlaylistItemsMovieRealtimeMutation, usePlaylistMovieDeleteMutation, usePlaylistMovieUpdateMutation } from "@/api/playlists/playlistMutations";
 import { CardUser } from "@/components/cards/CardUser";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import tw from "@/lib/tw";
 import { SharedValue } from "react-native-reanimated";
 import BottomSheetMovie from "@/components/bottom-sheets/sheets/BottomSheetMovie";
-import { useUIStore } from "@/stores/useUIStore";
 import { BottomSheetComment } from "@/components/bottom-sheets/sheets/BottomSheetComment";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { useUIStore } from "@/stores/useUIStore";
+import { useQuery } from "@tanstack/react-query";
+import { usePlaylistIsAllowedToEditQuery, usePlaylistItemsMovieQuery } from "@/api/playlists/playlistQueries";
 
 interface PlaylistMovieProps {
 	playlist: Playlist;
@@ -44,13 +45,14 @@ export const PlaylistMovie = ({
 	const { session } = useAuth();
 	const { mode } = useTheme();
 	const view = useUIStore((state) => state.playlistView);
+	const setPlaylistView = useUIStore((state) => state.setPlaylistView);
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const [shouldRefresh, setShouldRefresh] = useState(false);
   	const debouncedRefresh = useDebounce(shouldRefresh, 200);
 	const { data: isAllowedToEdit } = usePlaylistIsAllowedToEditQuery({
 		playlistId: playlist.id,
 		userId: session?.user.id,
-	})
+	});
 	const playlistItems = usePlaylistItemsMovieQuery({
 		playlistId: playlist.id,
 	});
@@ -279,7 +281,8 @@ export const PlaylistMovie = ({
 		scrollY={scrollY}
 		headerHeight={headerHeight}
 		// View
-		view={view}
+		defaultView={view}
+		onViewChange={setPlaylistView}
 		/>
 	</>
 	);

@@ -3,13 +3,11 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import React from "react";
 import { UserWatchlistTvSeries } from "@recomendapp/types";
-import CollectionScreen, { CollectionAction, SortByOption } from "@/components/screens/collection/CollectionScreen";
+import CollectionScreen, { CollectionAction, SortByOption } from "@/components/collection/CollectionScreen";
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import { useSharedValue } from "react-native-reanimated";
-import { useUserWatchlistTvSeriesDeleteMutation } from "@/features/user/userMutations";
-import { useUserWatchlistTvSeriesQuery } from "@/features/user/userQueries";
+import { useUserWatchlistTvSeriesDeleteMutation } from "@/api/users/userMutations";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
 import { useUIStore } from "@/stores/useUIStore";
 import { BottomSheetWatchlistTvSeriesComment } from "@/components/bottom-sheets/sheets/BottomSheetWatchlistTvSeriesComment";
@@ -17,23 +15,31 @@ import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTv
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { SharedValue } from "react-native-reanimated";
+import { useUserWatchlistTvSeriesQuery } from "@/api/users/userQueries";
 
-export const CollectionWatchlistTvSeries = () => {
+interface CollectionWatchlistTvSeriesProps {
+	scrollY?: SharedValue<number>;
+	headerHeight?: SharedValue<number>;
+}
+
+export const CollectionWatchlistTvSeries = ({
+	scrollY,
+	headerHeight,
+} : CollectionWatchlistTvSeriesProps) => {
 	const t = useTranslations();
 	const toast = useToast();
     const { user } = useAuth();
 	const { mode } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.watchlist.view);
+	const setWatchlistView = useUIStore((state) => state.setWatchlistView);
     const queryData = useUserWatchlistTvSeriesQuery({
 		userId: user?.id,
     });
 	const screenTitle = upperFirst(t('common.messages.watchlist'));
 	// Mutations
 	const { mutateAsync: deleteWatchlistMutation } = useUserWatchlistTvSeriesDeleteMutation();
-	// SharedValues
-	const scrollY = useSharedValue(0);
-	const headerHeight = useSharedValue(0);
 
 	// Handlers
 	const handleDeleteWatchlist = React.useCallback((data: UserWatchlistTvSeries) => {
@@ -182,11 +188,12 @@ export const CollectionWatchlistTvSeries = () => {
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
 		onItemAction={onItemAction}
-		// Shared Values
+		// SharedValues
 		scrollY={scrollY}
 		headerHeight={headerHeight}
 		// View
-		view={view}
+		defaultView={view}
+		onViewChange={setWatchlistView}
         />
 	</>
     );

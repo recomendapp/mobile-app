@@ -148,26 +148,26 @@ const ReviewForm = ({
 		<Stack.Screen
 		options={{
 			headerRight: () => (
-				review ?(
-					<Button
-					variant="ghost"
-					size="fit"
-					onPress={handleSave}
-					textStyle={{ color: colors.accentYellow }}
-					>
-						{upperFirst(t('common.messages.save'))}
-					</Button>
-				) : (
-					<Button
-					variant="ghost"
-					size="fit"
-					onPress={handleSave}
-					textStyle={{ color: colors.accentYellow }}
-					>
-						{upperFirst(t('common.messages.publish'))}
-					</Button>
-				)
-			)
+				<Button
+				variant="ghost"
+				size="fit"
+				onPress={handleSave}
+				textStyle={{ color: colors.accentYellow }}
+				>
+					{review ? upperFirst(t('common.messages.save')) : upperFirst(t('common.messages.publish'))}
+				</Button>
+			),
+			unstable_headerRightItems: (props) => [
+				{
+					type: "button",
+					label: review ? upperFirst(t('common.messages.save')) : upperFirst(t('common.messages.publish')),
+					onPress: handleSave,
+					icon: {
+						name: "checkmark",
+						type: "sfSymbol",
+					},
+				},
+			],
 		}}
 		/>
 		<Animated.View

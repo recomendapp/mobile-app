@@ -3,36 +3,42 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import React from "react";
 import { UserActivityTvSeries } from "@recomendapp/types";
-import CollectionScreen, { CollectionAction, SortByOption } from "@/components/screens/collection/CollectionScreen";
+import CollectionScreen, { CollectionAction, SortByOption } from "@/components/collection/CollectionScreen";
 import { Icons } from "@/constants/Icons";
 import { Alert } from "react-native";
 import richTextToPlainString from "@/utils/richTextToPlainString";
-import { useSharedValue } from "react-native-reanimated";
-import { useUserActivityTvSeriesUpdateMutation } from "@/features/user/userMutations";
-import { useUserHeartPicksTvSeriesQuery } from "@/features/user/userQueries";
+import { useUserActivityTvSeriesUpdateMutation } from "@/api/users/userMutations";
 import BottomSheetTvSeries from "@/components/bottom-sheets/sheets/BottomSheetTvSeries";
 import useBottomSheetStore from "@/stores/useBottomSheetStore";
-import { useUIStore } from "@/stores/useUIStore";
 import { useToast } from "@/components/Toast";
 import { useTheme } from "@/providers/ThemeProvider";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
+import { useUIStore } from "@/stores/useUIStore";
+import { SharedValue } from "react-native-reanimated";
+import { useUserHeartPicksTvSeriesQuery } from "@/api/users/userQueries";
 
-export const CollectionHeartPicksTvSeries = () => {
+interface CollectionHeartPicksTvSeriesProps {
+	scrollY?: SharedValue<number>;
+	headerHeight?: SharedValue<number>;
+}
+
+export const CollectionHeartPicksTvSeries = ({
+	scrollY,
+	headerHeight,
+} : CollectionHeartPicksTvSeriesProps) => {
 	const t = useTranslations();
 	const toast = useToast();
     const { user } = useAuth();
 	const { mode } = useTheme();
 	const openSheet = useBottomSheetStore((state) => state.openSheet);
 	const view = useUIStore((state) => state.heartPicks.view);
+	const setHeartPicksView = useUIStore((state) => state.setHeartPicksView);
     const queryData = useUserHeartPicksTvSeriesQuery({
 		userId: user?.id,
     });
 	const screenTitle = upperFirst(t('common.messages.heart_pick', { count: 2 }));
 	// Mutations
 	const { mutateAsync: updateActivity} = useUserActivityTvSeriesUpdateMutation();
-	// SharedValues
-	const scrollY = useSharedValue(0);
-	const headerHeight = useSharedValue(0);
 
 	// Handlers
 	const handleUnlike = React.useCallback((data: UserActivityTvSeries) => {
@@ -164,11 +170,12 @@ export const CollectionHeartPicksTvSeries = () => {
 		bottomSheetActions={bottomSheetActions}
 		swipeActions={swipeActions}
 		onItemAction={onItemAction}
-		// Shared Values
+		// SharedValues
 		scrollY={scrollY}
 		headerHeight={headerHeight}
 		// View
-		view={view}
+		defaultView={view}
+		onViewChange={setHeartPicksView}
         />
 	</>
     );

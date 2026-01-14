@@ -1,4 +1,4 @@
-import { usePlaylistQuery } from "@/features/playlist/playlistQueries";
+import { usePlaylistDetailsQuery } from "@/api/playlists/playlistQueries";
 import { useAuth } from "@/providers/AuthProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Redirect, Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -13,7 +13,7 @@ const ModalPlaylistEditLayout = () => {
 	const {
 		data: playlist,
 		isLoading,
-	} = usePlaylistQuery({
+	} = usePlaylistDetailsQuery({
 		playlistId: playlistId,
 	});
 	const loading = playlist === undefined || isLoading;

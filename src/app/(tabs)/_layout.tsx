@@ -13,37 +13,47 @@ import { useUIStore } from '@/stores/useUIStore';
 
 const TabsLayout = () => {
 	const { session } = useAuth();
-	const { colors } = useTheme();
+	const { colors, isLiquidGlassAvailable } = useTheme();
 	const t = useTranslations();
 	const router = useRouter();
 	const hasOnboarded = useUIStore(state => state.hasOnboarded);
 	const segment = useSegments();
-	const hideTabBarRoutes = ['(explore)', 'onboarding'];
+
+	useEffect(() => {
+		if (!hasOnboarded && !segment.some((seg) => seg === 'onboarding')) {
+			router.replace({ pathname: '/onboarding' });
+		}
+	}, [hasOnboarded, router, segment]);
+
 	// return (
-	// 	<NativeTabs iconColor={colors.muted} tintColor={colors.tint}>
+	// 	<NativeTabs
+	// 	iconColor={isLiquidGlassAvailable ? colors.accentYellow : colors.mutedForeground}
+	// 	tintColor={colors.accentYellow}
+	// 	backgroundColor={Platform.select({
+	// 		android: colors.muted,
+	// 		default: undefined
+	// 	})}
+	// 	indicatorColor={'transparent'}
+	// 	disableTransparentOnScrollEdge
+	//   	>
 	// 		<NativeTabs.Trigger name='(home)'>
 	// 			<Label>{upperFirst(t('common.messages.home'))}</Label>
-	// 			<Icon sf={'house.fill'} drawable='ic_menu_mylocation' />
+	// 			<Icon sf={{ default: 'house', selected: 'house.fill' }} drawable='home' />
 	// 		</NativeTabs.Trigger>
 	// 		<NativeTabs.Trigger name='(search)'>
 	// 			<Label>{upperFirst(t('common.messages.search'))}</Label>
-	// 			<Icon sf={'magnifyingglass'} drawable='ic_menu_mylocation' />
-	// 		</NativeTabs.Trigger>
-
-	// 		<NativeTabs.Trigger name='(explore)'>
-	// 			<Label>{upperFirst(t('common.messages.explore'))}</Label>
-	// 			<Icon sf={'map.fill'} drawable='ic_menu_mylocation' />
+	// 			<Icon sf={'magnifyingglass'} drawable='search' />
 	// 		</NativeTabs.Trigger>
 
 	// 		{/* LOGIN ONLY */}
 	// 		<Tabs.Protected guard={!!session}>
 	// 			<NativeTabs.Trigger name='(feed)'>
 	// 				<Label>{upperFirst(t('common.messages.feed'))}</Label>
-	// 				<Icon sf={'text.justify'} drawable='ic_menu_mylocation' />
+	// 				<Icon sf={'text.justify'} drawable='feed' />
 	// 			</NativeTabs.Trigger>
 	// 			<NativeTabs.Trigger name='(collection)'>
 	// 				<Label>{upperFirst(t('common.messages.library'))}</Label>
-	// 				<Icon sf={'books.vertical.fill'} drawable='ic_menu_mylocation' />
+	// 				<Icon sf={'books.vertical.fill'} drawable='library' />
 	// 			</NativeTabs.Trigger>
 	// 		</Tabs.Protected>
 
@@ -51,17 +61,11 @@ const TabsLayout = () => {
 	// 		<Tabs.Protected guard={!session}>
 	// 			<NativeTabs.Trigger name='auth'>
 	// 				<Label>{upperFirst(t('common.messages.login'))}</Label>
-	// 				<Icon sf={'person.crop.circle'} drawable='ic_menu_mylocation' />
+	// 				<Icon sf={'person.crop.circle'} />
 	// 			</NativeTabs.Trigger>
 	// 		</Tabs.Protected>
 	// 	</NativeTabs>
-	// )
-
-	useEffect(() => {
-		if (!hasOnboarded && !segment.some((seg) => seg === 'onboarding')) {
-			router.replace({ pathname: '/onboarding' });
-		}
-	}, [hasOnboarded, router, segment]);
+	// );
 
 	return (
 	<Tabs
@@ -77,7 +81,6 @@ const TabsLayout = () => {
 					default: {},
 				}),
 				position: 'absolute',
-				display: segment.some((seg) => hideTabBarRoutes.includes(seg)) ? 'none' : 'flex',
 			},
 			tabBarItemStyle: {
 				paddingTop: 4,
@@ -99,14 +102,6 @@ const TabsLayout = () => {
 				title: upperFirst(t('common.messages.search')),
 				tabBarIcon: ({ color }) => <Icons.Search size={28} color={color} />,
 			}}
-		/>
-
-		<Tabs.Screen
-		name='(explore)'
-		options={{
-			title: upperFirst(t('common.messages.explore')),
-			tabBarIcon: ({ color }) => <Icons.Explore size={28} color={color} />,
-		}}
 		/>
 
 		{/* LOGIN ONLY */}

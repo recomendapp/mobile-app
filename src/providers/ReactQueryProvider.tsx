@@ -6,7 +6,7 @@ import {
   PersistQueryClientProvider,
   PersistQueryClientProviderProps,
 } from '@tanstack/react-query-persist-client';
-import { persistKey } from '@/features';
+import { persistKey } from '@/api';
 // import { useReactQueryDevTools } from "@dev-plugins/react-query";
 
 const queryStorage = createMMKV({
@@ -51,7 +51,6 @@ const createQueryClient = () =>
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
-        structuralSharing: false,
         retry: false,
         staleTime: 5 * 60 * 1000,
         gcTime: 10 * 60 * 1000,

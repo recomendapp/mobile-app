@@ -9,9 +9,7 @@ import useBottomSheetStore from '@/stores/useBottomSheetStore';
 import { Alert } from 'react-native';
 import { ImageWithFallback } from '@/components/utils/ImageWithFallback';
 import { useAuth } from '@/providers/AuthProvider';
-import { usePlaylistDeleteMutation } from '@/features/playlist/playlistMutations';
-import { useUserPlaylistSavedQuery } from '@/features/user/userQueries';
-import { useUserPlaylistSavedDeleteMutation, useUserPlaylistSavedInsertMutation } from '@/features/user/userMutations';
+import { usePlaylistDeleteMutation } from '@/api/playlists/playlistMutations';
 import TrueSheet from '@/components/ui/TrueSheet';
 import { BottomSheetProps } from '../BottomSheetManager';
 import { useTranslations } from 'use-intl';
@@ -20,12 +18,13 @@ import { Text } from '@/components/ui/text';
 import richTextToPlainString from '@/utils/richTextToPlainString';
 import { useToast } from '@/components/Toast';
 import BottomSheetSharePlaylist from './share/BottomSheetSharePlaylist';
-import { GAP, PADDING_VERTICAL } from '@/theme/globals';
+import { GAP } from '@/theme/globals';
 import { View } from '@/components/ui/view';
 import ButtonActionPlaylistLike from '@/components/buttons/ButtonActionPlaylistLike';
 import ButtonActionPlaylistSaved from '@/components/buttons/ButtonActionPlaylistSaved';
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { FlashList } from '@shopify/flash-list';
+import { useUserPlaylistSaved } from '@/api/users/hooks/useUserPlaylistSaved';
 
 interface BottomSheetPlaylistProps extends BottomSheetProps {
 	playlist: Playlist,
@@ -39,6 +38,7 @@ interface Item {
 	submenu?: Item[];
 	closeSheet?: boolean;
 	disabled?: boolean;
+	destructive?: boolean;
 }
 
 const BottomSheetPlaylist = forwardRef<
@@ -48,22 +48,14 @@ const BottomSheetPlaylist = forwardRef<
 	const { session } = useAuth();
 	const toast = useToast();
 	const { closeSheet, openSheet } = useBottomSheetStore((state) => state);
-	const { colors, mode, tabBarHeight } = useTheme();
+	const { colors, mode, isLiquidGlassAvailable } = useTheme();
 	const router = useRouter();
 	const pathname = usePathname();
 	const t = useTranslations();
-	const {
-		data: saved,
-		isLoading: isLoadingSaved,
-	} = useUserPlaylistSavedQuery({
-		userId: session?.user.id,
-		playlistId: playlist.id,
-	});
-	const { mutateAsync: insertPlaylistSaved } = useUserPlaylistSavedInsertMutation();
-	const { mutateAsync: deletePlaylistSaved } = useUserPlaylistSavedDeleteMutation();
+	const { isSaved, toggle } = useUserPlaylistSaved({ playlistId: playlist.id });
 	const { mutateAsync: playlistDeleteMutation} = usePlaylistDeleteMutation();
 
-	const items: Item[] = [
+	const items = useMemo<Item[]>(() => [
 		...additionalItemsTop,
 		{
 			icon: Icons.Share,
@@ -74,33 +66,12 @@ const BottomSheetPlaylist = forwardRef<
 		},
 		...(session?.user.id && playlist.user?.id !== session.user.id ? [
 			{
-				icon: saved
+				icon: isSaved
 					? Icons.Check
 					: Icons.Add,
-				onPress: async () => {
-					if (saved) {
-						await deletePlaylistSaved({
-							savedId: saved.id,
-						}, {
-							onError: () => {
-								toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
-							}
-						});
-					} else {
-						await insertPlaylistSaved({
-							userId: session.user.id,
-							playlistId: playlist.id,
-						}, {
-							onError: () => {
-								toast.error(upperFirst(t('common.messages.error')), { description: upperFirst(t('common.messages.an_error_occurred')) });
-							}
-						});
-
-					}
-				},
-				label: saved ? upperFirst(t('common.messages.remove_from_library')) : upperFirst(t('common.messages.save_to_library')),
+				onPress: toggle,
+				label: isSaved ? upperFirst(t('common.messages.remove_from_library')) : upperFirst(t('common.messages.save_to_library')),
 				closeSheet: false,
-				disabled: isLoadingSaved,
 			}
 		] : []),
 		{
@@ -129,6 +100,7 @@ const BottomSheetPlaylist = forwardRef<
 			},
 			{
 				icon: Icons.Delete,
+				destructive: true,
 				onPress: async () => {
 					Alert.alert(
 						upperFirst(t('common.messages.are_u_sure')),
@@ -142,7 +114,7 @@ const BottomSheetPlaylist = forwardRef<
 								text: upperFirst(t('common.messages.delete')),
 								onPress: async () => {
 									await playlistDeleteMutation(
-										{ playlistId: playlist.id, userId: session.user.id },
+										{ playlistId: playlist.id },
 										{
 											onSuccess: () => {
 												toast.success(upperFirst(t('common.messages.deleted')));
@@ -168,7 +140,22 @@ const BottomSheetPlaylist = forwardRef<
 				closeSheet: false,
 			}
 		] : []),
-	];
+	], [
+		additionalItemsTop,
+		closeSheet,
+		id,
+		mode,
+		openSheet,
+		playlist,
+		router,
+		pathname,
+		session?.user.id,
+		t,
+		toast,
+		playlistDeleteMutation,
+		isSaved,
+		toggle,
+	]);
 
 	return (
 	<TrueSheet
@@ -181,7 +168,6 @@ const BottomSheetPlaylist = forwardRef<
 			'header',
 			...items,
 		]}
-		contentContainerStyle={{ paddingTop: PADDING_VERTICAL }}
 		bounces={false}
 		keyExtractor={(_, i) => i.toString()}
 		stickyHeaderIndices={[0]}
@@ -189,7 +175,7 @@ const BottomSheetPlaylist = forwardRef<
 			typeof item === 'string' ? (
 				<View
 				style={[
-					{ backgroundColor: colors.muted, borderColor: colors.mutedForeground, gap: GAP },
+					{ backgroundColor: isLiquidGlassAvailable ? 'transparent' : colors.muted, borderColor: colors.mutedForeground, gap: GAP },
 					tw`flex-row items-center justify-between border-b p-4`,
 				]}
 				>
@@ -220,21 +206,26 @@ const BottomSheetPlaylist = forwardRef<
 				variant='ghost'
 				icon={item.icon}
 				iconProps={{
-					color: colors.mutedForeground,
+					color: item.destructive ? colors.destructive : colors.mutedForeground,
 				}}
 				disabled={item.disabled}
-				style={tw`justify-start h-auto py-4`}
+				style={[
+					tw`justify-start h-auto py-4`,
+				]}
+				textStyle={{
+					color: item.destructive ? colors.destructive : colors.foreground
+				}}
 				onPress={() => {
 					(item.closeSheet === undefined || item.closeSheet === true) && closeSheet(id);
 					item.onPress();
 				}}
+				
 				>
 					{item.label}
 				</Button>
 			)
 		)}
 		indicatorStyle={mode === 'dark' ? 'white' : 'black'}
-		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		nestedScrollEnabled
 		/>
 	</TrueSheet>

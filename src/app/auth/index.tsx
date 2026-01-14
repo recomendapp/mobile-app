@@ -11,17 +11,15 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
 import { LinearGradient } from 'expo-linear-gradient';
 import Color from "color";
-import { useQuery } from "@tanstack/react-query";
-import { useUIBackgroundsOptions } from "@/api/options";
 import { Text } from "@/components/ui/text";
 import { getMediaDetails } from "@/components/utils/getMediaDetails";
 import { Database } from "@recomendapp/types";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { LoopCarousel } from "@/components/ui/LoopCarousel";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { isIOS } from "@/platform/detection";
+import { useUIBackgroundsQuery } from "@/api/ui/uiQueries";
 
 const AuthHeader = ({
   onBackgroundChange,
@@ -34,7 +32,7 @@ const AuthHeader = ({
   const bgColor = useMemo(() => Color(colors.background).rgb().object(), [colors.background]);
   const {
     data,
-  } = useQuery(useUIBackgroundsOptions());
+  } = useUIBackgroundsQuery();
   return (
     <View style={[tw`items-center justify-end`, { paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL, paddingTop: headerHeight, height: SCREEN_HEIGHT * 0.5 }]}>
       <Animated.View style={tw`absolute inset-0`}>
@@ -69,7 +67,7 @@ const AuthHeader = ({
 
 const AuthScreen = () => {
   const t = useTranslations();
-  const { colors } = useTheme();
+  const { colors, isLiquidGlassAvailable } = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [activeBackground, setActiveBackground] = useState<Database['public']['Functions']['get_ui_backgrounds']['Returns'][number] | null>(null);
@@ -89,15 +87,34 @@ const AuthScreen = () => {
     { name: upperFirst(t('common.messages.signup')), href: '/auth/signup' },
     { name: upperFirst(t('common.messages.show_me_around')), href: '/onboarding' },
   ], [t]);
+
+  const handleClose = useCallback(() => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/');
+    }
+  }, [router]);
   
 	return (
   <>
     <Stack.Screen
     options={{
       headerTitle: () => <></>,
-      headerRight: isIOS ? () => (
-        <Button variant="muted" icon={Icons.X} size="icon" style={tw`rounded-full`} onPress={() => router.canGoBack() ? router.back() : router.replace('/')} />
-      ) : undefined
+      headerLeft: () => (
+        <Button variant="muted" icon={Icons.X} size="icon" style={tw`rounded-full`} onPress={handleClose} />
+      ),
+      unstable_headerLeftItems: isLiquidGlassAvailable ? (props) => [
+        {
+          type: "button",
+          label: upperFirst(t('common.messages.close')),
+          onPress: handleClose,
+          icon: {
+            name: "xmark",
+            type: "sfSymbol",
+          },
+        },
+      ] : undefined,
     }}
     />
     <ScrollView

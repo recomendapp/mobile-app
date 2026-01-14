@@ -11,7 +11,6 @@ import { BORDER_RADIUS, GAP, HEIGHT, PADDING, PADDING_HORIZONTAL, PADDING_VERTIC
 import WheelSelector from "@/components/ui/WheelSelector";
 import Animated, { FadeInDown, FadeInRight, FadeOutDown, FadeOutRight } from "react-native-reanimated";
 import { useTheme } from "@/providers/ThemeProvider";
-import { useMediaMovieBackdropInfiniteQuery, useMediaMoviePosterInfiniteQuery } from "@/features/media/mediaQueries";
 import { Image } from "expo-image";
 import { CaptureResult, ShareViewRef } from "@/components/share/type";
 import { CircleIcon, LucideIcon } from "lucide-react-native";
@@ -24,7 +23,7 @@ import { useImagePalette } from "@/hooks/useImagePalette";
 import Color from "color";
 import { ShapeVerticalRoundedBackground, ShapeVerticalRoundedForeground } from "@/lib/icons";
 import { getTmdbImage } from "@/lib/tmdb/getTmdbImage";
-
+import { useMediaMovieBackdropsQuery, useMediaMoviePostersQuery } from "@/api/medias/mediaQueries";
 interface ShareMovieProps extends React.ComponentProps<typeof ViewShot> {
 	movie: MediaMovie;
 	variant?: 'default';
@@ -147,7 +146,7 @@ const PosterSelector = ({
 		data,
 		hasNextPage,
 		fetchNextPage,
-	} = useMediaMoviePosterInfiniteQuery({
+	} = useMediaMoviePostersQuery({
 		movieId: poster ? movie.id : undefined,
 	});
 	const posters = useMemo(() => data?.pages.flat() || [], [data]);
@@ -250,7 +249,7 @@ const BackdropImageSelector = ({
 		data,
 		hasNextPage,
 		fetchNextPage,
-	} = useMediaMovieBackdropInfiniteQuery({
+	} = useMediaMovieBackdropsQuery({
 		movieId: movieId,
 	});
 	const backdrops = useMemo(() => data?.pages.flat() || [], [data]);

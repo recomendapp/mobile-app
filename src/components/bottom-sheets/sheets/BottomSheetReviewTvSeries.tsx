@@ -1,4 +1,4 @@
-import React from 'react';
+import { forwardRef, useMemo } from 'react';
 import tw from '@/lib/tw';
 import { Icons } from '@/constants/Icons';
 import { UserReviewTvSeries } from '@recomendapp/types';
@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/providers/AuthProvider';
 import { PADDING_VERTICAL } from '@/theme/globals';
 import { Alert } from 'react-native';
-import { useUserReviewTvSeriesDeleteMutation } from '@/features/user/userMutations';
+import { useUserReviewTvSeriesDeleteMutation } from '@/api/users/userMutations';
 import { useToast } from '@/components/Toast';
 import { FlashList } from '@shopify/flash-list';
 
@@ -33,13 +33,13 @@ interface Item {
   disabled?: boolean;
 }
 
-export const BottomSheetReviewTvSeries = React.forwardRef<
+export const BottomSheetReviewTvSeries = forwardRef<
   React.ComponentRef<typeof TrueSheet>,
   BottomSheetReviewTvSeriesProps
 >(({ id, review, additionalItemsTop = [], additionalItemsBottom = [], ...props }, ref) => {
   const toast = useToast();
   const closeSheet = useBottomSheetStore((state) => state.closeSheet);
-  const { colors, mode, tabBarHeight } = useTheme();
+  const { colors, mode } = useTheme();
   const { session } = useAuth();
   const router = useRouter();
   const t = useTranslations();
@@ -47,7 +47,7 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
   // Mutations
   const { mutateAsync: reviewDeleteMutation } = useUserReviewTvSeriesDeleteMutation();
   // States
-  const items: Item[] = [
+  const items = useMemo<Item[]>(() => [
     ...additionalItemsTop,
     {
       icon: Icons.Movie,
@@ -107,7 +107,24 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
       }
     ] : []),
     ...additionalItemsBottom,
-  ];
+  ], [
+    additionalItemsTop,
+    additionalItemsBottom,
+    closeSheet,
+    id,
+    mode,
+    router,
+    pathname,
+    review.activity?.tv_series?.slug,
+    review.activity?.tv_series_id,
+    review.activity?.tv_series?.url,
+    review.id,
+    review.activity?.user_id,
+    session?.user.id,
+    t,
+    toast,
+    reviewDeleteMutation,
+  ]);
   return (
     <TrueSheet
     ref={ref}
@@ -138,7 +155,6 @@ export const BottomSheetReviewTvSeries = React.forwardRef<
         </Button>
       )}
       indicatorStyle={mode === 'dark' ? 'white' : 'black'}
-		  scrollIndicatorInsets={{ bottom: tabBarHeight }}
       nestedScrollEnabled
       />
     </TrueSheet>

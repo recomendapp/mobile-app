@@ -1,11 +1,9 @@
 import { useAuth } from "@/providers/AuthProvider";
-import { useUserActivityMovieQuery } from "@/features/user/userQueries";
 import { Icons } from "@/constants/Icons";
-import { useUserActivityMovieInsertMutation, useUserActivityMovieUpdateMutation } from "@/features/user/userMutations";
+import { useUserActivityMovieInsertMutation, useUserActivityMovieUpdateMutation } from "@/api/users/userMutations";
 import { useTheme } from "@/providers/ThemeProvider";
 import { MediaMovie } from "@recomendapp/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { userKeys } from "@/features/user/userKeys";
 import { upperFirst } from "lodash";
 import { useSharedValue } from "react-native-reanimated";
 import { useTranslations } from "use-intl";
@@ -14,6 +12,8 @@ import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/Toast";
 import { forwardRef, useCallback } from "react";
 import tw from "@/lib/tw";
+import { useUserActivityMovieQuery } from "@/api/users/userQueries";
+import { userKeys } from "@/api/users/userKeys";
 
 interface ButtonUserActivityMovieLikeProps
 	extends React.ComponentProps<typeof Button> {
@@ -125,7 +125,7 @@ const ButtonUserActivityMovieLike = forwardRef<
 			...iconProps,
 		}}
 		style={{
-			...({ backgroundColor: activity?.is_liked ? colors.accentPink : 'transparent' }),
+			...(activity?.is_liked ? { backgroundColor: colors.accentPink } : undefined),
 			...tw`rounded-full`,
 			...style,
 		}}

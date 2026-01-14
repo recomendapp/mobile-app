@@ -1,4 +1,3 @@
-import { useUserDiscoveryInfinite } from "@/features/user/userQueries";
 import tw from "@/lib/tw";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { CardUser } from "../cards/CardUser";
@@ -7,6 +6,7 @@ import { useTranslations } from "use-intl";
 import { upperFirst } from "lodash";
 import { Text } from "../ui/text";
 import { GAP } from "@/theme/globals";
+import { useWidgetUsersQuery } from "@/api/widgets/widgetQueries";
 
 interface WidgetUserDiscoveryProps extends React.ComponentPropsWithoutRef<typeof View> {
   labelStyle?: StyleProp<TextStyle>;
@@ -23,10 +23,10 @@ export const WidgetUserDiscovery = ({
     data: users,
     fetchNextPage,
     hasNextPage,
-  } = useUserDiscoveryInfinite({
+  } = useWidgetUsersQuery({
     filters: {
-      resultsPerPage: 20,
-      order: 'created_at-desc',
+      sortBy: 'created_at',
+      sortOrder: 'desc',
     }
   });
 
