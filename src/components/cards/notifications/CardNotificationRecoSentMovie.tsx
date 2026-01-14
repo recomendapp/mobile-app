@@ -45,7 +45,6 @@ const CardNotificationRecoSentMovieDefault = React.forwardRef<
 	const router = useRouter();
 	const onUserPress = React.useCallback(() => {
 		if (!sender?.username) return;
-		router.canGoBack() && router.back();
 		router.push(`/user/${sender.username}`);
 		onPress?.();
 	}, [router, sender?.username, onPress]);
@@ -109,7 +108,6 @@ const CardNotificationRecoSentMovie = React.forwardRef<
 	const router = useRouter();
 	const navigate = () => {
 		if (props.skeleton) return;
-		router.canGoBack() && router.back();
 		router.push(props.movie?.url as Href);
 		props.onPress?.();
 	};

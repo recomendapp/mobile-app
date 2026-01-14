@@ -41,7 +41,6 @@ const CardNotificationFollowerAcceptedDefault = React.forwardRef<
 	const router = useRouter();
 	const onUserPress = React.useCallback(() => {
 		if (!followee?.username) return;
-		router.canGoBack() && router.back();
 		router.push({
 			pathname: '/user/[username]',
 			params: { username: followee.username }
@@ -88,7 +87,6 @@ const CardNotificationFollowerAccepted = React.forwardRef<
 	const router = useRouter();
 	const navigate = () => {
 		if (props.skeleton) return;
-		router.canGoBack() && router.back();
 		router.push({
 			pathname: '/user/[username]',
 			params: { username: props.followee.username! }

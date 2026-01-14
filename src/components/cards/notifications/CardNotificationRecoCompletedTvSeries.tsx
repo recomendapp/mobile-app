@@ -45,7 +45,6 @@ const CardNotificationRecoCompletedTvSeriesDefault = React.forwardRef<
 	const router = useRouter();
 	const onUserPress = React.useCallback(() => {
 		if (!receiver?.username) return;
-		router.canGoBack() && router.back();
 		router.push(`/user/${receiver.username}`);
 		onPress?.();
 	}, [router, receiver?.username, onPress]);
@@ -109,7 +108,6 @@ const CardNotificationRecoCompletedTvSeries = React.forwardRef<
 	const router = useRouter();
 	const navigate = () => {
 		if (props.skeleton) return;
-		router.canGoBack() && router.back();
 		router.push(props.tvSeries?.url as Href);
 		props.onPress?.();
 	};

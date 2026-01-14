@@ -41,7 +41,6 @@ const CardNotificationFriendCreatedDefault = React.forwardRef<
 	const router = useRouter();
 	const onUserPress = React.useCallback(() => {
 		if (!friend?.username) return;
-		router.canGoBack() && router.back();
 		router.push({
 			pathname: '/user/[username]',
 			params: { username: friend.username }
@@ -88,7 +87,6 @@ const CardNotificationFriendCreated = React.forwardRef<
 	const router = useRouter();
 	const navigate = () => {
 		if (props.skeleton) return;
-		router.canGoBack() && router.back();
 		router.push({
 			pathname: '/user/[username]',
 			params: { username: props.friend.username! }
