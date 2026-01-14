@@ -121,7 +121,7 @@ const ShareUserDefault = ({ user, poster, scale = 1 } : { user: User | Profile, 
 			<Text style={[tw`font-bold`, { fontSize: 16 * scale }]}>
 				{user.full_name}
 				{user?.premium && (
-					<>{' '}<Icons.premium color={colors.accentBlue} size={14} /></>
+					<>{' '}<Icons.premium color={colors.accentBlue} size={10 * scale} /></>
 				)}
 			</Text>
 			<Text textColor="muted" style={{ fontSize: 12 * scale }}>@{user.username}</Text>
