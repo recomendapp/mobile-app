@@ -1,4 +1,5 @@
 import { useAuth } from '@/providers/AuthProvider';
+import { useNotifications } from '@/providers/NotificationsProvider';
 import { ThemeUpdater, useTheme } from '@/providers/ThemeProvider';
 import { Stack } from 'expo-router';
 import { upperFirst } from 'lodash';
@@ -9,6 +10,7 @@ const AppLayout = ({ segment } : { segment: string }) => {
   const { defaultScreenOptions } = useTheme();
   const t = useTranslations();
   const { session } = useAuth();
+  const { isMounted } = useNotifications();
   const initialRouteName = useMemo(() => {
     switch (segment) {
       case '(search)':
@@ -65,6 +67,12 @@ const AppLayout = ({ segment } : { segment: string }) => {
         <Stack.Screen name="settings/subscription" options={{ headerTitle: upperFirst(t('pages.settings.subscription.label')) }} />
         <Stack.Screen name="settings/security" options={{ headerTitle: upperFirst(t('pages.settings.security.label')) }} />
         <Stack.Screen name="settings/notifications" options={{ headerTitle: upperFirst(t('pages.settings.notifications.label')) }} />
+      </Stack.Protected>
+
+      {/* NOTIFICATIONS */}
+      <Stack.Protected guard={!!isMounted}>
+        <Stack.Screen name="notifications" options={{ headerTitle: upperFirst(t('common.messages.notification', { count: 2 })) }} />
+			  <Stack.Screen name="follow-requests" options={{ headerTitle: upperFirst(t('common.messages.follow_requests')) }} />
       </Stack.Protected>
       
       {/* ABOUT */}

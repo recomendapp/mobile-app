@@ -145,6 +145,32 @@ const ModalPlaylistEditGuestsAdd = () => {
 						{upperFirst(t('common.messages.save'))}
 					</Button>
 				),
+				unstable_headerLeftItems: (props) => [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.cancel')),
+						onPress: handleCancel,
+						tintColor: props.tintColor,
+						disabled: isUpsertingGuests,
+						icon: {
+							name: "xmark",
+							type: "sfSymbol",
+						},
+					},
+				],
+				unstable_headerRightItems: (props) => [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.save')),
+						onPress: handleSubmit,
+						tintColor: props.tintColor,
+						disabled: !canSave || isUpsertingGuests,
+						icon: {
+							name: "checkmark",
+							type: "sfSymbol",
+						},
+					},
+				],
 			}}
 		/>
 		<View style={[tw`gap-2`, { paddingHorizontal: PADDING, paddingVertical: PADDING_VERTICAL }]}>

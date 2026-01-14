@@ -12,7 +12,6 @@ import { Stack } from 'expo-router';
 import { enableFreeze, enableScreens } from 'react-native-screens';
 import { useTheme } from '@/providers/ThemeProvider';
 import { useAuth } from '@/providers/AuthProvider';
-import { useNotifications } from '@/providers/NotificationsProvider';
 import { upperFirst } from 'lodash';
 import { useTranslations } from 'use-intl';
 import { Platform } from 'react-native';
@@ -34,7 +33,6 @@ const RootLayoutNav = () => {
   const t = useTranslations();
   const { session } = useAuth();
   const { defaultScreenOptions, isLiquidGlassAvailable } = useTheme();
-  const { isMounted } = useNotifications();
   return (
   <Stack
   initialRouteName='(tabs)'
@@ -133,10 +131,6 @@ const RootLayoutNav = () => {
         } : {}),
       }}
       />
-    </Stack.Protected>
-    {/* NOTIFICATIONS */}
-    <Stack.Protected guard={!!isMounted}>
-      <Stack.Screen name="notifications" options={{ headerShown: false, presentation: 'modal', headerTitle: upperFirst(t('common.messages.notification', { count: 2 })) }} />
     </Stack.Protected>
     {/* AUTH */}
     <Stack.Protected guard={!session}>

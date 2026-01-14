@@ -52,7 +52,6 @@ export const playlistItemsMovieOptions = ({
 			return data;
 		},
 		enabled: !!playlistId,
-		structuralSharing: false,
 	});
 };
 
@@ -78,7 +77,6 @@ export const playlistItemsTvSeriesOptions = ({
 			return data;
 		},
 		enabled: !!playlistId,
-		structuralSharing: false,
 	});
 };
 /* -------------------------------------------------------------------------- */
@@ -108,7 +106,6 @@ export const playlistGuestsOptions = ({
 			return data;
 		},
 		enabled: !!playlistId,
-		structuralSharing: false,
 	});
 };
 

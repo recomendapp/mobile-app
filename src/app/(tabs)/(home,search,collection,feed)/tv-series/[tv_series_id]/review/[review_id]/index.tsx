@@ -17,6 +17,7 @@ import { EnrichedTextInput } from "@/components/RichText/EnrichedTextInput";
 import { GAP, PADDING_HORIZONTAL, PADDING_VERTICAL } from "@/theme/globals";
 import { useUserReviewTvSeriesLike } from "@/api/users/hooks/useUserReviewTvSeriesLike";
 import { useUserReviewTvSeriesQuery } from "@/api/users/userQueries";
+import { NativeStackHeaderItem } from "@react-navigation/native-stack";
 
 const ReviewTvSeriesScreen = () => {
 	const { session } = useAuth();
@@ -63,16 +64,18 @@ const ReviewTvSeriesScreen = () => {
 			</>
 			),
 			unstable_headerRightItems: (props) => [
-				{
-					type: "button",
-					label: upperFirst(t('common.messages.like')),
-					onPress: toggle,
-					icon: {
-						name: isLiked ? "heart.fill" : "heart",
-						type: "sfSymbol",
+				...(session ? [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.like')),
+						onPress: toggle,
+						icon: {
+							name: isLiked ? "heart.fill" : "heart",
+							type: "sfSymbol",
+						},
+						tintColor: isLiked ? colors.accentPink : undefined,
 					},
-					tintColor: isLiked ? colors.accentPink : undefined,
-				},
+				] satisfies NativeStackHeaderItem[] : []),
 				{
 					type: "button",
 					label: upperFirst(t('common.messages.menu')),

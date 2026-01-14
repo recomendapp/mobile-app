@@ -11,13 +11,13 @@ import { upperFirst } from "lodash";
 import { useTranslations } from "use-intl";
 import { useToast } from "@/components/Toast";
 import { useCallback, useMemo } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUserFollowersRequestsQuery } from "@/api/users/userQueries";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const FollowRequestsScreen = () => {
 	const t = useTranslations();
 	const toast = useToast();
-	const insets = useSafeAreaInsets();
+	const { bottomOffset, tabBarHeight } = useTheme();
 	const {
 		data,
 		isLoading,
@@ -94,9 +94,10 @@ const FollowRequestsScreen = () => {
 				gap: GAP,
 				paddingHorizontal: PADDING_HORIZONTAL,
 				paddingTop: PADDING_VERTICAL,
-				paddingBottom: insets.bottom + PADDING_VERTICAL,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 			}
 		]}
+		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		/>
 	</>
 	)

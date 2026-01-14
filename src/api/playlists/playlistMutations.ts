@@ -267,8 +267,9 @@ export const usePlaylistItemsMovieRealtimeMutation = ({
 				new: PlaylistItemMovie;
 			}
 		}) => {
-			const newPlaylistItems = queryClient.getQueryData(playlistItemsOptions.queryKey) || [];
-			if (!newPlaylistItems.length) throw new Error('playlist items is undefined');
+			const cacheData = queryClient.getQueryData(playlistItemsOptions.queryKey);
+			if (!cacheData) throw new Error('No cache data found');
+			const newPlaylistItems = [...cacheData];
 			switch (event) {
 				case 'INSERT':
 					if (payload.new.playlist_id !== playlistId) throw new Error('Invalid playlist id');
@@ -364,8 +365,9 @@ export const usePlaylistItemsTvSeriesRealtimeMutation = ({
 				new: PlaylistItemTvSeries;
 			}
 		}) => {
-			const newPlaylistItems = queryClient.getQueryData(playlistItemsOptions.queryKey) || [];
-			if (!newPlaylistItems.length) throw new Error('playlist items is undefined');
+			const cacheData = queryClient.getQueryData(playlistItemsOptions.queryKey);
+			if (!cacheData) throw new Error('No cache data found');
+			const newPlaylistItems = [...cacheData];
 			switch (event) {
 				case 'INSERT':
 					if (payload.new.playlist_id !== playlistId) throw new Error('Invalid playlist id');
@@ -439,7 +441,6 @@ export const usePlaylistItemsTvSeriesRealtimeMutation = ({
 		}
 	});
 };
-
 
 /* ---------------------------------- ITEMS --------------------------------- */
 // Movie

@@ -18,9 +18,11 @@ import { usePlaylistDetailsQuery } from "@/api/playlists/playlistQueries";
 import { useUserPlaylistLike } from "@/api/users/hooks/useUserPlaylistLike";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useUserPlaylistSaved } from "@/api/users/hooks/useUserPlaylistSaved";
+import { useAuth } from "@/providers/AuthProvider";
 
 const PlaylistScreen = () => {
 	const t = useTranslations();
+	const { session } = useAuth();
 	const { colors } = useTheme();
 	const { playlist_id } = useLocalSearchParams();
 	const playlistId = Number(playlist_id) || undefined;
@@ -56,26 +58,28 @@ const PlaylistScreen = () => {
 				</View>
 			) : undefined,
 			unstable_headerRightItems: (props) => [
-				{
-					type: "button",
-					label: upperFirst(t('common.messages.like')),
-					onPress: toggleLike,
-					icon: {
-						name: isLiked ? "heart.fill" : "heart",
-						type: "sfSymbol",
+				...(session && playlist && session.user.id !== playlist.user_id ? [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.like')),
+						onPress: toggleLike,
+						icon: {
+							name: isLiked ? "heart.fill" : "heart",
+							type: "sfSymbol",
+						},
+						tintColor: isLiked ? colors.accentPink : undefined,
 					},
-					tintColor: isLiked ? colors.accentPink : undefined,
-				},
-				{
-					type: "button",
-					label: upperFirst(t('common.messages.save')),
-					onPress: toggleSaved,
-					icon: {
-						name: isSaved ? "bookmark.fill" : "bookmark",
-						type: "sfSymbol",
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.save')),
+						onPress: toggleSaved,
+						icon: {
+							name: isSaved ? "bookmark.fill" : "bookmark",
+							type: "sfSymbol",
+						},
+						tintColor: isSaved ? colors.foreground : undefined,
 					},
-					tintColor: isSaved ? colors.foreground : undefined,
-				},
+				] as const : []),
 				{
 					type: "button",
 					label: upperFirst(t('common.messages.menu')),

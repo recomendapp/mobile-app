@@ -110,7 +110,7 @@ const ProfilePrivateAccountCard = () => {
 const ProfileScreen = () => {
 	const t = useTranslations();
 	const { username } = useLocalSearchParams<{ username: string }>();
-	const { session } = useAuth();
+	const { session, user } = useAuth();
 	const { colors, bottomOffset, tabBarHeight, isLiquidGlassAvailable } = useTheme();
 	const navigationHeaderHeight = useHeaderHeight();
 	const router = useRouter();
@@ -161,7 +161,10 @@ const ProfileScreen = () => {
 			headerTitleAlign: 'center',
 			headerRight: () => (
 			<>
-				{profile?.id === session?.user.id && (
+				{(
+					profile?.id === session?.user.id
+					|| user?.username === username
+				) && (
 					<Button
 					variant="ghost"
 					size="icon"

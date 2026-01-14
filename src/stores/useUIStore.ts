@@ -3,6 +3,13 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { zustandStorage } from './storage';
 
+interface MapState {
+  center: [number, number]; // [lng, lat]
+  zoom: number;
+  selectedMovieId: number | null;
+}
+
+
 interface UIStore {
   heartPicks: { tab: UserActivityType; view: ViewType };
   setHeartPicksTab: (tab: UserActivityType) => void;
@@ -27,6 +34,10 @@ interface UIStore {
 
   hasOnboarded: boolean;
   setHasOnboarded: (hasOnboarded: boolean) => void;
+
+  map: MapState;
+  setMapCamera: (center: [number, number], zoom: number) => void;
+  setSelectedMovieId: (id: number | null) => void;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -77,6 +88,22 @@ export const useUIStore = create<UIStore>()(
 			// Onboarding
 			hasOnboarded: false,
 			setHasOnboarded: (hasOnboarded) => set({ hasOnboarded }),
+
+			// Map
+			map: {
+				center: [2.5, 48.5],
+				zoom: 8,
+				selectedMovieId: null,
+			},
+			setMapCamera: (center, zoom) =>
+				set(state => ({
+					map: { ...state.map, center, zoom },
+				})),
+			setSelectedMovieId: (id) =>
+				set(state => ({
+					map: { ...state.map, selectedMovieId: id },
+				})),
+
 		}),
 		{
 			name: 'ui-storage',

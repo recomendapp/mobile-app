@@ -38,6 +38,7 @@ interface Item {
 	submenu?: Item[];
 	closeSheet?: boolean;
 	disabled?: boolean;
+	destructive?: boolean;
 }
 
 const BottomSheetPlaylist = forwardRef<
@@ -99,6 +100,7 @@ const BottomSheetPlaylist = forwardRef<
 			},
 			{
 				icon: Icons.Delete,
+				destructive: true,
 				onPress: async () => {
 					Alert.alert(
 						upperFirst(t('common.messages.are_u_sure')),
@@ -204,14 +206,20 @@ const BottomSheetPlaylist = forwardRef<
 				variant='ghost'
 				icon={item.icon}
 				iconProps={{
-					color: colors.mutedForeground,
+					color: item.destructive ? colors.destructive : colors.mutedForeground,
 				}}
 				disabled={item.disabled}
-				style={tw`justify-start h-auto py-4`}
+				style={[
+					tw`justify-start h-auto py-4`,
+				]}
+				textStyle={{
+					color: item.destructive ? colors.destructive : colors.foreground
+				}}
 				onPress={() => {
 					(item.closeSheet === undefined || item.closeSheet === true) && closeSheet(id);
 					item.onPress();
 				}}
+				
 				>
 					{item.label}
 				</Button>

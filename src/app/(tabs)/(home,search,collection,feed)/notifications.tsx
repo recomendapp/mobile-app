@@ -4,7 +4,7 @@ import { View } from "@/components/ui/view";
 import { Icons } from "@/constants/Icons";
 import tw from "@/lib/tw";
 import { useTheme } from "@/providers/ThemeProvider";
-import { GAP } from "@/theme/globals";
+import { GAP, PADDING_VERTICAL } from "@/theme/globals";
 import { LegendList } from "@legendapp/list";
 import { Stack, useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
@@ -22,15 +22,13 @@ import { CardNotificationFollowerCreated } from "@/components/cards/notification
 import { CardNotificationFriendCreated } from "@/components/cards/notifications/CardNotificationFriendCreated";
 import { CardNotificationFollowerRequest } from "@/components/cards/notifications/CardNotificationFollowerRequest";
 import { useToast } from "@/components/Toast";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNotificationsQuery } from "@/api/notifications/notificationQueries";
 
 const NotificationsScreen = () => {
 	const router = useRouter();
 	const t = useTranslations();
 	const toast = useToast();
-	const { colors } = useTheme();
-	const insets = useSafeAreaInsets();
+	const { colors, tabBarHeight, bottomOffset } = useTheme();
 	const { notificationsView, setNotificationsView } = useUIStore((state) => state);
 	const viewOptions = ['all', 'unread', 'archived'] as const;
 	const {
@@ -189,7 +187,7 @@ const NotificationsScreen = () => {
 					variant="ghost"
 					icon={Icons.UserPlus}
 					size="icon"
-					onPress={() => router.push("/notifications/follow-requests")}
+					onPress={() => router.push("/follow-requests")}
 					/>
 					<Button
 					variant="ghost"
@@ -203,6 +201,55 @@ const NotificationsScreen = () => {
 					</Button>
 				</View>
 			),
+			unstable_headerRightItems: (props) => [
+				{
+					type: "button",
+					label: upperFirst(t('common.messages.follow_requests')),
+					onPress: () => router.push("/follow-requests"),
+					tintColor: props.tintColor,
+					icon: {
+						name: "person.badge.plus",
+						type: "sfSymbol",
+					},
+				},
+				{
+					type: "menu",
+					variant: "plain",
+					label: notificationsView === 'all' ? 'All' : notificationsView === 'unread' ? 'Unread' : 'Archived',
+					menu: {
+						items: [
+							{
+								type: 'action',
+								label: 'All',
+								onPress: () => setNotificationsView('all'),
+								icon: {
+									name: notificationsView === 'all' ? "checkmark" : "circle",
+									type: "sfSymbol",
+								},
+							},
+							{
+								type: 'action',
+								label: 'Unread',
+								onPress: () => setNotificationsView('unread'),
+								icon: {
+									name: notificationsView === 'unread' ? "checkmark" : "circle",
+									type: "sfSymbol",
+								},
+							},
+							{
+								type: 'action',
+								label: 'Archived',
+								onPress: () => setNotificationsView('archived'),
+								icon: {
+									name: notificationsView === 'archived' ? "checkmark" : "circle",
+									type: "sfSymbol",
+								},
+							},
+						]
+					}
+					
+				}
+			],
 		}}
 		/>
 		<LegendList
@@ -213,10 +260,10 @@ const NotificationsScreen = () => {
 		contentContainerStyle={[
 			{
 				gap: GAP,
-				paddingBottom: insets.bottom,
+				paddingBottom: bottomOffset + PADDING_VERTICAL,
 			}
 		]}
-		scrollIndicatorInsets={{ bottom: insets.bottom }}
+		scrollIndicatorInsets={{ bottom: tabBarHeight }}
 		ListEmptyComponent={
 			loading ? <Icons.Loader />
 			: <Text textColor="muted" style={tw`text-center p-4`}>{upperFirst(t('common.messages.no_notifications'))}</Text>

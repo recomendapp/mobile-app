@@ -24,6 +24,7 @@ import { useMediaGenresQuery } from "@/api/medias/mediaQueries";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { Input } from "@/components/ui/Input";
 import { useExploreTileMetaQuery, useExploreTileQuery } from "@/api/explore/exploreQueries";
+import { useUIStore } from "@/stores/useUIStore";
 
 const MOVE_DELAY = 500;
 
@@ -32,11 +33,6 @@ const ExploreScreen = () => {
 	const filters = useExploreStore((state) => state.filters);
 	const { colors } = useTheme();
 	const insets = useSafeAreaInsets();
-	const userPosition = useMemo(() => ({
-		latitude: 48.5,
-		longitude: 2.5,
-		zoomLevel: 8,
-	}), []);
 	
 	const headerHeight = useHeaderHeight();
 	const { height: screenHeight } = useWindowDimensions();
@@ -57,6 +53,7 @@ const ExploreScreen = () => {
 	const optionsHeight = useSharedValue(0);
 	
 	// States
+	const { map, setMapCamera } = useUIStore((state) => state);
 	const [selectedMovie, setSelectedMovie] = useState<ExploreTile['features'][number] | null>(null);
 	const [showRecenter, setShowRecenter] = useState(false);
 	
@@ -71,6 +68,22 @@ const ExploreScreen = () => {
 		refetch: refetchTile
 	} = useExploreTileQuery({ exploreId: 1 });
 	const { data: tileMeta } = useExploreTileMetaQuery({ exploreId: 1 });
+
+	// Handlers
+	const handleSaveCameraPosition = useCallback(async () => {
+		if (!mapRef.current) return;
+		try {
+			const center = await mapRef.current.getCenter();
+			const zoom = await mapRef.current.getZoom();
+
+			const lng = center[0];
+			const lat = center[1];
+
+			setMapCamera([lng, lat], zoom);
+		} catch (error) {
+			console.error('Error getting camera position:', error);
+		}
+	}, [setMapCamera]);
 
 	const handleOnLocationPress = useCallback((e: OnPressEvent) => {
 		const location = e.features.at(0) as ExploreTile['features'][number];
@@ -149,6 +162,8 @@ const ExploreScreen = () => {
 		mapStyle={styleJSON}
 		attributionEnabled={false}
 		onRegionDidChange={async () => {
+			handleSaveCameraPosition();
+
 			if (!mapRef.current || !selectedMovie) return;
 
 			try {
@@ -177,8 +192,8 @@ const ExploreScreen = () => {
 			<Camera
 			ref={cameraRef}
 			defaultSettings={{
-				centerCoordinate: [userPosition.longitude, userPosition.latitude],
-				zoomLevel: userPosition.zoomLevel,
+				centerCoordinate: map.center,
+				zoomLevel: map.zoom,
 			}}
 			maxZoomLevel={12}
 			minZoomLevel={7}
@@ -191,7 +206,7 @@ const ExploreScreen = () => {
 				<ShapeSource
 				id="explore-points"
 				shape={tile}
-				onPress={handleOnLocationPress}
+				// onPress={handleOnLocationPress}
 				>
 					<SymbolLayer
 					id="movies"
@@ -301,7 +316,7 @@ const ExploreScreen = () => {
 			</MarkerView> */}
 		</MapView>
 
-		<TrueSheet
+		{/* <TrueSheet
 		ref={searchRef}
 		detents={['auto', 0.8]}
 		initialDetentIndex={0}
@@ -316,7 +331,7 @@ const ExploreScreen = () => {
 			<View>
 				<Text>Test Sheet Content</Text>
 			</View>
-		</TrueSheet>
+		</TrueSheet> */}
 
 		{/* <SearchBottomSheet
 		ref={searchRef}
@@ -331,7 +346,7 @@ const ExploreScreen = () => {
 		onClose={handleOnLocationClose}
       	/> */}
 
-		{/* <Animated.View onLayout={(e) => optionsHeight.value = e.nativeEvent.layout.height} style={[{ position: 'absolute', bottom: insets.bottom + PADDING_VERTICAL, right: PADDING_HORIZONTAL, gap: GAP }, animatedOptionsStyle]}>
+		<Animated.View onLayout={(e) => optionsHeight.value = e.nativeEvent.layout.height} style={[{ position: 'absolute', bottom: insets.bottom + PADDING_VERTICAL, right: PADDING_HORIZONTAL, gap: GAP }, animatedOptionsStyle]}>
 			{showRecenter && (
 				<Button
 				icon={Icons.Navigation}
@@ -348,7 +363,7 @@ const ExploreScreen = () => {
 			index={animatedFiltersIndex}
 			position={animatedFiltersPosition}
 			/>
-		</Animated.View> */}
+		</Animated.View>
 	</>
 	);
 };

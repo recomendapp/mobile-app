@@ -98,10 +98,10 @@ const ModalPlaylistEditGuests = () => {
 	const loading = guestsRequest === undefined || guestsRequestLoading;
 	
 	// Mutations
-	const { mutateAsync: upsertGuestsMutation } = usePlaylistGuestsUpsertMutation({
+	const { mutateAsync: upsertGuestsMutation, isPending: isUpsertingGuests } = usePlaylistGuestsUpsertMutation({
 		playlistId: playlistId,
 	});
-	const { mutateAsync: deleteGuestsMutation } = usePlaylistGuestsDeleteMutation({
+	const { mutateAsync: deleteGuestsMutation, isPending: isDeletingGuests } = usePlaylistGuestsDeleteMutation({
 		playlistId: playlistId,
 	});
 
@@ -253,6 +253,32 @@ const ModalPlaylistEditGuests = () => {
 						{upperFirst(t('common.messages.save'))}
 					</Button>
 				),
+				unstable_headerLeftItems: (props) => [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.cancel')),
+						onPress: handleCancel,
+						tintColor: props.tintColor,
+						disabled: isUpsertingGuests || isDeletingGuests,
+						icon: {
+							name: "xmark",
+							type: "sfSymbol",
+						},
+					},
+				],
+				unstable_headerRightItems: (props) => [
+					{
+						type: "button",
+						label: upperFirst(t('common.messages.save')),
+						onPress: handleSubmit,
+						tintColor: props.tintColor,
+						disabled: !canSave || isUpsertingGuests || isDeletingGuests,
+						icon: {
+							name: "checkmark",
+							type: "sfSymbol",
+						},
+					},
+				],
 			}}
 		/>
 		<View style={[tw`gap-2`, { paddingHorizontal: PADDING_HORIZONTAL, paddingVertical: PADDING_VERTICAL }]}>
