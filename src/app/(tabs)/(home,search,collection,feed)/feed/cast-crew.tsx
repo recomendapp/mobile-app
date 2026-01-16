@@ -38,7 +38,7 @@ const CastCrewFeedScreen = () => {
 		refetch,
 	} = useUserFeedCastCrewQuery();
 	const loading = isLoading || data === undefined;
-	const feed = useMemo(() => data?.pages.flat() || [], [data]);
+	const feed = useMemo(() => data?.pages.flat().filter(item => item.media !== null) || [], [data]);
 	// Render
 	const renderItem = useCallback(({ item } : { item: Database['public']['Functions']['get_feed_cast_crew']['Returns'][number], index: number }) => {
 		switch (item.media_type) {
