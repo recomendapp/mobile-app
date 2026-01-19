@@ -71,6 +71,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			ITSAppUsesNonExemptEncryption: false,
 			// UIDesignRequiresCompatibility: true, // Disable iOS 26 Liquid Glass effect
 			NSLocationWhenInUseUsageDescription: 'Your location is used to show relevant content based on where you are.',
+			NSCameraUsageDescription: "The camera is used to upload profile pictures, playlist covers, and story background images.",
+			NSPhotoLibraryUsageDescription: "Photos are used to select profile images, playlist covers, and shared story backgrounds.",
 		},
 		usesAppleSignIn: true,
 	},
@@ -132,7 +134,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		],
 		[
 			'expo-image-picker', {
-				photosPermission: 'The app accesses your photos to let you share them with your friends.',
+				photosPermission: 'Select images to upload profile pictures, playlist covers, and story backgrounds.',
 			}
 		],
 		'expo-secure-store',
