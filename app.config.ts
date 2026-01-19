@@ -235,5 +235,5 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			projectId: getProjectId(),
 		},
 	},
-	owner: 'lxup',
+	owner: 'recomend',
 });
